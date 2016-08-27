@@ -16,6 +16,7 @@ namespace osu.Desktop
             BasicGameHost host = Host.GetSuitableHost();
             host.Load(new OsuGame());
             host.Run();
+            
         }
     }
 }
