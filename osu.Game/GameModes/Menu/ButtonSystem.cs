@@ -264,9 +264,9 @@ namespace osu.Game.GameModes.Menu
         {
             //if (OsuGame.IdleTime > 6000 && State != MenuState.Exit)
             //    State = MenuState.Initial;
-            
-            if (state == MenuState.Exit && osuLogo.Alpha <= 0)                        
-                System.Environment.Exit(1);            
+
+            if (state == MenuState.Exit && osuLogo.Alpha <= 0)
+                Game.Exit();
 
             iconFacade.Width = osuLogo.SizeForFlow * 0.5f;
             base.Update();
