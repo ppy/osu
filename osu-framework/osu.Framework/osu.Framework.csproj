@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(SolutionDir)\packages\SharpFont.3.1.0\build\SharpFont.props" Condition="Exists('$(SolutionDir)\packages\SharpFont.3.1.0\build\SharpFont.props')" />
+  <Import Project="$(SolutionDir)\packages\SharpFont.Dependencies.2.6\build\SharpFont.Dependencies.props" Condition="Exists('$(SolutionDir)\packages\SharpFont.Dependencies.2.6\build\SharpFont.Dependencies.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>osu.Framework</RootNamespace>
+    <AssemblyName>osu.Framework</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ManagedBass, Version=0.23.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\ManagedBass.0.23.2\lib\net45\ManagedBass.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ManagedBass.PInvoke, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\ManagedBass.PInvoke.0.4.1\lib\net45\ManagedBass.PInvoke.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.1.1.2225.2\lib\net20\OpenTK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="OpenTK.GLControl, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.GLControl.1.1.2225.0\lib\net40\OpenTK.GLControl.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SharpFont, Version=3.0.1.200, Culture=neutral, PublicKeyToken=48add4c483071cdf, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\SharpFont.3.1.0\lib\net20\SharpFont.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Cached\Cached.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\MatrixExtensions\MatrixExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\PolygonExtensions\IConvexPolygonExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\PolygonExtensions\IPolygonExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\RectangleExtensions\RectangleExtensions.cs" />
+    <Compile Include="Audio\AdjustableAudioComponent.cs" />
+    <Compile Include="Audio\AudioCollectionManager.cs" />
+    <Compile Include="Audio\IHasCompletedState.cs" />
+    <Compile Include="Audio\Sample\AudioSampleBass.cs" />
+    <Compile Include="Audio\Sample\SampleManager.cs" />
+    <Compile Include="Audio\Track\TrackManager.cs" />
+    <Compile Include="Extensions\GeneralExtensions.cs" />
+    <Compile Include="IO\File\FileSafety.cs" />
+    <Compile Include="IO\Network\UrlEncoding.cs" />
+    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Threading\Delegates.cs" />
+    <Compile Include="Configuration\Bindable.cs" />
+    <Compile Include="Configuration\BindableBool.cs" />
+    <Compile Include="Configuration\BindableDouble.cs" />
+    <Compile Include="Configuration\BindableInt.cs" />
+    <Compile Include="Configuration\ConfigManager.cs" />
+    <Compile Include="Configuration\IBindable.cs" />
+    <Compile Include="Configuration\IHasObjectValue.cs" />
+    <Compile Include="Configuration\IValueChangedObservable.cs" />
+    <Compile Include="Configuration\SafeWriteStream.cs" />
+    <Compile Include="Audio\AudioManager.cs" />
+    <Compile Include="GameModes\GameMode.cs" />
+    <Compile Include="Graphics\Containers\AutoSizeContainer.cs" />
+    <Compile Include="Graphics\Sprites\NativeScaleSprite.cs" />
+    <Compile Include="Graphics\Sprites\Sprite.cs" />
+    <Compile Include="Graphics\Sprites\SpriteCircular.cs" />
+    <Compile Include="Graphics\Sprites\SpriteText.cs" />
+    <Compile Include="Graphics\Textures\PrefixTextureStore.cs" />
+    <Compile Include="IO\AsyncBufferStream.cs" />
+    <Compile Include="Audio\Sample\AudioSample.cs" />
+    <Compile Include="Audio\Track\AudioTrack.cs" />
+    <Compile Include="Audio\Track\AudioTrackBass.cs" />
+    <Compile Include="Audio\Track\AudioTrackVirtual.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Framework\Window.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Game.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Framework\BasicGameHost.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Framework\BasicGameWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Framework\GLControl.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Batches\LinearBatch.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Batches\QuadBatch.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Batches\VertexBatch.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Containers\BufferedContainer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Containers\Container.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Containers\MaskingContainer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Drawable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Drawable_TransformationHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\DrawInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\OpenGL\Buffers\FrameBuffer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\OpenGL\Buffers\LinearVertexBuffer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\OpenGL\Buffers\QuadVertexBuffer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\OpenGL\Buffers\RenderBuffer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\OpenGL\Buffers\VertexBuffer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\OpenGL\GLWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\OpenGL\Textures\TextureGL.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\OpenGL\Textures\TextureGLSingle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\OpenGL\Textures\TextureGLSub.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\OpenGL\Vertex.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Primitives\IConvexPolygon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Primitives\IPolygon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Primitives\Line.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Primitives\ProjectionRange.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Primitives\Quad.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Primitives\RectangleF.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Primitives\Triangle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Shaders\Shader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Shaders\ShaderManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Shaders\ShaderPart.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Shaders\Uniform.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Shaders\UniformBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Transformations\EasingTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Transformations\Transformation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphics\Transformations\TransformationType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Lists\IHasLifetime.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Lists\IReadOnlyList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Lists\LifetimeList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Lists\ReadOnlyList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Lists\SortedList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MathUtils\Interpolation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timing\DecoupleableInterpolatingFramedClock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timing\FramedClock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timing\FramedOffsetClock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timing\IAdjustableClock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timing\IClock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timing\IFrameBasedClock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timing\InterpolatingFramedClock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timing\ManualClock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timing\OffsetClock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timing\StopwatchClock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timing\ThrottledFrameClock.cs" />
+    <Compile Include="Graphics\Batches\IVertexBatch.cs" />
+    <Compile Include="Graphics\Containers\FlowContainer.cs" />
+    <Compile Include="Graphics\Containers\LargeContainer.cs" />
+    <Compile Include="Graphics\Containers\ProcessingContainer.cs" />
+    <Compile Include="Graphics\Drawables\Box.cs" />
+    <Compile Include="Graphics\Drawable_Interaction.cs" />
+    <Compile Include="Resources\CachedResourceStore.cs" />
+    <Compile Include="Resources\ChangeableResourceStore.cs" />
+    <Compile Include="Resources\DllResourceStore.cs" />
+    <Compile Include="Resources\FileSystemResourceStore.cs" />
+    <Compile Include="Resources\GlyphStore.cs" />
+    <Compile Include="Resources\IResourceStore.cs" />
+    <Compile Include="Resources\NamespacedResourceStore.cs" />
+    <Compile Include="Resources\ResourceStore.cs" />
+    <Compile Include="Graphics\Textures\Texture.cs" />
+    <Compile Include="Graphics\Textures\TextureAtlas.cs" />
+    <Compile Include="Graphics\Textures\TextureLoader.cs" />
+    <Compile Include="Input\Handlers\ICursorInputHandler.cs" />
+    <Compile Include="Input\Handlers\IKeyboardInputHandler.cs" />
+    <Compile Include="Input\Handlers\InputHandler.cs" />
+    <Compile Include="Input\Handlers\Keyboard\FormKeyboardHandler.cs" />
+    <Compile Include="Input\Handlers\Keyboard\OpenTKKeyboardHandler.cs" />
+    <Compile Include="Input\Handlers\Mouse\CursorMouseHandler.cs" />
+    <Compile Include="Input\Handlers\Mouse\FormMouseHandler.cs" />
+    <Compile Include="Input\InputManager.cs" />
+    <Compile Include="Input\InputState.cs" />
+    <Compile Include="Input\KeyboardState.cs" />
+    <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Input\UserInputManager.cs" />
+    <Compile Include="IUpdateable.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Graphics\Textures\TextureStore.cs" />
+    <Compile Include="RuntimeInfo.cs" />
+    <Compile Include="Framework\BasicGameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Threading\Scheduler.cs" />
+    <Compile Include="Threading\SleepHandle.cs" />
+    <Compile Include="Threading\SleepScheduler.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\osu-framework.licenseheader">
+      <Link>osu-framework.licenseheader</Link>
+    </None>
+    <None Include="packages.config" />
+    <EmbeddedResource Include="Shaders\sh_Bloom.fs" />
+    <EmbeddedResource Include="Shaders\sh_Blur2D.h" />
+    <EmbeddedResource Include="Shaders\sh_BlurHorizontal.fs" />
+    <EmbeddedResource Include="Shaders\sh_BlurVertical.fs" />
+    <EmbeddedResource Include="Shaders\sh_Colour.fs" />
+    <EmbeddedResource Include="Shaders\sh_Colour.vs" />
+    <EmbeddedResource Include="Shaders\sh_Particle.vs" />
+    <EmbeddedResource Include="Shaders\sh_Position.vs" />
+    <EmbeddedResource Include="Shaders\sh_Texture.fs" />
+    <EmbeddedResource Include="Shaders\sh_Texture2D.vs" />
+    <EmbeddedResource Include="Shaders\sh_Texture3D.vs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\packages\SharpFont.Dependencies.2.6\build\SharpFont.Dependencies.props')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\SharpFont.Dependencies.2.6\build\SharpFont.Dependencies.props'))" />
+    <Error Condition="!Exists('$(SolutionDir)\packages\SharpFont.3.1.0\build\SharpFont.props')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\SharpFont.3.1.0\build\SharpFont.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

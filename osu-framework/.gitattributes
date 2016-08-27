@@ -1,0 +1,19 @@
+# This won't normalise line endings, but it will ensure that merge drivers use CRLF
+* -text eol=crlf
+
+# Currently in-use binary file extensions
+*.blend  binary
+*.bmp    binary
+*.dll    binary
+*.exe    binary
+*.icns   binary
+*.ico    binary
+*.jpg    binary
+*.osz2   binary
+*.pdn    binary
+*.psd    binary
+*.PSD    binary
+*.tga    binary
+*.ttf    binary
+*.wav    binary
+*.xnb    binary
