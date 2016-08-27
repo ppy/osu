@@ -23,6 +23,8 @@ namespace osu.Game
             Window.Size = new Size(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
             Window.OnSizeChanged += window_OnSizeChanged;
 
+            Window.Title = "osu!";
+
             AddProcessingContainer(new RatioAdjust());
 
             //Add(new FontTest());
