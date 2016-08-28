@@ -57,6 +57,7 @@
     <Compile Include="Graphics\Cursor\CursorContainer.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\TextAwesome.cs" />
+    <Compile Include="Graphics\UserInterface\TextBox.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
     <Compile Include="Online\API\APIRequest.cs" />
     <Compile Include="Online\API\OAuth.cs" />
