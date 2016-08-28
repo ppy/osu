@@ -23,6 +23,8 @@ namespace osu.Game
             Window.Size = new Size(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
             Window.OnSizeChanged += window_OnSizeChanged;
 
+            if(Config.Get<bool>(OsuConfig.Maximized)) Window.IsMaximized = true;
+
             AddProcessingContainer(new RatioAdjust());
 
             //Add(new FontTest());
@@ -33,8 +35,13 @@ namespace osu.Game
 
         private void window_OnSizeChanged()
         {
-            Config.Set<int>(OsuConfig.Width, Window.Size.Width);
-            Config.Set<int>(OsuConfig.Height, Window.Size.Height);
+            // Don't store window sizes for minimized windows
+            if(!Window.IsMinimized)
+            {
+                Config.Set<int>(OsuConfig.Width, Window.Size.Width);
+                Config.Set<int>(OsuConfig.Height, Window.Size.Height);
+                Config.Set<bool>(OsuConfig.Maximized, Window.IsMaximized);
+            }
         }
     }
 }
