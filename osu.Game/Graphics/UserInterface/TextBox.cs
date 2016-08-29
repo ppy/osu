@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
         internal event OnCommitHandler OnCommit;
         public event OnCommitHandler OnChange;
 
-        internal float TextSize { get; private set; }
+        internal float SpaceWidth = 10;
 
         float length;
 
@@ -69,7 +69,7 @@ namespace osu.Game.Graphics.UserInterface
             textFlow = new FlowContainer()
             {
                 Direction = FlowDirection.HorizontalOnly,
-                //Padding = new Vector2(-TextSize / 3, 0)
+                //Padding = new Vector2(-SpaceWidth / 3, 0)
             };
 
             cursor = new Box()
@@ -278,19 +278,19 @@ namespace osu.Game.Graphics.UserInterface
 
             if (char.IsWhiteSpace(c))
             {
-                float width = TextSize / 2;
+                float width = SpaceWidth / 2;
 
                 switch ((int)c)
                 {
                     case 0x3000: //double-width space
-                        width = TextSize;
+                        width = SpaceWidth;
                         break;
                 }
 
                 textFlow.Add(ch = new Container()
                 {
                     SizeMode = InheritMode.None,
-                    Size = new Vector2(width, TextSize),
+                    Size = new Vector2(width, SpaceWidth),
                     Depth = selectionLeft
                 });
             }
@@ -335,7 +335,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Drawable ch = AddCharacterToFlow(c);
 
-            ch.Position = new Vector2(0, TextSize);
+            ch.Position = new Vector2(0, SpaceWidth);
             ch.MoveToY(0, 200, EasingTypes.OutExpo);
 
             text = text.Insert(selectionLeft, c.ToString());
