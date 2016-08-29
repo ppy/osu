@@ -12,12 +12,13 @@ using OpenTK.Input;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
+using osu.Framework.Threading;
 
 namespace osu.Game.Graphics.UserInterface
 {
     internal class TextBox : MaskingContainer
     {
-        private readonly FlowContainer textFlow;
+        private FlowContainer textFlow;
         private Box background;
         protected Box cursor;
         protected Container TextContainer;
@@ -42,22 +43,10 @@ namespace osu.Game.Graphics.UserInterface
 
         internal float SpaceWidth = 10;
 
-        float length;
+        private Scheduler textUpdateScheduler = new Scheduler();
 
-        public TextBox(string text, float size, Vector2 pos, float length)
+        public override void Load()
         {
-            TextSize = size;
-            Position = pos;
-            this.length = length;
-
-            if (length == 0)
-            {
-                length = 1;
-                SizeMode = InheritMode.X;
-            }
-
-            Size = new Vector2(length, size);
-
             Add(background = new Box()
             {
                 Colour = BackgroundUnfocused,
@@ -82,8 +71,6 @@ namespace osu.Game.Graphics.UserInterface
             TextContainer.Add(cursor);
 
             TextContainer.Add(textFlow);
-
-            Text = text;
         }
 
         private void resetSelection()
@@ -112,6 +99,8 @@ namespace osu.Game.Graphics.UserInterface
             //have to run this after children flow
             cursorAndLayout.Refresh(delegate
             {
+                textUpdateScheduler.Update();
+
                 Vector2 cursorPos = Vector2.Zero;
                 if (text.Length > 0)
                     cursorPos.X = getPositionAt(selectionLeft);
@@ -358,15 +347,18 @@ namespace osu.Game.Graphics.UserInterface
                 if (value == text)
                     return;
 
-                int startBefore = selectionStart;
-                selectionStart = selectionEnd = 0;
-                textFlow.Clear();
-                text = string.Empty;
+                textUpdateScheduler.Add(delegate
+                {
+                    int startBefore = selectionStart;
+                    selectionStart = selectionEnd = 0;
+                    textFlow?.Clear();
+                    text = string.Empty;
 
-                foreach (char c in value)
-                    addCharacter(c);
+                    foreach (char c in value)
+                        addCharacter(c);
 
-                selectionStart = MathHelper.Clamp(startBefore, 0, text.Length);
+                    selectionStart = MathHelper.Clamp(startBefore, 0, text.Length);
+                }, true);
 
                 cursorAndLayout.Invalidate();
             }
