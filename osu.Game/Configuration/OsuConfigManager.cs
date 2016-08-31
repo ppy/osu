@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
+using osu.Game.Online.API;
 
 namespace osu.Game.Configuration
 {
@@ -13,6 +14,10 @@ namespace osu.Game.Configuration
             Set(OsuConfig.Height, 768);
             Set(OsuConfig.Maximized, false);
             Set(OsuConfig.MouseSensitivity, 1.0);
+
+            Set(OsuConfig.Username, string.Empty);
+            Set(OsuConfig.Password, string.Empty);
+            Set(OsuConfig.Token, string.Empty);
         }
     }
 
@@ -22,5 +27,8 @@ namespace osu.Game.Configuration
         Height,
         Maximized,
         MouseSensitivity,
+        Username,
+        Password,
+        Token
     }
 }

@@ -1,12 +1,15 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using System.Drawing;
 using osu.Framework.Framework;
 using osu.Game.Configuration;
 using osu.Game.GameModes.Menu;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game
 {
@@ -16,6 +19,8 @@ namespace osu.Game
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
+        internal APIAccess API;
+
         public override void Load()
         {
             base.Load();
@@ -24,6 +29,19 @@ namespace osu.Game
             Window.OnSizeChanged += window_OnSizeChanged;
 
             if(Config.Get<bool>(OsuConfig.Maximized)) Window.IsMaximized = true;
+			
+            API = new APIAccess()
+            {
+                Username = Config.Get<string>(OsuConfig.Username),
+                Password = Config.Get<string>(OsuConfig.Password),
+                Token = Config.Get<string>(OsuConfig.Token)
+            };
+
+            //var req = new ListChannelsRequest();
+            //req.Success += content =>
+            //{
+            //};
+            //API.Queue(req);
 
             AddProcessingContainer(new RatioAdjust());
 
@@ -31,6 +49,14 @@ namespace osu.Game
 
             Add(new MainMenu());
             Add(new CursorContainer());
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            //refresh token may have changed.
+            Config.Set(OsuConfig.Token, API.Token);
+
+            base.Dispose(isDisposing);
         }
 
         private void window_OnSizeChanged()
