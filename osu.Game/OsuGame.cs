@@ -10,7 +10,6 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.Social;
 
 namespace osu.Game
 {

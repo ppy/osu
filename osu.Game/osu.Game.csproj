@@ -64,8 +64,8 @@
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
     <Compile Include="Online\API\SecurePassword.cs" />
     <Compile Include="Online\API\Requests\ListChannels.cs" />
-    <Compile Include="Online\Social\Channel.cs" />
-    <Compile Include="Online\Social\Message.cs" />
+    <Compile Include="Online\Chat\Channel.cs" />
+    <Compile Include="Online\Chat\Message.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

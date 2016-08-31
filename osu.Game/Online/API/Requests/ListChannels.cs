@@ -2,7 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Game.Online.Social;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Online.API.Requests
 {

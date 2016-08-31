@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.IO.Network;
-using osu.Game.Online.Social;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Online.API.Requests
 {
