@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\BeatmapSet.cs" />
+    <Compile Include="Beatmaps\Metadata.cs" />
     <Compile Include="Beatmaps\Objects\HitObject.cs" />
     <Compile Include="Beatmaps\Samples\HitSampleInfo.cs" />
     <Compile Include="Beatmaps\Samples\SampleBank.cs" />
