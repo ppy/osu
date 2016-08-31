@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps.Objects;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
@@ -10,6 +11,8 @@ namespace osu.Game.Beatmaps
     public class Beatmap
     {
         public List<HitObject> HitObjects;
+
+        public List<ControlPoint> ControlPoints;
 
         public string Difficulty;
         public User Creator;

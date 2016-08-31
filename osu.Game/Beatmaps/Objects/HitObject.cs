@@ -13,6 +13,6 @@ namespace osu.Game.Beatmaps.Objects
         public double StartTime;
         public double? EndTime;
 
-        public SampleInfo Sample;
+        public HitSampleInfo Sample;
     }
 }
