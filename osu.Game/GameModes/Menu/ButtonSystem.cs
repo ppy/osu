@@ -277,7 +277,7 @@ namespace osu.Game.GameModes.Menu
             private Sprite logo;
             private Container logoBounceContainer;
             private MenuVisualisation vis;
-            private VoidDelegate clickAction;
+            private Action clickAction;
 
             public float SizeForFlow => logo == null ? 0 : logo.ActualSize.X * logo.Scale * logoBounceContainer.Scale * 0.8f;
 
@@ -319,7 +319,7 @@ namespace osu.Game.GameModes.Menu
                 });
             }
 
-            public OsuLogo(VoidDelegate action)
+            public OsuLogo(Action action)
             {
                 clickAction = action;
             }
@@ -396,14 +396,14 @@ namespace osu.Game.GameModes.Menu
             private TextAwesome icon;
             private string internalName;
             private readonly FontAwesome symbol;
-            private VoidDelegate clickAction;
+            private Action clickAction;
             private readonly float extraWidth;
             private Key triggerKey;
             private string text;
 
             public override Quad ScreenSpaceInputQuad => box.ScreenSpaceInputQuad;
 
-            public Button(string text, string internalName, FontAwesome symbol, Color4 colour, VoidDelegate clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
+            public Button(string text, string internalName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
             {
                 this.internalName = internalName;
                 this.symbol = symbol;

@@ -118,7 +118,7 @@ namespace osu.Game.GameModes
                 Colour = colour ?? Color4.White;
             }
 
-            internal event VoidDelegate Activated;
+            internal event Action Activated;
 
             protected override bool OnClick(InputState state)
             {
