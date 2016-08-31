@@ -27,8 +27,6 @@ namespace osu.Game
 
             Window.Size = new Size(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
             Window.OnSizeChanged += window_OnSizeChanged;
-
-            if(Config.Get<bool>(OsuConfig.Maximized)) Window.IsMaximized = true;
 			
             API = new APIAccess()
             {
@@ -66,7 +64,6 @@ namespace osu.Game
             {
                 Config.Set<int>(OsuConfig.Width, Window.Size.Width);
                 Config.Set<int>(OsuConfig.Height, Window.Size.Height);
-                Config.Set<bool>(OsuConfig.Maximized, Window.IsMaximized);
             }
         }
     }

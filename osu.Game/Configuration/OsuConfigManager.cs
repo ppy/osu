@@ -12,7 +12,6 @@ namespace osu.Game.Configuration
         {
             Set(OsuConfig.Width, 1366);
             Set(OsuConfig.Height, 768);
-            Set(OsuConfig.Maximized, false);
             Set(OsuConfig.MouseSensitivity, 1.0);
 
             Set(OsuConfig.Username, string.Empty);
@@ -25,7 +24,6 @@ namespace osu.Game.Configuration
     {
         Width,
         Height,
-        Maximized,
         MouseSensitivity,
         Username,
         Password,
