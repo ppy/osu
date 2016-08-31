@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\ppy.OpenTK.1.1.2225.2\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
@@ -51,6 +57,15 @@
     <Compile Include="Graphics\Cursor\CursorContainer.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\TextAwesome.cs" />
+    <Compile Include="Online\API\APIAccess.cs" />
+    <Compile Include="Online\API\APIRequest.cs" />
+    <Compile Include="Online\API\OAuth.cs" />
+    <Compile Include="Online\API\OAuthToken.cs" />
+    <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
+    <Compile Include="Online\API\SecurePassword.cs" />
+    <Compile Include="Online\API\Requests\ListChannels.cs" />
+    <Compile Include="Online\Social\Channel.cs" />
+    <Compile Include="Online\Social\Message.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
