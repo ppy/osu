@@ -59,7 +59,7 @@ namespace osu.Game
 
         private void window_OnSizeChanged()
         {
-            // Don't store window sizes for minimized windows
+            //don't store window size if window is minimized
             if(!Window.IsMinimized)
             {
                 Config.Set<int>(OsuConfig.Width, Window.Size.Width);
