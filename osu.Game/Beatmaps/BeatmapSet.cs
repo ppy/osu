@@ -13,8 +13,7 @@ namespace osu.Game.Beatmaps
     {
         public List<Beatmap> Beatmaps { get; protected set; }
 
-        public string Artist;
-        public string Title;
+        public Metadata Metadata;
 
         public User Creator;
     }
