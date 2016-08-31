@@ -27,7 +27,7 @@ namespace osu.Game
 
             Window.Size = new Size(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
             Window.OnSizeChanged += window_OnSizeChanged;
-			
+
             API = new APIAccess()
             {
                 Username = Config.Get<string>(OsuConfig.Username),
