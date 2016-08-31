@@ -284,13 +284,16 @@ namespace osu.Game.GameModes.Menu
             public override void Load()
             {
                 base.Load();
-                logoBounceContainer = new AutoSizeContainer();
+
+                Add(logoBounceContainer = new AutoSizeContainer());
 
                 logo = new Sprite(Game.Textures.Get(@"menu-osu"))
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 };
+
+                logoBounceContainer.Add(logo);
 
                 Sprite ripple = new Sprite(Game.Textures.Get(@"menu-osu"))
                 {
@@ -299,16 +302,12 @@ namespace osu.Game.GameModes.Menu
                     Alpha = 0.4f
                 };
 
+                logoBounceContainer.Add(ripple);
+
                 ripple.ScaleTo(1.1f, 500);
                 ripple.FadeOut(500);
-                ripple.Transformations.ForEach(t =>
-                {
-                    t.Loop = true;
-                    t.LoopDelay = 300;
-                });
+                ripple.Loop(300);
 
-                logoBounceContainer.Add(logo);
-                logoBounceContainer.Add(ripple);
                 logoBounceContainer.Add(vis = new MenuVisualisation()
                 {
                     Anchor = Anchor.Centre,
@@ -318,7 +317,6 @@ namespace osu.Game.GameModes.Menu
                     //Radius = logo.Size.X / 2 * 0.96f,
                     Alpha = 0.2f,
                 });
-                Add(logoBounceContainer);
             }
 
             public OsuLogo(VoidDelegate action)
@@ -479,14 +477,72 @@ namespace osu.Game.GameModes.Menu
                 icon.RotateTo(10, offset, EasingTypes.InOutSine);
                 icon.ScaleTo(new Vector2(1, 0.9f), offset, EasingTypes.Out);
 
-                icon.Transformations.Add(new Transformation(TransformationType.Rotation, -10, 10, startTime, startTime + duration * 2, EasingTypes.InOutSine) { Loop = true, LoopDelay = duration * 2 });
-                icon.Transformations.Add(new Transformation(Vector2.Zero, new Vector2(0, -10), startTime, startTime + duration, EasingTypes.Out) { Loop = true, LoopDelay = duration });
-                icon.Transformations.Add(new Transformation(TransformationType.VectorScale, new Vector2(1, 0.9f), Vector2.One, startTime, startTime + duration, EasingTypes.Out) { Loop = true, LoopDelay = duration });
+                icon.Transformations.Add(new TransformRotation(Clock)
+                {
+                    StartValue = -10,
+                    EndValue = 10,
+                    StartTime = startTime,
+                    EndTime = startTime + duration * 2,
+                    Easing = EasingTypes.InOutSine,
+                    LoopCount = -1,
+                    LoopDelay = duration * 2
+                });
 
-                icon.Transformations.Add(new Transformation(new Vector2(0, -10), Vector2.Zero, startTime + duration, startTime + duration * 2, EasingTypes.In) { Loop = true, LoopDelay = duration });
-                icon.Transformations.Add(new Transformation(TransformationType.VectorScale, Vector2.One, new Vector2(1, 0.9f), startTime + duration, startTime + duration * 2, EasingTypes.In) { Loop = true, LoopDelay = duration });
+                icon.Transformations.Add(new TransformPosition(Clock)
+                {
+                    StartValue = Vector2.Zero,
+                    EndValue = new Vector2(0, -10),
+                    StartTime = startTime,
+                    EndTime = startTime + duration,
+                    Easing = EasingTypes.Out,
+                    LoopCount = -1,
+                    LoopDelay = duration
+                });
 
-                icon.Transformations.Add(new Transformation(TransformationType.Rotation, 10, -10, startTime + duration * 2, startTime + duration * 4, EasingTypes.InOutSine) { Loop = true, LoopDelay = duration * 2 });
+                icon.Transformations.Add(new TransformScaleVector(Clock)
+                {
+                    StartValue = new Vector2(1, 0.9f),
+                    EndValue = Vector2.One,
+                    StartTime = startTime,
+                    EndTime = startTime + duration,
+                    Easing = EasingTypes.Out,
+                    LoopCount = -1,
+                    LoopDelay = duration
+                });
+
+                icon.Transformations.Add(new TransformPosition(Clock)
+                {
+                    StartValue = new Vector2(0, -10),
+                    EndValue = Vector2.Zero,
+                    StartTime = startTime + duration,
+                    EndTime = startTime + duration * 2,
+                    Easing = EasingTypes.In,
+                    LoopCount = -1,
+                    LoopDelay = duration
+                });
+
+                icon.Transformations.Add(new TransformScaleVector(Clock)
+                {
+                    StartValue = Vector2.One,
+                    EndValue = new Vector2(1, 0.9f),
+                    StartTime = startTime + duration,
+                    EndTime = startTime + duration * 2,
+                    Easing = EasingTypes.In,
+                    LoopCount = -1,
+                    LoopDelay = duration
+                });
+
+                icon.Transformations.Add(new TransformRotation(Clock)
+                {
+                    StartValue = 10,
+                    EndValue = -10,
+                    StartTime = startTime + duration * 2,
+                    EndTime = startTime + duration * 4,
+                    Easing = EasingTypes.InOutSine,
+                    LoopCount = -1,
+                    LoopDelay = duration * 2
+                });
+
                 return true;
             }
 
