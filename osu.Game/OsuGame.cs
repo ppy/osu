@@ -59,8 +59,12 @@ namespace osu.Game
 
         private void window_OnSizeChanged()
         {
-            Config.Set(OsuConfig.Width, Window.Size.Width);
-            Config.Set(OsuConfig.Height, Window.Size.Height);
+            //don't store window size if window is minimized
+            if(!Window.IsMinimized)
+            {
+                Config.Set<int>(OsuConfig.Width, Window.Size.Width);
+                Config.Set<int>(OsuConfig.Height, Window.Size.Height);
+            }
         }
     }
 }
