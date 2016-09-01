@@ -139,10 +139,14 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         cursor.FadeTo(0.5f, 200, EasingTypes.Out);
                         cursor.FadeColour(Color4.White, 200, EasingTypes.Out);
-                        cursor.Transformations.Add(new Transformation(TransformationType.Fade, 0.5f, 0.2f, Time + 200, Time + 200 + /*(OsuGame.Audio.BeatSyncing ? (int)OsuGame.Audio.BeatLength : */500)
+                        cursor.Transformations.Add(new TransformAlpha(Clock)
                         {
+                            StartValue = 0.5f,
+                            EndValue = 0.2f,
+                            StartTime = Time,
+                            EndTime = Time + 500,
                             Easing = EasingTypes.InOutSine,
-                            Loop = true
+                            LoopCount = -1,
                         });
                     }
                 }
