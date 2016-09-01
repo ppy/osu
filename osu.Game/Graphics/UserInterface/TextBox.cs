@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using osu.Framework;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Drawables;
 using OpenTK.Graphics;
@@ -58,7 +59,6 @@ namespace osu.Game.Graphics.UserInterface
             textFlow = new FlowContainer()
             {
                 Direction = FlowDirection.HorizontalOnly,
-                //Padding = new Vector2(-SpaceWidth / 3, 0)
             };
 
             cursor = new Box()
@@ -223,7 +223,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (oldStart != selectionStart || oldEnd != selectionEnd)
             {
-                Game.Audio.Sample.GetSample(@"key-movement");
+                Game.Audio.Sample.Get(@"Keyboard/key-movement")?.Play();
                 cursorAndLayout.Invalidate();
             }
         }
@@ -239,7 +239,7 @@ namespace osu.Game.Graphics.UserInterface
             if (count == 0) return false;
 
             if (sound)
-                Game.Audio.Sample.GetSample(@"key-delete");
+                Game.Audio.Sample.Get(@"Keyboard/key-delete")?.Play();
 
             for (int i = 0; i < count; i++)
             {
@@ -504,9 +504,9 @@ namespace osu.Game.Graphics.UserInterface
             if (!string.IsNullOrEmpty(str))
             {
                 if (state.Keyboard.ShiftPressed)
-                    Game.Audio.Sample.GetSample(@"key-caps");
+                    Game.Audio.Sample.Get(@"Keyboard/key-caps")?.Play();
                 else
-                    Game.Audio.Sample.GetSample($@"key-press-{RNG.Next(1, 5)}");
+                    Game.Audio.Sample.Get($@"Keyboard/key-press-{RNG.Next(1, 5)}")?.Play();
                 insertString(str);
 
                 return true;
@@ -576,7 +576,7 @@ namespace osu.Game.Graphics.UserInterface
                 background.ClearTransformations();
                 background.FlashColour(BackgroundCommit, 400);
 
-                Game.Audio.Sample.GetSample(@"key-confirm");
+                Game.Audio.Sample.Get(@"Keyboard/key-confirm")?.Play();
                 OnCommit?.Invoke(this, true);
             }
             else
@@ -628,7 +628,7 @@ namespace osu.Game.Graphics.UserInterface
         //    //we only succeeded if there is pending data in the textbox
         //    if (imeDrawables.Count > 0)
         //    {
-        //        Game.Audio.Sample.GetSample($@"key-confirm");
+        //        Game.Audio.Sample.Get($@"Keyboard/key-confirm")?.Play();
 
         //        foreach (Drawable d in imeDrawables)
         //        {
@@ -677,7 +677,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 //in the case of backspacing (or a NOP), we can exit early here.
                 if (didDelete)
-                    Game.Audio.Sample.GetSample($@"key-delete").Play();
+                    Game.Audio.Sample.Get($@"Keyboard/key-delete")?.Play();
                 return;
             }
 
@@ -693,7 +693,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            Game.Audio.Sample.GetSample($@"key-press-{RNG.Next(1, 5)}");
+            Game.Audio.Sample.Get($@"Keyboard/key-press-{RNG.Next(1, 5)}")?.Play();
         }
         #endregion
     }
