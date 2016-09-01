@@ -107,7 +107,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 float cursorPosEnd = getPositionAt(selectionEnd);
 
-                float cursorWidth = 1;
+                float cursorWidth = 2;
 
                 if (selectionLength > 0)
                     cursorWidth = getPositionAt(selectionRight) - cursorPos.X;
@@ -127,7 +127,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (HasFocus)
                 {
                     cursor.ClearTransformations();
-                    cursor.MoveTo(cursorPos + new Vector2(2, 0), 60, EasingTypes.Out);
+                    cursor.MoveTo(cursorPos, 60, EasingTypes.Out);
                     cursor.ScaleTo(new Vector2(cursorWidth, 1), 60, EasingTypes.Out);
 
                     if (selectionLength > 0)
