@@ -372,8 +372,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            //if (!HasFocus)
-            //    return false;
+            if (!HasFocus)
+                return false;
 
             //if (backingTextbox?.ImeActive == true) return true;
 
