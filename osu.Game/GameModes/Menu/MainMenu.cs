@@ -17,7 +17,7 @@ namespace osu.Game.GameModes.Menu
         {
             base.Load();
 
-            AudioSample welcome = Game.Audio.Sample.Get(@"welcome.mp3");
+            AudioSample welcome = Game.Audio.Sample.Get(@"welcome");
             welcome.Play();
 
             Add(new ButtonSystem());
