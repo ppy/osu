@@ -3,6 +3,7 @@
 
 using System;
 using System.Security;
+using osu.Framework.Extensions;
 
 namespace osu.Game.Online.API
 {
