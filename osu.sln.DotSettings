@@ -1,0 +1,430 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=EmptyGeneralCatchClause/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=FieldCanBeMadeReadOnly_002EGlobal/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=FieldCanBeMadeReadOnly_002ELocal/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=MemberCanBeMadeStatic_002ELocal/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantUsingDirective/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=SuggestVarOrType_005FBuiltInTypes/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=SwitchStatementMissingSomeCases/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeCleanup/Profiles/=Code_0020Cleanup_0020_0028peppy_0029/@EntryIndexedValue">&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;Profile name="Code Cleanup (peppy)"&gt;&lt;CSArrangeThisQualifier&gt;True&lt;/CSArrangeThisQualifier&gt;&lt;RemoveCodeRedundancies&gt;True&lt;/RemoveCodeRedundancies&gt;&lt;CSUseVar&gt;&lt;BehavourStyle&gt;CAN_CHANGE_TO_EXPLICIT&lt;/BehavourStyle&gt;&lt;LocalVariableStyle&gt;ALWAYS_EXPLICIT&lt;/LocalVariableStyle&gt;&lt;ForeachVariableStyle&gt;ALWAYS_EXPLICIT&lt;/ForeachVariableStyle&gt;&lt;/CSUseVar&gt;&lt;CSOptimizeUsings&gt;&lt;OptimizeUsings&gt;True&lt;/OptimizeUsings&gt;&lt;EmbraceInRegion&gt;False&lt;/EmbraceInRegion&gt;&lt;RegionName&gt;&lt;/RegionName&gt;&lt;/CSOptimizeUsings&gt;&lt;CSShortenReferences&gt;True&lt;/CSShortenReferences&gt;&lt;CSReformatCode&gt;True&lt;/CSReformatCode&gt;&lt;CSReorderTypeMembers&gt;True&lt;/CSReorderTypeMembers&gt;&lt;/Profile&gt;</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_LINQ_QUERY/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_MULTILINE_CALLS_CHAIN/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_MULTILINE_EXTENDS_LIST/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_MULTILINE_FOR_STMT/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_MULTILINE_PARAMETER/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_MULTIPLE_DECLARATION/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_MULTLINE_TYPE_PARAMETER_CONSTRAINS/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_MULTLINE_TYPE_PARAMETER_LIST/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ANONYMOUS_METHOD_DECLARATION_BRACES/@EntryValue">NEXT_LINE</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/INITIALIZER_BRACES/@EntryValue">NEXT_LINE</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_CONSTRUCTOR_INITIALIZER_ON_SAME_LINE/@EntryValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AFTER_TYPECAST_PARENTHESES/@EntryValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_MULTIPLICATIVE_OP/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_BEFORE_SIZEOF_PARENTHESES/@EntryValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_BEFORE_TYPEOF_PARENTHESES/@EntryValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_WITHIN_SINGLE_LINE_ARRAY_INITIALIZER_BRACES/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_WITHING_EMPTY_BRACES/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/STICK_COMMENT/@EntryValue">False</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_ARRAY_INITIALIZER_STYLE/@EntryValue">CHOP_IF_LONG</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_BEFORE_BINARY_OPSIGN/@EntryValue">True</s:Boolean>
+	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LIMIT/@EntryValue">200</s:Int64>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_OBJECT_AND_COLLECTION_INITIALIZER_STYLE/@EntryValue">CHOP_ALWAYS</s:String>
+	<s:String x:Key="/Default/CodeStyle/CSharpFileLayoutPatterns/Pattern/@EntryValue">&lt;?xml version="1.0" encoding="utf-16"?&gt;&#xD;
+&lt;Patterns xmlns="urn:schemas-jetbrains-com:member-reordering-patterns"&gt;&#xD;
+  &lt;TypePattern DisplayName="COM interfaces or structs"&gt;&#xD;
+    &lt;TypePattern.Match&gt;&#xD;
+      &lt;Or&gt;&#xD;
+        &lt;And&gt;&#xD;
+          &lt;Kind Is="Interface" /&gt;&#xD;
+          &lt;Or&gt;&#xD;
+            &lt;HasAttribute Name="System.Runtime.InteropServices.InterfaceTypeAttribute" /&gt;&#xD;
+            &lt;HasAttribute Name="System.Runtime.InteropServices.ComImport" /&gt;&#xD;
+          &lt;/Or&gt;&#xD;
+        &lt;/And&gt;&#xD;
+        &lt;Kind Is="Struct" /&gt;&#xD;
+      &lt;/Or&gt;&#xD;
+    &lt;/TypePattern.Match&gt;&#xD;
+  &lt;/TypePattern&gt;&#xD;
+  &lt;TypePattern DisplayName="NUnit Test Fixtures" RemoveRegions="All"&gt;&#xD;
+    &lt;TypePattern.Match&gt;&#xD;
+      &lt;And&gt;&#xD;
+        &lt;Kind Is="Class" /&gt;&#xD;
+        &lt;HasAttribute Name="NUnit.Framework.TestFixtureAttribute" Inherited="True" /&gt;&#xD;
+      &lt;/And&gt;&#xD;
+    &lt;/TypePattern.Match&gt;&#xD;
+    &lt;Entry DisplayName="Setup/Teardown Methods"&gt;&#xD;
+      &lt;Entry.Match&gt;&#xD;
+        &lt;And&gt;&#xD;
+          &lt;Kind Is="Method" /&gt;&#xD;
+          &lt;Or&gt;&#xD;
+            &lt;HasAttribute Name="NUnit.Framework.SetUpAttribute" Inherited="True" /&gt;&#xD;
+            &lt;HasAttribute Name="NUnit.Framework.TearDownAttribute" Inherited="True" /&gt;&#xD;
+            &lt;HasAttribute Name="NUnit.Framework.FixtureSetUpAttribute" Inherited="True" /&gt;&#xD;
+            &lt;HasAttribute Name="NUnit.Framework.FixtureTearDownAttribute" Inherited="True" /&gt;&#xD;
+          &lt;/Or&gt;&#xD;
+        &lt;/And&gt;&#xD;
+      &lt;/Entry.Match&gt;&#xD;
+    &lt;/Entry&gt;&#xD;
+    &lt;Entry DisplayName="All other members" /&gt;&#xD;
+    &lt;Entry Priority="100" DisplayName="Test Methods"&gt;&#xD;
+      &lt;Entry.Match&gt;&#xD;
+        &lt;And&gt;&#xD;
+          &lt;Kind Is="Method" /&gt;&#xD;
+          &lt;HasAttribute Name="NUnit.Framework.TestAttribute" /&gt;&#xD;
+        &lt;/And&gt;&#xD;
+      &lt;/Entry.Match&gt;&#xD;
+      &lt;Entry.SortBy&gt;&#xD;
+        &lt;Name /&gt;&#xD;
+      &lt;/Entry.SortBy&gt;&#xD;
+    &lt;/Entry&gt;&#xD;
+  &lt;/TypePattern&gt;&#xD;
+  &lt;TypePattern DisplayName="Default Pattern"&gt;&#xD;
+    &lt;Group DisplayName="Fields/Properties"&gt;&#xD;
+      &lt;Group DisplayName="Public Fields"&gt;&#xD;
+        &lt;Entry DisplayName="Constant Fields"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Public" /&gt;&#xD;
+              &lt;Or&gt;&#xD;
+                &lt;Kind Is="Constant" /&gt;&#xD;
+                &lt;Readonly /&gt;&#xD;
+                &lt;And&gt;&#xD;
+                  &lt;Static /&gt;&#xD;
+                  &lt;Readonly /&gt;&#xD;
+                &lt;/And&gt;&#xD;
+              &lt;/Or&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Static Fields"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Public" /&gt;&#xD;
+              &lt;Static /&gt;&#xD;
+              &lt;Not&gt;&#xD;
+                &lt;Readonly /&gt;&#xD;
+              &lt;/Not&gt;&#xD;
+              &lt;Kind Is="Field" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Normal Fields"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Public" /&gt;&#xD;
+              &lt;Not&gt;&#xD;
+                &lt;Or&gt;&#xD;
+                  &lt;Static /&gt;&#xD;
+                  &lt;Readonly /&gt;&#xD;
+                &lt;/Or&gt;&#xD;
+              &lt;/Not&gt;&#xD;
+              &lt;Kind Is="Field" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+      &lt;/Group&gt;&#xD;
+      &lt;Entry DisplayName="Public Properties"&gt;&#xD;
+        &lt;Entry.Match&gt;&#xD;
+          &lt;And&gt;&#xD;
+            &lt;Access Is="Public" /&gt;&#xD;
+            &lt;Kind Is="Property" /&gt;&#xD;
+          &lt;/And&gt;&#xD;
+        &lt;/Entry.Match&gt;&#xD;
+      &lt;/Entry&gt;&#xD;
+      &lt;Group DisplayName="Internal Fields"&gt;&#xD;
+        &lt;Entry DisplayName="Constant Fields"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Internal" /&gt;&#xD;
+              &lt;Or&gt;&#xD;
+                &lt;Kind Is="Constant" /&gt;&#xD;
+                &lt;Readonly /&gt;&#xD;
+                &lt;And&gt;&#xD;
+                  &lt;Static /&gt;&#xD;
+                  &lt;Readonly /&gt;&#xD;
+                &lt;/And&gt;&#xD;
+              &lt;/Or&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Static Fields"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Internal" /&gt;&#xD;
+              &lt;Static /&gt;&#xD;
+              &lt;Not&gt;&#xD;
+                &lt;Readonly /&gt;&#xD;
+              &lt;/Not&gt;&#xD;
+              &lt;Kind Is="Field" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Normal Fields"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Internal" /&gt;&#xD;
+              &lt;Not&gt;&#xD;
+                &lt;Or&gt;&#xD;
+                  &lt;Static /&gt;&#xD;
+                  &lt;Readonly /&gt;&#xD;
+                &lt;/Or&gt;&#xD;
+              &lt;/Not&gt;&#xD;
+              &lt;Kind Is="Field" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+      &lt;/Group&gt;&#xD;
+      &lt;Entry DisplayName="Internal Properties"&gt;&#xD;
+        &lt;Entry.Match&gt;&#xD;
+          &lt;And&gt;&#xD;
+            &lt;Access Is="Internal" /&gt;&#xD;
+            &lt;Kind Is="Property" /&gt;&#xD;
+          &lt;/And&gt;&#xD;
+        &lt;/Entry.Match&gt;&#xD;
+      &lt;/Entry&gt;&#xD;
+      &lt;Group DisplayName="Protected Fields"&gt;&#xD;
+        &lt;Entry DisplayName="Constant Fields"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Protected" /&gt;&#xD;
+              &lt;Or&gt;&#xD;
+                &lt;Kind Is="Constant" /&gt;&#xD;
+                &lt;Readonly /&gt;&#xD;
+                &lt;And&gt;&#xD;
+                  &lt;Static /&gt;&#xD;
+                  &lt;Readonly /&gt;&#xD;
+                &lt;/And&gt;&#xD;
+              &lt;/Or&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Static Fields"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Protected" /&gt;&#xD;
+              &lt;Static /&gt;&#xD;
+              &lt;Not&gt;&#xD;
+                &lt;Readonly /&gt;&#xD;
+              &lt;/Not&gt;&#xD;
+              &lt;Kind Is="Field" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Normal Fields"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Protected" /&gt;&#xD;
+              &lt;Not&gt;&#xD;
+                &lt;Or&gt;&#xD;
+                  &lt;Static /&gt;&#xD;
+                  &lt;Readonly /&gt;&#xD;
+                &lt;/Or&gt;&#xD;
+              &lt;/Not&gt;&#xD;
+              &lt;Kind Is="Field" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+      &lt;/Group&gt;&#xD;
+      &lt;Entry DisplayName="Protected Properties"&gt;&#xD;
+        &lt;Entry.Match&gt;&#xD;
+          &lt;And&gt;&#xD;
+            &lt;Access Is="Protected" /&gt;&#xD;
+            &lt;Kind Is="Property" /&gt;&#xD;
+          &lt;/And&gt;&#xD;
+        &lt;/Entry.Match&gt;&#xD;
+      &lt;/Entry&gt;&#xD;
+      &lt;Group DisplayName="Private Fields"&gt;&#xD;
+        &lt;Entry DisplayName="Constant Fields"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Private" /&gt;&#xD;
+              &lt;Or&gt;&#xD;
+                &lt;Kind Is="Constant" /&gt;&#xD;
+                &lt;Readonly /&gt;&#xD;
+                &lt;And&gt;&#xD;
+                  &lt;Static /&gt;&#xD;
+                  &lt;Readonly /&gt;&#xD;
+                &lt;/And&gt;&#xD;
+              &lt;/Or&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Static Fields"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Private" /&gt;&#xD;
+              &lt;Static /&gt;&#xD;
+              &lt;Not&gt;&#xD;
+                &lt;Readonly /&gt;&#xD;
+              &lt;/Not&gt;&#xD;
+              &lt;Kind Is="Field" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Normal Fields"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Private" /&gt;&#xD;
+              &lt;Not&gt;&#xD;
+                &lt;Or&gt;&#xD;
+                  &lt;Static /&gt;&#xD;
+                  &lt;Readonly /&gt;&#xD;
+                &lt;/Or&gt;&#xD;
+              &lt;/Not&gt;&#xD;
+              &lt;Kind Is="Field" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+      &lt;/Group&gt;&#xD;
+      &lt;Entry DisplayName="Private Properties"&gt;&#xD;
+        &lt;Entry.Match&gt;&#xD;
+          &lt;And&gt;&#xD;
+            &lt;Access Is="Private" /&gt;&#xD;
+            &lt;Kind Is="Property" /&gt;&#xD;
+          &lt;/And&gt;&#xD;
+        &lt;/Entry.Match&gt;&#xD;
+      &lt;/Entry&gt;&#xD;
+    &lt;/Group&gt;&#xD;
+    &lt;Group DisplayName="Constructor/Destructor"&gt;&#xD;
+      &lt;Entry DisplayName="Ctor"&gt;&#xD;
+        &lt;Entry.Match&gt;&#xD;
+          &lt;Kind Is="Constructor" /&gt;&#xD;
+        &lt;/Entry.Match&gt;&#xD;
+      &lt;/Entry&gt;&#xD;
+      &lt;Region Name="Disposal"&gt;&#xD;
+        &lt;Entry DisplayName="Dtor"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;Kind Is="Destructor" /&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Dispose()"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Public" /&gt;&#xD;
+              &lt;Kind Is="Method" /&gt;&#xD;
+              &lt;Name Is="Dispose" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Dispose(true)"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Protected" /&gt;&#xD;
+              &lt;Or&gt;&#xD;
+                &lt;Virtual /&gt;&#xD;
+                &lt;Override /&gt;&#xD;
+              &lt;/Or&gt;&#xD;
+              &lt;Kind Is="Method" /&gt;&#xD;
+              &lt;Name Is="Dispose" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+      &lt;/Region&gt;&#xD;
+    &lt;/Group&gt;&#xD;
+    &lt;Group DisplayName="Methods"&gt;&#xD;
+      &lt;Group DisplayName="Public"&gt;&#xD;
+        &lt;Entry DisplayName="Static Methods"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Public" /&gt;&#xD;
+              &lt;Static /&gt;&#xD;
+              &lt;Kind Is="Method" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Methods"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Public" /&gt;&#xD;
+              &lt;Not&gt;&#xD;
+                &lt;Static /&gt;&#xD;
+              &lt;/Not&gt;&#xD;
+              &lt;Kind Is="Method" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+      &lt;/Group&gt;&#xD;
+      &lt;Group DisplayName="Internal"&gt;&#xD;
+        &lt;Entry DisplayName="Static Methods"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Internal" /&gt;&#xD;
+              &lt;Static /&gt;&#xD;
+              &lt;Kind Is="Method" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Methods"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Internal" /&gt;&#xD;
+              &lt;Not&gt;&#xD;
+                &lt;Static /&gt;&#xD;
+              &lt;/Not&gt;&#xD;
+              &lt;Kind Is="Method" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+      &lt;/Group&gt;&#xD;
+      &lt;Group DisplayName="Protected"&gt;&#xD;
+        &lt;Entry DisplayName="Static Methods"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Protected" /&gt;&#xD;
+              &lt;Static /&gt;&#xD;
+              &lt;Kind Is="Method" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Methods"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Protected" /&gt;&#xD;
+              &lt;Not&gt;&#xD;
+                &lt;Static /&gt;&#xD;
+              &lt;/Not&gt;&#xD;
+              &lt;Kind Is="Method" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+      &lt;/Group&gt;&#xD;
+      &lt;Group DisplayName="Private"&gt;&#xD;
+        &lt;Entry DisplayName="Static Methods"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Private" /&gt;&#xD;
+              &lt;Static /&gt;&#xD;
+              &lt;Kind Is="Method" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+        &lt;Entry DisplayName="Methods"&gt;&#xD;
+          &lt;Entry.Match&gt;&#xD;
+            &lt;And&gt;&#xD;
+              &lt;Access Is="Private" /&gt;&#xD;
+              &lt;Not&gt;&#xD;
+                &lt;Static /&gt;&#xD;
+              &lt;/Not&gt;&#xD;
+              &lt;Kind Is="Method" /&gt;&#xD;
+            &lt;/And&gt;&#xD;
+          &lt;/Entry.Match&gt;&#xD;
+        &lt;/Entry&gt;&#xD;
+      &lt;/Group&gt;&#xD;
+    &lt;/Group&gt;&#xD;
+  &lt;/TypePattern&gt;&#xD;
+&lt;/Patterns&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=Constants/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AA_BB" /&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=LocalConstants/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aa_bb" /&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PrivateConstants/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aa_bb" /&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PrivateInstanceFields/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb"&gt;&lt;ExtraRule Prefix="_" Suffix="" Style="aaBb" /&gt;&lt;/Policy&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PrivateStaticFields/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PrivateStaticReadonly/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aa_bb" /&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=StaticReadonly/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AA_BB" /&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=9d1af99b_002Dbefe_002D48a4_002D9eb3_002D661384e29869/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Static, Instance" AccessRightKinds="Private" Description="private methods"&gt;&lt;ElementKinds&gt;&lt;Kind Name="ASYNC_METHOD" /&gt;&lt;Kind Name="METHOD" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;&lt;/Policy&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=9ffbe43b_002Dc610_002D411b_002D9839_002D1416a146d9b0/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Static, Instance" AccessRightKinds="Protected, ProtectedInternal, Internal, Public" Description="internal/protected/public methods"&gt;&lt;ElementKinds&gt;&lt;Kind Name="ASYNC_METHOD" /&gt;&lt;Kind Name="METHOD" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;&lt;/Policy&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=a4c2df6c_002Db202_002D48d5_002Db077_002De678cb548c25/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Static, Instance" AccessRightKinds="Private" Description="private properties"&gt;&lt;ElementKinds&gt;&lt;Kind Name="PROPERTY" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;&lt;/Policy&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=fd562728_002Dc23d_002D417f_002Da19f_002D9d854247fbea/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Static, Instance" AccessRightKinds="Protected, ProtectedInternal, Internal, Public" Description="internal/protected/public properties"&gt;&lt;ElementKinds&gt;&lt;Kind Name="PROPERTY" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;&lt;/Policy&gt;</s:String>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EAddAccessorOwnerDeclarationBracesMigration/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EAlwaysTreatStructAsNotReorderableMigration/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EMigrateBlankLinesAroundFieldToBlankLinesAroundProperty/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EMigrateThisQualifierSettings/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
