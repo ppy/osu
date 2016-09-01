@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Extensions;
 using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API
