@@ -10,8 +10,8 @@ namespace osu.Game.Configuration
     {
         protected override void InitialiseDefaults()
         {
-            Set(OsuConfig.Width, 1366);
-            Set(OsuConfig.Height, 768);
+            Set(OsuConfig.Width, 1366, 640);
+            Set(OsuConfig.Height, 768, 480);
             Set(OsuConfig.MouseSensitivity, 1.0);
 
             Set(OsuConfig.Username, string.Empty);

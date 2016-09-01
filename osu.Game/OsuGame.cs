@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using osu.Framework.Framework;
@@ -10,6 +11,10 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using OpenTK;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 
 namespace osu.Game
 {
@@ -25,8 +30,10 @@ namespace osu.Game
         {
             base.Load();
 
-            Window.Size = new Size(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
-            Window.OnSizeChanged += window_OnSizeChanged;
+            //this completely overrides the framework default. will need to change once we make a proper FontStore.
+            Fonts = new TextureStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular")) { ScaleAdjust = 0.2f };
+
+            Parent.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
 
             API = new APIAccess()
             {
@@ -57,10 +64,16 @@ namespace osu.Game
             base.Dispose(isDisposing);
         }
 
-        private void window_OnSizeChanged()
+        public override bool Invalidate(bool affectsSize = true, bool affectsPosition = true, Drawable source = null)
         {
-            Config.Set(OsuConfig.Width, Window.Size.Width);
-            Config.Set(OsuConfig.Height, Window.Size.Height);
+            if (!base.Invalidate(affectsSize, affectsPosition, source)) return false;
+
+            if (Parent != null)
+            {
+                Parent.Width = Config.Set(OsuConfig.Width, ActualSize.X).Value;
+                Parent.Height = Config.Set(OsuConfig.Height, ActualSize.Y).Value;
+            }
+            return true;
         }
     }
 }
