@@ -51,7 +51,10 @@
     <Compile Include="Beatmaps\Objects\BaseHit.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchBaseHit.cs" />
     <Compile Include="Beatmaps\Objects\Mania\ManiaBaseHit.cs" />
+    <Compile Include="Beatmaps\Objects\Osu\Slider.cs" />
+    <Compile Include="Beatmaps\Objects\Osu\Circle.cs" />
     <Compile Include="Beatmaps\Objects\Osu\OsuBaseHit.cs" />
+    <Compile Include="Beatmaps\Objects\Osu\Spinner.cs" />
     <Compile Include="Beatmaps\Objects\Taiko\TaikoBaseHit.cs" />
     <Compile Include="Beatmaps\Samples\HitSampleInfo.cs" />
     <Compile Include="Beatmaps\Samples\SampleBank.cs" />
