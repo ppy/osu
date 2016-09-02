@@ -21,7 +21,14 @@ namespace osu.Game.GameModes.Play.Osu
         {
             base.Load();
 
-            Add(new Box() { SizeMode = InheritMode.XY, Alpha = 0.5f });
+            Add(new Box()
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                SizeMode = InheritMode.XY,
+                Size = new Vector2(1.3f, 1.3f),
+                Alpha = 0.5f
+            });
         }
     }
 }
