@@ -50,7 +50,9 @@
     <Compile Include="Beatmaps\Metadata.cs" />
     <Compile Include="Beatmaps\Objects\BaseHit.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchBaseHit.cs" />
+    <Compile Include="Beatmaps\Objects\Mania\HoldNote.cs" />
     <Compile Include="Beatmaps\Objects\Mania\ManiaBaseHit.cs" />
+    <Compile Include="Beatmaps\Objects\Mania\Note.cs" />
     <Compile Include="Beatmaps\Objects\Osu\Slider.cs" />
     <Compile Include="Beatmaps\Objects\Osu\Circle.cs" />
     <Compile Include="Beatmaps\Objects\Osu\OsuBaseHit.cs" />
