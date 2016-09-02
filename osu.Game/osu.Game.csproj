@@ -73,10 +73,15 @@
     <Compile Include="GameModes\Menu\ButtonSystem.cs" />
     <Compile Include="GameModes\Menu\MainMenu.cs" />
     <Compile Include="GameModes\FieldTest.cs" />
+    <Compile Include="GameModes\Play\Mania\ManiaHitRenderer.cs" />
+    <Compile Include="GameModes\Play\Mania\ManiaPlayfield.cs" />
     <Compile Include="GameModes\Play\HitRenderer.cs" />
     <Compile Include="GameModes\Play\Osu\OsuHitRenderer.cs" />
     <Compile Include="GameModes\Play\Osu\OsuPlayfield.cs" />
+    <Compile Include="GameModes\Play\Playfield.cs" />
     <Compile Include="GameModes\Play\PlayTest.cs" />
+    <Compile Include="GameModes\Play\Catch\CatchHitRenderer.cs" />
+    <Compile Include="GameModes\Play\Catch\CatchPlayfield.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoHitRenderer.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoPlayfield.cs" />
     <Compile Include="Graphics\Containers\OsuComponent.cs" />

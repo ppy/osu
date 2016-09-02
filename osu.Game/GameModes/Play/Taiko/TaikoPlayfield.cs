@@ -10,7 +10,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.GameModes.Play.Taiko
 {
-    public class TaikoPlayfield : Container
+    public class TaikoPlayfield : Playfield
     {
         public TaikoPlayfield()
         {
