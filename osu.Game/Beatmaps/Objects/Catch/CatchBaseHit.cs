@@ -4,7 +4,7 @@
 
 namespace osu.Game.Beatmaps.Objects.Catch
 {
-    class CatchBaseHit : BaseHit
+    public abstract class CatchBaseHit : BaseHit
     {
         public float Position;
     }
