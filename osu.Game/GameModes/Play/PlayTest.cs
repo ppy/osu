@@ -5,22 +5,46 @@ using System.Collections.Generic;
 using osu.Framework.GameModes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Objects;
+using osu.Game.Beatmaps.Objects.Osu;
+using osu.Game.GameModes.Play.Osu;
+using OpenTK;
 
 namespace osu.Game.GameModes.Play
 {
-    class PlayTest : GameMode
+    public class PlayTest : GameMode
     {
         public override void Load()
         {
             base.Load();
 
-            Beatmap beatmap = new Beatmap();
-
-            beatmap.HitObjects = new List<Beatmaps.Objects.BaseHit>()
+            Beatmap beatmap = new Beatmap
             {
-                new HitObject() {  },
+                HitObjects = new List<BaseHit>()
+                {
+                    new Circle()
+                    {
+                        StartTime = 500,
+                        Position = new Vector2(0, 0)
+                    },
+                    new Circle()
+                    {
+                        StartTime = 1000,
+                        Position = new Vector2(512, 0)
+                    },
+                    new Circle()
+                    {
+                        StartTime = 1500,
+                        Position = new Vector2(512, 384)
+                    },
+                    new Circle()
+                    {
+                        StartTime = 2000,
+                        Position = new Vector2(0, 384)
+                    },
+                }
             };
 
+            Add(new OsuHitRenderer() { Objects = beatmap.HitObjects });
         }
     }
 }
