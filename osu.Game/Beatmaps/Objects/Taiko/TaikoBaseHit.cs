@@ -6,7 +6,7 @@ namespace osu.Game.Beatmaps.Objects.Taiko
 {
     class TaikoBaseHit : BaseHit
     {
-        public bool Big;
+        public float Scale = 1;
 
         public TaikoColour Type;
     }
