@@ -48,7 +48,11 @@
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\BeatmapSet.cs" />
     <Compile Include="Beatmaps\Metadata.cs" />
-    <Compile Include="Beatmaps\Objects\HitObject.cs" />
+    <Compile Include="Beatmaps\Objects\BaseHit.cs" />
+    <Compile Include="Beatmaps\Objects\Catch\CatchBaseHit.cs" />
+    <Compile Include="Beatmaps\Objects\Mania\ManiaBaseHit.cs" />
+    <Compile Include="Beatmaps\Objects\Osu\OsuBaseHit.cs" />
+    <Compile Include="Beatmaps\Objects\Taiko\TaikoBaseHit.cs" />
     <Compile Include="Beatmaps\Samples\HitSampleInfo.cs" />
     <Compile Include="Beatmaps\Samples\SampleBank.cs" />
     <Compile Include="Beatmaps\Samples\SampleInfo.cs" />
