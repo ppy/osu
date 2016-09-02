@@ -62,6 +62,7 @@
     <Compile Include="GameModes\Menu\ButtonSystem.cs" />
     <Compile Include="GameModes\Menu\MainMenu.cs" />
     <Compile Include="GameModes\FieldTest.cs" />
+    <Compile Include="GameModes\Play\PlayTest.cs" />
     <Compile Include="Graphics\Containers\OsuComponent.cs" />
     <Compile Include="Graphics\Containers\OsuGameMode.cs" />
     <Compile Include="Graphics\Containers\OsuLargeComponent.cs" />
