@@ -13,6 +13,7 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Game.GameModes.Play;
 
 namespace osu.Game
 {
@@ -50,7 +51,8 @@ namespace osu.Game
 
             //Add(new FontTest());
 
-            Add(new MainMenu());
+            //Add(new MainMenu());
+            Add(new PlayTest());
             Add(new CursorContainer());
         }
 
