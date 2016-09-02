@@ -8,15 +8,21 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
-using osu.Game.Beatmaps.Objects.Taiko;
+using osu.Game.Beatmaps.Objects.Mania;
 using OpenTK;
 
-namespace osu.Game.GameModes.Play.Taiko
+namespace osu.Game.GameModes.Play.Mania
 {
-    public class TaikoHitRenderer : HitRenderer
+    public class ManiaHitRenderer : HitRenderer
     {
-        List<TaikoBaseHit> objects;
-        private TaikoPlayfield playfield;
+        private readonly int columns;
+        List<ManiaBaseHit> objects;
+        private ManiaPlayfield playfield;
+
+        public ManiaHitRenderer(int columns = 5)
+        {
+            this.columns = columns;
+        }
 
         public override List<BaseHit> Objects
         {
@@ -27,17 +33,17 @@ namespace osu.Game.GameModes.Play.Taiko
 
             set
             {
-                //osu! mode requires all objects to be of TaikoBaseHit type.
-                objects = value.ConvertAll(convertForTaiko);
+                //osu! mode requires all objects to be of ManiaBaseHit type.
+                objects = value.ConvertAll(convertForMania);
 
                 if (Parent != null)
                     Load();
             }
         }
 
-        private TaikoBaseHit convertForTaiko(BaseHit input)
+        private ManiaBaseHit convertForMania(BaseHit input)
         {
-            TaikoBaseHit h = input as TaikoBaseHit;
+            ManiaBaseHit h = input as ManiaBaseHit;
 
             if (h == null)
             {
@@ -45,9 +51,10 @@ namespace osu.Game.GameModes.Play.Taiko
 
                 if (o == null) throw new Exception(@"Can't convert!");
 
-                h = new TaikoBaseHit()
+                h = new Note()
                 {
-                    StartTime = o.StartTime
+                    StartTime = o.StartTime,
+                    Column = (int)Math.Round(o.Position.X / 512 * columns)
                 };
             }
 
@@ -59,24 +66,24 @@ namespace osu.Game.GameModes.Play.Taiko
             base.Load();
 
             if (playfield == null)
-                Add(playfield = new TaikoPlayfield());
+                Add(playfield = new ManiaPlayfield(columns));
             else
                 playfield.Clear();
 
             if (objects == null) return;
 
-            foreach (TaikoBaseHit h in objects)
+            foreach (ManiaBaseHit h in objects)
             {
                 //render stuff!
                 Sprite s = new Sprite(Game.Textures.Get(@"menu-osu"))
                 {
                     Origin = Anchor.Centre,
-                    Scale = 0.2f,
+                    Scale = 0.1f,
                     PositionMode = InheritMode.XY,
-                    Position = new Vector2(1.1f, 0.5f)
+                    Position = new Vector2((float)(h.Column + 0.5) / columns, -0.1f)
                 };
 
-                s.Transformations.Add(new TransformPositionX(Clock) { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = 1.1f, EndValue = 0.1f });
+                s.Transformations.Add(new TransformPositionY(Clock) { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = -0.1f, EndValue = 0.9f });
                 s.Transformations.Add(new TransformAlpha(Clock) { StartTime = h.StartTime + h.Duration + 200, EndTime = h.StartTime + h.Duration + 400, StartValue = 1, EndValue = 0 });
 
                 playfield.Add(s);

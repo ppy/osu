@@ -8,7 +8,7 @@ using OpenTK;
 
 namespace osu.Game.GameModes.Play.Osu
 {
-    public class OsuPlayfield : Container
+    public class OsuPlayfield : Playfield
     {
         public OsuPlayfield()
         {
