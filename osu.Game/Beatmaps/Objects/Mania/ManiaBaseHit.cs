@@ -4,7 +4,7 @@
 
 namespace osu.Game.Beatmaps.Objects.Mania
 {
-    class ManiaBaseHit : BaseHit
+    public abstract class ManiaBaseHit : BaseHit
     {
         public int Column;
     }
