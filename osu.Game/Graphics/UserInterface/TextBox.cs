@@ -36,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public bool ReadOnly;
 
-        //BackingTextBox backingTextbox;
+        TextInputSource textInput;
 
         internal delegate void OnCommitHandler(TextBox sender, bool newText);
         internal event OnCommitHandler OnCommit;
@@ -84,7 +84,7 @@ namespace osu.Game.Graphics.UserInterface
             OnChange = null;
             OnCommit = null;
 
-            UnbindTextbox();
+            UnbindInput();
 
             base.Dispose(disposing);
         }
@@ -200,7 +200,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private void moveSelection(int offset, bool expand)
         {
-            //if (backingTextbox?.ImeActive == true) return;
+            if (textInput?.ImeActive == true) return;
 
             int oldStart = selectionStart;
             int oldEnd = selectionEnd;
@@ -375,7 +375,7 @@ namespace osu.Game.Graphics.UserInterface
             if (!HasFocus)
                 return false;
 
-            //if (backingTextbox?.ImeActive == true) return true;
+            if (textInput?.ImeActive == true) return true;
 
             switch (args.Key)
             {
@@ -493,14 +493,14 @@ namespace osu.Game.Graphics.UserInterface
                         return true;
                     case Key.V:
                         //the text is pasted into the hidden textbox, so we don't need any direct clipboard interaction here.
-                        //insertString(backingTextbox.GetPendingText());
+                        //insertString(textInput.GetPendingText());
                         return true;
                 }
 
                 return false;
             }
 
-            string str = "A";// backingTextbox.GetPendingText();
+            string str = textInput.GetPendingText();
             if (!string.IsNullOrEmpty(str))
             {
                 if (state.Keyboard.ShiftPressed)
@@ -517,7 +517,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnDrag(InputState state)
         {
-            //if (backingTextbox?.ImeActive == true) return true;
+            //if (textInput?.ImeActive == true) return true;
 
             if (text.Length == 0) return true;
 
@@ -537,7 +537,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnDoubleClick(InputState state)
         {
-            //if (backingTextbox?.ImeActive == true) return true;
+            if (textInput?.ImeActive == true) return true;
 
             if (text.Length == 0) return true;
 
@@ -554,7 +554,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            //if (backingTextbox?.ImeActive == true) return true;
+            if (textInput?.ImeActive == true) return true;
 
             selectionStart = selectionEnd = getCharacterClosestTo(state.Mouse.Position);
 
@@ -565,7 +565,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnFocusLost(InputState state)
         {
-            UnbindTextbox();
+            UnbindInput();
 
             cursor.ClearTransformations();
             cursor.FadeOut(200);
@@ -592,7 +592,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (ReadOnly) return false;
 
-            //BindTextbox();
+            BindInput();
 
             textBeforeCommit = Text;
             if (ResetTextOnEdit)
@@ -606,39 +606,39 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         #region Native TextBox handling (winform specific)
-        protected void UnbindTextbox()
+        protected void UnbindInput()
         {
-            //backingTextbox?.Deactivate(OsuGame.Window.Form);
+            textInput?.Deactivate();
         }
 
-        //protected void BindTextbox()
-        //{
-        //    if (backingTextbox == null)
-        //    {
-        //        backingTextbox = new BackingTextBox();
-        //        backingTextbox.OnNewImeComposition += onImeComposition;
-        //        backingTextbox.OnNewImeResult += onImeResult;
-        //    }
+        protected void BindInput()
+        {
+            if (textInput == null)
+            {
+                textInput = Game.Host.TextInput;
+                textInput.OnNewImeComposition += onImeComposition;
+                textInput.OnNewImeResult += onImeResult;
+            }
 
-        //    backingTextbox.Activate(OsuGame.Window.Form);
-        //}
+            textInput.Activate();
+        }
 
-        //private void onImeResult(string s)
-        //{
-        //    //we only succeeded if there is pending data in the textbox
-        //    if (imeDrawables.Count > 0)
-        //    {
-        //        Game.Audio.Sample.Get($@"Keyboard/key-confirm")?.Play();
+        private void onImeResult(string s)
+        {
+            //we only succeeded if there is pending data in the textbox
+            if (imeDrawables.Count > 0)
+            {
+                Game.Audio.Sample.Get($@"Keyboard/key-confirm")?.Play();
 
-        //        foreach (Drawable d in imeDrawables)
-        //        {
-        //            d.Colour = Color4.White;
-        //            d.FadeTo(1, 200, EasingTypes.Out);
-        //        }
-        //    }
+                foreach (Drawable d in imeDrawables)
+                {
+                    d.Colour = Color4.White;
+                    d.FadeTo(1, 200, EasingTypes.Out);
+                }
+            }
 
-        //    imeDrawables.Clear();
-        //}
+            imeDrawables.Clear();
+        }
 
         List<Drawable> imeDrawables = new List<Drawable>();
 
