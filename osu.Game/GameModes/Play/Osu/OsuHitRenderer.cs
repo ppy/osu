@@ -4,12 +4,9 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
-using OpenTK;
 
 namespace osu.Game.GameModes.Play.Osu
 {
@@ -62,23 +59,6 @@ namespace osu.Game.GameModes.Play.Osu
 
                 playfield.Add(s);
             }
-        }
-    }
-
-    public class OsuPlayfield : Container
-    {
-        public OsuPlayfield()
-        {
-            Size = new Vector2(512, 384);
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
-        }
-
-        public override void Load()
-        {
-            base.Load();
-
-            Add(new Box() { SizeMode = InheritMode.XY, Alpha = 0.5f });
         }
     }
 }
