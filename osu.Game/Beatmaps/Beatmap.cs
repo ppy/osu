@@ -10,7 +10,7 @@ namespace osu.Game.Beatmaps
 {
     public class Beatmap
     {
-        public List<HitObject> HitObjects;
+        public List<BaseHit> HitObjects;
 
         public List<ControlPoint> ControlPoints;
 
