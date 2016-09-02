@@ -50,6 +50,8 @@
     <Compile Include="Beatmaps\Metadata.cs" />
     <Compile Include="Beatmaps\Objects\BaseHit.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchBaseHit.cs" />
+    <Compile Include="Beatmaps\Objects\Catch\Droplet.cs" />
+    <Compile Include="Beatmaps\Objects\Catch\Fruit.cs" />
     <Compile Include="Beatmaps\Objects\Mania\HoldNote.cs" />
     <Compile Include="Beatmaps\Objects\Mania\ManiaBaseHit.cs" />
     <Compile Include="Beatmaps\Objects\Mania\Note.cs" />
