@@ -83,8 +83,8 @@ namespace osu.Game.GameModes.Play.Mania
                     Position = new Vector2((float)(h.Column + 0.5) / columns, -0.1f)
                 };
 
-                s.Transformations.Add(new TransformPositionY(Clock) { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = -0.1f, EndValue = 0.9f });
-                s.Transformations.Add(new TransformAlpha(Clock) { StartTime = h.StartTime + h.Duration + 200, EndTime = h.StartTime + h.Duration + 400, StartValue = 1, EndValue = 0 });
+                s.Transforms.Add(new TransformPositionY(Clock) { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = -0.1f, EndValue = 0.9f });
+                s.Transforms.Add(new TransformAlpha(Clock) { StartTime = h.StartTime + h.Duration + 200, EndTime = h.StartTime + h.Duration + 400, StartValue = 1, EndValue = 0 });
 
                 playfield.Add(s);
             }
