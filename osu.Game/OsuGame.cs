@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using osu.Framework.Framework;
 using osu.Game.Configuration;
 using osu.Game.GameModes.Menu;
