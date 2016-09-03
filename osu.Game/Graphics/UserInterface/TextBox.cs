@@ -48,6 +48,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public override void Load()
         {
+            base.Load();
+
             Add(background = new Box()
             {
                 Colour = BackgroundUnfocused,
@@ -96,6 +98,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void UpdateLayout()
         {
+            base.UpdateLayout();
+
             //have to run this after children flow
             cursorAndLayout.Refresh(delegate
             {
