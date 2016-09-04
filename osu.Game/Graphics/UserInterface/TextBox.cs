@@ -143,7 +143,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         cursor.FadeTo(0.5f, 200, EasingTypes.Out);
                         cursor.FadeColour(Color4.White, 200, EasingTypes.Out);
-                        cursor.Transformations.Add(new TransformAlpha(Clock)
+                        cursor.Transforms.Add(new TransformAlpha(Clock)
                         {
                             StartValue = 0.5f,
                             EndValue = 0.2f,

@@ -477,7 +477,7 @@ namespace osu.Game.GameModes.Menu
                 icon.RotateTo(10, offset, EasingTypes.InOutSine);
                 icon.ScaleTo(new Vector2(1, 0.9f), offset, EasingTypes.Out);
 
-                icon.Transformations.Add(new TransformRotation(Clock)
+                icon.Transforms.Add(new TransformRotation(Clock)
                 {
                     StartValue = -10,
                     EndValue = 10,
@@ -488,7 +488,7 @@ namespace osu.Game.GameModes.Menu
                     LoopDelay = duration * 2
                 });
 
-                icon.Transformations.Add(new TransformPosition(Clock)
+                icon.Transforms.Add(new TransformPosition(Clock)
                 {
                     StartValue = Vector2.Zero,
                     EndValue = new Vector2(0, -10),
@@ -499,7 +499,7 @@ namespace osu.Game.GameModes.Menu
                     LoopDelay = duration
                 });
 
-                icon.Transformations.Add(new TransformScaleVector(Clock)
+                icon.Transforms.Add(new TransformScaleVector(Clock)
                 {
                     StartValue = new Vector2(1, 0.9f),
                     EndValue = Vector2.One,
@@ -510,7 +510,7 @@ namespace osu.Game.GameModes.Menu
                     LoopDelay = duration
                 });
 
-                icon.Transformations.Add(new TransformPosition(Clock)
+                icon.Transforms.Add(new TransformPosition(Clock)
                 {
                     StartValue = new Vector2(0, -10),
                     EndValue = Vector2.Zero,
@@ -521,7 +521,7 @@ namespace osu.Game.GameModes.Menu
                     LoopDelay = duration
                 });
 
-                icon.Transformations.Add(new TransformScaleVector(Clock)
+                icon.Transforms.Add(new TransformScaleVector(Clock)
                 {
                     StartValue = Vector2.One,
                     EndValue = new Vector2(1, 0.9f),
@@ -532,7 +532,7 @@ namespace osu.Game.GameModes.Menu
                     LoopDelay = duration
                 });
 
-                icon.Transformations.Add(new TransformRotation(Clock)
+                icon.Transforms.Add(new TransformRotation(Clock)
                 {
                     StartValue = 10,
                     EndValue = -10,
