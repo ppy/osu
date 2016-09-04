@@ -84,7 +84,7 @@ namespace osu.Game.GameModes.Menu
             buttonFlow.Add(backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -wedge_width, Key.Escape));
 
             //need a container to make the osu! icon flow properly.
-            buttonFlow.Add(iconFacade = new Drawable() { Size = new Vector2(0, button_area_height) });
+            buttonFlow.Add(iconFacade = new Container() { Size = new Vector2(0, button_area_height) });
 
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"solo", @"freeplay", FontAwesome.user, new Color4(102, 68, 204, 255), onSolo, wedge_width, Key.P)));
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"multi", @"multiplayer", FontAwesome.users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M)));
