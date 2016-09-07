@@ -43,7 +43,7 @@ namespace osu.Game.GameModes.Menu
             Add(new TimeDisplay()
             {
                 Position = new Vector2(400, 10),
-                millitaryTime = false
+                MilitaryTime = false
             });
         }
     }

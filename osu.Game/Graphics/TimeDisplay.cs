@@ -11,7 +11,6 @@ namespace osu.Game.Graphics.TimeDisplay
     public class TimeDisplay : Drawable
     {
         private SpriteText timeText;
-        private bool _24Hour;
 
         public override void Load()
         {
@@ -25,15 +24,12 @@ namespace osu.Game.Graphics.TimeDisplay
 
         protected override void Update()
         {
-            if (_24Hour)
+            if (MilitaryTime)
                 timeText.Text = DateTime.Now.ToString("HH:mm:ss");
             else
                 timeText.Text = DateTime.Now.ToString("h:mm:ss tt");
         }
 
-        public bool millitaryTime
-        {
-            set { _24Hour = value; }
-        }
+        public bool MilitaryTime { get; set; }
     }
 }
