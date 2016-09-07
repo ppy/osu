@@ -7,6 +7,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.TimeDisplay;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -37,6 +38,12 @@ namespace osu.Game.GameModes.Menu
                 Text = @"The quick brown fox jumped over the lazy dog.",
                 Position = new Vector2(50, 80),
                 Size = new Vector2(300, 20)
+            });
+
+            Add(new TimeDisplay()
+            {
+                Position = new Vector2(400, 10),
+                millitaryTime = false
             });
         }
     }
