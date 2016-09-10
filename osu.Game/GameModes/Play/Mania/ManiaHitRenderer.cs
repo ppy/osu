@@ -78,7 +78,7 @@ namespace osu.Game.GameModes.Play.Mania
                 Sprite s = new Sprite(Game.Textures.Get(@"menu-osu"))
                 {
                     Origin = Anchor.Centre,
-                    Scale = 0.1f,
+                    Scale = new Vector2(0.1f),
                     PositionMode = InheritMode.XY,
                     Position = new Vector2((float)(h.Column + 0.5) / columns, -0.1f)
                 };

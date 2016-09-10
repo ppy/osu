@@ -44,7 +44,7 @@ namespace osu.Game.GameModes.Play
             Add(new OsuHitRenderer()
             {
                 Objects = beatmap.HitObjects,
-                Scale = 0.5f,
+                Scale = new Vector2(0.5f),
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft
             });
@@ -52,7 +52,7 @@ namespace osu.Game.GameModes.Play
             Add(new TaikoHitRenderer()
             {
                 Objects = beatmap.HitObjects,
-                Scale = 0.5f,
+                Scale = new Vector2(0.5f),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight
             });
@@ -60,7 +60,7 @@ namespace osu.Game.GameModes.Play
             Add(new CatchHitRenderer()
             {
                 Objects = beatmap.HitObjects,
-                Scale = 0.5f,
+                Scale = new Vector2(0.5f),
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft
             });
@@ -68,7 +68,7 @@ namespace osu.Game.GameModes.Play
             Add(new ManiaHitRenderer()
             {
                 Objects = beatmap.HitObjects,
-                Scale = 0.5f,
+                Scale = new Vector2(0.5f),
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight
             });

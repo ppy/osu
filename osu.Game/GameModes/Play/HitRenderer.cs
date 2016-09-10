@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Drawables;
 using osu.Game.Beatmaps.Objects;
+using OpenTK;
 
 namespace osu.Game.GameModes.Play
 {
@@ -18,7 +19,7 @@ namespace osu.Game.GameModes.Play
         {
             base.Load();
 
-            Add(new Box() { SizeMode = InheritMode.XY, Alpha = 0.1f, Scale = 0.99f });
+            Add(new Box() { SizeMode = InheritMode.XY, Alpha = 0.1f, Scale = new Vector2(0.99f) });
         }
     }
 }

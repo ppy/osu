@@ -72,7 +72,7 @@ namespace osu.Game.GameModes.Play.Catch
                 Sprite s = new Sprite(Game.Textures.Get(@"menu-osu"))
                 {
                     Origin = Anchor.Centre,
-                    Scale = 0.1f,
+                    Scale = new Vector2(0.1f),
                     PositionMode = InheritMode.Y,
                     Position = new Vector2(h.Position, -0.1f)
                 };
