@@ -70,8 +70,8 @@ namespace osu.Game.Graphics.UserInterface
                 SizeMode = InheritMode.Y,
                 Alpha = 0
             };
-            TextContainer.Add(cursor);
 
+            TextContainer.Add(cursor);
             TextContainer.Add(textFlow);
         }
 
