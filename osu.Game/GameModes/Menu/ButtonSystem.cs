@@ -279,7 +279,7 @@ namespace osu.Game.GameModes.Menu
             private MenuVisualisation vis;
             private Action clickAction;
 
-            public float SizeForFlow => logo == null ? 0 : logo.ActualSize.X * logo.Scale * logoBounceContainer.Scale * 0.8f;
+            public float SizeForFlow => logo == null ? 0 : logo.ActualSize.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.8f;
 
             public override void Load()
             {
@@ -424,7 +424,7 @@ namespace osu.Game.GameModes.Menu
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Colour = colour,
-                    VectorScale = new Vector2(0, 1)
+                    Scale = new Vector2(0, 1)
                 });
 
                 iconText = new AutoSizeContainer
@@ -440,7 +440,7 @@ namespace osu.Game.GameModes.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Scale = 0.7f,
+                    Scale = new Vector2(0.7f),
                 };
                 iconText.Add(icon);
 
@@ -588,8 +588,8 @@ namespace osu.Game.GameModes.Menu
 
             protected override void Update()
             {
-                HandleInput = state != ButtonState.Exploded && box.VectorScale.X >= 0.8f;
-                iconText.Alpha = MathHelper.Clamp((box.VectorScale.X - 0.5f) / 0.3f, 0, 1);
+                HandleInput = state != ButtonState.Exploded && box.Scale.X >= 0.8f;
+                iconText.Alpha = MathHelper.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
                 base.Update();
             }
 
@@ -663,7 +663,7 @@ namespace osu.Game.GameModes.Menu
                         Quad q = base.DrawQuad;
 
                         //Will become infinite if we don't limit its maximum size.
-                        float wedge = Math.Min(q.Width, wedgeWidth / Scale / VectorScale.X);
+                        float wedge = Math.Min(q.Width, wedgeWidth / Scale.X);
 
                         q.TopLeft.X += wedge;
                         q.BottomRight.X -= wedge;

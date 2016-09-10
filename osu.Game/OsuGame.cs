@@ -47,7 +47,7 @@ namespace osu.Game
             //};
             //API.Queue(req);
 
-            AddProcessingContainer(new RatioAdjust());
+            AddProcessing(new RatioAdjust());
 
             //Add(new FontTest());
 
@@ -64,10 +64,10 @@ namespace osu.Game
             base.Dispose(isDisposing);
         }
 
-        public override bool Invalidate(bool affectsSize = true, bool affectsPosition = true, Drawable source = null)
+        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
         {
-            if (!base.Invalidate(affectsSize, affectsPosition, source)) return false;
-
+            if (!base.Invalidate(invalidation, source, shallPropagate)) return false;
+            
             if (Parent != null)
             {
                 Parent.Width = Config.Set(OsuConfig.Width, ActualSize.X).Value;
