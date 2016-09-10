@@ -122,7 +122,7 @@ namespace osu.Game.GameModes
 
             protected override bool OnClick(InputState state)
             {
-                Scale = 1.5f;
+                Scale = new Vector2(1.5f);
                 ScaleTo(1, 500, EasingTypes.In);
 
                 Activated?.Invoke();

@@ -12,8 +12,8 @@ namespace osu.Game.Graphics.Processing
         protected override void Update()
         {
             base.Update();
-            Scale = Parent.ActualSize.Y / 768f;
-            Size = new Vector2(1 / Scale);
+            Scale = new Vector2(Parent.ActualSize.Y / 768f);
+            Size = new Vector2(1 / Scale.X);
         }
     }
 }
