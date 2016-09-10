@@ -71,7 +71,7 @@ namespace osu.Game.GameModes.Play.Taiko
                 Sprite s = new Sprite(Game.Textures.Get(@"menu-osu"))
                 {
                     Origin = Anchor.Centre,
-                    Scale = 0.2f,
+                    Scale = new Vector2(0.2f),
                     PositionMode = InheritMode.XY,
                     Position = new Vector2(1.1f, 0.5f)
                 };

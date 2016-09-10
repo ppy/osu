@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
+using OpenTK;
 
 namespace osu.Game.GameModes.Play.Osu
 {
@@ -49,7 +50,7 @@ namespace osu.Game.GameModes.Play.Osu
                 Sprite s = new Sprite(Game.Textures.Get(@"menu-osu"))
                 {
                     Origin = Anchor.Centre,
-                    Scale = 0.1f,
+                    Scale = new Vector2(0.1f),
                     Alpha = 0,
                     Position = h.Position
                 };
