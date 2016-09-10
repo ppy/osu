@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
+using OpenTK;
 
 namespace osu.Game.GameModes
 {
@@ -36,7 +37,7 @@ namespace osu.Game.GameModes
                 SpriteText text = new SpriteText()
                 {
                     Text = $@"Font testy at size {i}",
-                    Scale = i
+                    Scale = new Vector2(i)
                 };
 
                 flow.Add(text);
