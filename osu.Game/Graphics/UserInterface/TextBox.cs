@@ -17,7 +17,7 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    internal class TextBox : MaskingContainer
+    internal class TextBox : ProcessingContainer
     {
         private FlowContainer textFlow;
         private Box background;
@@ -49,6 +49,8 @@ namespace osu.Game.Graphics.UserInterface
         public override void Load()
         {
             base.Load();
+
+            AddProcessing(new MaskingContainer());
 
             Add(background = new Box()
             {
