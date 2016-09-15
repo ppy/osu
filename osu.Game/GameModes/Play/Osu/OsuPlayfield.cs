@@ -12,6 +12,7 @@ namespace osu.Game.GameModes.Play.Osu
     {
         public OsuPlayfield()
         {
+            SizeMode = InheritMode.None;
             Size = new Vector2(512, 384);
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -26,7 +27,6 @@ namespace osu.Game.GameModes.Play.Osu
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 SizeMode = InheritMode.XY,
-                Size = new Vector2(1.3f, 1.3f),
                 Alpha = 0.5f
             });
         }
