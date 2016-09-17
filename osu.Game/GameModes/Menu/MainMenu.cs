@@ -7,7 +7,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.GameModes.Menu
 {
