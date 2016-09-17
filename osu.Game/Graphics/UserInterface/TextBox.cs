@@ -14,6 +14,8 @@ using osu.Framework.Input;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Framework.Threading;
+using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -46,36 +48,38 @@ namespace osu.Game.Graphics.UserInterface
 
         private Scheduler textUpdateScheduler = new Scheduler();
 
-        public override void Load()
-        {
-            base.Load();
+		public override void Load()
+		{
+			base.Load();
+			Add(new Drawable[]
+			{
+				new MaskingContainer(),
+				background = new Box()
+				{
+					Colour = BackgroundUnfocused,
+					SizeMode = InheritMode.XY
+				},
+				TextContainer = new Container() 
+				{
+					SizeMode = InheritMode.XY,
+					Children = new Drawable[]
+					{
+						cursor = new Box()
+						{
+							Size = Vector2.One,
+							Colour = Color4.Transparent,
+							SizeMode = InheritMode.Y,
+							Alpha = 0
+						},
+						textFlow = new FlowContainer()
+						{
+							Direction = FlowDirection.HorizontalOnly
+						}
+					}
+				},
 
-            AddProcessing(new MaskingContainer());
-
-            Add(background = new Box()
-            {
-                Colour = BackgroundUnfocused,
-                SizeMode = InheritMode.XY,
-            });
-
-            Add(TextContainer = new Container() { SizeMode = InheritMode.XY });
-
-            textFlow = new FlowContainer()
-            {
-                Direction = FlowDirection.HorizontalOnly,
-            };
-
-            cursor = new Box()
-            {
-                Size = Vector2.One,
-                Colour = Color4.Transparent,
-                SizeMode = InheritMode.Y,
-                Alpha = 0
-            };
-
-            TextContainer.Add(cursor);
-            TextContainer.Add(textFlow);
-        }
+			});
+		}
 
         private void resetSelection()
         {
@@ -168,10 +172,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (index > 0)
             {
-                if (index < text.Length)
-                    return textFlow.Children[index].Position.X + textFlow.Position.X;
-                else
-                    return textFlow.Children[index - 1].Position.X + textFlow.Children[index - 1].Size.X + textFlow.Padding.X + textFlow.Position.X;
+				if (index < text.Length)
+					return textFlow.Children.ElementAt(index).Position.X + textFlow.Position.X;
+				else
+				{
+					var d = textFlow.Children.ElementAt(index - 1);
+					return d.Position.X + d.Size.X + textFlow.Padding.X + textFlow.Position.X;
+				}
             }
             else
                 return 0;
@@ -247,16 +254,16 @@ namespace osu.Game.Graphics.UserInterface
             if (sound)
                 Game.Audio.Sample.Get(@"Keyboard/key-delete")?.Play();
 
-            for (int i = 0; i < count; i++)
-            {
-                Drawable d = textFlow.Children[start];
-                textFlow.Remove(d);
+			textFlow.Children.Skip(start).Take(count).ToList().ForEach(d =>
+			{
+				textFlow.Remove(d);
 
-                TextContainer.Add(d);
-                d.FadeOut(200);
-                d.MoveToY(d.Size.Y, 200, EasingTypes.InExpo);
-                d.Expire();
-            }
+				TextContainer.Add(d);
+				d.FadeOut(200);
+				d.MoveToY(d.Size.Y, 200, EasingTypes.InExpo);
+				d.Expire();
+			});
+
             text = text.Remove(start, count);
 
             if (selectionLength > 0)
@@ -270,8 +277,9 @@ namespace osu.Game.Graphics.UserInterface
 
         protected virtual Drawable AddCharacterToFlow(char c)
         {
-            for (int i = selectionLeft; i < text.Length; i++)
-                textFlow.Children[i].Depth = i + 1;
+			int i = selectionLeft;
+			foreach (Drawable dd in textFlow.Children.Skip(selectionLeft).Take(text.Length - selectionLeft))
+				dd.Depth = i + 1;
 
             Drawable ch;
 

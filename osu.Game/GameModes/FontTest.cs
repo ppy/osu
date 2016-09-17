@@ -21,28 +21,30 @@ namespace osu.Game.GameModes
     {
         private FlowContainer flow;
 
-        public override void Load()
-        {
-            base.Load();
+		public override void Load()
+		{
+			base.Load();
 
-            flow = new FlowContainer()
-            {
-                Anchor = Anchor.TopLeft,
-                Direction = FlowDirection.VerticalOnly
-            };
-            Add(flow);
+			Drawable[] flowChildren = new Drawable[50];
+			for (int i = 0; i < 50; i++)
+			{
+				int j = i + 1;
+				flowChildren[i] = new SpriteText()
+				{
+					Text = $@"Font testy at size {j}",
+					Scale = new Vector2(j)
+				};
+			}
 
-            for (int i = 1; i < 50; i++)
-            {
-                SpriteText text = new SpriteText()
-                {
-                    Text = $@"Font testy at size {i}",
-                    Scale = new Vector2(i)
-                };
+			Add(flow = new FlowContainer()
+			{
+				Anchor = Anchor.TopLeft,
+				Direction = FlowDirection.VerticalOnly,
+				Children = flowChildren,
+			});
 
-                flow.Add(text);
-            }
-        }
+
+		}
 
         protected override void Update()
         {
