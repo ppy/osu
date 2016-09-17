@@ -24,92 +24,84 @@ namespace osu.Game.GameModes
     {
         private AutoSizeContainer container;
 
-        public override void Load()
-        {
-            base.Load();
+		public override void Load()
+		{
+			base.Load();
+			OsuGame game = Game as OsuGame;
 
-            OsuGame game = Game as OsuGame;
+			ClickableBox button;
+			Add(new Drawable[]
+			{
+				new Box()
+				{
+					SizeMode = InheritMode.XY,
+					Size = new Vector2(1, 1),
+					Colour = Color4.DarkRed
+				},
+				button = new ClickableBox(Color4.Pink)
+				{
+					Size = new Vector2(50, 50)
+				},
+				container = new AutoSizeContainer()
+				{
+					Anchor = Anchor.Centre,
+					Origin = Anchor.Centre,
+					Children = new Drawable[]
+					{
+						new ClickableBox(Color4.SkyBlue)
+						{
+							SizeMode = InheritMode.XY,
+							Size = Vector2.One
+						},
+						new ClickableBox(Color4.Orange)
+						{
+							Size = new Vector2(50, 50),
+							Anchor = Anchor.TopLeft,
+							Origin = Anchor.TopLeft
+						},
+						new ClickableBox(Color4.Orange)
+						{
+							Size = new Vector2(50, 50),
+							Anchor = Anchor.TopRight,
+							Origin = Anchor.TopRight
+						},
+						new ClickableBox(Color4.Orange)
+						{
+							Size = new Vector2(50, 50),
+							Anchor = Anchor.BottomLeft,
+							Origin = Anchor.BottomLeft
+						},
+						new ClickableBox(Color4.Blue)
+						{
+							Size = new Vector2(10, 10),
+							Anchor = Anchor.Centre,
+							Origin = Anchor.Centre
+						},
+						new ClickableBox(Color4.Orange)
+						{
+							Size = new Vector2(50, 50),
+							Anchor = Anchor.BottomRight,
+							Origin = Anchor.BottomRight
+						},
+						new SpriteCircular(game.Textures.Get("coin"))
+						{
+							Position = new Vector2(100),
+							Anchor = Anchor.Centre,
+							Origin = Anchor.Centre
+						},
+						new SpriteText(game.Textures)
+						{
+							Anchor = Anchor.CentreLeft,
+							Origin = Anchor.CentreLeft,
+							Text = "12345"
+						}
+					}
+				}
+			});
 
-            Add(new Box()
-            {
-                SizeMode = InheritMode.XY,
+			button.Activated += () => ExitMode();
 
-                Size = new Vector2(1, 1),
-                Colour = Color4.DarkRed
-            });
-
-            ClickableBox button;
-            Add(button = new ClickableBox(Color4.Pink)
-            {
-                Size = new Vector2(50, 50)
-            });
-
-            button.Activated += () => ExitMode();
-
-            Add(container = new AutoSizeContainer()
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
-            });
-
-            container.Add(new ClickableBox(Color4.SkyBlue)
-            {
-                SizeMode = InheritMode.XY,
-
-                Size = Vector2.One
-            });
-
-            container.Add(new ClickableBox(Color4.Orange)
-            {
-                Size = new Vector2(50, 50),
-                Anchor = Anchor.TopLeft,
-                Origin = Anchor.TopLeft
-            });
-
-            container.Add(new ClickableBox(Color4.Orange)
-            {
-                Size = new Vector2(50, 50),
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight
-            });
-
-            container.Add(new ClickableBox(Color4.Orange)
-            {
-                Size = new Vector2(50, 50),
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft
-            });
-
-
-            container.Add(new ClickableBox(Color4.Blue)
-            {
-                Size = new Vector2(10, 10),
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
-            });
-
-            container.Add(new ClickableBox(Color4.Orange)
-            {
-                Size = new Vector2(50, 50),
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight
-            });
-
-            container.Add(new SpriteCircular(game.Textures.Get("coin"))
-            {
-                Position = new Vector2(100),
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre
-            });
-
-            Add(new SpriteText(game.Textures)
-            {
-                Origin = Anchor.CentreLeft,
-                Anchor = Anchor.CentreLeft,
-
-                Text = "12345"
-            });
-        }
+		}
 
         class ClickableBox : Box
         {
