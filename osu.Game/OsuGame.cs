@@ -5,12 +5,12 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Configuration;
 using osu.Game.GameModes.Menu;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using OpenTK;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 
