@@ -51,7 +51,6 @@
     <Compile Include="Graphics\Containers\OsuComponent.cs" />
     <Compile Include="Graphics\Containers\OsuGameMode.cs" />
     <Compile Include="Graphics\Containers\OsuLargeComponent.cs" />
-    <Compile Include="Graphics\Cursor\CursorContainer.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\TextAwesome.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
