@@ -50,14 +50,14 @@ namespace osu.Game.GameModes.Menu
         {
             base.Load();
 
-            Add(new Drawable[]
+            Children = new Drawable[]
             {
                 osuLogo = new OsuLogo(onOsuLogo)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre
                 },
-                buttonArea = new Container()
+                buttonArea = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -66,12 +66,12 @@ namespace osu.Game.GameModes.Menu
                     Alpha = 0,
                     Children = new Drawable[]
                     {
-                        new Box()
+                        new Box
                         {
                             SizeMode = InheritMode.XY,
                             Colour = new Color4(50, 50, 50, 255)
                         },
-                        buttonFlow = new FlowContainerWithOrigin()
+                        buttonFlow = new FlowContainerWithOrigin
                         {
                             Anchor = Anchor.Centre,
                             Position = new Vector2(wedge_width * 2 - (button_width + osuLogo.SizeForFlow / 4), 0),
@@ -80,7 +80,7 @@ namespace osu.Game.GameModes.Menu
                             {
                                 settingsButton = new Button(@"settings", @"options", FontAwesome.gear, new Color4(85, 85, 85, 255), onSettings, -wedge_width, Key.O),
                                 backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -wedge_width, Key.Escape),
-                                iconFacade = new Container() //need a container to make the osu! icon flow properly.
+                                iconFacade = new Container //need a container to make the osu! icon flow properly.
 								{
 									Size = new Vector2(0, button_area_height)
 								}
@@ -89,7 +89,7 @@ namespace osu.Game.GameModes.Menu
                         }
                     }
                 }
-            });
+            };
 
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"solo", @"freeplay", FontAwesome.user, new Color4(102, 68, 204, 255), onSolo, wedge_width, Key.P)));
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"multi", @"multiplayer", FontAwesome.users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M)));
@@ -290,36 +290,41 @@ namespace osu.Game.GameModes.Menu
             {
                 base.Load();
 
-                Sprite ripple = new Sprite(Game.Textures.Get(@"menu-osu"))
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Alpha = 0.4f
-                };
-                ripple.ScaleTo(1.1f, 500);
-                ripple.FadeOut(500);
-                ripple.Loop(300);
+				Sprite ripple;
 
-                Add(logoBounceContainer = new AutoSizeContainer()
-                {
-                    Children = new Drawable[]
-                    {
-                        logo = new Sprite(Game.Textures.Get(@"menu-osu"))
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre
-                        },
-                        ripple,
-                        vis = new MenuVisualisation()
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Size = logo.Size,
-                            Additive = true,
-                            Alpha = 0.2f,
-                        }
-                    }
-                });
+
+				Children = new Drawable[]
+				{
+					logoBounceContainer = new AutoSizeContainer
+					{
+						Children = new Drawable[]
+						{
+							logo = new Sprite(Game.Textures.Get(@"menu-osu"))
+							{
+								Anchor = Anchor.Centre,
+								Origin = Anchor.Centre
+							},
+							ripple = new Sprite(Game.Textures.Get(@"menu-osu"))
+							{
+								Anchor = Anchor.Centre,
+								Origin = Anchor.Centre,
+								Alpha = 0.4f
+							},
+							vis = new MenuVisualisation()
+							{
+								Anchor = Anchor.Centre,
+								Origin = Anchor.Centre,
+								Size = logo.Size,
+								Additive = true,
+								Alpha = 0.2f,
+							}
+						}
+					}
+				};
+
+				ripple.ScaleTo(1.1f, 500);
+				ripple.FadeOut(500);
+				ripple.Loop(300);
             }
 
             public OsuLogo(Action action)
@@ -422,7 +427,7 @@ namespace osu.Game.GameModes.Menu
 				base.Load();
 				Alpha = 0;
 
-				Add(new Drawable[]
+				Children = new Drawable[]
 				{
 					box = new WedgedBox(new Vector2(button_width + Math.Abs(extraWidth), button_area_height), wedge_width)
 					{
@@ -431,7 +436,7 @@ namespace osu.Game.GameModes.Menu
 						Colour = colour,
 						Scale = new Vector2(0, 2)
 					},
-					iconText = new AutoSizeContainer()
+					iconText = new AutoSizeContainer
 					{
 						Position = new Vector2(extraWidth / 2, 0),
 						Anchor = Anchor.Centre,
@@ -439,7 +444,7 @@ namespace osu.Game.GameModes.Menu
 						Children = new Drawable[]
 						{
 							icon = new TextAwesome(symbol, 40, Vector2.Zero),
-							new SpriteText()
+							new SpriteText
 							{
 								Direction = FlowDirection.HorizontalOnly,
 								Anchor = Anchor.Centre,
@@ -449,7 +454,7 @@ namespace osu.Game.GameModes.Menu
 							}
 						}
 					}
-				});
+				};
 			}
 
             protected override bool OnHover(InputState state)
