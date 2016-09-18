@@ -46,12 +46,17 @@ namespace osu.Game
 			//};
 			//API.Queue(req);
 
-			Add(new Drawable[]
+			Children = new Drawable[]
 			{
-				new RatioAdjust(),
-				new MainMenu(),
-				new CursorContainer()
-			});
+				new RatioAdjust
+				{
+					Children = new Drawable[]
+					{
+						new MainMenu(),
+						new CursorContainer()
+					}
+				}
+			};
         }
 
         protected override void Dispose(bool isDisposing)

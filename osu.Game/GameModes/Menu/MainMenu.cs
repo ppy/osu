@@ -23,22 +23,22 @@ namespace osu.Game.GameModes.Menu
 
 			AudioSample welcome = Game.Audio.Sample.Get(@"welcome");
 
-			Add(new Drawable[]
+			Children = new Drawable[]
 			{
 				new ButtonSystem(),
-				new TextBox()
+				new TextBox
 				{
 					Text = @"The quick brown fox jumped over the lazy dog.",
 					Position = new Vector2(50, 50),
 					Size = new Vector2(300, 20)
 				},
-				new SpriteText()
+				new SpriteText
 				{
 					Text = @"The quick brown fox jumped over the lazy dog.",
 					Position = new Vector2(50, 80),
 					Size = new Vector2(300, 20)
 				}
-			});
+			};
 		}
     }
 }
