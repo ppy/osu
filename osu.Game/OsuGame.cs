@@ -40,18 +40,18 @@ namespace osu.Game
                 Token = Config.Get<string>(OsuConfig.Token)
             };
 
-            //var req = new ListChannelsRequest();
-            //req.Success += content =>
-            //{
-            //};
-            //API.Queue(req);
+			//var req = new ListChannelsRequest();
+			//req.Success += content =>
+			//{
+			//};
+			//API.Queue(req);
 
-            AddProcessing(new RatioAdjust());
-
-            //Add(new FontTest());
-
-            Add(new MainMenu());
-            Add(new CursorContainer());
+			Add(new Drawable[]
+			{
+				new RatioAdjust(),
+				new MainMenu(),
+				new CursorContainer()
+			});
         }
 
         protected override void Dispose(bool isDisposing)
