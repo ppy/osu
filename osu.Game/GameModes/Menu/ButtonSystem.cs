@@ -310,7 +310,7 @@ namespace osu.Game.GameModes.Menu
 								Origin = Anchor.Centre,
 								Alpha = 0.4f
 							},
-							vis = new MenuVisualisation()
+							vis = new MenuVisualisation
 							{
 								Anchor = Anchor.Centre,
 								Origin = Anchor.Centre,
