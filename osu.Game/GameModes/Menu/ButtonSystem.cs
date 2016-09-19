@@ -50,13 +50,14 @@ namespace osu.Game.GameModes.Menu
         {
             base.Load();
 
+			osuLogo = new OsuLogo(onOsuLogo)
+			{
+				Origin = Anchor.Centre,
+				Anchor = Anchor.Centre
+			};
+
             Children = new Drawable[]
             {
-                osuLogo = new OsuLogo(onOsuLogo)
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre
-                },
                 buttonArea = new Container
                 {
                     Anchor = Anchor.Centre,
@@ -88,7 +89,8 @@ namespace osu.Game.GameModes.Menu
                             CentreTarget = iconFacade
                         }
                     }
-                }
+                },
+				osuLogo
             };
 
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"solo", @"freeplay", FontAwesome.user, new Color4(102, 68, 204, 255), onSolo, wedge_width, Key.P)));
@@ -100,8 +102,6 @@ namespace osu.Game.GameModes.Menu
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!editor", @"edit", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), onEdit, 0, Key.E)));
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!direct", @"direct", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), onDirect, 0, Key.D)));
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"exit", @"exit", FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), onExit, 0, Key.Q)));
-
-            buttonFlow.CentreTarget = iconFacade;
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)

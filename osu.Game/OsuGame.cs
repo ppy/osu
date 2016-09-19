@@ -29,7 +29,7 @@ namespace osu.Game
             base.Load();
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            Fonts = new TextureStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular")) { ScaleAdjust = 0.2f };
+            Fonts = new TextureStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular")) { ScaleAdjust = 0.01f };
 
             Parent.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
 
