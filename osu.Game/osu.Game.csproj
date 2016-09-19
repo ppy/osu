@@ -46,17 +46,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\OsuConfigManager.cs" />
-    <Compile Include="GameModes\FontTest.cs" />
     <Compile Include="GameModes\Menu\ButtonSystem.cs" />
     <Compile Include="GameModes\Menu\MainMenu.cs" />
-    <Compile Include="GameModes\FieldTest.cs" />
     <Compile Include="Graphics\Containers\OsuComponent.cs" />
     <Compile Include="Graphics\Containers\OsuGameMode.cs" />
     <Compile Include="Graphics\Containers\OsuLargeComponent.cs" />
-    <Compile Include="Graphics\Cursor\CursorContainer.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\TextAwesome.cs" />
-    <Compile Include="Graphics\UserInterface\TextBox.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
     <Compile Include="Online\API\APIRequest.cs" />
     <Compile Include="Online\API\OAuth.cs" />
