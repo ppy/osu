@@ -5,12 +5,12 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Configuration;
 using osu.Game.GameModes.Menu;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using OpenTK;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 
@@ -29,7 +29,7 @@ namespace osu.Game
             base.Load();
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            Fonts = new TextureStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular")) { ScaleAdjust = 0.2f };
+            Fonts = new TextureStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular")) { ScaleAdjust = 0.01f };
 
             Parent.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
 
@@ -40,18 +40,23 @@ namespace osu.Game
                 Token = Config.Get<string>(OsuConfig.Token)
             };
 
-            //var req = new ListChannelsRequest();
-            //req.Success += content =>
-            //{
-            //};
-            //API.Queue(req);
+			//var req = new ListChannelsRequest();
+			//req.Success += content =>
+			//{
+			//};
+			//API.Queue(req);
 
-            AddProcessing(new RatioAdjust());
-
-            //Add(new FontTest());
-
-            Add(new MainMenu());
-            Add(new CursorContainer());
+			Children = new Drawable[]
+			{
+				new RatioAdjust
+				{
+					Children = new Drawable[]
+					{
+						new MainMenu(),
+						new CursorContainer()
+					}
+				}
+			};
         }
 
         protected override void Dispose(bool isDisposing)
