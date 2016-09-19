@@ -50,12 +50,6 @@ namespace osu.Game.GameModes.Menu
         {
             base.Load();
 
-			osuLogo = new OsuLogo(onOsuLogo)
-			{
-				Origin = Anchor.Centre,
-				Anchor = Anchor.Centre
-			};
-
             Children = new Drawable[]
             {
                 buttonArea = new Container
@@ -89,7 +83,11 @@ namespace osu.Game.GameModes.Menu
                         }
                     }
                 },
-				osuLogo
+				osuLogo = new OsuLogo(onOsuLogo)
+				{
+					Origin = Anchor.Centre,
+					Anchor = Anchor.Centre
+				}
             };
 
 			buttonFlow.Position = new Vector2(wedge_width * 2 - (button_width + osuLogo.SizeForFlow / 4), 0);
