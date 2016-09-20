@@ -50,41 +50,47 @@ namespace osu.Game.GameModes.Menu
         {
             base.Load();
 
-            osuLogo = new OsuLogo(onOsuLogo)
+            Children = new Drawable[]
             {
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
+                buttonArea = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    SizeMode = InheritMode.X,
+                    Size = new Vector2(1, button_area_height),
+                    Alpha = 0,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            SizeMode = InheritMode.XY,
+                            Colour = new Color4(50, 50, 50, 255)
+                        },
+                        buttonFlow = new FlowContainerWithOrigin
+                        {
+                            Anchor = Anchor.Centre,
+                            Padding = new Vector2(-wedge_width, 0),
+                            Children = new Drawable[]
+                            {
+                                settingsButton = new Button(@"settings", @"options", FontAwesome.gear, new Color4(85, 85, 85, 255), onSettings, -wedge_width, Key.O),
+                                backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -wedge_width, Key.Escape),
+                                iconFacade = new Container //need a container to make the osu! icon flow properly.
+								{
+									Size = new Vector2(0, button_area_height)
+								}
+                            },
+                            CentreTarget = iconFacade
+                        }
+                    }
+                },
+				osuLogo = new OsuLogo(onOsuLogo)
+				{
+					Origin = Anchor.Centre,
+					Anchor = Anchor.Centre
+				}
             };
 
-            Add(buttonArea = new Container()
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                SizeMode = InheritMode.X,
-                Size = new Vector2(1, button_area_height),
-                Alpha = 0
-            });
-
-            Add(osuLogo);
-
-            buttonArea.Add(new Box()
-            {
-                SizeMode = InheritMode.XY,
-                Colour = new Color4(50, 50, 50, 255)
-            });
-
-            buttonArea.Add(buttonFlow = new FlowContainerWithOrigin()
-            {
-                Anchor = Anchor.Centre,
-                Position = new Vector2(wedge_width * 2 - (button_width + osuLogo.SizeForFlow / 4), 0),
-                Padding = new Vector2(-wedge_width, 0)
-            });
-
-            buttonFlow.Add(settingsButton = new Button(@"settings", @"options", FontAwesome.gear, new Color4(85, 85, 85, 255), onSettings, -wedge_width, Key.O));
-            buttonFlow.Add(backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -wedge_width, Key.Escape));
-
-            //need a container to make the osu! icon flow properly.
-            buttonFlow.Add(iconFacade = new Container() { Size = new Vector2(0, button_area_height) });
+			buttonFlow.Position = new Vector2(wedge_width * 2 - (button_width + osuLogo.SizeForFlow / 4), 0);
 
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"solo", @"freeplay", FontAwesome.user, new Color4(102, 68, 204, 255), onSolo, wedge_width, Key.P)));
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"multi", @"multiplayer", FontAwesome.users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M)));
@@ -95,8 +101,6 @@ namespace osu.Game.GameModes.Menu
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!editor", @"edit", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), onEdit, 0, Key.E)));
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!direct", @"direct", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), onDirect, 0, Key.D)));
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"exit", @"exit", FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), onExit, 0, Key.Q)));
-
-            buttonFlow.CentreTarget = iconFacade;
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -177,6 +181,8 @@ namespace osu.Game.GameModes.Menu
 
         MenuState state;
 
+        public override bool HandleInput => state != MenuState.Exit;
+
         public MenuState State
         {
             get
@@ -235,8 +241,6 @@ namespace osu.Game.GameModes.Menu
                             b.State = Button.ButtonState.Expanded;
                         break;
                     case MenuState.Exit:
-                        HandleInput = false;
-
                         buttonArea.FadeOut(200);
 
                         foreach (Button b in buttonsTopLevel)
@@ -285,38 +289,41 @@ namespace osu.Game.GameModes.Menu
             {
                 base.Load();
 
-                Add(logoBounceContainer = new AutoSizeContainer());
+				Sprite ripple;
 
-                logo = new Sprite(Game.Textures.Get(@"menu-osu"))
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                };
 
-                logoBounceContainer.Add(logo);
+				Children = new Drawable[]
+				{
+					logoBounceContainer = new AutoSizeContainer
+					{
+						Children = new Drawable[]
+						{
+							logo = new Sprite(Game.Textures.Get(@"menu-osu"))
+							{
+								Anchor = Anchor.Centre,
+								Origin = Anchor.Centre
+							},
+							ripple = new Sprite(Game.Textures.Get(@"menu-osu"))
+							{
+								Anchor = Anchor.Centre,
+								Origin = Anchor.Centre,
+								Alpha = 0.4f
+							},
+							vis = new MenuVisualisation
+							{
+								Anchor = Anchor.Centre,
+								Origin = Anchor.Centre,
+								Size = logo.Size,
+								Additive = true,
+								Alpha = 0.2f,
+							}
+						}
+					}
+				};
 
-                Sprite ripple = new Sprite(Game.Textures.Get(@"menu-osu"))
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Alpha = 0.4f
-                };
-
-                logoBounceContainer.Add(ripple);
-
-                ripple.ScaleTo(1.1f, 500);
-                ripple.FadeOut(500);
-                ripple.Loop(300);
-
-                logoBounceContainer.Add(vis = new MenuVisualisation()
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = logo.Size,
-                    Additive = true,
-                    //Radius = logo.Size.X / 2 * 0.96f,
-                    Alpha = 0.2f,
-                });
+				ripple.ScaleTo(1.1f, 500);
+				ripple.FadeOut(500);
+				ripple.Loop(300);
             }
 
             public OsuLogo(Action action)
@@ -414,46 +421,40 @@ namespace osu.Game.GameModes.Menu
                 this.text = text;
             }
 
-            public override void Load()
-            {
-                base.Load();
-                Alpha = 0;
+			public override void Load()
+			{
+				base.Load();
+				Alpha = 0;
 
-                Add(box = new WedgedBox(new Vector2(button_width + Math.Abs(extraWidth), button_area_height), wedge_width)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Colour = colour,
-                    Scale = new Vector2(0, 1)
-                });
-
-                iconText = new AutoSizeContainer
-                {
-                    Position = new Vector2(extraWidth / 2, 0),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                };
-
-                Add(iconText);
-
-                icon = new TextAwesome(symbol, 40, Vector2.Zero)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.7f),
-                };
-                iconText.Add(icon);
-
-                SpriteText ft = new SpriteText()
-                {
-                    Direction = FlowDirection.HorizontalOnly,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Position = new Vector2(0, 25),
-                    Text = text
-                };
-                iconText.Add(ft);
-            }
+				Children = new Drawable[]
+				{
+					box = new WedgedBox(new Vector2(button_width + Math.Abs(extraWidth), button_area_height), wedge_width)
+					{
+						Anchor = Anchor.Centre,
+						Origin = Anchor.Centre,
+						Colour = colour,
+						Scale = new Vector2(0, 1)
+					},
+					iconText = new AutoSizeContainer
+					{
+						Position = new Vector2(extraWidth / 2, 0),
+						Anchor = Anchor.Centre,
+						Origin = Anchor.Centre,
+						Children = new Drawable[]
+						{
+							icon = new TextAwesome(symbol, 40, Vector2.Zero),
+							new SpriteText
+							{
+								Direction = FlowDirection.HorizontalOnly,
+								Anchor = Anchor.Centre,
+								Origin = Anchor.Centre,
+								Position = new Vector2(0, 25),
+								Text = text
+							}
+						}
+					}
+				};
+			}
 
             protected override bool OnHover(InputState state)
             {
@@ -586,9 +587,10 @@ namespace osu.Game.GameModes.Menu
                 //box.FlashColour(ColourHelper.Lighten2(colour, 0.7f), 200);
             }
 
+            public override bool HandleInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
+
             protected override void Update()
             {
-                HandleInput = state != ButtonState.Exploded && box.Scale.X >= 0.8f;
                 iconText.Alpha = MathHelper.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
                 base.Update();
             }
