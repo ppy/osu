@@ -65,7 +65,7 @@ namespace osu.Game.Online.API
                 Token = req.ResponseObject;
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 //todo: potentially only kill the refresh token on certain exception types.
                 Token = null;
