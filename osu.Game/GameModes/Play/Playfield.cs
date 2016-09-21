@@ -7,5 +7,11 @@ namespace osu.Game.GameModes.Play
 {
     public class Playfield : Container
     {
+        public override void Load()
+        {
+            base.Load();
+
+            Masking = true;
+        }
     }
 }
