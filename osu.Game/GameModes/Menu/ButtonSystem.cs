@@ -181,6 +181,8 @@ namespace osu.Game.GameModes.Menu
 
         MenuState state;
 
+        public override bool HandleInput => state != MenuState.Exit;
+
         public MenuState State
         {
             get
@@ -239,8 +241,6 @@ namespace osu.Game.GameModes.Menu
                             b.State = Button.ButtonState.Expanded;
                         break;
                     case MenuState.Exit:
-                        HandleInput = false;
-
                         buttonArea.FadeOut(200);
 
                         foreach (Button b in buttonsTopLevel)
@@ -298,14 +298,16 @@ namespace osu.Game.GameModes.Menu
 					{
 						Children = new Drawable[]
 						{
-							logo = new Sprite(Game.Textures.Get(@"menu-osu"))
+							logo = new Sprite()
 							{
-								Anchor = Anchor.Centre,
+                                Texture = Game.Textures.Get(@"menu-osu"),
+                                Anchor = Anchor.Centre,
 								Origin = Anchor.Centre
 							},
-							ripple = new Sprite(Game.Textures.Get(@"menu-osu"))
+							ripple = new Sprite()
 							{
-								Anchor = Anchor.Centre,
+                                Texture = Game.Textures.Get(@"menu-osu"),
+                                Anchor = Anchor.Centre,
 								Origin = Anchor.Centre,
 								Alpha = 0.4f
 							},
@@ -587,9 +589,10 @@ namespace osu.Game.GameModes.Menu
                 //box.FlashColour(ColourHelper.Lighten2(colour, 0.7f), 200);
             }
 
+            public override bool HandleInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
+
             protected override void Update()
             {
-                HandleInput = state != ButtonState.Exploded && box.Scale.X >= 0.8f;
                 iconText.Alpha = MathHelper.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
                 base.Update();
             }
