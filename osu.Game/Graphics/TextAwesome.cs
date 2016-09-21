@@ -28,11 +28,9 @@ namespace osu.Game.Graphics
             }
         }
 
-        internal TextAwesome(FontAwesome icon = FontAwesome.circle, float size = 10, Vector2? position = null)
-            : base(null)
+        public TextAwesome()
         {
-            Icon = icon;
-            Origin = osu.Framework.Graphics.Anchor.Centre;
+            Origin = Framework.Graphics.Anchor.Centre;
         }
     }
 
