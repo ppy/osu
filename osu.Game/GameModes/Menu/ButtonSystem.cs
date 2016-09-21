@@ -298,14 +298,16 @@ namespace osu.Game.GameModes.Menu
 					{
 						Children = new Drawable[]
 						{
-							logo = new Sprite(Game.Textures.Get(@"menu-osu"))
+							logo = new Sprite
 							{
-								Anchor = Anchor.Centre,
+                                Texture = Game.Textures.Get(@"menu-osu"),
+                                Anchor = Anchor.Centre,
 								Origin = Anchor.Centre
 							},
-							ripple = new Sprite(Game.Textures.Get(@"menu-osu"))
+							ripple = new Sprite
 							{
-								Anchor = Anchor.Centre,
+                                Texture = Game.Textures.Get(@"menu-osu"),
+                                Anchor = Anchor.Centre,
 								Origin = Anchor.Centre,
 								Alpha = 0.4f
 							},
