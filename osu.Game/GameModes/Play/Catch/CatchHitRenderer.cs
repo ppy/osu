@@ -69,8 +69,9 @@ namespace osu.Game.GameModes.Play.Catch
             foreach (CatchBaseHit h in objects)
             {
                 //render stuff!
-                Sprite s = new Sprite(Game.Textures.Get(@"menu-osu"))
+                Sprite s = new Sprite
                 {
+                    Texture = Game.Textures.Get(@"menu-osu"),
                     Origin = Anchor.Centre,
                     Scale = new Vector2(0.1f),
                     PositionMode = InheritMode.Y,

@@ -24,7 +24,7 @@ namespace osu.Game.GameModes.Play.Catch
         {
             base.Load();
 
-            Add(new Box() { SizeMode = InheritMode.XY, Alpha = 0.5f });
+            Add(new Box { SizeMode = InheritMode.XY, Alpha = 0.5f });
         }
     }
 }

@@ -24,10 +24,11 @@ namespace osu.Game.GameModes.Play.Taiko
         {
             base.Load();
 
-            Add(new Box() { SizeMode = InheritMode.XY, Alpha = 0.5f });
+            Add(new Box { SizeMode = InheritMode.XY, Alpha = 0.5f });
 
-            Add(new Sprite(Game.Textures.Get(@"menu-osu"))
+            Add(new Sprite
             {
+                Texture = Game.Textures.Get(@"menu-osu"),
                 Origin = Anchor.Centre,
                 Scale = new Vector2(0.2f),
                 PositionMode = InheritMode.XY,
