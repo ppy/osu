@@ -41,37 +41,37 @@ namespace osu.Game.GameModes.Play
                 HitObjects = objects
             };
 
-            Add(new OsuHitRenderer()
+            Children = new Drawable[]
             {
-                Objects = beatmap.HitObjects,
-                Scale = new Vector2(0.5f),
-                Anchor = Anchor.TopLeft,
-                Origin = Anchor.TopLeft
-            });
-
-            Add(new TaikoHitRenderer()
-            {
-                Objects = beatmap.HitObjects,
-                Scale = new Vector2(0.5f),
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight
-            });
-
-            Add(new CatchHitRenderer()
-            {
-                Objects = beatmap.HitObjects,
-                Scale = new Vector2(0.5f),
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft
-            });
-
-            Add(new ManiaHitRenderer()
-            {
-                Objects = beatmap.HitObjects,
-                Scale = new Vector2(0.5f),
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight
-            });
+                new OsuHitRenderer
+                {
+                    Objects = beatmap.HitObjects,
+                    Scale = new Vector2(0.5f),
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft
+                },
+                new TaikoHitRenderer
+                {
+                    Objects = beatmap.HitObjects,
+                    Scale = new Vector2(0.5f),
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight
+                },
+                new CatchHitRenderer
+                {
+                    Objects = beatmap.HitObjects,
+                    Scale = new Vector2(0.5f),
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft
+                },
+                new ManiaHitRenderer
+                {
+                    Objects = beatmap.HitObjects,
+                    Scale = new Vector2(0.5f),
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight
+                }
+            };
         }
     }
 }
