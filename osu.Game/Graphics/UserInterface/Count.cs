@@ -27,7 +27,7 @@ namespace osu.Game.Graphics
 		public override bool HandleInput => true;
 		public override bool Contains(Vector2 screenSpacePos) => true;
 
-		internal bool NotCounting => (keyCounter != null && !keyCounter.IsCounting);
+		internal bool IsCounting => (keyCounter != null && keyCounter.isCounting);
 
 		public override void Load()
 		{
@@ -70,7 +70,7 @@ namespace osu.Game.Graphics
 
 		public void CountTriggerPressed()
 		{
-			if (isLit || NotCounting)
+			if (isLit || !IsCounting)
 				return;
 			isLit = true;
 			countSpriteText.Text = (++count).ToString();
@@ -82,6 +82,8 @@ namespace osu.Game.Graphics
 
 		public void CountTriggerReleased()
 		{
+			if(!IsCounting)
+				return;
 			countSpriteText.Colour = textColourNormal;
 			keySpriteText.Colour = textColourNormal;
 			buttonSprite.Texture = Game.Textures.Get(@"KeyCounter/key-up");

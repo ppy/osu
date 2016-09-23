@@ -14,7 +14,7 @@ namespace osu.Framework.Graphics
 {
 	class KeyCounter : OsuComponent
 	{
-		public bool IsCounting = true;
+		public bool isCounting = true;
 		internal FlowContainer flow;
 
 		public override void Load()
