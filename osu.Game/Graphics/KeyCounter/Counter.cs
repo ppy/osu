@@ -64,6 +64,8 @@ namespace osu.Game.Graphics.KeyCounter
             sTextCount.Text = countingValue.ToString();
         }
 
+        public override bool Contains(Vector2 screenSpacePos) => true;
+
         public override void Load()
         {
             base.Load();

@@ -10,7 +10,12 @@ namespace osu.Game.Graphics.KeyCounter
     /// </summary>
     class KeyCounter : Drawable
     {
-        private FlowContainer counterContainer;
+        class KeyCounterFlow : FlowContainer
+        {
+            public override bool Contains(Vector2 screenSpacePos) => true;
+        }
+
+        private KeyCounterFlow counterContainer;
         private List<Count> counterList;
 
         private bool isCounting = true;
@@ -28,13 +33,15 @@ namespace osu.Game.Graphics.KeyCounter
             }
         }
 
+        public override bool Contains(Vector2 screenSpacePos) => true;
+
         public override void Load()
         {
             base.Load();
 
             counterList = new List<Count>();
 
-            counterContainer = new FlowContainer
+            counterContainer = new KeyCounterFlow
             {
                 Direction = FlowDirection.HorizontalOnly,
                 Anchor = Anchor.Centre,
