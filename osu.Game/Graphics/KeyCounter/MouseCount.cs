@@ -20,8 +20,6 @@ namespace osu.Game.Graphics.KeyCounter
             eventMouse = btn;
         }
 
-        //public override bool HasFocus => true;
-
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             if (args.Button == eventMouse)
