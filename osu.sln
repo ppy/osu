@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Framework.Desktop", "osu-framework\osu.Framework.Desktop\osu.Framework.Desktop.csproj", "{65DC628F-A640-4111-AB35-3A5652BC1E17}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Desktop.VisualTests", "osu.Desktop.VisualTests\osu.Desktop.VisualTests.csproj", "{69051C69-12AE-4E7D-A3E6-460D2E282312}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,12 @@ Global
 		{65DC628F-A640-4111-AB35-3A5652BC1E17}.Deploy|Any CPU.Build.0 = Debug|Any CPU
 		{65DC628F-A640-4111-AB35-3A5652BC1E17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65DC628F-A640-4111-AB35-3A5652BC1E17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69051C69-12AE-4E7D-A3E6-460D2E282312}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69051C69-12AE-4E7D-A3E6-460D2E282312}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69051C69-12AE-4E7D-A3E6-460D2E282312}.Deploy|Any CPU.ActiveCfg = Deploy|Any CPU
+		{69051C69-12AE-4E7D-A3E6-460D2E282312}.Deploy|Any CPU.Build.0 = Deploy|Any CPU
+		{69051C69-12AE-4E7D-A3E6-460D2E282312}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69051C69-12AE-4E7D-A3E6-460D2E282312}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,5 +72,6 @@ Global
 		{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D} = {0D37A2AD-80A4-464F-A1DE-1560B70F1CE3}
 		{D9A367C9-4C1A-489F-9B05-A0CEA2B53B58} = {0D37A2AD-80A4-464F-A1DE-1560B70F1CE3}
 		{65DC628F-A640-4111-AB35-3A5652BC1E17} = {7A75DFA2-DE65-4458-98AF-26AF96FFD6DC}
+		{69051C69-12AE-4E7D-A3E6-460D2E282312} = {0D37A2AD-80A4-464F-A1DE-1560B70F1CE3}
 	EndGlobalSection
 EndGlobal
