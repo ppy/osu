@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -26,10 +27,17 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 if (value && !isLit && IsCounting)
-                    Counts++;
-                isLit = value;
+                    IncreaseCount();
+                if (isLit != value)
+                {
+                    isLit = value;
+                    UpdateGlowSprite();
+                }
             }
         }
+
+        public Color4 KeyDownTextColor { get; set; } = Color4.DarkGray;
+        public Color4 KeyUpTextColor { get; set; } = Color4.White;
 
         protected Count(string name)
         {
@@ -61,17 +69,42 @@ namespace osu.Game.Graphics.UserInterface
                     Text = Name,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Position = new Vector2(0, -buttonSprite.Height / 4)
+                    Position = new Vector2(0, -buttonSprite.Height / 4),
+                    Colour = KeyUpTextColor
                 },
                 countSpriteText = new SpriteText
                 {
                     Text = Counts.ToString(),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Position = new Vector2(0, buttonSprite.Height / 4)
+                    Position = new Vector2(0, buttonSprite.Height / 4),
+                    Colour = KeyUpTextColor
                 }
             };
             glowSprite.Hide();
+        }
+
+        private void UpdateGlowSprite()
+        {
+            //can have a FadeTime property or const
+            if (IsLit)
+            {
+                glowSprite.Show();
+                countSpriteText.FadeColour(KeyDownTextColor, 0);
+                keySpriteText.FadeColour(KeyDownTextColor, 0);
+            }
+            else
+            {
+                glowSprite.Hide();
+                countSpriteText.FadeColour(KeyUpTextColor, 0);
+                keySpriteText.FadeColour(KeyUpTextColor, 0);
+            }
+        }
+
+        private void IncreaseCount()
+        {
+            Counts++;
+            countSpriteText.Text = Counts.ToString();
         }
     }
 }
