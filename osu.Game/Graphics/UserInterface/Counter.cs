@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -58,14 +59,16 @@ namespace osu.Game.Graphics.UserInterface
                 keySpriteText = new SpriteText
                 {
                     Text = Name,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Position = new Vector2(0, -buttonSprite.Height / 4)
                 },
                 countSpriteText = new SpriteText
                 {
                     Text = Counts.ToString(),
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Position = new Vector2(0, buttonSprite.Height / 4)
                 }
             };
             glowSprite.Hide();
