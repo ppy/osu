@@ -54,14 +54,18 @@ namespace osu.Game.Graphics
 				keySpriteText = new SpriteText
 				{
 					Text = name,
-					Anchor = Anchor.TopCentre,
-					Origin = Anchor.TopCentre,
+					Anchor = Anchor.Centre,
+					Origin = Anchor.Centre,
+					Position = new Vector2(0, -buttonSprite.Height / 4),
+					Colour = textColourNormal,
 				},
 				countSpriteText = new SpriteText
 				{
 					Text = count.ToString(),
-					Anchor = Anchor.BottomCentre,
-					Origin = Anchor.BottomCentre,
+					Anchor = Anchor.Centre,
+					Origin = Anchor.Centre,
+					Position = new Vector2(0, buttonSprite.Height / 4),
+					Colour = textColourNormal,
 				}
 			};
 
@@ -76,7 +80,6 @@ namespace osu.Game.Graphics
 			countSpriteText.Text = (++count).ToString();
 			countSpriteText.Colour = textColourGlow;
 			keySpriteText.Colour = textColourGlow;
-			buttonSprite.Texture = Game.Textures.Get(@"key-hit");
 			glowSprite.Show();
 		}
 
@@ -86,7 +89,6 @@ namespace osu.Game.Graphics
 				return;
 			countSpriteText.Colour = textColourNormal;
 			keySpriteText.Colour = textColourNormal;
-			buttonSprite.Texture = Game.Textures.Get(@"KeyCounter/key-up");
 			glowSprite.FadeOut(4);
 			isLit = false;
 		}
