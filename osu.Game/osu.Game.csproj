@@ -53,6 +53,8 @@
     <Compile Include="Graphics\Containers\OsuLargeComponent.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\TextAwesome.cs" />
+    <Compile Include="Graphics\UserInterface\Counter.cs" />
+    <Compile Include="Graphics\UserInterface\KeyCounter.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
     <Compile Include="Online\API\APIRequest.cs" />
     <Compile Include="Online\API\OAuth.cs" />
