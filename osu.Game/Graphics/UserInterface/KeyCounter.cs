@@ -23,7 +23,7 @@ namespace osu.Framework.Graphics
 
 			Children = new Drawable[]
 			{
-				flow = new BoundsBypassFlowContainer
+				flow = new KeyCounterFlowContainer
 				{
 					Direction = FlowDirection.HorizontalOnly,
 					LayoutEasing = EasingTypes.Out,
@@ -38,5 +38,10 @@ namespace osu.Framework.Graphics
 			addCount.keyCounter = this;
 			flow.Add(addCount);
 		}
+	}
+
+	class KeyCounterFlowContainer : FlowContainer
+	{
+		public override bool Contains(Vector2 screenSpacePos) => true;
 	}
 }
