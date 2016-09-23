@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
 ﻿// Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
+
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using OpenTK;
 
 namespace osu.Game.Graphics.KeyCounter
 {
@@ -46,6 +48,7 @@ namespace osu.Game.Graphics.KeyCounter
             counterContainer = new KeyCounterFlow
             {
                 Direction = FlowDirection.HorizontalOnly,
+                Padding = new Vector2(5.0f, 1.0f),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
             };
