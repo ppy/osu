@@ -13,8 +13,14 @@ namespace osu.Game.Graphics.UserInterface
             Direction = FlowDirection.HorizontalOnly;
         }
 
-        public void AddKey(Count key) => base.Add(key);
+        public void AddKey(Count key)
+        {
+            key.ParentCounter = this;
+            base.Add(key);
+        }
 
         public override bool Contains(Vector2 screenSpacePos) => true;
+
+        public bool IsCounting { get; set; }
     }
 }
