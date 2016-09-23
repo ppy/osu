@@ -101,7 +101,7 @@ namespace osu.Game.Graphics.KeyCounter
                 Text = name,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Position = new Vector2(0, 20)
+                Position = new Vector2(0, 15)
             };
 
             sTextCount = new SpriteText//(string.Empty, @"scoreentry", 2.5f, Clocks.Game, new Vector2(0, 10), 0.0f, Color4.Transparent)

@@ -48,7 +48,7 @@ namespace osu.Game.Graphics.KeyCounter
             counterContainer = new KeyCounterFlow
             {
                 Direction = FlowDirection.HorizontalOnly,
-                Padding = new Vector2(5.0f, 1.0f),
+                Padding = new Vector2(10.0f, 1.0f),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
             };
