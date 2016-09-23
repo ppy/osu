@@ -444,13 +444,19 @@ namespace osu.Game.GameModes.Menu
 						Origin = Anchor.Centre,
 						Children = new Drawable[]
 						{
-							icon = new TextAwesome(symbol, 40, Vector2.Zero),
+							icon = new TextAwesome
+                            {
+                                Anchor = Anchor.Centre,
+                                TextSize = 40,
+                                Position = new Vector2(0, 0),
+                                Icon = symbol
+                            },
 							new SpriteText
 							{
 								Direction = FlowDirection.HorizontalOnly,
 								Anchor = Anchor.Centre,
 								Origin = Anchor.Centre,
-								Position = new Vector2(0, 25),
+								Position = new Vector2(0, 35),
 								Text = text
 							}
 						}

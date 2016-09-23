@@ -37,7 +37,11 @@ namespace osu.Game
             base.Load();
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            Fonts = new TextureStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular")) { ScaleAdjust = 0.01f };
+            Fonts = new TextureStore() { ScaleAdjust = 0.01f };
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
+
 
             API = new APIAccess()
             {
