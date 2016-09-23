@@ -24,14 +24,14 @@ namespace osu.Game.Graphics.UserInterface
         public bool IsLit
         {
             get { return isLit; }
-            set
+            protected set
             {
-                if (value && !isLit && ParentCounter.IsCounting)
-                    IncreaseCount();
                 if (isLit != value)
                 {
                     isLit = value;
                     UpdateGlowSprite();
+                    if (value && ParentCounter.IsCounting)
+                        IncreaseCount();
                 }
             }
         }
