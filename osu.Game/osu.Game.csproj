@@ -64,6 +64,10 @@
     <Compile Include="Online\Chat\Message.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Graphics\UserInterface\Count.cs" />
+    <Compile Include="Graphics\UserInterface\KeyboardCount.cs" />
+    <Compile Include="Graphics\UserInterface\KeyCounter.cs" />
+    <Compile Include="Graphics\UserInterface\MouseCount.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
