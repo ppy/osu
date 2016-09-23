@@ -37,14 +37,14 @@ namespace osu.Game.Graphics
 			{
 				buttonSprite = new Sprite
 				{
-					Texture = Game.Textures.Get(@"key-up"),
+					Texture = Game.Textures.Get(@"KeyCounter/key-up"),
 					Anchor = Anchor.Centre,
 					Origin = Anchor.Centre,
 					Children = new Drawable[]
 					{
 						glowSprite = new Sprite
 						{
-							Texture = Game.Textures.Get(@"key-glow"),
+							Texture = Game.Textures.Get(@"KeyCounter/key-glow"),
 							Anchor = Anchor.Centre,
 							Origin = Anchor.Centre,
 							Alpha = 0.4f,
@@ -84,7 +84,7 @@ namespace osu.Game.Graphics
 		{
 			countSpriteText.Colour = textColourNormal;
 			keySpriteText.Colour = textColourNormal;
-			buttonSprite.Texture = Game.Textures.Get(@"key-up");
+			buttonSprite.Texture = Game.Textures.Get(@"KeyCounter/key-up");
 			glowSprite.FadeOut(4);
 			isLit = false;
 		}
