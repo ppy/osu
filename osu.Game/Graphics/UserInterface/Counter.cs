@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
         private SpriteText countSpriteText;
 
         public override string Name { get; }
-        public bool IsCounting { get; set; }
+        public KeyCounter ParentCounter { get; set; }
         public int Counts { get; private set; }
 
         private bool isLit;
@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
             get { return isLit; }
             set
             {
-                if (value && !isLit && IsCounting)
+                if (value && !isLit && ParentCounter.IsCounting)
                     IncreaseCount();
                 if (isLit != value)
                 {
