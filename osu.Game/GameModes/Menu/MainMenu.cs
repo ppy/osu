@@ -8,6 +8,7 @@ using osu.Framework.GameModes;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.KeyCounter;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -16,6 +17,7 @@ namespace osu.Game.GameModes.Menu
         public override string Name => @"Main Menu";
 
         private AudioTrackBass bgm;
+        private KeyCounter kc;
 
 		public override void Load()
 		{
@@ -40,5 +42,17 @@ namespace osu.Game.GameModes.Menu
 				}
 			};
 		}
+            Add(kc = new KeyCounter
+            {
+                Position = new Vector2(250, 280)
+            });            
+
+            kc.AddKey(new KeyboardCount(@"Z", OpenTK.Input.Key.Z));
+            kc.AddKey(new KeyboardCount(@"X", OpenTK.Input.Key.X));
+            kc.AddKey(new MouseCount(@"M1", OpenTK.Input.MouseButton.Left));
+            kc.AddKey(new MouseCount(@"M2", OpenTK.Input.MouseButton.Right));
+            
+            //kc.IsCounting = false;
+        }
     }
 }
