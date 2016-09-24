@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.UserInterface
                         },
                         countSpriteText = new SpriteText
                         {
-                            Text = Count.ToString(),
+                            Text = Count.ToString(@"#,0"),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Position = new Vector2(0, buttonSprite.Height / 4),
@@ -113,7 +113,7 @@ namespace osu.Game.Graphics.UserInterface
         private void IncreaseCount()
         {
             Count++;
-            countSpriteText.Text = Count.ToString();
+            countSpriteText.Text = Count.ToString(@"#,0");
         }
     }
 }
