@@ -26,18 +26,6 @@ namespace osu.Game.GameModes.Menu
 			Children = new Drawable[]
 			{
 				new ButtonSystem(),
-				new TextBox
-				{
-					Text = @"The quick brown fox jumped over the lazy dog.",
-					Position = new Vector2(50, 50),
-					Size = new Vector2(300, 20)
-				},
-				new SpriteText
-				{
-					Text = @"The quick brown fox jumped over the lazy dog.",
-					Position = new Vector2(50, 80),
-					Size = new Vector2(300, 20)
-				}
 			};
 		}
     }
