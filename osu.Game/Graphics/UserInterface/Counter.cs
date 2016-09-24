@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    abstract class Count : AutoSizeContainer
+    public abstract class Count : AutoSizeContainer
     {
         private Sprite buttonSprite;
         private Sprite glowSprite;
