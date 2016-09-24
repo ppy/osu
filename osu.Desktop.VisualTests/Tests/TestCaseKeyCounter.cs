@@ -23,8 +23,8 @@ namespace osu.Desktop.Tests
                 IsCounting = true
             };
             Add(kc);
-            kc.AddKey(new KeyCounterKeyBoard(@"Z", Key.Z));
-            kc.AddKey(new KeyCounterKeyBoard(@"X", Key.X));
+            kc.AddKey(new KeyCounterKeyboard(@"Z", Key.Z));
+            kc.AddKey(new KeyCounterKeyboard(@"X", Key.X));
             kc.AddKey(new KeyCounterMouse(@"M1", MouseButton.Left));
             kc.AddKey(new KeyCounterMouse(@"M2", MouseButton.Right));
         }
