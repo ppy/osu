@@ -6,9 +6,9 @@ using OpenTK;
 
 namespace osu.Game.Graphics
 {
-    internal class TextAwesome : SpriteText
+    public class TextAwesome : SpriteText
     {
-        //internal override FontFace FontFace => (int)Icon < 0xf000 ? FontFace.OsuFont : FontFace.FontAwesome;
+        //public override FontFace FontFace => (int)Icon < 0xf000 ? FontFace.OsuFont : FontFace.FontAwesome;
 
         private FontAwesome icon;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Graphics
         }
     }
 
-    internal enum FontAwesome
+    public enum FontAwesome
     {
         glass = 0xf000,
         music = 0xf001,
