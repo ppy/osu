@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="Tests\TestCaseKeyCounter.cs" />
     <Compile Include="Tests\TestCaseTextAwesome.cs" />
     <Compile Include="VisualTestGame.cs" />
   </ItemGroup>
