@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
@@ -22,20 +23,72 @@ namespace osu.Game.Graphics.UserInterface
         {
             counters.Add(key);
             key.IsCounting = this.IsCounting;
+            key.FadeTime = this.FadeTime;
+            key.KeyDownTextColor = this.KeyDownTextColor;
+            key.KeyUpTextColor = this.KeyUpTextColor;
             base.Add(key);
         }
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
+        //further: change default values here and in KeyCounter if needed, instead of passing them in every constructor
         private bool isCounting;
         public bool IsCounting
         {
             get { return isCounting; }
             set
             {
-                isCounting = value;
-                foreach (var child in counters)
-                    child.IsCounting = value;
+                if (value != isCounting)
+                {
+                    isCounting = value;
+                    foreach (var child in counters)
+                        child.IsCounting = value;
+                }
+            }
+        }
+
+        private int fadeTime = 0;
+        public int FadeTime
+        {
+            get { return fadeTime; }
+            set
+            {
+                if (value != fadeTime)
+                {
+                    fadeTime = value;
+                    foreach (var child in counters)
+                        child.FadeTime = value;
+                }
+            }
+        }
+
+        private Color4 keyDownTextColor = Color4.DarkGray;
+        public Color4 KeyDownTextColor
+        {
+            get { return keyDownTextColor; }
+            set
+            {
+                if (value != keyDownTextColor)
+                {
+                    keyDownTextColor = value;
+                    foreach (var child in counters)
+                        child.KeyDownTextColor = value;
+                }
+            }
+        }
+
+        private Color4 keyUpTextColor = Color4.White;
+        public Color4 KeyUpTextColor
+        {
+            get { return keyUpTextColor; }
+            set
+            {
+                if (value != keyUpTextColor)
+                {
+                    keyUpTextColor = value;
+                    foreach (var child in counters)
+                        child.KeyUpTextColor = value;
+                }
             }
         }
     }
