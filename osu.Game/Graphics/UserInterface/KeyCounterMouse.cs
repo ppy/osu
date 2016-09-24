@@ -8,10 +8,10 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class MouseCount : Count
+    public class KeyCounterMouse : KeyCounter
     {
         public MouseButton Button { get; }
-        public MouseCount(string name, MouseButton button) : base(name)
+        public KeyCounterMouse(string name, MouseButton button) : base(name)
         {
             Button = button;
         }

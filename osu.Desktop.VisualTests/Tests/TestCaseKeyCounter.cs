@@ -16,17 +16,17 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
 
-            KeyCounter kc = new KeyCounter
+            KeyCounterCollection kc = new KeyCounterCollection
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 IsCounting = true
             };
             Add(kc);
-            kc.AddKey(new KeyBoardCount(@"Z", Key.Z));
-            kc.AddKey(new KeyBoardCount(@"X", Key.X));
-            kc.AddKey(new MouseCount(@"M1", MouseButton.Left));
-            kc.AddKey(new MouseCount(@"M2", MouseButton.Right));
+            kc.AddKey(new KeyCounterKeyBoard(@"Z", Key.Z));
+            kc.AddKey(new KeyCounterKeyBoard(@"X", Key.X));
+            kc.AddKey(new KeyCounterMouse(@"M1", MouseButton.Left));
+            kc.AddKey(new KeyCounterMouse(@"M2", MouseButton.Right));
         }
     }
 }
