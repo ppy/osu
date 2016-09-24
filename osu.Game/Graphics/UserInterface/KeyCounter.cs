@@ -37,8 +37,10 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        //further: change default values here and in KeyCounterCollection if needed, instead of passing them in every constructor
         public Color4 KeyDownTextColor { get; set; } = Color4.DarkGray;
         public Color4 KeyUpTextColor { get; set; } = Color4.White;
+        public int FadeTime { get; set; } = 0;
 
         protected KeyCounter(string name)
         {
@@ -96,16 +98,15 @@ namespace osu.Game.Graphics.UserInterface
 
         private void UpdateGlowSprite()
         {
-            //can have a FadeTime property or const
             if (IsLit)
             {
-                glowSprite.FadeIn();
-                textLayer.FadeColour(KeyDownTextColor, 0);
+                glowSprite.FadeIn(FadeTime);
+                textLayer.FadeColour(KeyDownTextColor, FadeTime);
             }
             else
             {
                 glowSprite.FadeOut();
-                textLayer.FadeColour(KeyUpTextColor, 0);
+                textLayer.FadeColour(KeyUpTextColor, FadeTime);
             }
         }
 
