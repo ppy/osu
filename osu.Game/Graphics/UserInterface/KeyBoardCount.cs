@@ -7,7 +7,7 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    class KeyBoardCount : Count
+    public class KeyBoardCount : Count
     {
         public Key Key { get; }
         public KeyBoardCount(string name, Key key) : base(name)

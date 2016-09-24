@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    class KeyCounter : FlowContainer
+    public class KeyCounter : FlowContainer
     {
         public KeyCounter()
         {
