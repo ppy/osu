@@ -76,21 +76,21 @@ namespace osu.Game.GameModes.Menu
                                 backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -wedge_width, Key.Escape),
                                 iconFacade = new Container //need a container to make the osu! icon flow properly.
 								{
-									Size = new Vector2(0, button_area_height)
-								}
+                                    Size = new Vector2(0, button_area_height)
+                                }
                             },
                             CentreTarget = iconFacade
                         }
                     }
                 },
-				osuLogo = new OsuLogo(onOsuLogo)
-				{
-					Origin = Anchor.Centre,
-					Anchor = Anchor.Centre
-				}
+                osuLogo = new OsuLogo(onOsuLogo)
+                {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre
+                }
             };
 
-			buttonFlow.Position = new Vector2(wedge_width * 2 - (button_width + osuLogo.SizeForFlow / 4), 0);
+            buttonFlow.Position = new Vector2(wedge_width * 2 - (button_width + osuLogo.SizeForFlow / 4), 0);
 
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"solo", @"freeplay", FontAwesome.user, new Color4(102, 68, 204, 255), onSolo, wedge_width, Key.P)));
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"multi", @"multiplayer", FontAwesome.users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M)));
@@ -289,43 +289,43 @@ namespace osu.Game.GameModes.Menu
             {
                 base.Load();
 
-				Sprite ripple;
+                Sprite ripple;
 
 
-				Children = new Drawable[]
-				{
-					logoBounceContainer = new AutoSizeContainer
-					{
-						Children = new Drawable[]
-						{
-							logo = new Sprite
-							{
+                Children = new Drawable[]
+                {
+                    logoBounceContainer = new AutoSizeContainer
+                    {
+                        Children = new Drawable[]
+                        {
+                            logo = new Sprite()
+                            {
                                 Texture = Game.Textures.Get(@"menu-osu"),
                                 Anchor = Anchor.Centre,
-								Origin = Anchor.Centre
-							},
-							ripple = new Sprite
-							{
+                                Origin = Anchor.Centre
+                            },
+                            ripple = new Sprite()
+                            {
                                 Texture = Game.Textures.Get(@"menu-osu"),
                                 Anchor = Anchor.Centre,
-								Origin = Anchor.Centre,
-								Alpha = 0.4f
-							},
-							vis = new MenuVisualisation
-							{
-								Anchor = Anchor.Centre,
-								Origin = Anchor.Centre,
-								Size = logo.Size,
-								Additive = true,
-								Alpha = 0.2f,
-							}
-						}
-					}
-				};
+                                Origin = Anchor.Centre,
+                                Alpha = 0.4f
+                            },
+                            vis = new MenuVisualisation
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = logo.Size,
+                                Additive = true,
+                                Alpha = 0.2f,
+                            }
+                        }
+                    }
+                };
 
-				ripple.ScaleTo(1.1f, 500);
-				ripple.FadeOut(500);
-				ripple.Loop(300);
+                ripple.ScaleTo(1.1f, 500);
+                ripple.FadeOut(500);
+                ripple.Loop(300);
             }
 
             public OsuLogo(Action action)
@@ -423,40 +423,46 @@ namespace osu.Game.GameModes.Menu
                 this.text = text;
             }
 
-			public override void Load()
-			{
-				base.Load();
-				Alpha = 0;
+            public override void Load()
+            {
+                base.Load();
+                Alpha = 0;
 
-				Children = new Drawable[]
-				{
-					box = new WedgedBox(new Vector2(button_width + Math.Abs(extraWidth), button_area_height), wedge_width)
-					{
-						Anchor = Anchor.Centre,
-						Origin = Anchor.Centre,
-						Colour = colour,
-						Scale = new Vector2(0, 1)
-					},
-					iconText = new AutoSizeContainer
-					{
-						Position = new Vector2(extraWidth / 2, 0),
-						Anchor = Anchor.Centre,
-						Origin = Anchor.Centre,
-						Children = new Drawable[]
-						{
-							icon = new TextAwesome(symbol, 40, Vector2.Zero),
-							new SpriteText
-							{
-								Direction = FlowDirection.HorizontalOnly,
-								Anchor = Anchor.Centre,
-								Origin = Anchor.Centre,
-								Position = new Vector2(0, 25),
-								Text = text
-							}
-						}
-					}
-				};
-			}
+                Children = new Drawable[]
+                {
+                    box = new WedgedBox(new Vector2(button_width + Math.Abs(extraWidth), button_area_height), wedge_width)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Colour = colour,
+                        Scale = new Vector2(0, 1)
+                    },
+                    iconText = new AutoSizeContainer
+                    {
+                        Position = new Vector2(extraWidth / 2, 0),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Children = new Drawable[]
+                        {
+                            icon = new TextAwesome
+                            {
+                                Anchor = Anchor.Centre,
+                                TextSize = 40,
+                                Position = new Vector2(0, 0),
+                                Icon = symbol
+                            },
+                            new SpriteText
+                            {
+                                Direction = FlowDirection.HorizontalOnly,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Position = new Vector2(0, 35),
+                                Text = text
+                            }
+                        }
+                    }
+                };
+            }
 
             protected override bool OnHover(InputState state)
             {
