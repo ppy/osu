@@ -1,30 +1,42 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Framework.GameModes;
+using OpenTK;
+using osu.Framework.GameModes.Testing;
+using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.GameModes.Play.Catch;
+using osu.Game.GameModes.Play.Mania;
 using osu.Game.GameModes.Play.Osu;
 using osu.Game.GameModes.Play.Taiko;
-using osu.Framework.Graphics;
-using osu.Game.GameModes.Play.Mania;
-using OpenTK;
+using System.Collections.Generic;
+using osu.Framework.Timing;
 
-namespace osu.Game.GameModes.Play
+namespace osu.Desktop.Tests
 {
-    public class PlayTest : GameMode
+    class TestCaseGamefield : TestCase
     {
-        public override void Load()
+        public override string Name => @"Gamefield";
+
+        public override string Description => @"Showing hitobjects and what not.";
+
+        FramedOffsetClock localClock;
+
+        protected override IFrameBasedClock Clock => localClock;
+
+        public override void Reset()
         {
-            base.Load();
+            base.Reset();
+
+            ///create a new clock offset to 0.
+            localClock = new FramedOffsetClock(base.Clock) { Offset = -base.Clock.CurrentTime };
 
             List<BaseHit> objects = new List<BaseHit>();
 
-            int time = 0;
+            int time = 500;
             for (int i = 0; i < 100; i++)
             {
                 objects.Add(new Circle()
@@ -41,7 +53,7 @@ namespace osu.Game.GameModes.Play
                 HitObjects = objects
             };
 
-            Children = new Drawable[]
+            Add(new Drawable[]
             {
                 new OsuHitRenderer
                 {
@@ -71,7 +83,13 @@ namespace osu.Game.GameModes.Play
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight
                 }
-            };
+            });
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            localClock.ProcessFrame();
         }
     }
 }

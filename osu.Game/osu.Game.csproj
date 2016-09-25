@@ -79,7 +79,6 @@
     <Compile Include="GameModes\Play\Osu\OsuHitRenderer.cs" />
     <Compile Include="GameModes\Play\Osu\OsuPlayfield.cs" />
     <Compile Include="GameModes\Play\Playfield.cs" />
-    <Compile Include="GameModes\Play\PlayTest.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoHitRenderer.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoPlayfield.cs" />
     <Compile Include="Graphics\Containers\OsuComponent.cs" />
