@@ -6,9 +6,9 @@ using OpenTK;
 
 namespace osu.Game.Graphics
 {
-    internal class TextAwesome : SpriteText
+    public class TextAwesome : SpriteText
     {
-        //internal override FontFace FontFace => (int)Icon < 0xf000 ? FontFace.OsuFont : FontFace.FontAwesome;
+        //public override FontFace FontFace => (int)Icon < 0xf000 ? FontFace.OsuFont : FontFace.FontAwesome;
 
         private FontAwesome icon;
 
@@ -28,15 +28,13 @@ namespace osu.Game.Graphics
             }
         }
 
-        internal TextAwesome(FontAwesome icon = FontAwesome.circle, float size = 10, Vector2? position = null)
-            : base(null)
+        public TextAwesome()
         {
-            Icon = icon;
-            Origin = osu.Framework.Graphics.Anchor.Centre;
+            Origin = Framework.Graphics.Anchor.Centre;
         }
     }
 
-    internal enum FontAwesome
+    public enum FontAwesome
     {
         glass = 0xf000,
         music = 0xf001,

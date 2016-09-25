@@ -97,6 +97,7 @@
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\Message.cs" />
     <Compile Include="OsuGame.cs" />
+    <Compile Include="OsuGameBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\User.cs" />
   </ItemGroup>
