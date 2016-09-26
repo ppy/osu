@@ -18,7 +18,19 @@ namespace osu.Game.Graphics.UserInterface
 
         public override string Name { get; }
         public bool IsCounting { get; set; }
-        public int Count { get; private set; }
+        private int count;
+        public int Count
+        {
+            get { return count; }
+            private set
+            {
+                if (count != value)
+                {
+                    count = value;
+                    countSpriteText.Text = value.ToString(@"#,0");
+                }
+            }
+        }
 
         private bool isLit;
         public bool IsLit
@@ -29,9 +41,9 @@ namespace osu.Game.Graphics.UserInterface
                 if (isLit != value)
                 {
                     isLit = value;
-                    UpdateGlowSprite();
+                    updateGlowSprite(value);
                     if (value && IsCounting)
-                        IncreaseCount();
+                        Count++;
                 }
             }
         }
@@ -95,24 +107,18 @@ namespace osu.Game.Graphics.UserInterface
             Width = buttonSprite.Width;
         }
 
-        private void UpdateGlowSprite()
+        private void updateGlowSprite(bool show)
         {
-            if (IsLit)
+            if (show)
             {
                 glowSprite.FadeIn(FadeTime);
                 textLayer.FadeColour(KeyDownTextColor, FadeTime);
             }
             else
             {
-                glowSprite.FadeOut();
+                glowSprite.FadeOut(FadeTime);
                 textLayer.FadeColour(KeyUpTextColor, FadeTime);
             }
-        }
-
-        private void IncreaseCount()
-        {
-            Count++;
-            countSpriteText.Text = Count.ToString(@"#,0");
         }
     }
 }
