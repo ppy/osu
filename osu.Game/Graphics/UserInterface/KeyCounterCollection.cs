@@ -28,6 +28,12 @@ namespace osu.Game.Graphics.UserInterface
             base.Add(key);
         }
 
+        public void ResetCount()
+        {
+            foreach (var counter in counters)
+                counter.ResetCount();
+        }
+
         public override bool Contains(Vector2 screenSpacePos) => true;
 
         //further: change default values here and in KeyCounter if needed, instead of passing them in every constructor
