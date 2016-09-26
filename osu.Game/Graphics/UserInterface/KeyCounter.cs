@@ -80,6 +80,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    SizeMode = InheritMode.XY,
                     Children = new Drawable[]
                     {
                         new SpriteText
@@ -87,7 +88,8 @@ namespace osu.Game.Graphics.UserInterface
                             Text = Name,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Position = new Vector2(0, -buttonSprite.Height / 4),
+                            PositionMode = InheritMode.XY,
+                            Position = new Vector2(0, -0.25f),
                             Colour = KeyUpTextColor
                         },
                         countSpriteText = new SpriteText
@@ -95,7 +97,8 @@ namespace osu.Game.Graphics.UserInterface
                             Text = Count.ToString(@"#,0"),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Position = new Vector2(0, buttonSprite.Height / 4),
+                            PositionMode = InheritMode.XY,
+                            Position = new Vector2(0, 0.25f),
                             Colour = KeyUpTextColor
                         }
                     }
