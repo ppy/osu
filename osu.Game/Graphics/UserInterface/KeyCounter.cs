@@ -14,7 +14,6 @@ namespace osu.Game.Graphics.UserInterface
         private Sprite buttonSprite;
         private Sprite glowSprite;
         private Container textLayer;
-        private SpriteText keySpriteText;
         private SpriteText countSpriteText;
 
         public override string Name { get; }
@@ -71,7 +70,7 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        keySpriteText = new SpriteText
+                        new SpriteText
                         {
                             Text = Name,
                             Anchor = Anchor.Centre,
