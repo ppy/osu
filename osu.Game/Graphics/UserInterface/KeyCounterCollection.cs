@@ -16,7 +16,6 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private List<KeyCounter> counters = new List<KeyCounter>();
-        //default capacity is 4, and osu! uses 4 keys usually, so it won't trouble
         public IReadOnlyList<KeyCounter> Counters => counters;
 
         public void AddKey(KeyCounter key)
