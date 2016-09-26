@@ -24,11 +24,11 @@ namespace osu.Game.GameModes.Play.Mania
             this.columns = columns;
         }
 
-        public override List<BaseHit> Objects
+        public override List<HitObject> Objects
         {
             get
             {
-                return objects.ConvertAll(o => (BaseHit)o);
+                return objects.ConvertAll(o => (HitObject)o);
             }
 
             set
@@ -41,7 +41,7 @@ namespace osu.Game.GameModes.Play.Mania
             }
         }
 
-        private ManiaBaseHit convertForMania(BaseHit input)
+        private ManiaBaseHit convertForMania(HitObject input)
         {
             ManiaBaseHit h = input as ManiaBaseHit;
 

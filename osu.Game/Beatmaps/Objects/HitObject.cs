@@ -8,7 +8,7 @@ namespace osu.Game.Beatmaps.Objects
     /// <summary>
     /// A hitobject describes a point in a beatmap 
     /// </summary>
-    public abstract class BaseHit
+    public abstract class HitObject
     {
         public double StartTime;
         public double? EndTime;

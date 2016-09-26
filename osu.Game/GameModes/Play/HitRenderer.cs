@@ -13,7 +13,7 @@ namespace osu.Game.GameModes.Play
 {
     public abstract class HitRenderer : LargeContainer
     {
-        public abstract List<BaseHit> Objects { get; set; }
+        public abstract List<HitObject> Objects { get; set; }
 
         public override void Load()
         {
