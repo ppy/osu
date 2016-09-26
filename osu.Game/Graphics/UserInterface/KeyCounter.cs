@@ -120,5 +120,7 @@ namespace osu.Game.Graphics.UserInterface
                 textLayer.FadeColour(KeyUpTextColor, FadeTime);
             }
         }
+
+        public void ResetCount() => Count = 0;
     }
 }
