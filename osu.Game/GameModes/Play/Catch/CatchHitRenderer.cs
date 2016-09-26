@@ -18,11 +18,11 @@ namespace osu.Game.GameModes.Play.Catch
         List<CatchBaseHit> objects;
         private CatchPlayfield playfield;
 
-        public override List<BaseHit> Objects
+        public override List<HitObject> Objects
         {
             get
             {
-                return objects.ConvertAll(o => (BaseHit)o);
+                return objects.ConvertAll(o => (HitObject)o);
             }
 
             set
@@ -35,7 +35,7 @@ namespace osu.Game.GameModes.Play.Catch
             }
         }
 
-        private CatchBaseHit convertForCatch(BaseHit input)
+        private CatchBaseHit convertForCatch(HitObject input)
         {
             CatchBaseHit h = input as CatchBaseHit;
 

@@ -3,7 +3,7 @@
 
 namespace osu.Game.Beatmaps.Objects.Taiko
 {
-    class TaikoBaseHit : BaseHit
+    class TaikoBaseHit : HitObject
     {
         public float Scale = 1;
 

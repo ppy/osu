@@ -5,7 +5,7 @@ using OpenTK;
 
 namespace osu.Game.Beatmaps.Objects.Osu
 {
-    public abstract class OsuBaseHit : BaseHit
+    public abstract class OsuBaseHit : HitObject
     {
         public Vector2 Position;
     }

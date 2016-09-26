@@ -16,11 +16,11 @@ namespace osu.Game.GameModes.Play.Osu
         List<OsuBaseHit> objects;
         private OsuPlayfield playfield;
 
-        public override List<BaseHit> Objects
+        public override List<HitObject> Objects
         {
             get
             {
-                return objects.ConvertAll(o => (BaseHit)o);
+                return objects.ConvertAll(o => (HitObject)o);
             }
 
             set

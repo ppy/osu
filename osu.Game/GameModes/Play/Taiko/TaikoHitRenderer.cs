@@ -18,11 +18,11 @@ namespace osu.Game.GameModes.Play.Taiko
         List<TaikoBaseHit> objects;
         private TaikoPlayfield playfield;
 
-        public override List<BaseHit> Objects
+        public override List<HitObject> Objects
         {
             get
             {
-                return objects.ConvertAll(o => (BaseHit)o);
+                return objects.ConvertAll(o => (HitObject)o);
             }
 
             set
@@ -35,7 +35,7 @@ namespace osu.Game.GameModes.Play.Taiko
             }
         }
 
-        private TaikoBaseHit convertForTaiko(BaseHit input)
+        private TaikoBaseHit convertForTaiko(HitObject input)
         {
             TaikoBaseHit h = input as TaikoBaseHit;
 
