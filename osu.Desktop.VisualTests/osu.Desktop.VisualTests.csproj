@@ -149,7 +149,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="KeyCounterTutorial\Count.cs" />
+    <Compile Include="KeyCounterTutorial\KeyboardCount.cs" />
+    <Compile Include="KeyCounterTutorial\KeyCounter.cs" />
+    <Compile Include="KeyCounterTutorial\MouseCount.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="KeyCounterTutorial\TestCaseKeyCounter.cs" />
     <Compile Include="Tests\TestCaseTextAwesome.cs" />
     <Compile Include="VisualTestGame.cs" />
   </ItemGroup>
