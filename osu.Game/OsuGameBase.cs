@@ -50,6 +50,12 @@ namespace osu.Game
             });
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            API.Update();
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             //refresh token may have changed.

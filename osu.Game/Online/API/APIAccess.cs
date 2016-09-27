@@ -5,12 +5,14 @@ using System;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Threading;
+using osu.Framework;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Online.API
 {
-    public class APIAccess
+    public class APIAccess : IUpdateable
     {
         private OAuth authentication;
 
@@ -19,6 +21,8 @@ namespace osu.Game.Online.API
         const string ClientSecret = @"d6fgZuZeQ0eSXkEj5igdqQX6ztdtS6Ow";
 
         ConcurrentQueue<APIRequest> queue = new ConcurrentQueue<APIRequest>();
+
+        public Scheduler Scheduler = new Scheduler();
 
         public string Username;
 
@@ -272,6 +276,11 @@ namespace osu.Game.Online.API
         {
             authentication.Clear();
             State = APIState.Offline;
+        }
+
+        public void Update()
+        {
+            Scheduler.Update();
         }
     }
 }
