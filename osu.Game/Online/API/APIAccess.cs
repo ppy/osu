@@ -10,11 +10,11 @@ using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Online.API
 {
-    internal class APIAccess
+    public class APIAccess
     {
         private OAuth authentication;
 
-        internal string Endpoint = @"https://new.ppy.sh";
+        public string Endpoint = @"https://new.ppy.sh";
         const string ClientId = @"daNBnfdv7SppRVc61z0XuOI13y6Hroiz";
         const string ClientSecret = @"d6fgZuZeQ0eSXkEj5igdqQX6ztdtS6Ow";
 
@@ -52,7 +52,7 @@ namespace osu.Game.Online.API
 
         Logger log;
 
-        internal APIAccess()
+        public APIAccess()
         {
             authentication = new OAuth(ClientId, ClientSecret, Endpoint);
             log = Logger.GetLogger(LoggingTarget.Network);
@@ -61,7 +61,7 @@ namespace osu.Game.Online.API
             thread.Start();
         }
 
-        internal string AccessToken => authentication.RequestAccessToken();
+        public string AccessToken => authentication.RequestAccessToken();
 
         /// <summary>
         /// Number of consecutive requests which failed due to network issues.
@@ -221,16 +221,16 @@ namespace osu.Game.Online.API
             }
         }
 
-        internal void Queue(APIRequest request)
+        public void Queue(APIRequest request)
         {
             queue.Enqueue(request);
         }
 
-        internal event StateChangeDelegate OnStateChange;
+        public event StateChangeDelegate OnStateChange;
 
-        internal delegate void StateChangeDelegate(APIState oldState, APIState newState);
+        public delegate void StateChangeDelegate(APIState oldState, APIState newState);
 
-        internal enum APIState
+        public enum APIState
         {
             /// <summary>
             /// We cannot login (not enough credentials).
@@ -268,7 +268,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        internal void Logout()
+        public void Logout()
         {
             authentication.Clear();
             State = APIState.Offline;
