@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Online.Chat.Display.osu.Online.Social;
 
 namespace osu.Desktop.Tests
 {
@@ -105,10 +106,7 @@ namespace osu.Desktop.Tests
                     //    osu.Messages[0].Drawable.Expire();
                     //    osu.Messages.RemoveAt(0);
                     //}
-                    flow.Add(new SpriteText
-                    {
-                        Text = $@"{m.User.Name}: {m.Content}"
-                    });
+                    flow.Add(new ChatLine(m));
                     channel.Messages.Add(m);
                 }
 
