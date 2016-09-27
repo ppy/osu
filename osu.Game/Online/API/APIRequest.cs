@@ -74,17 +74,16 @@ namespace osu.Game.Online.API
 
             WebRequest.BlockingPerform();
 
-            //OsuGame.Scheduler.Add(delegate {
-                Success?.Invoke();
-            //});
+            api.Scheduler.Add(delegate { Success?.Invoke(); });
         }
 
         public void Fail(Exception e)
         {
             WebRequest?.Abort();
-            //OsuGame.Scheduler.Add(delegate {
+            api.Scheduler.Add(delegate
+            {
                 Failure?.Invoke(e);
-            //});
+            });
         }
     }
 
