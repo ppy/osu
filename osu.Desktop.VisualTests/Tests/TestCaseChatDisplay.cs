@@ -14,6 +14,7 @@ using osu.Game.Online.Chat;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Desktop.Tests
 {
@@ -24,25 +25,18 @@ namespace osu.Desktop.Tests
         public override string Name => @"Chat";
         public override string Description => @"Testing API polling";
 
-        List<Channel> channels = new List<Channel>();
+        private List<Channel> channels = new List<Channel>();
         private FlowContainer flow;
 
-        Scheduler scheduler = new Scheduler();
+        private Scheduler scheduler = new Scheduler();
 
         private APIAccess api => ((OsuGameBase)Game).API;
+
+        private long? lastMessageId;
 
         public override void Reset()
         {
             base.Reset();
-
-            flow = new FlowContainer()
-            {
-                Direction = FlowDirection.VerticalOnly,
-                LayoutDuration = 100,
-                LayoutEasing = EasingTypes.Out,
-                Padding = new Vector2(1, 1)
-            };
-
 
             lastMessageId = null;
 
@@ -51,14 +45,20 @@ namespace osu.Desktop.Tests
             else
                 initializeChannels();
 
-
-            ScrollContainer scrolling = new ScrollContainer()
+            Add(new ScrollContainer()
             {
-                Size = new Vector2(1, 0.5f)
-            };
-
-            scrolling.Add(flow);
-            Add(scrolling);
+                Size = new Vector2(1, 0.5f),
+                Children = new Drawable[]
+                {
+                    flow = new FlowContainer
+                    {
+                        Direction = FlowDirection.VerticalOnly,
+                        LayoutDuration = 100,
+                        LayoutEasing = EasingTypes.Out,
+                        Padding = new Vector2(1, 1)
+                    }
+                }
+            });
         }
 
         protected override void Update()
@@ -83,8 +83,6 @@ namespace osu.Desktop.Tests
             api.Queue(req);
         }
 
-        long? lastMessageId = null;
-
         private void requestNewMessages()
         {
             messageRequest.Wait();
@@ -94,7 +92,6 @@ namespace osu.Desktop.Tests
             GetMessagesRequest gm = new GetMessagesRequest(new List<Channel> { channel }, lastMessageId);
             gm.Success += delegate (List<Message> messages)
             {
-                channel.Messages.Clear();
                 foreach (Message m in messages)
                 {
                     //m.LineWidth = this.Size.X; //this is kinda ugly.
@@ -108,7 +105,10 @@ namespace osu.Desktop.Tests
                     //    osu.Messages[0].Drawable.Expire();
                     //    osu.Messages.RemoveAt(0);
                     //}
-
+                    flow.Add(new SpriteText
+                    {
+                        Text = $@"{m.User.Name}: {m.Content}"
+                    });
                     channel.Messages.Add(m);
                 }
 
