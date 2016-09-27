@@ -21,10 +21,10 @@ namespace osu.Game.Online.Chat
         public DateTime Timestamp;
 
         [JsonProperty(@"content")]
-        internal string Content;
+        public string Content;
 
         [JsonProperty(@"sender")]
-        internal User User;
+        public User User;
 
         [JsonConstructor]
         public Message()
