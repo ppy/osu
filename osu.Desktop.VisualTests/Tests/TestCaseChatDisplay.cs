@@ -94,6 +94,7 @@ namespace osu.Desktop.Tests
             GetMessagesRequest gm = new GetMessagesRequest(new List<Channel> { channel }, lastMessageId);
             gm.Success += delegate (List<Message> messages)
             {
+                channel.Messages.Clear();
                 foreach (Message m in messages)
                 {
                     //m.LineWidth = this.Size.X; //this is kinda ugly.
