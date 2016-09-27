@@ -25,14 +25,6 @@ namespace osu.Game
             Add(new MainMenu());
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            //refresh token may have changed.
-            Config.Set(OsuConfig.Token, API.Token);
-
-            base.Dispose(isDisposing);
-        }
-
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
         {
             if (!base.Invalidate(invalidation, source, shallPropagate)) return false;

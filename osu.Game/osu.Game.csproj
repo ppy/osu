@@ -62,6 +62,7 @@
     <Compile Include="Online\API\Requests\ListChannels.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\Message.cs" />
+    <Compile Include="Online\User.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="OsuGameBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
