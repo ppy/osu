@@ -92,7 +92,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
-    <Reference Include="OpenTK, Version=1.2.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4" />
+    <Reference Include="OpenTK, Version=1.2.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>..\packages\ppy.OpenTK.1.1.2225.3\lib\net20\OpenTK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +151,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Tests\TestCaseGamefield.cs" />
+    <Compile Include="Tests\TestCaseKeyCounter.cs" />
     <Compile Include="Tests\TestCaseTextAwesome.cs" />
     <Compile Include="VisualTestGame.cs" />
   </ItemGroup>
