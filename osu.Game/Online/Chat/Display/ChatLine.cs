@@ -14,8 +14,17 @@ namespace osu.Game.Online.Chat.Display
     {
         public class ChatLine : AutoSizeContainer
         {
+            private readonly Message msg;
+
             public ChatLine(Message msg)
             {
+                this.msg = msg;
+            }
+
+            public override void Load()
+            {
+                base.Load();
+
                 SizeMode = InheritMode.X;
 
                 Add(new Box
