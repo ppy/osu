@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
-using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using OpenTK;
@@ -20,7 +19,7 @@ using OpenTK.Input;
 
 namespace osu.Game.GameModes.Menu
 {
-    internal class ButtonSystem : OsuLargeComponent
+    public class ButtonSystem : OsuLargeComponent
     {
         private FlowContainerWithOrigin buttonFlow;
 
@@ -290,7 +289,6 @@ namespace osu.Game.GameModes.Menu
                 base.Load();
 
                 Sprite ripple;
-
 
                 Children = new Drawable[]
                 {
