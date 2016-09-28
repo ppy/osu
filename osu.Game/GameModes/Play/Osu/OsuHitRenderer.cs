@@ -18,11 +18,6 @@ namespace osu.Game.GameModes.Play.Osu
 
         public override List<HitObject> Objects
         {
-            get
-            {
-                return objects.ConvertAll(o => (HitObject)o);
-            }
-
             set
             {
                 //osu! mode requires all objects to be of OsuBaseHit type.
