@@ -22,7 +22,7 @@ namespace osu.Game.Online.Chat
 
         public List<Message> Messages = new List<Message>();
 
-        internal bool Joined;
+        //internal bool Joined;
 
         [JsonConstructor]
         public Channel()
