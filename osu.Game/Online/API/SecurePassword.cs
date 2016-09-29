@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Diagnostics;
 using System.Security;
 using osu.Framework.Extensions;
 
@@ -35,6 +36,8 @@ namespace osu.Game.Online.API
 
         internal string Get(Representation request = Representation.Raw)
         {
+            Debug.Assert(representation == request);
+
             switch (request)
             {
                 default:
