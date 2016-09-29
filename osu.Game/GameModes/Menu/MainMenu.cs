@@ -12,7 +12,7 @@ namespace osu.Game.GameModes.Menu
     {
         public override string Name => @"Main Menu";
 
-        private AudioTrackBass bgm;
+        //private AudioTrackBass bgm;
 
 		public override void Load()
 		{
