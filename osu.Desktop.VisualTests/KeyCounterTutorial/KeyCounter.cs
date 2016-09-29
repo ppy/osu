@@ -31,5 +31,14 @@ namespace osu.Desktop.KeyCounterTutorial
             counter.IsCounting = IsCounting;
             Add(counter);
         }
+
+        public void Reset()
+        {
+            foreach (var child in Children)
+            {
+                var counter = (Count)child;
+                counter.Reset();
+            }
+        }
     }
 }

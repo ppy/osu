@@ -16,10 +16,11 @@ namespace osu.Desktop.KeyCounterTutorial
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (IsCounting && args.Key == CounterKey)
+            if (IsCounting && !IsLit && args.Key == CounterKey)
             {
                 ++Value;
                 IsLit = true;
+                UpdateVisualState(IsLit);
             }
             return base.OnKeyDown(state, args);
         }
@@ -27,7 +28,10 @@ namespace osu.Desktop.KeyCounterTutorial
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
             if (IsCounting && args.Key == CounterKey)
+            {
                 IsLit = false;
+                UpdateVisualState(IsLit);
+            }
             return base.OnKeyUp(state, args);
         }
     }
