@@ -4,6 +4,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
 
@@ -44,7 +45,7 @@ namespace osu.Game
                 {
                     Children = new Drawable[]
                     {
-                        new CursorContainer()
+                        new OsuCursorContainer()
                     }
                 }
             });
