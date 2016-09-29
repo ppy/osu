@@ -29,7 +29,8 @@ namespace osu.Game.GameModes
         protected override double OnEntering(GameMode last)
         {
             //only show the pop button if we are entered form another gamemode.
-            popButton.Alpha = 1;
+            if (last != null)
+                popButton.Alpha = 1;
 
             MoveTo(new Vector2(ActualSize.X, 0));
             MoveTo(Vector2.Zero, transition_time, EasingTypes.OutQuint);
