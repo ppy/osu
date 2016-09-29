@@ -21,6 +21,15 @@ namespace osu.Game.GameModes.Menu
 {
     public class ButtonSystem : OsuLargeComponent
     {
+        public Action OnEdit;
+        public Action OnExit;
+        public Action OnDirect;
+        public Action OnSolo;
+        public Action OnSettings;
+        public Action OnMulti;
+        public Action OnChart;
+        public Action OnTest;
+
         private FlowContainerWithOrigin buttonFlow;
 
         const float button_area_height = 128;
@@ -71,7 +80,7 @@ namespace osu.Game.GameModes.Menu
                             Padding = new Vector2(-wedge_width, 0),
                             Children = new Drawable[]
                             {
-                                settingsButton = new Button(@"settings", @"options", FontAwesome.gear, new Color4(85, 85, 85, 255), onSettings, -wedge_width, Key.O),
+                                settingsButton = new Button(@"settings", @"options", FontAwesome.gear, new Color4(85, 85, 85, 255), OnSettings, -wedge_width, Key.O),
                                 backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -wedge_width, Key.Escape),
                                 iconFacade = new Container //need a container to make the osu! icon flow properly.
 								{
@@ -91,14 +100,14 @@ namespace osu.Game.GameModes.Menu
 
             buttonFlow.Position = new Vector2(wedge_width * 2 - (button_width + osuLogo.SizeForFlow / 4), 0);
 
-            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"solo", @"freeplay", FontAwesome.user, new Color4(102, 68, 204, 255), onSolo, wedge_width, Key.P)));
-            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"multi", @"multiplayer", FontAwesome.users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M)));
-            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"chart", @"charts", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), onChart)));
-            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"tests", @"tests", FontAwesome.terminal, new Color4(80, 53, 160, 255), onTest, 0, Key.T)));
+            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"solo", @"freeplay", FontAwesome.user, new Color4(102, 68, 204, 255), OnSolo, wedge_width, Key.P)));
+            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"multi", @"multiplayer", FontAwesome.users, new Color4(94, 63, 186, 255), OnMulti, 0, Key.M)));
+            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"chart", @"charts", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), OnChart)));
+            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"tests", @"tests", FontAwesome.terminal, new Color4(80, 53, 160, 255), OnTest, 0, Key.T)));
 
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"play", @"play", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, wedge_width, Key.P)));
-            buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!editor", @"edit", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), onEdit, 0, Key.E)));
-            buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!direct", @"direct", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), onDirect, 0, Key.D)));
+            buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!editor", @"edit", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), OnEdit, 0, Key.E)));
+            buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!direct", @"direct", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), OnDirect, 0, Key.D)));
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"exit", @"exit", FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), onExit, 0, Key.Q)));
         }
 
@@ -108,57 +117,20 @@ namespace osu.Game.GameModes.Menu
             return true;
         }
 
-        private void onSettings()
-        {
-            //OsuGame.Options.LoginOnly = false;
-            //OsuGame.Options.Expanded = true;
-        }
-
         private void onPlay()
         {
             State = MenuState.Play;
         }
 
-        private void onEdit()
-        {
-            //OsuGame.ChangeMode(OsuModes.SelectEdit);
-        }
-
-        private void onDirect()
-        {
-            //OsuGame.ChangeMode(OsuModes.OnlineSelection);
-        }
-
         private void onExit()
         {
-            //OsuGame.ChangeMode(OsuModes.Exit);
             State = MenuState.Exit;
+            OnExit?.Invoke();
         }
 
         private void onBack()
         {
             State = MenuState.TopLevel;
-        }
-
-        private void onSolo()
-        {
-            //OsuGame.ChangeMode(OsuModes.SelectPlay);
-        }
-
-        private void onMulti()
-        {
-            //OsuGame.ChangeMode(OsuModes.Lobby);
-        }
-
-        private void onChart()
-        {
-            //OsuGame.ChangeMode(OsuModes.Charts);
-        }
-
-        private void onTest()
-        {
-
-            //OsuGame.ChangeMode(OsuModes.FieldTest);
         }
 
         private void onOsuLogo()

@@ -4,7 +4,13 @@
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.GameModes;
+using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
+using osu.Game.GameModes.Charts;
+using osu.Game.GameModes.Direct;
+using osu.Game.GameModes.Edit;
+using osu.Game.GameModes.Multiplayer;
+using osu.Game.GameModes.Play;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -19,10 +25,21 @@ namespace osu.Game.GameModes.Menu
 			base.Load();
 
 			AudioSample welcome = Game.Audio.Sample.Get(@"welcome");
+            welcome.Play();
 
 			Children = new Drawable[]
 			{
-				new ButtonSystem(),
+				new ButtonSystem()
+                {
+                    OnChart = delegate { Push(new ChartListing()); },
+                    OnDirect = delegate { Push(new OnlineListing()); },
+                    OnEdit = delegate { Push(new SongSelectEdit()); },
+                    OnSolo = delegate { Push(new SongSelectPlay()); },
+                    OnMulti = delegate { Push(new Lobby()); },
+                    OnTest  = delegate { Push(new TestBrowser()); },
+                    OnExit = delegate { Game.Host.Exit(); },
+                    OnSettings = delegate { (Game as OsuGame).Options.PoppedOut = !(Game as OsuGame).Options.PoppedOut; },
+                }
 			};
 		}
     }

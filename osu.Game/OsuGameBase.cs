@@ -7,6 +7,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 
 namespace osu.Game
 {
@@ -15,6 +16,8 @@ namespace osu.Game
         internal OsuConfigManager Config = new OsuConfigManager();
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
+
+        public Options Options;
 
         internal APIAccess API;
 
@@ -45,6 +48,7 @@ namespace osu.Game
                 {
                     Children = new Drawable[]
                     {
+                        Options = new Options(),
                         new OsuCursorContainer()
                     }
                 }
