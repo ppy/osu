@@ -11,10 +11,11 @@ using osu.Game.GameModes.Direct;
 using osu.Game.GameModes.Edit;
 using osu.Game.GameModes.Multiplayer;
 using osu.Game.GameModes.Play;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.GameModes.Menu
 {
-    internal class MainMenu : GameMode
+    internal class MainMenu : OsuGameMode
     {
         public override string Name => @"Main Menu";
 

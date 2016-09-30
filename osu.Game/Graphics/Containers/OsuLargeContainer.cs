@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuLargeComponent : LargeContainer
+    public class OsuLargeContainer : LargeContainer
     {
         public new OsuGameBase Game => base.Game as OsuGameBase;
     }

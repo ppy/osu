@@ -19,7 +19,7 @@ using OpenTK.Input;
 
 namespace osu.Game.GameModes.Menu
 {
-    public class ButtonSystem : OsuLargeComponent
+    public class ButtonSystem : OsuLargeContainer
     {
         public Action OnEdit;
         public Action OnExit;
@@ -247,7 +247,7 @@ namespace osu.Game.GameModes.Menu
         /// <summary>
         /// osu! logo and its attachments (pulsing, visualiser etc.)
         /// </summary>
-        class OsuLogo : OsuComponent
+        class OsuLogo : OsuContainer
         {
             private Sprite logo;
             private Container logoBounceContainer;
@@ -367,7 +367,7 @@ namespace osu.Game.GameModes.Menu
         /// Button designed specifically for the osu!next main menu.
         /// In order to correctly flow, we have to use a negative margin on the parent container (due to the parallelogram shape).
         /// </summary>
-        private class Button : OsuComponent
+        private class Button : OsuContainer
         {
             private Container iconText;
             private WedgedBox box;
