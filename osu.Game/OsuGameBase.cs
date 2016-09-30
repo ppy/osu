@@ -1,4 +1,5 @@
-﻿using osu.Framework.Graphics;
+﻿using osu.Framework.GameModes;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Textures;
@@ -18,6 +19,7 @@ namespace osu.Game
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
         public Options Options;
+        public Toolbar Toolbar;
 
         internal APIAccess API;
 
@@ -48,6 +50,7 @@ namespace osu.Game
                 {
                     Children = new Drawable[]
                     {
+                        Toolbar = new Toolbar(),
                         Options = new Options(),
                         new OsuCursorContainer()
                     }
