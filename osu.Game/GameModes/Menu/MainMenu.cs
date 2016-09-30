@@ -21,16 +21,16 @@ namespace osu.Game.GameModes.Menu
 
         //private AudioTrackBass bgm;
 
-		public override void Load()
-		{
-			base.Load();
+        public override void Load()
+        {
+            base.Load();
 
-			AudioSample welcome = Game.Audio.Sample.Get(@"welcome");
+            AudioSample welcome = Game.Audio.Sample.Get(@"welcome");
             welcome.Play();
 
-			Children = new Drawable[]
-			{
-				new ButtonSystem()
+            Children = new Drawable[]
+            {
+                new ButtonSystem()
                 {
                     OnChart = delegate { Push(new ChartListing()); },
                     OnDirect = delegate { Push(new OnlineListing()); },
@@ -38,10 +38,16 @@ namespace osu.Game.GameModes.Menu
                     OnSolo = delegate { Push(new SongSelectPlay()); },
                     OnMulti = delegate { Push(new Lobby()); },
                     OnTest  = delegate { Push(new TestBrowser()); },
-                    OnExit = delegate { Game.Host.Exit(); },
-                    OnSettings = delegate { (Game as OsuGame).Options.PoppedOut = !(Game as OsuGame).Options.PoppedOut; },
+                    OnExit = delegate {
+                        Game.Scheduler.AddDelayed(delegate {
+                            Game.Host.Exit();
+                        }, ButtonSystem.EXIT_DELAY);
+                    },
+                    OnSettings = delegate {
+                        Game.Options.PoppedOut = !Game.Options.PoppedOut;
+                    },
                 }
-			};
-		}
+            };
+        }
     }
 }

@@ -36,6 +36,8 @@ namespace osu.Game.GameModes.Menu
         const float button_width = 180f;
         const float wedge_width = 25.6f;
 
+        public const int EXIT_DELAY = 3000;
+
         private OsuLogo osuLogo;
         private Drawable iconFacade;
         private Container buttonArea;
@@ -221,9 +223,10 @@ namespace osu.Game.GameModes.Menu
                             b.State = Button.ButtonState.Contracted;
 
                         osuLogo.Delay(150);
-                        osuLogo.ScaleTo(1f, 4000);
-                        osuLogo.RotateTo(20, 4000);
-                        osuLogo.FadeOut(4000);
+
+                        osuLogo.ScaleTo(1f, EXIT_DELAY * 1.5f);
+                        osuLogo.RotateTo(20, EXIT_DELAY * 1.5f);
+                        osuLogo.FadeOut(EXIT_DELAY);
                         break;
                 }
 
