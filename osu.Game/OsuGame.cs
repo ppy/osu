@@ -5,7 +5,10 @@ using osu.Game.Configuration;
 using osu.Game.GameModes.Menu;
 using OpenTK;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.OS;
+using osu.Game.Graphics.Background;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game
 {
@@ -22,7 +25,15 @@ namespace osu.Game
         {
             base.Load();
 
-            Add(new MainMenu());
+            Add(new Drawable[] {
+                new ParallaxContainer
+                {
+                    Children = new [] {
+                        new Background()
+                    }
+                },
+                new MainMenu()
+            });
         }
 
         protected override void Dispose(bool isDisposing)
