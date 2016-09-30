@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.Containers
 {
-    class OsuComponent : AutoSizeContainer
+    class OsuContainer : AutoSizeContainer
     {
         public new OsuGameBase Game => base.Game as OsuGameBase;
     }
