@@ -62,6 +62,8 @@
     <Compile Include="GameModes\Direct\OnlineListing.cs" />
     <Compile Include="GameModes\Play\SongSelectPlay.cs" />
     <Compile Include="GameModes\Edit\SongSelectEdit.cs" />
+    <Compile Include="Graphics\Background\Background.cs" />
+    <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Containers\OsuContainer.cs" />
     <Compile Include="Graphics\Containers\OsuGameMode.cs" />
     <Compile Include="Graphics\Containers\OsuLargeContainer.cs" />
