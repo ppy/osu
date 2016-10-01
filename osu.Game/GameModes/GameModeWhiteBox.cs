@@ -25,6 +25,7 @@ namespace osu.Game.GameModes
         protected virtual IEnumerable<Type> PossibleChildren => null;
 
         private FlowContainer childModeButtons;
+        private Container textContainer;
 
         protected override double OnEntering(GameMode last)
         {
@@ -32,26 +33,33 @@ namespace osu.Game.GameModes
             if (last != null)
                 popButton.Alpha = 1;
 
-            MoveTo(new Vector2(ActualSize.X, 0));
-            MoveTo(Vector2.Zero, transition_time, EasingTypes.OutQuint);
-            return transition_time;
+            Content.Alpha = 0;
+            textContainer.Position = new Vector2(ActualSize.X / 16, 0);
+
+            Content.Delay(300);
+            textContainer.MoveTo(Vector2.Zero, transition_time, EasingTypes.OutExpo);
+            Content.FadeIn(transition_time, EasingTypes.OutExpo);
+            return 0;// transition_time * 1000;
         }
 
         protected override double OnExiting(GameMode next)
         {
-            MoveTo(new Vector2(ActualSize.X, 0), transition_time, EasingTypes.OutQuint);
+            textContainer.MoveTo(new Vector2((ActualSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
+            Content.FadeOut(transition_time, EasingTypes.OutExpo);
             return transition_time;
         }
 
         protected override double OnSuspending(GameMode next)
         {
-            Content.MoveTo(new Vector2(-ActualSize.X, 0), transition_time, EasingTypes.OutQuint);
+            textContainer.MoveTo(new Vector2(-(ActualSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
+            Content.FadeOut(transition_time, EasingTypes.OutExpo);
             return transition_time;
         }
 
         protected override double OnResuming(GameMode last)
         {
-            Content.MoveTo(Vector2.Zero, transition_time, EasingTypes.OutQuint);
+            textContainer.MoveTo(Vector2.Zero, transition_time, EasingTypes.OutExpo);
+            Content.FadeIn(transition_time, EasingTypes.OutExpo);
             return transition_time;
         }
 
@@ -64,24 +72,34 @@ namespace osu.Game.GameModes
                     new Box
                     {
                         SizeMode = InheritMode.XY,
-                        Size = new Vector2(1),
+                        Size = new Vector2(0.7f),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Colour = getColourFor(GetType())
+                        Colour = getColourFor(GetType()),
+                        Alpha = 0.6f,
+                        Additive = true
                     },
-                    new SpriteText
+                    textContainer = new AutoSizeContainer
                     {
-                        Text = GetType().Name,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        TextSize = 50,
-                    },
-                    new SpriteText
-                    {
-                        Text = GetType().Namespace,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Position = new Vector2(0, 30)
+                        Children = new[]
+                        {
+                            new SpriteText
+                            {
+                                Text = GetType().Name,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                TextSize = 50,
+                            },
+                            new SpriteText
+                            {
+                                Text = GetType().Namespace,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Position = new Vector2(0, 30)
+                            },
+                        }
                     },
                     popButton = new Button
                     {
