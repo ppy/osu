@@ -22,7 +22,7 @@ namespace osu.Game.GameModes.Menu
         private ButtonSystem buttons;
         public override string Name => @"Main Menu";
 
-        private AudioTrack bgm;
+        //private AudioTrack bgm;
 
         public override void Load()
         {
