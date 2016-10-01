@@ -24,7 +24,7 @@ namespace osu.Game.Online.Chat
         public string Content;
 
         [JsonProperty(@"sender")]
-        public string User;
+        public User User;
 
         [JsonConstructor]
         public Message()

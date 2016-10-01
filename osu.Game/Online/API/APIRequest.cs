@@ -11,7 +11,7 @@ namespace osu.Game.Online.API
     /// An API request with a well-defined response type.
     /// </summary>
     /// <typeparam name="T">Type of the response (used for deserialisation).</typeparam>
-    internal class APIRequest<T> : APIRequest
+    public class APIRequest<T> : APIRequest
     {
         protected override WebRequest CreateWebRequest() => new JsonWebRequest<T>(Uri);
 
@@ -36,7 +36,7 @@ namespace osu.Game.Online.API
         /// <summary>
         /// The maximum amount of time before this request will fail.
         /// </summary>
-        internal int Timeout = WebRequest.DEFAULT_TIMEOUT;
+        public int Timeout = WebRequest.DEFAULT_TIMEOUT;
 
         protected virtual string Target => string.Empty;
 
@@ -46,11 +46,11 @@ namespace osu.Game.Online.API
 
         private double remainingTime => Math.Max(0, Timeout - (DateTime.Now.TotalMilliseconds() - (startTime ?? 0)));
 
-        internal bool ExceededTimeout => remainingTime == 0;
+        public bool ExceededTimeout => remainingTime == 0;
 
         private double? startTime;
 
-        internal double StartTime => startTime ?? -1;
+        public double StartTime => startTime ?? -1;
 
         private APIAccess api;
         protected WebRequest WebRequest;
@@ -58,7 +58,7 @@ namespace osu.Game.Online.API
         public event APISuccessHandler Success;
         public event APIFailureHandler Failure;
 
-        internal void Perform(APIAccess api)
+        public void Perform(APIAccess api)
         {
             if (startTime == null)
                 startTime = DateTime.Now.TotalMilliseconds();
@@ -74,17 +74,16 @@ namespace osu.Game.Online.API
 
             WebRequest.BlockingPerform();
 
-            //OsuGame.Scheduler.Add(delegate {
-                Success?.Invoke();
-            //});
+            api.Scheduler.Add(delegate { Success?.Invoke(); });
         }
 
-        internal void Fail(Exception e)
+        public void Fail(Exception e)
         {
             WebRequest?.Abort();
-            //OsuGame.Scheduler.Add(delegate {
+            api.Scheduler.Add(delegate
+            {
                 Failure?.Invoke(e);
-            //});
+            });
         }
     }
 
