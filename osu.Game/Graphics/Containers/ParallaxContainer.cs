@@ -5,14 +5,20 @@ using OpenTK;
 
 namespace osu.Game.Graphics.Containers
 {
-    class ParallaxContainer : LargeContainer
+    class ParallaxContainer : Container
     {
         public float ParallaxAmount = 0.02f;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
-        private Container content = new LargeContainer()
+        public ParallaxContainer()
         {
+            RelativeSizeAxes = Axes.Both;
+        }
+
+        private Container content = new Container()
+        {
+            RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre
         };
@@ -27,7 +33,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnMouseMove(InputState state)
         {
-            content.Position = (state.Mouse.Position - ActualSize / 2) * ParallaxAmount;
+            content.Position = (state.Mouse.Position - Size / 2) * ParallaxAmount;
             return base.OnMouseMove(state);
         }
 

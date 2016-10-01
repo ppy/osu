@@ -25,11 +25,11 @@ namespace osu.Game.Online.Chat.Display
             {
                 base.Load();
 
-                SizeMode = InheritMode.X;
+                RelativeSizeAxes = Axes.X;
 
                 Add(new Box
                 {
-                    SizeMode = InheritMode.XY,
+                    RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Aqua,
                     Alpha = 0.2f
                 });
@@ -44,16 +44,16 @@ namespace osu.Game.Online.Chat.Display
                 {
                     Text = msg.User.Name,
                     Origin = Anchor.TopRight,
-                    PositionMode = InheritMode.X,
+                    RelativePositionAxes = Axes.X,
                     Position = new Vector2(0.14f,0),
                 });
 
                 Add(new SpriteText
                 {
                     Text = msg.Content,
-                    PositionMode = InheritMode.X,
+                    RelativePositionAxes = Axes.X,
                     Position = new Vector2(0.15f, 0),
-                    SizeMode = InheritMode.X,
+                    RelativeSizeAxes = Axes.X,
                     Size = new Vector2(0.85f, 1),
                 });
             }

@@ -14,7 +14,7 @@ namespace osu.Game.GameModes.Play.Catch
     {
         public CatchPlayfield()
         {
-            SizeMode = InheritMode.Y;
+            RelativeSizeAxes = Axes.Y;
             Size = new Vector2(512, 0.9f);
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
@@ -24,7 +24,7 @@ namespace osu.Game.GameModes.Play.Catch
         {
             base.Load();
 
-            Add(new Box { SizeMode = InheritMode.XY, Alpha = 0.5f });
+            Add(new Box { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
         }
     }
 }

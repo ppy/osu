@@ -17,7 +17,7 @@ namespace osu.Game.GameModes.Play.Mania
         public ManiaPlayfield(int columns)
         {
             this.columns = columns;
-            SizeMode = InheritMode.XY;
+            RelativeSizeAxes = Axes.Both;
             Size = new Vector2(columns / 20f, 1f);
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
@@ -27,14 +27,14 @@ namespace osu.Game.GameModes.Play.Mania
         {
             base.Load();
 
-            Add(new Box() { SizeMode = InheritMode.XY, Alpha = 0.5f });
+            Add(new Box() { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
 
             for (int i = 0; i < columns; i++)
                 Add(new Box()
                 {
-                    SizeMode = InheritMode.Y,
+                    RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(2, 1),
-                    PositionMode = InheritMode.XY,
+                    RelativePositionAxes = Axes.Both,
                     Position = new Vector2((float)i / columns, 0),
                     Alpha = 0.5f,
                     Colour = Color4.Black

@@ -11,15 +11,20 @@ using OpenTK;
 
 namespace osu.Game.GameModes.Play
 {
-    public abstract class HitRenderer : LargeContainer
+    public abstract class HitRenderer : Container
     {
         public abstract List<HitObject> Objects { set; }
+
+        public HitRenderer()
+        {
+            RelativeSizeAxes = Axes.Both;
+        }
 
         public override void Load()
         {
             base.Load();
 
-            Add(new Box() { SizeMode = InheritMode.XY, Alpha = 0.1f, Scale = new Vector2(0.99f) });
+            Add(new Box() { RelativeSizeAxes = Axes.Both, Alpha = 0.1f, Scale = new Vector2(0.99f) });
         }
     }
 }

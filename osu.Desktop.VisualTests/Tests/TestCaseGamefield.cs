@@ -31,8 +31,10 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
 
-            ///create a new clock offset to 0.
-            localClock = new FramedOffsetClock(base.Clock) { Offset = -base.Clock.CurrentTime };
+            //ensure we are at offset 0
+            if (localClock == null)
+                localClock = new FramedOffsetClock(base.Clock);
+            localClock.Offset = -base.Clock.CurrentTime;
 
             List<HitObject> objects = new List<HitObject>();
 
