@@ -54,7 +54,7 @@ namespace osu.Desktop.Tests
                     flow = new FlowContainer
                     {
                         Direction = FlowDirection.VerticalOnly,
-                        SizeMode = InheritMode.X,
+                        RelativeSizeAxes = Axes.X,
                         LayoutDuration = 100,
                         LayoutEasing = EasingTypes.Out,
                         Padding = new Vector2(1, 1)

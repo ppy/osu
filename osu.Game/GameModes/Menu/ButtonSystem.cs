@@ -19,7 +19,7 @@ using OpenTK.Input;
 
 namespace osu.Game.GameModes.Menu
 {
-    public class ButtonSystem : LargeContainer
+    public class ButtonSystem : Container
     {
         public Action OnEdit;
         public Action OnExit;
@@ -58,6 +58,11 @@ namespace osu.Game.GameModes.Menu
             Exit,
         }
 
+        public ButtonSystem()
+        {
+            RelativeSizeAxes = Axes.Both;
+        }
+
         public override void Load()
         {
             base.Load();
@@ -68,14 +73,14 @@ namespace osu.Game.GameModes.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    SizeMode = InheritMode.X,
+                    RelativeSizeAxes = Axes.X,
                     Size = new Vector2(1, button_area_height),
                     Alpha = 0,
                     Children = new Drawable[]
                     {
                         buttonAreaBackground = new Box
                         {
-                            SizeMode = InheritMode.XY,
+                            RelativeSizeAxes = Axes.Both,
                             Size = new Vector2(2, 1),
                             Colour = new Color4(50, 50, 50, 255),
                             Anchor = Anchor.Centre,
@@ -279,7 +284,7 @@ namespace osu.Game.GameModes.Menu
             private MenuVisualisation vis;
             private Action clickAction;
 
-            public float SizeForFlow => logo == null ? 0 : logo.ActualSize.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.8f;
+            public float SizeForFlow => logo == null ? 0 : logo.Size.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.8f;
 
             public override void Load()
             {

@@ -4,17 +4,23 @@
 using System;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.Processing
 {
-    class RatioAdjust : LargeContainer
+    class RatioAdjust : Container
     {
         public override bool Contains(Vector2 screenSpacePos) => true;
+
+        public RatioAdjust()
+        {
+            RelativeSizeAxes = Axes.Both;
+        }
 
         protected override void Update()
         {
             base.Update();
-            Vector2 parent = Parent.ActualSize;
+            Vector2 parent = Parent.Size;
 
             Scale = new Vector2(Math.Min(parent.Y / 768f, parent.X / 1024f));
             Size = new Vector2(1 / Scale.X);

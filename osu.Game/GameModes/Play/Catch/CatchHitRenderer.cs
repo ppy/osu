@@ -66,10 +66,10 @@ namespace osu.Game.GameModes.Play.Catch
                 //render stuff!
                 Sprite s = new Sprite
                 {
-                    Texture = Game.Textures.Get(@"menu-osu"),
+                    Texture = Game.Textures.Get(@"Menu/logo"),
                     Origin = Anchor.Centre,
                     Scale = new Vector2(0.1f),
-                    PositionMode = InheritMode.Y,
+                    RelativePositionAxes = Axes.Y,
                     Position = new Vector2(h.Position, -0.1f)
                 };
 

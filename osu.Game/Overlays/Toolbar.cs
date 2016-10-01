@@ -22,15 +22,14 @@ namespace osu.Game.Overlays
         {
             base.Load();
 
-            Depth = float.MaxValue;
-            SizeMode = InheritMode.X;
+            RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, height);
 
             Children = new Drawable[]
             {
                 new Box
                 {
-                    SizeMode = InheritMode.XY,
+                    RelativeSizeAxes = Axes.Both,
                     Colour = new Color4(0.1f, 0.1f, 0.1f, 0.9f)
                 }
             };

@@ -29,6 +29,8 @@ namespace osu.Game
         {
             base.Load();
 
+            ShowPerformanceOverlay = true;
+
             Add(new Drawable[] {
                 new ParallaxContainer
                 {
@@ -47,8 +49,8 @@ namespace osu.Game
 
             if (Parent != null)
             {
-                Config.Set(OsuConfig.Width, ActualSize.X);
-                Config.Set(OsuConfig.Height, ActualSize.Y);
+                Config.Set(OsuConfig.Width, Size.X);
+                Config.Set(OsuConfig.Height, Size.Y);
             }
             return true;
         }

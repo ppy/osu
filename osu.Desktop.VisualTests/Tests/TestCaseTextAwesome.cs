@@ -30,7 +30,7 @@ namespace osu.Desktop.Tests
 
             Add(flow = new FlowContainer()
             {
-                SizeMode = InheritMode.XY,
+                RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(0.5f),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre

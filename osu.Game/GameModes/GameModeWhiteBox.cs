@@ -33,7 +33,7 @@ namespace osu.Game.GameModes
                 popButton.Alpha = 1;
 
             Content.Alpha = 0;
-            textContainer.Position = new Vector2(ActualSize.X / 16, 0);
+            textContainer.Position = new Vector2(Size.X / 16, 0);
 
             Content.Delay(300);
             textContainer.MoveTo(Vector2.Zero, transition_time, EasingTypes.OutExpo);
@@ -43,14 +43,14 @@ namespace osu.Game.GameModes
 
         protected override double OnExiting(GameMode next)
         {
-            textContainer.MoveTo(new Vector2((ActualSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2((Size.X / 16), 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
             return transition_time;
         }
 
         protected override double OnSuspending(GameMode next)
         {
-            textContainer.MoveTo(new Vector2(-(ActualSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2(-(Size.X / 16), 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
             return transition_time;
         }
@@ -70,7 +70,7 @@ namespace osu.Game.GameModes
             {
                     new Box
                     {
-                        SizeMode = InheritMode.XY,
+                        RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.7f),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -103,7 +103,7 @@ namespace osu.Game.GameModes
                     popButton = new Button
                     {
                         Text = @"Back",
-                        SizeMode = InheritMode.X,
+                        RelativeSizeAxes = Axes.X,
                         Size = new Vector2(0.1f, 40),
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
@@ -118,7 +118,7 @@ namespace osu.Game.GameModes
                         Direction = FlowDirection.VerticalOnly,
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        SizeMode = InheritMode.XY,
+                        RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.1f, 1)
                     }
             };
@@ -130,7 +130,7 @@ namespace osu.Game.GameModes
                     childModeButtons.Add(new Button
                     {
                         Text = $@"{t.Name}",
-                        SizeMode = InheritMode.X,
+                        RelativeSizeAxes = Axes.X,
                         Size = new Vector2(1, 40),
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
