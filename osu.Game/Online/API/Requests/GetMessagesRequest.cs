@@ -7,7 +7,7 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Online.API.Requests
 {
-    internal class GetMessagesRequest : APIRequest<List<Message>>
+    public class GetMessagesRequest : APIRequest<List<Message>>
     {
         List<Channel> channels;
         long? since;
