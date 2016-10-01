@@ -150,6 +150,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="Tests\TestCaseChatDisplay.cs" />
+    <Compile Include="Tests\TestCaseGamefield.cs" />
     <Compile Include="Tests\TestCaseKeyCounter.cs" />
     <Compile Include="Tests\TestCaseMenuButtonSystem.cs" />
     <Compile Include="Tests\TestCaseTextAwesome.cs" />

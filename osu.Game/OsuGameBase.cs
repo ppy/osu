@@ -19,9 +19,9 @@ namespace osu.Game
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
         public Options Options;
+        public APIAccess API;
         public Toolbar Toolbar;
 
-        internal APIAccess API;
 
         protected override Container AddTarget => ratioContainer?.IsLoaded == true ? ratioContainer : base.AddTarget;
 
@@ -56,6 +56,21 @@ namespace osu.Game
                     }
                 }
             });
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            API.Update();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            //refresh token may have changed.
+            Config.Set(OsuConfig.Token, API.Token);
+            Config.Save();
+
+            base.Dispose(isDisposing);
         }
     }
 }

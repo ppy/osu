@@ -2,12 +2,14 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Game.Online.Chat;
+using OpenTK;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Beatmaps.Objects.Osu
 {
-    public class ListChannelsRequest : APIRequest<List<Channel>>
+    public class Slider : OsuBaseHit
     {
-        protected override string Target => @"chat/channels";
+        public List<Vector2> Path;
+
+        public int RepeatCount;
     }
 }

@@ -1,13 +1,16 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
-using osu.Game.Online.Chat;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Beatmaps.Timing
 {
-    public class ListChannelsRequest : APIRequest<List<Channel>>
+    public class ControlPoint
     {
-        protected override string Target => @"chat/channels";
+        public double Time;
     }
 }

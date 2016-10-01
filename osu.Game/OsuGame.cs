@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.OS;
 using osu.Game.Graphics.Background;
+using osu.Game.GameModes.Play;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game
@@ -34,14 +35,6 @@ namespace osu.Game
                 },
                 new MainMenu()
             });
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            //refresh token may have changed.
-            Config.Set(OsuConfig.Token, API.Token);
-
-            base.Dispose(isDisposing);
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
