@@ -6,7 +6,7 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Online.API.Requests
 {
-    internal class ListChannelsRequest : APIRequest<List<Channel>>
+    public class ListChannelsRequest : APIRequest<List<Channel>>
     {
         protected override string Target => @"chat/channels";
     }
