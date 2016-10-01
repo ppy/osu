@@ -10,11 +10,14 @@ using osu.Framework.OS;
 using osu.Game.Graphics.Background;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 
 namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
+        public Toolbar Toolbar;
+
         public override void SetHost(BasicGameHost host)
         {
             base.SetHost(host);
@@ -33,7 +36,8 @@ namespace osu.Game
                         new Background()
                     }
                 },
-                new MainMenu()
+                new MainMenu(),
+                Toolbar = new Toolbar(),
             });
         }
 
