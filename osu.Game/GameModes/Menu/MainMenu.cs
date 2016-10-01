@@ -6,20 +6,23 @@ using osu.Framework.Audio.Track;
 using osu.Framework.GameModes;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Transformations;
 using osu.Game.GameModes.Charts;
 using osu.Game.GameModes.Direct;
 using osu.Game.GameModes.Edit;
 using osu.Game.GameModes.Multiplayer;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics.Containers;
+using OpenTK;
 
 namespace osu.Game.GameModes.Menu
 {
     internal class MainMenu : OsuGameMode
     {
+        private ButtonSystem buttons;
         public override string Name => @"Main Menu";
 
-        //private AudioTrackBass bgm;
+        private AudioTrack bgm;
 
         public override void Load()
         {
@@ -30,22 +33,29 @@ namespace osu.Game.GameModes.Menu
 
             Children = new Drawable[]
             {
-                new ButtonSystem()
+                new ParallaxContainer
                 {
-                    OnChart = delegate { Push(new ChartListing()); },
-                    OnDirect = delegate { Push(new OnlineListing()); },
-                    OnEdit = delegate { Push(new SongSelectEdit()); },
-                    OnSolo = delegate { Push(new SongSelectPlay()); },
-                    OnMulti = delegate { Push(new Lobby()); },
-                    OnTest  = delegate { Push(new TestBrowser()); },
-                    OnExit = delegate {
-                        Game.Scheduler.AddDelayed(delegate {
-                            Game.Host.Exit();
-                        }, ButtonSystem.EXIT_DELAY);
-                    },
-                    OnSettings = delegate {
-                        Game.Options.PoppedOut = !Game.Options.PoppedOut;
-                    },
+                    ParallaxAmount = 0.01f,
+                    Children = new Drawable[]
+                    {
+                        buttons = new ButtonSystem()
+                        {
+                            OnChart = delegate { Push(new ChartListing()); },
+                            OnDirect = delegate { Push(new OnlineListing()); },
+                            OnEdit = delegate { Push(new SongSelectEdit()); },
+                            OnSolo = delegate { Push(new SongSelectPlay()); },
+                            OnMulti = delegate { Push(new Lobby()); },
+                            OnTest  = delegate { Push(new TestBrowser()); },
+                            OnExit = delegate {
+                                Game.Scheduler.AddDelayed(delegate {
+                                    Game.Host.Exit();
+                                }, ButtonSystem.EXIT_DELAY);
+                            },
+                            OnSettings = delegate {
+                                Game.Options.PoppedOut = !Game.Options.PoppedOut;
+                            },
+                        }
+                    }
                 }
             };
         }
