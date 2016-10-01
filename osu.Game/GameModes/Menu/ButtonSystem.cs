@@ -19,17 +19,29 @@ using OpenTK.Input;
 
 namespace osu.Game.GameModes.Menu
 {
-    public class ButtonSystem : OsuLargeComponent
+    public class ButtonSystem : Container
     {
+        public Action OnEdit;
+        public Action OnExit;
+        public Action OnDirect;
+        public Action OnSolo;
+        public Action OnSettings;
+        public Action OnMulti;
+        public Action OnChart;
+        public Action OnTest;
+
         private FlowContainerWithOrigin buttonFlow;
 
-        const float button_area_height = 128;
-        const float button_width = 180f;
-        const float wedge_width = 25.6f;
+        const float button_area_height = 100;
+        const float button_width = 140f;
+        const float wedge_width = 20;
+
+        public const int EXIT_DELAY = 3000;
 
         private OsuLogo osuLogo;
         private Drawable iconFacade;
         private Container buttonArea;
+        private Box buttonAreaBackground;
 
         private Button backButton;
         private Button settingsButton;
@@ -40,9 +52,15 @@ namespace osu.Game.GameModes.Menu
         public enum MenuState
         {
             Initial,
-            Exit,
             TopLevel,
             Play,
+            EnteringMode,
+            Exit,
+        }
+
+        public ButtonSystem()
+        {
+            RelativeSizeAxes = Axes.Both;
         }
 
         public override void Load()
@@ -55,15 +73,18 @@ namespace osu.Game.GameModes.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    SizeMode = InheritMode.X,
+                    RelativeSizeAxes = Axes.X,
                     Size = new Vector2(1, button_area_height),
                     Alpha = 0,
                     Children = new Drawable[]
                     {
-                        new Box
+                        buttonAreaBackground = new Box
                         {
-                            SizeMode = InheritMode.XY,
-                            Colour = new Color4(50, 50, 50, 255)
+                            RelativeSizeAxes = Axes.Both,
+                            Size = new Vector2(2, 1),
+                            Colour = new Color4(50, 50, 50, 255),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                         },
                         buttonFlow = new FlowContainerWithOrigin
                         {
@@ -71,7 +92,7 @@ namespace osu.Game.GameModes.Menu
                             Padding = new Vector2(-wedge_width, 0),
                             Children = new Drawable[]
                             {
-                                settingsButton = new Button(@"settings", @"options", FontAwesome.gear, new Color4(85, 85, 85, 255), onSettings, -wedge_width, Key.O),
+                                settingsButton = new Button(@"settings", @"options", FontAwesome.gear, new Color4(85, 85, 85, 255), OnSettings, -wedge_width, Key.O),
                                 backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -wedge_width, Key.Escape),
                                 iconFacade = new Container //need a container to make the osu! icon flow properly.
 								{
@@ -91,14 +112,14 @@ namespace osu.Game.GameModes.Menu
 
             buttonFlow.Position = new Vector2(wedge_width * 2 - (button_width + osuLogo.SizeForFlow / 4), 0);
 
-            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"solo", @"freeplay", FontAwesome.user, new Color4(102, 68, 204, 255), onSolo, wedge_width, Key.P)));
-            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"multi", @"multiplayer", FontAwesome.users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M)));
-            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"chart", @"charts", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), onChart)));
-            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"tests", @"tests", FontAwesome.terminal, new Color4(80, 53, 160, 255), onTest, 0, Key.T)));
+            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"solo", @"freeplay", FontAwesome.user, new Color4(102, 68, 204, 255), OnSolo, wedge_width, Key.P)));
+            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"multi", @"multiplayer", FontAwesome.users, new Color4(94, 63, 186, 255), OnMulti, 0, Key.M)));
+            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"chart", @"charts", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), OnChart)));
+            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"tests", @"tests", FontAwesome.terminal, new Color4(80, 53, 160, 255), OnTest, 0, Key.T)));
 
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"play", @"play", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, wedge_width, Key.P)));
-            buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!editor", @"edit", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), onEdit, 0, Key.E)));
-            buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!direct", @"direct", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), onDirect, 0, Key.D)));
+            buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!editor", @"edit", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), OnEdit, 0, Key.E)));
+            buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!direct", @"direct", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), OnDirect, 0, Key.D)));
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"exit", @"exit", FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), onExit, 0, Key.Q)));
         }
 
@@ -108,57 +129,20 @@ namespace osu.Game.GameModes.Menu
             return true;
         }
 
-        private void onSettings()
-        {
-            //OsuGame.Options.LoginOnly = false;
-            //OsuGame.Options.Expanded = true;
-        }
-
         private void onPlay()
         {
             State = MenuState.Play;
         }
 
-        private void onEdit()
-        {
-            //OsuGame.ChangeMode(OsuModes.SelectEdit);
-        }
-
-        private void onDirect()
-        {
-            //OsuGame.ChangeMode(OsuModes.OnlineSelection);
-        }
-
         private void onExit()
         {
-            //OsuGame.ChangeMode(OsuModes.Exit);
             State = MenuState.Exit;
+            OnExit?.Invoke();
         }
 
         private void onBack()
         {
             State = MenuState.TopLevel;
-        }
-
-        private void onSolo()
-        {
-            //OsuGame.ChangeMode(OsuModes.SelectPlay);
-        }
-
-        private void onMulti()
-        {
-            //OsuGame.ChangeMode(OsuModes.Lobby);
-        }
-
-        private void onChart()
-        {
-            //OsuGame.ChangeMode(OsuModes.Charts);
-        }
-
-        private void onTest()
-        {
-
-            //OsuGame.ChangeMode(OsuModes.FieldTest);
         }
 
         private void onOsuLogo()
@@ -195,11 +179,16 @@ namespace osu.Game.GameModes.Menu
                 MenuState lastState = state;
                 state = value;
 
+                //todo: figure a more elegant way of doing this.
+                buttonsTopLevel.ForEach(b => b.ContractStyle = 0);
+                buttonsPlay.ForEach(b => b.ContractStyle = 0);
+                backButton.ContractStyle = 0;
+                settingsButton.ContractStyle = 0;
+
                 switch (state)
                 {
                     case MenuState.Initial:
-                        backButton.State = Button.ButtonState.Contracted;
-
+                        buttonAreaBackground.ScaleTo(Vector2.One, 500, EasingTypes.Out);
                         buttonArea.FadeOut(500);
 
                         osuLogo.Delay(150);
@@ -213,7 +202,7 @@ namespace osu.Game.GameModes.Menu
                             b.State = Button.ButtonState.Contracted;
                         break;
                     case MenuState.TopLevel:
-                        backButton.State = Button.ButtonState.Contracted;
+                        buttonAreaBackground.ScaleTo(Vector2.One, 200, EasingTypes.Out);
 
                         osuLogo.MoveTo(buttonFlow.Position, 200, EasingTypes.In);
                         osuLogo.ScaleTo(0.5f, 200, EasingTypes.In);
@@ -231,13 +220,25 @@ namespace osu.Game.GameModes.Menu
                             b.State = Button.ButtonState.Contracted;
                         break;
                     case MenuState.Play:
-                        backButton.State = Button.ButtonState.Expanded;
-
                         foreach (Button b in buttonsTopLevel)
                             b.State = Button.ButtonState.Exploded;
 
                         foreach (Button b in buttonsPlay)
                             b.State = Button.ButtonState.Expanded;
+                        break;
+                    case MenuState.EnteringMode:
+                        buttonAreaBackground.ScaleTo(new Vector2(2, 0), 300, EasingTypes.InSine);
+
+                        buttonsTopLevel.ForEach(b => b.ContractStyle = 1);
+                        buttonsPlay.ForEach(b => b.ContractStyle = 1);
+                        backButton.ContractStyle = 1;
+                        settingsButton.ContractStyle = 1;
+
+                        foreach (Button b in buttonsTopLevel)
+                            b.State = Button.ButtonState.Contracted;
+
+                        foreach (Button b in buttonsPlay)
+                            b.State = Button.ButtonState.Contracted;
                         break;
                     case MenuState.Exit:
                         buttonArea.FadeOut(200);
@@ -249,13 +250,14 @@ namespace osu.Game.GameModes.Menu
                             b.State = Button.ButtonState.Contracted;
 
                         osuLogo.Delay(150);
-                        osuLogo.ScaleTo(1f, 4000);
-                        osuLogo.RotateTo(20, 4000);
-                        osuLogo.FadeOut(4000);
+
+                        osuLogo.ScaleTo(1f, EXIT_DELAY * 1.5f);
+                        osuLogo.RotateTo(20, EXIT_DELAY * 1.5f);
+                        osuLogo.FadeOut(EXIT_DELAY);
                         break;
                 }
 
-                backButton.State = state >= MenuState.Play ? Button.ButtonState.Expanded : Button.ButtonState.Contracted;
+                backButton.State = state == MenuState.Play ? Button.ButtonState.Expanded : Button.ButtonState.Contracted;
                 settingsButton.State = state == MenuState.TopLevel ? Button.ButtonState.Expanded : Button.ButtonState.Contracted;
 
                 if (lastState == MenuState.Initial)
@@ -275,14 +277,14 @@ namespace osu.Game.GameModes.Menu
         /// <summary>
         /// osu! logo and its attachments (pulsing, visualiser etc.)
         /// </summary>
-        class OsuLogo : OsuComponent
+        class OsuLogo : AutoSizeContainer
         {
             private Sprite logo;
             private Container logoBounceContainer;
             private MenuVisualisation vis;
             private Action clickAction;
 
-            public float SizeForFlow => logo == null ? 0 : logo.ActualSize.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.8f;
+            public float SizeForFlow => logo == null ? 0 : logo.Size.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.8f;
 
             public override void Load()
             {
@@ -298,13 +300,13 @@ namespace osu.Game.GameModes.Menu
                         {
                             logo = new Sprite()
                             {
-                                Texture = Game.Textures.Get(@"menu-osu"),
+                                Texture = Game.Textures.Get(@"Menu/logo"),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre
                             },
                             ripple = new Sprite()
                             {
-                                Texture = Game.Textures.Get(@"menu-osu"),
+                                Texture = Game.Textures.Get(@"Menu/logo"),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Alpha = 0.4f
@@ -395,7 +397,7 @@ namespace osu.Game.GameModes.Menu
         /// Button designed specifically for the osu!next main menu.
         /// In order to correctly flow, we have to use a negative margin on the parent container (due to the parallelogram shape).
         /// </summary>
-        private class Button : OsuComponent
+        private class Button : AutoSizeContainer
         {
             private Container iconText;
             private WedgedBox box;
@@ -445,7 +447,7 @@ namespace osu.Game.GameModes.Menu
                             icon = new TextAwesome
                             {
                                 Anchor = Anchor.Centre,
-                                TextSize = 40,
+                                TextSize = 30,
                                 Position = new Vector2(0, 0),
                                 Icon = symbol
                             },
@@ -454,6 +456,7 @@ namespace osu.Game.GameModes.Menu
                                 Direction = FlowDirection.HorizontalOnly,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
+                                TextSize = 16,
                                 Position = new Vector2(0, 35),
                                 Text = text
                             }
@@ -601,8 +604,9 @@ namespace osu.Game.GameModes.Menu
                 base.Update();
             }
 
-            ButtonState state;
+            public int ContractStyle;
 
+            ButtonState state;
             public ButtonState State
             {
                 get { return state; }
@@ -612,15 +616,25 @@ namespace osu.Game.GameModes.Menu
                     if (state == value)
                         return;
 
-                    ButtonState lastState = state;
                     state = value;
 
                     switch (state)
                     {
                         case ButtonState.Contracted:
-                            const int contract_duration = 500;
-                            box.ScaleTo(new Vector2(0, 1), contract_duration, EasingTypes.OutExpo);
-                            FadeOut(contract_duration);
+                            switch (ContractStyle)
+                            {
+                                default:
+                                    box.ScaleTo(new Vector2(0, 1), 500, EasingTypes.OutExpo);
+                                    FadeOut(500);
+                                    break;
+                                case 1:
+                                    box.ScaleTo(new Vector2(0, 1), 400, EasingTypes.InSine);
+                                    FadeOut(800);
+                                    break;
+                            }
+                            break;
+                        case ButtonState.Contracted2:
+
                             break;
                         case ButtonState.Expanded:
                             const int expand_duration = 500;
@@ -641,6 +655,7 @@ namespace osu.Game.GameModes.Menu
             public enum ButtonState
             {
                 Contracted,
+                Contracted2,
                 Expanded,
                 Exploded
             }

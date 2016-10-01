@@ -1,4 +1,5 @@
-﻿using osu.Framework.Graphics;
+﻿using osu.Framework.GameModes;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Textures;
@@ -7,6 +8,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 
 namespace osu.Game
 {
@@ -16,6 +18,7 @@ namespace osu.Game
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
+        public Options Options;
         public APIAccess API;
 
         protected override Container AddTarget => ratioContainer?.IsLoaded == true ? ratioContainer : base.AddTarget;
@@ -45,6 +48,7 @@ namespace osu.Game
                 {
                     Children = new Drawable[]
                     {
+                        Options = new Options(),
                         new OsuCursorContainer()
                     }
                 }
