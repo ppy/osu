@@ -10,13 +10,12 @@ using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.GameModes
 {
-    public class GameModeWhiteBox : OsuGameMode
+    public class GameModeWhiteBox : GameMode
     {
         private Button popButton;
 

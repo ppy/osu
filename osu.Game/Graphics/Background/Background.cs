@@ -7,10 +7,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.Background
 {
-    class Background : OsuLargeContainer
+    class Background : LargeContainer
     {
         protected Sprite BackgroundSprite;
 
