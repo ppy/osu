@@ -17,7 +17,7 @@ using OpenTK;
 
 namespace osu.Game.GameModes.Menu
 {
-    internal class MainMenu : OsuGameMode
+    internal class MainMenu : GameMode
     {
         private ButtonSystem buttons;
         public override string Name => @"Main Menu";
@@ -28,9 +28,13 @@ namespace osu.Game.GameModes.Menu
         {
             base.Load();
 
+            OsuGame osu = (OsuGame)Game;
+
             AudioSample welcome = Game.Audio.Sample.Get(@"welcome");
             welcome.Play();
 
+            //bgm = Game.Audio.Track.Get(@"circles");
+            //bgm.Start();
             Children = new Drawable[]
             {
                 new ParallaxContainer
@@ -52,7 +56,7 @@ namespace osu.Game.GameModes.Menu
                                 }, ButtonSystem.EXIT_DELAY);
                             },
                             OnSettings = delegate {
-                                Game.Options.PoppedOut = !Game.Options.PoppedOut;
+                                osu.Options.PoppedOut = !osu.Options.PoppedOut;
                             },
                         }
                     }
