@@ -6,6 +6,7 @@ using osu.Game.GameModes.Menu;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.OS;
+using osu.Game.GameModes.Play;
 
 namespace osu.Game
 {
