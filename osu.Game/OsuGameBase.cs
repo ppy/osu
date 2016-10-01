@@ -20,8 +20,6 @@ namespace osu.Game
 
         public Options Options;
         public APIAccess API;
-        public Toolbar Toolbar;
-
 
         protected override Container AddTarget => ratioContainer?.IsLoaded == true ? ratioContainer : base.AddTarget;
 
@@ -50,7 +48,6 @@ namespace osu.Game
                 {
                     Children = new Drawable[]
                     {
-                        Toolbar = new Toolbar(),
                         Options = new Options(),
                         new OsuCursorContainer()
                     }
