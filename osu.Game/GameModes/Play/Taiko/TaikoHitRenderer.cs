@@ -65,10 +65,10 @@ namespace osu.Game.GameModes.Play.Taiko
                 //render stuff!
                 Sprite s = new Sprite
                 {
-                    Texture = Game.Textures.Get(@"menu-osu"),
+                    Texture = Game.Textures.Get(@"Menu/logo"),
                     Origin = Anchor.Centre,
                     Scale = new Vector2(0.2f),
-                    PositionMode = InheritMode.XY,
+                    RelativePositionAxes = Axes.Both,
                     Position = new Vector2(1.1f, 0.5f)
                 };
 

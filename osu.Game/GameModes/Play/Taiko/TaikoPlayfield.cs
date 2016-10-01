@@ -14,7 +14,7 @@ namespace osu.Game.GameModes.Play.Taiko
     {
         public TaikoPlayfield()
         {
-            SizeMode = InheritMode.X;
+            RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, 100);
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -24,14 +24,14 @@ namespace osu.Game.GameModes.Play.Taiko
         {
             base.Load();
 
-            Add(new Box { SizeMode = InheritMode.XY, Alpha = 0.5f });
+            Add(new Box { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
 
             Add(new Sprite
             {
-                Texture = Game.Textures.Get(@"menu-osu"),
+                Texture = Game.Textures.Get(@"Menu/logo"),
                 Origin = Anchor.Centre,
                 Scale = new Vector2(0.2f),
-                PositionMode = InheritMode.XY,
+                RelativePositionAxes = Axes.Both,
                 Position = new Vector2(0.1f, 0.5f),
                 Colour = Color4.Gray
             });

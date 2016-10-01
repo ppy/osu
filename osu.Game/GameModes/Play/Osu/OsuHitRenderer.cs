@@ -44,7 +44,7 @@ namespace osu.Game.GameModes.Play.Osu
                 //render stuff!
                 Sprite s = new Sprite
                 {
-                    Texture = Game.Textures.Get(@"menu-osu"),
+                    Texture = Game.Textures.Get(@"Menu/logo"),
                     Origin = Anchor.Centre,
                     Scale = new Vector2(0.1f),
                     Alpha = 0,
