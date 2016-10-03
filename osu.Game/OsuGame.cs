@@ -5,12 +5,19 @@ using osu.Game.Configuration;
 using osu.Game.GameModes.Menu;
 using OpenTK;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.OS;
+using osu.Game.Graphics.Background;
+using osu.Game.GameModes.Play;
+using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 
 namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
+        public Toolbar Toolbar;
+
         public override void SetHost(BasicGameHost host)
         {
             base.SetHost(host);
@@ -22,15 +29,18 @@ namespace osu.Game
         {
             base.Load();
 
-            Add(new MainMenu());
-        }
+            ShowPerformanceOverlay = true;
 
-        protected override void Dispose(bool isDisposing)
-        {
-            //refresh token may have changed.
-            Config.Set(OsuConfig.Token, API.Token);
-
-            base.Dispose(isDisposing);
+            Add(new Drawable[] {
+                new ParallaxContainer
+                {
+                    Children = new [] {
+                        new Background()
+                    }
+                },
+                new MainMenu(),
+                Toolbar = new Toolbar(),
+            });
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
@@ -39,8 +49,8 @@ namespace osu.Game
 
             if (Parent != null)
             {
-                Config.Set(OsuConfig.Width, ActualSize.X);
-                Config.Set(OsuConfig.Height, ActualSize.Y);
+                Config.Set(OsuConfig.Width, Size.X);
+                Config.Set(OsuConfig.Height, Size.Y);
             }
             return true;
         }
