@@ -29,8 +29,6 @@ namespace osu.Game
         {
             base.Load();
 
-            ShowPerformanceOverlay = true;
-
             Add(new Drawable[] {
                 new ParallaxContainer
                 {
