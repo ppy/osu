@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Graphics.Containers
+namespace osu.Game.GameModes.Play
 {
-    class OsuLargeComponent : LargeContainer
+    class Player : GameModeWhiteBox
     {
-        public new OsuGame Game => base.Game as OsuGame;
+        protected override IEnumerable<Type> PossibleChildren => new[] {
+                typeof(Results)
+        };
     }
 }

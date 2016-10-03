@@ -3,17 +3,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Graphics.Containers
+namespace osu.Game.Users
 {
-    class OsuComponent : AutoSizeContainer
+    public class User
     {
-        public new OsuGame Game => base.Game as OsuGame;
+        public int Id;
+        public string Username;
     }
 }

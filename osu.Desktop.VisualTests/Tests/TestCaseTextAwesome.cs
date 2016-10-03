@@ -1,4 +1,7 @@
-﻿using OpenTK;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
@@ -27,7 +30,7 @@ namespace osu.Desktop.Tests
 
             Add(flow = new FlowContainer()
             {
-                SizeMode = InheritMode.XY,
+                RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(0.5f),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
