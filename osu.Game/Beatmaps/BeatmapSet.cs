@@ -11,6 +11,8 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public class BeatmapSet
     {
+        public int BeatmapSetID;
+        
         public List<Beatmap> Beatmaps { get; protected set; }
 
         public Metadata Metadata;
