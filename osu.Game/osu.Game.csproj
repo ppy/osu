@@ -164,6 +164,10 @@
     <Compile Include="Database\BeatmapSet.cs" />
     <Compile Include="Database\BeatmapMetadata.cs" />
     <Compile Include="Database\Beatmap.cs" />
+    <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
+    <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
+    <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
+    <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -184,6 +188,8 @@
   <ItemGroup />
   <ItemGroup>
     <Folder Include="Database\" />
+    <Folder Include="Beatmaps\Formats\" />
+    <Folder Include="Beatmaps\IO\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
