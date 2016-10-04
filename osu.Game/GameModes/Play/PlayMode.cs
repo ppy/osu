@@ -10,11 +10,11 @@ namespace osu.Game.GameModes.Play
     {
         [Description(@"osu!")]
         Osu = 0,
-        [Description(@"taiko")]
+        [Description(@"osu!taiko")]
         Taiko = 1,
-        [Description(@"catch")]
+        [Description(@"osu!catch")]
         Catch = 2,
-        [Description(@"mania")]
+        [Description(@"osu!mania")]
         Mania = 3
     }
 }
