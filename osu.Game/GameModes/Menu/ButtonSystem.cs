@@ -701,6 +701,4 @@ namespace osu.Game.GameModes.Menu
         {
         }
     }
-
-
 }
