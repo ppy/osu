@@ -1,5 +1,5 @@
 ﻿using System;
-using osu.Game.Beatmaps;
+using osu.Game.GameModes.Play;
 using SQLite;
 
 namespace osu.Game.Database
@@ -15,7 +15,7 @@ namespace osu.Game.Database
         public string Author { get; set; }
         public string Source { get; set; }
         public string Tags { get; set; }
-        public GameMode Mode { get; set; }
+        public PlayMode Mode { get; set; }
         public int PreviewTime { get; set; }
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
