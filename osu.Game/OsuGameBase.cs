@@ -17,7 +17,7 @@ namespace osu.Game
     public class OsuGameBase : BaseGame
     {
         internal OsuConfigManager Config = new OsuConfigManager();
-        internal BeatmapDatabase Beatmaps = new BeatmapDatabase();
+        internal BeatmapDatabase Beatmaps { get; private set; }
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -33,6 +33,8 @@ namespace osu.Game
         public override void Load(BaseGame game)
         {
             base.Load(game);
+
+            Beatmaps = new BeatmapDatabase(Host.Storage);
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
             Fonts = new TextureStore() { ScaleAdjust = 0.01f };
