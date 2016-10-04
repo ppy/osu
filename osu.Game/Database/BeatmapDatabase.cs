@@ -1,4 +1,5 @@
 ﻿using System;
+using osu.Framework.OS;
 using SQLite;
 
 namespace osu.Game.Database
@@ -7,11 +8,11 @@ namespace osu.Game.Database
     {
         private static SQLiteConnection Connection { get; set; }
         
-        public BeatmapDatabase()
+        public BeatmapDatabase(BasicStorage storage)
         {
             if (Connection == null)
             {
-                Connection = new SQLiteConnection("beatmap.db");
+                Connection = storage.GetDb("beatmaps");
                 Connection.CreateTable<BeatmapMetadata>();
                 Connection.CreateTable<BeatmapSet>();
                 Connection.CreateTable<Beatmap>();
