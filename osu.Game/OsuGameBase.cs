@@ -5,6 +5,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
@@ -15,6 +16,7 @@ namespace osu.Game
     public class OsuGameBase : Framework.Game
     {
         internal OsuConfigManager Config = new OsuConfigManager();
+        internal BeatmapDatabase Beatmaps = new BeatmapDatabase();
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
