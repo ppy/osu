@@ -143,7 +143,6 @@
     <Compile Include="Database\BeatmapSet.cs" />
     <Compile Include="Database\BeatmapMetadata.cs" />
     <Compile Include="Database\Beatmap.cs" />
-    <Compile Include="Beatmaps\GameMode.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
