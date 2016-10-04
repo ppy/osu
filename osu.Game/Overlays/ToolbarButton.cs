@@ -157,21 +157,20 @@ namespace osu.Game.Overlays
         {
             Action?.Invoke();
             HoverBackground.FlashColour(Color4.White, 400);
-            return base.OnClick(state);
+            return true;
         }
 
         protected override bool OnHover(InputState state)
         {
             HoverBackground.FadeTo(0.4f, 200);
             tooltipContainer.FadeIn(100);
-            return base.OnHover(state);
+            return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             HoverBackground.FadeTo(0, 200);
             tooltipContainer.FadeOut(100);
-            base.OnHoverLost(state);
         }
     }
 }
