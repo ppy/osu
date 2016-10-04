@@ -139,8 +139,6 @@
     <Compile Include="Overlays\ToolbarModeSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\User.cs" />
-    <Compile Include="SQLite.cs" />
-    <Compile Include="SQLiteAsync.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
     <Compile Include="Database\BeatmapSet.cs" />
     <Compile Include="Database\BeatmapMetadata.cs" />
