@@ -2,10 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Framework.Cached;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -27,7 +24,6 @@ namespace osu.Game.Overlays
 
         public Action<PlayMode> OnPlayModeChange;
         
-
         public ToolbarModeSelector()
         {
             RelativeSizeAxes = Axes.Y;
@@ -92,7 +88,7 @@ namespace osu.Game.Overlays
             activeMode.Invalidate();
         }
 
-        Cached<Drawable> activeMode = new Cached<Drawable>();
+        private Cached<Drawable> activeMode = new Cached<Drawable>();
 
         protected override void UpdateLayout()
         {
