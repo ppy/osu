@@ -12,7 +12,7 @@ namespace osu.Game.Database
         {
             if (Connection == null)
             {
-                Connection = storage.GetDb("beatmaps");
+                Connection = storage.GetDatabase(@"beatmaps");
                 Connection.CreateTable<BeatmapMetadata>();
                 Connection.CreateTable<BeatmapSet>();
                 Connection.CreateTable<Beatmap>();
