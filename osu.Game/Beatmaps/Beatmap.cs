@@ -10,11 +10,12 @@ namespace osu.Game.Beatmaps
 {
     public class Beatmap
     {
+        public int BeatmapID;
+        
         public List<HitObject> HitObjects;
-
         public List<ControlPoint> ControlPoints;
-
-        public string Difficulty;
-        public User Creator;
+        
+        public string Version;
+        public Metadata Metadata;
     }
 }
