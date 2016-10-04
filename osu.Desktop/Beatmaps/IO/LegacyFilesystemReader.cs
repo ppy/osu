@@ -19,15 +19,16 @@ namespace osu.Desktop.Beatmaps.IO
         }
     
         private string BasePath { get; set; }
+        private string[] Beatmaps { get; set; }
         private Beatmap FirstMap { get; set; }
     
         public LegacyFilesystemReader(string path)
         {
             BasePath = path;
-            var maps = ReadBeatmaps();
-            if (maps.Length == 0)
+            Beatmaps = Directory.GetFiles(BasePath, "*.osu").Select(f => Path.GetFileName(f)).ToArray();
+            if (Beatmaps.Length == 0)
                 throw new FileNotFoundException("This directory contains no beatmaps");
-            using (var stream = new StreamReader(ReadFile(maps[0])))
+            using (var stream = new StreamReader(ReadFile(Beatmaps[0])))
             {
                 var decoder = BeatmapDecoder.GetDecoder(stream);
                 FirstMap = decoder.Decode(stream);
@@ -36,7 +37,7 @@ namespace osu.Desktop.Beatmaps.IO
 
         public override string[] ReadBeatmaps()
         {
-            return Directory.GetFiles(BasePath, "*.osu").Select(f => Path.GetFileName(f)).ToArray();
+            return Beatmaps;
         }
 
         public override Stream ReadFile(string name)
