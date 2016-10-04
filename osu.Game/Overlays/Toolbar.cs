@@ -10,6 +10,10 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Configuration;
+using System;
+using System.Linq;
+using osu.Game.GameModes.Play;
+using osu.Framework.Extensions;
 
 namespace osu.Game.Overlays
 {
@@ -18,6 +22,12 @@ namespace osu.Game.Overlays
         const float height = 50;
         private FlowContainer leftFlow;
         private FlowContainer rightFlow;
+        private FlowContainer modeButtons;
+
+        public Action OnSettings;
+        public Action OnHome;
+        public Action<PlayMode> OnPlayModeChange;
+
 
         public override void Load()
         {
@@ -25,6 +35,27 @@ namespace osu.Game.Overlays
 
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, height);
+
+            modeButtons = new FlowContainer
+            {
+                RelativeSizeAxes = Axes.Y,
+                Direction = FlowDirection.HorizontalOnly
+            };
+
+            foreach (PlayMode m in Enum.GetValues(typeof(PlayMode)))
+            {
+                var localMode = m;
+                modeButtons.Add(new ToolbarModeButton
+                {
+                    Mode = m,
+                    Action = delegate
+                    {
+                        SetGameMode(localMode);
+                        OnPlayModeChange?.Invoke(localMode);
+                    }
+                });
+            }
+
 
             Children = new Drawable[]
             {
@@ -37,15 +68,19 @@ namespace osu.Game.Overlays
                 {
                     Direction = FlowDirection.HorizontalOnly,
                     RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(0, 1),
                     Children = new []
                     {
-                        new ToolbarButton(FontAwesome.gear),
-                        new ToolbarButton(FontAwesome.home),
-                        new ToolbarModeButton(FontAwesome.fa_osu_osu_o, @"osu!"),
-                        new ToolbarModeButton(FontAwesome.fa_osu_taiko_o, @"taiko"),
-                        new ToolbarModeButton(FontAwesome.fa_osu_fruits_o, @"catch"),
-                        new ToolbarModeButton(FontAwesome.fa_osu_mania_o, @"mania"),
+                        new ToolbarButton
+                        {
+                            Icon = FontAwesome.gear,
+                            Action = OnSettings
+                        },
+                        new ToolbarButton
+                        {
+                            Icon = FontAwesome.home,
+                            Action = OnHome
+                        },
+                        modeButtons
                     }
                 },
                 rightFlow = new FlowContainer
@@ -57,32 +92,96 @@ namespace osu.Game.Overlays
                     Size = new Vector2(0, 1),
                     Children = new []
                     {
-                        new ToolbarButton(FontAwesome.search),
-                        new ToolbarButton(FontAwesome.user, ((OsuGame)Game).Config.Get<string>(OsuConfig.Username)),
-                        new ToolbarButton(FontAwesome.bars),
+                        new ToolbarButton
+                        {
+                            Icon = FontAwesome.search
+                        },
+                        new ToolbarButton
+                        {
+                            Icon = FontAwesome.user,
+                            Text = ((OsuGame)Game).Config.Get<string>(OsuConfig.Username)
+                        },
+                        new ToolbarButton
+                        {
+                            Icon = FontAwesome.bars
+                        },
                     }
                 }
             };
         }
 
+        public void SetGameMode(PlayMode mode)
+        {
+            foreach (var m in modeButtons.Children.Cast<ToolbarModeButton>())
+            {
+                m.Active = m.Mode == mode;
+            }
+        }
+
         public class ToolbarModeButton : ToolbarButton
         {
-            public ToolbarModeButton(FontAwesome icon, string text = null) : base(icon, text)
+            private PlayMode mode;
+            public PlayMode Mode
             {
+                get { return mode; }
+                set
+                {
+                    mode = value;
+                    Text = mode.GetDescription();
+                    Icon = getModeIcon(mode);
+                }
+            }
+
+            public bool Active
+            {
+                set
+                {
+                    Background.Colour = value ? new Color4(100, 100, 100, 140) : new Color4(20, 20, 20, 140);
+                }
+            }
+
+            private FontAwesome getModeIcon(PlayMode mode)
+            {
+                switch (mode)
+                {
+                    default: return FontAwesome.fa_osu_osu_o;
+                    case PlayMode.Taiko: return FontAwesome.fa_osu_taiko_o;
+                    case PlayMode.Catch: return FontAwesome.fa_osu_fruits_o;
+                    case PlayMode.Mania: return FontAwesome.fa_osu_mania_o;
+                }
             }
 
             public override void Load()
             {
                 base.Load();
-                Icon.TextSize = height * 0.7f;
+                DrawableIcon.TextSize = height * 0.7f;
             }
         }
 
         public class ToolbarButton : FlowContainer
         {
-            public TextAwesome Icon;
-            public SpriteText Text;
-            private Box background;
+            public FontAwesome Icon
+            {
+                get { return DrawableIcon.Icon; }
+                set { DrawableIcon.Icon = value; }
+            }
+
+            public string Text
+            {
+                get { return DrawableText.Text; }
+                set
+                {
+                    DrawableText.Text = value;
+                    paddingIcon.Alpha = string.IsNullOrEmpty(value) ? 0 : 1;
+                }
+            }
+
+            public Action Action;
+
+            protected TextAwesome DrawableIcon;
+            protected SpriteText DrawableText;
+            protected Box Background;
+            protected Box HoverBackground;
             private Drawable paddingLeft;
             private Drawable paddingRight;
             private Drawable paddingIcon;
@@ -97,44 +196,60 @@ namespace osu.Game.Overlays
                 }
             }
 
-            public ToolbarButton(FontAwesome icon, string text = null)
+            public ToolbarButton()
             {
-                background = new Box
+                Background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = new Color4(20, 20, 20, 140),
                 };
 
-                this.Icon = new TextAwesome()
+                HoverBackground = new Box
                 {
-                    Icon = icon,
+                    RelativeSizeAxes = Axes.Both,
+                    Additive = true,
+                    Colour = new Color4(20, 20, 20, 0),
+                    Alpha = 0,
+                };
+
+                DrawableIcon = new TextAwesome()
+                {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                 };
 
-                this.Text = new SpriteText
+                DrawableText = new SpriteText
                 {
-                    Text = text,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                 };
 
                 paddingLeft = new Container { RelativeSizeAxes = Axes.Y };
                 paddingRight = new Container { RelativeSizeAxes = Axes.Y };
-                paddingIcon = new Container { Size = new Vector2(string.IsNullOrEmpty(text) ? 0 : 5, 0) };
+                paddingIcon = new Container
+                {
+                    Size = new Vector2(5, 0),
+                    Alpha = 0
+                };
 
                 Padding = 10;
             }
 
+            protected override bool OnClick(InputState state)
+            {
+                Action?.Invoke();
+                return base.OnClick(state);
+            }
+
             protected override bool OnHover(InputState state)
             {
-                background.FadeColour(new Color4(130, 130, 130, 160), 100);
+                HoverBackground.FadeTo(0.4f, 200);
                 return base.OnHover(state);
             }
 
             protected override void OnHoverLost(InputState state)
             {
-                background.FadeColour(new Color4(20, 20, 20, 140), 100);
+                HoverBackground.FadeTo(0, 200);
                 base.OnHoverLost(state);
             }
 
@@ -147,11 +262,12 @@ namespace osu.Game.Overlays
 
                 Children = new Drawable[]
                 {
-                    background,
+                    Background,
+                    HoverBackground,
                     paddingLeft,
-                    Icon,
+                    DrawableIcon,
                     paddingIcon,
-                    Text,
+                    DrawableText,
                     paddingRight,
                 };
             }

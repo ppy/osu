@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Configuration;
 using osu.Game.Configuration;
 using osu.Game.GameModes.Menu;
 using OpenTK;
@@ -17,6 +18,9 @@ namespace osu.Game
     public class OsuGame : OsuGameBase
     {
         public Toolbar Toolbar;
+        public MainMenu MainMenu;
+
+        public Bindable<PlayMode> PlayMode;
 
         public override void SetHost(BasicGameHost host)
         {
@@ -36,9 +40,18 @@ namespace osu.Game
                         new Background()
                     }
                 },
-                new MainMenu(),
-                Toolbar = new Toolbar(),
+                MainMenu = new MainMenu(),
+                Toolbar = new Toolbar
+                {
+                    OnHome = delegate { MainMenu.MakeCurrent(); },
+                    OnSettings = delegate { Options.PoppedOut = !Options.PoppedOut; },
+                    OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
+                },
             });
+
+            PlayMode = Config.GetBindable<PlayMode>(OsuConfig.PlayMode);
+            PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
+            PlayMode.TriggerChange();
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
