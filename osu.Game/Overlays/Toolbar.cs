@@ -7,21 +7,15 @@ using osu.Framework.Graphics.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Game.Configuration;
 using System;
-using System.Linq;
 using osu.Game.GameModes.Play;
-using osu.Framework.Extensions;
 
 namespace osu.Game.Overlays
 {
-    public partial class Toolbar : Container
+    public class Toolbar : Container
     {
         const float height = 50;
-        private FlowContainer leftFlow;
-        private FlowContainer rightFlow;
 
         public Action OnSettings;
         public Action OnHome;
@@ -43,7 +37,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = new Color4(0.1f, 0.1f, 0.1f, 0.4f)
                 },
-                leftFlow = new FlowContainer
+                new FlowContainer
                 {
                     Direction = FlowDirection.HorizontalOnly,
                     RelativeSizeAxes = Axes.Y,
@@ -53,27 +47,28 @@ namespace osu.Game.Overlays
                         {
                             Icon = FontAwesome.gear,
                             Action = OnSettings,
-                            TooltipMain = "Settings"
+                            TooltipMain = "Settings",
+                            TooltipSub = "Change your settings",
                         },
                         new ToolbarButton
                         {
                             Icon = FontAwesome.home,
                             TooltipMain = "Home",
+                            TooltipSub = "Return to the main menu",
                             Action = OnHome
                         },
                         modeSelector = new ToolbarModeSelector
                         {
-                            OnPlayModeChange = this.OnPlayModeChange
+                            OnPlayModeChange = OnPlayModeChange
                         }
                     }
                 },
-                rightFlow = new FlowContainer
+                new FlowContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Direction = FlowDirection.HorizontalOnly,
                     RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(0, 1),
                     Children = new []
                     {
                         new ToolbarButton
