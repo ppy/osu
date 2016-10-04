@@ -17,7 +17,7 @@ using OpenTK;
 
 namespace osu.Game.GameModes.Menu
 {
-    internal class MainMenu : GameMode
+    public class MainMenu : GameMode
     {
         private ButtonSystem buttons;
         public override string Name => @"Main Menu";
