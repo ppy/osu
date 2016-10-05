@@ -86,7 +86,7 @@
     <Compile Include="GameModes\Play\PlayMode.cs" />
     <Compile Include="GameModes\Play\Results.cs" />
     <Compile Include="GameModes\Direct\OnlineListing.cs" />
-    <Compile Include="GameModes\Play\SongSelectPlay.cs" />
+    <Compile Include="GameModes\Play\PlaySongSelect.cs" />
     <Compile Include="GameModes\Play\Catch\CatchHitRenderer.cs" />
     <Compile Include="GameModes\Play\Catch\CatchPlayfield.cs" />
     <Compile Include="GameModes\Play\HitRenderer.cs" />
@@ -97,7 +97,7 @@
     <Compile Include="GameModes\Play\Playfield.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoHitRenderer.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoPlayfield.cs" />
-    <Compile Include="GameModes\Edit\SongSelectEdit.cs" />
+    <Compile Include="GameModes\Edit\EditSongSelect.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />

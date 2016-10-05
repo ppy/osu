@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.Background
 
         string textureName;
 
-        public Background(string textureName = @"Menu/background")
+        public Background(string textureName = @"Backgrounds/bg1")
         {
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;

@@ -11,6 +11,8 @@ namespace osu.Game.GameModes.Play
 {
     class Player : GameModeWhiteBox
     {
+        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
+
         protected override IEnumerable<Type> PossibleChildren => new[] {
                 typeof(Results)
         };
