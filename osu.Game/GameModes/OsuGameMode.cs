@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Background;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.GameModes
 {
@@ -40,8 +41,14 @@ namespace osu.Game.GameModes
             }
             else if (bg != null)
             {
-                bg.Depth = float.MinValue;
-                AddTopLevel(Background = bg);
+                AddTopLevel(new ParallaxContainer
+                {
+                    Depth = float.MinValue,
+                    Children = new[]
+                    {
+                        Background = bg
+                    }
+                });
             }
 
 

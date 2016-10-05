@@ -6,8 +6,10 @@ using System.Collections.Generic;
 
 namespace osu.Game.GameModes.Play
 {
-    class SongSelectPlay : GameModeWhiteBox
+    class PlaySongSelect : GameModeWhiteBox
     {
+        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
+
         protected override IEnumerable<Type> PossibleChildren => new[] {
                 typeof(ModSelect),
                 typeof(Player)

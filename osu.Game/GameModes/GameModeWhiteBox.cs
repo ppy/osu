@@ -27,7 +27,7 @@ namespace osu.Game.GameModes
         private Container textContainer;
         private Box box;
 
-        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Menu/songselect");
+        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg2");
 
         protected override void OnEntering(GameMode last)
         {
