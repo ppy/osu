@@ -84,7 +84,6 @@ namespace osu.Game.GameModes
         public override void Load()
         {
             base.Load();
-
             Add(new Background(textureName));
         }
 
@@ -92,6 +91,5 @@ namespace osu.Game.GameModes
         {
             return base.Equals(other) && textureName == ((BackgroundModeCustom)other).textureName;
         }
-
     }
 }
