@@ -34,12 +34,6 @@ namespace osu.Game
             base.Load();
 
             Add(new Drawable[] {
-                new ParallaxContainer
-                {
-                    Children = new [] {
-                        new Background()
-                    }
-                },
                 MainMenu = new MainMenu(),
                 Toolbar = new Toolbar
                 {
