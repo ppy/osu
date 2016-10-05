@@ -153,6 +153,14 @@ namespace osu.Game.Overlays
             };
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            //todo: find a way to avoid using this (autosize needs to be able to ignore certain drawables.. in this case the tooltip)
+            Size = new Vector2(WIDTH + DrawableText.Size.X, 1);
+        }
+
         protected override bool OnClick(InputState state)
         {
             Action?.Invoke();
