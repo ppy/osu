@@ -12,11 +12,14 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
+using osu.Game.GameModes.Backgrounds;
 using osu.Game.GameModes.Play.Catch;
 using osu.Game.GameModes.Play.Mania;
 using osu.Game.GameModes.Play.Osu;
 using osu.Game.GameModes.Play.Taiko;
+using osu.Game.Graphics.UserInterface;
 using OpenTK;
+using OpenTK.Input;
 
 namespace osu.Game.GameModes.Play
 {
@@ -59,7 +62,6 @@ namespace osu.Game.GameModes.Play
                     Add(new OsuHitRenderer
                     {
                         Objects = beatmap.HitObjects,
-                        Scale = new Vector2(0.8f),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     });
@@ -68,7 +70,6 @@ namespace osu.Game.GameModes.Play
                     Add(new TaikoHitRenderer
                     {
                         Objects = beatmap.HitObjects,
-                        Scale = new Vector2(0.8f),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     });
@@ -77,7 +78,6 @@ namespace osu.Game.GameModes.Play
                     Add(new CatchHitRenderer
                     {
                         Objects = beatmap.HitObjects,
-                        Scale = new Vector2(0.8f),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     });
@@ -86,12 +86,27 @@ namespace osu.Game.GameModes.Play
                     Add(new ManiaHitRenderer
                     {
                         Objects = beatmap.HitObjects,
-                        Scale = new Vector2(0.8f),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     });
                     break;
             }
+
+            Add(new KeyCounterCollection
+            {
+                IsCounting = true,
+                FadeTime = 50,
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Position = new Vector2(10, 50),
+                Counters = new KeyCounter[]
+                {
+                    new KeyCounterKeyboard(@"Z", Key.Z),
+                    new KeyCounterKeyboard(@"X", Key.X),
+                    new KeyCounterMouse(@"M1", MouseButton.Left),
+                    new KeyCounterMouse(@"M2", MouseButton.Right),
+                }
+            });
         }
     }
 }
