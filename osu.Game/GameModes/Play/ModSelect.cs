@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics;
 using osu.Framework.GameModes;
+using osu.Game.GameModes.Backgrounds;
 
 namespace osu.Game.GameModes.Play
 {

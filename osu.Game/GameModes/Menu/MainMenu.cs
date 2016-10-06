@@ -7,6 +7,7 @@ using osu.Framework.GameModes;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.GameModes.Backgrounds;
 using osu.Game.GameModes.Charts;
 using osu.Game.GameModes.Direct;
 using osu.Game.GameModes.Edit;

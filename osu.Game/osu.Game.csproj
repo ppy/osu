@@ -70,6 +70,9 @@
     <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="GameModes\BackgroundMode.cs" />
+    <Compile Include="GameModes\Backgrounds\BackgroundModeCustom.cs" />
+    <Compile Include="GameModes\Backgrounds\BackgroundModeDefault.cs" />
+    <Compile Include="GameModes\Backgrounds\BackgroundModeEmpty.cs" />
     <Compile Include="GameModes\Charts\ChartInfo.cs" />
     <Compile Include="GameModes\Edit\Editor.cs" />
     <Compile Include="GameModes\GameModeWhiteBox.cs" />
