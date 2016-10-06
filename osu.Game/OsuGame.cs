@@ -10,6 +10,7 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.OS;
+using osu.Game.GameModes;
 using osu.Game.Graphics.Background;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics.Containers;
@@ -60,11 +61,19 @@ namespace osu.Game
 
         private void modeChanged(GameMode newMode)
         {
+            // - Ability to change window size
+            // - Ability to adjust music playback
+            // - Frame limiter changes
+
             //central game mode change logic.
             if (newMode is Player)
+            {
                 Toolbar.FadeOut(100);
+            }
             else
+            {
                 Toolbar.FadeIn(100);
+            }
 
             Cursor.FadeIn(100);
 
