@@ -15,5 +15,18 @@ namespace osu.Game.GameModes.Play
                 typeof(ModSelect),
                 typeof(Player)
         };
+
+        public override void Load()
+        {
+            base.Load();
+
+            OsuGame osu = Game as OsuGame;
+
+            osu.PlayMode.ValueChanged += PlayMode_ValueChanged;
+        }
+
+        private void PlayMode_ValueChanged(object sender, EventArgs e)
+        {
+        }
     }
 }
