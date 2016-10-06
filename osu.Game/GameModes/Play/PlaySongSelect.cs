@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.GameModes.Backgrounds;
 
 namespace osu.Game.GameModes.Play
 {

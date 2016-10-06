@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.GameModes.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
 

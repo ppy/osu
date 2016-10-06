@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics.Transformations;
-using osu.Game.Graphics.Background;
 using OpenTK;
 
 namespace osu.Game.GameModes
@@ -59,37 +58,6 @@ namespace osu.Game.GameModes
         {
             Content.MoveToX(0, transition_length, EasingTypes.OutExpo);
             base.OnResuming(last);
-        }
-    }
-
-    public class BackgroundModeDefault : BackgroundMode
-    {
-        public override void Load()
-        {
-            base.Load();
-
-            Add(new Background());
-        }
-    }
-
-    public class BackgroundModeCustom : BackgroundMode
-    {
-        private readonly string textureName;
-
-        public BackgroundModeCustom(string textureName)
-        {
-            this.textureName = textureName;
-        }
-
-        public override void Load()
-        {
-            base.Load();
-            Add(new Background(textureName));
-        }
-
-        public override bool Equals(BackgroundMode other)
-        {
-            return base.Equals(other) && textureName == ((BackgroundModeCustom)other).textureName;
         }
     }
 }

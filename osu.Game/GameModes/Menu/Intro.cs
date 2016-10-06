@@ -5,11 +5,14 @@ using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.GameModes;
+using osu.Game.GameModes.Backgrounds;
 
 namespace osu.Game.GameModes.Menu
 {
     class Intro : OsuGameMode
     {
+        protected override BackgroundMode CreateBackground() => new BackgroundModeEmpty();
+
         public override void Load()
         {
             base.Load();
