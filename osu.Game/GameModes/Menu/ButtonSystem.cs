@@ -115,7 +115,6 @@ namespace osu.Game.GameModes.Menu
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"solo", @"freeplay", FontAwesome.user, new Color4(102, 68, 204, 255), OnSolo, wedge_width, Key.P)));
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"multi", @"multiplayer", FontAwesome.users, new Color4(94, 63, 186, 255), OnMulti, 0, Key.M)));
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"chart", @"charts", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), OnChart)));
-            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"tests", @"tests", FontAwesome.terminal, new Color4(80, 53, 160, 255), OnTest, 0, Key.T)));
 
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"play", @"play", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, wedge_width, Key.P)));
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!editor", @"edit", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), OnEdit, 0, Key.E)));
