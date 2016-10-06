@@ -22,10 +22,6 @@ namespace osu.Game.GameModes.Menu
         private ButtonSystem buttons;
         public override string Name => @"Main Menu";
 
-        protected override bool IsTopLevel => true;
-
-        private AudioTrack bgm;
-
         protected override BackgroundMode CreateBackground() => new BackgroundModeDefault();
 
         public override void Load()
@@ -33,13 +29,6 @@ namespace osu.Game.GameModes.Menu
             base.Load();
 
             OsuGame osu = (OsuGame)Game;
-
-            AudioSample welcome = Game.Audio.Sample.Get(@"welcome");
-            welcome.Play();
-
-            bgm = Game.Audio.Track.Get(@"circles");
-            bgm.Looping = true;
-            bgm.Start();
 
             Children = new Drawable[]
             {
@@ -50,6 +39,7 @@ namespace osu.Game.GameModes.Menu
                     {
                         buttons = new ButtonSystem()
                         {
+                            Alpha = 0,
                             OnChart = delegate { Push(new ChartListing()); },
                             OnDirect = delegate { Push(new OnlineListing()); },
                             OnEdit = delegate { Push(new EditSongSelect()); },
@@ -68,6 +58,8 @@ namespace osu.Game.GameModes.Menu
                     }
                 }
             };
+
+            buttons.FadeIn(500);
         }
 
         protected override void OnSuspending(GameMode next)
