@@ -73,6 +73,7 @@
     <Compile Include="GameModes\Charts\ChartInfo.cs" />
     <Compile Include="GameModes\Edit\Editor.cs" />
     <Compile Include="GameModes\GameModeWhiteBox.cs" />
+    <Compile Include="GameModes\Menu\Intro.cs" />
     <Compile Include="GameModes\Menu\ButtonSystem.cs" />
     <Compile Include="GameModes\Menu\MainMenu.cs" />
     <Compile Include="GameModes\Multiplayer\Lobby.cs" />
