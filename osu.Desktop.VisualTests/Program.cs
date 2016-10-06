@@ -13,7 +13,7 @@ namespace osu.Framework.VisualTests
         public static void Main(string[] args)
         {
             BasicGameHost host = Host.GetSuitableHost();
-            host.Load(new VisualTestGame());
+            host.Add(new VisualTestGame());
             host.Run();
         }
     }
