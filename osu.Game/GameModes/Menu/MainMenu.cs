@@ -24,7 +24,7 @@ namespace osu.Game.GameModes.Menu
 
         protected override bool IsTopLevel => true;
 
-        //private AudioTrack bgm;
+        private AudioTrack bgm;
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeDefault();
 
@@ -37,8 +37,10 @@ namespace osu.Game.GameModes.Menu
             AudioSample welcome = Game.Audio.Sample.Get(@"welcome");
             welcome.Play();
 
-            //bgm = Game.Audio.Track.Get(@"circles");
-            //bgm.Start();
+            bgm = Game.Audio.Track.Get(@"circles");
+            bgm.Looping = true;
+            bgm.Start();
+
             Children = new Drawable[]
             {
                 new ParallaxContainer
