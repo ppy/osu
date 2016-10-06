@@ -34,6 +34,7 @@ namespace osu.Game
                     Origin = Anchor.BottomRight,
                     Position = new Vector2(10, 10),
                     Size = new Vector2(40, 180),
+                    Alpha = 0,
                     Children = new Drawable[]
                     {
                         new Box
@@ -66,6 +67,8 @@ namespace osu.Game
                     }
                 }
             };
+
+            updateFill();
         }
 
         protected override bool OnWheelDown(InputState state)
@@ -73,7 +76,7 @@ namespace osu.Game
             appear();
 
             VolumeGlobal.Value -= 0.05f;
-            meterFill.ScaleTo(new Vector2(1, (float)VolumeGlobal.Value), 300, EasingTypes.OutQuint);
+            updateFill();
 
             return base.OnWheelDown(state);
         }
@@ -83,9 +86,14 @@ namespace osu.Game
             appear();
 
             VolumeGlobal.Value += 0.05f;
-            meterFill.ScaleTo(new Vector2(1, (float)VolumeGlobal.Value), 300, EasingTypes.OutQuint);
+            updateFill();
 
             return base.OnWheelUp(state);
+        }
+
+        private void updateFill()
+        {
+            meterFill.ScaleTo(new Vector2(1, (float)VolumeGlobal.Value), 300, EasingTypes.OutQuint);
         }
 
         private void appear()
