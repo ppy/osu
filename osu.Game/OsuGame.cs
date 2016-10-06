@@ -37,6 +37,11 @@ namespace osu.Game
         {
             base.Load();
 
+            //attach out bindables to the audio subsystem.
+            Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeGlobal));
+            Audio.VolumeSample.Weld(Config.GetBindable<double>(OsuConfig.VolumeEffect));
+            Audio.VolumeTrack.Weld(Config.GetBindable<double>(OsuConfig.VolumeMusic));
+
             Add(new Drawable[] {
                 intro = new Intro(),
                 Toolbar = new Toolbar
@@ -46,6 +51,12 @@ namespace osu.Game
                     OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
                     Alpha = 0.001f //fixes invalidation fuckup
                 },
+                new VolumeControl
+                {
+                    VolumeGlobal = Audio.Volume,
+                    VolumeSample = Audio.VolumeSample,
+                    VolumeTrack = Audio.VolumeTrack
+                }
             });
 
             intro.ModePushed += modeAdded;

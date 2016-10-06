@@ -131,6 +131,7 @@
     <Compile Include="Overlays\ToolbarModeSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\User.cs" />
+    <Compile Include="VolumeControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
