@@ -99,6 +99,7 @@
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
+    <Compile Include="Graphics\Gameplay\Catch\Catcher.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\TextAwesome.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounter.cs" />
