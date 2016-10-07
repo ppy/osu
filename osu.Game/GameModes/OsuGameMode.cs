@@ -64,16 +64,5 @@ namespace osu.Game.GameModes
 
             base.OnExiting(next);
         }
-
-        protected override void OnResuming(GameMode last)
-        {
-            base.OnResuming(last);
-        }
-
-        protected override void OnSuspending(GameMode next)
-        {
-            base.OnSuspending(next);
-        }
-
     }
 }
