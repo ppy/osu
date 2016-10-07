@@ -6,10 +6,12 @@ using System.Collections.Generic;
 
 namespace osu.Game.GameModes.Edit
 {
-    class SongSelectEdit : GameModeWhiteBox
+    class EditSongSelect : GameModeWhiteBox
     {
         protected override IEnumerable<Type> PossibleChildren => new[] {
                 typeof(Editor)
         };
+
+        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
     }
 }
