@@ -66,5 +66,16 @@ namespace osu.Game.GameModes.Menu
             Content.FadeOut(300);
             base.OnSuspending(next);
         }
+
+        protected override void OnResuming(GameMode last)
+        {
+            //this is an exit
+            Game.Scheduler.AddDelayed(delegate
+            {
+                Game.Exit();
+            }, 300);
+
+            base.OnResuming(last);
+        }
     }
 }

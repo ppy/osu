@@ -49,7 +49,7 @@ namespace osu.Game.GameModes.Menu
                             OnTest  = delegate { Push(new TestBrowser()); },
                             OnExit = delegate {
                                 Game.Scheduler.AddDelayed(delegate {
-                                    Game.Host.Exit();
+                                    Exit();
                                 }, ButtonSystem.EXIT_DELAY);
                             },
                             OnSettings = delegate {
