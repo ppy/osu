@@ -24,8 +24,6 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
 
-            Random rnd = new Random();
-
             ScoreCounter uc = new ScoreCounter
             {
                 Origin = Anchor.TopRight,
@@ -89,35 +87,16 @@ namespace osu.Desktop.Tests
             };
             Add(pc);
 
-            Button resetButton = new Button
-            {
-                Origin = Anchor.TopLeft,
-                Anchor = Anchor.TopLeft,
-                Text = @"Reset all",
-                Width = 100,
-                Height = 20,
-                Position = new Vector2(0, 0),
-            };
-            resetButton.Action += delegate
+            AddButton(@"Reset all", delegate
             {
                 uc.Count = 0;
                 sc.Count = 0;
                 ac.Count = 0;
                 cc.Count = 0;
                 pc.SetCount(0, 0);
-            };
-            Add(resetButton);
+            });
 
-            Button hitButton = new Button
-            {
-                Origin = Anchor.TopLeft,
-                Anchor = Anchor.TopLeft,
-                Text = @"Hit! :D",
-                Width = 100,
-                Height = 20,
-                Position = new Vector2(0, 20),
-            };
-            hitButton.Action += delegate
+            AddButton(@"Hit! :D", delegate
             {
                 uc.Count += 300 + (ulong)(300.0 * (sc.Count > 0 ? sc.Count - 1 : 0) / 25.0);
                 sc.Count++;
@@ -130,64 +109,24 @@ namespace osu.Desktop.Tests
                 );
                 pc.Numerator++;
                 pc.Denominator++;
-            };
-            Add(hitButton);
+            });
 
-            Button missButton = new Button
-            {
-                Origin = Anchor.TopLeft,
-                Anchor = Anchor.TopLeft,
-                Text = @"miss...",
-                Width = 100,
-                Height = 20,
-                Position = new Vector2(0, 40),
-            };
-            missButton.Action += delegate
+            AddButton(@"miss...", delegate
             {
                 sc.Count = 0;
                 ac.Count = 0;
                 cc.Count = 0;
                 pc.Denominator++;
-            };
-            Add(missButton);
+            });
 
-            Button forceResetButton = new Button
-            {
-                Origin = Anchor.TopLeft,
-                Anchor = Anchor.TopLeft,
-                Text = @"Force reset",
-                Width = 100,
-                Height = 20,
-                Position = new Vector2(0, 60),
-            };
-            forceResetButton.Action += delegate
-            {
-                uc.ResetCount();
-                sc.ResetCount();
-                ac.ResetCount();
-                pc.ResetCount();
-                cc.ResetCount();
-            };
-            Add(forceResetButton);
-
-            Button stopButton = new Button
-            {
-                Origin = Anchor.TopLeft,
-                Anchor = Anchor.TopLeft,
-                Text = @"STOP!",
-                Width = 100,
-                Height = 20,
-                Position = new Vector2(0, 80),
-            };
-            stopButton.Action += delegate
+            AddButton(@"Stop counters", delegate
             {
                 uc.StopRolling();
                 sc.StopRolling();
                 cc.StopRolling();
                 ac.StopRolling();
                 pc.StopRolling();
-            };
-            Add(stopButton);
+            });
         }
     }
 }

@@ -43,9 +43,9 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         /// <summary>
-        /// Tints pop-out before animation. Intended to use the last grabbed fruit colour.
+        /// Increaces counter and tints pop-out before animation.
         /// </summary>
-        /// <param name="colour"></param>
+        /// <param name="colour">Last grabbed fruit colour.</param>
         public void CatchFruit(Color4 colour)
         {
             popOutSpriteText.Colour = colour;
