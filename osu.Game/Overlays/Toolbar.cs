@@ -25,8 +25,12 @@ namespace osu.Game.Overlays
 
         private ToolbarModeSelector modeSelector;
 
+        public ToolbarState State { get; private set; }
+
         public void SetState(ToolbarState state, bool instant = false)
         {
+            State = state;
+
             int time = instant ? 0 : 200;
 
             switch (state)
