@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
-    /// A simple rollover counter that accepts unsigned long values.
+    /// A simple rolling counter that accepts unsigned long values.
     /// </summary>
     public class ULongCounter : RollingCounter<ulong>
     {

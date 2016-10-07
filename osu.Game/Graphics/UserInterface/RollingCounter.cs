@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
-    /// Skeleton for a counter with a simple rollover animation.
+    /// Skeleton for a counter with a simple roll-up animation.
     /// </summary>
     /// <typeparam name="T">Type of the actual counter.</typeparam>
     public abstract class RollingCounter<T> : Container
@@ -35,18 +35,18 @@ namespace osu.Game.Graphics.UserInterface
 
         /// <summary>
         /// If true, each time the Count is updated, it will roll over from the current visible value.
-        /// Else, it will roll over from the current count value.
+        /// Else, it will roll up from the current count value.
         /// </summary>
         public bool IsRollingContinuous = true;
 
         /// <summary>
-        /// If true, the rollover duration will be proportional to the counter.
+        /// If true, the roll-up duration will be proportional to the counter.
         /// </summary>
         public bool IsRollingProportional = false;
 
         /// <summary>
-        /// If IsRollingProportional = false, duration in milliseconds for the counter rollover animation for each element.
-        /// If IsRollingProportional = true, duration in milliseconds for the counter rollover animation in total.
+        /// If IsRollingProportional = false, duration in milliseconds for the counter roll-up animation for each element.
+        /// If IsRollingProportional = true, duration in milliseconds for the counter roll-up animation in total.
         /// </summary>
         public ulong RollingDuration = 0;
 
@@ -90,7 +90,10 @@ namespace osu.Game.Graphics.UserInterface
             {
                 if (Clock != null)
                 {
-                    RollingTotalDuration = IsRollingProportional ? GetProportionalDuration(VisibleCount, value) : RollingDuration;
+                    RollingTotalDuration =
+                        IsRollingProportional
+                            ? GetProportionalDuration(VisibleCount, value)
+                            : RollingDuration;
                     transformCount(IsRollingContinuous ? VisibleCount : count, value);
                 }
                 count = value;
@@ -117,11 +120,12 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         /// <summary>
-        /// Calculates the duration of the rollover animation by using the difference between the current visible value and the new final value.
+        /// Calculates the duration of the roll-up animation by using the difference between the current visible value
+        /// and the new final value.
         /// </summary>
         /// <remarks>
-        /// Intended to be used in conjunction with IsRolloverProportional = true.
-        /// If you're sure your superclass won't never need to be proportional, then it is not necessary to override this function.
+        /// Intended to be used in conjunction with IsRollingProportional = true.
+        /// Unless a derived class needs to have a proportional rolling, it is not necessary to override this function.
         /// </remarks>
         /// <param name="currentValue">Current visible value.</param>
         /// <param name="newValue">New final value.</param>
@@ -178,15 +182,17 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         /// <summary>
-        /// Called when the count is updated to add a transformer that changes the value of the visible count (i.e. implement the rollover animation).
+        /// Called when the count is updated to add a transformer that changes the value of the visible count (i.e.
+        /// implement the rollover animation).
         /// </summary>
         /// <param name="currentValue">Count value before modification.</param>
         /// <param name="newValue">Expected count value after modification-</param>
         /// <remarks>
-        /// Unless you need to set a custom animation according to the current or new value of the count, the recommended approach is to call
-        /// transformCount(CustomTransformer(Clock), currentValue, newValue), where CustomTransformer is a custom Transformer related to the
-        /// type T of the RolloverCounter.
-        /// By using this approach, there is no need to check if the Clock is not null; this validation is done before adding the transformer.
+        /// Unless you need to set a custom animation according to the current or new value of the count, the
+        /// recommended approach is to call transformCount(CustomTransformer(Clock), currentValue, newValue), where
+        /// CustomTransformer is a custom Transformer related to the type T of the RolloverCounter.
+        /// By using this approach, there is no need to check if the Clock is not null; this validation is done before
+        /// adding the transformer.
         /// </remarks>
         protected abstract void transformCount(T currentValue, T newValue);
 

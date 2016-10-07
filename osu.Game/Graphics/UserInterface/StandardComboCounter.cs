@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
-    /// Uses the 'x' symbol and has a pop-out effect while rolling over. Used by osu! standard.
+    /// Uses the 'x' symbol and has a pop-out effect while rolling over. Used in osu! standard.
     /// </summary>
     public class StandardComboCounter : ULongCounter
     {
@@ -42,11 +42,6 @@ namespace osu.Game.Graphics.UserInterface
                 TextSize = this.TextSize,
                 Alpha = 0,
             });
-        }
-
-        public override void ResetCount()
-        {
-            SetCountWithoutRolling(0);
         }
 
         protected override void updateTextSize()

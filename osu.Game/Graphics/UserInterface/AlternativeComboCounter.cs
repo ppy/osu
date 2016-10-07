@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
-    /// Allows tint and vertical scaling animation. Used by osu!taiko and osu!mania.
+    /// Allows tint and vertical scaling animation. Used in osu!taiko and osu!mania.
     /// </summary>
     public class AlternativeComboCounter : ULongCounter // btw, I'm terribly bad with names... OUENDAN!
     {
         public Color4 OriginalColour;
         public Color4 TintColour = Color4.OrangeRed;
         public int TintDuration = 500;
-        public float ScaleFactor = 1;
+        public float ScaleFactor = 2;
         public EasingTypes TintEasing = EasingTypes.None;
         public bool CanAnimateWhenBackwards = false;
 
@@ -72,7 +72,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (countSpriteText != null)
             {
-                countSpriteText.Text = newValue.ToString(@"#,0");
+                countSpriteText.Text = newValue.ToString("#,0");
                 if (newValue == 0)
                 {
                     countSpriteText.FadeOut(TintDuration);
