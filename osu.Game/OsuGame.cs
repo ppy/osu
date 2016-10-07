@@ -59,6 +59,8 @@ namespace osu.Game
                 }
             });
 
+            Toolbar.SetState(ToolbarState.Hidden, true);
+
             intro.ModePushed += modeAdded;
             intro.Exited += modeRemoved;
 
@@ -78,13 +80,13 @@ namespace osu.Game
             // - Frame limiter changes
 
             //central game mode change logic.
-            if (newMode is Player)
+            if (newMode is Player || newMode is Intro)
             {
-                Toolbar.FadeOut(100);
+                Toolbar.SetState(ToolbarState.Hidden);
             }
             else
             {
-                Toolbar.FadeIn(100);
+                Toolbar.SetState(ToolbarState.Visible);
             }
 
             Cursor.FadeIn(100);
