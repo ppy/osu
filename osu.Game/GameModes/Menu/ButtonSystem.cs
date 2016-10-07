@@ -125,16 +125,19 @@ namespace osu.Game.GameModes.Menu
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Key == Key.Escape)
+            switch (args.Key)
             {
-                if (State == MenuState.Initial)
-                    return false;
+                case Key.Space:
+                    osuLogo.TriggerClick(state);
+                    return true;
+                case Key.Escape:
+                    if (State == MenuState.Initial)
+                        return false;
 
-                State = MenuState.Initial;
-                return true;
+                    State = MenuState.Initial;
+                    return true;
             }
-
-            osuLogo.TriggerClick(state);
+            
             return true;
         }
 
