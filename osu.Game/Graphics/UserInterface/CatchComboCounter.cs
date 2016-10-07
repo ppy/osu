@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
-    /// Similar to Standard, but without the 'x' and has colour shadows. Used by osu!catch.
+    /// Similar to Standard, but without the 'x' and has tinted pop-ups. Used in osu!catch.
     /// </summary>
     public class CatchComboCounter : StandardComboCounter
     {
@@ -36,6 +36,7 @@ namespace osu.Game.Graphics.UserInterface
             }
             else
             {
+                // Backwards pop-up animation has no tint colour
                 popOutSpriteText.Colour = countSpriteText.Colour;
                 transformCount(new TranformULongCounter(Clock), currentValue, newValue);
             }
