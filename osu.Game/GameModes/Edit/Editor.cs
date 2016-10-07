@@ -22,10 +22,10 @@ namespace osu.Game.GameModes.Edit
             Background.FadeColour(Color4.DarkGray, 500);
         }
 
-        protected override void OnExiting(GameMode next)
+        protected override bool OnExiting(GameMode next)
         {
-            base.OnExiting(next);
             Background.FadeColour(Color4.White, 500);
+            return base.OnExiting(next);
         }
     }
 }

@@ -55,14 +55,14 @@ namespace osu.Game.GameModes
             base.OnEntering(last);
         }
 
-        protected override void OnExiting(GameMode next)
+        protected override bool OnExiting(GameMode next)
         {
             OsuGameMode nextOsu = next as OsuGameMode;
 
             if (Background != null && !Background.Equals(nextOsu?.Background))
                 Background.Exit();
 
-            base.OnExiting(next);
+            return base.OnExiting(next);
         }
     }
 }

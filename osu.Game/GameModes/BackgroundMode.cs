@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics.Transformations;
 using OpenTK;
+using osu.Framework.Graphics;
+using osu.Framework.Input;
 
 namespace osu.Game.GameModes
 {
@@ -46,12 +48,12 @@ namespace osu.Game.GameModes
             base.OnSuspending(next);
         }
 
-        protected override void OnExiting(GameMode next)
+        protected override bool OnExiting(GameMode next)
         {
             Content.FadeOut(transition_length, EasingTypes.OutExpo);
             Content.MoveToX(x_movement_amount, transition_length, EasingTypes.OutExpo);
 
-            base.OnExiting(next);
+            return base.OnExiting(next);
         }
 
         protected override void OnResuming(GameMode last)
