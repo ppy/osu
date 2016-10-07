@@ -63,6 +63,19 @@ namespace osu.Game.Tests.Beatmaps.IO
                 Assert.AreEqual("Renatus", meta.TitleUnicode);
             }
         }
+        [Test]
+        public void TestReadFile()
+        {
+            using (var osz = File.OpenRead(Resource.GetPath("241526 Soleily - Renatus.osz")))
+            {
+                var reader = new OszArchiveReader(osz);
+                using (var stream = new StreamReader(
+                    reader.ReadFile("Soleily - Renatus (Deif) [Platter].osu")))
+                {
+                    Assert.AreEqual("osu file format v13", stream.ReadLine().Trim());
+                }
+            }
+        }
     }
 }
 

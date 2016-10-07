@@ -8,5 +8,10 @@ namespace osu.Game.Beatmaps.Objects.Osu
     public abstract class OsuBaseHit : HitObject
     {
         public Vector2 Position;
+
+        public static OsuBaseHit Parse(string val)
+        {
+            return null;
+        }
     }
 }
