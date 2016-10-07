@@ -103,6 +103,7 @@
     <Compile Include="GameModes\Play\Taiko\TaikoHitRenderer.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoPlayfield.cs" />
     <Compile Include="GameModes\Edit\EditSongSelect.cs" />
+    <Compile Include="Input\GlobalHotkeys.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
@@ -126,6 +127,7 @@
     <Compile Include="Online\User.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="OsuGameBase.cs" />
+    <Compile Include="Overlays\ChatConsole.cs" />
     <Compile Include="Overlays\Options.cs" />
     <Compile Include="Overlays\Toolbar.cs" />
     <Compile Include="Overlays\ToolbarButton.cs" />
