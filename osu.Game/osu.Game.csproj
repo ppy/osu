@@ -62,7 +62,7 @@
   <ItemGroup>
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\BeatmapSet.cs" />
-    <Compile Include="Beatmaps\Metadata.cs" />
+    <Compile Include="Beatmaps\BeatmapMetadata.cs" />
     <Compile Include="Beatmaps\Objects\HitObject.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchBaseHit.cs" />
     <Compile Include="Beatmaps\Objects\Catch\Droplet.cs" />
@@ -149,13 +149,11 @@
     <Compile Include="Users\User.cs" />
     <Compile Include="VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
-    <Compile Include="Database\BeatmapSet.cs" />
-    <Compile Include="Database\BeatmapMetadata.cs" />
-    <Compile Include="Database\Beatmap.cs" />
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
+    <Compile Include="Beatmaps\BaseDifficulty.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
