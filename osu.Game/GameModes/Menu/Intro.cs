@@ -40,7 +40,6 @@ namespace osu.Game.GameModes.Menu
             };
 
             AudioSample welcome = Game.Audio.Sample.Get(@"welcome");
-            welcome.Play();
 
             AudioTrack bgm = Game.Audio.Track.Get(@"circles");
             bgm.Looping = true;
