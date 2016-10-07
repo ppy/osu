@@ -19,7 +19,7 @@ using OpenTK.Input;
 
 namespace osu.Game.GameModes.Menu
 {
-    public class ButtonSystem : Container
+    public partial class ButtonSystem : Container
     {
         public Action OnEdit;
         public Action OnExit;
@@ -103,8 +103,9 @@ namespace osu.Game.GameModes.Menu
                         }
                     }
                 },
-                osuLogo = new OsuLogo(onOsuLogo)
+                osuLogo = new OsuLogo
                 {
+                    Action = onOsuLogo,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre
                 }
@@ -271,95 +272,6 @@ namespace osu.Game.GameModes.Menu
 
             iconFacade.Width = osuLogo.SizeForFlow * 0.5f;
             base.Update();
-        }
-
-        /// <summary>
-        /// osu! logo and its attachments (pulsing, visualiser etc.)
-        /// </summary>
-        class OsuLogo : AutoSizeContainer
-        {
-            private Sprite logo;
-            private Container logoBounceContainer;
-            private MenuVisualisation vis;
-            private Action clickAction;
-
-            public float SizeForFlow => logo == null ? 0 : logo.Size.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.8f;
-
-            public override void Load()
-            {
-                base.Load();
-
-                Sprite ripple;
-
-                Children = new Drawable[]
-                {
-                    logoBounceContainer = new AutoSizeContainer
-                    {
-                        Children = new Drawable[]
-                        {
-                            logo = new Sprite()
-                            {
-                                Texture = Game.Textures.Get(@"Menu/logo"),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre
-                            },
-                            ripple = new Sprite()
-                            {
-                                Texture = Game.Textures.Get(@"Menu/logo"),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Alpha = 0.4f
-                            },
-                            vis = new MenuVisualisation
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = logo.Size,
-                                Additive = true,
-                                Alpha = 0.2f,
-                            }
-                        }
-                    }
-                };
-
-                ripple.ScaleTo(1.1f, 500);
-                ripple.FadeOut(500);
-                ripple.Loop(300);
-            }
-
-            public OsuLogo(Action action)
-            {
-                clickAction = action;
-            }
-
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-            {
-                logoBounceContainer.ScaleTo(1.1f, 1000, EasingTypes.Out);
-                return true;
-            }
-
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-            {
-                logoBounceContainer.ScaleTo(1.2f, 500, EasingTypes.OutElastic);
-                return true;
-            }
-
-            protected override bool OnClick(InputState state)
-            {
-                clickAction?.Invoke();
-                return true;
-            }
-
-            protected override bool OnHover(InputState state)
-            {
-                logoBounceContainer.ScaleTo(1.2f, 500, EasingTypes.OutElastic);
-                return true;
-            }
-
-            protected override void OnHoverLost(InputState state)
-            {
-                logoBounceContainer.ScaleTo(1, 500, EasingTypes.OutElastic);
-            }
         }
 
         /// <summary>

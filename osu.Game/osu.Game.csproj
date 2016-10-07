@@ -79,6 +79,7 @@
     <Compile Include="GameModes\Menu\Intro.cs" />
     <Compile Include="GameModes\Menu\ButtonSystem.cs" />
     <Compile Include="GameModes\Menu\MainMenu.cs" />
+    <Compile Include="GameModes\Menu\OsuLogo.cs" />
     <Compile Include="GameModes\Multiplayer\Lobby.cs" />
     <Compile Include="GameModes\Multiplayer\Match.cs" />
     <Compile Include="GameModes\Multiplayer\MatchCreate.cs" />
