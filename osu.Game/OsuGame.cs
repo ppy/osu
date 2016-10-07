@@ -9,7 +9,7 @@ using osu.Game.GameModes.Menu;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.OS;
+using osu.Framework.Platform;
 using osu.Game.GameModes;
 using osu.Game.Graphics.Background;
 using osu.Game.GameModes.Play;
