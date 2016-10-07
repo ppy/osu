@@ -69,11 +69,8 @@ namespace osu.Game.GameModes.Menu
 
         protected override void OnResuming(GameMode last)
         {
-            //this is an exit
-            Game.Scheduler.AddDelayed(delegate
-            {
-                Game.Exit();
-            }, 300);
+            //we are just an intro. if we are resumed, we just want to exit after a short delay (to allow the last mode to transition out).
+            Game.Scheduler.AddDelayed(Exit, 300);
 
             base.OnResuming(last);
         }

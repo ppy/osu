@@ -60,6 +60,7 @@ namespace osu.Game
             });
 
             intro.ModePushed += modeAdded;
+            intro.Exited += modeRemoved;
 
             PlayMode = Config.GetBindable<PlayMode>(OsuConfig.PlayMode);
             PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
@@ -89,6 +90,9 @@ namespace osu.Game
             Cursor.FadeIn(100);
 
             ModeChanged?.Invoke(newMode);
+
+            if (newMode == null)
+                Host.Exit();
         }
 
         private void modeAdded(GameMode newMode)
