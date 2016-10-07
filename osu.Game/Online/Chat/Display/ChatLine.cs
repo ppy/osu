@@ -1,6 +1,8 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Drawables;
@@ -14,11 +16,11 @@ namespace osu.Game.Online.Chat.Display
     {
         public class ChatLine : AutoSizeContainer
         {
-            private readonly Message msg;
+            public readonly Message Message;
 
-            public ChatLine(Message msg)
+            public ChatLine(Message message)
             {
-                this.msg = msg;
+                this.Message = message;
             }
 
             public override void Load()
@@ -27,34 +29,27 @@ namespace osu.Game.Online.Chat.Display
 
                 RelativeSizeAxes = Axes.X;
 
-                Add(new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Aqua,
-                    Alpha = 0.2f
-                });
-
                 Add(new SpriteText
                 {
-                    Text = msg.Timestamp.ToLocalTime().ToLongTimeString(),
+                    Text = Message.Timestamp.ToLocalTime().ToLongTimeString(),
                     Colour = new Color4(128, 128, 128, 255)
                 });
 
                 Add(new SpriteText
                 {
-                    Text = msg.User.Name,
+                    Text = Message.User.Name,
                     Origin = Anchor.TopRight,
                     RelativePositionAxes = Axes.X,
-                    Position = new Vector2(0.14f,0),
+                    Position = new Vector2(0.2f,0),
                 });
 
                 Add(new SpriteText
                 {
-                    Text = msg.Content,
+                    Text = Message.Content,
                     RelativePositionAxes = Axes.X,
-                    Position = new Vector2(0.15f, 0),
+                    Position = new Vector2(0.22f, 0),
                     RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(0.85f, 1),
+                    Size = new Vector2(0.78f, 1),
                 });
             }
         }
