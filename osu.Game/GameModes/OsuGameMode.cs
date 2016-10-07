@@ -60,7 +60,13 @@ namespace osu.Game.GameModes
             OsuGameMode nextOsu = next as OsuGameMode;
 
             if (Background != null && !Background.Equals(nextOsu?.Background))
-                Background.Exit();
+            {
+                if (nextOsu != null)
+                    //We need to use MakeCurrent in case we are jumping up multiple game modes.
+                    nextOsu.Background.MakeCurrent();
+                else
+                    Background.Exit();
+            }
 
             return base.OnExiting(next);
         }
