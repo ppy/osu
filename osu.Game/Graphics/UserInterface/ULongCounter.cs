@@ -18,10 +18,7 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class ULongCounter : RollingCounter<ulong>
     {
-        protected override void transformCount(ulong currentValue, ulong newValue)
-        {
-            transformCount(new TranformULongCounter(Clock), currentValue, newValue);
-        }
+        protected override Type transformType => typeof(TransformULongCounter);
 
         public override void ResetCount()
         {
@@ -33,7 +30,7 @@ namespace osu.Game.Graphics.UserInterface
             return count.ToString("#,0");
         }
 
-        protected class TranformULongCounter : Transform<ulong>
+        protected class TransformULongCounter : Transform<ulong>
         {
             public override ulong CurrentValue
             {
@@ -53,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
                 (d as ULongCounter).VisibleCount = CurrentValue;
             }
 
-            public TranformULongCounter(IClock clock)
+            public TransformULongCounter(IClock clock)
                 : base(clock)
             {
             }

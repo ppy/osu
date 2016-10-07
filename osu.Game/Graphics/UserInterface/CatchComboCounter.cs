@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class CatchComboCounter : StandardComboCounter
     {
-        public CatchComboCounter()
+        public CatchComboCounter() : base()
         {
             CanPopOutWhenBackwards = true;
         }
@@ -30,15 +30,15 @@ namespace osu.Game.Graphics.UserInterface
             // Animate rollover only when going backwards
             if (newValue > currentValue)
             {
-                updateTransforms(typeof(TranformULongCounter));
-                removeTransforms(typeof(TranformULongCounter));
+                updateTransforms(typeof(TransformULongCounter));
+                removeTransforms(typeof(TransformULongCounter));
                 VisibleCount = newValue;
             }
             else
             {
                 // Backwards pop-up animation has no tint colour
                 popOutSpriteText.Colour = countSpriteText.Colour;
-                transformCount(new TranformULongCounter(Clock), currentValue, newValue);
+                transformCount(new TransformULongCounter(Clock), currentValue, newValue);
             }
         }
 

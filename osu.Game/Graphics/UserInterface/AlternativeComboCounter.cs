@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.UserInterface
         public EasingTypes TintEasing = EasingTypes.None;
         public bool CanAnimateWhenBackwards = false;
 
-        public AlternativeComboCounter()
+        public AlternativeComboCounter() : base()
         {
             IsRollingContinuous = false;
         }
@@ -46,15 +46,15 @@ namespace osu.Game.Graphics.UserInterface
             // Animate rollover only when going backwards
             if (newValue > currentValue)
             {
-                updateTransforms(typeof(TranformULongCounter));
-                removeTransforms(typeof(TranformULongCounter));
+                updateTransforms(typeof(TransformULongCounter));
+                removeTransforms(typeof(TransformULongCounter));
                 VisibleCount = newValue;
             }
             else
-                transformCount(new TranformULongCounter(Clock), currentValue, newValue);
+                transformCount(new TransformULongCounter(Clock), currentValue, newValue);
         }
 
-        protected override ulong GetProportionalDuration(ulong currentValue, ulong newValue)
+        protected override ulong getProportionalDuration(ulong currentValue, ulong newValue)
         {
             ulong difference = currentValue > newValue ? currentValue - newValue : currentValue - newValue;
             return difference * RollingDuration;

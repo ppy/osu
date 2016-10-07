@@ -18,6 +18,8 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class AccuracyCounter : RollingCounter<float>
     {
+        protected override Type transformType => typeof(TransformAccuracy);
+
         private long numerator = 0;
         public long Numerator
         {
@@ -69,11 +71,6 @@ namespace osu.Game.Graphics.UserInterface
         protected override string formatCount(float count)
         {
             return count.ToString("0.00") + "%";
-        }
-
-        protected override void transformCount(float currentValue, float newValue)
-        {
-            transformCount(new TransformAccuracy(Clock), currentValue, newValue);
         }
 
         protected class TransformAccuracy : Transform<float>
