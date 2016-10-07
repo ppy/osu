@@ -17,12 +17,16 @@ using OpenTK;
 
 namespace osu.Game.GameModes.Menu
 {
-    public class MainMenu : GameMode
+    public class MainMenu : OsuGameMode
     {
         private ButtonSystem buttons;
         public override string Name => @"Main Menu";
 
+        protected override bool IsTopLevel => true;
+
         //private AudioTrack bgm;
+
+        protected override BackgroundMode CreateBackground() => new BackgroundModeDefault();
 
         public override void Load()
         {
@@ -46,8 +50,8 @@ namespace osu.Game.GameModes.Menu
                         {
                             OnChart = delegate { Push(new ChartListing()); },
                             OnDirect = delegate { Push(new OnlineListing()); },
-                            OnEdit = delegate { Push(new SongSelectEdit()); },
-                            OnSolo = delegate { Push(new SongSelectPlay()); },
+                            OnEdit = delegate { Push(new EditSongSelect()); },
+                            OnSolo = delegate { Push(new PlaySongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
                             OnTest  = delegate { Push(new TestBrowser()); },
                             OnExit = delegate {
@@ -64,27 +68,28 @@ namespace osu.Game.GameModes.Menu
             };
         }
 
-        protected override double OnSuspending(GameMode next)
+        protected override void OnSuspending(GameMode next)
         {
+            base.OnSuspending(next);
+
             const float length = 400;
 
             buttons.State = ButtonSystem.MenuState.EnteringMode;
 
             Content.FadeOut(length, EasingTypes.InSine);
             Content.MoveTo(new Vector2(-800, 0), length, EasingTypes.InSine);
-
-            return base.OnSuspending(next);
         }
 
-        protected override double OnResuming(GameMode last)
+        protected override void OnResuming(GameMode last)
         {
+            base.OnResuming(last);
+
             const float length = 300;
 
             buttons.State = ButtonSystem.MenuState.TopLevel;
 
             Content.FadeIn(length, EasingTypes.OutQuint);
             Content.MoveTo(new Vector2(0, 0), length, EasingTypes.OutQuint);
-            return base.OnResuming(last);
         }
     }
 }

@@ -633,9 +633,6 @@ namespace osu.Game.GameModes.Menu
                                     break;
                             }
                             break;
-                        case ButtonState.Contracted2:
-
-                            break;
                         case ButtonState.Expanded:
                             const int expand_duration = 500;
                             box.ScaleTo(new Vector2(1, 1), expand_duration, EasingTypes.OutExpo);
@@ -647,15 +644,12 @@ namespace osu.Game.GameModes.Menu
                             FadeOut(explode_duration / 4 * 3);
                             break;
                     }
-
-
                 }
             }
 
             public enum ButtonState
             {
                 Contracted,
-                Contracted2,
                 Expanded,
                 Exploded
             }
