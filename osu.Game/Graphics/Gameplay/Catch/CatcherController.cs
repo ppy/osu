@@ -51,14 +51,9 @@ namespace osu.Game.Graphics.Gameplay.Catch
         {
             if (mainCatcher.IsDashing && lastDashFrame < Clock.CurrentTime - 16)
             {
-                Catcher glowSprite = new Catcher
-                {
-                    Position = mainCatcher.Position,
-                    Scale = mainCatcher.Scale,
-                    Colour = mainCatcher.IsHyperDashing ? Color4.Red : Color4.White,
-                    FlipHorizontal = mainCatcher.FlipHorizontal,
-                    Anchor = mainCatcher.catcherAnchor
-                };
+                Drawable glowSprite = mainCatcher.Clone();
+                glowSprite.Colour = mainCatcher.IsHyperDashing ? Color4.Red : Color4.White;
+                
                 glowSprite.Transforms.Add(new TransformAlpha(Clock)
                 {
                     StartTime = Clock.CurrentTime,

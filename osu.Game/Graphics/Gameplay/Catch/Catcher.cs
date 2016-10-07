@@ -112,6 +112,11 @@ namespace osu.Game.Graphics.Gameplay.Catch
             base.Update();
         }
 
+        public override Drawable Clone()
+        {
+            return catcherSprite.Clone();
+        }
+
         public void UpdateMovement(bool direction, bool move)
         {
             IsMoving = move;
