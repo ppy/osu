@@ -8,6 +8,7 @@ using osu.Game.Configuration;
 using osu.Game.GameModes.Menu;
 using OpenTK;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Game.GameModes;
@@ -15,12 +16,16 @@ using osu.Game.Graphics.Background;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Framework.Input;
+using osu.Game.Input;
+using OpenTK.Input;
 
 namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
         public Toolbar Toolbar;
+        public ChatConsole Chat;
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
         private Intro intro;
 
@@ -51,15 +56,21 @@ namespace osu.Game
                     OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
                     Alpha = 0.001f //fixes invalidation fuckup
                 },
+                Chat = new ChatConsole(),
                 new VolumeControl
                 {
                     VolumeGlobal = Audio.Volume,
                     VolumeSample = Audio.VolumeSample,
                     VolumeTrack = Audio.VolumeTrack
+                },
+                new GlobalHotkeys //exists because UserInputManager is at a level below us.
+                {
+                    Handler = globalHotkeyPressed
                 }
             });
 
             Toolbar.SetState(ToolbarState.Hidden, true);
+            Chat.SetState(ChatConsoleState.Hidden, true);
 
             intro.ModePushed += modeAdded;
             intro.Exited += modeRemoved;
@@ -69,6 +80,18 @@ namespace osu.Game
             PlayMode.TriggerChange();
 
             Cursor.Alpha = 0;
+        }
+
+        private bool globalHotkeyPressed(InputState state, KeyDownEventArgs args)
+        {
+            switch (args.Key)
+            {
+                case Key.F8:
+                    Chat.SetState(Chat.State == ChatConsoleState.Hidden ? ChatConsoleState.Visible : ChatConsoleState.Hidden);
+                    return true;
+            }
+            
+            return base.OnKeyDown(state, args);
         }
 
         public Action<GameMode> ModeChanged;
@@ -83,6 +106,7 @@ namespace osu.Game
             if (newMode is Player || newMode is Intro)
             {
                 Toolbar.SetState(ToolbarState.Hidden);
+                Chat.SetState(ChatConsoleState.Hidden);
             }
             else
             {
@@ -101,7 +125,10 @@ namespace osu.Game
         {
             if (!intro.DidLoadMenu || intro.ChildGameMode != null)
             {
-                intro.MakeCurrent();
+                Scheduler.Add(delegate
+                {
+                    intro.MakeCurrent();
+                });
                 return true;
             }
             

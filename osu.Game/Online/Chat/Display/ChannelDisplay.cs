@@ -24,29 +24,34 @@ namespace osu.Game.Online.Chat.Display
             newMessages(channel.Messages);
             channel.NewMessagesArrived += newMessages;
 
-            RelativeSizeAxes = Axes.X;
+            RelativeSizeAxes = Axes.Both;
             Direction = FlowDirection.VerticalOnly;
 
-            Add(new SpriteText
+            Children = new Drawable[]
             {
-                Text = channel.Name
-            });
-
-            Add(new ScrollContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                Size = new Vector2(1, 200),
-                Children = new Drawable[]
+                new SpriteText
                 {
-                    flow = new FlowContainer
+                    Text = channel.Name,
+                    TextSize = 50,
+                    Alpha = 0.3f,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                },
+                new ScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        Direction = FlowDirection.VerticalOnly,
-                        RelativeSizeAxes = Axes.X,
-                        LayoutEasing = EasingTypes.Out,
-                        Padding = new Vector2(1, 1)
+                        flow = new FlowContainer
+                        {
+                            Direction = FlowDirection.VerticalOnly,
+                            RelativeSizeAxes = Axes.X,
+                            LayoutEasing = EasingTypes.Out,
+                            Padding = new Vector2(1, 1)
+                        }
                     }
                 }
-            });
+            };
         }
 
         protected override void Dispose(bool isDisposing)
