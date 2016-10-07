@@ -5,17 +5,27 @@ using System.Collections.Generic;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Users;
+using SQLite;
 
 namespace osu.Game.Beatmaps
 {
     public class Beatmap
     {
-        public int BeatmapID;
-        
-        public List<HitObject> HitObjects;
-        public List<ControlPoint> ControlPoints;
-        
-        public string Version;
-        public Metadata Metadata;
+        [PrimaryKey]
+        public int BeatmapID { get; set; }
+        [NotNull, Indexed]
+        public int BeatmapSetID { get; set; }
+        [Indexed]
+        public int BeatmapMetadataID { get; set; }
+        public int BaseDifficultyID { get; set; }
+        [Ignore]
+        public List<HitObject> HitObjects { get; set; }
+        [Ignore]
+        public List<ControlPoint> ControlPoints { get; set; }
+        [Ignore]
+        public BeatmapMetadata Metadata { get; set; }
+        [Ignore]
+        public BaseDifficulty BaseDifficulty { get; set; }
+        public string Version { get; set; }
     }
 }

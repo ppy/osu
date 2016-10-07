@@ -45,7 +45,7 @@ namespace osu.Desktop.Beatmaps.IO
             return File.OpenRead(Path.Combine(BasePath, name));
         }
 
-        public override Metadata ReadMetadata()
+        public override BeatmapMetadata ReadMetadata()
         {
             return FirstMap.Metadata;
         }    }

@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps.IO
         /// <summary>
         /// Reads the beatmap metadata from this archive.
         /// </summary>
-        public abstract Metadata ReadMetadata();
+        public abstract BeatmapMetadata ReadMetadata();
         /// <summary>
         /// Gets a list of beatmap file names.
         /// </summary>

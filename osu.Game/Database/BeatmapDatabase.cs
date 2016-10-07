@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using osu.Framework.OS;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using SQLite;
@@ -52,7 +53,7 @@ namespace osu.Game.Database
                     var beatmap = decoder.Decode(stream);
                     maps.Add(new Beatmap
                     {
-                        ID = beatmap.BeatmapID,
+                        BeatmapID = beatmap.BeatmapID,
                         BeatmapSetID = metadata.BeatmapSetID,
                         // TODO: Import more things
                     });

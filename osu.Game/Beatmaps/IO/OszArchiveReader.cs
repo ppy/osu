@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps.IO
             return entry.OpenReader();
         }
 
-        public override Metadata ReadMetadata()
+        public override BeatmapMetadata ReadMetadata()
         {
             return FirstMap.Metadata;
         }

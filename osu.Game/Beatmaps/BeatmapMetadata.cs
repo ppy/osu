@@ -2,11 +2,15 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.GameModes.Play;
+using SQLite;
 
 namespace osu.Game.Beatmaps
 {
-    public class Metadata
+    public class BeatmapMetadata
     {
+        [PrimaryKey]
+        public int ID { get; set; }
+        
         public int BeatmapSetID { get; set; }
         public string Title { get; set; }
         public string TitleUnicode { get; set; }
