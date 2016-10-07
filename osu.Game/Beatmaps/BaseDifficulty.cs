@@ -1,16 +1,12 @@
 ﻿using System;
 using SQLite;
 
-namespace osu.Game.Database
+namespace osu.Game.Beatmaps
 {
-    public class Beatmap
+    public class BaseDifficulty
     {
-        [PrimaryKey]
+        [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
-        [NotNull, Indexed]
-        public int BeatmapSetID { get; set; }
-        [Indexed]
-        public int BeatmapMetadataID { get; set; }
         public float DrainRate { get; set; }
         public float CircleSize { get; set; }
         public float OverallDifficulty { get; set; }
@@ -19,3 +15,4 @@ namespace osu.Game.Database
         public float SliderTickRate { get; set; }
     }
 }
+
