@@ -24,6 +24,12 @@ namespace osu.Game.GameModes
         const float transition_length = 500;
         const float x_movement_amount = 50;
 
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            //we don't want to handle escape key.
+            return false;
+        }
+
         public override void Load()
         {
             base.Load();
