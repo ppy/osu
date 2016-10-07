@@ -4,6 +4,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Game.Beatmaps.IO;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
@@ -33,6 +34,7 @@ namespace osu.Game
         {
             base.Load();
 
+            OszArchiveReader.Register();
             Beatmaps = new BeatmapDatabase(Host.Storage);
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
