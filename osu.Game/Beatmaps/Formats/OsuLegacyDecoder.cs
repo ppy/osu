@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.GameModes.Play;
@@ -18,7 +19,8 @@ namespace osu.Game.Beatmaps.Formats
             AddDecoder<OsuLegacyDecoder>("osu file format v10");
             // TODO: Not sure how far back to go, or differences between versions
         }
-        private enum Section
+
+        private enum Section
         {
             None,
             General,
@@ -30,7 +32,8 @@ namespace osu.Game.Beatmaps.Formats
             Colours,
             HitObjects,
         }
-        private void HandleGeneral(Beatmap beatmap, string key, string val)
+
+        private void HandleGeneral(Beatmap beatmap, string key, string val)
         {
             switch (key)
             {
@@ -53,7 +56,7 @@ namespace osu.Game.Beatmaps.Formats
                     // TODO
                     break;
                 case "Mode":
-                    beatmap.Metadata.Mode = (PlayMode)int.Parse(val);
+                    beatmap.Mode = (PlayMode)int.Parse(val);
                     break;
                 case "LetterboxInBreaks":
                     // TODO
@@ -67,11 +70,69 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
+        private void HandleMetadata(Beatmap beatmap, string key, string val)
+        {
+            switch (key)
+            {
+                case "Title":
+                    beatmap.Metadata.Title = val;
+                    break;
+                case "TitleUnicode":
+                    beatmap.Metadata.TitleUnicode = val;
+                    break;
+                case "Artist":
+                    beatmap.Metadata.Artist = val;
+                    break;
+                case "ArtistUnicode":
+                    beatmap.Metadata.ArtistUnicode = val;
+                    break;
+                case "Creator":
+                    beatmap.Metadata.Author = val;
+                    break;
+                case "Version":
+                    beatmap.Version = val;
+                    break;
+                case "Source":
+                    beatmap.Metadata.Source = val;
+                    break;
+                case "Tags":
+                    beatmap.Metadata.Tags = val;
+                    break;
+                case "BeatmapID":
+                    beatmap.BeatmapID = int.Parse(val);
+                    break;
+                case "BeatmapSetID":
+                    beatmap.BeatmapSetID = int.Parse(val);
+                    beatmap.Metadata.BeatmapSetID = int.Parse(val);
+                    break;
+            }
+        }
+
+        private void HandleEvents(Beatmap beatmap, string val)
+        {
+            if (val.StartsWith("//"))
+                return;
+            string[] split = val.Split(',');
+            EventType type;
+            int _type;
+            if (!int.TryParse(split[0], out _type))
+            {
+                if (!Enum.TryParse(split[0], out type))
+                    throw new InvalidDataException($@"Unknown event type {split[0]}");
+            }
+            else
+                type = (EventType)_type;
+            // TODO: Parse and store the rest of the event
+            if (type == EventType.Background)
+                beatmap.Metadata.BackgroundFile = split[2].Trim('"');
+        }
+
         public override Beatmap Decode(TextReader stream)
         {
             var beatmap = new Beatmap
             {
                 Metadata = new BeatmapMetadata(),
+                BaseDifficulty = new BaseDifficulty(),
                 HitObjects = new List<HitObject>(),
                 ControlPoints = new List<ControlPoint>(),
             };
@@ -89,7 +150,7 @@ namespace osu.Game.Beatmaps.Formats
                 if (line.StartsWith("[") && line.EndsWith("]"))
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
-                        throw new InvalidOperationException($@"Unknown osu section {line}");
+                        throw new InvalidDataException($@"Unknown osu section {line}");
                     continue;
                 }
                 
@@ -109,13 +170,13 @@ namespace osu.Game.Beatmaps.Formats
                         // TODO
                         break;
                     case Section.Metadata:
-                        // TODO
+                        HandleMetadata(beatmap, key, val);
                         break;
                     case Section.Difficulty:
                         // TODO
                         break;
                     case Section.Events:
-                        // TODO
+                        HandleEvents(beatmap, val);
                         break;
                     case Section.TimingPoints:
                         // TODO

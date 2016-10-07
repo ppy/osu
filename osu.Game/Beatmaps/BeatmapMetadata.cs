@@ -19,7 +19,6 @@ namespace osu.Game.Beatmaps
         public string Author { get; set; }
         public string Source { get; set; }
         public string Tags { get; set; }
-        public PlayMode Mode { get; set; }
         public int PreviewTime { get; set; }
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
