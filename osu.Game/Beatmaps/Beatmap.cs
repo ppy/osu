@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.GameModes.Play;
 using osu.Game.Users;
 using SQLite;
 
@@ -26,6 +27,7 @@ namespace osu.Game.Beatmaps
         public BeatmapMetadata Metadata { get; set; }
         [Ignore]
         public BaseDifficulty BaseDifficulty { get; set; }
+        public PlayMode Mode { get; set; }
         public string Version { get; set; }
     }
 }
