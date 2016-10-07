@@ -15,7 +15,11 @@ namespace osu.Game.GameModes.Menu
     class Intro : OsuGameMode
     {
         private OsuLogo logo;
-        private bool didLoadMenu;
+
+        /// <summary>
+        /// Whether we have loaded the menu previously.
+        /// </summary>
+        internal bool DidLoadMenu;
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeEmpty();
 
@@ -54,7 +58,7 @@ namespace osu.Game.GameModes.Menu
 
             Game.Scheduler.AddDelayed(delegate
             {
-                didLoadMenu = true;
+                DidLoadMenu = true;
                 Push(new MainMenu());
             }, 2900);
 
@@ -73,7 +77,7 @@ namespace osu.Game.GameModes.Menu
         protected override bool OnExiting(GameMode next)
         {
             //cancel exiting if we haven't loaded the menu yet.
-            return !didLoadMenu;
+            return !DidLoadMenu;
         }
 
         protected override void OnResuming(GameMode last)

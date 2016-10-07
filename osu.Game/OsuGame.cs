@@ -95,6 +95,17 @@ namespace osu.Game
                 Host.Exit();
         }
 
+        protected override bool OnExiting()
+        {
+            if (!intro.DidLoadMenu || intro.ChildGameMode != null)
+            {
+                intro.MakeCurrent();
+                return true;
+            }
+            
+            return base.OnExiting();
+        }
+
         private void modeAdded(GameMode newMode)
         {
             newMode.ModePushed += modeAdded;
