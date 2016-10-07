@@ -6,9 +6,9 @@ using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Beatmaps.IO
 {
-    public class OszArchiveReader : ArchiveReader
+    public sealed class OszArchiveReader : ArchiveReader
     {
-        static OszArchiveReader()
+        public static void Register()
         {
             AddReader<OszArchiveReader>((storage, path) =>
             {
@@ -20,6 +20,7 @@ namespace osu.Game.Beatmaps.IO
                         return zip.Entries.Any(e => e.FileName.EndsWith(".osu"));
                 }
             });
+            OsuLegacyDecoder.Register();
         }
     
         private ZipFile Archive { get; set; }
