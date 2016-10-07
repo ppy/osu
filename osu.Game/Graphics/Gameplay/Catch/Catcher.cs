@@ -10,24 +10,29 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
-using osu.Framework.Timing;
 
 namespace osu.Game.Graphics.Gameplay.Catch
 {
-    public class Catcher : Container
+    class Catcher : Container
     {
         private Sprite catcherSprite;
 
-        int lastDashFrame;
+        public Anchor catcherAnchor => facingRight ? Anchor.BottomLeft : Anchor.BottomRight;
 
-        private bool moving;
+        private float hyperMultiplier;
 
-        private FramedOffsetClock localClock;
-
-        public float HyperMultiplier = 5.0f; // these will probably have to be set by the ruleset later
-
-        private Vector2 catcherScale => new Vector2(0.7f, 0.7f);
-        private Anchor catcherAnchor => facingRight ? Anchor.BottomLeft : Anchor.BottomRight;
+        private bool isMoving;
+        public bool IsMoving
+        {
+            get { return isMoving; }
+            protected set
+            {
+                if (isMoving != value)
+                {
+                    isMoving = value;
+                }
+            }
+        }
 
         private bool facingRight;
         public bool FacingRight
@@ -39,8 +44,9 @@ namespace osu.Game.Graphics.Gameplay.Catch
                 {
                     facingRight = value;
 
-                    catcherSprite.FlipHorizontal = facingRight ? false : true;
+                    FlipHorizontal = facingRight ? false : true;
 
+                    //todo: why isn't this working any more?
                     catcherSprite.Anchor = catcherAnchor;
                 }
             }
@@ -69,119 +75,53 @@ namespace osu.Game.Graphics.Gameplay.Catch
 
         public override void Load()
         {
-            base.Load();
-
-            facingRight = true;
-            moving = false;
-
-            if (localClock == null) localClock = Clock as FramedOffsetClock;
-            catcherSprite = new Sprite
+            if (catcherSprite == null)
             {
-                Texture = Game.Textures.Get(@"Gameplay/Catch/fruit-catcher-idle"),
-                Scale = catcherScale,
-                Anchor = catcherAnchor
-            };
-            
-            Height = 320 * catcherScale.Y; // static size to prevent skinning changing the gameplay
-            Width = 307 * catcherScale.X; 
+                facingRight = true;
+                IsMoving = false;
 
-            lastDashFrame = 0;
-            IsDashing = false;
+                catcherSprite = new Sprite
+                {
+                    Texture = Game.Textures.Get(@"Gameplay/Catch/fruit-catcher-idle"),
+                    Scale = this.Scale,
+                    Anchor = catcherAnchor
+                };
 
-            Add(catcherSprite);
+                IsDashing = false;
+                isHyperDashing = false;
+                hyperMultiplier = 1.0f;
 
-            ResetPosition();
+                Add(catcherSprite);
+            }
         }
 
         protected override void Update()
         {
             float speedMultiplier = 1;
             if (IsDashing) speedMultiplier *= 2;
-            if (IsHyperDashing) speedMultiplier *= HyperMultiplier;
+            if (IsHyperDashing) speedMultiplier *= hyperMultiplier;
 
-            if (moving)
+            if (IsMoving)
             {
                 MoveToX(Position.X + (FacingRight ? speedMultiplier : speedMultiplier * -1));
                 if (Position.X < 0) MoveToX(0);
-                if (Position.X > (768 - (Width * catcherScale.X))) MoveToX(768 - (Width * catcherScale.X));
+                if (Position.X > (768 - (Width * Scale.X))) MoveToX(768 - (Width * Scale.X));
             }
 
-            if (IsDashing && lastDashFrame < localClock.CurrentTime - 16)
-            {
-                Sprite glowSprite = new Sprite
-                {
-                    Texture = catcherSprite.Texture,
-                    Scale = catcherScale,
-                    Additive = true,
-                    FlipHorizontal = catcherSprite.FlipHorizontal,
-                    Anchor = catcherAnchor
-                };
-                glowSprite.Transforms.Add(new TransformAlpha(Clock)
-                {
-                    StartTime = Clock.CurrentTime,
-                    EndTime = Clock.CurrentTime + 100,
-                    StartValue = 1,
-                    EndValue = 0
-                });
-                glowSprite.Expire(true);
-                Add(glowSprite);
-
-                lastDashFrame = (int)Clock.CurrentTime;
-            }
-
+            
             base.Update();
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public void UpdateMovement(bool direction, bool move)
         {
-            switch (args.Key)
-            {
-                case Key.Left:
-                    FacingRight = false;
-                    moving = true;
-                    break;
-                case Key.Right:
-                    FacingRight = true;
-                    moving = true;
-                    break;
-                case Key.ShiftLeft:
-                    IsDashing = true;
-                    break;
-                case Key.ControlLeft: // hyper testing
-                    IsHyperDashing = true;
-                    break;
-            }
-
-            return true;
-            //return base.OnKeyDown(state, args);
+            IsMoving = move;
+            FacingRight = direction;
         }
 
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        public void ToggleHyperDash(bool value, float multiplier = 1.0f)
         {
-            switch (args.Key)
-            {
-                case Key.Left:
-                    if (!state.Keyboard.Keys.Contains(Key.Right))
-                        moving = false;
-                    else
-                        FacingRight = true;
-                    break;
-                case Key.Right:
-                    if (!state.Keyboard.Keys.Contains(Key.Left))
-                        moving = false;
-                    else
-                        FacingRight = false;
-                    break;
-                case Key.ShiftLeft:
-                    IsDashing = false;
-                    break;
-                case Key.ControlLeft: // hyper testing
-                    IsHyperDashing = false;
-                    break;
-            }
-
-            return true;
-            //return base.OnKeyUp(state, args);
+            hyperMultiplier = !value ? 1.0f : multiplier;
+            IsHyperDashing = value;
         }
 
         private void updateHyperEffects(bool begin)
@@ -194,7 +134,7 @@ namespace osu.Game.Graphics.Gameplay.Catch
             Sprite hyperSprite = new Sprite
             {
                 Texture = catcherSprite.Texture,
-                Scale = catcherScale,
+                Scale = this.Scale,
                 Additive = true,
                 FlipHorizontal = catcherSprite.FlipHorizontal,
                 Colour = Color4.Red,
@@ -211,16 +151,11 @@ namespace osu.Game.Graphics.Gameplay.Catch
             {
                 StartTime = Clock.CurrentTime,
                 EndTime = Clock.CurrentTime + 1200,
-                StartValue = catcherScale,
-                EndValue = new Vector2(catcherScale.X * 1.2f, catcherScale.Y * 1.2f)
+                StartValue = this.Scale,
+                EndValue = new Vector2(this.Scale.X * 1.2f, this.Scale.Y * 1.2f)
             });
             hyperSprite.Expire(true);
             Add(hyperSprite);
-        }
-
-        public void ResetPosition()
-        {
-            Position = new Vector2(240, Position.Y);
         }
     }
 }

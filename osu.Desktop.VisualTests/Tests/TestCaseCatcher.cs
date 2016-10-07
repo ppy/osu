@@ -13,10 +13,6 @@ namespace osu.Desktop.Tests
 {
     class TestCaseCatcher : TestCase
     {
-        FramedOffsetClock localClock;
-
-        protected override IFrameBasedClock Clock => localClock;
-
         public override string Name => @"Catcher";
 
         public override string Description => @"Tests osu!catch catcher";
@@ -25,22 +21,10 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
 
-            //ensure we are at offset 0
-            if (localClock == null)
-                localClock = new FramedOffsetClock(base.Clock);
-            localClock.Offset = -base.Clock.CurrentTime;
-
-            Add(new Catcher()
+            Add(new CatcherController()
             {
-                Position = (new Vector2(240, 400)),
-                //Clock
+                Position = new Vector2(0, 300)
             });
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            localClock.ProcessFrame();
         }
     }
 }
