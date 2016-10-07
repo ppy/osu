@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Objects;
+using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.GameModes.Play;
 
@@ -41,31 +42,53 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.Metadata.AudioFile = val;
                     break;
                 case "AudioLeadIn":
-                    // TODO
+                    beatmap.AudioLeadIn = int.Parse(val);
                     break;
                 case "PreviewTime":
                     beatmap.Metadata.PreviewTime = int.Parse(val);
                     break;
                 case "Countdown":
-                    // TODO
+                    beatmap.Countdown = int.Parse(val) == 1;
                     break;
                 case "SampleSet":
-                    // TODO
+                    beatmap.SampleSet = (SampleSet)Enum.Parse(typeof(SampleSet), val);
                     break;
                 case "StackLeniency":
-                    // TODO
+                    beatmap.StackLeniency = float.Parse(val);
                     break;
                 case "Mode":
                     beatmap.Mode = (PlayMode)int.Parse(val);
                     break;
                 case "LetterboxInBreaks":
-                    // TODO
+                    beatmap.LetterboxInBreaks = int.Parse(val) == 1;
                     break;
                 case "SpecialStyle":
-                    // TODO
+                    beatmap.SpecialStyle = int.Parse(val) == 1;
                     break;
                 case "WidescreenStoryboard":
-                    // TODO
+                    beatmap.WidescreenStoryboard = int.Parse(val) == 1;
+                    break;
+            }
+        }
+
+        private void HandleEditor(Beatmap beatmap, string key, string val)
+        {
+            switch (key)
+            {
+                case "Bookmarks":
+                    beatmap.StoredBookmarks = val;
+                    break;
+                case "DistanceSpacing":
+                    beatmap.DistanceSpacing = double.Parse(val);
+                    break;
+                case "BeatDivisor":
+                    beatmap.BeatDivisor = int.Parse(val);
+                    break;
+                case "GridSize":
+                    beatmap.GridSize = int.Parse(val);
+                    break;
+                case "TimelineZoom":
+                    beatmap.TimelineZoom = double.Parse(val);
                     break;
             }
         }
@@ -108,6 +131,31 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
+        private void HandleDifficulty(Beatmap beatmap, string key, string val)
+        {
+            switch (key)
+            {
+                case "HPDrainRate":
+                    beatmap.BaseDifficulty.DrainRate = float.Parse(val);
+                    break;
+                case "CircleSize":
+                    beatmap.BaseDifficulty.CircleSize = float.Parse(val);
+                    break;
+                case "OverallDifficulty":
+                    beatmap.BaseDifficulty.OverallDifficulty = float.Parse(val);
+                    break;
+                case "ApproachRate":
+                    beatmap.BaseDifficulty.ApproachRate = float.Parse(val);
+                    break;
+                case "SliderMultiplier":
+                    beatmap.BaseDifficulty.SliderMultiplier = float.Parse(val);
+                    break;
+                case "SliderTickRate":
+                    beatmap.BaseDifficulty.SliderTickRate = float.Parse(val);
+                    break;
+            }
+        }
+
         private void HandleEvents(Beatmap beatmap, string val)
         {
             if (val.StartsWith("//"))
@@ -125,6 +173,11 @@ namespace osu.Game.Beatmaps.Formats
             // TODO: Parse and store the rest of the event
             if (type == EventType.Background)
                 beatmap.Metadata.BackgroundFile = split[2].Trim('"');
+        }
+
+        private void HandleTimingPoints(Beatmap beatmap, string val)
+        {
+            // TODO
         }
 
         public override Beatmap Decode(TextReader stream)
@@ -167,22 +220,22 @@ namespace osu.Game.Beatmaps.Formats
                         HandleGeneral(beatmap, key, val);
                         break;
                     case Section.Editor:
-                        // TODO
+                        HandleEditor(beatmap, key, val);
                         break;
                     case Section.Metadata:
                         HandleMetadata(beatmap, key, val);
                         break;
                     case Section.Difficulty:
-                        // TODO
+                        HandleDifficulty(beatmap, key, val);
                         break;
                     case Section.Events:
                         HandleEvents(beatmap, val);
                         break;
                     case Section.TimingPoints:
-                        // TODO
+                        HandleTimingPoints(beatmap, val);
                         break;
                     case Section.HitObjects:
-                        // TODO
+                        beatmap.HitObjects.Add(HitObject.Parse(beatmap.Mode, val));
                         break;
                 }
             }
