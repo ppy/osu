@@ -258,7 +258,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected void updateTextSize()
+        protected virtual void updateTextSize()
         {
             if (countSpriteText != null)
                 countSpriteText.TextSize = TextSize;
