@@ -76,9 +76,12 @@
     <Compile Include="GameModes\Charts\ChartInfo.cs" />
     <Compile Include="GameModes\Edit\Editor.cs" />
     <Compile Include="GameModes\GameModeWhiteBox.cs" />
+    <Compile Include="GameModes\Menu\Button.cs" />
+    <Compile Include="GameModes\Menu\FlowContainerWithOrigin.cs" />
     <Compile Include="GameModes\Menu\Intro.cs" />
     <Compile Include="GameModes\Menu\ButtonSystem.cs" />
     <Compile Include="GameModes\Menu\MainMenu.cs" />
+    <Compile Include="GameModes\Menu\MenuVisualisation.cs" />
     <Compile Include="GameModes\Menu\OsuLogo.cs" />
     <Compile Include="GameModes\Multiplayer\Lobby.cs" />
     <Compile Include="GameModes\Multiplayer\Match.cs" />
