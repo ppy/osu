@@ -63,7 +63,7 @@ namespace osu.Game.GameModes.Menu
 
             logo.ScaleTo(0);
 
-            logo.ScaleTo(1,5900, EasingTypes.OutQuint);
+            logo.ScaleTo(1, 5900, EasingTypes.OutQuint);
             logo.FadeIn(30000, EasingTypes.OutQuint);
         }
 
@@ -82,7 +82,7 @@ namespace osu.Game.GameModes.Menu
         protected override void OnResuming(GameMode last)
         {
             //we are just an intro. if we are resumed, we just want to exit after a short delay (to allow the last mode to transition out).
-            Game.Scheduler.AddDelayed(Exit, 300);
+            Game.Scheduler.AddDelayed(Exit, 600);
 
             base.OnResuming(last);
         }
