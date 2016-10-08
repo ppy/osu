@@ -13,7 +13,7 @@ namespace osu.Desktop
         [STAThread]
         public static void Main()
         {
-            BasicGameHost host = Host.GetSuitableHost();
+            BasicGameHost host = Host.GetSuitableHost(@"osu");
             host.Add(new OsuGame());
             host.Run();
         }

@@ -12,7 +12,7 @@ namespace osu.Framework.VisualTests
         [STAThread]
         public static void Main(string[] args)
         {
-            BasicGameHost host = Host.GetSuitableHost();
+            BasicGameHost host = Host.GetSuitableHost(@"visual-tests");
             host.Add(new VisualTestGame());
             host.Run();
         }
