@@ -21,10 +21,11 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
+using osu.Framework;
 
 namespace osu.Game.Overlays
 {
-    public class ChatConsole : Container
+    public class ChatConsole : Container, IStateful<ChatConsoleState>
     {
         private APIAccess api => ((OsuGameBase)Game).API;
 
@@ -71,7 +72,7 @@ namespace osu.Game.Overlays
             careChannels = new List<Channel>();
 
             //if (api.State != APIAccess.APIState.Online)
-              //  return;
+            //  return;
 
             Add(new FlowContainer
             {
@@ -141,24 +142,32 @@ namespace osu.Game.Overlays
             api.Queue(fetchReq);
         }
 
-        public ChatConsoleState State { get; private set; }
+        private ChatConsoleState state;
 
-        public void SetState(ChatConsoleState state, bool instant = false)
+        public ChatConsoleState State
         {
-            State = state;
-
-            int time = instant ? 0 : 500;
-
-            switch (state)
+            get
             {
-                case ChatConsoleState.Hidden:
-                    MoveToY(-Size.Y, time, EasingTypes.InQuint);
-                    FadeOut(time, EasingTypes.InQuint);
-                    break;
-                case ChatConsoleState.Visible:
-                    MoveToY(0, time, EasingTypes.OutQuint);
-                    FadeIn(time, EasingTypes.OutQuint);
-                    break;
+                return state;
+            }
+
+            set
+            {
+                state = value;
+
+                const int transition_length = 500;
+
+                switch (state)
+                {
+                    case ChatConsoleState.Hidden:
+                        MoveToY(-Size.Y, transition_length, EasingTypes.InQuint);
+                        FadeOut(transition_length, EasingTypes.InQuint);
+                        break;
+                    case ChatConsoleState.Visible:
+                        MoveToY(0, transition_length, EasingTypes.OutQuint);
+                        FadeIn(transition_length, EasingTypes.OutQuint);
+                        break;
+                }
             }
         }
     }

@@ -65,7 +65,7 @@ namespace osu.Game.GameModes.Menu
 
             const float length = 400;
 
-            buttons.State = ButtonSystem.MenuState.EnteringMode;
+            buttons.State = MenuState.EnteringMode;
 
             Content.FadeOut(length, EasingTypes.InSine);
             Content.MoveTo(new Vector2(-800, 0), length, EasingTypes.InSine);
@@ -77,7 +77,7 @@ namespace osu.Game.GameModes.Menu
 
             const float length = 300;
 
-            buttons.State = ButtonSystem.MenuState.TopLevel;
+            buttons.State = MenuState.TopLevel;
 
             Content.FadeIn(length, EasingTypes.OutQuint);
             Content.MoveTo(new Vector2(0, 0), length, EasingTypes.OutQuint);

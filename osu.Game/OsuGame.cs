@@ -69,8 +69,11 @@ namespace osu.Game
                 }
             });
 
-            Toolbar.SetState(ToolbarState.Hidden, true);
-            Chat.SetState(ChatConsoleState.Hidden, true);
+            Toolbar.State = ToolbarState.Hidden;
+            Toolbar.Flush();
+
+            Chat.State = ChatConsoleState.Hidden;
+            Chat.Flush();
 
             intro.ModePushed += modeAdded;
             intro.Exited += modeRemoved;
@@ -87,7 +90,7 @@ namespace osu.Game
             switch (args.Key)
             {
                 case Key.F8:
-                    Chat.SetState(Chat.State == ChatConsoleState.Hidden ? ChatConsoleState.Visible : ChatConsoleState.Hidden);
+                    Chat.State = Chat.State == ChatConsoleState.Hidden ? ChatConsoleState.Visible : ChatConsoleState.Hidden;
                     return true;
             }
             
@@ -105,12 +108,12 @@ namespace osu.Game
             //central game mode change logic.
             if (newMode is Player || newMode is Intro)
             {
-                Toolbar.SetState(ToolbarState.Hidden);
-                Chat.SetState(ChatConsoleState.Hidden);
+                Toolbar.State = ToolbarState.Hidden;
+                Chat.State = ChatConsoleState.Hidden;
             }
             else
             {
-                Toolbar.SetState(ToolbarState.Visible);
+                Toolbar.State = ToolbarState.Visible;
             }
 
             Cursor.FadeIn(100);

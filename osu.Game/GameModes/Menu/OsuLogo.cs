@@ -17,7 +17,7 @@ namespace osu.Game.GameModes.Menu
     {
         private Sprite logo;
         private Container logoBounceContainer;
-        private ButtonSystem.MenuVisualisation vis;
+        private MenuVisualisation vis;
 
         public Action Action;
 
@@ -69,7 +69,7 @@ namespace osu.Game.GameModes.Menu
                                 }
                             }
                         },
-                        vis = new ButtonSystem.MenuVisualisation
+                        vis = new MenuVisualisation
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
