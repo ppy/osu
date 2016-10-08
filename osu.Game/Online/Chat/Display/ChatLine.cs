@@ -23,34 +23,52 @@ namespace osu.Game.Online.Chat.Display
                 this.Message = message;
             }
 
+            const float padding = 200;
+            const float text_size = 20;
+
             public override void Load()
             {
                 base.Load();
 
                 RelativeSizeAxes = Axes.X;
 
-                Add(new SpriteText
+                Children = new Drawable[]
                 {
-                    Text = Message.Timestamp.ToLocalTime().ToLongTimeString(),
-                    Colour = new Color4(128, 128, 128, 255)
-                });
-
-                Add(new SpriteText
-                {
-                    Text = Message.User.Name,
-                    Origin = Anchor.TopRight,
-                    RelativePositionAxes = Axes.X,
-                    Position = new Vector2(0.2f,0),
-                });
-
-                Add(new SpriteText
-                {
-                    Text = Message.Content,
-                    RelativePositionAxes = Axes.X,
-                    Position = new Vector2(0.22f, 0),
-                    RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(0.78f, 1),
-                });
+                    new Container
+                    {
+                        Size = new Vector2(padding, text_size),
+                        Children = new Drawable[]
+                        {
+                            new SpriteText
+                            {
+                                Text = Message.Timestamp.ToLocalTime().ToLongTimeString(),
+                                TextSize = text_size,
+                                Colour = new Color4(128, 128, 128, 255)
+                            },
+                            new SpriteText
+                            {
+                                Text = Message.User.Name,
+                                TextSize = text_size,
+                                Origin = Anchor.TopRight,
+                                Anchor = Anchor.TopRight,
+                            }
+                        }
+                    },
+                    new PaddingContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Padding = new Padding { Left = padding + 10 },
+                        Children = new Drawable[]
+                        {
+                            new SpriteText
+                            {
+                                Text = Message.Content,
+                                TextSize = text_size,
+                                RelativeSizeAxes = Axes.X,
+                            }
+                        }
+                    }
+                };
             }
         }
     }
