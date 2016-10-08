@@ -7,6 +7,7 @@ using osu.Framework.GameModes;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.GameModes.Backgrounds;
 using osu.Game.GameModes.Charts;
 using osu.Game.GameModes.Direct;
 using osu.Game.GameModes.Edit;
@@ -22,10 +23,6 @@ namespace osu.Game.GameModes.Menu
         private ButtonSystem buttons;
         public override string Name => @"Main Menu";
 
-        protected override bool IsTopLevel => true;
-
-        //private AudioTrack bgm;
-
         protected override BackgroundMode CreateBackground() => new BackgroundModeDefault();
 
         public override void Load()
@@ -34,11 +31,6 @@ namespace osu.Game.GameModes.Menu
 
             OsuGame osu = (OsuGame)Game;
 
-            AudioSample welcome = Game.Audio.Sample.Get(@"welcome");
-            welcome.Play();
-
-            //bgm = Game.Audio.Track.Get(@"circles");
-            //bgm.Start();
             Children = new Drawable[]
             {
                 new ParallaxContainer
@@ -48,17 +40,14 @@ namespace osu.Game.GameModes.Menu
                     {
                         buttons = new ButtonSystem()
                         {
+                            Alpha = 0,
                             OnChart = delegate { Push(new ChartListing()); },
                             OnDirect = delegate { Push(new OnlineListing()); },
                             OnEdit = delegate { Push(new EditSongSelect()); },
                             OnSolo = delegate { Push(new PlaySongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
                             OnTest  = delegate { Push(new TestBrowser()); },
-                            OnExit = delegate {
-                                Game.Scheduler.AddDelayed(delegate {
-                                    Game.Host.Exit();
-                                }, ButtonSystem.EXIT_DELAY);
-                            },
+                            OnExit = delegate { Game.Scheduler.AddDelayed(Exit, ButtonSystem.EXIT_DELAY); },
                             OnSettings = delegate {
                                 osu.Options.PoppedOut = !osu.Options.PoppedOut;
                             },
@@ -66,6 +55,8 @@ namespace osu.Game.GameModes.Menu
                     }
                 }
             };
+
+            buttons.FadeIn(500);
         }
 
         protected override void OnSuspending(GameMode next)

@@ -70,11 +70,16 @@
     <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="GameModes\BackgroundMode.cs" />
+    <Compile Include="GameModes\Backgrounds\BackgroundModeCustom.cs" />
+    <Compile Include="GameModes\Backgrounds\BackgroundModeDefault.cs" />
+    <Compile Include="GameModes\Backgrounds\BackgroundModeEmpty.cs" />
     <Compile Include="GameModes\Charts\ChartInfo.cs" />
     <Compile Include="GameModes\Edit\Editor.cs" />
     <Compile Include="GameModes\GameModeWhiteBox.cs" />
+    <Compile Include="GameModes\Menu\Intro.cs" />
     <Compile Include="GameModes\Menu\ButtonSystem.cs" />
     <Compile Include="GameModes\Menu\MainMenu.cs" />
+    <Compile Include="GameModes\Menu\OsuLogo.cs" />
     <Compile Include="GameModes\Multiplayer\Lobby.cs" />
     <Compile Include="GameModes\Multiplayer\Match.cs" />
     <Compile Include="GameModes\Multiplayer\MatchCreate.cs" />
@@ -127,6 +132,7 @@
     <Compile Include="Overlays\ToolbarModeSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\User.cs" />
+    <Compile Include="VolumeControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">

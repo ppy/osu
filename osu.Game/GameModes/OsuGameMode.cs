@@ -55,25 +55,20 @@ namespace osu.Game.GameModes
             base.OnEntering(last);
         }
 
-        protected override void OnExiting(GameMode next)
+        protected override bool OnExiting(GameMode next)
         {
             OsuGameMode nextOsu = next as OsuGameMode;
 
             if (Background != null && !Background.Equals(nextOsu?.Background))
-                Background.Exit();
+            {
+                if (nextOsu != null)
+                    //We need to use MakeCurrent in case we are jumping up multiple game modes.
+                    nextOsu.Background.MakeCurrent();
+                else
+                    Background.Exit();
+            }
 
-            base.OnExiting(next);
+            return base.OnExiting(next);
         }
-
-        protected override void OnResuming(GameMode last)
-        {
-            base.OnResuming(last);
-        }
-
-        protected override void OnSuspending(GameMode next)
-        {
-            base.OnSuspending(next);
-        }
-
     }
 }

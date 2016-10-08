@@ -20,6 +20,10 @@ namespace osu.Game.Configuration
             Set(OsuConfig.Token, string.Empty);
 
             Set(OsuConfig.PlayMode, PlayMode.Osu);
+
+            Set(OsuConfig.VolumeGlobal, 0.8, 0, 1);
+            Set(OsuConfig.VolumeMusic, 1.0, 0, 1);
+            Set(OsuConfig.VolumeEffect, 1.0, 0, 1);
         }
     }
 
@@ -31,6 +35,9 @@ namespace osu.Game.Configuration
         Username,
         Password,
         Token,
-        PlayMode
+        PlayMode,
+        VolumeGlobal,
+        VolumeEffect,
+        VolumeMusic
     }
 }

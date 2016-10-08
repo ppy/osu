@@ -19,7 +19,7 @@ using OpenTK.Input;
 
 namespace osu.Game.GameModes.Menu
 {
-    public class ButtonSystem : Container
+    public partial class ButtonSystem : Container
     {
         public Action OnEdit;
         public Action OnExit;
@@ -103,8 +103,9 @@ namespace osu.Game.GameModes.Menu
                         }
                     }
                 },
-                osuLogo = new OsuLogo(onOsuLogo)
+                osuLogo = new OsuLogo
                 {
+                    Action = onOsuLogo,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre
                 }
@@ -115,7 +116,6 @@ namespace osu.Game.GameModes.Menu
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"solo", @"freeplay", FontAwesome.user, new Color4(102, 68, 204, 255), OnSolo, wedge_width, Key.P)));
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"multi", @"multiplayer", FontAwesome.users, new Color4(94, 63, 186, 255), OnMulti, 0, Key.M)));
             buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"chart", @"charts", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), OnChart)));
-            buttonsPlay.Add((Button)buttonFlow.Add(new Button(@"tests", @"tests", FontAwesome.terminal, new Color4(80, 53, 160, 255), OnTest, 0, Key.T)));
 
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"play", @"play", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, wedge_width, Key.P)));
             buttonsTopLevel.Add((Button)buttonFlow.Add(new Button(@"osu!editor", @"edit", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), OnEdit, 0, Key.E)));
@@ -125,6 +125,15 @@ namespace osu.Game.GameModes.Menu
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (args.Key == Key.Escape)
+            {
+                if (State == MenuState.Initial)
+                    return false;
+
+                State = MenuState.Initial;
+                return true;
+            }
+
             osuLogo.TriggerClick(state);
             return true;
         }
@@ -272,95 +281,6 @@ namespace osu.Game.GameModes.Menu
 
             iconFacade.Width = osuLogo.SizeForFlow * 0.5f;
             base.Update();
-        }
-
-        /// <summary>
-        /// osu! logo and its attachments (pulsing, visualiser etc.)
-        /// </summary>
-        class OsuLogo : AutoSizeContainer
-        {
-            private Sprite logo;
-            private Container logoBounceContainer;
-            private MenuVisualisation vis;
-            private Action clickAction;
-
-            public float SizeForFlow => logo == null ? 0 : logo.Size.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.8f;
-
-            public override void Load()
-            {
-                base.Load();
-
-                Sprite ripple;
-
-                Children = new Drawable[]
-                {
-                    logoBounceContainer = new AutoSizeContainer
-                    {
-                        Children = new Drawable[]
-                        {
-                            logo = new Sprite()
-                            {
-                                Texture = Game.Textures.Get(@"Menu/logo"),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre
-                            },
-                            ripple = new Sprite()
-                            {
-                                Texture = Game.Textures.Get(@"Menu/logo"),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Alpha = 0.4f
-                            },
-                            vis = new MenuVisualisation
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = logo.Size,
-                                Additive = true,
-                                Alpha = 0.2f,
-                            }
-                        }
-                    }
-                };
-
-                ripple.ScaleTo(1.1f, 500);
-                ripple.FadeOut(500);
-                ripple.Loop(300);
-            }
-
-            public OsuLogo(Action action)
-            {
-                clickAction = action;
-            }
-
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-            {
-                logoBounceContainer.ScaleTo(1.1f, 1000, EasingTypes.Out);
-                return true;
-            }
-
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-            {
-                logoBounceContainer.ScaleTo(1.2f, 500, EasingTypes.OutElastic);
-                return true;
-            }
-
-            protected override bool OnClick(InputState state)
-            {
-                clickAction?.Invoke();
-                return true;
-            }
-
-            protected override bool OnHover(InputState state)
-            {
-                logoBounceContainer.ScaleTo(1.2f, 500, EasingTypes.OutElastic);
-                return true;
-            }
-
-            protected override void OnHoverLost(InputState state)
-            {
-                logoBounceContainer.ScaleTo(1, 500, EasingTypes.OutElastic);
-            }
         }
 
         /// <summary>
