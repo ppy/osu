@@ -41,11 +41,11 @@ namespace osu.Game.Overlays
                 {
                     case ToolbarState.Hidden:
                         MoveToY(-Size.Y, transition_time, EasingTypes.InQuint);
-                        FadeOut(transition_time);
+                        FadeOut(transition_time, EasingTypes.InQuint);
                         break;
                     case ToolbarState.Visible:
                         MoveToY(0, transition_time, EasingTypes.OutQuint);
-                        FadeIn(transition_time);
+                        FadeIn(transition_time, EasingTypes.OutQuint);
                         break;
                 }
             }
