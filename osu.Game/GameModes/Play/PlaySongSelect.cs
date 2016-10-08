@@ -3,16 +3,41 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Configuration;
+using osu.Game.GameModes.Backgrounds;
 
 namespace osu.Game.GameModes.Play
 {
     class PlaySongSelect : GameModeWhiteBox
     {
+        private Bindable<PlayMode> playMode;
+
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
         protected override IEnumerable<Type> PossibleChildren => new[] {
                 typeof(ModSelect),
                 typeof(Player)
         };
+
+        public override void Load()
+        {
+            base.Load();
+
+            OsuGame osu = Game as OsuGame;
+
+            playMode = osu.PlayMode;
+            playMode.ValueChanged += PlayMode_ValueChanged;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            playMode.ValueChanged -= PlayMode_ValueChanged;
+        }
+
+        private void PlayMode_ValueChanged(object sender, EventArgs e)
+        {
+        }
     }
 }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using osu.Framework.GameModes;
+using osu.Game.GameModes.Backgrounds;
 using osu.Game.GameModes.Play;
 using OpenTK.Graphics;
 
@@ -27,10 +28,10 @@ namespace osu.Game.GameModes.Multiplayer
             Background.FadeColour(Color4.DarkGray, 500);
         }
 
-        protected override void OnExiting(GameMode next)
+        protected override bool OnExiting(GameMode next)
         {
-            base.OnExiting(next);
             Background.FadeColour(Color4.White, 500);
+            return base.OnExiting(next);
         }
     }
 }

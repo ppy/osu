@@ -9,6 +9,8 @@ using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Configuration;
 using System;
+using osu.Framework.Graphics.Transformations;
+using osu.Framework.Timing;
 using osu.Game.GameModes.Play;
 
 namespace osu.Game.Overlays
@@ -22,6 +24,23 @@ namespace osu.Game.Overlays
         public Action<PlayMode> OnPlayModeChange;
 
         private ToolbarModeSelector modeSelector;
+
+        public void SetState(ToolbarState state, bool instant = false)
+        {
+            int time = instant ? 0 : 200;
+
+            switch (state)
+            {
+                case ToolbarState.Hidden:
+                    MoveToY(-Size.Y, time, EasingTypes.InQuint);
+                    FadeOut(time);
+                    break;
+                case ToolbarState.Visible:
+                    MoveToY(0, time, EasingTypes.OutQuint);
+                    FadeIn(time);
+                    break;
+            }
+        }
 
         public override void Load()
         {
@@ -90,5 +109,11 @@ namespace osu.Game.Overlays
         }
 
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
+    }
+
+    public enum ToolbarState
+    {
+        Visible,
+        Hidden,
     }
 }

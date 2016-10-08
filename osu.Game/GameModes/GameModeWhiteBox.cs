@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.GameModes.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -52,12 +53,12 @@ namespace osu.Game.GameModes
             Content.FadeIn(transition_time, EasingTypes.OutExpo);
         }
 
-        protected override void OnExiting(GameMode next)
+        protected override bool OnExiting(GameMode next)
         {
-            base.OnExiting(next);
-
             textContainer.MoveTo(new Vector2((Size.X / 16), 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
+
+            return base.OnExiting(next);
         }
 
         protected override void OnSuspending(GameMode next)

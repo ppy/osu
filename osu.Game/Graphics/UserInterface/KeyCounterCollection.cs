@@ -16,7 +16,15 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private List<KeyCounter> counters = new List<KeyCounter>();
-        public IReadOnlyList<KeyCounter> Counters => counters;
+        public IEnumerable<KeyCounter> Counters
+        {
+            get { return counters; }
+            set
+            {
+                foreach (var k in value)
+                    AddKey(k);
+            }
+        }
 
         public void AddKey(KeyCounter key)
         {

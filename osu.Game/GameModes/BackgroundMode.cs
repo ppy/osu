@@ -8,8 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics.Transformations;
-using osu.Game.Graphics.Background;
 using OpenTK;
+using osu.Framework.Graphics;
+using osu.Framework.Input;
 
 namespace osu.Game.GameModes
 {
@@ -22,6 +23,12 @@ namespace osu.Game.GameModes
 
         const float transition_length = 500;
         const float x_movement_amount = 50;
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            //we don't want to handle escape key.
+            return false;
+        }
 
         public override void Load()
         {
@@ -47,49 +54,18 @@ namespace osu.Game.GameModes
             base.OnSuspending(next);
         }
 
-        protected override void OnExiting(GameMode next)
+        protected override bool OnExiting(GameMode next)
         {
             Content.FadeOut(transition_length, EasingTypes.OutExpo);
             Content.MoveToX(x_movement_amount, transition_length, EasingTypes.OutExpo);
 
-            base.OnExiting(next);
+            return base.OnExiting(next);
         }
 
         protected override void OnResuming(GameMode last)
         {
             Content.MoveToX(0, transition_length, EasingTypes.OutExpo);
             base.OnResuming(last);
-        }
-    }
-
-    public class BackgroundModeDefault : BackgroundMode
-    {
-        public override void Load()
-        {
-            base.Load();
-
-            Add(new Background());
-        }
-    }
-
-    public class BackgroundModeCustom : BackgroundMode
-    {
-        private readonly string textureName;
-
-        public BackgroundModeCustom(string textureName)
-        {
-            this.textureName = textureName;
-        }
-
-        public override void Load()
-        {
-            base.Load();
-            Add(new Background(textureName));
-        }
-
-        public override bool Equals(BackgroundMode other)
-        {
-            return base.Equals(other) && textureName == ((BackgroundModeCustom)other).textureName;
         }
     }
 }
