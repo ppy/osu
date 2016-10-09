@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Width = MaxStars * StarSize,
+                    Width = MaxStars * StarSize + Math.Max(MaxStars - 1, 0) * StarSpacing,
                     Height = StarSize,
                 }
             };
