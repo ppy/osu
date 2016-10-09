@@ -80,7 +80,7 @@ namespace osu.Desktop.Tests
             ListChannelsRequest req = new ListChannelsRequest();
             req.Success += delegate (List<Channel> channels)
             {
-                Game.Scheduler.Add(delegate
+                Scheduler.Add(delegate
                 {
                     loading.FadeOut(100);
                 });

@@ -35,7 +35,7 @@ namespace osu.Game.Overlays
 
         private Container content;
 
-        protected override Container AddTarget => content;
+        protected override Container Content => content;
 
         public ChatConsole()
         {
@@ -44,17 +44,19 @@ namespace osu.Game.Overlays
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
-            AddTopLevel(new Box
+            InternalChildren = new Drawable[]
             {
-                Depth = float.MinValue,
-                RelativeSizeAxes = Axes.Both,
-                Colour = new Color4(0.1f, 0.1f, 0.1f, 0.4f)
-            });
-
-            AddTopLevel(content = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-            });
+                new Box
+                {
+                    Depth = float.MinValue,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = new Color4(0.1f, 0.1f, 0.1f, 0.4f)
+                },
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }
+            };
         }
 
         public override void Load()
@@ -94,7 +96,7 @@ namespace osu.Game.Overlays
             ListChannelsRequest req = new ListChannelsRequest();
             req.Success += delegate (List<Channel> channels)
             {
-                Game.Scheduler.Add(delegate
+                Scheduler.Add(delegate
                 {
                     loading.FadeOut(100);
                 });
@@ -103,7 +105,7 @@ namespace osu.Game.Overlays
                 //addChannel(channels.Find(c => c.Name == @"#lobby"));
                 //addChannel(channels.Find(c => c.Name == @"#english"));
 
-                messageRequest = Game.Scheduler.AddDelayed(() => FetchNewMessages(api), 1000, true);
+                messageRequest = Scheduler.AddDelayed(() => FetchNewMessages(api), 1000, true);
             };
             api.Queue(req);
         }
