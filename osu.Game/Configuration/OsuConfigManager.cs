@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
+using osu.Game.GameModes.Play;
 using osu.Game.Online.API;
 
 namespace osu.Game.Configuration
@@ -17,6 +18,12 @@ namespace osu.Game.Configuration
             Set(OsuConfig.Username, string.Empty);
             Set(OsuConfig.Password, string.Empty);
             Set(OsuConfig.Token, string.Empty);
+
+            Set(OsuConfig.PlayMode, PlayMode.Osu);
+
+            Set(OsuConfig.VolumeGlobal, 0.8, 0, 1);
+            Set(OsuConfig.VolumeMusic, 1.0, 0, 1);
+            Set(OsuConfig.VolumeEffect, 1.0, 0, 1);
         }
     }
 
@@ -27,6 +34,10 @@ namespace osu.Game.Configuration
         MouseSensitivity,
         Username,
         Password,
-        Token
+        Token,
+        PlayMode,
+        VolumeGlobal,
+        VolumeEffect,
+        VolumeMusic
     }
 }

@@ -21,9 +21,11 @@ namespace osu.Game
         public Options Options;
         public APIAccess API;
 
-        protected override Container AddTarget => ratioContainer?.IsLoaded == true ? ratioContainer : base.AddTarget;
+        protected override Container Content => ratioContainer?.IsLoaded == true ? ratioContainer : base.Content;
 
         private RatioAdjust ratioContainer;
+
+        public CursorContainer Cursor;
 
         public override void Load()
         {
@@ -49,7 +51,7 @@ namespace osu.Game
                     Children = new Drawable[]
                     {
                         Options = new Options(),
-                        new OsuCursorContainer()
+                        Cursor = new OsuCursorContainer()
                     }
                 }
             });
