@@ -42,8 +42,8 @@ namespace osu.Game.Graphics.UserInterface
         public bool IsRollingProportional = false;
 
         /// <summary>
-        /// If IsRollingProportional = false, duration in milliseconds for the counter roll-up animation for each element.
-        /// If IsRollingProportional = true, duration in milliseconds for the counter roll-up animation in total.
+        /// If IsRollingProportional = false, duration in milliseconds for the counter roll-up animation for each
+        /// element; else duration in milliseconds for the counter roll-up animation in total.
         /// </summary>
         public ulong RollingDuration = 0;
 
@@ -103,7 +103,10 @@ namespace osu.Game.Graphics.UserInterface
 
         protected RollingCounter()
         {
-            Debug.Assert(transformType.IsSubclassOf(typeof(Transform<T>)) || transformType == typeof(Transform<T>), @"transformType should be a subclass of Transform<T>.");
+            Debug.Assert(
+                transformType.IsSubclassOf(typeof(Transform<T>)) || transformType == typeof(Transform<T>),
+                @"transformType should be a subclass of Transform<T>."
+            );
         }
 
         public override void Load()
