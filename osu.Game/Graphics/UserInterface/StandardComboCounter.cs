@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.UserInterface
         public float PopOutSmallScale = 1.2f;
         public EasingTypes PopOutEasing = EasingTypes.None;
         public bool CanPopOutWhenBackwards = false;
-        public float PopOutInitialAlpha = 1.0f;
+        public float PopOutInitialAlpha = 0.75f;
 
         public StandardComboCounter() : base()
         {

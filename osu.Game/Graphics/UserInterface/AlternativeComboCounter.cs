@@ -62,7 +62,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected virtual void transformAnimate()
         {
-            countSpriteText.Colour = TintColour;
+            countSpriteText.FadeColour(TintColour, 0);
             countSpriteText.ScaleTo(new Vector2(1, ScaleFactor));
             countSpriteText.FadeColour(OriginalColour, TintDuration, TintEasing);
             countSpriteText.ScaleTo(new Vector2(1, 1), TintDuration, TintEasing);

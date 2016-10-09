@@ -96,7 +96,7 @@ namespace osu.Game.Graphics.UserInterface
                         IsRollingProportional
                             ? getProportionalDuration(VisibleCount, value)
                             : RollingDuration;
-                    transformCount(IsRollingContinuous ? VisibleCount : count, value);
+                    transformCount(IsRollingContinuous ? VisibleCount : prevCount, value);
                 }
             }
         }

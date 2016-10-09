@@ -110,7 +110,7 @@ namespace osu.Game.Graphics.UserInterface
             transform.StartValue = stars[i].Scale;
             transform.EndValue = new Vector2(
                 Interpolation.ValueAt(
-                    (isIncrement ? Math.Min(i + 1, Count) : Math.Max(i, Count)),
+                    Math.Min(Math.Max(i, Count), i + 1),
                     MinStarSize,
                     1.0f,
                     i,
