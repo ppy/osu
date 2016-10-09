@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
@@ -21,16 +22,28 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override Type transformType => typeof(TransformStar);
 
-        protected float MinStarSize = 0.001f;
+        protected float MinStarSize = 0.3f;
 
-        protected FlowContainer starContainer;
+        protected Container starContainer;
         protected List<TextAwesome> stars = new List<TextAwesome>();
+
+        public float MinStarAlpha = 0.5f;
 
         public int MaxStars = 10;
 
+        public int StarSize = 20;
+
+        public int StarSpacing = 2;
+
         public StarCounter() : base()
         {
-            RollingDuration = 5000;
+            IsRollingProportional = true;
+            RollingDuration = 100;
+        }
+
+        protected override ulong getProportionalDuration(float currentValue, float newValue)
+        {
+            return (ulong)(Math.Abs(currentValue - newValue) * RollingDuration);
         }
 
         public override void ResetCount()
@@ -45,11 +58,12 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                starContainer = new FlowContainer
+                starContainer = new Container
                 {
-                    Direction = FlowDirection.HorizontalOnly,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
+                    Width = MaxStars * StarSize,
+                    Height = StarSize,
                 }
             };
 
@@ -58,21 +72,16 @@ namespace osu.Game.Graphics.UserInterface
                 TextAwesome star = new TextAwesome
                 {
                     Icon = FontAwesome.star,
+                    Anchor = Anchor.CentreLeft,
                     Origin = Anchor.Centre,
-                    TextSize = 20,
+                    TextSize = StarSize,
+                    Scale = new Vector2(MinStarSize),
+                    Alpha = MinStarAlpha,
+                    Position = new Vector2((StarSize + StarSpacing) * i + (StarSize + StarSpacing) / 2, 0),
                 };
                 stars.Add(star);
                 starContainer.Add(star);
             }
-
-            // HACK: To mantain container height constant
-            starContainer.Add(new TextAwesome
-            {
-                Icon = FontAwesome.star,
-                Origin = Anchor.Centre,
-                TextSize = 20,
-                Alpha = 0.002f,
-            });
 
             ResetCount();
         }
@@ -82,11 +91,18 @@ namespace osu.Game.Graphics.UserInterface
             for (int i = 0; i < MaxStars; i++)
             {
                 if (newValue < i)
+                {
+                    stars[i].Alpha = MinStarAlpha;
                     stars[i].ScaleTo(MinStarSize);
-                else if (newValue > (i + 1))
-                    stars[i].ScaleTo(1f);
+                }
                 else
-                    stars[i].ScaleTo(Interpolation.ValueAt(newValue, MinStarSize, 1f, i, i + 1, EasingTypes.None));
+                {
+                    stars[i].Alpha = 1;
+                    if (newValue > (i + 1))
+                        stars[i].ScaleTo(1f);
+                    else
+                        stars[i].ScaleTo(Interpolation.ValueAt(newValue, MinStarSize, 1f, i, i + 1, EasingTypes.None));
+                }
             }
         }
 
