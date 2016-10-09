@@ -19,17 +19,22 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
 
-            KeyCounterCollection kc = new KeyCounterCollection
+            Children = new[]
             {
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                IsCounting = true
+                new KeyCounterCollection
+                {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    IsCounting = true,
+                    Counters = new KeyCounter[]
+                    {
+                        new KeyCounterKeyboard(@"Z", Key.Z),
+                        new KeyCounterKeyboard(@"X", Key.X),
+                        new KeyCounterMouse(@"M1", MouseButton.Left),
+                        new KeyCounterMouse(@"M2", MouseButton.Right),
+                    },
+                },
             };
-            Add(kc);
-            kc.AddKey(new KeyCounterKeyboard(@"Z", Key.Z));
-            kc.AddKey(new KeyCounterKeyboard(@"X", Key.X));
-            kc.AddKey(new KeyCounterMouse(@"M1", MouseButton.Left));
-            kc.AddKey(new KeyCounterMouse(@"M2", MouseButton.Right));
         }
     }
 }
