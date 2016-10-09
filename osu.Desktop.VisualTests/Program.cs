@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Desktop;
-using osu.Framework.OS;
+using osu.Framework.Platform;
 
 namespace osu.Framework.VisualTests
 {
@@ -13,7 +13,7 @@ namespace osu.Framework.VisualTests
         public static void Main(string[] args)
         {
             BasicGameHost host = Host.GetSuitableHost();
-            host.Load(new VisualTestGame());
+            host.Add(new VisualTestGame());
             host.Run();
         }
     }

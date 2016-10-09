@@ -10,12 +10,13 @@ using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.GameModes.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.GameModes
 {
-    public class GameModeWhiteBox : GameMode
+    public class GameModeWhiteBox : OsuGameMode
     {
         private Button popButton;
 
@@ -25,9 +26,14 @@ namespace osu.Game.GameModes
 
         private FlowContainer childModeButtons;
         private Container textContainer;
+        private Box box;
 
-        protected override double OnEntering(GameMode last)
+        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg2");
+
+        protected override void OnEntering(GameMode last)
         {
+            base.OnEntering(last);
+
             //only show the pop button if we are entered form another gamemode.
             if (last != null)
                 popButton.Alpha = 1;
@@ -35,31 +41,40 @@ namespace osu.Game.GameModes
             Content.Alpha = 0;
             textContainer.Position = new Vector2(Size.X / 16, 0);
 
-            Content.Delay(300);
+            box.ScaleTo(0.2f);
+            box.RotateTo(-20);
+
+            Content.Delay(300, true);
+
+            box.ScaleTo(1, transition_time, EasingTypes.OutElastic);
+            box.RotateTo(0, transition_time / 2, EasingTypes.OutQuint);
+
             textContainer.MoveTo(Vector2.Zero, transition_time, EasingTypes.OutExpo);
             Content.FadeIn(transition_time, EasingTypes.OutExpo);
-            return 0;// transition_time * 1000;
         }
 
-        protected override double OnExiting(GameMode next)
+        protected override bool OnExiting(GameMode next)
         {
             textContainer.MoveTo(new Vector2((Size.X / 16), 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
-            return transition_time;
+
+            return base.OnExiting(next);
         }
 
-        protected override double OnSuspending(GameMode next)
+        protected override void OnSuspending(GameMode next)
         {
+            base.OnSuspending(next);
+
             textContainer.MoveTo(new Vector2(-(Size.X / 16), 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
-            return transition_time;
         }
 
-        protected override double OnResuming(GameMode last)
+        protected override void OnResuming(GameMode last)
         {
+            base.OnResuming(last);
+
             textContainer.MoveTo(Vector2.Zero, transition_time, EasingTypes.OutExpo);
             Content.FadeIn(transition_time, EasingTypes.OutExpo);
-            return transition_time;
         }
 
         public override void Load()
@@ -68,15 +83,15 @@ namespace osu.Game.GameModes
 
             Children = new Drawable[]
             {
-                    new Box
+                    box = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.7f),
+                        Size = new Vector2(0.3f),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Colour = getColourFor(GetType()),
-                        Alpha = 0.6f,
-                        Additive = true
+                        Alpha = 1,
+                        Additive = false
                     },
                     textContainer = new AutoSizeContainer
                     {

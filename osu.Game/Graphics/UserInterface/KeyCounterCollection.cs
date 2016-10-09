@@ -16,16 +16,25 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private List<KeyCounter> counters = new List<KeyCounter>();
-        public IReadOnlyList<KeyCounter> Counters => counters;
+        public IEnumerable<KeyCounter> Counters
+        {
+            get { return counters; }
+            set
+            {
+                foreach (var k in value)
+                    addKey(k);
 
-        public void AddKey(KeyCounter key)
+                Children = value;
+            }
+        }
+
+        private void addKey(KeyCounter key)
         {
             counters.Add(key);
-            key.IsCounting = this.IsCounting;
-            key.FadeTime = this.FadeTime;
-            key.KeyDownTextColor = this.KeyDownTextColor;
-            key.KeyUpTextColor = this.KeyUpTextColor;
-            base.Add(key);
+            key.IsCounting = IsCounting;
+            key.FadeTime = FadeTime;
+            key.KeyDownTextColor = KeyDownTextColor;
+            key.KeyUpTextColor = KeyUpTextColor;
         }
 
         public void ResetCount()

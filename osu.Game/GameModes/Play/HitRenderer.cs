@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Drawables;
 using osu.Game.Beatmaps.Objects;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.GameModes.Play
 {
@@ -24,7 +25,12 @@ namespace osu.Game.GameModes.Play
         {
             base.Load();
 
-            Add(new Box() { RelativeSizeAxes = Axes.Both, Alpha = 0.1f, Scale = new Vector2(0.99f) });
+            Add(new Box()
+            {
+                RelativeSizeAxes = Axes.Both,
+                Alpha = 0.8f,
+                Colour = new Color4(5, 5, 5, 255),
+            });
         }
     }
 }
