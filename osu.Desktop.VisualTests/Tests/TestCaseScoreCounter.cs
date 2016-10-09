@@ -102,6 +102,7 @@ namespace osu.Desktop.Tests
                 ac.Count = 0;
                 cc.Count = 0;
                 pc.SetCount(0, 0);
+                tc.Count = 0;
             });
 
             AddButton(@"Hit! :D", delegate

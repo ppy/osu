@@ -16,6 +16,12 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public uint LeadingZeroes = 0;
 
+        public override void Load()
+        {
+            base.Load();
+            countSpriteText.FixedWidth = true;
+        }
+
         protected override string formatCount(ulong count)
         {
             return count.ToString("D" + LeadingZeroes);
