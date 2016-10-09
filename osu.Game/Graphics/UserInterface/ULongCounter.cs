@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A simple rolling counter that accepts unsigned long values.
     /// </summary>
-    public class ULongCounter : RollingCounter<ulong>
+    public class ULongCounter : NumericRollingCounter<ulong>
     {
         protected override Type transformType => typeof(TransformULongCounter);
 

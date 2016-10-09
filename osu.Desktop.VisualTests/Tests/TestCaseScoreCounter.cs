@@ -87,6 +87,14 @@ namespace osu.Desktop.Tests
             };
             Add(pc);
 
+            StarCounter tc = new StarCounter
+            {
+                Origin = Anchor.BottomLeft,
+                Anchor = Anchor.BottomLeft,
+                Position = new Vector2(20, 160),
+            };
+            Add(tc);
+
             AddButton(@"Reset all", delegate
             {
                 uc.Count = 0;
@@ -119,6 +127,11 @@ namespace osu.Desktop.Tests
                 pc.Denominator++;
             });
 
+            AddButton(@"Alter stars", delegate
+            {
+                tc.Count = RNG.NextSingle() * tc.MaxStars;
+            });
+
             AddButton(@"Stop counters", delegate
             {
                 uc.StopRolling();
@@ -126,6 +139,7 @@ namespace osu.Desktop.Tests
                 cc.StopRolling();
                 ac.StopRolling();
                 pc.StopRolling();
+                tc.StopRolling();
             });
         }
     }

@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// Used as an accuracy counter. Represented visually as a percentage, internally as a fraction.
     /// </summary>
-    public class AccuracyCounter : RollingCounter<float>
+    public class AccuracyCounter : NumericRollingCounter<float>
     {
         protected override Type transformType => typeof(TransformAccuracy);
 

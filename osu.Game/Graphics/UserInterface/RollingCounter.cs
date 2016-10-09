@@ -1,9 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
-
-using osu.Framework.Graphics;
+﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using System;
 using System.Collections.Generic;
@@ -15,8 +11,12 @@ using System.Threading.Tasks;
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
-    /// Skeleton for a counter with a simple roll-up animation.
+    /// Skeleton for a counter which value rolls-up in a lapse of time.
     /// </summary>
+    /// <remarks>
+    /// This class only abstracts the basics to roll-up a value in a lapse of time by using Transforms.
+    /// In order to show a value, you must implement a way to display it, i.e., as a numeric counter or a bar.
+    /// </remarks>
     /// <typeparam name="T">Type of the actual counter.</typeparam>
     public abstract class RollingCounter<T> : Container
     {
@@ -28,19 +28,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </remarks>
         protected virtual Type transformType => typeof(Transform<T>);
 
-        protected SpriteText countSpriteText;
         protected ulong RollingTotalDuration = 0;
-
-        protected float textSize = 20.0f;
-        public float TextSize
-        {
-            get { return textSize; }
-            set
-            {
-                textSize = value;
-                updateTextSize();
-            }
-        }
 
         /// <summary>
         /// If true, each time the Count is updated, it will roll over from the current visible value.
@@ -121,16 +109,6 @@ namespace osu.Game.Graphics.UserInterface
             if (Count == null)
                 ResetCount();
             VisibleCount = Count;
-            Children = new Drawable[]
-            {
-                countSpriteText = new SpriteText
-                {
-                    Text = formatCount(Count),
-                    TextSize = this.TextSize,
-                    Anchor = this.Anchor,
-                    Origin = this.Origin,
-                },
-            };
         }
 
         /// <summary>
@@ -250,18 +228,6 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         /// <param name="currentValue">Visible count value before modification.</param>
         /// <param name="newValue">Expected visible count value after modification-</param>
-        protected virtual void transformVisibleCount(T currentValue, T newValue)
-        {
-            if (countSpriteText != null)
-            {
-                countSpriteText.Text = formatCount(newValue);
-            }
-        }
-
-        protected virtual void updateTextSize()
-        {
-            if (countSpriteText != null)
-                countSpriteText.TextSize = TextSize;
-        }
+        protected abstract void transformVisibleCount(T currentValue, T newValue);
     }
 }
