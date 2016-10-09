@@ -49,7 +49,7 @@ namespace osu.Game
                     OnHome = delegate { MainMenu?.MakeCurrent(); },
                     OnSettings = delegate { Options.PoppedOut = !Options.PoppedOut; },
                     OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
-                    Alpha = 0.001f //fixes invalidation fuckup
+                    Alpha = 0.001f,
                 },
                 new VolumeControl
                 {
