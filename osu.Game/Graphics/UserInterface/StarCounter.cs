@@ -33,12 +33,13 @@ namespace osu.Game.Graphics.UserInterface
 
         public int StarSize = 20;
 
-        public int StarSpacing = 2;
+        public int StarSpacing = 4;
 
         public StarCounter() : base()
         {
             IsRollingProportional = true;
-            RollingDuration = 100;
+            RollingDuration = 150;
+            RollingEasing = EasingTypes.Out;
         }
 
         protected override ulong getProportionalDuration(float currentValue, float newValue)

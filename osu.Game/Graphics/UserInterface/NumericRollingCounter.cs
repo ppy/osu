@@ -33,7 +33,6 @@ namespace osu.Game.Graphics.UserInterface
 
         public override void Load()
         {
-
             base.Load();
             Children = new Drawable[]
             {
