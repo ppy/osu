@@ -141,7 +141,7 @@ namespace osu.Desktop.Tests
 
             AddButton(@"Alter stars", delegate
             {
-                tc.Count = RNG.NextSingle() * tc.MaxStars;
+                tc.Count = RNG.NextSingle() * (tc.MaxStars + 1);
                 text.Text = tc.Count.ToString("0.00");
             });
 

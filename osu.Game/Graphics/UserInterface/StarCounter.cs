@@ -126,6 +126,9 @@ namespace osu.Game.Graphics.UserInterface
 
         protected void transformStar(int i, bool isIncrement)
         {
+            if (i >= MaxStars)
+                return;
+
             if (Clock == null)
                 return;
 
