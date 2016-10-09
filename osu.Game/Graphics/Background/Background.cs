@@ -15,9 +15,13 @@ namespace osu.Game.Graphics.Background
     {
         protected Sprite BackgroundSprite;
 
-        public Background()
+        string textureName;
+
+        public Background(string textureName = @"Backgrounds/bg1")
         {
+            this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
+            Depth = float.MinValue;
         }
 
         public override void Load()
@@ -26,7 +30,7 @@ namespace osu.Game.Graphics.Background
 
             Add(BackgroundSprite = new Sprite
             {
-                Texture = Game.Textures.Get(@"Menu/background"),
+                Texture = Game.Textures.Get(textureName),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Colour = Color4.DarkGray

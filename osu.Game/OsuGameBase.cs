@@ -25,6 +25,8 @@ namespace osu.Game
 
         private RatioAdjust ratioContainer;
 
+        public CursorContainer Cursor;
+
         public override void Load()
         {
             base.Load();
@@ -49,7 +51,7 @@ namespace osu.Game
                     Children = new Drawable[]
                     {
                         Options = new Options(),
-                        new OsuCursorContainer()
+                        Cursor = new OsuCursorContainer()
                     }
                 }
             });

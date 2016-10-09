@@ -6,7 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework.GameModes;
+using osu.Game.GameModes.Backgrounds;
 using osu.Game.GameModes.Play;
+using OpenTK.Graphics;
 
 namespace osu.Game.GameModes.Multiplayer
 {
@@ -16,5 +19,19 @@ namespace osu.Game.GameModes.Multiplayer
             typeof(MatchSongSelect),
             typeof(Player),
         };
+
+        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
+
+        protected override void OnEntering(GameMode last)
+        {
+            base.OnEntering(last);
+            Background.FadeColour(Color4.DarkGray, 500);
+        }
+
+        protected override bool OnExiting(GameMode next)
+        {
+            Background.FadeColour(Color4.White, 500);
+            return base.OnExiting(next);
+        }
     }
 }

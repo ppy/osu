@@ -6,10 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework.GameModes;
+using osu.Game.GameModes.Backgrounds;
+using OpenTK.Graphics;
 
 namespace osu.Game.GameModes.Multiplayer
 {
     class MatchSongSelect : GameModeWhiteBox
     {
+        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
     }
 }
