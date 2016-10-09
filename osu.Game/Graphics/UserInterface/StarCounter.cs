@@ -27,6 +27,7 @@ namespace osu.Game.Graphics.UserInterface
         protected List<TextAwesome> stars = new List<TextAwesome>();
 
         public ulong StarAnimationDuration = 500;
+        public EasingTypes StarAnimationEasing = EasingTypes.OutElasticHalf;
         public ulong FadeDuration = 100;
         public float MinStarSize = 0.3f;
         public float MinStarAlpha = 0.5f;
@@ -116,7 +117,7 @@ namespace osu.Game.Graphics.UserInterface
                     i + 1
                 )
             );
-            transform.Easing = EasingTypes.OutElasticHalf;
+            transform.Easing = StarAnimationEasing;
 
             stars[i].Transforms.Add(transform);
         }
