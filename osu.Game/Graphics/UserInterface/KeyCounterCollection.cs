@@ -22,18 +22,19 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 foreach (var k in value)
-                    AddKey(k);
+                    addKey(k);
+
+                Children = value;
             }
         }
 
-        public void AddKey(KeyCounter key)
+        private void addKey(KeyCounter key)
         {
             counters.Add(key);
-            key.IsCounting = this.IsCounting;
-            key.FadeTime = this.FadeTime;
-            key.KeyDownTextColor = this.KeyDownTextColor;
-            key.KeyUpTextColor = this.KeyUpTextColor;
-            base.Add(key);
+            key.IsCounting = IsCounting;
+            key.FadeTime = FadeTime;
+            key.KeyDownTextColor = KeyDownTextColor;
+            key.KeyUpTextColor = KeyUpTextColor;
         }
 
         public void ResetCount()
