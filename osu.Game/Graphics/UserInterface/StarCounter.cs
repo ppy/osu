@@ -97,7 +97,9 @@ namespace osu.Game.Graphics.UserInterface
                 if (t.GetType() == typeof(TransformAlpha) || t.GetType() == typeof(TransformScaleVector))
                     t.Apply(stars[i]);
 
-            stars[i].Transforms.RemoveAll(t => t.GetType() == typeof(TransformScaleVector) || t.GetType() == typeof(TransformAlpha));
+            stars[i].Transforms.RemoveAll(t =>
+                t.GetType() == typeof(TransformScaleVector) || t.GetType() == typeof(TransformAlpha)
+            );
         }
 
         protected void transformStarScale(int i, TransformScaleVector transform, bool isIncrement, double startTime)
@@ -105,7 +107,15 @@ namespace osu.Game.Graphics.UserInterface
             transform.StartTime = startTime;
             transform.EndTime = transform.StartTime + StarAnimationDuration;
             transform.StartValue = stars[i].Scale;
-            transform.EndValue = new Vector2(Interpolation.ValueAt((isIncrement ? Math.Min(i + 1, Count) : Math.Max(i, Count)), MinStarSize, 1.0f, i, i + 1));
+            transform.EndValue = new Vector2(
+                Interpolation.ValueAt(
+                    (isIncrement ? Math.Min(i + 1, Count) : Math.Max(i, Count)),
+                    MinStarSize,
+                    1.0f,
+                    i,
+                    i + 1
+                )
+            );
             transform.Easing = EasingTypes.OutElasticHalf;
 
             stars[i].Transforms.Add(transform);
@@ -136,10 +146,12 @@ namespace osu.Game.Graphics.UserInterface
             double startTime = Time;
             // If incrementing, animation should had started when VisibleCount crossed start of star (i)
             if (isIncrement)
-                startTime -= i == (int)Math.Floor(prevCount) ? getProportionalDuration(prevCount, VisibleCount) : getProportionalDuration(i, VisibleCount);
+                startTime -= i == (int)Math.Floor(prevCount) ?
+                    getProportionalDuration(prevCount, VisibleCount) : getProportionalDuration(i, VisibleCount);
             // If decrementing, animation should had started when VisibleCount crossed end of star (i + 1)
             else
-                startTime -= i == (int)Math.Floor(prevCount) ? getProportionalDuration(prevCount, VisibleCount) : getProportionalDuration(i + 1, VisibleCount);
+                startTime -= i == (int)Math.Floor(prevCount) ?
+                    getProportionalDuration(prevCount, VisibleCount) : getProportionalDuration(i + 1, VisibleCount);
 
             updateTransformStar(i);
 
