@@ -21,7 +21,7 @@ namespace osu.Game
         public Options Options;
         public APIAccess API;
 
-        protected override Container AddTarget => ratioContainer?.IsLoaded == true ? ratioContainer : base.AddTarget;
+        protected override Container Content => ratioContainer?.IsLoaded == true ? ratioContainer : base.Content;
 
         private RatioAdjust ratioContainer;
 

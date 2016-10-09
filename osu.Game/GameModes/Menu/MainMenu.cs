@@ -45,7 +45,7 @@ namespace osu.Game.GameModes.Menu
                             OnSolo = delegate { Push(new PlaySongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
                             OnTest  = delegate { Push(new TestBrowser()); },
-                            OnExit = delegate { Game.Scheduler.AddDelayed(Exit, ButtonSystem.EXIT_DELAY); },
+                            OnExit = delegate { Scheduler.AddDelayed(Exit, ButtonSystem.EXIT_DELAY); },
                             OnSettings = delegate {
                                 osu.Options.PoppedOut = !osu.Options.PoppedOut;
                             },
