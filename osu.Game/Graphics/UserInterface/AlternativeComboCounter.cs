@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         public Color4 OriginalColour;
         public Color4 TintColour = Color4.OrangeRed;
-        public int TintDuration = 500;
+        public int TintDuration = 250;
         public float ScaleFactor = 2;
         public EasingTypes TintEasing = EasingTypes.None;
         public bool CanAnimateWhenBackwards = false;
