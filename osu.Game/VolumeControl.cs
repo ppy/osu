@@ -1,19 +1,18 @@
-﻿using System;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Configuration;
+﻿using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Drawables;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Transformations;
+using OpenTK;
 
 namespace osu.Game
 {
     internal class VolumeControl : Container
     {
-        private Box meterFill;
-        private Container meterContainer;
+        private FlowContainer volumeMetersContainer;
+        private VolumeMeter VolumeMeterGlobal;
+        private VolumeMeter VolumeMeterSample;
+        private VolumeMeter VolumeMeterTrack;
 
         public BindableDouble VolumeGlobal { get; set; }
         public BindableDouble VolumeSample { get; set; }
@@ -29,41 +28,17 @@ namespace osu.Game
             base.Load();
             Children = new Drawable[]
             {
-                meterContainer = new Container {
+                volumeMetersContainer = new FlowContainer() {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Position = new Vector2(10, 10),
-                    Size = new Vector2(40, 180),
+                    Position = new Vector2(10, 30),
                     Alpha = 0,
+                    Padding = new Vector2(15,0),
                     Children = new Drawable[]
                     {
-                        new Box
-                        {
-                            Colour = Color4.Black,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.5f, 0.9f),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Colour = Color4.DarkGray,
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                meterFill = new Box
-                                {
-                                    Colour = Color4.White,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Origin = Anchor.BottomCentre,
-                                    Anchor = Anchor.BottomCentre
-                                },
-                            }
-                        }
+                        VolumeMeterGlobal = new VolumeMeter("Master"),
+                        VolumeMeterSample= new VolumeMeter("Effects"),
+                        VolumeMeterTrack= new VolumeMeter("Music")
                     }
                 }
             };
@@ -75,7 +50,19 @@ namespace osu.Game
         {
             appear();
 
-            VolumeGlobal.Value -= 0.05f;
+            if (VolumeMeterSample.Contains(state.Mouse.Position))
+            {
+                VolumeSample.Value -= 0.05f;
+            }
+            else if (VolumeMeterTrack.Contains(state.Mouse.Position))
+            {
+                VolumeTrack.Value -= 0.05f;
+            }
+            else
+            {
+                VolumeGlobal.Value -= 0.05f;
+            }
+
             updateFill();
 
             return base.OnWheelDown(state);
@@ -85,7 +72,19 @@ namespace osu.Game
         {
             appear();
 
-            VolumeGlobal.Value += 0.05f;
+            if (VolumeMeterSample.Contains(state.Mouse.Position))
+            {
+                VolumeSample.Value += 0.05f;
+            }
+            else if (VolumeMeterTrack.Contains(state.Mouse.Position))
+            {
+                VolumeTrack.Value += 0.05f;
+            }
+            else
+            {
+                VolumeGlobal.Value += 0.05f;
+            }
+
             updateFill();
 
             return base.OnWheelUp(state);
@@ -93,15 +92,17 @@ namespace osu.Game
 
         private void updateFill()
         {
-            meterFill.ScaleTo(new Vector2(1, (float)VolumeGlobal.Value), 300, EasingTypes.OutQuint);
+            VolumeMeterGlobal.MeterFill.ScaleTo(new Vector2(1, (float)VolumeGlobal.Value), 300, EasingTypes.OutQuint);
+            VolumeMeterSample.MeterFill.ScaleTo(new Vector2(1, (float)VolumeSample.Value), 300, EasingTypes.OutQuint);
+            VolumeMeterTrack.MeterFill.ScaleTo(new Vector2(1, (float)VolumeTrack.Value), 300, EasingTypes.OutQuint);
         }
 
         private void appear()
         {
-            meterContainer.ClearTransformations();
-            meterContainer.FadeIn(100);
-            meterContainer.Delay(1000);
-            meterContainer.FadeOut(100);
+            volumeMetersContainer.ClearTransformations();
+            volumeMetersContainer.FadeIn(100);
+            volumeMetersContainer.Delay(1000);
+            volumeMetersContainer.FadeOut(100);
         }
     }
 }

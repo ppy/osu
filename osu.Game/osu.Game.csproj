@@ -133,6 +133,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="VolumeControl.cs" />
+    <Compile Include="VolumeMeter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
