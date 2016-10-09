@@ -41,7 +41,7 @@ namespace osu.Game.GameModes
             }
             else if (bg != null)
             {
-                AddTopLevel(new ParallaxContainer
+                AddInternal(new ParallaxContainer
                 {
                     Depth = float.MinValue,
                     Children = new[]
@@ -50,7 +50,6 @@ namespace osu.Game.GameModes
                     }
                 });
             }
-
 
             base.OnEntering(last);
         }
