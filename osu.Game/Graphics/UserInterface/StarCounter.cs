@@ -87,7 +87,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void transformCount(float currentValue, float newValue)
         {
-            transformStar((int)Math.Floor(currentValue), currentValue < newValue);
+            transformStar((int)Math.Floor(currentValue), currentValue, currentValue < newValue);
             transformCount(new TransformStarCounter(Clock), currentValue, newValue);
         }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
 
-        protected void transformStar(int i, bool isIncrement)
+        protected void transformStar(int i, float value, bool isIncrement)
         {
             if (i >= MaxStars)
                 return;
@@ -147,11 +147,11 @@ namespace osu.Game.Graphics.UserInterface
             // If incrementing, animation should had started when VisibleCount crossed start of star (i)
             if (isIncrement)
                 startTime -= i == (int)Math.Floor(prevCount) ?
-                    getProportionalDuration(prevCount, VisibleCount) : getProportionalDuration(i, VisibleCount);
+                    getProportionalDuration(prevCount, value) : getProportionalDuration(i, value);
             // If decrementing, animation should had started when VisibleCount crossed end of star (i + 1)
             else
                 startTime -= i == (int)Math.Floor(prevCount) ?
-                    getProportionalDuration(prevCount, VisibleCount) : getProportionalDuration(i + 1, VisibleCount);
+                    getProportionalDuration(prevCount, value) : getProportionalDuration(i + 1, value);
 
             updateTransformStar(i);
 
@@ -164,12 +164,12 @@ namespace osu.Game.Graphics.UserInterface
             // Detect increment that passes over an integer value
             if (Math.Ceiling(currentValue) <= Math.Floor(newValue))
                 for (int i = (int)Math.Ceiling(currentValue); i <= Math.Floor(newValue); i++)
-                    transformStar(i, true);
+                    transformStar(i, newValue, true);
 
             // Detect decrement that passes over an integer value
             if (Math.Floor(currentValue) >= Math.Ceiling(newValue))
                 for (int i = (int)Math.Floor(newValue); i < Math.Floor(currentValue); i++)
-                    transformStar(i, false);
+                    transformStar(i, newValue, false);
         }
 
         protected class TransformStarCounter : Transform<float>
