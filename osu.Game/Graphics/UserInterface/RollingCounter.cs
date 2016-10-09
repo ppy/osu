@@ -52,6 +52,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public EasingTypes RollingEasing = EasingTypes.None;
 
+        protected T prevVisibleCount;
         protected T visibleCount;
 
         /// <summary>
@@ -65,13 +66,15 @@ namespace osu.Game.Graphics.UserInterface
             }
             protected set
             {
+                prevVisibleCount = visibleCount;
                 if (visibleCount.Equals(value))
                     return;
-                transformVisibleCount(visibleCount, value);
                 visibleCount = value;
+                transformVisibleCount(prevVisibleCount, value);
             }
         }
 
+        protected T prevCount;
         protected T count;
 
         /// <summary>
@@ -85,6 +88,8 @@ namespace osu.Game.Graphics.UserInterface
             }
             set
             {
+                prevCount = count;
+                count = value;
                 if (Clock != null)
                 {
                     RollingTotalDuration =
@@ -93,13 +98,12 @@ namespace osu.Game.Graphics.UserInterface
                             : RollingDuration;
                     transformCount(IsRollingContinuous ? VisibleCount : count, value);
                 }
-                count = value;
             }
         }
 
         protected RollingCounter()
         {
-            Debug.Assert(transformType.IsSubclassOf(typeof(Transform<T>)), @"transformType should be a subclass of Transform<T>.");
+            Debug.Assert(transformType.IsSubclassOf(typeof(Transform<T>)) || transformType == typeof(Transform<T>), @"transformType should be a subclass of Transform<T>.");
         }
 
         public override void Load()

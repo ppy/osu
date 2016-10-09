@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Transformations;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.MathUtils;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Desktop.Tests
 {
@@ -87,6 +88,15 @@ namespace osu.Desktop.Tests
             };
             Add(pc);
 
+            SpriteText text = new SpriteText
+            {
+                Origin = Anchor.BottomLeft,
+                Anchor = Anchor.BottomLeft,
+                Position = new Vector2(20, 190),
+                Text = @"- unset -",
+            };
+            Add(text);
+
             StarCounter tc = new StarCounter
             {
                 Origin = Anchor.BottomLeft,
@@ -103,6 +113,7 @@ namespace osu.Desktop.Tests
                 cc.Count = 0;
                 pc.SetCount(0, 0);
                 tc.Count = 0;
+                text.Text = tc.Count.ToString("0.00");
             });
 
             AddButton(@"Hit! :D", delegate
@@ -131,6 +142,7 @@ namespace osu.Desktop.Tests
             AddButton(@"Alter stars", delegate
             {
                 tc.Count = RNG.NextSingle() * tc.MaxStars;
+                text.Text = tc.Count.ToString("0.00");
             });
 
             AddButton(@"Stop counters", delegate
