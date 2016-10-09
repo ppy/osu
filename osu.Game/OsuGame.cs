@@ -37,7 +37,7 @@ namespace osu.Game
         {
             base.Load();
 
-            //attach out bindables to the audio subsystem.
+            //attach our bindables to the audio subsystem.
             Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeGlobal));
             Audio.VolumeSample.Weld(Config.GetBindable<double>(OsuConfig.VolumeEffect));
             Audio.VolumeTrack.Weld(Config.GetBindable<double>(OsuConfig.VolumeMusic));
