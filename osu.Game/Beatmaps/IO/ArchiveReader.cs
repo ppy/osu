@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using osu.Framework.OS;
+using osu.Framework.Platform;
 
 namespace osu.Game.Beatmaps.IO
 {
