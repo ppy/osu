@@ -6,18 +6,18 @@ namespace osu.Game.Beatmaps.Formats
 {
     public abstract class BeatmapDecoder
     {
-        private static Dictionary<string, Type> Decoders { get; set; } = new Dictionary<string, Type>();
+        private static Dictionary<string, Type> decoders { get; set; } = new Dictionary<string, Type>();
     
         public static BeatmapDecoder GetDecoder(TextReader stream)
         {
             var line = stream.ReadLine().Trim();
-            if (!Decoders.ContainsKey(line))
+            if (!decoders.ContainsKey(line))
                 throw new IOException("Unknown file format");
-            return (BeatmapDecoder)Activator.CreateInstance(Decoders[line]);
+            return (BeatmapDecoder)Activator.CreateInstance(decoders[line]);
         }
         protected static void AddDecoder<T>(string magic) where T : BeatmapDecoder
         {
-            Decoders[magic] = typeof(T);
+            decoders[magic] = typeof(T);
         }
     
         public abstract Beatmap Decode(TextReader stream);

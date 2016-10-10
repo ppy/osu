@@ -13,11 +13,11 @@ namespace osu.Game.Beatmaps.IO
             public Type Type { get; set; }
         }
     
-        private static List<Reader> Readers { get; set; } = new List<Reader>();
+        private static List<Reader> readers { get; set; } = new List<Reader>();
     
         public static ArchiveReader GetReader(BasicStorage storage, string path)
         {
-            foreach (var reader in Readers)
+            foreach (var reader in readers)
             {
                 if (reader.Test(storage, path))
                     return (ArchiveReader)Activator.CreateInstance(reader.Type);
@@ -27,7 +27,7 @@ namespace osu.Game.Beatmaps.IO
         
         protected static void AddReader<T>(Func<BasicStorage, string, bool> test) where T : ArchiveReader
         {
-            Readers.Add(new Reader { Test = test, Type = typeof(T) });
+            readers.Add(new Reader { Test = test, Type = typeof(T) });
         }
     
         /// <summary>
