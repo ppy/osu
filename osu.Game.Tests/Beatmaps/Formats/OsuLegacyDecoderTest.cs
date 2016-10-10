@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using NUnit.Framework;
+using OpenTK.Graphics;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.GameModes.Play;
@@ -93,6 +94,28 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(9, difficulty.ApproachRate);
                 Assert.AreEqual(1.8f, difficulty.SliderMultiplier);
                 Assert.AreEqual(2, difficulty.SliderTickRate);
+            }
+        }
+        
+        [Test]
+        public void TestDecodeColors()
+        {
+            var decoder = new OsuLegacyDecoder();
+            using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
+            {
+                var beatmap = decoder.Decode(new StreamReader(stream));
+                Color4[] expected =
+                {
+                    new Color4(142, 199, 255, 255),
+                    new Color4(255, 128, 128, 255),
+                    new Color4(128, 255, 255, 255),
+                    new Color4(128, 255, 128, 255),
+                    new Color4(255, 187, 255, 255),
+                    new Color4(255, 177, 140, 255),
+                };
+                Assert.AreEqual(expected.Length, beatmap.ComboColors.Count);
+                for (int i = 0; i < expected.Length; i++)
+                    Assert.AreEqual(expected[i], beatmap.ComboColors[i]);
             }
         }
     }

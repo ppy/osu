@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using OpenTK.Graphics;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
@@ -29,6 +30,8 @@ namespace osu.Game.Beatmaps
         public BeatmapMetadata Metadata { get; set; }
         [Ignore]
         public BaseDifficulty BaseDifficulty { get; set; }
+        [Ignore]
+        public List<Color4> ComboColors { get; set; }
         
         // General
         public int AudioLeadIn { get; set; }
