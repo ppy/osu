@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using OpenTK.Graphics;
 using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Samples;
@@ -180,6 +181,24 @@ namespace osu.Game.Beatmaps.Formats
             // TODO
         }
 
+        private void HandleColours(Beatmap beatmap, string key, string val)
+        {
+            string[] split = val.Split(',');
+            if (split.Length != 3)
+                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {val}");
+            byte r, g, b;
+            if (!byte.TryParse(split[0], out r) || !byte.TryParse(split[1], out g) || !byte.TryParse(split[2], out b))
+                throw new InvalidOperationException($@"Color must be specified with 8-bit integer components");
+            // Note: the combo index specified in the beatmap is discarded
+            beatmap.ComboColors.Add(new Color4
+            {
+                R = r / 255f,
+                G = g / 255f,
+                B = b / 255f,
+                A = 1f,
+            });
+        }
+
         public override Beatmap Decode(TextReader stream)
         {
             var beatmap = new Beatmap
@@ -188,6 +207,7 @@ namespace osu.Game.Beatmaps.Formats
                 BaseDifficulty = new BaseDifficulty(),
                 HitObjects = new List<HitObject>(),
                 ControlPoints = new List<ControlPoint>(),
+                ComboColors = new List<Color4>(),
             };
             var section = Section.None;
             string line;
@@ -210,8 +230,7 @@ namespace osu.Game.Beatmaps.Formats
                 }
                 
                 string val = line, key = null;
-                if (section != Section.Events && section != Section.TimingPoints
-                    && section != Section.HitObjects)
+                if (section != Section.Events && section != Section.TimingPoints && section != Section.HitObjects)
                 {
                     key = val.Remove(val.IndexOf(':')).Trim();
                     val = val.Substring(val.IndexOf(':') + 1).Trim();
@@ -235,6 +254,9 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                     case Section.TimingPoints:
                         HandleTimingPoints(beatmap, val);
+                        break;
+                    case Section.Colours:
+                        HandleColours(beatmap, key, val);
                         break;
                     case Section.HitObjects:
                         beatmap.HitObjects.Add(HitObject.Parse(beatmap.Mode, val));
