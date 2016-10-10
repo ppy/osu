@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps.Formats
             HitObjects,
         }
 
-        private void HandleGeneral(Beatmap beatmap, string key, string val)
+        private void handleGeneral(Beatmap beatmap, string key, string val)
         {
             switch (key)
             {
@@ -72,7 +72,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void HandleEditor(Beatmap beatmap, string key, string val)
+        private void handleEditor(Beatmap beatmap, string key, string val)
         {
             switch (key)
             {
@@ -94,7 +94,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void HandleMetadata(Beatmap beatmap, string key, string val)
+        private void handleMetadata(Beatmap beatmap, string key, string val)
         {
             switch (key)
             {
@@ -132,7 +132,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void HandleDifficulty(Beatmap beatmap, string key, string val)
+        private void handleDifficulty(Beatmap beatmap, string key, string val)
         {
             switch (key)
             {
@@ -157,7 +157,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void HandleEvents(Beatmap beatmap, string val)
+        private void handleEvents(Beatmap beatmap, string val)
         {
             if (val.StartsWith("//"))
                 return;
@@ -176,12 +176,12 @@ namespace osu.Game.Beatmaps.Formats
                 beatmap.Metadata.BackgroundFile = split[2].Trim('"');
         }
 
-        private void HandleTimingPoints(Beatmap beatmap, string val)
+        private void handleTimingPoints(Beatmap beatmap, string val)
         {
             // TODO
         }
 
-        private void HandleColours(Beatmap beatmap, string key, string val)
+        private void handleColours(Beatmap beatmap, string key, string val)
         {
             string[] split = val.Split(',');
             if (split.Length != 3)
@@ -238,25 +238,25 @@ namespace osu.Game.Beatmaps.Formats
                 switch (section)
                 {
                     case Section.General:
-                        HandleGeneral(beatmap, key, val);
+                        handleGeneral(beatmap, key, val);
                         break;
                     case Section.Editor:
-                        HandleEditor(beatmap, key, val);
+                        handleEditor(beatmap, key, val);
                         break;
                     case Section.Metadata:
-                        HandleMetadata(beatmap, key, val);
+                        handleMetadata(beatmap, key, val);
                         break;
                     case Section.Difficulty:
-                        HandleDifficulty(beatmap, key, val);
+                        handleDifficulty(beatmap, key, val);
                         break;
                     case Section.Events:
-                        HandleEvents(beatmap, val);
+                        handleEvents(beatmap, val);
                         break;
                     case Section.TimingPoints:
-                        HandleTimingPoints(beatmap, val);
+                        handleTimingPoints(beatmap, val);
                         break;
                     case Section.Colours:
-                        HandleColours(beatmap, key, val);
+                        handleColours(beatmap, key, val);
                         break;
                     case Section.HitObjects:
                         beatmap.HitObjects.Add(HitObject.Parse(beatmap.Mode, val));
