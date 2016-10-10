@@ -5,6 +5,7 @@ using osu.Framework.Extensions;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics;
 using OpenTK.Graphics;
+using osu.Framework;
 
 namespace osu.Game.Overlays
 {
@@ -42,9 +43,9 @@ namespace osu.Game.Overlays
             }
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
             DrawableIcon.TextSize *= 1.4f;
         }
     }

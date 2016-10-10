@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
 using OpenTK;
+using System.Diagnostics;
 
 namespace osu.Game.GameModes.Play.Osu
 {
@@ -20,17 +21,16 @@ namespace osu.Game.GameModes.Play.Osu
         {
             set
             {
+                Debug.Assert(objects == null);
+
                 //osu! mode requires all objects to be of OsuBaseHit type.
                 objects = value.ConvertAll(o => (OsuBaseHit)o);
-
-                if (Parent != null)
-                    Load();
             }
         }
 
-        public override void Load()
+        public override void Load(Framework.BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             if (playfield == null)
                 Add(playfield = new OsuPlayfield());
@@ -44,7 +44,7 @@ namespace osu.Game.GameModes.Play.Osu
                 //render stuff!
                 Sprite s = new Sprite
                 {
-                    Texture = Game.Textures.Get(@"Menu/logo"),
+                    Texture = game.Textures.Get(@"Menu/logo"),
                     Origin = Anchor.Centre,
                     Scale = new Vector2(0.1f),
                     Alpha = 0,

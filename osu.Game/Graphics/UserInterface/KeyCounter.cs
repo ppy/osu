@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -58,20 +59,20 @@ namespace osu.Game.Graphics.UserInterface
             Name = name;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
             Children = new Drawable[]
             {
                 buttonSprite = new Sprite
                 {
-                    Texture = Game.Textures.Get(@"KeyCounter/key-up"),
+                    Texture = game.Textures.Get(@"KeyCounter/key-up"),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
                 glowSprite = new Sprite
                 {
-                    Texture = Game.Textures.Get(@"KeyCounter/key-glow"),
+                    Texture = game.Textures.Get(@"KeyCounter/key-glow"),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Alpha = 0

@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Play.Mania
 {
@@ -23,9 +24,9 @@ namespace osu.Game.GameModes.Play.Mania
             Origin = Anchor.BottomCentre;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Add(new Box() { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
 

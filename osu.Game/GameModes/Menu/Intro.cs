@@ -23,9 +23,9 @@ namespace osu.Game.GameModes.Menu
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeEmpty();
 
-        public override void Load()
+        public override void Load(Framework.BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Children = new Drawable[]
             {
@@ -39,9 +39,9 @@ namespace osu.Game.GameModes.Menu
                 }
             };
 
-            AudioSample welcome = Game.Audio.Sample.Get(@"welcome");
+            AudioSample welcome = game.Audio.Sample.Get(@"welcome");
 
-            AudioTrack bgm = Game.Audio.Track.Get(@"circles");
+            AudioTrack bgm = game.Audio.Track.Get(@"circles");
             bgm.Looping = true;
 
             Scheduler.Add(delegate
