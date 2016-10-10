@@ -20,17 +20,30 @@ using osu.Framework;
 using osu.Framework.Input;
 using osu.Game.Input;
 using OpenTK.Input;
+using System.IO;
 
 namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
+        private class ImportBeatmapIPC
+        {
+            public string Path;
+        }
+    
         public Toolbar Toolbar;
         public ChatConsole Chat;
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
         private Intro intro;
+        private string[] args;
+        private IPCHost<ImportBeatmapIPC> BeatmapIPC;
 
         public Bindable<PlayMode> PlayMode;
+        
+        public OsuGame(string[] args)
+        {
+            this.args = args;
+        }
 
         public override void SetHost(BasicGameHost host)
         {
@@ -41,7 +54,27 @@ namespace osu.Game
 
         public override void Load(BaseGame game)
         {
+<<<<<<< HEAD
             base.Load(game);
+=======
+            BeatmapIPC = new IPCHost<ImportBeatmapIPC>(Host);
+            
+            if (!Host.IsPrimaryInstance)
+            {
+                if (args.Length == 1 && File.Exists(args[0]))
+                {
+                    BeatmapIPC.SendMessage(new ImportBeatmapIPC { Path = args[0] }).Wait();
+                    Console.WriteLine(@"Sent file to running instance");
+                }
+                else
+                    Console.WriteLine(@"osu! does not support multiple running instances.");
+                Environment.Exit(0);
+            }
+
+            BeatmapIPC.MessageReceived += (message) => Console.WriteLine($@"Got beatmap: {message.Path}");
+            
+            base.Load();
+>>>>>>> Implement beatmap sending/receiving over IPC
 
             //attach our bindables to the audio subsystem.
             Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeGlobal));
