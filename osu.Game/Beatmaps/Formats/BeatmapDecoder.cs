@@ -6,7 +6,7 @@ namespace osu.Game.Beatmaps.Formats
 {
     public abstract class BeatmapDecoder
     {
-        private static Dictionary<string, Type> decoders { get; set; } = new Dictionary<string, Type>();
+        private static Dictionary<string, Type> decoders { get; } = new Dictionary<string, Type>();
     
         public static BeatmapDecoder GetDecoder(TextReader stream)
         {
