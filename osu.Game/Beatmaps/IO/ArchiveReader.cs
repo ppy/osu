@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps.IO
             public Type Type { get; set; }
         }
     
-        private static List<Reader> readers { get; set; } = new List<Reader>();
+        private static List<Reader> readers { get; } = new List<Reader>();
     
         public static ArchiveReader GetReader(BasicStorage storage, string path)
         {
