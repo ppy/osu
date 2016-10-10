@@ -23,32 +23,32 @@ namespace osu.Game.Beatmaps.IO
             OsuLegacyDecoder.Register();
         }
     
-        private ZipFile Archive { get; set; }
-        private string[] Beatmaps { get; set; }
-        private Beatmap FirstMap { get; set; }
+        private ZipFile archive { get; set; }
+        private string[] beatmaps { get; set; }
+        private Beatmap firstMap { get; set; }
     
-        public OszArchiveReader(Stream archive)
+        public OszArchiveReader(Stream archiveStream)
         {
-            Archive = ZipFile.Read(archive);
-            Beatmaps = Archive.Entries.Where(e => e.FileName.EndsWith(".osu"))
+            archive = ZipFile.Read(archiveStream);
+            beatmaps = archive.Entries.Where(e => e.FileName.EndsWith(".osu"))
                 .Select(e => e.FileName).ToArray();
-            if (Beatmaps.Length == 0)
+            if (beatmaps.Length == 0)
                 throw new FileNotFoundException("This directory contains no beatmaps");
-            using (var stream = new StreamReader(ReadFile(Beatmaps[0])))
+            using (var stream = new StreamReader(ReadFile(beatmaps[0])))
             {
                 var decoder = BeatmapDecoder.GetDecoder(stream);
-                FirstMap = decoder.Decode(stream);
+                firstMap = decoder.Decode(stream);
             }
         }
 
         public override string[] ReadBeatmaps()
         {
-            return Beatmaps;
+            return beatmaps;
         }
 
         public override Stream ReadFile(string name)
         {
-            ZipEntry entry = Archive.Entries.SingleOrDefault(e => e.FileName == name);
+            ZipEntry entry = archive.Entries.SingleOrDefault(e => e.FileName == name);
             if (entry == null)
                 throw new FileNotFoundException();
             return entry.OpenReader();
@@ -56,11 +56,11 @@ namespace osu.Game.Beatmaps.IO
 
         public override BeatmapMetadata ReadMetadata()
         {
-            return FirstMap.Metadata;
+            return firstMap.Metadata;
         }
         public override void Dispose()
         {
-            Archive.Dispose();
+            archive.Dispose();
         }
     }
 }
