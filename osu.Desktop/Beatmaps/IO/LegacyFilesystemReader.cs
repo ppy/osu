@@ -48,5 +48,10 @@ namespace osu.Desktop.Beatmaps.IO
         public override BeatmapMetadata ReadMetadata()
         {
             return FirstMap.Metadata;
+        }
+        
+        public override void Dispose()
+        {
+            // no-op
         }    }
 }
