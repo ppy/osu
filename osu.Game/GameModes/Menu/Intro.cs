@@ -44,18 +44,17 @@ namespace osu.Game.GameModes.Menu
             AudioTrack bgm = Game.Audio.Track.Get(@"circles");
             bgm.Looping = true;
 
-            Game.Scheduler.Add(delegate
+            Scheduler.Add(delegate
             {
                 welcome.Play();
-            }, true);
+            });
 
-
-            Game.Scheduler.AddDelayed(delegate
+            Scheduler.AddDelayed(delegate
             {
                 bgm.Start();
             }, 600);
 
-            Game.Scheduler.AddDelayed(delegate
+            Scheduler.AddDelayed(delegate
             {
                 DidLoadMenu = true;
                 Push(new MainMenu());
@@ -82,7 +81,7 @@ namespace osu.Game.GameModes.Menu
         protected override void OnResuming(GameMode last)
         {
             //we are just an intro. if we are resumed, we just want to exit after a short delay (to allow the last mode to transition out).
-            Game.Scheduler.AddDelayed(Exit, 300);
+            Scheduler.AddDelayed(Exit, 300);
 
             base.OnResuming(last);
         }
