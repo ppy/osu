@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using NUnit.Framework;
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.GameModes.Play;
 using osu.Game.Tests.Resources;
@@ -38,7 +40,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("Renatus", meta.TitleUnicode);
             }
         }
-        
+
         [Test]
         public void TestDecodeGeneral()
         {
@@ -56,7 +58,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(false, beatmap.WidescreenStoryboard);
             }
         }
-        
+
         [Test]
         public void TestDecodeEditor()
         {
@@ -79,7 +81,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(2, beatmap.TimelineZoom);
             }
         }
-        
+
         [Test]
         public void TestDecodeDifficulty()
         {
@@ -96,7 +98,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(2, difficulty.SliderTickRate);
             }
         }
-        
+
         [Test]
         public void TestDecodeColors()
         {
@@ -116,6 +118,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(expected.Length, beatmap.ComboColors.Count);
                 for (int i = 0; i < expected.Length; i++)
                     Assert.AreEqual(expected[i], beatmap.ComboColors[i]);
+            }
+        }
+
+        [Test]        public void TestDecodeHitObjects()
+        {
+            var decoder = new OsuLegacyDecoder();
+            using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
+            {
+                var beatmap = decoder.Decode(new StreamReader(stream));
+                var slider = beatmap.HitObjects[0] as Slider;
+                Assert.IsNotNull(slider);
+                Assert.AreEqual(new Vector2(192, 168), slider.Position);
+                Assert.AreEqual(956, slider.StartTime);
+                Assert.AreEqual(SampleType.None, slider.Sample.Type);
+                var circle = beatmap.HitObjects[1] as Circle;
+                Assert.IsNotNull(circle);
+                Assert.AreEqual(new Vector2(304, 56), circle.Position);
+                Assert.AreEqual(1285, circle.StartTime);
+                Assert.AreEqual(SampleType.Clap, circle.Sample.Type);
             }
         }
     }

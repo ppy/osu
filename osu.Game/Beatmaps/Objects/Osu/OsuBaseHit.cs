@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps.Objects.Osu
             }
             result.Position = new Vector2(int.Parse(split[0]), int.Parse(split[1]));
             result.StartTime = double.Parse(split[2]);
-            result.Sample = new HitSampleInfo { Type = (SampleType)int.Parse(split[3]) };
+            result.Sample = new HitSampleInfo { Type = (SampleType)int.Parse(split[4]) };
             result.NewCombo = combo;
             // TODO: "addition" field
             return result;
