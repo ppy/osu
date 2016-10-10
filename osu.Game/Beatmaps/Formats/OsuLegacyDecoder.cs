@@ -199,6 +199,8 @@ namespace osu.Game.Beatmaps.Formats
                 line = line.Trim();
                 if (string.IsNullOrEmpty(line))
                     continue;
+                if (line.StartsWith("osu file format v"))
+                    continue;
                     
                 if (line.StartsWith("[") && line.EndsWith("]"))
                 {
