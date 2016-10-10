@@ -15,6 +15,7 @@ using osu.Game.GameModes.Multiplayer;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics.Containers;
 using OpenTK;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -25,11 +26,11 @@ namespace osu.Game.GameModes.Menu
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeDefault();
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
-            OsuGame osu = (OsuGame)Game;
+            OsuGame osu = (OsuGame)game;
 
             Children = new Drawable[]
             {

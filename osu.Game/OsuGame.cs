@@ -15,6 +15,7 @@ using osu.Game.Graphics.Background;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Framework;
 
 namespace osu.Game
 {
@@ -33,9 +34,9 @@ namespace osu.Game
             host.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             //attach our bindables to the audio subsystem.
             Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeGlobal));

@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework;
 using osu.Game.Graphics.Background;
 
 namespace osu.Game.GameModes.Backgrounds
@@ -14,9 +15,9 @@ namespace osu.Game.GameModes.Backgrounds
             this.textureName = textureName;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
             Add(new Background(textureName));
         }
 
