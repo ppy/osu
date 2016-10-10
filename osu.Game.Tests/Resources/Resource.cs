@@ -6,10 +6,10 @@ namespace osu.Game.Tests.Resources
 {
     public static class Resource
     {
-        public static string GetPath(string path)
+        public static Stream OpenResource(string name)
         {
-            var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            return Path.Combine(assemblyDir, "Resources", path);
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream(
+                $@"osu.Game.Tests.Resources.{name}");
         }
     }
 }

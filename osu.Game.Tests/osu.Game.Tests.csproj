@@ -34,9 +34,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Resources\241526 Soleily - Renatus.osz">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
@@ -48,10 +45,16 @@
     <Folder Include="Resources\" />
     <Folder Include="Beatmaps\" />
     <Folder Include="Beatmaps\IO\" />
+    <Folder Include="Beatmaps\Formats\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\IO\OszArchiveReaderTest.cs" />
     <Compile Include="Resources\Resource.cs" />
+    <Compile Include="Beatmaps\Formats\OsuLegacyDecoderTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\241526 Soleily - Renatus.osz" />
+    <EmbeddedResource Include="Resources\Soleily - Renatus %28Gamu%29 [Insane].osu" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
