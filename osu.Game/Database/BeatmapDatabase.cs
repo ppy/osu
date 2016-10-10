@@ -11,23 +11,23 @@ namespace osu.Game.Database
 {
     public class BeatmapDatabase
     {
-        private static SQLiteConnection Connection { get; set; }
+        private static SQLiteConnection connection { get; set; }
         
         public BeatmapDatabase(BasicStorage storage)
         {
-            if (Connection == null)
+            if (connection == null)
             {
-                Connection = storage.GetDatabase(@"beatmaps");
-                Connection.CreateTable<BeatmapMetadata>();
-                Connection.CreateTable<BaseDifficulty>();
-                Connection.CreateTable<BeatmapSet>();
-                Connection.CreateTable<Beatmap>();
+                connection = storage.GetDatabase(@"beatmaps");
+                connection.CreateTable<BeatmapMetadata>();
+                connection.CreateTable<BaseDifficulty>();
+                connection.CreateTable<BeatmapSet>();
+                connection.CreateTable<Beatmap>();
             }
         }
         public void AddBeatmap(ArchiveReader input)
         {
             var metadata = input.ReadMetadata();
-            if (Connection.Table<BeatmapSet>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
+            if (connection.Table<BeatmapSet>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
                 return;
             string[] mapNames = input.ReadBeatmaps();
             var beatmapSet = new BeatmapSet { BeatmapSetID = metadata.BeatmapSetID };
@@ -39,12 +39,12 @@ namespace osu.Game.Database
                     var decoder = BeatmapDecoder.GetDecoder(stream);
                     var beatmap = decoder.Decode(stream);
                     maps.Add(beatmap);
-                    beatmap.BaseDifficultyID = Connection.Insert(beatmap.BaseDifficulty);
+                    beatmap.BaseDifficultyID = connection.Insert(beatmap.BaseDifficulty);
                 }
             }
-            beatmapSet.BeatmapMetadataID = Connection.Insert(metadata);
-            Connection.Insert(beatmapSet);
-            Connection.InsertAll(maps);
+            beatmapSet.BeatmapMetadataID = connection.Insert(metadata);
+            connection.Insert(beatmapSet);
+            connection.InsertAll(maps);
         }
     }
 }
