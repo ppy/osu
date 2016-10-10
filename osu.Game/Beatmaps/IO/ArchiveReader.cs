@@ -5,7 +5,7 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Beatmaps.IO
 {
-    public abstract class ArchiveReader
+    public abstract class ArchiveReader : IDisposable
     {
         private class Reader
         {
@@ -42,5 +42,7 @@ namespace osu.Game.Beatmaps.IO
         /// Opens a stream for reading a specific file from this archive.
         /// </summary>
         public abstract Stream ReadFile(string name);
+
+        public abstract void Dispose();
     }
 }

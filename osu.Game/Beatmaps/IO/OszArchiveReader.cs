@@ -58,5 +58,9 @@ namespace osu.Game.Beatmaps.IO
         {
             return FirstMap.Metadata;
         }
+        public override void Dispose()
+        {
+            Archive.Dispose();
+        }
     }
 }
