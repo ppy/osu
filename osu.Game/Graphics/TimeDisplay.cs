@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -13,6 +14,7 @@ namespace osu.Game.Graphics.TimeDisplay
         private SpriteText timeText;
         private string format;
         private float textSize;
+        private Vector2 textPos;
 
         public override void Load()
         {
@@ -21,7 +23,7 @@ namespace osu.Game.Graphics.TimeDisplay
             {
                 timeText = new SpriteText()
                 {
-                    Direction = FlowDirection.HorizontalOnly
+                    Direction = FlowDirection.HorizontalOnly,
                 }
             };
         }
@@ -30,6 +32,7 @@ namespace osu.Game.Graphics.TimeDisplay
         {
             timeText.Text = DateTime.Now.ToString(format);
             timeText.TextSize = textSize;
+            timeText.Position = textPos;
         }
 
         public string Format
@@ -45,6 +48,14 @@ namespace osu.Game.Graphics.TimeDisplay
             set
             {
                 textSize = value;
+            }
+        }
+
+        public Vector2 TextPosition
+        {
+            set
+            {
+                textPos = value;
             }
         }
     }

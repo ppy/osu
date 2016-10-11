@@ -90,6 +90,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.TopRight,
                     Direction = FlowDirection.HorizontalOnly,
                     RelativeSizeAxes = Axes.Y,
+
                     Children = new Drawable[]
                     {
                         new ToolbarButton
@@ -107,9 +108,10 @@ namespace osu.Game.Overlays
                         },
                         new TimeDisplay
                         {
-                            Size = new Vector2(70, 0),
+                            Size = new Vector2(110, 0),
+                            TextPosition = new Vector2(0, 12),
                             TextSize = 24,
-                            Format = "hh:mm:ss"
+                            Format = "hh:mm:ss tt"
                         },
                     }
                 }
