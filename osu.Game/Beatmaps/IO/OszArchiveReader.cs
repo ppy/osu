@@ -13,12 +13,7 @@ namespace osu.Game.Beatmaps.IO
             AddReader<OszArchiveReader>((storage, path) =>
             {
                 using (var stream = storage.GetStream(path))
-                {
-                    if (!ZipFile.IsZipFile(stream, false))
-                        return false;
-                    using (ZipFile zip = ZipFile.Read(stream))
-                        return zip.Entries.Any(e => e.FileName.EndsWith(".osu"));
-                }
+                    return ZipFile.IsZipFile(stream, false);
             });
             OsuLegacyDecoder.Register();
         }
