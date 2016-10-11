@@ -30,7 +30,6 @@ namespace osu.Game.Graphics.TimeDisplay
             timeText.Text = DateTime.Now.ToString(format);
         }
 
-        public bool MilitaryTime { get; set; }
         public string Format
         {
             set
