@@ -15,7 +15,7 @@ namespace osu.Desktop.Tests
             Add(new TimeDisplay
             {
                 Position = new OpenTK.Vector2(100, 100),
-                Format = @"""It is ""s"" seconds and ""m"" minutes and ""tt"" on ""d"" day"""
+                Format = "'It is 's' seconds and 'm' minutes and 'tt' on 'd' day'"
             });
         }
     }
