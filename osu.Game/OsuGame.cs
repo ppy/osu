@@ -26,7 +26,7 @@ namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
-        private class ImportBeatmapIPC
+        private class ImportBeatmap
         {
             public string Path;
         }
@@ -36,7 +36,7 @@ namespace osu.Game
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
         private Intro intro;
         private string[] args;
-        private IPCHost<ImportBeatmapIPC> BeatmapIPC;
+        private IPCChannel<ImportBeatmap> BeatmapIPC;
 
         public Bindable<PlayMode> PlayMode;
         
@@ -54,16 +54,13 @@ namespace osu.Game
 
         public override void Load(BaseGame game)
         {
-<<<<<<< HEAD
-            base.Load(game);
-=======
-            BeatmapIPC = new IPCHost<ImportBeatmapIPC>(Host);
+            BeatmapIPC = new IPCChannel<ImportBeatmap>(Host);
             
             if (!Host.IsPrimaryInstance)
             {
                 if (args.Length == 1 && File.Exists(args[0]))
                 {
-                    BeatmapIPC.SendMessage(new ImportBeatmapIPC { Path = args[0] }).Wait();
+                    BeatmapIPC.SendMessage(new ImportBeatmap { Path = args[0] }).Wait();
                     Console.WriteLine(@"Sent file to running instance");
                 }
                 else
@@ -72,9 +69,8 @@ namespace osu.Game
             }
 
             BeatmapIPC.MessageReceived += (message) => Console.WriteLine($@"Got beatmap: {message.Path}");
-            
-            base.Load();
->>>>>>> Implement beatmap sending/receiving over IPC
+
+            base.Load(game);
 
             //attach our bindables to the audio subsystem.
             Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeGlobal));
