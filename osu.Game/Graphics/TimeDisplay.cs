@@ -35,34 +35,8 @@ namespace osu.Game.Graphics.TimeDisplay
         {
             set
             {
-                format = ProcessFormat(value);
+                format = value;
             }
-        }
-
-        private string ProcessFormat(string format)
-        {
-            format = format.Insert(0, "\"");
-            format = format.Insert(format.Length - 1, "\"");
-
-            int start = 0;
-            int end = 0;
-
-            while (start != -1 && end != -1)
-            {
-                 start = format.IndexOf('[', start + 1);
-                 end = format.IndexOf(']', end + 1);
-
-                if ((end - start == 2) || (end - start == 3))
-                {
-                    format = format.Remove(start, 1);
-                    format = format.Remove(end - 1, 1);
-
-                    format = format.Insert(start, "\"");
-                    format = format.Insert(end, "\"");
-                }
-            }
-
-            return format;
         }
     }
 }
