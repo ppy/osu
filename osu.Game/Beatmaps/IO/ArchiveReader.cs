@@ -20,7 +20,7 @@ namespace osu.Game.Beatmaps.IO
             foreach (var reader in readers)
             {
                 if (reader.Test(storage, path))
-                    return (ArchiveReader)Activator.CreateInstance(reader.Type);
+                    return (ArchiveReader)Activator.CreateInstance(reader.Type, storage.GetStream(path));
             }
             throw new IOException("Unknown file format");
         }
