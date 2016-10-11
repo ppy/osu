@@ -103,6 +103,12 @@ namespace osu.Game.Overlays
                         {
                             Icon = FontAwesome.bars
                         },
+                        new TimeDisplay
+                        {
+                            Size = new Vector2(70, 0),
+                            TextSize = 24,
+                            Format = "hh:mm:ss"
+                        },
                     }
                 }
             };
