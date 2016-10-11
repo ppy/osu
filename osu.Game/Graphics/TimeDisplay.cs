@@ -41,38 +41,24 @@ namespace osu.Game.Graphics.TimeDisplay
 
         private string ProcessFormat(string format)
         {
-            bool token;
+            format = format.Insert(0, "\"");
+            format = format.Insert(format.Length - 1, "\"");
 
-            for (int i=0; i<format.Length; i++)
+            int start = 0;
+            int end = 0;
+
+            while (start != -1 && end != -1)
             {
-                token = false;
+                 start = format.IndexOf('[', start + 1);
+                 end = format.IndexOf(']', end + 1);
 
-                if(i < format.Length - 2)
+                if ((end - start == 2) || (end - start == 3))
                 {
-                    if ((format[i] == '[') && (format[i + 2] == ']'))
-                    {
-                        token = true;
-                        format = format.Remove(i, 1);
-                        format = format.Remove(i + 1, 1);
-                        i++;
-                    }
-                }
+                    format = format.Remove(start, 1);
+                    format = format.Remove(end - 1, 1);
 
-                if(i < format.Length - 3)
-                {
-                    if ((format[i] == '[') && (format[i + 3] == ']'))
-                    {
-                        token = true;
-                        format = format.Remove(i, 1);
-                        format = format.Remove(i + 2, 1);
-                        i+=2;
-                    }
-                }
-                
-                if(!token)
-                {
-                    if (format[i] != ' ')
-                        format = format.Insert(i++, @"\");
+                    format = format.Insert(start, "\"");
+                    format = format.Insert(end, "\"");
                 }
             }
 
