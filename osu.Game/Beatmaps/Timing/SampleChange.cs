@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using osu.Framework.GameModes;
+using osu.Game.Beatmaps.Samples;
 
-namespace osu.Game.Graphics.Containers
+namespace osu.Game.Beatmaps.Timing
 {
-    class OsuGameMode : GameMode
+    class SampleChange : ControlPoint
     {
-        public new OsuGame Game => base.Game as OsuGame;
+        public SampleInfo Sample;
     }
 }
