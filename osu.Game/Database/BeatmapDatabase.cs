@@ -16,6 +16,7 @@ namespace osu.Game.Database
     {
         private static SQLiteConnection connection { get; set; }
         private BasicStorage storage;
+        public event Action<BeatmapSetInfo> BeatmapSetAdded;
         
         public BeatmapDatabase(BasicStorage storage)
         {
@@ -75,6 +76,7 @@ namespace osu.Game.Database
             connection.Insert(beatmapSet);
             beatmapSet.BeatmapMetadataID = connection.Insert(metadata);
             connection.UpdateWithChildren(beatmapSet);
+            BeatmapSetAdded?.Invoke(beatmapSet);
         }
 
         public ArchiveReader GetReader(BeatmapSetInfo beatmapSet)

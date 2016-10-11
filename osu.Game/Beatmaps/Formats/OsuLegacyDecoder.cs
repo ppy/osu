@@ -223,7 +223,6 @@ namespace osu.Game.Beatmaps.Formats
                 line = stream.ReadLine();
                 if (line == null)
                     break;
-                line = line.Trim();
                 if (string.IsNullOrEmpty(line))
                     continue;
                 if (line.StartsWith(@"osu file format v"))

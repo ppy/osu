@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps;
 using osu.Game.GameModes.Backgrounds;
 using osu.Framework;
 
@@ -20,16 +22,16 @@ namespace osu.Game.GameModes.Play
 
         private FlowContainer setList;
 
+        private Drawable createSetUI(BeatmapSet bset)
+        {
+            return new SpriteText { Text = bset.Metadata.Title };
+        }
+
         private void addBeatmapSets()
         {
             var sets = (Game as OsuGame).Beatmaps.GetBeatmapSets();
             foreach (var beatmapSet in sets)
-            {
-                setList.Add(new SpriteText
-                {
-                    Text = beatmapSet.Metadata.Title
-                });
-            }
+                setList.Add(createSetUI(beatmapSet));
         }
 
         public override void Load(BaseGame game)
@@ -41,13 +43,22 @@ namespace osu.Game.GameModes.Play
             playMode = osu.PlayMode;
             playMode.ValueChanged += PlayMode_ValueChanged;
 
-            Add(setList = new FlowContainer
+            Add(new ScrollContainer
             {
-                Direction = FlowDirection.VerticalOnly,
-                Padding = new OpenTK.Vector2(0, osu.Toolbar.Height)
+                OriginPosition = new OpenTK.Vector2(0, -osu.Toolbar.Height),
+                Children = new[]
+                {
+                    setList = new FlowContainer
+                    {
+                        Direction = FlowDirection.VerticalOnly,
+                        Padding = new OpenTK.Vector2(25, 25)
+                    }
+                }
             });
 
             addBeatmapSets();
+
+            (Game as OsuGame).Beatmaps.BeatmapSetAdded += bset => setList.Add(createSetUI(bset));
         }
 
         protected override void Dispose(bool isDisposing)
