@@ -31,6 +31,7 @@ namespace osu.Game
             base.SetHost(host);
 
             host.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
+            host.Window.Title = "osu!";
         }
 
         public override void Load()
