@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Desktop;
-using osu.Framework.OS;
+using osu.Framework.Platform;
 using osu.Game;
 
 namespace osu.Desktop
@@ -13,8 +13,8 @@ namespace osu.Desktop
         [STAThread]
         public static void Main()
         {
-            BasicGameHost host = Host.GetSuitableHost();
-            host.Load(new OsuGame());
+            BasicGameHost host = Host.GetSuitableHost(@"osu");
+            host.Add(new OsuGame());
             host.Run();
         }
     }
