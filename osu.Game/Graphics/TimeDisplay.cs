@@ -8,28 +8,75 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.TimeDisplay
 {
-    public class TimeDisplay : Drawable
+    public class TimeDisplay : Container
     {
         private SpriteText timeText;
+        private string format;
 
         public override void Load()
         {
             base.Load();
-
-            Add(timeText = new SpriteText()
+            Children = new Drawable[]
             {
-                Direction = FlowDirection.HorizontalOnly
-            });
+                timeText = new SpriteText()
+                {
+                    Direction = FlowDirection.HorizontalOnly
+                }
+            };
         }
 
         protected override void Update()
         {
-            if (MilitaryTime)
-                timeText.Text = DateTime.Now.ToString("HH:mm:ss");
-            else
-                timeText.Text = DateTime.Now.ToString("h:mm:ss tt");
+            timeText.Text = DateTime.Now.ToString(format);
         }
 
         public bool MilitaryTime { get; set; }
+        public string Format
+        {
+            set
+            {
+                format = ProcessFormat(value);
+            }
+        }
+
+        private string ProcessFormat(string format)
+        {
+            bool token;
+
+            for (int i=0; i<format.Length; i++)
+            {
+                token = false;
+
+                if(i < format.Length - 2)
+                {
+                    if ((format[i] == '[') && (format[i + 2] == ']'))
+                    {
+                        token = true;
+                        format = format.Remove(i, 1);
+                        format = format.Remove(i + 1, 1);
+                        i++;
+                    }
+                }
+
+                if(i < format.Length - 3)
+                {
+                    if ((format[i] == '[') && (format[i + 3] == ']'))
+                    {
+                        token = true;
+                        format = format.Remove(i, 1);
+                        format = format.Remove(i + 2, 1);
+                        i+=2;
+                    }
+                }
+                
+                if(!token)
+                {
+                    if (format[i] != ' ')
+                        format = format.Insert(i++, @"\");
+                }
+            }
+
+            return format;
+        }
     }
 }

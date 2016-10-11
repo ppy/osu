@@ -155,6 +155,7 @@
     <Compile Include="Tests\TestCaseKeyCounter.cs" />
     <Compile Include="Tests\TestCaseMenuButtonSystem.cs" />
     <Compile Include="Tests\TestCaseTextAwesome.cs" />
+    <Compile Include="Tests\TestCaseTimeDisplay.cs" />
     <Compile Include="VisualTestGame.cs" />
   </ItemGroup>
   <ItemGroup />
