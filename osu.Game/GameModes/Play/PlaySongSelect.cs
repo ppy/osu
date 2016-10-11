@@ -33,6 +33,25 @@ namespace osu.Game.GameModes.Play
             foreach (var beatmapSet in sets)
                 setList.Add(createSetUI(beatmapSet));
         }
+        
+        public PlaySongSelect()
+        {
+            Children = new[]
+            {
+                new ScrollContainer
+                {
+                    OriginPosition = new OpenTK.Vector2(0, -(Game as OsuGame).Toolbar.Height),
+                    Children = new[]
+                    {
+                        setList = new FlowContainer
+                        {
+                            Direction = FlowDirection.VerticalOnly,
+                            Padding = new OpenTK.Vector2(25, 25)
+                        }
+                    }
+                }
+            };
+        }
 
         public override void Load(BaseGame game)
         {
@@ -42,19 +61,6 @@ namespace osu.Game.GameModes.Play
 
             playMode = osu.PlayMode;
             playMode.ValueChanged += PlayMode_ValueChanged;
-
-            Add(new ScrollContainer
-            {
-                OriginPosition = new OpenTK.Vector2(0, -osu.Toolbar.Height),
-                Children = new[]
-                {
-                    setList = new FlowContainer
-                    {
-                        Direction = FlowDirection.VerticalOnly,
-                        Padding = new OpenTK.Vector2(25, 25)
-                    }
-                }
-            });
 
             addBeatmapSets();
 
