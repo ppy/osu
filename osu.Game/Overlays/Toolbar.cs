@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Drawables;
+
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
@@ -12,6 +13,7 @@ using System;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Timing;
 using osu.Game.GameModes.Play;
+using osu.Game.Graphics.TimeDisplay;
 
 namespace osu.Game.Overlays
 {
@@ -88,7 +90,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.TopRight,
                     Direction = FlowDirection.HorizontalOnly,
                     RelativeSizeAxes = Axes.Y,
-                    Children = new []
+                    Children = new Drawable[]
                     {
                         new ToolbarButton
                         {
