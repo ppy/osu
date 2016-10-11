@@ -21,6 +21,7 @@ using osu.Framework.Input;
 using osu.Game.Input;
 using OpenTK.Input;
 using System.IO;
+using osu.Game.Beatmaps.IO;
 
 namespace osu.Game
 {
@@ -68,8 +69,21 @@ namespace osu.Game
                 Environment.Exit(0);
             }
 
-            BeatmapIPC.MessageReceived += (message) => Console.WriteLine($@"Got beatmap: {message.Path}");
-
+            BeatmapIPC.MessageReceived += message =>
+            {
+                try
+                {
+                    var reader = ArchiveReader.GetReader(Host.Storage, message.Path);
+                    Beatmaps.AddBeatmap(reader);
+                    // TODO: Switch to beatmap list and select the new song
+                }
+                catch (Exception ex)
+                {
+                    // TODO: Show the user some info?
+                    Console.WriteLine($@"Failed to import beatmap: {ex}");
+                }
+            };
+            
             base.Load(game);
 
             //attach our bindables to the audio subsystem.

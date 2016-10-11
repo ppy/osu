@@ -18,7 +18,12 @@ namespace osu.Game.Beatmaps.Objects.Osu
             Circle = 1,
             Slider = 2,
             NewCombo = 4,
+            CircleNewCombo = 5,
+            SliderNewCombo = 6,
             Spinner = 8,
+            ColourHax = 122,
+            Hold = 128,
+            ManiaLong = 128,
         }
 
         public static OsuBaseHit Parse(string val)
@@ -26,6 +31,7 @@ namespace osu.Game.Beatmaps.Objects.Osu
             string[] split = val.Split(',');
             var type = (HitObjectType)int.Parse(split[3]);
             bool combo = type.HasFlag(HitObjectType.NewCombo);
+            type &= (HitObjectType)0xF;
             type &= ~HitObjectType.NewCombo;
             OsuBaseHit result;
             switch (type)
