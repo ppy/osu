@@ -12,6 +12,7 @@ namespace osu.Game.Graphics.TimeDisplay
     {
         private SpriteText timeText;
         private string format;
+        private float textSize;
 
         public override void Load()
         {
@@ -28,6 +29,7 @@ namespace osu.Game.Graphics.TimeDisplay
         protected override void Update()
         {
             timeText.Text = DateTime.Now.ToString(format);
+            timeText.TextSize = textSize;
         }
 
         public string Format
@@ -35,6 +37,14 @@ namespace osu.Game.Graphics.TimeDisplay
             set
             {
                 format = value;
+            }
+        }
+
+        public float TextSize
+        {
+            set
+            {
+                textSize = value;
             }
         }
     }
