@@ -9,7 +9,9 @@ namespace osu.Game.Tests.Resources
         public static Stream OpenResource(string name)
         {
             return Assembly.GetExecutingAssembly().GetManifestResourceStream(
-                $@"osu.Game.Tests.Resources.{name}");
+                $@"osu.Game.Tests.Resources.{name}") ??
+                Assembly.LoadFrom("osu.Game.Resources.dll").GetManifestResourceStream(
+                $@"osu.Game.Resources.{name}");
         }
     }
 }

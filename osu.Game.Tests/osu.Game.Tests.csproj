@@ -46,6 +46,10 @@
       <Project>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</Project>
       <Name>osu.Game</Name>
     </ProjectReference>
+    <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
+      <Project>{D9A367C9-4C1A-489F-9B05-A0CEA2B53B58}</Project>
+      <Name>osu.Game.Resources</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -59,7 +63,6 @@
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoderTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\241526 Soleily - Renatus.osz" />
     <EmbeddedResource Include="Resources\Soleily - Renatus %28Gamu%29 [Insane].osu" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
