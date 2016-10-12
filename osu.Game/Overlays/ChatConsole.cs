@@ -27,8 +27,6 @@ namespace osu.Game.Overlays
 {
     public class ChatConsole : Container, IStateful<ChatConsoleState>
     {
-        private APIAccess api => ((OsuGameBase)Game).API;
-
         private ChannelDisplay channelDisplay;
 
         private ScheduledDelegate messageRequest;
@@ -37,8 +35,12 @@ namespace osu.Game.Overlays
 
         protected override Container Content => content;
 
-        public ChatConsole()
+        private APIAccess api;
+
+        public ChatConsole(APIAccess api)
         {
+            this.api = api;
+
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, 300);
             Anchor = Anchor.BottomLeft;
