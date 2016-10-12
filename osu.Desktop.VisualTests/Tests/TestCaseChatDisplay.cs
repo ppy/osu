@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transformations;
 using osu.Framework.Threading;
 using osu.Game;
 using osu.Game.Online.API;
@@ -15,7 +14,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Online.Chat.Display.osu.Online.Social;
+using osu.Game.Online.Chat.Display;
 using osu.Framework;
 
 namespace osu.Desktop.Tests
@@ -27,14 +26,13 @@ namespace osu.Desktop.Tests
         public override string Name => @"Chat";
         public override string Description => @"Testing API polling";
 
-        private List<Channel> channels = new List<Channel>();
-        private FlowContainer flow;
+        FlowContainer flow;
 
         private Scheduler scheduler = new Scheduler();
 
         private APIAccess api;
 
-        private long? lastMessageId;
+        private ChannelDisplay channelDisplay;
 
         public override void Load(BaseGame game)
         {
@@ -47,28 +45,10 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
 
-            lastMessageId = null;
-
             if (api.State != APIAccess.APIState.Online)
                 api.OnStateChange += delegate { initializeChannels(); };
             else
                 initializeChannels();
-
-            Add(new ScrollContainer()
-            {
-                Size = new Vector2(1, 0.5f),
-                Children = new Drawable[]
-                {
-                    flow = new FlowContainer
-                    {
-                        Direction = FlowDirection.VerticalOnly,
-                        RelativeSizeAxes = Axes.X,
-                        LayoutDuration = 100,
-                        LayoutEasing = EasingTypes.Out,
-                        Spacing = new Vector2(1, 1)
-                    }
-                }
-            });
         }
 
         protected override void Update()
@@ -77,60 +57,87 @@ namespace osu.Desktop.Tests
             base.Update();
         }
 
+        private long? lastMessageId;
+
+        List<Channel> careChannels;
+
         private void initializeChannels()
         {
+            careChannels = new List<Channel>();
+
             if (api.State != APIAccess.APIState.Online)
                 return;
+
+            Add(flow = new FlowContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Direction = FlowDirection.VerticalOnly
+            });
+
+            SpriteText loading;
+            Add(loading = new SpriteText
+            {
+                Text = @"Loading available channels...",
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                TextSize = 40,
+            });
 
             messageRequest?.Cancel();
 
             ListChannelsRequest req = new ListChannelsRequest();
             req.Success += delegate (List<Channel> channels)
             {
-                this.channels = channels;
-                messageRequest = scheduler.AddDelayed(requestNewMessages, 1000, true);
+                Scheduler.Add(delegate
+                {
+                    loading.FadeOut(100);
+                });
+
+                addChannel(channels.Find(c => c.Name == @"#osu"));
+                addChannel(channels.Find(c => c.Name == @"#lobby"));
+                addChannel(channels.Find(c => c.Name == @"#english"));
+
+                messageRequest = scheduler.AddDelayed(() => FetchNewMessages(api), 1000, true);
             };
             api.Queue(req);
         }
 
-        private void requestNewMessages()
+        private void addChannel(Channel channel)
         {
-            messageRequest.Wait();
+            flow.Add(channelDisplay = new ChannelDisplay(channel)
+            {
+                Size = new Vector2(1, 0.3f)
+            });
 
-            Channel channel = channels.Find(c => c.Name == "#osu");
+            careChannels.Add(channel);
+        }
 
-            GetMessagesRequest gm = new GetMessagesRequest(new List<Channel> { channel }, lastMessageId);
-            gm.Success += delegate (List<Message> messages)
+        GetMessagesRequest fetchReq;
+
+        public void FetchNewMessages(APIAccess api)
+        {
+            if (fetchReq != null) return;
+
+            fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
+            fetchReq.Success += delegate (List<Message> messages)
             {
                 foreach (Message m in messages)
                 {
-                    //m.LineWidth = this.Size.X; //this is kinda ugly.
-                    //m.Drawable.Depth = m.Id;
-                    //m.Drawable.FadeInFromZero(800);
-
-                    //flow.Add(m.Drawable);
-
-                    //if (osu.Messages.Count > 50)
-                    //{
-                    //    osu.Messages[0].Drawable.Expire();
-                    //    osu.Messages.RemoveAt(0);
-                    //}
-                    flow.Add(new ChatLine(m));
-                    channel.Messages.Add(m);
+                    careChannels.Find(c => c.Id == m.ChannelId).AddNewMessages(m);
                 }
 
                 lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
 
                 Debug.Write("success!");
-                messageRequest.Continue();
+                fetchReq = null;
             };
-            gm.Failure += delegate
+            fetchReq.Failure += delegate
             {
                 Debug.Write("failure!");
-                messageRequest.Continue();
+                fetchReq = null;
             };
 
-            api.Queue(gm);
+            api.Queue(fetchReq);
         }
     }
 }
