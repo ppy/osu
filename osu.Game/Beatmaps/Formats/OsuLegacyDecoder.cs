@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Events;
@@ -55,7 +56,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.SampleSet = (SampleSet)Enum.Parse(typeof(SampleSet), val);
                     break;
                 case "StackLeniency":
-                    beatmap.StackLeniency = float.Parse(val);
+                    beatmap.StackLeniency = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case "Mode":
                     beatmap.Mode = (PlayMode)int.Parse(val);
@@ -80,7 +81,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.StoredBookmarks = val;
                     break;
                 case "DistanceSpacing":
-                    beatmap.DistanceSpacing = double.Parse(val);
+                    beatmap.DistanceSpacing = double.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case "BeatDivisor":
                     beatmap.BeatDivisor = int.Parse(val);
@@ -89,7 +90,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.GridSize = int.Parse(val);
                     break;
                 case "TimelineZoom":
-                    beatmap.TimelineZoom = double.Parse(val);
+                    beatmap.TimelineZoom = double.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
             }
         }
@@ -137,22 +138,22 @@ namespace osu.Game.Beatmaps.Formats
             switch (key)
             {
                 case "HPDrainRate":
-                    beatmap.BaseDifficulty.DrainRate = float.Parse(val);
+                    beatmap.BaseDifficulty.DrainRate = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case "CircleSize":
-                    beatmap.BaseDifficulty.CircleSize = float.Parse(val);
+                    beatmap.BaseDifficulty.CircleSize = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case "OverallDifficulty":
-                    beatmap.BaseDifficulty.OverallDifficulty = float.Parse(val);
+                    beatmap.BaseDifficulty.OverallDifficulty = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case "ApproachRate":
-                    beatmap.BaseDifficulty.ApproachRate = float.Parse(val);
+                    beatmap.BaseDifficulty.ApproachRate = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case "SliderMultiplier":
-                    beatmap.BaseDifficulty.SliderMultiplier = float.Parse(val);
+                    beatmap.BaseDifficulty.SliderMultiplier = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case "SliderTickRate":
-                    beatmap.BaseDifficulty.SliderTickRate = float.Parse(val);
+                    beatmap.BaseDifficulty.SliderTickRate = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
             }
         }
@@ -161,6 +162,8 @@ namespace osu.Game.Beatmaps.Formats
         {
             if (val.StartsWith("//"))
                 return;
+            if (val.StartsWith(" "))
+                return; // TODO
             string[] split = val.Split(',');
             EventType type;
             int _type;
