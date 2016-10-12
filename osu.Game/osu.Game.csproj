@@ -76,9 +76,12 @@
     <Compile Include="GameModes\Charts\ChartInfo.cs" />
     <Compile Include="GameModes\Edit\Editor.cs" />
     <Compile Include="GameModes\GameModeWhiteBox.cs" />
+    <Compile Include="GameModes\Menu\Button.cs" />
+    <Compile Include="GameModes\Menu\FlowContainerWithOrigin.cs" />
     <Compile Include="GameModes\Menu\Intro.cs" />
     <Compile Include="GameModes\Menu\ButtonSystem.cs" />
     <Compile Include="GameModes\Menu\MainMenu.cs" />
+    <Compile Include="GameModes\Menu\MenuVisualisation.cs" />
     <Compile Include="GameModes\Menu\OsuLogo.cs" />
     <Compile Include="GameModes\Multiplayer\Lobby.cs" />
     <Compile Include="GameModes\Multiplayer\Match.cs" />
@@ -103,6 +106,7 @@
     <Compile Include="GameModes\Play\Taiko\TaikoHitRenderer.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoPlayfield.cs" />
     <Compile Include="GameModes\Edit\EditSongSelect.cs" />
+    <Compile Include="Input\GlobalHotkeys.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
@@ -129,11 +133,13 @@
     <Compile Include="Online\API\SecurePassword.cs" />
     <Compile Include="Online\API\Requests\ListChannels.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
+    <Compile Include="Online\Chat\Display\ChannelDisplay.cs" />
     <Compile Include="Online\Chat\Display\ChatLine.cs" />
     <Compile Include="Online\Chat\Message.cs" />
     <Compile Include="Online\User.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="OsuGameBase.cs" />
+    <Compile Include="Overlays\ChatConsole.cs" />
     <Compile Include="Overlays\Options.cs" />
     <Compile Include="Overlays\Toolbar.cs" />
     <Compile Include="Overlays\ToolbarButton.cs" />
