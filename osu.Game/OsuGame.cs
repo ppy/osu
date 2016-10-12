@@ -56,7 +56,7 @@ namespace osu.Game
                     OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
                     Alpha = 0.001f,
                 },
-                Chat = new ChatConsole(),
+                Chat = new ChatConsole(API),
                 new VolumeControl
                 {
                     VolumeGlobal = Audio.Volume,
