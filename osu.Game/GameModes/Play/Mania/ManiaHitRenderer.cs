@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Objects.Mania;
 using OpenTK;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Play.Mania
 {
@@ -30,9 +31,6 @@ namespace osu.Game.GameModes.Play.Mania
             {
                 //osu! mode requires all objects to be of ManiaBaseHit type.
                 objects = value.ConvertAll(convertForMania);
-
-                if (Parent != null)
-                    Load();
             }
         }
 
@@ -56,9 +54,9 @@ namespace osu.Game.GameModes.Play.Mania
             return h;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             if (playfield == null)
                 Add(playfield = new ManiaPlayfield(columns));
@@ -72,7 +70,7 @@ namespace osu.Game.GameModes.Play.Mania
                 //render stuff!
                 Sprite s = new Sprite
                 {
-                    Texture = Game.Textures.Get(@"Menu/logo"),
+                    Texture = game.Textures.Get(@"Menu/logo"),
                     Origin = Anchor.Centre,
                     Scale = new Vector2(0.1f),
                     RelativePositionAxes = Axes.Both,
