@@ -47,8 +47,7 @@ namespace osu.Game.GameModes.Menu
             Scheduler.Add(delegate
             {
                 welcome.Play();
-            }, true);
-
+            });
 
             Scheduler.AddDelayed(delegate
             {
