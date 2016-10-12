@@ -81,6 +81,7 @@ namespace osu.Game.GameModes.Menu
                         },
                         buttonFlow = new FlowContainerWithOrigin
                         {
+                            Direction = FlowDirection.HorizontalOnly,
                             Anchor = Anchor.Centre,
                             Spacing = new Vector2(-wedge_width, 0),
                             Children = new Drawable[]
@@ -133,7 +134,7 @@ namespace osu.Game.GameModes.Menu
                     State = MenuState.Initial;
                     return true;
             }
-            
+
             return true;
         }
 
