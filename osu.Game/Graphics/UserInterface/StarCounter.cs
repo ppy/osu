@@ -128,8 +128,6 @@ namespace osu.Game.Graphics.UserInterface
         protected void transformStarAlpha(int i, TransformAlpha transform, bool isIncrement, double startTime)
         {
             transform.StartTime = startTime;
-            //if (!isIncrement)
-                //transform.StartTime += StarAnimationDuration - FadeDuration;
             transform.EndTime = transform.StartTime + FadeDuration;
             transform.StartValue = stars[i].Alpha;
             transform.EndValue = i < Count ? 1.0f : MinStarAlpha;

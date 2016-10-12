@@ -32,20 +32,25 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public override void Load(BaseGame game)
+        protected NumericRollingCounter() : base()
         {
-            base.Load(game);
-
             Children = new Drawable[]
             {
                 countSpriteText = new SpriteText
                 {
-                    Text = formatCount(Count),
                     TextSize = this.TextSize,
                     Anchor = this.Anchor,
                     Origin = this.Origin,
                 },
             };
+        }
+
+        public override void Load(BaseGame game)
+        {
+            base.Load(game);
+            countSpriteText.Text = formatCount(count);
+            countSpriteText.Anchor = this.Anchor;
+            countSpriteText.Origin = this.Origin;
         }
 
         protected override void transformVisibleCount(T currentValue, T newValue)

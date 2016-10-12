@@ -17,11 +17,14 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public uint LeadingZeroes = 0;
 
+        public ScoreCounter() : base()
+        {
+            countSpriteText.FixedWidth = true;    
+        }
+
         public override void Load(BaseGame game)
         {
             base.Load(game);
-
-            countSpriteText.FixedWidth = true;
         }
 
         protected override string formatCount(ulong count)

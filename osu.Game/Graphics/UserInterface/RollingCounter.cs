@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
     /// In order to show a value, you must implement a way to display it, i.e., as a numeric counter or a bar.
     /// </remarks>
     /// <typeparam name="T">Type of the actual counter.</typeparam>
-    public abstract class RollingCounter<T> : Container
+    public abstract class RollingCounter<T> : AutoSizeContainer
     {
         /// <summary>
         /// Type of the Transform to use.
@@ -91,7 +91,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 prevCount = count;
                 count = value;
-                if (Clock != null)
+                if (IsLoaded)
                 {
                     RollingTotalDuration =
                         IsRollingProportional
@@ -102,7 +102,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected RollingCounter()
+        protected RollingCounter() : base()
         {
             Debug.Assert(
                 transformType.IsSubclassOf(typeof(Transform<T>)) || transformType == typeof(Transform<T>),
@@ -113,7 +113,9 @@ namespace osu.Game.Graphics.UserInterface
         public override void Load(BaseGame game)
         {
             base.Load(game);
+
             removeTransforms(transformType);
+            
             if (Count == null)
                 ResetCount();
             VisibleCount = Count;
