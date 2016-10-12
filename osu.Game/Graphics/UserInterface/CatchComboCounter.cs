@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
                 removeTransforms(typeof(TransformULongCounter));
                 VisibleCount = newValue;
             }
-            else
+            else if (currentValue != 0)
             {
                 // Backwards pop-up animation has no tint colour
                 popOutSpriteText.Colour = countSpriteText.Colour;

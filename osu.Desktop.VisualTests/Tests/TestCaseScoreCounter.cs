@@ -42,11 +42,11 @@ namespace osu.Desktop.Tests
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
-                Position = new Vector2(20, 20),
+                Position = new Vector2(10, 10),
                 InnerCountPosition = new Vector2(10, 10),
                 IsRollingProportional = true,
                 RollingDuration = 20,
-                PopOutDuration = 3000,
+                PopOutDuration = 100,
                 Count = 0,
                 TextSize = 40,
             };

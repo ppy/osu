@@ -52,7 +52,7 @@ namespace osu.Game.Graphics.UserInterface
                 removeTransforms(typeof(TransformULongCounter));
                 VisibleCount = newValue;
             }
-            else
+            else if (currentValue != 0)
                 transformCount(new TransformULongCounter(Clock), currentValue, newValue);
         }
 
@@ -62,7 +62,7 @@ namespace osu.Game.Graphics.UserInterface
             return difference * RollingDuration;
         }
 
-        protected virtual void transformAnimate()
+        protected virtual void transformAnimate(ulong newValue)
         {
             countSpriteText.FadeColour(TintColour, 0);
             countSpriteText.ScaleTo(new Vector2(1, ScaleFactor));
@@ -72,20 +72,15 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void transformVisibleCount(ulong currentValue, ulong newValue)
         {
-            if (countSpriteText != null)
-            {
-                countSpriteText.Text = newValue.ToString("#,0");
-                if (newValue == 0)
-                {
-                    countSpriteText.FadeOut(TintDuration);
-                    return;
-                }
+            countSpriteText.Text = formatCount(newValue);
+
+            if (newValue == 0)
+                countSpriteText.FadeOut(TintDuration);
+            else
                 countSpriteText.Show();
-                if (newValue > currentValue || CanAnimateWhenBackwards)
-                {
-                    transformAnimate();
-                }
-            }
+
+            if (newValue > currentValue || CanAnimateWhenBackwards)
+                transformAnimate(newValue);
         }
     }
 }
