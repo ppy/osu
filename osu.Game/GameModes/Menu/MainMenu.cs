@@ -1,8 +1,6 @@
 //Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
 using osu.Framework.GameModes;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
@@ -15,6 +13,7 @@ using osu.Game.GameModes.Multiplayer;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics.Containers;
 using OpenTK;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -25,11 +24,11 @@ namespace osu.Game.GameModes.Menu
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeDefault();
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
-            OsuGame osu = (OsuGame)Game;
+            OsuGame osu = (OsuGame)game;
 
             Children = new Drawable[]
             {
@@ -65,7 +64,7 @@ namespace osu.Game.GameModes.Menu
 
             const float length = 400;
 
-            buttons.State = ButtonSystem.MenuState.EnteringMode;
+            buttons.State = MenuState.EnteringMode;
 
             Content.FadeOut(length, EasingTypes.InSine);
             Content.MoveTo(new Vector2(-800, 0), length, EasingTypes.InSine);
@@ -77,7 +76,7 @@ namespace osu.Game.GameModes.Menu
 
             const float length = 300;
 
-            buttons.State = ButtonSystem.MenuState.TopLevel;
+            buttons.State = MenuState.TopLevel;
 
             Content.FadeIn(length, EasingTypes.OutQuint);
             Content.MoveTo(new Vector2(0, 0), length, EasingTypes.OutQuint);

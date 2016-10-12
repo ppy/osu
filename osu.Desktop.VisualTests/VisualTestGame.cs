@@ -9,9 +9,9 @@ namespace osu.Framework.VisualTests
 {
     class VisualTestGame : OsuGameBase
     {
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Add(new TestBrowser());
 

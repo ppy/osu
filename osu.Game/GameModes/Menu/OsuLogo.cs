@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -17,7 +18,7 @@ namespace osu.Game.GameModes.Menu
     {
         private Sprite logo;
         private Container logoBounceContainer;
-        private ButtonSystem.MenuVisualisation vis;
+        private MenuVisualisation vis;
 
         public Action Action;
 
@@ -69,7 +70,7 @@ namespace osu.Game.GameModes.Menu
                                 }
                             }
                         },
-                        vis = new ButtonSystem.MenuVisualisation
+                        vis = new MenuVisualisation
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -82,12 +83,12 @@ namespace osu.Game.GameModes.Menu
             };
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
-            logo.Texture = Game.Textures.Get(@"Menu/logo");
-            ripple.Texture = Game.Textures.Get(@"Menu/logo");
+            logo.Texture = game.Textures.Get(@"Menu/logo");
+            ripple.Texture = game.Textures.Get(@"Menu/logo");
 
             ripple.ScaleTo(1.1f, 500);
             ripple.FadeOut(500);

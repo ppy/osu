@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.GameModes.Backgrounds;
 using OpenTK.Graphics;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -23,9 +24,9 @@ namespace osu.Game.GameModes.Menu
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeEmpty();
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Children = new Drawable[]
             {
@@ -39,16 +40,15 @@ namespace osu.Game.GameModes.Menu
                 }
             };
 
-            AudioSample welcome = Game.Audio.Sample.Get(@"welcome");
+            AudioSample welcome = game.Audio.Sample.Get(@"welcome");
 
-            AudioTrack bgm = Game.Audio.Track.Get(@"circles");
+            AudioTrack bgm = game.Audio.Track.Get(@"circles");
             bgm.Looping = true;
 
             Scheduler.Add(delegate
             {
                 welcome.Play();
-            }, true);
-
+            });
 
             Scheduler.AddDelayed(delegate
             {
@@ -63,7 +63,7 @@ namespace osu.Game.GameModes.Menu
 
             logo.ScaleTo(0);
 
-            logo.ScaleTo(1,5900, EasingTypes.OutQuint);
+            logo.ScaleTo(1, 5900, EasingTypes.OutQuint);
             logo.FadeIn(30000, EasingTypes.OutQuint);
         }
 
@@ -82,7 +82,7 @@ namespace osu.Game.GameModes.Menu
         protected override void OnResuming(GameMode last)
         {
             //we are just an intro. if we are resumed, we just want to exit after a short delay (to allow the last mode to transition out).
-            Scheduler.AddDelayed(Exit, 300);
+            Scheduler.AddDelayed(Exit, 600);
 
             base.OnResuming(last);
         }

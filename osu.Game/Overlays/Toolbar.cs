@@ -12,10 +12,11 @@ using System;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Timing;
 using osu.Game.GameModes.Play;
+using osu.Framework;
 
 namespace osu.Game.Overlays
 {
-    public class Toolbar : Container
+    public class Toolbar : Container, IStateful<ToolbarState>
     {
         const float height = 50;
 
@@ -25,26 +26,34 @@ namespace osu.Game.Overlays
 
         private ToolbarModeSelector modeSelector;
 
-        public void SetState(ToolbarState state, bool instant = false)
-        {
-            int time = instant ? 0 : 200;
+        private ToolbarState state;
 
-            switch (state)
+        public ToolbarState State
+        {
+            get { return state; }
+            set
             {
-                case ToolbarState.Hidden:
-                    MoveToY(-Size.Y, time, EasingTypes.InQuint);
-                    FadeOut(time);
-                    break;
-                case ToolbarState.Visible:
-                    MoveToY(0, time, EasingTypes.OutQuint);
-                    FadeIn(time);
-                    break;
+                state = value;
+
+                const int transition_time = 200;
+
+                switch (state)
+                {
+                    case ToolbarState.Hidden:
+                        MoveToY(-Size.Y, transition_time, EasingTypes.InQuint);
+                        FadeOut(transition_time, EasingTypes.InQuint);
+                        break;
+                    case ToolbarState.Visible:
+                        MoveToY(0, transition_time, EasingTypes.OutQuint);
+                        FadeIn(transition_time, EasingTypes.OutQuint);
+                        break;
+                }
             }
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, height);
@@ -97,7 +106,7 @@ namespace osu.Game.Overlays
                         new ToolbarButton
                         {
                             Icon = FontAwesome.user,
-                            Text = ((OsuGame)Game).Config.Get<string>(OsuConfig.Username)
+                            Text = ((OsuGame)game).Config.Get<string>(OsuConfig.Username)
                         },
                         new ToolbarButton
                         {
