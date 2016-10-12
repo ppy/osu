@@ -12,20 +12,19 @@ namespace osu.Game
 {
     internal class VolumeMeter : Container
     {
-        public Box MeterFill { get; set; }
-
-        public BindableDouble Volume { get; set; }
+        private Box meterFill;
+        private BindableDouble volume;
 
         public VolumeMeter(string meterName, BindableDouble volume)
         {
-            Volume = volume;
+            this.volume = volume;
             Size = new Vector2(40, 180);
             Children = new Drawable[]
             {
                 new Box
                 {
                     Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both
                 },
                 new Container
                 {
@@ -38,15 +37,15 @@ namespace osu.Game
                         new Box
                         {
                             Colour = Color4.DarkGray,
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.Both
                         },
-                        MeterFill = new Box
+                        meterFill = new Box
                         {
                             Colour = Color4.White,
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.BottomCentre
-                        },
+                        }
                     }
                 },
                 new SpriteText {Text = meterName, Anchor = Anchor.BottomCentre,Origin = Anchor.BottomCentre,Position = new Vector2(0,-20)}
@@ -61,18 +60,18 @@ namespace osu.Game
 
         protected override bool OnWheelUp(InputState state)
         {
-            Volume.Value += 0.05f;
+            volume.Value += 0.05f;
             updateFill();
             return base.OnWheelUp(state);
         }
 
         protected override bool OnWheelDown(InputState state)
         {
-            Volume.Value -= 0.05f;
+            volume.Value -= 0.05f;
             updateFill();
             return base.OnWheelDown(state);
         }
 
-        private void updateFill() => MeterFill.ScaleTo(new Vector2(1, (float)Volume.Value), 300, EasingTypes.OutQuint);
+        private void updateFill() => meterFill.ScaleTo(new Vector2(1, (float)volume.Value), 300, EasingTypes.OutQuint);
     }
 }
