@@ -13,7 +13,7 @@ using OpenTK;
 
 namespace osu.Game.Online.Chat.Display
 {
-    public class ChannelDisplay : FlowContainer
+    public class ChannelDisplay : Container
     {
         private readonly Channel channel;
         private FlowContainer flow;
@@ -25,7 +25,6 @@ namespace osu.Game.Online.Chat.Display
             channel.NewMessagesArrived += newMessages;
 
             RelativeSizeAxes = Axes.Both;
-            Direction = FlowDirection.VerticalOnly;
 
             Children = new Drawable[]
             {
@@ -39,14 +38,12 @@ namespace osu.Game.Online.Chat.Display
                 },
                 new ScrollContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
                         flow = new FlowContainer
                         {
                             Direction = FlowDirection.VerticalOnly,
                             RelativeSizeAxes = Axes.X,
-                            LayoutEasing = EasingTypes.Out,
                             Spacing = new Vector2(1, 1)
                         }
                     }

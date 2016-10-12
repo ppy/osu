@@ -44,19 +44,19 @@ namespace osu.Game.Overlays
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
-            InternalChildren = new Drawable[]
+            AddInternal(new Drawable[]
             {
                 new Box
                 {
                     Depth = float.MinValue,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0.1f, 0.1f, 0.1f, 0.4f)
+                    Colour = new Color4(0.1f, 0.1f, 0.1f, 0.4f),
                 },
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                 }
-            };
+            });
         }
 
         public override void Load()
@@ -76,12 +76,6 @@ namespace osu.Game.Overlays
             //if (api.State != APIAccess.APIState.Online)
             //  return;
 
-            Add(new FlowContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Direction = FlowDirection.VerticalOnly
-            });
-
             SpriteText loading;
             Add(loading = new SpriteText
             {
@@ -99,9 +93,9 @@ namespace osu.Game.Overlays
                 Scheduler.Add(delegate
                 {
                     loading.FadeOut(100);
+                    addChannel(channels.Find(c => c.Name == @"#osu"));
                 });
-
-                addChannel(channels.Find(c => c.Name == @"#osu"));
+                
                 //addChannel(channels.Find(c => c.Name == @"#lobby"));
                 //addChannel(channels.Find(c => c.Name == @"#english"));
 
