@@ -27,10 +27,5 @@ namespace osu.Game.GameModes.Menu
                 return CentreTarget.Position + CentreTarget.Size / 2;
             }
         }
-
-        public FlowContainerWithOrigin()
-        {
-            Direction = FlowDirection.HorizontalOnly;
-        }
     }
 }
