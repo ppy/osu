@@ -30,6 +30,8 @@ namespace osu.Game.Online.Chat
 
         //internal bool Joined;
 
+        public const int MAX_HISTORY = 100;
+
         [JsonConstructor]
         public Channel()
         {
@@ -47,13 +49,9 @@ namespace osu.Game.Online.Chat
 
         private void purgeOldMessages()
         {
-            const int max_history = 50;
-
             int messageCount = Messages.Count;
-            if (messageCount > 50)
-            {
-                Messages.RemoveRange(0, messageCount - max_history);
-            }
+            if (messageCount > MAX_HISTORY)
+                Messages.RemoveRange(0, messageCount - MAX_HISTORY);
         }
     }
 }
