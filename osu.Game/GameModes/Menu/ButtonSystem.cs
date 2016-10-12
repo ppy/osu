@@ -16,10 +16,11 @@ using osu.Game.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Menu
 {
-    public partial class ButtonSystem : Container
+    public partial class ButtonSystem : Container, IStateful<MenuState>
     {
         public Action OnEdit;
         public Action OnExit;
@@ -32,9 +33,10 @@ namespace osu.Game.GameModes.Menu
 
         private FlowContainerWithOrigin buttonFlow;
 
-        const float button_area_height = 100;
-        const float button_width = 140f;
-        const float wedge_width = 20;
+        //todo: make these non-internal somehow.
+        internal const float button_area_height = 100;
+        internal const float button_width = 140f;
+        internal const float wedge_width = 20;
 
         public const int EXIT_DELAY = 3000;
 
@@ -49,23 +51,14 @@ namespace osu.Game.GameModes.Menu
         List<Button> buttonsTopLevel = new List<Button>();
         List<Button> buttonsPlay = new List<Button>();
 
-        public enum MenuState
-        {
-            Initial,
-            TopLevel,
-            Play,
-            EnteringMode,
-            Exit,
-        }
-
         public ButtonSystem()
         {
             RelativeSizeAxes = Axes.Both;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Children = new Drawable[]
             {
@@ -88,8 +81,9 @@ namespace osu.Game.GameModes.Menu
                         },
                         buttonFlow = new FlowContainerWithOrigin
                         {
+                            Direction = FlowDirection.HorizontalOnly,
                             Anchor = Anchor.Centre,
-                            Padding = new Vector2(-wedge_width, 0),
+                            Spacing = new Vector2(-wedge_width, 0),
                             Children = new Drawable[]
                             {
                                 settingsButton = new Button(@"settings", @"options", FontAwesome.gear, new Color4(85, 85, 85, 255), OnSettings, -wedge_width, Key.O),
@@ -128,16 +122,19 @@ namespace osu.Game.GameModes.Menu
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Key == Key.Escape)
+            switch (args.Key)
             {
-                if (State == MenuState.Initial)
-                    return false;
+                case Key.Space:
+                    osuLogo.TriggerClick(state);
+                    return true;
+                case Key.Escape:
+                    if (State == MenuState.Initial)
+                        return false;
 
-                State = MenuState.Initial;
-                return true;
+                    State = MenuState.Initial;
+                    return true;
             }
 
-            osuLogo.TriggerClick(state);
             return true;
         }
 
@@ -208,10 +205,10 @@ namespace osu.Game.GameModes.Menu
                         osuLogo.ScaleTo(1, 800, EasingTypes.OutExpo);
 
                         foreach (Button b in buttonsTopLevel)
-                            b.State = Button.ButtonState.Contracted;
+                            b.State = ButtonState.Contracted;
 
                         foreach (Button b in buttonsPlay)
-                            b.State = Button.ButtonState.Contracted;
+                            b.State = ButtonState.Contracted;
                         break;
                     case MenuState.TopLevel:
                         buttonAreaBackground.ScaleTo(Vector2.One, 200, EasingTypes.Out);
@@ -226,17 +223,17 @@ namespace osu.Game.GameModes.Menu
                             buttonArea.Delay(150, true);
 
                         foreach (Button b in buttonsTopLevel)
-                            b.State = Button.ButtonState.Expanded;
+                            b.State = ButtonState.Expanded;
 
                         foreach (Button b in buttonsPlay)
-                            b.State = Button.ButtonState.Contracted;
+                            b.State = ButtonState.Contracted;
                         break;
                     case MenuState.Play:
                         foreach (Button b in buttonsTopLevel)
-                            b.State = Button.ButtonState.Exploded;
+                            b.State = ButtonState.Exploded;
 
                         foreach (Button b in buttonsPlay)
-                            b.State = Button.ButtonState.Expanded;
+                            b.State = ButtonState.Expanded;
                         break;
                     case MenuState.EnteringMode:
                         buttonAreaBackground.ScaleTo(new Vector2(2, 0), 300, EasingTypes.InSine);
@@ -247,19 +244,19 @@ namespace osu.Game.GameModes.Menu
                         settingsButton.ContractStyle = 1;
 
                         foreach (Button b in buttonsTopLevel)
-                            b.State = Button.ButtonState.Contracted;
+                            b.State = ButtonState.Contracted;
 
                         foreach (Button b in buttonsPlay)
-                            b.State = Button.ButtonState.Contracted;
+                            b.State = ButtonState.Contracted;
                         break;
                     case MenuState.Exit:
                         buttonArea.FadeOut(200);
 
                         foreach (Button b in buttonsTopLevel)
-                            b.State = Button.ButtonState.Contracted;
+                            b.State = ButtonState.Contracted;
 
                         foreach (Button b in buttonsPlay)
-                            b.State = Button.ButtonState.Contracted;
+                            b.State = ButtonState.Contracted;
 
                         osuLogo.Delay(150);
 
@@ -269,8 +266,8 @@ namespace osu.Game.GameModes.Menu
                         break;
                 }
 
-                backButton.State = state == MenuState.Play ? Button.ButtonState.Expanded : Button.ButtonState.Contracted;
-                settingsButton.State = state == MenuState.TopLevel ? Button.ButtonState.Expanded : Button.ButtonState.Contracted;
+                backButton.State = state == MenuState.Play ? ButtonState.Expanded : ButtonState.Contracted;
+                settingsButton.State = state == MenuState.TopLevel ? ButtonState.Expanded : ButtonState.Contracted;
 
                 if (lastState == MenuState.Initial)
                     buttonArea.DelayReset();
@@ -285,337 +282,14 @@ namespace osu.Game.GameModes.Menu
             iconFacade.Width = osuLogo.SizeForFlow * 0.5f;
             base.Update();
         }
+    }
 
-        /// <summary>
-        /// A flow container with an origin based on one of its contained drawables.
-        /// </summary>
-        private class FlowContainerWithOrigin : FlowContainer
-        {
-            /// <summary>
-            /// A target drawable which this flowcontainer should be centered around.
-            /// This target MUST be in this FlowContainer's *direct* children.
-            /// </summary>
-            internal Drawable CentreTarget;
-
-            public override Anchor Origin => Anchor.Custom;
-
-            public override Vector2 OriginPosition
-            {
-                get
-                {
-                    if (CentreTarget == null)
-                        return base.OriginPosition;
-
-                    return CentreTarget.Position + CentreTarget.Size / 2;
-                }
-            }
-
-            public FlowContainerWithOrigin()
-            {
-                Direction = FlowDirection.HorizontalOnly;
-            }
-        }
-
-        /// <summary>
-        /// Button designed specifically for the osu!next main menu.
-        /// In order to correctly flow, we have to use a negative margin on the parent container (due to the parallelogram shape).
-        /// </summary>
-        private class Button : AutoSizeContainer
-        {
-            private Container iconText;
-            private WedgedBox box;
-            private Color4 colour;
-            private TextAwesome icon;
-            private string internalName;
-            private readonly FontAwesome symbol;
-            private Action clickAction;
-            private readonly float extraWidth;
-            private Key triggerKey;
-            private string text;
-
-            public override Quad ScreenSpaceInputQuad => box.ScreenSpaceInputQuad;
-
-            public Button(string text, string internalName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
-            {
-                this.internalName = internalName;
-                this.symbol = symbol;
-                this.colour = colour;
-                this.clickAction = clickAction;
-                this.extraWidth = extraWidth;
-                this.triggerKey = triggerKey;
-                this.text = text;
-            }
-
-            public override void Load()
-            {
-                base.Load();
-                Alpha = 0;
-
-                Children = new Drawable[]
-                {
-                    box = new WedgedBox(new Vector2(button_width + Math.Abs(extraWidth), button_area_height), wedge_width)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Colour = colour,
-                        Scale = new Vector2(0, 1)
-                    },
-                    iconText = new AutoSizeContainer
-                    {
-                        Position = new Vector2(extraWidth / 2, 0),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Children = new Drawable[]
-                        {
-                            icon = new TextAwesome
-                            {
-                                Anchor = Anchor.Centre,
-                                TextSize = 30,
-                                Position = new Vector2(0, 0),
-                                Icon = symbol
-                            },
-                            new SpriteText
-                            {
-                                Direction = FlowDirection.HorizontalOnly,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                TextSize = 16,
-                                Position = new Vector2(0, 35),
-                                Text = text
-                            }
-                        }
-                    }
-                };
-            }
-
-            protected override bool OnHover(InputState state)
-            {
-                if (State != ButtonState.Expanded) return true;
-
-                //if (OsuGame.Instance.IsActive)
-                //    Game.Audio.PlaySamplePositional($@"menu-{internalName}-hover", @"menuclick");
-
-                box.ScaleTo(new Vector2(1.5f, 1), 500, EasingTypes.OutElastic);
-
-                int duration = 0; //(int)(Game.Audio.BeatLength / 2);
-                if (duration == 0) duration = 250;
-
-                icon.ClearTransformations();
-
-                icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
-
-                double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
-                double startTime = Time + offset;
-
-                icon.RotateTo(10, offset, EasingTypes.InOutSine);
-                icon.ScaleTo(new Vector2(1, 0.9f), offset, EasingTypes.Out);
-
-                icon.Transforms.Add(new TransformRotation(Clock)
-                {
-                    StartValue = -10,
-                    EndValue = 10,
-                    StartTime = startTime,
-                    EndTime = startTime + duration * 2,
-                    Easing = EasingTypes.InOutSine,
-                    LoopCount = -1,
-                    LoopDelay = duration * 2
-                });
-
-                icon.Transforms.Add(new TransformPosition(Clock)
-                {
-                    StartValue = Vector2.Zero,
-                    EndValue = new Vector2(0, -10),
-                    StartTime = startTime,
-                    EndTime = startTime + duration,
-                    Easing = EasingTypes.Out,
-                    LoopCount = -1,
-                    LoopDelay = duration
-                });
-
-                icon.Transforms.Add(new TransformScaleVector(Clock)
-                {
-                    StartValue = new Vector2(1, 0.9f),
-                    EndValue = Vector2.One,
-                    StartTime = startTime,
-                    EndTime = startTime + duration,
-                    Easing = EasingTypes.Out,
-                    LoopCount = -1,
-                    LoopDelay = duration
-                });
-
-                icon.Transforms.Add(new TransformPosition(Clock)
-                {
-                    StartValue = new Vector2(0, -10),
-                    EndValue = Vector2.Zero,
-                    StartTime = startTime + duration,
-                    EndTime = startTime + duration * 2,
-                    Easing = EasingTypes.In,
-                    LoopCount = -1,
-                    LoopDelay = duration
-                });
-
-                icon.Transforms.Add(new TransformScaleVector(Clock)
-                {
-                    StartValue = Vector2.One,
-                    EndValue = new Vector2(1, 0.9f),
-                    StartTime = startTime + duration,
-                    EndTime = startTime + duration * 2,
-                    Easing = EasingTypes.In,
-                    LoopCount = -1,
-                    LoopDelay = duration
-                });
-
-                icon.Transforms.Add(new TransformRotation(Clock)
-                {
-                    StartValue = 10,
-                    EndValue = -10,
-                    StartTime = startTime + duration * 2,
-                    EndTime = startTime + duration * 4,
-                    Easing = EasingTypes.InOutSine,
-                    LoopCount = -1,
-                    LoopDelay = duration * 2
-                });
-
-                return true;
-            }
-
-            protected override void OnHoverLost(InputState state)
-            {
-                icon.ClearTransformations();
-                icon.RotateTo(0, 500, EasingTypes.Out);
-                icon.MoveTo(Vector2.Zero, 500, EasingTypes.Out);
-                icon.ScaleTo(0.7f, 500, EasingTypes.OutElasticHalf);
-                icon.ScaleTo(Vector2.One, 200, EasingTypes.Out);
-
-                if (State == ButtonState.Expanded)
-                    box.ScaleTo(new Vector2(1, 1), 500, EasingTypes.OutElastic);
-            }
-
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-            {
-                trigger();
-                return true;
-            }
-
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-            {
-                base.OnKeyDown(state, args);
-
-                if (triggerKey == args.Key && triggerKey != Key.Unknown)
-                {
-                    trigger();
-                    return true;
-                }
-
-                return false;
-            }
-
-            private void trigger()
-            {
-                //Game.Audio.PlaySamplePositional($@"menu-{internalName}-click", internalName.Contains(@"back") ? @"menuback" : @"menuhit");
-
-                clickAction?.Invoke();
-
-                //box.FlashColour(ColourHelper.Lighten2(colour, 0.7f), 200);
-            }
-
-            public override bool HandleInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
-
-            protected override void Update()
-            {
-                iconText.Alpha = MathHelper.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
-                base.Update();
-            }
-
-            public int ContractStyle;
-
-            ButtonState state;
-            public ButtonState State
-            {
-                get { return state; }
-                set
-                {
-
-                    if (state == value)
-                        return;
-
-                    state = value;
-
-                    switch (state)
-                    {
-                        case ButtonState.Contracted:
-                            switch (ContractStyle)
-                            {
-                                default:
-                                    box.ScaleTo(new Vector2(0, 1), 500, EasingTypes.OutExpo);
-                                    FadeOut(500);
-                                    break;
-                                case 1:
-                                    box.ScaleTo(new Vector2(0, 1), 400, EasingTypes.InSine);
-                                    FadeOut(800);
-                                    break;
-                            }
-                            break;
-                        case ButtonState.Expanded:
-                            const int expand_duration = 500;
-                            box.ScaleTo(new Vector2(1, 1), expand_duration, EasingTypes.OutExpo);
-                            FadeIn(expand_duration / 6);
-                            break;
-                        case ButtonState.Exploded:
-                            const int explode_duration = 200;
-                            box.ScaleTo(new Vector2(2, 1), explode_duration, EasingTypes.OutExpo);
-                            FadeOut(explode_duration / 4 * 3);
-                            break;
-                    }
-                }
-            }
-
-            public enum ButtonState
-            {
-                Contracted,
-                Expanded,
-                Exploded
-            }
-
-            /// <summary>
-            ///    ________
-            ///   /       /
-            ///  /       /
-            /// /_______/
-            /// </summary>
-            class WedgedBox : Box
-            {
-                float wedgeWidth;
-
-                public WedgedBox(Vector2 boxSize, float wedgeWidth)
-                {
-                    Size = boxSize;
-                    this.wedgeWidth = wedgeWidth;
-                }
-
-                /// <summary>
-                /// Custom DrawQuad used to create the slanted effect.
-                /// </summary>
-                protected override Quad DrawQuad
-                {
-                    get
-                    {
-                        Quad q = base.DrawQuad;
-
-                        //Will become infinite if we don't limit its maximum size.
-                        float wedge = Math.Min(q.Width, wedgeWidth / Scale.X);
-
-                        q.TopLeft.X += wedge;
-                        q.BottomRight.X -= wedge;
-
-                        return q;
-                    }
-                }
-            }
-        }
-
-        internal class MenuVisualisation : Drawable
-        {
-        }
+    public enum MenuState
+    {
+        Initial,
+        TopLevel,
+        Play,
+        EnteringMode,
+        Exit,
     }
 }

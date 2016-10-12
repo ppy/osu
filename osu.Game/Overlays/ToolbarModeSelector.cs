@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Transformations;
 using osu.Game.GameModes.Play;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 
 namespace osu.Game.Overlays
 {
@@ -29,9 +30,9 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.Y;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Children = new Drawable[]
             {
