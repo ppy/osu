@@ -1,4 +1,5 @@
-﻿using osu.Framework.Configuration;
+﻿using osu.Framework;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Drawables;
@@ -52,9 +53,9 @@ namespace osu.Game
             };
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
             updateFill();
         }
 
@@ -62,14 +63,14 @@ namespace osu.Game
         {
             volume.Value += 0.05f;
             updateFill();
-            return base.OnWheelUp(state);
+            return true;
         }
 
         protected override bool OnWheelDown(InputState state)
         {
             volume.Value -= 0.05f;
             updateFill();
-            return base.OnWheelDown(state);
+            return true;
         }
 
         private void updateFill() => meterFill.ScaleTo(new Vector2(1, (float)volume.Value), 300, EasingTypes.OutQuint);
