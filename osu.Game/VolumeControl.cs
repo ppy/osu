@@ -20,9 +20,18 @@ namespace osu.Game
             RelativeSizeAxes = Axes.Both;
         }
 
+        private void volumeChanged(object sender, System.EventArgs e)
+        {
+            appear();
+        }
+
         public override void Load(BaseGame game)
         {
             base.Load(game);
+            VolumeGlobal.ValueChanged += volumeChanged;
+            VolumeSample.ValueChanged += volumeChanged;
+            VolumeTrack.ValueChanged += volumeChanged;
+
             Children = new Drawable[]
             {
                 volumeMetersContainer = new FlowContainer
@@ -44,14 +53,12 @@ namespace osu.Game
 
         protected override bool OnWheelDown(InputState state)
         {
-            appear();
             volumeMeterMaster.TriggerWheelDown(state);
             return true;
         }
 
         protected override bool OnWheelUp(InputState state)
         {
-            appear();
             volumeMeterMaster.TriggerWheelUp(state);
             return true;
         }
