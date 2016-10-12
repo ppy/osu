@@ -95,7 +95,7 @@ namespace osu.Game.Overlays
                     loading.FadeOut(100);
                     addChannel(channels.Find(c => c.Name == @"#osu"));
                 });
-                
+
                 //addChannel(channels.Find(c => c.Name == @"#lobby"));
                 //addChannel(channels.Find(c => c.Name == @"#english"));
 
@@ -142,10 +142,7 @@ namespace osu.Game.Overlays
 
         public ChatConsoleState State
         {
-            get
-            {
-                return state;
-            }
+            get { return state; }
 
             set
             {
