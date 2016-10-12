@@ -20,6 +20,7 @@ using osu.Game.GameModes.Play.Taiko;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Input;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Play
 {
@@ -31,9 +32,9 @@ namespace osu.Game.GameModes.Play
                 typeof(Results)
         };
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             List<HitObject> objects = new List<HitObject>();
 
@@ -54,7 +55,7 @@ namespace osu.Game.GameModes.Play
                 HitObjects = objects
             };
 
-            OsuGame osu = Game as OsuGame;
+            OsuGame osu = game as OsuGame;
 
             switch (osu.PlayMode.Value)
             {

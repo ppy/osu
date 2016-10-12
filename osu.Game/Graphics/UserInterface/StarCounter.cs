@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
@@ -52,9 +53,9 @@ namespace osu.Game.Graphics.UserInterface
             StopRolling();
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Children = new Drawable[]
             {
@@ -79,6 +80,8 @@ namespace osu.Game.Graphics.UserInterface
                     Alpha = (i == 0) ? 1.0f : MinStarAlpha,
                     Position = new Vector2((StarSize + StarSpacing) * i + (StarSize + StarSpacing) / 2, 0),
                 };
+
+                //todo: user Container<T> once we have it.
                 stars.Add(star);
                 starContainer.Add(star);
             }

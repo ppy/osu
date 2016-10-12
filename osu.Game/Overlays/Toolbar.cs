@@ -51,9 +51,9 @@ namespace osu.Game.Overlays
             }
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, height);
@@ -106,7 +106,7 @@ namespace osu.Game.Overlays
                         new ToolbarButton
                         {
                             Icon = FontAwesome.user,
-                            Text = ((OsuGame)Game).Config.Get<string>(OsuConfig.Username)
+                            Text = ((OsuGame)game).Config.Get<string>(OsuConfig.Username)
                         },
                         new ToolbarButton
                         {

@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Drawables;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Transformations;
+using osu.Framework;
 
 namespace osu.Game
 {
@@ -24,9 +25,9 @@ namespace osu.Game
             RelativeSizeAxes = Axes.Both;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
             Children = new Drawable[]
             {
                 meterContainer = new Container {

@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -35,15 +36,15 @@ namespace osu.Game.Graphics.Cursor
                 Origin = Anchor.Centre;
             }
 
-            public override void Load()
+            public override void Load(BaseGame game)
             {
-                base.Load();
+                base.Load(game);
 
                 Children = new Drawable[]
                 {
                     new Sprite
                     {
-                        Texture = Game.Textures.Get(@"Cursor/cursor")
+                        Texture = game.Textures.Get(@"Cursor/cursor")
                     }
                 };
             }

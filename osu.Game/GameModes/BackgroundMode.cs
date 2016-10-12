@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Transformations;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
+using osu.Framework;
 
 namespace osu.Game.GameModes
 {
@@ -30,9 +31,9 @@ namespace osu.Game.GameModes
             return false;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Content.Scale *= 1 + (x_movement_amount / Size.X) * 2;
         }

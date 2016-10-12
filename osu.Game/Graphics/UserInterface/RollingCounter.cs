@@ -1,4 +1,5 @@
-﻿using osu.Framework.Graphics;
+﻿using osu.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
 using System;
@@ -109,9 +110,9 @@ namespace osu.Game.Graphics.UserInterface
             );
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
             removeTransforms(transformType);
             if (Count == null)
                 ResetCount();

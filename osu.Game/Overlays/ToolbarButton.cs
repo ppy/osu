@@ -10,6 +10,7 @@ using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Overlays
