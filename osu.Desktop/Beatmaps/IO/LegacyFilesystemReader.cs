@@ -25,9 +25,9 @@ namespace osu.Desktop.Beatmaps.IO
         public LegacyFilesystemReader(string path)
         {
             basePath = path;
-            beatmaps = Directory.GetFiles(basePath, "*.osu").Select(f => Path.GetFileName(f)).ToArray();
+            beatmaps = Directory.GetFiles(basePath, @"*.osu").Select(f => Path.GetFileName(f)).ToArray();
             if (beatmaps.Length == 0)
-                throw new FileNotFoundException("This directory contains no beatmaps");
+                throw new FileNotFoundException(@"This directory contains no beatmaps");
             using (var stream = new StreamReader(ReadFile(beatmaps[0])))
             {
                 var decoder = BeatmapDecoder.GetDecoder(stream);
