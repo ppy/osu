@@ -1,4 +1,5 @@
-﻿using osu.Framework.Configuration;
+﻿using System.Linq;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -9,6 +10,7 @@ namespace osu.Game
     internal class VolumeControl : Container
     {
         private FlowContainer volumeMetersContainer;
+        private VolumeMeter volumeMeterMaster;
         public BindableDouble VolumeGlobal { get; set; }
         public BindableDouble VolumeSample { get; set; }
         public BindableDouble VolumeTrack { get; set; }
@@ -32,7 +34,7 @@ namespace osu.Game
                     Padding = new Vector2(15, 0),
                     Children = new Drawable[]
                     {
-                        new VolumeMeter("Master", VolumeGlobal),
+                        volumeMeterMaster = new VolumeMeter("Master", VolumeGlobal),
                         new VolumeMeter("Effects", VolumeSample),
                         new VolumeMeter("Music", VolumeTrack)
                     }
@@ -43,12 +45,16 @@ namespace osu.Game
         protected override bool OnWheelDown(InputState state)
         {
             appear();
+            if (volumeMetersContainer.Children.All(vm => !vm.Contains(state.Mouse.Position)))
+                volumeMeterMaster.TriggerWheelDown(state);
             return base.OnWheelDown(state);
         }
 
         protected override bool OnWheelUp(InputState state)
         {
             appear();
+            if (volumeMetersContainer.Children.All(vm => !vm.Contains(state.Mouse.Position)))
+                volumeMeterMaster.TriggerWheelUp(state);
             return base.OnWheelUp(state);
         }
 
