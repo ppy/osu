@@ -11,9 +11,9 @@ namespace osu.Game.GameModes.Menu
     {
         /// <summary>
         /// A target drawable which this flowcontainer should be centered around.
-        /// This target MUST be in this FlowContainer's *direct* children.
+        /// This target should be a direct child of this FlowContainer.
         /// </summary>
-        internal Drawable CentreTarget;
+        public Drawable CentreTarget;
 
         public override Anchor Origin => Anchor.Custom;
 
