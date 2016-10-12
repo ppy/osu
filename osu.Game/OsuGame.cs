@@ -37,7 +37,7 @@ namespace osu.Game
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
         private Intro intro;
         private string[] args;
-        private IPCChannel<ImportBeatmap> BeatmapIPC;
+        private IpcChannel<ImportBeatmap> BeatmapIPC;
 
         public Bindable<PlayMode> PlayMode;
         
@@ -55,7 +55,7 @@ namespace osu.Game
 
         public override void Load(BaseGame game)
         {
-            BeatmapIPC = new IPCChannel<ImportBeatmap>(Host);
+            BeatmapIPC = new IpcChannel<ImportBeatmap>(Host);
             
             if (!Host.IsPrimaryInstance)
             {
