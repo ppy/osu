@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 using osu.Framework.Graphics.Transformations;
 using System;
 using System.Collections.Generic;
@@ -29,9 +30,10 @@ namespace osu.Game.Graphics.UserInterface
             IsRollingContinuous = false;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
+
             countSpriteText.Hide();
             OriginalColour = Colour;
         }

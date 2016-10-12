@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using System;
@@ -30,9 +31,10 @@ namespace osu.Game.Graphics.UserInterface
             IsRollingContinuous = false;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
+
             countSpriteText.Alpha = 0;
             Add(popOutSpriteText = new SpriteText
             {
