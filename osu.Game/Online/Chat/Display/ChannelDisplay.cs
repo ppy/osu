@@ -67,13 +67,13 @@ namespace osu.Game.Online.Chat.Display
         {
             if (!IsLoaded) return;
 
-            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - 20));
+            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
-            //up to last 20 messages
+            //up to last Channel.MAX_HISTORY messages
             foreach (Message m in displayMessages)
                 flow.Add(new ChatLine(m));
 
-            while (flow.Children.Count() > 20)
+            while (flow.Children.Count() > Channel.MAX_HISTORY)
                 flow.Remove(flow.Children.First());
         }
     }
