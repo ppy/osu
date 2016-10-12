@@ -29,10 +29,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK">
-      <HintPath>..\packages\ppy.OpenTK.1.1.2225.3\lib\net20\OpenTK.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.1.1.2225.3\lib\net20\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
