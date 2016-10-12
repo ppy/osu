@@ -10,6 +10,8 @@ using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Overlays
 {
@@ -29,7 +31,6 @@ namespace osu.Game.Overlays
             set
             {
                 DrawableText.Text = value;
-                paddingIcon.Alpha = string.IsNullOrEmpty(value) ? 0 : 1;
             }
         }
 
@@ -55,102 +56,65 @@ namespace osu.Game.Overlays
         protected TextAwesome DrawableIcon;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
-        private Drawable paddingLeft;
-        private Drawable paddingRight;
-        private Drawable paddingIcon;
         private FlowContainer tooltipContainer;
         private SpriteText tooltip1;
         private SpriteText tooltip2;
 
-        public new float Padding
-        {
-            get { return paddingLeft.Size.X; }
-            set
-            {
-                paddingLeft.Size = new Vector2(value, 1);
-                paddingRight.Size = new Vector2(value, 1);
-                tooltipContainer.Position = new Vector2(value, tooltipContainer.Position.Y);
-            }
-        }
-
         public ToolbarButton()
         {
-            HoverBackground = new Box
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Additive = true,
-                Colour = new Color4(60, 60, 60, 255),
-                Alpha = 0,
-            };
-
-            DrawableIcon = new TextAwesome
-            {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-            };
-
-            DrawableText = new SpriteText
-            {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-            };
-
-            tooltipContainer = new FlowContainer
-            {
-                Direction = FlowDirection.VerticalOnly,
-                Anchor = Anchor.BottomLeft,
-                Position = new Vector2(0, -5),
-                Alpha = 0,
-                Children = new[]
+                HoverBackground = new Box
                 {
-                    tooltip1 = new SpriteText()
+                    RelativeSizeAxes = Axes.Both,
+                    Additive = true,
+                    Colour = new Color4(60, 60, 60, 255),
+                    Alpha = 0,
+                },
+                new FlowContainer
+                {
+                    Direction = FlowDirection.HorizontalOnly,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Padding = new MarginPadding { Left = 5, Right = 5 },
+                    RelativeSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        TextSize = 22,
+                        DrawableIcon = new TextAwesome
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
+                        DrawableText = new SpriteText
+                        {
+                            Margin = new MarginPadding { Left = 5 },
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
                     },
-                    tooltip2 = new SpriteText
+                },
+                tooltipContainer = new FlowContainer
+                {
+                    Direction = FlowDirection.VerticalOnly,
+                    Anchor = Anchor.BottomLeft,
+                    Position = new Vector2(5, -5),
+                    Alpha = 0,
+                    Children = new[]
                     {
-                        TextSize = 15
+                        tooltip1 = new SpriteText()
+                        {
+                            TextSize = 22,
+                        },
+                        tooltip2 = new SpriteText
+                        {
+                            TextSize = 15
+                        }
                     }
                 }
             };
 
-            paddingLeft = new Container { RelativeSizeAxes = Axes.Y };
-            paddingRight = new Container { RelativeSizeAxes = Axes.Y };
-            paddingIcon = new Container
-            {
-                Size = new Vector2(5, 0),
-                Alpha = 0
-            };
-
-            Padding = 10;
             RelativeSizeAxes = Axes.Y;
             Size = new Vector2(WIDTH, 1);
-        }
-
-        public override void Load()
-        {
-            base.Load();
-
-            Children = new Drawable[]
-            {
-                    HoverBackground,
-                    new FlowContainer
-                    {
-                        Direction = FlowDirection.HorizontalOnly,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        RelativeSizeAxes = Axes.Y,
-                        Children = new Drawable[]
-                        {
-                            paddingLeft,
-                            DrawableIcon,
-                            paddingIcon,
-                            DrawableText,
-                            paddingRight
-                        },
-                    },
-                    tooltipContainer
-            };
         }
 
         protected override void Update()
@@ -158,7 +122,7 @@ namespace osu.Game.Overlays
             base.Update();
 
             //todo: find a way to avoid using this (autosize needs to be able to ignore certain drawables.. in this case the tooltip)
-            Size = new Vector2(WIDTH + DrawableText.Size.X, 1);
+            Size = new Vector2(WIDTH + (DrawableText.IsVisible ? DrawableText.Size.X : 0), 1);
         }
 
         protected override bool OnClick(InputState state)

@@ -3,7 +3,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
-using OpenTK;
+using osu.Framework.Graphics.Transformations;
 
 namespace osu.Game
 {
@@ -20,9 +20,9 @@ namespace osu.Game
             RelativeSizeAxes = Axes.Both;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
             Children = new Drawable[]
             {
                 volumeMetersContainer = new FlowContainer

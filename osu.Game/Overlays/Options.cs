@@ -9,6 +9,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
+using osu.Framework;
 
 namespace osu.Game.Overlays
 {
@@ -16,9 +17,9 @@ namespace osu.Game.Overlays
     {
         const float width = 300;
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Depth = float.MaxValue;
             RelativeSizeAxes = Axes.Y;

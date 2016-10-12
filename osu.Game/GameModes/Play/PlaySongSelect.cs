@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Game.GameModes.Backgrounds;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Play
 {
@@ -19,11 +20,11 @@ namespace osu.Game.GameModes.Play
                 typeof(Player)
         };
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
-            OsuGame osu = Game as OsuGame;
+            OsuGame osu = game as OsuGame;
 
             playMode = osu.PlayMode;
             playMode.ValueChanged += PlayMode_ValueChanged;

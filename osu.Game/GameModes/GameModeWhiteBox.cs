@@ -13,6 +13,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.GameModes.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 
 namespace osu.Game.GameModes
 {
@@ -77,9 +78,9 @@ namespace osu.Game.GameModes
             Content.FadeIn(transition_time, EasingTypes.OutExpo);
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Children = new Drawable[]
             {

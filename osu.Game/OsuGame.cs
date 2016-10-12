@@ -8,6 +8,7 @@ using osu.Game.Configuration;
 using osu.Game.GameModes.Menu;
 using OpenTK;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Game.GameModes;
@@ -15,12 +16,17 @@ using osu.Game.Graphics.Background;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Framework;
+using osu.Framework.Input;
+using osu.Game.Input;
+using OpenTK.Input;
 
 namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
         public Toolbar Toolbar;
+        public ChatConsole Chat;
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
         private Intro intro;
 
@@ -33,9 +39,9 @@ namespace osu.Game
             host.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             //attach our bindables to the audio subsystem.
             Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeGlobal));
@@ -49,17 +55,26 @@ namespace osu.Game
                     OnHome = delegate { MainMenu?.MakeCurrent(); },
                     OnSettings = delegate { Options.PoppedOut = !Options.PoppedOut; },
                     OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
-                    Alpha = 0.001f //fixes invalidation fuckup
+                    Alpha = 0.001f,
                 },
+                Chat = new ChatConsole(API),
                 new VolumeControl
                 {
                     VolumeGlobal = Audio.Volume,
                     VolumeSample = Audio.VolumeSample,
                     VolumeTrack = Audio.VolumeTrack
+                },
+                new GlobalHotkeys //exists because UserInputManager is at a level below us.
+                {
+                    Handler = globalHotkeyPressed
                 }
             });
 
-            Toolbar.SetState(ToolbarState.Hidden, true);
+            Toolbar.State = ToolbarState.Hidden;
+            Toolbar.Flush();
+
+            Chat.State = ChatConsoleState.Hidden;
+            Chat.Flush();
 
             intro.ModePushed += modeAdded;
             intro.Exited += modeRemoved;
@@ -69,6 +84,18 @@ namespace osu.Game
             PlayMode.TriggerChange();
 
             Cursor.Alpha = 0;
+        }
+
+        private bool globalHotkeyPressed(InputState state, KeyDownEventArgs args)
+        {
+            switch (args.Key)
+            {
+                case Key.F8:
+                    Chat.State = Chat.State == ChatConsoleState.Hidden ? ChatConsoleState.Visible : ChatConsoleState.Hidden;
+                    return true;
+            }
+            
+            return base.OnKeyDown(state, args);
         }
 
         public Action<GameMode> ModeChanged;
@@ -82,11 +109,12 @@ namespace osu.Game
             //central game mode change logic.
             if (newMode is Player || newMode is Intro)
             {
-                Toolbar.SetState(ToolbarState.Hidden);
+                Toolbar.State = ToolbarState.Hidden;
+                Chat.State = ChatConsoleState.Hidden;
             }
             else
             {
-                Toolbar.SetState(ToolbarState.Visible);
+                Toolbar.State = ToolbarState.Visible;
             }
 
             Cursor.FadeIn(100);
@@ -101,7 +129,10 @@ namespace osu.Game
         {
             if (!intro.DidLoadMenu || intro.ChildGameMode != null)
             {
-                intro.MakeCurrent();
+                Scheduler.Add(delegate
+                {
+                    intro.MakeCurrent();
+                });
                 return true;
             }
             

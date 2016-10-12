@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Drawables;
 using OpenTK;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Play.Osu
 {
@@ -18,9 +19,9 @@ namespace osu.Game.GameModes.Play.Osu
             Origin = Anchor.Centre;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Add(new Box()
             {

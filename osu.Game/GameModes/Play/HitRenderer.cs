@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Drawables;
 using osu.Game.Beatmaps.Objects;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Play
 {
@@ -21,9 +22,9 @@ namespace osu.Game.GameModes.Play
             RelativeSizeAxes = Axes.Both;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Add(new Box()
             {

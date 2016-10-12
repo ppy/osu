@@ -1,4 +1,5 @@
-﻿using osu.Framework.GameModes;
+﻿using osu.Framework;
+using osu.Framework.GameModes;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -12,7 +13,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game
 {
-    public class OsuGameBase : Framework.Game
+    public class OsuGameBase : BaseGame
     {
         internal OsuConfigManager Config = new OsuConfigManager();
 
@@ -27,9 +28,9 @@ namespace osu.Game
 
         public CursorContainer Cursor;
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
             Fonts = new TextureStore() { ScaleAdjust = 0.01f };
