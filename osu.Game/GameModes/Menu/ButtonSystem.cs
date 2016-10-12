@@ -90,7 +90,7 @@ namespace osu.Game.GameModes.Menu
                         buttonFlow = new FlowContainerWithOrigin
                         {
                             Anchor = Anchor.Centre,
-                            Padding = new Vector2(-wedge_width, 0),
+                            Spacing = new Vector2(-wedge_width, 0),
                             Children = new Drawable[]
                             {
                                 settingsButton = new Button(@"settings", @"options", FontAwesome.gear, new Color4(85, 85, 85, 255), OnSettings, -wedge_width, Key.O),

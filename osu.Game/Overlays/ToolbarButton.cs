@@ -10,6 +10,7 @@ using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 
 namespace osu.Game.Overlays
 {
@@ -127,9 +128,9 @@ namespace osu.Game.Overlays
             Size = new Vector2(WIDTH, 1);
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Children = new Drawable[]
             {
