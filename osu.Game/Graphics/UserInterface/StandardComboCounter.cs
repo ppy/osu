@@ -20,7 +20,9 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class StandardComboCounter : ULongCounter
     {
-        public SpriteText popOutSpriteText;
+        protected SpriteText popOutSpriteText;
+
+        protected volatile int scheduledPopOutCurrentId = 0;
 
         public ulong PopOutDuration = 0;
         public float PopOutBigScale = 2.0f;
@@ -82,7 +84,7 @@ namespace osu.Game.Graphics.UserInterface
                 removeTransforms(typeof(TransformULongCounter));
                 VisibleCount = newValue;
             }
-            else
+            else if (currentValue != 0)
                 transformCount(new TransformULongCounter(Clock), currentValue, newValue);
         }
 
@@ -97,55 +99,61 @@ namespace osu.Game.Graphics.UserInterface
             return count.ToString("#,0") + "x";
         }
 
-        protected virtual void transformPopOut(ulong newValue)
+        protected virtual void transformPopOut(ulong currentValue, ulong newValue)
         {
+            popOutSpriteText.Text = formatCount(newValue);
+            countSpriteText.Text = formatCount(currentValue);
+
             popOutSpriteText.ScaleTo(PopOutBigScale);
             popOutSpriteText.FadeTo(PopOutInitialAlpha);
-            popOutSpriteText.Position = Vector2.Zero;
+            popOutSpriteText.MoveTo(Vector2.Zero);
 
             popOutSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
             popOutSpriteText.FadeOut(PopOutDuration, PopOutEasing);
             popOutSpriteText.MoveTo(countSpriteText.Position, PopOutDuration, PopOutEasing);
 
+            scheduledPopOutCurrentId++;
+            int newTaskId = scheduledPopOutCurrentId;
             Scheduler.AddDelayed(delegate
             {
-                transformPopOutNew(newValue);
+                scheduledPopOutSmall(newTaskId, newValue);
             }, PopOutDuration);
         }
 
-        protected virtual void transformPopOutNew(ulong newValue)
-        {   
-            // Too late; scheduled task invalidated
-            if (newValue != VisibleCount)
-                return;
+        protected virtual void transformNoPopOut(ulong newValue)
+        {
+            scheduledPopOutCurrentId++;
+            countSpriteText.Text = formatCount(newValue);
+            countSpriteText.ScaleTo(1);
+        }
 
+        protected virtual void transformPopOutSmall(ulong newValue)
+        {
             countSpriteText.Text = formatCount(newValue);
             countSpriteText.ScaleTo(PopOutSmallScale);
             countSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
         }
 
+        protected virtual void scheduledPopOutSmall(int id, ulong newValue)
+        {
+            // Too late; scheduled task invalidated
+            if (id != scheduledPopOutCurrentId)
+                return;
+
+            transformPopOutSmall(newValue);
+        }
+
         protected override void transformVisibleCount(ulong currentValue, ulong newValue)
         {
-            popOutSpriteText.Text = formatCount(newValue);
-            if (newValue > currentValue)
-            {
-                countSpriteText.Text = formatCount(newValue - 1);
-                
-            }
-            else
-            {
-                countSpriteText.Text = formatCount(newValue);
-            }
             if (newValue == 0)
-            {
                 countSpriteText.FadeOut(PopOutDuration);
-            }
             else
-            {
                 countSpriteText.Show();
-                if (newValue > currentValue || CanPopOutWhenBackwards)
-                    transformPopOut(newValue);
-            }
+
+            if (newValue > currentValue || CanPopOutWhenBackwards)
+                transformPopOut(currentValue, newValue);
+            else
+                transformNoPopOut(newValue);
         }
     }
 }
