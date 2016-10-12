@@ -15,11 +15,11 @@ namespace osu.Game.Beatmaps.Formats
     {
         public static void Register()
         {
-            AddDecoder<OsuLegacyDecoder>("osu file format v14");
-            AddDecoder<OsuLegacyDecoder>("osu file format v13");
-            AddDecoder<OsuLegacyDecoder>("osu file format v12");
-            AddDecoder<OsuLegacyDecoder>("osu file format v11");
-            AddDecoder<OsuLegacyDecoder>("osu file format v10");
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v14");
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v13");
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v12");
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v11");
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v10");
             // TODO: Not sure how far back to go, or differences between versions
         }
 
@@ -40,34 +40,34 @@ namespace osu.Game.Beatmaps.Formats
         {
             switch (key)
             {
-                case "AudioFilename":
+                case @"AudioFilename":
                     beatmap.Metadata.AudioFile = val;
                     break;
-                case "AudioLeadIn":
+                case @"AudioLeadIn":
                     beatmap.AudioLeadIn = int.Parse(val);
                     break;
-                case "PreviewTime":
+                case @"PreviewTime":
                     beatmap.Metadata.PreviewTime = int.Parse(val);
                     break;
-                case "Countdown":
+                case @"Countdown":
                     beatmap.Countdown = int.Parse(val) == 1;
                     break;
-                case "SampleSet":
+                case @"SampleSet":
                     beatmap.SampleSet = (SampleSet)Enum.Parse(typeof(SampleSet), val);
                     break;
-                case "StackLeniency":
+                case @"StackLeniency":
                     beatmap.StackLeniency = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
-                case "Mode":
+                case @"Mode":
                     beatmap.Mode = (PlayMode)int.Parse(val);
                     break;
-                case "LetterboxInBreaks":
+                case @"LetterboxInBreaks":
                     beatmap.LetterboxInBreaks = int.Parse(val) == 1;
                     break;
-                case "SpecialStyle":
+                case @"SpecialStyle":
                     beatmap.SpecialStyle = int.Parse(val) == 1;
                     break;
-                case "WidescreenStoryboard":
+                case @"WidescreenStoryboard":
                     beatmap.WidescreenStoryboard = int.Parse(val) == 1;
                     break;
             }
@@ -77,19 +77,19 @@ namespace osu.Game.Beatmaps.Formats
         {
             switch (key)
             {
-                case "Bookmarks":
+                case @"Bookmarks":
                     beatmap.StoredBookmarks = val;
                     break;
-                case "DistanceSpacing":
+                case @"DistanceSpacing":
                     beatmap.DistanceSpacing = double.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
-                case "BeatDivisor":
+                case @"BeatDivisor":
                     beatmap.BeatDivisor = int.Parse(val);
                     break;
-                case "GridSize":
+                case @"GridSize":
                     beatmap.GridSize = int.Parse(val);
                     break;
-                case "TimelineZoom":
+                case @"TimelineZoom":
                     beatmap.TimelineZoom = double.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
             }
@@ -99,34 +99,34 @@ namespace osu.Game.Beatmaps.Formats
         {
             switch (key)
             {
-                case "Title":
+                case @"Title":
                     beatmap.Metadata.Title = val;
                     break;
-                case "TitleUnicode":
+                case @"TitleUnicode":
                     beatmap.Metadata.TitleUnicode = val;
                     break;
-                case "Artist":
+                case @"Artist":
                     beatmap.Metadata.Artist = val;
                     break;
-                case "ArtistUnicode":
+                case @"ArtistUnicode":
                     beatmap.Metadata.ArtistUnicode = val;
                     break;
-                case "Creator":
+                case @"Creator":
                     beatmap.Metadata.Author = val;
                     break;
-                case "Version":
+                case @"Version":
                     beatmap.Version = val;
                     break;
-                case "Source":
+                case @"Source":
                     beatmap.Metadata.Source = val;
                     break;
-                case "Tags":
+                case @"Tags":
                     beatmap.Metadata.Tags = val;
                     break;
-                case "BeatmapID":
+                case @"BeatmapID":
                     beatmap.BeatmapID = int.Parse(val);
                     break;
-                case "BeatmapSetID":
+                case @"BeatmapSetID":
                     beatmap.BeatmapSetID = int.Parse(val);
                     beatmap.Metadata.BeatmapSetID = int.Parse(val);
                     break;
@@ -137,22 +137,22 @@ namespace osu.Game.Beatmaps.Formats
         {
             switch (key)
             {
-                case "HPDrainRate":
+                case @"HPDrainRate":
                     beatmap.BaseDifficulty.DrainRate = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
-                case "CircleSize":
+                case @"CircleSize":
                     beatmap.BaseDifficulty.CircleSize = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
-                case "OverallDifficulty":
+                case @"OverallDifficulty":
                     beatmap.BaseDifficulty.OverallDifficulty = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
-                case "ApproachRate":
+                case @"ApproachRate":
                     beatmap.BaseDifficulty.ApproachRate = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
-                case "SliderMultiplier":
+                case @"SliderMultiplier":
                     beatmap.BaseDifficulty.SliderMultiplier = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
-                case "SliderTickRate":
+                case @"SliderTickRate":
                     beatmap.BaseDifficulty.SliderTickRate = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
             }
@@ -160,9 +160,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(Beatmap beatmap, string val)
         {
-            if (val.StartsWith("//"))
+            if (val.StartsWith(@"//"))
                 return;
-            if (val.StartsWith(" "))
+            if (val.StartsWith(@" "))
                 return; // TODO
             string[] split = val.Split(',');
             EventType type;
@@ -222,10 +222,10 @@ namespace osu.Game.Beatmaps.Formats
                 line = line.Trim();
                 if (string.IsNullOrEmpty(line))
                     continue;
-                if (line.StartsWith("osu file format v"))
+                if (line.StartsWith(@"osu file format v"))
                     continue;
                     
-                if (line.StartsWith("[") && line.EndsWith("]"))
+                if (line.StartsWith(@"[") && line.EndsWith(@"]"))
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
                         throw new InvalidDataException($@"Unknown osu section {line}");

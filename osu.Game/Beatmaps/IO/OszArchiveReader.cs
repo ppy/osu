@@ -25,10 +25,10 @@ namespace osu.Game.Beatmaps.IO
         public OszArchiveReader(Stream archiveStream)
         {
             archive = ZipFile.Read(archiveStream);
-            beatmaps = archive.Entries.Where(e => e.FileName.EndsWith(".osu"))
+            beatmaps = archive.Entries.Where(e => e.FileName.EndsWith(@".osu"))
                 .Select(e => e.FileName).ToArray();
             if (beatmaps.Length == 0)
-                throw new FileNotFoundException("This directory contains no beatmaps");
+                throw new FileNotFoundException(@"This directory contains no beatmaps");
             using (var stream = new StreamReader(ReadFile(beatmaps[0])))
             {
                 var decoder = BeatmapDecoder.GetDecoder(stream);

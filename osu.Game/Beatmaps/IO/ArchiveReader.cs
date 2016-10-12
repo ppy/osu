@@ -22,7 +22,7 @@ namespace osu.Game.Beatmaps.IO
                 if (reader.Test(storage, path))
                     return (ArchiveReader)Activator.CreateInstance(reader.Type, storage.GetStream(path));
             }
-            throw new IOException("Unknown file format");
+            throw new IOException(@"Unknown file format");
         }
         
         protected static void AddReader<T>(Func<BasicStorage, string, bool> test) where T : ArchiveReader
