@@ -55,16 +55,12 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void transformVisibleCount(T currentValue, T newValue)
         {
-            if (countSpriteText != null)
-            {
-                countSpriteText.Text = formatCount(newValue);
-            }
+            countSpriteText.Text = formatCount(newValue);
         }
 
         protected virtual void updateTextSize()
         {
-            if (countSpriteText != null)
-                countSpriteText.TextSize = TextSize;
+            countSpriteText.TextSize = TextSize;
         }
     }
 }
