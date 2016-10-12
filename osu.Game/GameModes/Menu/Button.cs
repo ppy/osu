@@ -44,9 +44,9 @@ namespace osu.Game.GameModes.Menu
             this.text = text;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
             Alpha = 0;
 
             Children = new Drawable[]

@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Online.Chat.Display.osu.Online.Social;
 using OpenTK;
+using osu.Framework;
 
 namespace osu.Game.Online.Chat.Display
 {
@@ -57,9 +58,9 @@ namespace osu.Game.Online.Chat.Display
             channel.NewMessagesArrived -= newMessages;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
             newMessages(channel.Messages);
         }
 

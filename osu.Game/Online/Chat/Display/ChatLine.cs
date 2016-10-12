@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Online.Chat.Display
@@ -27,9 +28,9 @@ namespace osu.Game.Online.Chat.Display
             const float padding = 200;
             const float text_size = 20;
 
-            public override void Load()
+            public override void Load(BaseGame game)
             {
-                base.Load();
+                base.Load(game);
 
                 RelativeSizeAxes = Axes.X;
 

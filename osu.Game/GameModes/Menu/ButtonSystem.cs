@@ -56,9 +56,9 @@ namespace osu.Game.GameModes.Menu
             RelativeSizeAxes = Axes.Both;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Children = new Drawable[]
             {

@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Objects.Catch;
 using OpenTK;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Play.Catch
 {
@@ -24,9 +25,6 @@ namespace osu.Game.GameModes.Play.Catch
             {
                 //osu! mode requires all objects to be of CatchBaseHit type.
                 objects = value.ConvertAll(convertForCatch);
-
-                if (Parent != null)
-                    Load();
             }
         }
 
@@ -50,9 +48,9 @@ namespace osu.Game.GameModes.Play.Catch
             return h;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             if (playfield == null)
                 Add(playfield = new CatchPlayfield());
@@ -66,7 +64,7 @@ namespace osu.Game.GameModes.Play.Catch
                 //render stuff!
                 Sprite s = new Sprite
                 {
-                    Texture = Game.Textures.Get(@"Menu/logo"),
+                    Texture = game.Textures.Get(@"Menu/logo"),
                     Origin = Anchor.Centre,
                     Scale = new Vector2(0.1f),
                     RelativePositionAxes = Axes.Y,

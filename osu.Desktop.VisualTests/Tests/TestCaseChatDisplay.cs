@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Online.Chat.Display;
+using osu.Framework;
 
 namespace osu.Desktop.Tests
 {
@@ -29,9 +30,16 @@ namespace osu.Desktop.Tests
 
         private Scheduler scheduler = new Scheduler();
 
-        private APIAccess api => ((OsuGameBase)Game).API;
+        private APIAccess api;
 
         private ChannelDisplay channelDisplay;
+
+        public override void Load(BaseGame game)
+        {
+            base.Load(game);
+
+            api = ((OsuGameBase)game).API;
+        }
 
         public override void Reset()
         {

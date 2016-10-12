@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Objects.Taiko;
 using OpenTK;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Play.Taiko
 {
@@ -24,9 +25,6 @@ namespace osu.Game.GameModes.Play.Taiko
             {
                 //osu! mode requires all objects to be of TaikoBaseHit type.
                 objects = value.ConvertAll(convertForTaiko);
-
-                if (Parent != null)
-                    Load();
             }
         }
 
@@ -49,9 +47,9 @@ namespace osu.Game.GameModes.Play.Taiko
             return h;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             if (playfield == null)
                 Add(playfield = new TaikoPlayfield());
@@ -65,7 +63,7 @@ namespace osu.Game.GameModes.Play.Taiko
                 //render stuff!
                 Sprite s = new Sprite
                 {
-                    Texture = Game.Textures.Get(@"Menu/logo"),
+                    Texture = game.Textures.Get(@"Menu/logo"),
                     Origin = Anchor.Centre,
                     Scale = new Vector2(0.2f),
                     RelativePositionAxes = Axes.Both,
