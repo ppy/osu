@@ -29,28 +29,33 @@ namespace osu.Game.Graphics.UserInterface
         public StandardComboCounter() : base()
         {
             IsRollingContinuous = false;
+
+            countSpriteText.Alpha = 0;
+
+            popOutSpriteText = new SpriteText
+            {
+                Origin = this.Origin,
+                Anchor = this.Anchor,
+                TextSize = this.TextSize,
+                Alpha = 0,
+            };
         }
 
         public override void Load(BaseGame game)
         {
             base.Load(game);
 
-            countSpriteText.Alpha = 0;
-            Add(popOutSpriteText = new SpriteText
-            {
-                Text = formatCount(Count),
-                Origin = this.Origin,
-                Anchor = this.Anchor,
-                TextSize = this.TextSize,
-                Alpha = 0,
-            });
+            popOutSpriteText.Origin = this.Origin;
+            popOutSpriteText.Anchor = this.Anchor;
+
+            Add(popOutSpriteText);
         }
 
         protected override void updateTextSize()
         {
             base.updateTextSize();
-            if (popOutSpriteText != null)
-                popOutSpriteText.TextSize = this.TextSize;
+
+            popOutSpriteText.TextSize = this.TextSize;
         }
 
 
@@ -91,19 +96,16 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void transformVisibleCount(ulong currentValue, ulong newValue)
         {
-            if (countSpriteText != null && popOutSpriteText != null)
+            countSpriteText.Text = popOutSpriteText.Text = formatCount(newValue);
+            if (newValue == 0)
             {
-                countSpriteText.Text = popOutSpriteText.Text = formatCount(newValue);
-                if (newValue == 0)
-                {
-                    countSpriteText.FadeOut(PopOutDuration);
-                }
-                else
-                {
-                    countSpriteText.Show();
-                    if (newValue > currentValue || CanPopOutWhenBackwards)
-                        transformPopOut();
-                }
+                countSpriteText.FadeOut(PopOutDuration);
+            }
+            else
+            {
+                countSpriteText.Show();
+                if (newValue > currentValue || CanPopOutWhenBackwards)
+                    transformPopOut();
             }
         }
     }
