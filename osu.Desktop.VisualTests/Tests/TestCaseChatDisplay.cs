@@ -65,7 +65,7 @@ namespace osu.Desktop.Tests
                         RelativeSizeAxes = Axes.X,
                         LayoutDuration = 100,
                         LayoutEasing = EasingTypes.Out,
-                        Padding = new Vector2(1, 1)
+                        Spacing = new Vector2(1, 1)
                     }
                 }
             });
