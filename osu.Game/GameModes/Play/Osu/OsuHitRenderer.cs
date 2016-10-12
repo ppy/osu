@@ -9,6 +9,7 @@ using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
 using OpenTK;
 using System.Diagnostics;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Play.Osu
 {
@@ -28,7 +29,7 @@ namespace osu.Game.GameModes.Play.Osu
             }
         }
 
-        public override void Load(Framework.BaseGame game)
+        public override void Load(BaseGame game)
         {
             base.Load(game);
 

@@ -13,7 +13,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game
 {
-    public class OsuGameBase : Framework.BaseGame
+    public class OsuGameBase : BaseGame
     {
         internal OsuConfigManager Config = new OsuConfigManager();
 

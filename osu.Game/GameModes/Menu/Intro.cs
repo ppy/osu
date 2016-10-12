@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.GameModes.Backgrounds;
 using OpenTK.Graphics;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -23,7 +24,7 @@ namespace osu.Game.GameModes.Menu
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeEmpty();
 
-        public override void Load(Framework.BaseGame game)
+        public override void Load(BaseGame game)
         {
             base.Load(game);
 
