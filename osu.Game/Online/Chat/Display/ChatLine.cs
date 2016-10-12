@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Online.Chat.Display
 {
@@ -54,10 +55,10 @@ namespace osu.Game.Online.Chat.Display
                             }
                         }
                     },
-                    new PaddingContainer
+                    new Container
                     {
                         RelativeSizeAxes = Axes.X,
-                        Padding = new Padding { Left = padding + 10 },
+                        Padding = new MarginPadding { Left = padding + 10 },
                         Children = new Drawable[]
                         {
                             new SpriteText

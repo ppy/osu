@@ -47,7 +47,7 @@ namespace osu.Game.Online.Chat.Display
                             Direction = FlowDirection.VerticalOnly,
                             RelativeSizeAxes = Axes.X,
                             LayoutEasing = EasingTypes.Out,
-                            Padding = new Vector2(1, 1)
+                            Spacing = new Vector2(1, 1)
                         }
                     }
                 }
