@@ -1,9 +1,12 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using osu.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
+using osu.Framework.Timing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +24,22 @@ namespace osu.Game.Graphics.UserInterface
 
         public ulong PopOutDuration = 0;
         public float PopOutBigScale = 2.0f;
-        public float PopOutSmallScale = 1.2f;
+        public float PopOutSmallScale = 1.1f;
         public EasingTypes PopOutEasing = EasingTypes.None;
         public bool CanPopOutWhenBackwards = false;
         public float PopOutInitialAlpha = 0.75f;
+
+        public Vector2 InnerCountPosition
+        {
+            get
+            {
+                return countSpriteText.Position;
+            }
+            set
+            {
+                countSpriteText.Position = value;
+            }
+        }
 
         public StandardComboCounter() : base()
         {
@@ -58,7 +73,6 @@ namespace osu.Game.Graphics.UserInterface
             popOutSpriteText.TextSize = this.TextSize;
         }
 
-
         protected override void transformCount(ulong currentValue, ulong newValue)
         {
             // Animate rollover only when going backwards
@@ -83,20 +97,45 @@ namespace osu.Game.Graphics.UserInterface
             return count.ToString("#,0") + "x";
         }
 
-        protected virtual void transformPopOut()
+        protected virtual void transformPopOut(ulong newValue)
         {
-            countSpriteText.ScaleTo(PopOutSmallScale);
-            countSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
-
             popOutSpriteText.ScaleTo(PopOutBigScale);
             popOutSpriteText.FadeTo(PopOutInitialAlpha);
+            popOutSpriteText.Position = Vector2.Zero;
+
             popOutSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
             popOutSpriteText.FadeOut(PopOutDuration, PopOutEasing);
+            popOutSpriteText.MoveTo(countSpriteText.Position, PopOutDuration, PopOutEasing);
+
+            Scheduler.AddDelayed(delegate
+            {
+                transformPopOutNew(newValue);
+            }, PopOutDuration);
+        }
+
+        protected virtual void transformPopOutNew(ulong newValue)
+        {   
+            // Too late; scheduled task invalidated
+            if (newValue != VisibleCount)
+                return;
+
+            countSpriteText.Text = formatCount(newValue);
+            countSpriteText.ScaleTo(PopOutSmallScale);
+            countSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
         }
 
         protected override void transformVisibleCount(ulong currentValue, ulong newValue)
         {
-            countSpriteText.Text = popOutSpriteText.Text = formatCount(newValue);
+            popOutSpriteText.Text = formatCount(newValue);
+            if (newValue > currentValue)
+            {
+                countSpriteText.Text = formatCount(newValue - 1);
+                
+            }
+            else
+            {
+                countSpriteText.Text = formatCount(newValue);
+            }
             if (newValue == 0)
             {
                 countSpriteText.FadeOut(PopOutDuration);
@@ -105,7 +144,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 countSpriteText.Show();
                 if (newValue > currentValue || CanPopOutWhenBackwards)
-                    transformPopOut();
+                    transformPopOut(newValue);
             }
         }
     }

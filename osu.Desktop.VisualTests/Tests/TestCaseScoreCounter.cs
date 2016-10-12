@@ -43,9 +43,10 @@ namespace osu.Desktop.Tests
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 Position = new Vector2(20, 20),
+                InnerCountPosition = new Vector2(10, 10),
                 IsRollingProportional = true,
                 RollingDuration = 20,
-                PopOutDuration = 250,
+                PopOutDuration = 3000,
                 Count = 0,
                 TextSize = 40,
             };
@@ -57,7 +58,7 @@ namespace osu.Desktop.Tests
                 Anchor = Anchor.Centre,
                 IsRollingProportional = true,
                 RollingDuration = 20,
-                PopOutDuration = 250,
+                PopOutDuration = 100,
                 Count = 0,
                 TextSize = 40,
             };
