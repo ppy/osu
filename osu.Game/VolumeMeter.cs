@@ -1,5 +1,4 @@
-﻿using osu.Framework;
-using osu.Framework.Configuration;
+﻿using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Drawables;
@@ -53,26 +52,28 @@ namespace osu.Game
             };
         }
 
-        public override void Load(BaseGame game)
+        public double Volume
         {
-            base.Load(game);
-            updateFill();
+            get { return volume.Value; }
+            private set
+            {
+                volume.Value = value;
+                updateFill();
+            }
         }
 
         protected override bool OnWheelUp(InputState state)
         {
-            volume.Value += 0.05f;
-            updateFill();
+            Volume += 0.05f;
             return true;
         }
 
         protected override bool OnWheelDown(InputState state)
         {
-            volume.Value -= 0.05f;
-            updateFill();
+            Volume -= 0.05f;
             return true;
         }
 
-        private void updateFill() => meterFill.ScaleTo(new Vector2(1, (float)volume.Value), 300, EasingTypes.OutQuint);
+        private void updateFill() => meterFill.ScaleTo(new Vector2(1, (float)Volume), 300, EasingTypes.OutQuint);
     }
 }
