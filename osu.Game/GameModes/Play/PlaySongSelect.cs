@@ -83,6 +83,7 @@ namespace osu.Game.GameModes.Play
                         {
                             Direction = FlowDirection.VerticalOnly,
                             Padding = new MarginPadding(25),
+                            Spacing = new Vector2(0, 25),
                         }
                     }
                 }

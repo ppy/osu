@@ -59,24 +59,34 @@ namespace osu.Game.GameModes.Play
         {
             BeatmapSet = beatmapSet;
             Alpha = collapsedAlpha;
-            Children = new Drawable[]
+            Children = new[]
             {
-                new Box
-                {
-                    Colour = new Color4(0, 0, 0, 0.75f),
-                    RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(1),
-                },
                 topContainer = new FlowContainer
                 {
                     Direction = FlowDirection.VerticalOnly,
-                    Children = new[] { new SpriteText { Text = this.BeatmapSet.Metadata.Title, TextSize = 25 } }
+                    Children = new[]
+                    {
+                        new AutoSizeContainer
+                        {
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    Colour = new Color4(0, 0, 0, 0.75f),
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(1),
+                                },
+                                new SpriteText { Text = this.BeatmapSet.Metadata.Title, TextSize = 25 } 
+                            }
+                        }
+                    }
                 }
             };
             difficulties = new FlowContainer // Deliberately not added to children
             {
-                Spacing = new Vector2(0, 10),
+                Margin = new MarginPadding { Top = 10 },
                 Padding = new MarginPadding { Left = 50 },
+                Spacing = new Vector2(0, 10),
                 Direction = FlowDirection.VerticalOnly,
                 Children = this.BeatmapSet.Beatmaps.Select(b => new BeatmapButton(this.BeatmapSet, b))
             };
