@@ -10,9 +10,7 @@ namespace osu.Game.GameModes.Play.Taiko
 {
     public class TaikoHitRenderer : HitRenderer<TaikoBaseHit>
     {
-        private static readonly TaikoConverter converter = new TaikoConverter();
-
-        protected override HitObjectConverter<TaikoBaseHit> Converter => converter;
+        protected override HitObjectConverter<TaikoBaseHit> Converter { get; } = new TaikoConverter();
 
         protected override Playfield CreatePlayfield() => new TaikoPlayfield();
 
