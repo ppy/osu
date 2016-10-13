@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{54377672-20B1-40AF-8087-5CF73BF3953A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>osu.Game.Tests</RootNamespace>
+    <AssemblyName>osu.Game.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="nunit.framework">
+      <HintPath>$(SolutionDir)\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK">
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.1.1.2225.3\lib\net20\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="OpenTK.dll.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
+      <Project>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</Project>
+      <Name>osu.Game</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
+      <Project>{D9A367C9-4C1A-489F-9B05-A0CEA2B53B58}</Project>
+      <Name>osu.Game.Resources</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+    <Folder Include="Beatmaps\" />
+    <Folder Include="Beatmaps\IO\" />
+    <Folder Include="Beatmaps\Formats\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Beatmaps\IO\OszArchiveReaderTest.cs" />
+    <Compile Include="Resources\Resource.cs" />
+    <Compile Include="Beatmaps\Formats\OsuLegacyDecoderTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Soleily - Renatus %28Gamu%29 [Insane].osu" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
