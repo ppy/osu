@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using SQLite;
 
 namespace osu.Game.Beatmaps

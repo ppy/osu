@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using NUnit.Framework;
 using OpenTK;
@@ -19,7 +19,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             OsuLegacyDecoder.Register();
         }
-        [Test]
+
+        [Test]
         public void TestDecodeMetadata()
         {
             var decoder = new OsuLegacyDecoder();
@@ -121,7 +122,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        [Test]        public void TestDecodeHitObjects()
+        [Test]
+        public void TestDecodeHitObjects()
         {
             var decoder = new OsuLegacyDecoder();
             using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))

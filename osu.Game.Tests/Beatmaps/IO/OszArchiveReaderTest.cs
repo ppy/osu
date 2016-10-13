@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using NUnit.Framework;
 using osu.Game.Beatmaps.IO;
@@ -63,7 +63,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                 Assert.AreEqual("Renatus", meta.TitleUnicode);
             }
         }
-        [Test]
+
+        [Test]
         public void TestReadFile()
         {
             using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))

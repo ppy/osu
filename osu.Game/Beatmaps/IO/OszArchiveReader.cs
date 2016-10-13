@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using Ionic.Zip;
@@ -53,7 +53,8 @@ namespace osu.Game.Beatmaps.IO
         {
             return firstMap.Metadata;
         }
-        public override void Dispose()
+
+        public override void Dispose()
         {
             archive.Dispose();
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -15,7 +15,8 @@ namespace osu.Game.Beatmaps.Formats
                 throw new IOException(@"Unknown file format");
             return (BeatmapDecoder)Activator.CreateInstance(decoders[line]);
         }
-        protected static void AddDecoder<T>(string magic) where T : BeatmapDecoder
+
+        protected static void AddDecoder<T>(string magic) where T : BeatmapDecoder
         {
             decoders[magic] = typeof(T);
         }

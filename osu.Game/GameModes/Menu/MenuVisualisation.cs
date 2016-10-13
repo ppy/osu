@@ -1,4 +1,4 @@
-﻿using osu.Framework.Graphics;
+using osu.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;

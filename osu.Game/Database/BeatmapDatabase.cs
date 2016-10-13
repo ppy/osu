@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Platform;
@@ -24,7 +24,8 @@ namespace osu.Game.Database
                 connection.CreateTable<Beatmap>();
             }
         }
-        public void AddBeatmap(ArchiveReader input)
+
+        public void AddBeatmap(ArchiveReader input)
         {
             var metadata = input.ReadMetadata();
             if (connection.Table<BeatmapSet>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
