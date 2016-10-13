@@ -43,17 +43,23 @@ namespace osu.Game.Graphics.UserInterface
             SetCountWithoutRolling(0);
         }
 
-        protected override void transformCount(ulong currentValue, ulong newValue)
+        protected override void transformCount(ulong visibleValue, ulong prevValue, ulong currentValue, ulong newValue)
         {
             // Animate rollover only when going backwards
             if (newValue > currentValue)
             {
                 updateTransforms(typeof(TransformULongCounter));
                 removeTransforms(typeof(TransformULongCounter));
+
+                // If was decreasing, stops roll before increasing
+                if (currentValue < prevValue)
+                    VisibleCount = currentValue;
+
                 VisibleCount = newValue;
             }
-            else if (currentValue != 0)
-                transformCount(new TransformULongCounter(Clock), currentValue, newValue);
+            // Also, animate only if was not rollbacking already
+            else if (currentValue > prevValue)
+                transformCount(new TransformULongCounter(Clock), visibleValue, newValue);
         }
 
         protected override ulong getProportionalDuration(ulong currentValue, ulong newValue)

@@ -75,6 +75,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        protected T prevPrevCount;
         protected T prevCount;
         protected T count;
 
@@ -89,6 +90,7 @@ namespace osu.Game.Graphics.UserInterface
             }
             set
             {
+                prevPrevCount = prevCount;
                 prevCount = count;
                 count = value;
                 if (IsLoaded)
@@ -97,7 +99,7 @@ namespace osu.Game.Graphics.UserInterface
                         IsRollingProportional
                             ? getProportionalDuration(VisibleCount, value)
                             : RollingDuration;
-                    transformCount(IsRollingContinuous ? VisibleCount : prevCount, value);
+                    transformCount(visibleCount, prevPrevCount, prevCount, value);
                 }
             }
         }
@@ -181,6 +183,19 @@ namespace osu.Game.Graphics.UserInterface
         protected void removeTransforms(Type type)
         {
             Transforms.RemoveAll(t => t.GetType() == type);
+        }
+
+        /// <summary>
+        /// Called when the count is updated to add a transformer that changes the value of the visible count (i.e.
+        /// implement the rollover animation).
+        /// </summary>
+        /// <param name="visibleValue">Count value currently visible to user.</param>
+        /// <param name="currentValue">Count value before previous modification.</param>
+        /// <param name="currentValue">Count value before modification.</param>
+        /// <param name="newValue">Expected count value after modification.</param>
+        protected virtual void transformCount(T visibleValue, T prevValue, T currentValue, T newValue)
+        {
+            transformCount(IsRollingContinuous ? visibleValue : currentValue, newValue);
         }
 
         /// <summary>
