@@ -22,5 +22,7 @@ namespace osu.Game.Beatmaps
         public BeatmapMetadata Metadata { get; set; }
         [Ignore]
         public User Creator { get; set; }
+        public string Hash { get; set; }
+        public string Path { get; set; }
     }
 }
