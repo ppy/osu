@@ -30,7 +30,7 @@ namespace osu.Game.Overlays
 
         protected abstract void PopOut();
 
-        public void ReverseVisibility()
+        public void ToggleVisibility()
             => State = (State == Visibility.Visible ? Visibility.Hidden : Visibility.Visible);
     }
     public enum Visibility
