@@ -13,7 +13,7 @@ using osu.Framework;
 
 namespace osu.Game.Overlays
 {
-    public class Options : Container
+    public class Options : Container, IStateful<Visibility>
     {
         const float width = 300;
 
@@ -41,35 +41,35 @@ namespace osu.Game.Overlays
             switch (args.Key)
             {
                 case Key.Escape:
-                    if (!poppedOut) return false;
+                    if (State == Visibility.Hidden) return false;
 
-                    PoppedOut = false;
+                    State = Visibility.Hidden;
                     return true;
             }
             return base.OnKeyDown(state, args);
         }
 
-        private bool poppedOut;
+        private Visibility state;
 
-        public bool PoppedOut
+        public Visibility State
         {
-            get { return poppedOut; }
+            get { return state; }
 
             set
             {
-                if (value == poppedOut) return;
+                if (value == state) return;
 
-                poppedOut = value;
+                state = value;
 
-                if (poppedOut)
+                switch (state)
                 {
-                    MoveTo(new Vector2(0, 0), 300, EasingTypes.Out);
+                    case Visibility.Hidden:
+                        MoveTo(new Vector2(-width, 0), 300, EasingTypes.Out);
+                        break;
+                    case Visibility.Visible:
+                        MoveTo(new Vector2(0, 0), 300, EasingTypes.Out);
+                        break;
                 }
-                else
-                {
-                    MoveTo(new Vector2(-width, 0), 300, EasingTypes.Out);
-                }
-
             }
         }
     }
