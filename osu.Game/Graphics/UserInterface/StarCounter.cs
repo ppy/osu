@@ -10,19 +10,18 @@ using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class StarCounter : RollingCounter<float>
+    public class StarCounter : AutoSizeContainer
     {
-        protected override Type transformType => typeof(TransformStarCounter);
+        private Container starContainer;
+        private List<TextAwesome> stars = new List<TextAwesome>();
 
-        protected Container starContainer;
-        protected List<TextAwesome> stars = new List<TextAwesome>();
+        private double transformStartTime = 0;
 
         /// <summary>
         /// Maximum amount of stars displayed.
@@ -36,13 +35,52 @@ namespace osu.Game.Graphics.UserInterface
             protected set;
         }
 
-        public ulong StarAnimationDuration = 500;
-        public EasingTypes StarAnimationEasing = EasingTypes.OutElasticHalf;
-        public ulong FadeDuration = 100;
-        public float MinStarSize = 0.3f;
+        public double AnimationDelay = 150;
+
+        public double ScalingDuration = 500;
+        public EasingTypes ScalingEasing = EasingTypes.OutElasticHalf;
+        public float MinStarScale = 0.3f;
+
+        public double FadingDuration = 100;
         public float MinStarAlpha = 0.5f;
-        public int StarSize = 20;
-        public int StarSpacing = 4;
+
+        public float StarSize = 20;
+        public float StarSpacing = 4;
+
+        public float VisibleValue
+        {
+            get
+            {
+                double elapsedTime = Time - transformStartTime;
+                double expectedElapsedTime = Math.Abs(prevCount - count) * AnimationDelay;
+                if (elapsedTime >= expectedElapsedTime)
+                    return count;
+                return Interpolation.ValueAt(elapsedTime, prevCount, count, 0, expectedElapsedTime);
+            }
+        }
+
+        private float prevCount;
+        private float count;
+
+        /// <summary>
+        /// Amount of stars represented.
+        /// </summary>
+        public float Count
+        {
+            get
+            {
+                return count;
+            }
+            set
+            {
+                prevCount = VisibleValue;
+                count = value;
+                if (IsLoaded)
+                {
+                    transformCount(prevCount, count);
+                }
+            }
+        }
 
         /// <summary>
         /// Shows a float count as stars. Used as star difficulty display.
@@ -50,10 +88,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="stars">Maximum amount of stars to display.</param>
         public StarCounter(int stars = 10)
         {
-            IsRollingProportional = true;
-            RollingDuration = 150;
-
-            MaxStars = stars;
+            MaxStars = Math.Max(stars, 0);
 
             Children = new Drawable[]
             {
@@ -63,17 +98,6 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.CentreLeft,
                 }
             };
-        }
-
-        protected override ulong getProportionalDuration(float currentValue, float newValue)
-        {
-            return (ulong)(Math.Abs(currentValue - newValue) * RollingDuration);
-        }
-
-        public override void ResetCount()
-        {
-            Count = 0;
-            StopRolling();
         }
 
         public override void Load(BaseGame game)
@@ -91,8 +115,6 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.Centre,
                     TextSize = StarSize,
-                    Scale = new Vector2(MinStarSize),
-                    Alpha = (i == 0) ? 1.0f : MinStarAlpha,
                     Position = new Vector2((StarSize + StarSpacing) * i + (StarSize + StarSpacing) / 2, 0),
                 };
 
@@ -101,118 +123,75 @@ namespace osu.Game.Graphics.UserInterface
                 starContainer.Add(star);
             }
 
-            ResetCount();
+            StopAnimation();
         }
 
-        protected override void transformCount(float currentValue, float newValue)
+        public void ResetCount()
         {
-            transformStar((int)Math.Floor(currentValue), currentValue, currentValue < newValue);
-            transformCount(new TransformStarCounter(Clock), currentValue, newValue);
+            Count = 0;
+            StopAnimation();
         }
 
-        protected void updateTransformStar(int i)
+        public void StopAnimation()
         {
-            foreach (ITransform t in stars[i].Transforms.AliveItems)
-                if (t.GetType() == typeof(TransformAlpha) || t.GetType() == typeof(TransformScaleVector))
-                    t.Apply(stars[i]);
+            prevCount = count;
+            transformStartTime = Time;
 
-            stars[i].Transforms.RemoveAll(t =>
-                t.GetType() == typeof(TransformScaleVector) || t.GetType() == typeof(TransformAlpha)
-            );
-        }
-
-        protected void transformStarScale(int i, TransformScaleVector transform, bool isIncrement, double startTime)
-        {
-            transform.StartTime = startTime;
-            transform.EndTime = transform.StartTime + StarAnimationDuration;
-            transform.StartValue = stars[i].Scale;
-            transform.EndValue = new Vector2(
-                Interpolation.ValueAt(
-                    Math.Min(Math.Max(i, Count), i + 1),
-                    MinStarSize,
-                    1.0f,
-                    i,
-                    i + 1
-                )
-            );
-            transform.Easing = StarAnimationEasing;
-
-            stars[i].Transforms.Add(transform);
-        }
-
-        protected void transformStarAlpha(int i, TransformAlpha transform, bool isIncrement, double startTime)
-        {
-            transform.StartTime = startTime;
-            transform.EndTime = transform.StartTime + FadeDuration;
-            transform.StartValue = stars[i].Alpha;
-            transform.EndValue = i < Count ? 1.0f : MinStarAlpha;
-
-            stars[i].Transforms.Add(transform);
-        }
-
-
-        protected void transformStar(int i, float value, bool isIncrement)
-        {
-            if (i >= MaxStars)
-                return;
-
-            if (Clock == null)
-                return;
-
-            // Calculate time where animation should had started
-            double startTime = Time;
-            // If incrementing, animation should had started when VisibleCount crossed start of star (i)
-            if (isIncrement)
-                startTime -= i == (int)Math.Floor(prevCount) ?
-                    getProportionalDuration(prevCount, value) : getProportionalDuration(i, value);
-            // If decrementing, animation should had started when VisibleCount crossed end of star (i + 1)
-            else
-                startTime -= i == (int)Math.Floor(prevCount) ?
-                    getProportionalDuration(prevCount, value) : getProportionalDuration(i + 1, value);
-
-            updateTransformStar(i);
-
-            transformStarScale(i, new TransformScaleVector(Clock), isIncrement, startTime);
-            transformStarAlpha(i, new TransformAlpha(Clock), isIncrement, startTime);
-        }
-
-        protected override void transformVisibleCount(float currentValue, float newValue)
-        {
-            // Detect increment that passes over an integer value
-            if (Math.Ceiling(currentValue) <= Math.Floor(newValue))
-                for (int i = (int)Math.Ceiling(currentValue); i <= Math.Floor(newValue); i++)
-                    transformStar(i, newValue, true);
-
-            // Detect decrement that passes over an integer value
-            if (Math.Floor(currentValue) >= Math.Ceiling(newValue))
-                for (int i = (int)Math.Floor(newValue); i < Math.Floor(currentValue); i++)
-                    transformStar(i, newValue, false);
-        }
-
-        protected class TransformStarCounter : Transform<float>
-        {
-            public override float CurrentValue
+            for (int i = 0; i < MaxStars; i++)
             {
-                get
-                {
-                    double time = Time;
-                    if (time < StartTime) return StartValue;
-                    if (time >= EndTime) return EndValue;
+                stars[i].DelayReset();
+                transformStarQuick(i, count);
+            }
+        }
 
-                    return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+        private float getStarScale(int i, float value)
+        {
+            if (value <= i)
+                return MinStarScale;
+            if (i + 1 <= value)
+                return 1.0f;
+            return Interpolation.ValueAt(value, MinStarScale, 1.0f, i, i + 1);
+        }
+
+        private void transformStar(int i, float value)
+        {
+            stars[i].FadeTo(i < value ? 1.0f : MinStarAlpha, FadingDuration);
+            stars[i].ScaleTo(getStarScale(i, value), ScalingDuration, ScalingEasing);
+        }
+
+        private void transformStarQuick(int i, float value)
+        {
+            stars[i].FadeTo(i < value ? 1.0f : MinStarAlpha);
+            stars[i].ScaleTo(getStarScale(i, value));
+        }
+
+        private void transformCount(float currentValue, float newValue)
+        {
+            if (currentValue < newValue)
+            {
+                int currentValueFloor = (int)currentValue;
+                for (int i = 0; i < MaxStars; i++)
+                {
+                    stars[i].DelayReset();
+                    stars[i].ClearTransformations();
+                    if (i > currentValueFloor)
+                        stars[i].Delay((i - currentValueFloor) * AnimationDelay);
+                    transformStar(i, newValue);
                 }
             }
-
-            public override void Apply(Drawable d)
+            else
             {
-                base.Apply(d);
-                (d as StarCounter).VisibleCount = CurrentValue;
+                int currentValueCeiling = (int)Math.Ceiling(currentValue);
+                for (int i = MaxStars - 1; i >= 0; i--)
+                {
+                    stars[i].DelayReset();
+                    stars[i].ClearTransformations();
+                    if (i < currentValueCeiling)
+                        stars[i].Delay((currentValueCeiling - i) * AnimationDelay);
+                    transformStar(i, newValue);
+                }
             }
-
-            public TransformStarCounter(IClock clock)
-            : base(clock)
-            {
-            }
+            transformStartTime = Time;
         }
     }
 }

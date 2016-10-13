@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
-using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using System;
 using System.Collections.Generic;
@@ -16,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// Used as an accuracy counter. Represented visually as a percentage, internally as a fraction.
     /// </summary>
-    public class AccuracyCounter : NumericRollingCounter<float>
+    public class AccuracyCounter : RollingCounter<float>
     {
         protected override Type transformType => typeof(TransformAccuracy);
 
@@ -73,20 +72,13 @@ namespace osu.Game.Graphics.UserInterface
             return count.ToString("0.00") + "%";
         }
 
-        protected class TransformAccuracy : Transform<float>
+        protected override ulong getProportionalDuration(float currentValue, float newValue)
         {
-            public override float CurrentValue
-            {
-                get
-                {
-                    double time = Time;
-                    if (time < StartTime) return StartValue;
-                    if (time >= EndTime) return EndValue;
+            return (ulong)(Math.Abs(currentValue - newValue) * RollingDuration);
+        }
 
-                    return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
-                }
-            }
-
+        protected class TransformAccuracy : TransformFloat
+        {
             public override void Apply(Drawable d)
             {
                 base.Apply(d);

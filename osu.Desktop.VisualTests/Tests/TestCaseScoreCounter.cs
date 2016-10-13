@@ -81,7 +81,7 @@ namespace osu.Desktop.Tests
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
-                RollingDuration = 1000,
+                RollingDuration = 500,
                 RollingEasing = EasingTypes.Out,
                 Count = 100.0f,
                 Position = new Vector2(20, 60),
@@ -133,9 +133,9 @@ namespace osu.Desktop.Tests
 
             AddButton(@"miss...", delegate
             {
-                standardCombo.Count = 0;
-                alternativeCombo.Count = 0;
-                catchCombo.Count = 0;
+                standardCombo.RollBack();
+                alternativeCombo.RollBack();
+                catchCombo.RollBack();
                 accuracyCombo.Denominator++;
             });
 
@@ -152,7 +152,7 @@ namespace osu.Desktop.Tests
                 catchCombo.StopRolling();
                 alternativeCombo.StopRolling();
                 accuracyCombo.StopRolling();
-                stars.StopRolling();
+                stars.StopAnimation();
             });
         }
     }

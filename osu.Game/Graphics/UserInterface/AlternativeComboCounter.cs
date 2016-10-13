@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// Allows tint and vertical scaling animation. Used in osu!taiko and osu!mania.
     /// </summary>
-    public class AlternativeComboCounter : ULongCounter // btw, I'm terribly bad with names... OUENDAN!
+    public class AlternativeComboCounter : ComboCounter
     {
         public Color4 OriginalColour;
         public Color4 TintColour = Color4.OrangeRed;
@@ -25,41 +25,16 @@ namespace osu.Game.Graphics.UserInterface
         public EasingTypes TintEasing = EasingTypes.None;
         public bool CanAnimateWhenBackwards = false;
 
-        public AlternativeComboCounter()
-        {
-            IsRollingContinuous = false;
-        }
-
         public override void Load(BaseGame game)
         {
             base.Load(game);
 
-            countSpriteText.Hide();
             OriginalColour = Colour;
         }
 
         public override void ResetCount()
         {
             SetCountWithoutRolling(0);
-        }
-
-        protected override void transformCount(ulong visibleValue, ulong prevValue, ulong currentValue, ulong newValue)
-        {
-            // Animate rollover only when going backwards
-            if (newValue > currentValue)
-            {
-                updateTransforms(typeof(TransformULongCounter));
-                removeTransforms(typeof(TransformULongCounter));
-
-                // If was decreasing, stops roll before increasing
-                if (currentValue < prevValue)
-                    VisibleCount = currentValue;
-
-                VisibleCount = newValue;
-            }
-            // Also, animate only if was not rollbacking already
-            else if (currentValue > prevValue)
-                transformCount(new TransformULongCounter(Clock), visibleValue, newValue);
         }
 
         protected override ulong getProportionalDuration(ulong currentValue, ulong newValue)
