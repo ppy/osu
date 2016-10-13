@@ -56,7 +56,7 @@ namespace osu.Game.GameModes.Play
                                 },
                                 new SpriteText
                                 {
-                                    Text = string.Format(" mapped by {0}", beatmap.Version),
+                                    Text = string.Format(" mapped by {0}", (beatmap.Metadata ?? set.Metadata).Author),
                                     TextSize = 16,
                                 },
                             }
