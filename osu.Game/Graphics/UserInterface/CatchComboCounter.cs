@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class CatchComboCounter : StandardComboCounter
     {
-        public CatchComboCounter() : base()
+        public CatchComboCounter()
         {
             CanPopOutWhenBackwards = true;
         }

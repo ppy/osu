@@ -48,7 +48,7 @@ namespace osu.Game.Graphics.UserInterface
         /// Shows a float count as stars. Used as star difficulty display.
         /// </summary>
         /// <param name="stars">Maximum amount of stars to display.</param>
-        public StarCounter(int stars = 10) : base()
+        public StarCounter(int stars = 10)
         {
             IsRollingProportional = true;
             RollingDuration = 150;
