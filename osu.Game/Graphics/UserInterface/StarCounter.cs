@@ -175,7 +175,7 @@ namespace osu.Game.Graphics.UserInterface
                     stars[i].DelayReset();
                     stars[i].ClearTransformations();
                     if (i > currentValueFloor)
-                        stars[i].Delay((i - currentValueFloor) * AnimationDelay);
+                        stars[i].Delay((i - currentValue) * AnimationDelay);
                     transformStar(i, newValue);
                 }
             }
@@ -187,7 +187,7 @@ namespace osu.Game.Graphics.UserInterface
                     stars[i].DelayReset();
                     stars[i].ClearTransformations();
                     if (i < currentValueCeiling)
-                        stars[i].Delay((currentValueCeiling - i) * AnimationDelay);
+                        stars[i].Delay((currentValue - i) * AnimationDelay);
                     transformStar(i, newValue);
                 }
             }
