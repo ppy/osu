@@ -51,6 +51,14 @@ namespace osu.Game
             };
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            VolumeGlobal.ValueChanged -= volumeChanged;
+            VolumeSample.ValueChanged -= volumeChanged;
+            VolumeTrack.ValueChanged -= volumeChanged;
+            base.Dispose(isDisposing);
+        }
+
         protected override bool OnWheelDown(InputState state)
         {
             volumeMeterMaster.TriggerWheelDown(state);
