@@ -219,7 +219,10 @@ namespace osu.Game.Online.API
                     {
                         //NotificationManager.ShowMessage($@"We just went {newState}!", newState == APIState.Online ? Color4.YellowGreen : Color4.OrangeRed, 5000);
                         log.Add($@"We just went {newState}!");
-                        OnStateChange?.Invoke(oldState, newState);
+                        Scheduler.Add(delegate
+                        {
+                            OnStateChange?.Invoke(oldState, newState);
+                        });
                     }
                 }
             }
