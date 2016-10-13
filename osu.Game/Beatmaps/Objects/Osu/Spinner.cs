@@ -3,7 +3,7 @@
 
 namespace osu.Game.Beatmaps.Objects.Osu
 {
-    public class Spinner
+    public class Spinner : OsuBaseHit
     {
     }
 }
