@@ -1,4 +1,4 @@
-﻿using osu.Framework;
+using osu.Framework;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;

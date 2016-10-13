@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,5 +53,6 @@ namespace osu.Desktop.Beatmaps.IO
         public override void Dispose()
         {
             // no-op
-        }    }
+        }
+    }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace osu.Game.Beatmaps.Events
 {
     public enum EventType
