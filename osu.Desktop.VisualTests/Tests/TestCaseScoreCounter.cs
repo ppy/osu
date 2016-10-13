@@ -25,7 +25,7 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
 
-            ScoreCounter uc = new ScoreCounter
+            ScoreCounter uc = new ScoreCounter(7)
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
@@ -34,7 +34,6 @@ namespace osu.Desktop.Tests
                 RollingEasing = EasingTypes.Out,
                 Count = 0,
                 Position = new Vector2(20, 20),
-                LeadingZeroes = 7,
             };
             Add(uc);
 
