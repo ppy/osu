@@ -1,12 +1,12 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenTK;
+using OpenTK.Graphics;
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Drawables;
@@ -17,15 +17,10 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Chat.Display;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Input;
-using OpenTK.Input;
-using osu.Framework;
 
 namespace osu.Game.Overlays
 {
-    public class ChatConsole : Container, IStateful<Visibility>
+    public class ChatConsole : Overlay
     {
         private ChannelDisplay channelDisplay;
 
@@ -69,7 +64,7 @@ namespace osu.Game.Overlays
 
         private long? lastMessageId;
 
-        List<Channel> careChannels;
+        private List<Channel> careChannels;
 
         private void initializeChannels()
         {
@@ -112,7 +107,7 @@ namespace osu.Game.Overlays
             careChannels.Add(channel);
         }
 
-        GetMessagesRequest fetchReq;
+        private GetMessagesRequest fetchReq;
 
         public void FetchNewMessages(APIAccess api)
         {
@@ -140,30 +135,18 @@ namespace osu.Game.Overlays
             api.Queue(fetchReq);
         }
 
-        private Visibility state;
+        private const int transition_length = 500;
 
-        public Visibility State
+        protected override void PopIn()
         {
-            get { return state; }
+            MoveToY(0, transition_length, EasingTypes.OutQuint);
+            FadeIn(transition_length, EasingTypes.OutQuint);
+        }
 
-            set
-            {
-                state = value;
-
-                const int transition_length = 500;
-
-                switch (state)
-                {
-                    case Visibility.Hidden:
-                        MoveToY(-Size.Y, transition_length, EasingTypes.InQuint);
-                        FadeOut(transition_length, EasingTypes.InQuint);
-                        break;
-                    case Visibility.Visible:
-                        MoveToY(0, transition_length, EasingTypes.OutQuint);
-                        FadeIn(transition_length, EasingTypes.OutQuint);
-                        break;
-                }
-            }
+        protected override void PopOut()
+        {
+            MoveToY(-Size.Y, transition_length, EasingTypes.InQuint);
+            FadeOut(transition_length, EasingTypes.InQuint);
         }
     }
 }
