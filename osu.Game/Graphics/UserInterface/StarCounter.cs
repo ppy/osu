@@ -17,9 +17,6 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    /// <summary>
-    /// Shows a float count as stars. Used as star difficulty display.
-    /// </summary>
     public class StarCounter : RollingCounter<float>
     {
         protected override Type transformType => typeof(TransformStarCounter);
@@ -27,19 +24,45 @@ namespace osu.Game.Graphics.UserInterface
         protected Container starContainer;
         protected List<TextAwesome> stars = new List<TextAwesome>();
 
+        /// <summary>
+        /// Maximum amount of stars displayed.
+        /// </summary>
+        /// <remarks>
+        /// This does not limit the counter value, but the amount of stars displayed.
+        /// </remarks>
+        public int MaxStars
+        {
+            get;
+            protected set;
+        }
+
         public ulong StarAnimationDuration = 500;
         public EasingTypes StarAnimationEasing = EasingTypes.OutElasticHalf;
         public ulong FadeDuration = 100;
         public float MinStarSize = 0.3f;
         public float MinStarAlpha = 0.5f;
-        public int MaxStars = 10;
         public int StarSize = 20;
         public int StarSpacing = 4;
 
-        public StarCounter() : base()
+        /// <summary>
+        /// Shows a float count as stars. Used as star difficulty display.
+        /// </summary>
+        /// <param name="stars">Maximum amount of stars to display.</param>
+        public StarCounter(int stars = 10)
         {
             IsRollingProportional = true;
             RollingDuration = 150;
+
+            MaxStars = stars;
+
+            Children = new Drawable[]
+            {
+                starContainer = new Container
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                }
+            };
         }
 
         protected override ulong getProportionalDuration(float currentValue, float newValue)
@@ -57,16 +80,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Load(game);
 
-            Children = new Drawable[]
-            {
-                starContainer = new Container
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Width = MaxStars * StarSize + Math.Max(MaxStars - 1, 0) * StarSpacing,
-                    Height = StarSize,
-                }
-            };
+            starContainer.Width = MaxStars * StarSize + Math.Max(MaxStars - 1, 0) * StarSpacing;
+            starContainer.Height = StarSize;
 
             for (int i = 0; i < MaxStars; i++)
             {
@@ -128,8 +143,6 @@ namespace osu.Game.Graphics.UserInterface
         protected void transformStarAlpha(int i, TransformAlpha transform, bool isIncrement, double startTime)
         {
             transform.StartTime = startTime;
-            //if (!isIncrement)
-                //transform.StartTime += StarAnimationDuration - FadeDuration;
             transform.EndTime = transform.StartTime + FadeDuration;
             transform.StartValue = stars[i].Alpha;
             transform.EndValue = i < Count ? 1.0f : MinStarAlpha;

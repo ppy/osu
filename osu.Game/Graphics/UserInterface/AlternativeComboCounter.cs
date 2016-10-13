@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.UserInterface
         public EasingTypes TintEasing = EasingTypes.None;
         public bool CanAnimateWhenBackwards = false;
 
-        public AlternativeComboCounter() : base()
+        public AlternativeComboCounter()
         {
             IsRollingContinuous = false;
         }
@@ -43,17 +43,23 @@ namespace osu.Game.Graphics.UserInterface
             SetCountWithoutRolling(0);
         }
 
-        protected override void transformCount(ulong currentValue, ulong newValue)
+        protected override void transformCount(ulong visibleValue, ulong prevValue, ulong currentValue, ulong newValue)
         {
             // Animate rollover only when going backwards
             if (newValue > currentValue)
             {
                 updateTransforms(typeof(TransformULongCounter));
                 removeTransforms(typeof(TransformULongCounter));
+
+                // If was decreasing, stops roll before increasing
+                if (currentValue < prevValue)
+                    VisibleCount = currentValue;
+
                 VisibleCount = newValue;
             }
-            else
-                transformCount(new TransformULongCounter(Clock), currentValue, newValue);
+            // Also, animate only if was not rollbacking already
+            else if (currentValue > prevValue)
+                transformCount(new TransformULongCounter(Clock), visibleValue, newValue);
         }
 
         protected override ulong getProportionalDuration(ulong currentValue, ulong newValue)
@@ -62,7 +68,7 @@ namespace osu.Game.Graphics.UserInterface
             return difference * RollingDuration;
         }
 
-        protected virtual void transformAnimate()
+        protected virtual void transformAnimate(ulong newValue)
         {
             countSpriteText.FadeColour(TintColour, 0);
             countSpriteText.ScaleTo(new Vector2(1, ScaleFactor));
@@ -72,20 +78,15 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void transformVisibleCount(ulong currentValue, ulong newValue)
         {
-            if (countSpriteText != null)
-            {
-                countSpriteText.Text = newValue.ToString("#,0");
-                if (newValue == 0)
-                {
-                    countSpriteText.FadeOut(TintDuration);
-                    return;
-                }
+            countSpriteText.Text = formatCount(newValue);
+
+            if (newValue == 0)
+                countSpriteText.FadeOut(TintDuration);
+            else
                 countSpriteText.Show();
-                if (newValue > currentValue || CanAnimateWhenBackwards)
-                {
-                    transformAnimate();
-                }
-            }
+
+            if (newValue > currentValue || CanAnimateWhenBackwards)
+                transformAnimate(newValue);
         }
     }
 }

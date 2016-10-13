@@ -32,15 +32,12 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public override void Load(BaseGame game)
+        protected NumericRollingCounter()
         {
-            base.Load(game);
-
             Children = new Drawable[]
             {
                 countSpriteText = new SpriteText
                 {
-                    Text = formatCount(Count),
                     TextSize = this.TextSize,
                     Anchor = this.Anchor,
                     Origin = this.Origin,
@@ -48,18 +45,22 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
+        public override void Load(BaseGame game)
+        {
+            base.Load(game);
+            countSpriteText.Text = formatCount(count);
+            countSpriteText.Anchor = this.Anchor;
+            countSpriteText.Origin = this.Origin;
+        }
+
         protected override void transformVisibleCount(T currentValue, T newValue)
         {
-            if (countSpriteText != null)
-            {
-                countSpriteText.Text = formatCount(newValue);
-            }
+            countSpriteText.Text = formatCount(newValue);
         }
 
         protected virtual void updateTextSize()
         {
-            if (countSpriteText != null)
-                countSpriteText.TextSize = TextSize;
+            countSpriteText.TextSize = TextSize;
         }
     }
 }

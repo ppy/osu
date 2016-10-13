@@ -25,7 +25,7 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
 
-            ScoreCounter uc = new ScoreCounter
+            ScoreCounter score = new ScoreCounter(7)
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
@@ -34,36 +34,36 @@ namespace osu.Desktop.Tests
                 RollingEasing = EasingTypes.Out,
                 Count = 0,
                 Position = new Vector2(20, 20),
-                LeadingZeroes = 7,
             };
-            Add(uc);
+            Add(score);
 
-            StandardComboCounter sc = new StandardComboCounter
+            StandardComboCounter standardCombo = new StandardComboCounter
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
-                Position = new Vector2(20, 20),
+                Position = new Vector2(10, 10),
+                InnerCountPosition = new Vector2(10, 10),
                 IsRollingProportional = true,
                 RollingDuration = 20,
-                PopOutDuration = 250,
+                PopOutDuration = 100,
                 Count = 0,
                 TextSize = 40,
             };
-            Add(sc);
+            Add(standardCombo);
 
-            CatchComboCounter cc = new CatchComboCounter
+            CatchComboCounter catchCombo = new CatchComboCounter
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 IsRollingProportional = true,
                 RollingDuration = 20,
-                PopOutDuration = 250,
+                PopOutDuration = 100,
                 Count = 0,
                 TextSize = 40,
             };
-            Add(cc);
+            Add(catchCombo);
 
-            AlternativeComboCounter ac = new AlternativeComboCounter
+            AlternativeComboCounter alternativeCombo = new AlternativeComboCounter
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
@@ -74,10 +74,10 @@ namespace osu.Desktop.Tests
                 Count = 0,
                 TextSize = 40,
             };
-            Add(ac);
+            Add(alternativeCombo);
 
 
-            AccuracyCounter pc = new AccuracyCounter
+            AccuracyCounter accuracyCombo = new AccuracyCounter
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
@@ -86,73 +86,73 @@ namespace osu.Desktop.Tests
                 Count = 100.0f,
                 Position = new Vector2(20, 60),
             };
-            Add(pc);
+            Add(accuracyCombo);
 
-            SpriteText text = new SpriteText
+            SpriteText starsLabel = new SpriteText
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 Position = new Vector2(20, 190),
                 Text = @"- unset -",
             };
-            Add(text);
+            Add(starsLabel);
 
-            StarCounter tc = new StarCounter
+            StarCounter stars = new StarCounter
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 Position = new Vector2(20, 160),
             };
-            Add(tc);
+            Add(stars);
 
             AddButton(@"Reset all", delegate
             {
-                uc.Count = 0;
-                sc.Count = 0;
-                ac.Count = 0;
-                cc.Count = 0;
-                pc.SetCount(0, 0);
-                tc.Count = 0;
-                text.Text = tc.Count.ToString("0.00");
+                score.Count = 0;
+                standardCombo.Count = 0;
+                alternativeCombo.Count = 0;
+                catchCombo.Count = 0;
+                accuracyCombo.SetCount(0, 0);
+                stars.Count = 0;
+                starsLabel.Text = stars.Count.ToString("0.00");
             });
 
             AddButton(@"Hit! :D", delegate
             {
-                uc.Count += 300 + (ulong)(300.0 * (sc.Count > 0 ? sc.Count - 1 : 0) / 25.0);
-                sc.Count++;
-                ac.Count++;
-                cc.CatchFruit(new Color4(
+                score.Count += 300 + (ulong)(300.0 * (standardCombo.Count > 0 ? standardCombo.Count - 1 : 0) / 25.0);
+                standardCombo.Count++;
+                alternativeCombo.Count++;
+                catchCombo.CatchFruit(new Color4(
                     Math.Max(0.5f, RNG.NextSingle()),
                     Math.Max(0.5f, RNG.NextSingle()),
                     Math.Max(0.5f, RNG.NextSingle()),
                     1)
                 );
-                pc.Numerator++;
-                pc.Denominator++;
+                accuracyCombo.Numerator++;
+                accuracyCombo.Denominator++;
             });
 
             AddButton(@"miss...", delegate
             {
-                sc.Count = 0;
-                ac.Count = 0;
-                cc.Count = 0;
-                pc.Denominator++;
+                standardCombo.Count = 0;
+                alternativeCombo.Count = 0;
+                catchCombo.Count = 0;
+                accuracyCombo.Denominator++;
             });
 
             AddButton(@"Alter stars", delegate
             {
-                tc.Count = RNG.NextSingle() * (tc.MaxStars + 1);
-                text.Text = tc.Count.ToString("0.00");
+                stars.Count = RNG.NextSingle() * (stars.MaxStars + 1);
+                starsLabel.Text = stars.Count.ToString("0.00");
             });
 
             AddButton(@"Stop counters", delegate
             {
-                uc.StopRolling();
-                sc.StopRolling();
-                cc.StopRolling();
-                ac.StopRolling();
-                pc.StopRolling();
-                tc.StopRolling();
+                score.StopRolling();
+                standardCombo.StopRolling();
+                catchCombo.StopRolling();
+                alternativeCombo.StopRolling();
+                accuracyCombo.StopRolling();
+                stars.StopRolling();
             });
         }
     }

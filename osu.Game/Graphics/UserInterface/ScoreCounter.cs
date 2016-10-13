@@ -13,15 +13,27 @@ namespace osu.Game.Graphics.UserInterface
     public class ScoreCounter : ULongCounter
     {
         /// <summary>
-        /// How many leading zeroes the counter will have.
+        /// How many leading zeroes the counter has.
         /// </summary>
-        public uint LeadingZeroes = 0;
+        public uint LeadingZeroes
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Displays score.
+        /// </summary>
+        /// <param name="leading">How many leading zeroes the counter will have.</param>
+        public ScoreCounter(uint leading = 0)
+        {
+            countSpriteText.FixedWidth = true;
+            LeadingZeroes = leading;
+        }
 
         public override void Load(BaseGame game)
         {
             base.Load(game);
-
-            countSpriteText.FixedWidth = true;
         }
 
         protected override string formatCount(ulong count)
