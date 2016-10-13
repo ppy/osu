@@ -63,18 +63,27 @@
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\BeatmapSet.cs" />
     <Compile Include="Beatmaps\BeatmapMetadata.cs" />
+    <Compile Include="Beatmaps\Objects\Catch\CatchConverter.cs" />
+    <Compile Include="Beatmaps\Objects\Catch\Drawable\DrawableFruit.cs" />
     <Compile Include="Beatmaps\Objects\HitObject.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchBaseHit.cs" />
     <Compile Include="Beatmaps\Objects\Catch\Droplet.cs" />
     <Compile Include="Beatmaps\Objects\Catch\Fruit.cs" />
+    <Compile Include="Beatmaps\Objects\HitObjectConverter.cs" />
+    <Compile Include="Beatmaps\Objects\Mania\Drawable\DrawableNote.cs" />
     <Compile Include="Beatmaps\Objects\Mania\HoldNote.cs" />
     <Compile Include="Beatmaps\Objects\Mania\ManiaBaseHit.cs" />
+    <Compile Include="Beatmaps\Objects\Mania\ManiaConverter.cs" />
     <Compile Include="Beatmaps\Objects\Mania\Note.cs" />
     <Compile Include="Beatmaps\Objects\Osu\Circle.cs" />
+    <Compile Include="Beatmaps\Objects\Osu\Drawable\DrawableCircle.cs" />
     <Compile Include="Beatmaps\Objects\Osu\OsuBaseHit.cs" />
+    <Compile Include="Beatmaps\Objects\Osu\OsuConverter.cs" />
     <Compile Include="Beatmaps\Objects\Osu\Slider.cs" />
     <Compile Include="Beatmaps\Objects\Osu\Spinner.cs" />
+    <Compile Include="Beatmaps\Objects\Taiko\Drawable\DrawableTaikoHit.cs" />
     <Compile Include="Beatmaps\Objects\Taiko\TaikoBaseHit.cs" />
+    <Compile Include="Beatmaps\Objects\Taiko\TaikoConverter.cs" />
     <Compile Include="Beatmaps\Samples\HitSampleInfo.cs" />
     <Compile Include="Beatmaps\Samples\SampleBank.cs" />
     <Compile Include="Beatmaps\Samples\SampleInfo.cs" />
@@ -127,19 +136,10 @@
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\TextAwesome.cs" />
-    <Compile Include="Graphics\UserInterface\AlternativeComboCounter.cs" />
-    <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounter.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounterKeyboard.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounterCollection.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounterMouse.cs" />
-    <Compile Include="Graphics\UserInterface\AccuracyCounter.cs" />
-    <Compile Include="Graphics\UserInterface\NumericRollingCounter.cs" />
-    <Compile Include="Graphics\UserInterface\ScoreCounter.cs" />
-    <Compile Include="Graphics\UserInterface\CatchComboCounter.cs" />
-    <Compile Include="Graphics\UserInterface\StandardComboCounter.cs" />
-    <Compile Include="Graphics\UserInterface\StarCounter.cs" />
-    <Compile Include="Graphics\UserInterface\ULongCounter.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
     <Compile Include="Online\API\APIRequest.cs" />
     <Compile Include="Online\API\OAuth.cs" />
@@ -188,12 +188,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Database\" />
-    <Folder Include="Beatmaps\Formats\" />
-    <Folder Include="Beatmaps\IO\" />
-    <Folder Include="Beatmaps\Events\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

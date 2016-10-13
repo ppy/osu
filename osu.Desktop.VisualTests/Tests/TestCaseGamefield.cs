@@ -23,7 +23,7 @@ namespace osu.Desktop.Tests
 
         public override string Description => @"Showing hitobjects and what not.";
 
-        FramedOffsetClock localClock;
+        FramedClock localClock;
 
         protected override IFrameBasedClock Clock => localClock;
 
@@ -32,9 +32,7 @@ namespace osu.Desktop.Tests
             base.Reset();
 
             //ensure we are at offset 0
-            if (localClock == null)
-                localClock = new FramedOffsetClock(base.Clock);
-            localClock.Offset = -base.Clock.CurrentTime;
+            localClock = new FramedClock();
 
             List<HitObject> objects = new List<HitObject>();
 
