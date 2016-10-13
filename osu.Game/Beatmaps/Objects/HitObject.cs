@@ -1,7 +1,9 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Samples;
+using osu.Game.GameModes.Play;
 
 namespace osu.Game.Beatmaps.Objects
 {
@@ -16,5 +18,17 @@ namespace osu.Game.Beatmaps.Objects
         public double Duration => (EndTime ?? StartTime) - StartTime;
 
         public HitSampleInfo Sample;
+
+        public static HitObject Parse(PlayMode mode, string val)
+        {
+            //TODO: move to modular HitObjectParser system rather than static parsing. (https://github.com/ppy/osu/pull/60/files#r83135780)
+            switch (mode)
+            {
+                case PlayMode.Osu:
+                    return OsuBaseHit.Parse(val);
+                default:
+                    return null;
+            }
+        }
     }
 }

@@ -19,11 +19,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Framework.Desktop", "os
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Desktop.VisualTests", "osu.Desktop.VisualTests\osu.Desktop.VisualTests.csproj", "{69051C69-12AE-4E7D-A3E6-460D2E282312}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Tests", "osu.Game.Tests\osu.Game.Tests.csproj", "{54377672-20B1-40AF-8087-5CF73BF3953A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Deploy|Any CPU = Deploy|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Deploy|Any CPU = Deploy|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -56,6 +59,12 @@ Global
 		{69051C69-12AE-4E7D-A3E6-460D2E282312}.Deploy|Any CPU.ActiveCfg = Debug|Any CPU
 		{69051C69-12AE-4E7D-A3E6-460D2E282312}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69051C69-12AE-4E7D-A3E6-460D2E282312}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54377672-20B1-40AF-8087-5CF73BF3953A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54377672-20B1-40AF-8087-5CF73BF3953A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54377672-20B1-40AF-8087-5CF73BF3953A}.Deploy|Any CPU.ActiveCfg = Release|Any CPU
+		{54377672-20B1-40AF-8087-5CF73BF3953A}.Deploy|Any CPU.Build.0 = Release|Any CPU
+		{54377672-20B1-40AF-8087-5CF73BF3953A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54377672-20B1-40AF-8087-5CF73BF3953A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +76,7 @@ Global
 		{D9A367C9-4C1A-489F-9B05-A0CEA2B53B58} = {0D37A2AD-80A4-464F-A1DE-1560B70F1CE3}
 		{65DC628F-A640-4111-AB35-3A5652BC1E17} = {7A75DFA2-DE65-4458-98AF-26AF96FFD6DC}
 		{69051C69-12AE-4E7D-A3E6-460D2E282312} = {0D37A2AD-80A4-464F-A1DE-1560B70F1CE3}
+		{54377672-20B1-40AF-8087-5CF73BF3953A} = {0D37A2AD-80A4-464F-A1DE-1560B70F1CE3}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
