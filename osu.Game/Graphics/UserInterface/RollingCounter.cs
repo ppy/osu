@@ -1,6 +1,10 @@
-﻿using osu.Framework;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using System;
 using System.Collections.Generic;
@@ -11,14 +15,6 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    /// <summary>
-    /// Skeleton for a counter which value rolls-up in a lapse of time.
-    /// </summary>
-    /// <remarks>
-    /// This class only abstracts the basics to roll-up a value in a lapse of time by using Transforms.
-    /// In order to show a value, you must implement a way to display it, i.e., as a numeric counter or a bar.
-    /// </remarks>
-    /// <typeparam name="T">Type of the actual counter.</typeparam>
     public abstract class RollingCounter<T> : AutoSizeContainer
     {
         /// <summary>
@@ -29,13 +25,9 @@ namespace osu.Game.Graphics.UserInterface
         /// </remarks>
         protected virtual Type transformType => typeof(Transform<T>);
 
-        protected ulong RollingTotalDuration = 0;
+        protected ulong rollingTotalDuration = 0;
 
-        /// <summary>
-        /// If true, each time the Count is updated, it will roll over from the current visible value.
-        /// Else, it will roll up from the current count value.
-        /// </summary>
-        public bool IsRollingContinuous = true;
+        protected SpriteText countSpriteText;
 
         /// <summary>
         /// If true, the roll-up duration will be proportional to the counter.
@@ -67,15 +59,13 @@ namespace osu.Game.Graphics.UserInterface
             }
             protected set
             {
-                prevVisibleCount = visibleCount;
                 if (visibleCount.Equals(value))
                     return;
                 visibleCount = value;
-                transformVisibleCount(prevVisibleCount, value);
+                countSpriteText.Text = formatCount(value);
             }
         }
 
-        protected T prevPrevCount;
         protected T prevCount;
         protected T count;
 
@@ -90,26 +80,49 @@ namespace osu.Game.Graphics.UserInterface
             }
             set
             {
-                prevPrevCount = prevCount;
                 prevCount = count;
                 count = value;
                 if (IsLoaded)
                 {
-                    RollingTotalDuration =
+                    rollingTotalDuration =
                         IsRollingProportional
-                            ? getProportionalDuration(VisibleCount, value)
+                            ? getProportionalDuration(visibleCount, value)
                             : RollingDuration;
-                    transformCount(visibleCount, prevPrevCount, prevCount, value);
+                    transformCount(visibleCount, count);
                 }
             }
         }
 
+        protected float textSize = 20.0f;
+
+        public float TextSize
+        {
+            get { return textSize; }
+            set
+            {
+                textSize = value;
+                countSpriteText.TextSize = value;
+            }
+        }
+
+        /// <summary>
+        /// Skeleton of a numeric counter which value rolls over time.
+        /// </summary>
         protected RollingCounter()
         {
             Debug.Assert(
                 transformType.IsSubclassOf(typeof(Transform<T>)) || transformType == typeof(Transform<T>),
                 @"transformType should be a subclass of Transform<T>."
             );
+
+            Children = new Drawable[]
+            {
+                countSpriteText = new SpriteText
+                {
+                    Anchor = this.Anchor,
+                    Origin = this.Origin,
+                },
+            };
         }
 
         public override void Load(BaseGame game)
@@ -117,10 +130,12 @@ namespace osu.Game.Graphics.UserInterface
             base.Load(game);
 
             removeTransforms(transformType);
-            
-            if (Count == null)
-                ResetCount();
+
             VisibleCount = Count;
+
+            countSpriteText.Text = formatCount(count);
+            countSpriteText.Anchor = this.Anchor;
+            countSpriteText.Origin = this.Origin;
         }
 
         /// <summary>
@@ -145,7 +160,10 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Resets count to default value.
         /// </summary>
-        public abstract void ResetCount();
+        public virtual void ResetCount()
+        {
+            SetCountWithoutRolling(default(T));
+        }
 
         /// <summary>
         /// Calculates the duration of the roll-up animation by using the difference between the current visible value
@@ -189,19 +207,6 @@ namespace osu.Game.Graphics.UserInterface
         /// Called when the count is updated to add a transformer that changes the value of the visible count (i.e.
         /// implement the rollover animation).
         /// </summary>
-        /// <param name="visibleValue">Count value currently visible to user.</param>
-        /// <param name="currentValue">Count value before previous modification.</param>
-        /// <param name="currentValue">Count value before modification.</param>
-        /// <param name="newValue">Expected count value after modification.</param>
-        protected virtual void transformCount(T visibleValue, T prevValue, T currentValue, T newValue)
-        {
-            transformCount(IsRollingContinuous ? visibleValue : currentValue, newValue);
-        }
-
-        /// <summary>
-        /// Called when the count is updated to add a transformer that changes the value of the visible count (i.e.
-        /// implement the rollover animation).
-        /// </summary>
         /// <param name="currentValue">Count value before modification.</param>
         /// <param name="newValue">Expected count value after modification-</param>
         /// <remarks>
@@ -239,20 +244,12 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             transform.StartTime = Time;
-            transform.EndTime = Time + RollingTotalDuration;
+            transform.EndTime = Time + rollingTotalDuration;
             transform.StartValue = currentValue;
             transform.EndValue = newValue;
             transform.Easing = RollingEasing;
 
             Transforms.Add(transform);
         }
-
-        /// <summary>
-        /// This procedure is called each time the visible count value is updated.
-        /// Override to create custom animations.
-        /// </summary>
-        /// <param name="currentValue">Visible count value before modification.</param>
-        /// <param name="newValue">Expected visible count value after modification-</param>
-        protected abstract void transformVisibleCount(T currentValue, T newValue);
     }
 }

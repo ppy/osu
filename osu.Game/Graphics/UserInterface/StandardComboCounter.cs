@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// Uses the 'x' symbol and has a pop-out effect while rolling over. Used in osu! standard.
     /// </summary>
-    public class StandardComboCounter : ULongCounter
+    public class StandardComboCounter : ComboCounter
     {
         protected SpriteText popOutSpriteText;
 
@@ -45,10 +45,6 @@ namespace osu.Game.Graphics.UserInterface
 
         public StandardComboCounter()
         {
-            IsRollingContinuous = false;
-
-            countSpriteText.Alpha = 0;
-
             popOutSpriteText = new SpriteText
             {
                 Origin = this.Origin,
@@ -66,32 +62,6 @@ namespace osu.Game.Graphics.UserInterface
             popOutSpriteText.Anchor = this.Anchor;
 
             Add(popOutSpriteText);
-        }
-
-        protected override void updateTextSize()
-        {
-            base.updateTextSize();
-
-            popOutSpriteText.TextSize = this.TextSize;
-        }
-
-        protected override void transformCount(ulong visibleValue, ulong prevValue, ulong currentValue, ulong newValue)
-        {
-            // Animate rollover only when going backwards
-            if (newValue > currentValue)
-            {
-                updateTransforms(typeof(TransformULongCounter));
-                removeTransforms(typeof(TransformULongCounter));
-
-                // If was decreasing, stops roll before increasing
-                if (currentValue < prevValue)
-                    VisibleCount = currentValue;
-
-                VisibleCount = newValue;
-            }
-            // Also, animate only if was not rollbacking already
-            else if (currentValue > prevValue)
-                transformCount(new TransformULongCounter(Clock), visibleValue, newValue);
         }
 
         protected override ulong getProportionalDuration(ulong currentValue, ulong newValue)
@@ -160,6 +130,13 @@ namespace osu.Game.Graphics.UserInterface
                 transformPopOut(currentValue, newValue);
             else
                 transformNoPopOut(newValue);
+        }
+
+        protected override void updateTextSize()
+        {
+            base.updateTextSize();
+
+            popOutSpriteText.TextSize = this.TextSize;
         }
     }
 }
