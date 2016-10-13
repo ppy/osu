@@ -18,7 +18,7 @@ namespace osu.Game.Online.Chat
         public int ChannelId;
 
         [JsonProperty(@"timestamp")]
-        public DateTime Timestamp;
+        public DateTimeOffset Timestamp;
 
         [JsonProperty(@"content")]
         public string Content;
