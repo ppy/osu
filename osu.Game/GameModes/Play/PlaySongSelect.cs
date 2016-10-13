@@ -12,7 +12,10 @@ using osu.Game.GameModes.Backgrounds;
 using osu.Framework;
 using osu.Game.Database;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Drawables;
 using System.Linq;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.GameModes.Play
 {
@@ -50,10 +53,30 @@ namespace osu.Game.GameModes.Play
         
         public PlaySongSelect()
         {
-            Children = new[]
+            const float backgroundWidth = 0.6f;
+            const float backgroundSlant = 25;
+            Children = new Drawable[]
             {
+                new BackgroundBox(backgroundSlant)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(backgroundWidth, 0.5f),
+                    Colour = new Color4(0, 0, 0, 0.5f),
+                },
+                new BackgroundBox(-backgroundSlant)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    RelativePositionAxes = Axes.Y,
+                    Size = new Vector2(backgroundWidth, 0.5f),
+                    Position = new Vector2(0, 0.5f),
+                    Colour = new Color4(0, 0, 0, 0.5f),
+                },
                 scrollContainer = new ScrollContainer
                 {
+                    RelativeSizeAxes = Axes.Both,
+                    RelativePositionAxes = Axes.Both,
+                    Size = new Vector2(0.5f, 1),
+                    Position = new Vector2(0.5f, 0),
                     Children = new[]
                     {
                         setList = new FlowContainer
@@ -94,6 +117,28 @@ namespace osu.Game.GameModes.Play
 
         private void PlayMode_ValueChanged(object sender, EventArgs e)
         {
+        }
+        
+        class BackgroundBox : Box
+        {
+            private float wedgeWidth;
+
+            public BackgroundBox(float wedgeWidth)
+            {
+                this.wedgeWidth = wedgeWidth;
+            }
+
+            protected override Quad DrawQuad
+            {
+                get
+                {
+                    Quad q = base.DrawQuad;
+                    q.TopRight.X += wedgeWidth;
+                    q.BottomRight.X -= wedgeWidth;
+                    return q;
+                }
+            }
+        
         }
     }
 }

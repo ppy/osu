@@ -21,11 +21,14 @@ using OpenTK.Graphics;
 
 namespace osu.Game.GameModes.Play
 {
-    class BeatmapGroup : FlowContainer
+    class BeatmapGroup : AutoSizeContainer
     {
+        private const float collapsedAlpha = 0.75f;
+
         public event Action<BeatmapSet> SetSelected;
         public event Action<BeatmapSet, Beatmap> BeatmapSelected;
         public BeatmapSet BeatmapSet;
+        private FlowContainer topContainer;
         private FlowContainer difficulties;
         private bool collapsed;
         public bool Collapsed
@@ -37,7 +40,6 @@ namespace osu.Game.GameModes.Play
                     return;
                 collapsed = value;
                 this.ClearTransformations();
-                const float collapsedAlpha = 0.75f;
                 const float uncollapsedAlpha = 1;
                 Transforms.Add(new TransformAlpha(Clock)
                 {
@@ -47,19 +49,29 @@ namespace osu.Game.GameModes.Play
                     EndTime = Time + 250,
                 });
                 if (collapsed)
-                    Remove(difficulties);
+                    topContainer.Remove(difficulties);
                 else
-                    Add(difficulties);
+                    topContainer.Add(difficulties);
             }
         }
 
         public BeatmapGroup(BeatmapSet beatmapSet)
         {
             BeatmapSet = beatmapSet;
-            Direction = FlowDirection.VerticalOnly;
+            Alpha = collapsedAlpha;
             Children = new Drawable[]
             {
-                new SpriteText { Text = this.BeatmapSet.Metadata.Title, TextSize = 25 },
+                new Box
+                {
+                    Colour = new Color4(0, 0, 0, 0.75f),
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(1),
+                },
+                topContainer = new FlowContainer
+                {
+                    Direction = FlowDirection.VerticalOnly,
+                    Children = new[] { new SpriteText { Text = this.BeatmapSet.Metadata.Title, TextSize = 25 } }
+                }
             };
             difficulties = new FlowContainer // Deliberately not added to children
             {
