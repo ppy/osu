@@ -21,6 +21,7 @@ namespace osu.Game.Beatmaps.Objects
 
         public static HitObject Parse(PlayMode mode, string val)
         {
+            //TODO: move to modular HitObjectParser system rather than static parsing. (https://github.com/ppy/osu/pull/60/files#r83135780)
             switch (mode)
             {
                 case PlayMode.Osu:
