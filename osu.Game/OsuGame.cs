@@ -20,17 +20,31 @@ using osu.Framework;
 using osu.Framework.Input;
 using osu.Game.Input;
 using OpenTK.Input;
+using System.IO;
+using osu.Game.Beatmaps.IO;
 
 namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
+        private class ImportBeatmap
+        {
+            public string Path;
+        }
+    
         public Toolbar Toolbar;
         public ChatConsole Chat;
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
         private Intro intro;
+        private string[] args;
+        private IpcChannel<ImportBeatmap> BeatmapIPC;
 
         public Bindable<PlayMode> PlayMode;
+        
+        public OsuGame(string[] args)
+        {
+            this.args = args;
+        }
 
         public override void SetHost(BasicGameHost host)
         {
@@ -41,6 +55,35 @@ namespace osu.Game
 
         public override void Load(BaseGame game)
         {
+            BeatmapIPC = new IpcChannel<ImportBeatmap>(Host);
+            
+            if (!Host.IsPrimaryInstance)
+            {
+                if (args.Length == 1 && File.Exists(args[0]))
+                {
+                    BeatmapIPC.SendMessage(new ImportBeatmap { Path = args[0] }).Wait();
+                    Console.WriteLine(@"Sent file to running instance");
+                }
+                else
+                    Console.WriteLine(@"osu! does not support multiple running instances.");
+                Environment.Exit(0);
+            }
+
+            BeatmapIPC.MessageReceived += message =>
+            {
+                try
+                {
+                    var reader = ArchiveReader.GetReader(Host.Storage, message.Path);
+                    Beatmaps.AddBeatmap(reader);
+                    // TODO: Switch to beatmap list and select the new song
+                }
+                catch (Exception ex)
+                {
+                    // TODO: Show the user some info?
+                    Console.WriteLine($@"Failed to import beatmap: {ex}");
+                }
+            };
+            
             base.Load(game);
 
             //attach our bindables to the audio subsystem.

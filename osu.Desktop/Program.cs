@@ -11,10 +11,10 @@ namespace osu.Desktop
     public static class Program
     {
         [STAThread]
-        public static void Main()
+        public static void Main(string[] args)
         {
             BasicGameHost host = Host.GetSuitableHost(@"osu");
-            host.Add(new OsuGame());
+            host.Add(new OsuGame(args));
             host.Run();
         }
     }
