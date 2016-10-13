@@ -48,7 +48,7 @@ namespace osu.Game.GameModes.Menu
                             OnMulti = delegate { Push(new Lobby()); },
                             OnTest  = delegate { Push(new TestBrowser()); },
                             OnExit = delegate { Scheduler.AddDelayed(Exit, ButtonSystem.EXIT_DELAY); },
-                            OnSettings = osu.Options.ReverseVisibility,
+                            OnSettings = osu.Options.ToggleVisibility,
                         }
                     }
                 }
