@@ -104,7 +104,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected RollingCounter() : base()
+        protected RollingCounter()
         {
             Debug.Assert(
                 transformType.IsSubclassOf(typeof(Transform<T>)) || transformType == typeof(Transform<T>),

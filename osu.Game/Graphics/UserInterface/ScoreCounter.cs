@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.UserInterface
         /// Displays score.
         /// </summary>
         /// <param name="leading">How many leading zeroes the counter will have.</param>
-        public ScoreCounter(uint leading = 0) : base()
+        public ScoreCounter(uint leading = 0)
         {
             countSpriteText.FixedWidth = true;
             LeadingZeroes = leading;

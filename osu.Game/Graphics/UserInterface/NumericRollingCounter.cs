@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected NumericRollingCounter() : base()
+        protected NumericRollingCounter()
         {
             Children = new Drawable[]
             {

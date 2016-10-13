@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public StandardComboCounter() : base()
+        public StandardComboCounter()
         {
             IsRollingContinuous = false;
 

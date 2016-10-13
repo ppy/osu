@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.UserInterface
         public EasingTypes TintEasing = EasingTypes.None;
         public bool CanAnimateWhenBackwards = false;
 
-        public AlternativeComboCounter() : base()
+        public AlternativeComboCounter()
         {
             IsRollingContinuous = false;
         }
