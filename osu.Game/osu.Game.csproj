@@ -136,19 +136,10 @@
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\TextAwesome.cs" />
-    <Compile Include="Graphics\UserInterface\AlternativeComboCounter.cs" />
-    <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounter.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounterKeyboard.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounterCollection.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounterMouse.cs" />
-    <Compile Include="Graphics\UserInterface\AccuracyCounter.cs" />
-    <Compile Include="Graphics\UserInterface\NumericRollingCounter.cs" />
-    <Compile Include="Graphics\UserInterface\ScoreCounter.cs" />
-    <Compile Include="Graphics\UserInterface\CatchComboCounter.cs" />
-    <Compile Include="Graphics\UserInterface\StandardComboCounter.cs" />
-    <Compile Include="Graphics\UserInterface\StarCounter.cs" />
-    <Compile Include="Graphics\UserInterface\ULongCounter.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
     <Compile Include="Online\API\APIRequest.cs" />
     <Compile Include="Online\API\OAuth.cs" />
@@ -197,12 +188,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Database\" />
-    <Folder Include="Beatmaps\Formats\" />
-    <Folder Include="Beatmaps\IO\" />
-    <Folder Include="Beatmaps\Events\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
