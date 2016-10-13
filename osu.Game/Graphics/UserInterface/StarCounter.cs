@@ -169,25 +169,23 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (currentValue < newValue)
             {
-                int currentValueFloor = (int)currentValue;
                 for (int i = 0; i < MaxStars; i++)
                 {
                     stars[i].DelayReset();
                     stars[i].ClearTransformations();
-                    if (i > currentValueFloor)
+                    if (i > currentValue)
                         stars[i].Delay((i - currentValue) * AnimationDelay);
                     transformStar(i, newValue);
                 }
             }
             else
             {
-                int currentValueCeiling = (int)Math.Ceiling(currentValue);
                 for (int i = MaxStars - 1; i >= 0; i--)
                 {
                     stars[i].DelayReset();
                     stars[i].ClearTransformations();
-                    if (i < currentValueCeiling)
-                        stars[i].Delay((currentValue - i) * AnimationDelay);
+                    if (i < (currentValue - 1))
+                        stars[i].Delay((currentValue - 1 - i) * AnimationDelay);
                     transformStar(i, newValue);
                 }
             }
