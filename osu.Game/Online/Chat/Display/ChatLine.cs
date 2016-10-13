@@ -56,7 +56,7 @@ namespace osu.Game.Online.Chat.Display
                             }
                         }
                     },
-                    new Container
+                    new AutoSizeContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         Padding = new MarginPadding { Left = padding + 10 },
