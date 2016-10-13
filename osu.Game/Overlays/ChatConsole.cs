@@ -25,7 +25,7 @@ using osu.Framework;
 
 namespace osu.Game.Overlays
 {
-    public class ChatConsole : Container, IStateful<ChatConsoleState>
+    public class ChatConsole : Container, IStateful<Visibility>
     {
         private ChannelDisplay channelDisplay;
 
@@ -140,9 +140,9 @@ namespace osu.Game.Overlays
             api.Queue(fetchReq);
         }
 
-        private ChatConsoleState state;
+        private Visibility state;
 
-        public ChatConsoleState State
+        public Visibility State
         {
             get { return state; }
 
@@ -154,22 +154,16 @@ namespace osu.Game.Overlays
 
                 switch (state)
                 {
-                    case ChatConsoleState.Hidden:
+                    case Visibility.Hidden:
                         MoveToY(-Size.Y, transition_length, EasingTypes.InQuint);
                         FadeOut(transition_length, EasingTypes.InQuint);
                         break;
-                    case ChatConsoleState.Visible:
+                    case Visibility.Visible:
                         MoveToY(0, transition_length, EasingTypes.OutQuint);
                         FadeIn(transition_length, EasingTypes.OutQuint);
                         break;
                 }
             }
         }
-    }
-
-    public enum ChatConsoleState
-    {
-        Visible,
-        Hidden,
     }
 }

@@ -16,7 +16,7 @@ using osu.Framework;
 
 namespace osu.Game.Overlays
 {
-    public class Toolbar : Container, IStateful<ToolbarState>
+    public class Toolbar : Container, IStateful<Visibility>
     {
         const float height = 50;
 
@@ -26,9 +26,9 @@ namespace osu.Game.Overlays
 
         private ToolbarModeSelector modeSelector;
 
-        private ToolbarState state;
+        private Visibility state;
 
-        public ToolbarState State
+        public Visibility State
         {
             get { return state; }
             set
@@ -39,11 +39,11 @@ namespace osu.Game.Overlays
 
                 switch (state)
                 {
-                    case ToolbarState.Hidden:
+                    case Visibility.Hidden:
                         MoveToY(-Size.Y, transition_time, EasingTypes.InQuint);
                         FadeOut(transition_time, EasingTypes.InQuint);
                         break;
-                    case ToolbarState.Visible:
+                    case Visibility.Visible:
                         MoveToY(0, transition_time, EasingTypes.OutQuint);
                         FadeIn(transition_time, EasingTypes.OutQuint);
                         break;
@@ -118,11 +118,5 @@ namespace osu.Game.Overlays
         }
 
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
-    }
-
-    public enum ToolbarState
-    {
-        Visible,
-        Hidden,
     }
 }
