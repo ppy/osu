@@ -17,9 +17,6 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    /// <summary>
-    /// Shows a float count as stars. Used as star difficulty display.
-    /// </summary>
     public class StarCounter : RollingCounter<float>
     {
         protected override Type transformType => typeof(TransformStarCounter);
@@ -27,6 +24,12 @@ namespace osu.Game.Graphics.UserInterface
         protected Container starContainer;
         protected List<TextAwesome> stars = new List<TextAwesome>();
 
+        /// <summary>
+        /// Maximum amount of stars displayed.
+        /// </summary>
+        /// <remarks>
+        /// This does not limit the counter value, but the amount of stars displayed.
+        /// </remarks>
         public int MaxStars
         {
             get;
@@ -41,6 +44,10 @@ namespace osu.Game.Graphics.UserInterface
         public int StarSize = 20;
         public int StarSpacing = 4;
 
+        /// <summary>
+        /// Shows a float count as stars. Used as star difficulty display.
+        /// </summary>
+        /// <param name="stars">Maximum amount of stars to display.</param>
         public StarCounter(int stars = 10) : base()
         {
             IsRollingProportional = true;
