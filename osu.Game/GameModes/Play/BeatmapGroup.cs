@@ -15,48 +15,66 @@ using osu.Framework.Graphics.Primitives;
 using OpenTK;
 using System.Linq;
 using osu.Framework.Graphics.Drawables;
+using osu.Framework.Graphics.Transformations;
+using osu.Framework.Input;
+using OpenTK.Graphics;
 
 namespace osu.Game.GameModes.Play
 {
     class BeatmapGroup : FlowContainer
     {
-        private BeatmapSet beatmapSet;
+        public event Action<BeatmapSet> SetSelected;
+        public event Action<BeatmapSet, Beatmap> BeatmapSelected;
+        public BeatmapSet BeatmapSet;
+        private FlowContainer difficulties;
         private bool collapsed;
         public bool Collapsed
         {
             get { return collapsed; }
             set
             {
+                if (collapsed == value)
+                    return;
                 collapsed = value;
+                this.ClearTransformations();
+                const float collapsedAlpha = 0.75f;
+                const float uncollapsedAlpha = 1;
+                Transforms.Add(new TransformAlpha(Clock)
+                {
+                    StartValue = collapsed ? uncollapsedAlpha : collapsedAlpha,
+                    EndValue = collapsed ? collapsedAlpha : uncollapsedAlpha,
+                    StartTime = Time,
+                    EndTime = Time + 250,
+                });
                 if (collapsed)
-                    Alpha = 0.75f;
+                    Remove(difficulties);
                 else
-                    Alpha = 1;
-                // TODO: whatever
+                    Add(difficulties);
             }
         }
 
         public BeatmapGroup(BeatmapSet beatmapSet)
         {
-            this.beatmapSet = beatmapSet;
-            this.collapsed = true;
+            BeatmapSet = beatmapSet;
             Direction = FlowDirection.VerticalOnly;
-            Children = new[]
+            Children = new Drawable[]
             {
-                new SpriteText() { Text = this.beatmapSet.Metadata.Title, TextSize = 25 },
-                new FlowContainer
-                {
-                    Spacing = new Vector2(0, 10),
-                    Padding = new MarginPadding { Left = 50 },
-                    Direction = FlowDirection.VerticalOnly,
-                    Children = this.beatmapSet.Beatmaps.Select(b => new BeatmapButton(this.beatmapSet, b))
-                },
+                new SpriteText { Text = this.BeatmapSet.Metadata.Title, TextSize = 25 },
             };
+            difficulties = new FlowContainer // Deliberately not added to children
+            {
+                Spacing = new Vector2(0, 10),
+                Padding = new MarginPadding { Left = 50 },
+                Direction = FlowDirection.VerticalOnly,
+                Children = this.BeatmapSet.Beatmaps.Select(b => new BeatmapButton(this.BeatmapSet, b))
+            };
+            collapsed = true;
         }
-
-        public override void Load(BaseGame game)
+        
+        protected override bool OnClick(InputState state)
         {
-            base.Load(game);
+            SetSelected?.Invoke(BeatmapSet);
+            return true;
         }
     }
 }
