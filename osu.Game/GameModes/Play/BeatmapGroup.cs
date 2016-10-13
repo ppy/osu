@@ -2,15 +2,11 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Beatmaps;
-using osu.Game.GameModes.Backgrounds;
-using osu.Framework;
-using osu.Game.Database;
 using osu.Framework.Graphics.Primitives;
 using OpenTK;
 using System.Linq;
@@ -23,7 +19,7 @@ namespace osu.Game.GameModes.Play
 {
     class BeatmapGroup : AutoSizeContainer
     {
-        private const float collapsedAlpha = 0.75f;
+        private const float collapsedAlpha = 0.3f;
 
         public event Action<BeatmapSet> SetSelected;
         public event Action<BeatmapSet, Beatmap> BeatmapSelected;
@@ -64,29 +60,14 @@ namespace osu.Game.GameModes.Play
                 topContainer = new FlowContainer
                 {
                     Direction = FlowDirection.VerticalOnly,
-                    Children = new[]
-                    {
-                        new AutoSizeContainer
-                        {
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Colour = new Color4(0, 0, 0, 0.75f),
-                                    RelativeSizeAxes = Axes.Both,
-                                    Size = new Vector2(1),
-                                },
-                                new SpriteText { Text = this.BeatmapSet.Metadata.Title, TextSize = 25 } 
-                            }
-                        }
-                    }
+                    Children = new[] { new BeatmapSetBox(beatmapSet) }
                 }
             };
             difficulties = new FlowContainer // Deliberately not added to children
             {
-                Margin = new MarginPadding { Top = 10 },
-                Padding = new MarginPadding { Left = 50 },
-                Spacing = new Vector2(0, 10),
+                Margin = new MarginPadding { Top = 5 },
+                Padding = new MarginPadding { Left = 25 },
+                Spacing = new Vector2(0, 5),
                 Direction = FlowDirection.VerticalOnly,
                 Children = this.BeatmapSet.Beatmaps.Select(b => new BeatmapButton(this.BeatmapSet, b))
             };
@@ -97,6 +78,73 @@ namespace osu.Game.GameModes.Play
         {
             SetSelected?.Invoke(BeatmapSet);
             return true;
+        }
+    }
+    
+    class BeatmapSetBox : AutoSizeContainer
+    {
+        private BeatmapSet beatmapSet;
+
+        public BeatmapSetBox(BeatmapSet beatmapSet)
+        {
+            this.beatmapSet = beatmapSet;
+            Children = new Drawable[]
+            {
+                new Box
+                {
+                    Colour = new Color4(85, 85, 85, 255), // TODO: Gradient, and beatmap texture
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(1),
+                },
+                new FlowContainer
+                {
+                    Direction = FlowDirection.VerticalOnly,
+                    Spacing = new Vector2(0, 2),
+                    Padding = new MarginPadding { Top = 3, Left = 20, Right = 20, Bottom = 3 },
+                    Children = new[]
+                    {
+                        // TODO: Make these italic
+                        new SpriteText
+                        {
+                            Text = this.beatmapSet.Metadata.TitleUnicode ?? this.beatmapSet.Metadata.Title,
+                            TextSize = 20
+                        },
+                        new SpriteText
+                        {
+                            Text = this.beatmapSet.Metadata.ArtistUnicode ?? this.beatmapSet.Metadata.Artist,
+                            TextSize = 16
+                        },
+                        new FlowContainer
+                        {
+                            Children = new[]
+                            {
+                                new DifficultyIcon(FontAwesome.dot_circle_o, new Color4(159, 198, 0, 255)),
+                                new DifficultyIcon(FontAwesome.dot_circle_o, new Color4(246, 101, 166, 255)),
+                            }
+                        }
+                    }
+                }
+            };
+        }
+    }
+    
+    class DifficultyIcon : Container
+    {
+        public DifficultyIcon(FontAwesome icon, Color4 color)
+        {
+            const float size = 20;
+            Size = new Vector2(size);
+            Children = new[]
+            {
+                new TextAwesome
+                {
+                    Anchor = Anchor.Centre,
+                    TextSize = size,
+                    Size = new Vector2(size),
+                    Colour = color,
+                    Icon = icon
+                }
+            };
         }
     }
 }
