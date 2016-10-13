@@ -29,10 +29,5 @@ namespace osu.Game.GameModes.Play
                 new SpriteText { Text = beatmap.Version },
             };
         }
-
-        public override void Load(BaseGame game)
-        {
-            base.Load(game);
-        }
     }
 }

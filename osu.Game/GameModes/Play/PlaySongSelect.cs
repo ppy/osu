@@ -12,6 +12,7 @@ using osu.Game.GameModes.Backgrounds;
 using osu.Framework;
 using osu.Game.Database;
 using osu.Framework.Graphics.Primitives;
+using System.Linq;
 
 namespace osu.Game.GameModes.Play
 {
@@ -25,12 +26,26 @@ namespace osu.Game.GameModes.Play
 
         private ScrollContainer scrollContainer;
         private FlowContainer setList;
+        
+        private void addBeatmapSet(BeatmapSet beatmapSet)
+        {
+            var group = new BeatmapGroup(beatmapSet);
+            group.SetSelected += (selectedSet) =>
+            {
+                foreach (var child in setList.Children)
+                {
+                    var childGroup = child as BeatmapGroup;
+                    childGroup.Collapsed = childGroup.BeatmapSet != selectedSet;
+                }
+            };
+            setList.Add(group);
+        }
 
         private void addBeatmapSets()
         {
             var sets = beatmaps.GetBeatmapSets();
             foreach (var beatmapSet in sets)
-                setList.Add(new BeatmapGroup(beatmapSet));
+                addBeatmapSet(beatmapSet);
         }
         
         public PlaySongSelect()
@@ -65,8 +80,9 @@ namespace osu.Game.GameModes.Play
             }
             
             beatmaps = (game as OsuGameBase).Beatmaps;
-            beatmaps.BeatmapSetAdded += bset => Scheduler.Add(() => setList.Add(new BeatmapGroup(bset)));
+            beatmaps.BeatmapSetAdded += bset => Scheduler.Add(() => addBeatmapSet(bset));
             addBeatmapSets();
+            (setList.Children.First() as BeatmapGroup).Collapsed = false;
         }
 
         protected override void Dispose(bool isDisposing)
