@@ -21,7 +21,7 @@ namespace osu.Desktop.Beatmaps.IO
         private string basePath { get; set; }
         private string[] beatmaps { get; set; }
         private Beatmap firstMap { get; set; }
-    
+
         public LegacyFilesystemReader(string path)
         {
             basePath = path;

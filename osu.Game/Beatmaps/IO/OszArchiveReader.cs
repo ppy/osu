@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using Ionic.Zip;
 using osu.Game.Beatmaps.Formats;
 
