@@ -14,6 +14,7 @@ using osu.Game.GameModes.Play;
 using osu.Game.Graphics.Containers;
 using OpenTK;
 using osu.Framework;
+using osu.Game.Overlays;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -48,7 +49,7 @@ namespace osu.Game.GameModes.Menu
                             OnTest  = delegate { Push(new TestBrowser()); },
                             OnExit = delegate { Scheduler.AddDelayed(Exit, ButtonSystem.EXIT_DELAY); },
                             OnSettings = delegate {
-                                osu.Options.PoppedOut = !osu.Options.PoppedOut;
+                                osu.Options.State = osu.Options.State.Reverse();
                             },
                         }
                     }

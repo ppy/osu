@@ -96,7 +96,7 @@ namespace osu.Game
                 Toolbar = new Toolbar
                 {
                     OnHome = delegate { MainMenu?.MakeCurrent(); },
-                    OnSettings = delegate { Options.PoppedOut = !Options.PoppedOut; },
+                    OnSettings = delegate { Options.State = Options.State.Reverse(); },
                     OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
                     Alpha = 0.001f,
                 },
