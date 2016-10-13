@@ -3,35 +3,53 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Drawables;
 using osu.Game.Beatmaps.Objects;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework;
 
 namespace osu.Game.GameModes.Play
 {
-    public abstract class HitRenderer : Container
+    public abstract class HitRenderer<T> : Container
     {
-        public abstract List<HitObject> Objects { set; }
+        private List<T> objects;
 
-        public HitRenderer()
+        public List<HitObject> Objects
         {
-            RelativeSizeAxes = Axes.Both;
+            set
+            {
+                objects = Convert(value);
+                if (IsLoaded)
+                    loadObjects();
+            }
         }
+
+        private Playfield playfield;
+
+        protected abstract Playfield CreatePlayfield();
+
+        protected abstract List<T> Convert(List<HitObject> objects);
 
         public override void Load(BaseGame game)
         {
             base.Load(game);
 
-            Add(new Box()
+            RelativeSizeAxes = Axes.Both;
+
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Alpha = 0.8f,
-                Colour = new Color4(5, 5, 5, 255),
-            });
+                playfield = CreatePlayfield()
+            };
+
+            loadObjects();
         }
+
+        private void loadObjects()
+        {
+            if (objects == null) return;
+            foreach (T h in objects)
+                playfield.Add(GetVisualRepresentation(h));
+        }
+
+        protected abstract Drawable GetVisualRepresentation(T h);
     }
 }
