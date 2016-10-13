@@ -15,7 +15,7 @@ using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.GameModes.Play
 {
-    class PlaySongSelect : OsuGameMode
+    public class PlaySongSelect : OsuGameMode
     {
         private Bindable<PlayMode> playMode;
         private BeatmapDatabase beatmaps;
@@ -26,16 +26,11 @@ namespace osu.Game.GameModes.Play
         private ScrollContainer scrollContainer;
         private FlowContainer setList;
 
-        private Drawable createSetUI(BeatmapSet bset)
-        {
-            return new SpriteText { Text = bset.Metadata.Title };
-        }
-
         private void addBeatmapSets()
         {
             var sets = beatmaps.GetBeatmapSets();
             foreach (var beatmapSet in sets)
-                setList.Add(createSetUI(beatmapSet));
+                setList.Add(new BeatmapGroup(beatmapSet));
         }
         
         public PlaySongSelect()
@@ -61,16 +56,17 @@ namespace osu.Game.GameModes.Play
             base.Load(game);
 
             OsuGame osu = game as OsuGame;
-
-            playMode = osu.PlayMode;
-            playMode.ValueChanged += PlayMode_ValueChanged;
-            beatmaps = osu.Beatmaps;
+            if (osu != null)
+            {
+                playMode = osu.PlayMode;
+                playMode.ValueChanged += PlayMode_ValueChanged;
+                // Temporary:
+                scrollContainer.Padding = new MarginPadding { Top = osu.Toolbar.Height };
+            }
             
-            scrollContainer.Padding = new MarginPadding { Top = osu.Toolbar.Height };
-
+            beatmaps = (game as OsuGameBase).Beatmaps;
+            beatmaps.BeatmapSetAdded += bset => Scheduler.Add(() => setList.Add(new BeatmapGroup(bset)));
             addBeatmapSets();
-
-            beatmaps.BeatmapSetAdded += bset => setList.Add(createSetUI(bset));
         }
 
         protected override void Dispose(bool isDisposing)

@@ -3,6 +3,7 @@
 
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics.Cursor;
+using osu.Game.Database;
 using osu.Game;
 
 namespace osu.Framework.VisualTests
