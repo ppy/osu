@@ -96,7 +96,7 @@ namespace osu.Game
                 Toolbar = new Toolbar
                 {
                     OnHome = delegate { MainMenu?.MakeCurrent(); },
-                    OnSettings = delegate { Options.State = Options.State.Reverse(); },
+                    OnSettings = Options.ReverseVisibility,
                     OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
                     Alpha = 0.001f,
                 },
@@ -134,7 +134,7 @@ namespace osu.Game
             switch (args.Key)
             {
                 case Key.F8:
-                    Chat.State = Chat.State.Reverse();
+                    Chat.ReverseVisibility();
                     return true;
             }
 
