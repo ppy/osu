@@ -48,7 +48,13 @@ namespace osu.Game
                         }
                     }
                 },
-                new SpriteText {Text = meterName, Anchor = Anchor.BottomCentre,Origin = Anchor.BottomCentre,Position = new Vector2(0,-20)}
+                new SpriteText
+                {
+                    Text = meterName,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Position = new Vector2(0,-20)
+                }
             };
         }
 
