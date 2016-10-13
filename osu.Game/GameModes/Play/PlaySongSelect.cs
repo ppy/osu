@@ -10,16 +10,20 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.GameModes.Backgrounds;
 using osu.Framework;
+using osu.Game.Database;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.GameModes.Play
 {
     class PlaySongSelect : OsuGameMode
     {
         private Bindable<PlayMode> playMode;
+        private BeatmapDatabase beatmaps;
 
         // TODO: use currently selected track as bg
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
+        private ScrollContainer scrollContainer;
         private FlowContainer setList;
 
         private Drawable createSetUI(BeatmapSet bset)
@@ -29,7 +33,7 @@ namespace osu.Game.GameModes.Play
 
         private void addBeatmapSets()
         {
-            var sets = (Game as OsuGame).Beatmaps.GetBeatmapSets();
+            var sets = beatmaps.GetBeatmapSets();
             foreach (var beatmapSet in sets)
                 setList.Add(createSetUI(beatmapSet));
         }
@@ -38,15 +42,14 @@ namespace osu.Game.GameModes.Play
         {
             Children = new[]
             {
-                new ScrollContainer
+                scrollContainer = new ScrollContainer
                 {
-                    OriginPosition = new OpenTK.Vector2(0, -(Game as OsuGame).Toolbar.Height),
                     Children = new[]
                     {
                         setList = new FlowContainer
                         {
                             Direction = FlowDirection.VerticalOnly,
-                            Padding = new OpenTK.Vector2(25, 25)
+                            Padding = new MarginPadding(25),
                         }
                     }
                 }
@@ -61,10 +64,13 @@ namespace osu.Game.GameModes.Play
 
             playMode = osu.PlayMode;
             playMode.ValueChanged += PlayMode_ValueChanged;
+            beatmaps = osu.Beatmaps;
+            
+            scrollContainer.Padding = new MarginPadding { Top = osu.Toolbar.Height };
 
             addBeatmapSets();
 
-            (Game as OsuGame).Beatmaps.BeatmapSetAdded += bset => setList.Add(createSetUI(bset));
+            beatmaps.BeatmapSetAdded += bset => setList.Add(createSetUI(bset));
         }
 
         protected override void Dispose(bool isDisposing)
