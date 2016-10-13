@@ -1,4 +1,4 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -63,11 +63,11 @@ namespace osu.Game
                 if (args.Length == 1 && File.Exists(args[0]))
                 {
                     BeatmapIPC.SendMessage(new ImportBeatmap { Path = args[0] }).Wait();
-					Logger.Log(@"Sent file to running instance");
+                    Logger.Log(@"Sent file to running instance");
                 }
                 else
-					Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
-				Environment.Exit(0);
+                    Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
+                Environment.Exit(0);
             }
 
             BeatmapIPC.MessageReceived += message =>
@@ -80,9 +80,9 @@ namespace osu.Game
                 }
                 catch (Exception ex)
                 {
-					// TODO: Show the user some info?
-					Logger.Log($@"Failed to import beatmap: {ex}", LoggingTarget.Runtime, LogLevel.Error);
-				}
+                    // TODO: Show the user some info?
+                    Logger.Log($@"Failed to import beatmap: {ex}", LoggingTarget.Runtime, LogLevel.Error);
+                }
             };
             
             base.Load(game);
