@@ -10,9 +10,7 @@ namespace osu.Game.GameModes.Play.Osu
 {
     public class OsuHitRenderer : HitRenderer<OsuBaseHit>
     {
-        private static readonly OsuConverter converter = new OsuConverter();
-
-        protected override HitObjectConverter<OsuBaseHit> Converter => converter;
+        protected override HitObjectConverter<OsuBaseHit> Converter { get; } = new OsuConverter();
 
         protected override Playfield CreatePlayfield() => new OsuPlayfield();
 
