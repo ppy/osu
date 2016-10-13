@@ -27,19 +27,35 @@ namespace osu.Game.Graphics.UserInterface
         protected Container starContainer;
         protected List<TextAwesome> stars = new List<TextAwesome>();
 
+        public int MaxStars
+        {
+            get;
+            protected set;
+        }
+
         public ulong StarAnimationDuration = 500;
         public EasingTypes StarAnimationEasing = EasingTypes.OutElasticHalf;
         public ulong FadeDuration = 100;
         public float MinStarSize = 0.3f;
         public float MinStarAlpha = 0.5f;
-        public int MaxStars = 10;
         public int StarSize = 20;
         public int StarSpacing = 4;
 
-        public StarCounter() : base()
+        public StarCounter(int stars = 10) : base()
         {
             IsRollingProportional = true;
             RollingDuration = 150;
+
+            MaxStars = stars;
+
+            Children = new Drawable[]
+            {
+                starContainer = new Container
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                }
+            };
         }
 
         protected override ulong getProportionalDuration(float currentValue, float newValue)
@@ -57,16 +73,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Load(game);
 
-            Children = new Drawable[]
-            {
-                starContainer = new Container
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Width = MaxStars * StarSize + Math.Max(MaxStars - 1, 0) * StarSpacing,
-                    Height = StarSize,
-                }
-            };
+            starContainer.Width = MaxStars * StarSize + Math.Max(MaxStars - 1, 0) * StarSpacing;
+            starContainer.Height = StarSize;
 
             for (int i = 0; i < MaxStars; i++)
             {
