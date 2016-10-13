@@ -23,6 +23,7 @@ namespace osu.Game.GameModes.Play
     {
         private Bindable<PlayMode> playMode;
         private BeatmapDatabase beatmaps;
+        private BeatmapSet selectedBeatmapSet;
 
         // TODO: use currently selected track as bg
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
@@ -30,17 +31,20 @@ namespace osu.Game.GameModes.Play
         private ScrollContainer scrollContainer;
         private FlowContainer setList;
         
+        private void selectBeatmapSet(BeatmapSet beatmapSet)
+        {
+            selectedBeatmapSet = beatmapSet;
+            foreach (var child in setList.Children)
+            {
+                var childGroup = child as BeatmapGroup;
+                childGroup.Collapsed = childGroup.BeatmapSet != beatmapSet;
+            }
+        }
+        
         private void addBeatmapSet(BeatmapSet beatmapSet)
         {
             var group = new BeatmapGroup(beatmapSet);
-            group.SetSelected += (selectedSet) =>
-            {
-                foreach (var child in setList.Children)
-                {
-                    var childGroup = child as BeatmapGroup;
-                    childGroup.Collapsed = childGroup.BeatmapSet != selectedSet;
-                }
-            };
+            group.SetSelected += (selectedSet) => selectBeatmapSet(selectedSet);
             setList.Add(group);
         }
 
@@ -106,7 +110,9 @@ namespace osu.Game.GameModes.Play
             beatmaps = (game as OsuGameBase).Beatmaps;
             beatmaps.BeatmapSetAdded += bset => Scheduler.Add(() => addBeatmapSet(bset));
             addBeatmapSets();
-            (setList.Children.First() as BeatmapGroup).Collapsed = false;
+            var first = setList.Children.First() as BeatmapGroup;
+            first.Collapsed = false;
+            selectedBeatmapSet = first.BeatmapSet;
         }
 
         protected override void Dispose(bool isDisposing)
