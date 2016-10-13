@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected SpriteText popOutSpriteText;
 
-        protected volatile int scheduledPopOutCurrentId = 0;
+        protected uint scheduledPopOutCurrentId = 0;
 
         public ulong PopOutDuration = 0;
         public float PopOutBigScale = 2.0f;
@@ -84,6 +84,7 @@ namespace osu.Game.Graphics.UserInterface
                 removeTransforms(typeof(TransformULongCounter));
                 VisibleCount = newValue;
             }
+            // Also, ignore rollback if already rollbacking
             else if (currentValue != 0)
                 transformCount(new TransformULongCounter(Clock), currentValue, newValue);
         }
@@ -113,7 +114,7 @@ namespace osu.Game.Graphics.UserInterface
             popOutSpriteText.MoveTo(countSpriteText.Position, PopOutDuration, PopOutEasing);
 
             scheduledPopOutCurrentId++;
-            int newTaskId = scheduledPopOutCurrentId;
+            uint newTaskId = scheduledPopOutCurrentId;
             Scheduler.AddDelayed(delegate
             {
                 scheduledPopOutSmall(newTaskId, newValue);
@@ -134,7 +135,7 @@ namespace osu.Game.Graphics.UserInterface
             countSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
         }
 
-        protected virtual void scheduledPopOutSmall(int id, ulong newValue)
+        protected virtual void scheduledPopOutSmall(uint id, ulong newValue)
         {
             // Too late; scheduled task invalidated
             if (id != scheduledPopOutCurrentId)
