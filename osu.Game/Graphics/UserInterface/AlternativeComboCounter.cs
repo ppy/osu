@@ -32,9 +32,9 @@ namespace osu.Game.Graphics.UserInterface
             OriginalColour = Colour;
         }
 
-        protected override ulong getProportionalDuration(ulong currentValue, ulong newValue)
+        protected override double getProportionalDuration(ulong currentValue, ulong newValue)
         {
-            ulong difference = currentValue > newValue ? currentValue - newValue : currentValue - newValue;
+            double difference = currentValue > newValue ? currentValue - newValue : currentValue - newValue;
             return difference * RollingDuration;
         }
 
