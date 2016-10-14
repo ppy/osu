@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected uint scheduledPopOutCurrentId = 0;
 
-        public ulong PopOutDuration = 0;
+        public ulong PopOutDuration = 150;
         public float PopOutBigScale = 2.0f;
         public float PopOutSmallScale = 1.1f;
         public EasingTypes PopOutEasing = EasingTypes.None;

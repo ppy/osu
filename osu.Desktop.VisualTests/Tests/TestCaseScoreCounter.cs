@@ -30,8 +30,6 @@ namespace osu.Desktop.Tests
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
                 TextSize = 40,
-                RollingDuration = 1000,
-                RollingEasing = EasingTypes.Out,
                 Count = 0,
                 Position = new Vector2(20, 20),
             };
@@ -43,9 +41,6 @@ namespace osu.Desktop.Tests
                 Anchor = Anchor.BottomLeft,
                 Position = new Vector2(10, 10),
                 InnerCountPosition = new Vector2(10, 10),
-                IsRollingProportional = true,
-                RollingDuration = 20,
-                PopOutDuration = 100,
                 Count = 0,
                 TextSize = 40,
             };
@@ -55,9 +50,6 @@ namespace osu.Desktop.Tests
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                IsRollingProportional = true,
-                RollingDuration = 20,
-                PopOutDuration = 100,
                 Count = 0,
                 TextSize = 40,
             };
@@ -68,9 +60,6 @@ namespace osu.Desktop.Tests
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 Position = new Vector2(20, 80),
-                IsRollingProportional = true,
-                RollingDuration = 20,
-                ScaleFactor = 2,
                 Count = 0,
                 TextSize = 40,
             };
@@ -81,9 +70,6 @@ namespace osu.Desktop.Tests
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
-                RollingDuration = 500,
-                RollingEasing = EasingTypes.Out,
-                Count = 100.0f,
                 Position = new Vector2(20, 60),
             };
             Add(accuracyCombo);
@@ -133,9 +119,9 @@ namespace osu.Desktop.Tests
 
             AddButton(@"miss...", delegate
             {
-                standardCombo.RollBack();
-                alternativeCombo.RollBack();
-                catchCombo.RollBack();
+                standardCombo.Roll();
+                alternativeCombo.Roll();
+                catchCombo.Roll();
                 accuracyCombo.Denominator++;
             });
 

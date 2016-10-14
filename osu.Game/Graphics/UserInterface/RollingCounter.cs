@@ -25,12 +25,12 @@ namespace osu.Game.Graphics.UserInterface
         /// </remarks>
         protected virtual Type transformType => typeof(Transform<T>);
 
-        protected ulong rollingTotalDuration = 0;
+        protected double rollingTotalDuration = 0;
 
         protected SpriteText countSpriteText;
 
         /// <summary>
-        /// If true, the roll-up duration will be proportional to the counter.
+        /// If true, the roll-up duration will be proportional to change in value.
         /// </summary>
         public bool IsRollingProportional = false;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
         /// If IsRollingProportional = false, duration in milliseconds for the counter roll-up animation for each
         /// element; else duration in milliseconds for the counter roll-up animation in total.
         /// </summary>
-        public ulong RollingDuration = 0;
+        public double RollingDuration = 0;
 
         /// <summary>
         /// Easing for the counter rollover animation.
@@ -176,7 +176,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="currentValue">Current visible value.</param>
         /// <param name="newValue">New final value.</param>
         /// <returns>Calculated rollover duration in milliseconds.</returns>
-        protected virtual ulong getProportionalDuration(T currentValue, T newValue)
+        protected virtual double getProportionalDuration(T currentValue, T newValue)
         {
             return RollingDuration;
         }
@@ -209,13 +209,6 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         /// <param name="currentValue">Count value before modification.</param>
         /// <param name="newValue">Expected count value after modification-</param>
-        /// <remarks>
-        /// Unless you need to set a custom animation according to the current or new value of the count, the
-        /// recommended approach is to call transformCount(CustomTransformer(Clock), currentValue, newValue), where
-        /// CustomTransformer is of type transformerType.
-        /// By using this approach, there is no need to check if the Clock is not null; this validation is done before
-        /// adding the transformer.
-        /// </remarks>
         /// <seealso cref="transformType"/>
         protected virtual void transformCount(T currentValue, T newValue)
         {

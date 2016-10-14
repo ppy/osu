@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         public Color4 OriginalColour;
         public Color4 TintColour = Color4.OrangeRed;
-        public int TintDuration = 250;
+        public int TintDuration = 300;
         public float ScaleFactor = 2;
         public EasingTypes TintEasing = EasingTypes.None;
         public bool CanAnimateWhenBackwards = false;
@@ -30,11 +30,6 @@ namespace osu.Game.Graphics.UserInterface
             base.Load(game);
 
             OriginalColour = Colour;
-        }
-
-        public override void ResetCount()
-        {
-            SetCountWithoutRolling(0);
         }
 
         protected override ulong getProportionalDuration(ulong currentValue, ulong newValue)

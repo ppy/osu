@@ -167,27 +167,15 @@ namespace osu.Game.Graphics.UserInterface
 
         private void transformCount(float currentValue, float newValue)
         {
-            if (currentValue < newValue)
+            for (int i = 0; i < MaxStars; i++)
             {
-                for (int i = 0; i < MaxStars; i++)
-                {
-                    stars[i].DelayReset();
-                    stars[i].ClearTransformations();
-                    if (i > currentValue)
-                        stars[i].Delay((i - currentValue) * AnimationDelay);
-                    transformStar(i, newValue);
-                }
-            }
-            else
-            {
-                for (int i = MaxStars - 1; i >= 0; i--)
-                {
-                    stars[i].DelayReset();
-                    stars[i].ClearTransformations();
-                    if (i < (currentValue - 1))
-                        stars[i].Delay((currentValue - 1 - i) * AnimationDelay);
-                    transformStar(i, newValue);
-                }
+                stars[i].DelayReset();
+                stars[i].ClearTransformations();
+                if (currentValue <= newValue)
+                    stars[i].Delay(Math.Max(i - currentValue, 0) * AnimationDelay);
+                else
+                    stars[i].Delay(Math.Max(currentValue - 1 - i, 0) * AnimationDelay);
+                transformStar(i, newValue);
             }
             transformStartTime = Time;
         }

@@ -25,11 +25,11 @@ namespace osu.Game.Graphics.UserInterface
             return count.ToString("#,0");
         }
 
-        public override void RollBack(ulong newValue = 0)
+        public override void Roll(ulong newValue = 0)
         {
             popOutSpriteText.Colour = countSpriteText.Colour;
 
-            base.RollBack(newValue);
+            base.Roll(newValue);
         }
 
         /// <summary>

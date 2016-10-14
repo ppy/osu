@@ -35,6 +35,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             countSpriteText.FixedWidth = true;
             LeadingZeroes = leading;
+
+            RollingDuration = 1000;
+            RollingEasing = EasingTypes.Out;
         }
 
         public override void Load(BaseGame game)
@@ -42,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
             base.Load(game);
         }
 
-        protected override ulong getProportionalDuration(ulong currentValue, ulong newValue)
+        protected override double getProportionalDuration(ulong currentValue, ulong newValue)
         {
             return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
         }
