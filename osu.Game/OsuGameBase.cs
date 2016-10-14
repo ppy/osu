@@ -72,8 +72,11 @@ namespace osu.Game
         protected override void Dispose(bool isDisposing)
         {
             //refresh token may have changed.
-            Config.Set(OsuConfig.Token, API.Token);
-            Config.Save();
+            if (Config != null && API != null)
+            {
+                Config.Set(OsuConfig.Token, API.Token);
+                Config.Save();
+            }
 
             base.Dispose(isDisposing);
         }

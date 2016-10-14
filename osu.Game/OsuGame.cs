@@ -28,7 +28,7 @@ namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
-        private class ImportBeatmap
+        public class ImportBeatmap
         {
             public string Path;
         }
@@ -37,15 +37,9 @@ namespace osu.Game
         public ChatConsole Chat;
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
         private Intro intro;
-        private string[] args;
         private IpcChannel<ImportBeatmap> BeatmapIPC;
 
         public Bindable<PlayMode> PlayMode;
-
-        public OsuGame(string[] args)
-        {
-            this.args = args;
-        }
 
         public override void SetHost(BasicGameHost host)
         {
@@ -60,13 +54,7 @@ namespace osu.Game
 
             if (!Host.IsPrimaryInstance)
             {
-                if (args.Length == 1 && File.Exists(args[0]))
-                {
-                    BeatmapIPC.SendMessage(new ImportBeatmap { Path = args[0] }).Wait();
-                    Logger.Log(@"Sent file to running instance");
-                }
-                else
-                    Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
+                Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
                 Environment.Exit(0);
             }
 
