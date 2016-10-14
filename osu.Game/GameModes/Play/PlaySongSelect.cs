@@ -81,12 +81,13 @@ namespace osu.Game.GameModes.Play
                     RelativePositionAxes = Axes.Both,
                     Size = new Vector2(0.5f, 1),
                     Position = new Vector2(0.5f, 0),
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         setList = new FlowContainer
                         {
+                            RelativeSizeAxes = Axes.X,
+                            Size = new Vector2(1, 0),
                             Direction = FlowDirection.VerticalOnly,
-                            Padding = new MarginPadding(25),
                             Spacing = new Vector2(0, 25),
                         }
                     }

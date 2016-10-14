@@ -55,16 +55,22 @@ namespace osu.Game.GameModes.Play
         {
             BeatmapSet = beatmapSet;
             Alpha = collapsedAlpha;
+            RelativeSizeAxes = Axes.X;
+            Size = new Vector2(1, 0);
             Children = new[]
             {
                 topContainer = new FlowContainer
                 {
+                    RelativeSizeAxes = Axes.X,
+                    Size = new Vector2(1, 0),
                     Direction = FlowDirection.VerticalOnly,
                     Children = new[] { new BeatmapSetBox(beatmapSet) }
                 }
             };
             difficulties = new FlowContainer // Deliberately not added to children
             {
+                RelativeSizeAxes = Axes.X,
+                Size = new Vector2(1, 0),
                 Margin = new MarginPadding { Top = 5 },
                 Padding = new MarginPadding { Left = 25 },
                 Spacing = new Vector2(0, 5),
@@ -88,6 +94,8 @@ namespace osu.Game.GameModes.Play
         public BeatmapSetBox(BeatmapSet beatmapSet)
         {
             this.beatmapSet = beatmapSet;
+            RelativeSizeAxes = Axes.X;
+            Size = new Vector2(1, 0);
             Children = new Drawable[]
             {
                 new Box
