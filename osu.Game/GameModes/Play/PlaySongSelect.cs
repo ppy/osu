@@ -51,6 +51,9 @@ namespace osu.Game.GameModes.Play
         private void addBeatmapSets()
         {
             var sets = beatmaps.GetBeatmapSets();
+
+            if (sets.Length == 0) return;
+
             foreach (var beatmapSet in sets)
                 addBeatmapSet(beatmapSet);
         }
@@ -112,9 +115,12 @@ namespace osu.Game.GameModes.Play
             beatmaps = (game as OsuGameBase).Beatmaps;
             beatmaps.BeatmapSetAdded += bset => Scheduler.Add(() => addBeatmapSet(bset));
             addBeatmapSets();
-            var first = setList.Children.First() as BeatmapGroup;
-            first.Collapsed = false;
-            selectedBeatmapSet = first.BeatmapSet;
+            var first = setList.Children.FirstOrDefault() as BeatmapGroup;
+            if (first != null)
+            {
+                first.Collapsed = false;
+                selectedBeatmapSet = first.BeatmapSet;
+            }
         }
 
         protected override void Dispose(bool isDisposing)
