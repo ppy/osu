@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps.Objects.Mania
                 {
                     OsuBaseHit o = i as OsuBaseHit;
 
-                    if (o == null) throw new Exception(@"Can't convert!");
+                    if (o == null) throw new HitObjectConvertException(@"Mania", i);
 
                     h = new Note
                     {

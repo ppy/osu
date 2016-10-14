@@ -21,7 +21,7 @@ namespace osu.Game.Beatmaps.Objects.Taiko
                 {
                     OsuBaseHit o = i as OsuBaseHit;
 
-                    if (o == null) throw new Exception(@"Can't convert!");
+                    if (o == null) throw new HitObjectConvertException(@"Taiko", i);
 
                     h = new TaikoBaseHit
                     {

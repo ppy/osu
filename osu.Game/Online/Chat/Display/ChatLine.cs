@@ -43,7 +43,7 @@ namespace osu.Game.Online.Chat.Display
                         {
                             new SpriteText
                             {
-                                Text = Message.Timestamp.ToLocalTime().ToLongTimeString(),
+                                Text = Message.Timestamp.LocalDateTime.ToLongTimeString(),
                                 TextSize = text_size,
                                 Colour = new Color4(128, 128, 128, 255)
                             },
