@@ -10,7 +10,7 @@ namespace osu.Game.GameModes.Play.Catch
 {
     public class CatchHitRenderer : HitRenderer<CatchBaseHit>
     {
-        protected override HitObjectConverter<CatchBaseHit> Converter { get; } = new CatchConverter();
+        protected override HitObjectConverter<CatchBaseHit> Converter => new CatchConverter();
 
         protected override Playfield CreatePlayfield() => new CatchPlayfield();
 

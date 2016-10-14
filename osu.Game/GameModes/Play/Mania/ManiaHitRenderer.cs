@@ -16,10 +16,9 @@ namespace osu.Game.GameModes.Play.Mania
         public ManiaHitRenderer(int columns = 5)
         {
             this.columns = columns;
-            Converter = new ManiaConverter(columns);
         }
 
-        protected override HitObjectConverter<ManiaBaseHit> Converter { get; }
+        protected override HitObjectConverter<ManiaBaseHit> Converter => new ManiaConverter(columns);
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(columns);
 
