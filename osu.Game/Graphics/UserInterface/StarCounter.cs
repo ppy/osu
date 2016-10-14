@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.MathUtils;
-using osu.Framework.Timing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,14 +34,14 @@ namespace osu.Game.Graphics.UserInterface
             protected set;
         }
 
-        public double AnimationDelay = 150;
+        private double animationDelay => 150;
 
-        public double ScalingDuration = 500;
-        public EasingTypes ScalingEasing = EasingTypes.OutElasticHalf;
-        public float MinStarScale = 0.3f;
+        private double scalingDuration => 500;
+        private EasingTypes scalingEasing => EasingTypes.OutElasticHalf;
+        private float minStarScale => 0.3f;
 
-        public double FadingDuration = 100;
-        public float MinStarAlpha = 0.5f;
+        private double fadingDuration => 100;
+        private float minStarAlpha => 0.5f;
 
         public float StarSize = 20;
         public float StarSpacing = 4;
@@ -52,7 +51,7 @@ namespace osu.Game.Graphics.UserInterface
             get
             {
                 double elapsedTime = Time - transformStartTime;
-                double expectedElapsedTime = Math.Abs(prevCount - count) * AnimationDelay;
+                double expectedElapsedTime = Math.Abs(prevCount - count) * animationDelay;
                 if (elapsedTime >= expectedElapsedTime)
                     return count;
                 return Interpolation.ValueAt(elapsedTime, prevCount, count, 0, expectedElapsedTime);
@@ -147,21 +146,21 @@ namespace osu.Game.Graphics.UserInterface
         private float getStarScale(int i, float value)
         {
             if (value <= i)
-                return MinStarScale;
+                return minStarScale;
             if (i + 1 <= value)
                 return 1.0f;
-            return Interpolation.ValueAt(value, MinStarScale, 1.0f, i, i + 1);
+            return Interpolation.ValueAt(value, minStarScale, 1.0f, i, i + 1);
         }
 
         private void transformStar(int i, float value)
         {
-            stars[i].FadeTo(i < value ? 1.0f : MinStarAlpha, FadingDuration);
-            stars[i].ScaleTo(getStarScale(i, value), ScalingDuration, ScalingEasing);
+            stars[i].FadeTo(i < value ? 1.0f : minStarAlpha, fadingDuration);
+            stars[i].ScaleTo(getStarScale(i, value), scalingDuration, scalingEasing);
         }
 
         private void transformStarQuick(int i, float value)
         {
-            stars[i].FadeTo(i < value ? 1.0f : MinStarAlpha);
+            stars[i].FadeTo(i < value ? 1.0f : minStarAlpha);
             stars[i].ScaleTo(getStarScale(i, value));
         }
 
@@ -172,9 +171,9 @@ namespace osu.Game.Graphics.UserInterface
                 stars[i].DelayReset();
                 stars[i].ClearTransformations();
                 if (currentValue <= newValue)
-                    stars[i].Delay(Math.Max(i - currentValue, 0) * AnimationDelay);
+                    stars[i].Delay(Math.Max(i - currentValue, 0) * animationDelay);
                 else
-                    stars[i].Delay(Math.Max(currentValue - 1 - i, 0) * AnimationDelay);
+                    stars[i].Delay(Math.Max(currentValue - 1 - i, 0) * animationDelay);
                 transformStar(i, newValue);
             }
             transformStartTime = Time;
