@@ -97,7 +97,6 @@ namespace osu.Game
                     OnHome = delegate { MainMenu?.MakeCurrent(); },
                     OnSettings = Options.ToggleVisibility,
                     OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
-                    Alpha = 0.001f,
                 },
                 Chat = new ChatConsole(API),
                 new VolumeControl
@@ -111,12 +110,6 @@ namespace osu.Game
                     Handler = globalHotkeyPressed
                 }
             });
-
-            Toolbar.State = Visibility.Hidden;
-            Toolbar.Flush();
-
-            Chat.State = Visibility.Hidden;
-            Chat.Flush();
 
             intro.ModePushed += modeAdded;
             intro.Exited += modeRemoved;
