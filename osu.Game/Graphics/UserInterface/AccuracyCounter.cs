@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Timing;
@@ -47,6 +48,20 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        public AccuracyCounter()
+        {
+            RollingDuration = 500;
+            RollingEasing = EasingTypes.Out;
+        }
+
+        public override void Load(BaseGame game)
+        {
+            base.Load(game);
+
+            updateCount();
+            StopRolling();
+        }
+
         public void SetCount(long num, ulong den)
         {
             numerator = num;
@@ -72,9 +87,9 @@ namespace osu.Game.Graphics.UserInterface
             return count.ToString("0.00") + "%";
         }
 
-        protected override ulong getProportionalDuration(float currentValue, float newValue)
+        protected override double getProportionalDuration(float currentValue, float newValue)
         {
-            return (ulong)(Math.Abs(currentValue - newValue) * RollingDuration);
+            return Math.Abs(currentValue - newValue) * RollingDuration;
         }
 
         protected class TransformAccuracy : TransformFloat

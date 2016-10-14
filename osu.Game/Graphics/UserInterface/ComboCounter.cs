@@ -21,9 +21,9 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected Type transformType => typeof(TransformCombo);
 
-        private bool rollbacking = false;
+        private bool rolling = false;
 
-        protected ulong rollingTotalDuration = 0;
+        protected ulong rollingTotalDuration;
 
         /// <summary>
         /// If true, the roll-down duration will be proportional to the counter.
@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
         /// If IsRollingProportional = false, duration in milliseconds for the counter roll-up animation for each
         /// element; else duration in milliseconds for the counter roll-up animation in total.
         /// </summary>
-        public ulong RollingDuration = 0;
+        public ulong RollingDuration = 20;
 
         /// <summary>
         /// Easing for the counter rollover animation.
@@ -132,16 +132,6 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         /// <summary>
-        /// Sets count value, bypassing rollover animation.
-        /// </summary>
-        /// <param name="count">New count value.</param>
-        public virtual void SetCountWithoutRolling(ulong count)
-        {
-            Count = count;
-            StopRolling();
-        }
-
-        /// <summary>
         /// Stops rollover animation, forcing the visible count to be the actual count.
         /// </summary>
         public virtual void StopRolling()
@@ -151,14 +141,14 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         /// <summary>
-        /// Animates roll-back to an specific value.
+        /// Animates roll-up/roll-back to an specific value.
         /// </summary>
         /// <param name="newValue">Target value.</param>
-        public virtual void RollBack(ulong newValue = 0)
+        public virtual void Roll(ulong newValue = 0)
         {
-            rollbacking = true;
+            rolling = true;
             Count = newValue;
-            rollbacking = false;
+            rolling = false;
         }
 
         /// <summary>
@@ -166,7 +156,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual void ResetCount()
         {
-            SetCountWithoutRolling(default(ulong));
+            Count = default(ulong);
         }
 
         protected virtual ulong getProportionalDuration(ulong currentValue, ulong newValue)
@@ -195,7 +185,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected virtual void transformCount(ulong visibleValue, ulong prevValue, ulong currentValue, ulong newValue)
         {
-            if (!rollbacking)
+            if (!rolling)
             {
                 updateComboTransforms();
                 removeComboTransforms();
