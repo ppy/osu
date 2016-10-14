@@ -30,7 +30,7 @@ namespace osu.Game.GameModes.Play
 
         private ScrollContainer scrollContainer;
         private FlowContainer setList;
-        
+
         private void selectBeatmapSet(BeatmapSet beatmapSet)
         {
             selectedBeatmapSet = beatmapSet;
@@ -40,7 +40,7 @@ namespace osu.Game.GameModes.Play
                 childGroup.Collapsed = childGroup.BeatmapSet != beatmapSet;
             }
         }
-        
+
         private void addBeatmapSet(BeatmapSet beatmapSet)
         {
             var group = new BeatmapGroup(beatmapSet);
@@ -54,7 +54,7 @@ namespace osu.Game.GameModes.Play
             foreach (var beatmapSet in sets)
                 addBeatmapSet(beatmapSet);
         }
-        
+
         public PlaySongSelect()
         {
             const float backgroundWidth = 0.6f;
@@ -85,6 +85,7 @@ namespace osu.Game.GameModes.Play
                     {
                         setList = new FlowContainer
                         {
+                            Padding = new MarginPadding { Top = 25, Bottom = 25 },
                             RelativeSizeAxes = Axes.X,
                             Size = new Vector2(1, 0),
                             Direction = FlowDirection.VerticalOnly,
@@ -107,7 +108,7 @@ namespace osu.Game.GameModes.Play
                 // Temporary:
                 scrollContainer.Padding = new MarginPadding { Top = osu.Toolbar.Height };
             }
-            
+
             beatmaps = (game as OsuGameBase).Beatmaps;
             beatmaps.BeatmapSetAdded += bset => Scheduler.Add(() => addBeatmapSet(bset));
             addBeatmapSets();
@@ -126,7 +127,7 @@ namespace osu.Game.GameModes.Play
         private void PlayMode_ValueChanged(object sender, EventArgs e)
         {
         }
-        
+
         class BackgroundBox : Box
         {
             private float wedgeWidth;
@@ -146,7 +147,7 @@ namespace osu.Game.GameModes.Play
                     return q;
                 }
             }
-        
+
         }
     }
 }
