@@ -16,7 +16,10 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class ScoreCounter : RollingCounter<ulong>
     {
-        protected override Type transformType => typeof(TransformScore);
+        protected override Type TransformType => typeof(TransformScore);
+
+        public override double RollingDuration => 1000;
+        public override EasingTypes RollingEasing => EasingTypes.Out;
 
         /// <summary>
         /// How many leading zeroes the counter has.
@@ -33,11 +36,8 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="leading">How many leading zeroes the counter will have.</param>
         public ScoreCounter(uint leading = 0)
         {
-            countSpriteText.FixedWidth = true;
+            CountSpriteText.FixedWidth = true;
             LeadingZeroes = leading;
-
-            RollingDuration = 1000;
-            RollingEasing = EasingTypes.Out;
         }
 
         public override void Load(BaseGame game)
@@ -45,12 +45,12 @@ namespace osu.Game.Graphics.UserInterface
             base.Load(game);
         }
 
-        protected override double getProportionalDuration(ulong currentValue, ulong newValue)
+        protected override double GetProportionalDuration(ulong currentValue, ulong newValue)
         {
             return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
         }
 
-        protected override string formatCount(ulong count)
+        protected override string FormatCount(ulong count)
         {
             return count.ToString("D" + LeadingZeroes);
         }

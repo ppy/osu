@@ -2,32 +2,30 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using osu.Game.GameModes.Play.Osu;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.GameModes.Play.Catch
 {
     /// <summary>
     /// Similar to Standard, but without the 'x' and has tinted pop-ups. Used in osu!catch.
     /// </summary>
-    public class CatchComboCounter : StandardComboCounter
+    public class CatchComboCounter : OsuComboCounter
     {
-        public CatchComboCounter()
-        {
-            CanPopOutWhenBackwards = true;
-        }
+        protected override bool CanPopOutWhenBackwards => true;
 
-        protected override string formatCount(ulong count)
+        protected override string FormatCount(ulong count)
         {
             return count.ToString("#,0");
         }
 
         public override void Roll(ulong newValue = 0)
         {
-            popOutSpriteText.Colour = countSpriteText.Colour;
+            PopOutSpriteText.Colour = CountSpriteText.Colour;
 
             base.Roll(newValue);
         }
@@ -38,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="colour">Last grabbed fruit colour.</param>
         public void CatchFruit(Color4 colour)
         {
-            popOutSpriteText.Colour = colour;
+            PopOutSpriteText.Colour = colour;
             Count++;
         }
     }

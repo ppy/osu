@@ -17,28 +17,37 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class ComboCounter : AutoSizeContainer
+    public abstract class ComboCounter : Container
     {
         protected Type transformType => typeof(TransformCombo);
+
+        protected bool IsRolling = false;
+
+        protected SpriteText PopOutSpriteText;
+
+        protected virtual ulong PopOutDuration => 150;
+        protected virtual float PopOutScale => 2.0f;
+        protected virtual EasingTypes PopOutEasing => EasingTypes.None;
+        protected virtual float PopOutInitialAlpha => 0.75f;
 
         /// <summary>
         /// If true, the roll-down duration will be proportional to the counter.
         /// </summary>
-        public bool IsRollingProportional = true;
+        protected virtual bool IsRollingProportional => true;
 
         /// <summary>
         /// If IsRollingProportional = false, duration in milliseconds for the counter roll-up animation for each
         /// element; else duration in milliseconds for the counter roll-up animation in total.
         /// </summary>
-        public double RollingDuration = 20;
+        protected virtual double RollingDuration => 20;
 
         /// <summary>
         /// Easing for the counter rollover animation.
         /// </summary>
-        public EasingTypes RollingEasing = EasingTypes.None;
+        protected EasingTypes RollingEasing => EasingTypes.None;
 
-        protected ulong prevVisibleCount;
-        protected ulong visibleCount;
+        private ulong prevVisibleCount;
+        private ulong visibleCount;
 
         /// <summary>
         /// Value shown at the current moment.
@@ -55,11 +64,10 @@ namespace osu.Game.Graphics.UserInterface
                     return;
                 prevVisibleCount = visibleCount;
                 visibleCount = value;
-                transformVisibleCount(prevVisibleCount, visibleCount);
+                transformVisibleCount(prevVisibleCount, visibleCount, IsRolling);
             }
         }
 
-        protected ulong prevPrevCount;
         protected ulong prevCount;
         protected ulong count;
 
@@ -80,25 +88,25 @@ namespace osu.Game.Graphics.UserInterface
 
         private void setCount(ulong value, bool rolling = false)
         {
-            prevPrevCount = prevCount;
             prevCount = count;
             count = value;
             if (IsLoaded)
             {
-                transformCount(VisibleCount, prevPrevCount, prevCount, value, rolling);
+                transformCount(VisibleCount, prevCount, value, rolling);
             }
         }
 
-        protected SpriteText countSpriteText;
+        protected SpriteText CountSpriteText;
 
-        protected float textSize = 20.0f;
+        private float textSize = 20.0f;
         public float TextSize
         {
             get { return textSize; }
             set
             {
                 textSize = value;
-                updateTextSize();
+                CountSpriteText.TextSize = TextSize;
+                PopOutSpriteText.TextSize = TextSize;
             }
         }
 
@@ -109,12 +117,16 @@ namespace osu.Game.Graphics.UserInterface
         {
             Children = new Drawable[]
             {
-                countSpriteText = new SpriteText
+                CountSpriteText = new SpriteText
                 {
                     Anchor = this.Anchor,
                     Origin = this.Origin,
                     Alpha = 0,
                 },
+                PopOutSpriteText = new SpriteText
+                {
+                    Alpha = 0,
+                }
             };
         }
 
@@ -122,8 +134,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Load(game);
 
-            countSpriteText.Anchor = this.Anchor;
-            countSpriteText.Origin = this.Origin;
+            CountSpriteText.Anchor = this.Anchor;
+            CountSpriteText.Origin = this.Origin;
 
             StopRolling();
         }
@@ -133,7 +145,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual void StopRolling()
         {
-            removeComboTransforms();
+            Flush(false, typeof(TransformCombo));
             VisibleCount = Count;
         }
 
@@ -154,62 +166,55 @@ namespace osu.Game.Graphics.UserInterface
             Count = default(ulong);
         }
 
-        protected virtual double getProportionalDuration(ulong currentValue, ulong newValue)
+        protected double GetProportionalDuration(ulong currentValue, ulong newValue)
         {
-            return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
+            double difference = currentValue > newValue ? currentValue - newValue : currentValue - newValue;
+            return difference * RollingDuration;
         }
 
-        protected abstract void transformVisibleCount(ulong currentValue, ulong newValue);
-
-        protected virtual string formatCount(ulong count)
+        protected virtual string FormatCount(ulong count)
         {
             return count.ToString();
         }
 
-        private void updateComboTransforms()
+        protected abstract void OnCountRolling(ulong currentValue, ulong newValue);
+        protected abstract void OnCountIncrement(ulong newValue);
+        protected abstract void OnCountChange(ulong newValue);
+
+        private void transformVisibleCount(ulong currentValue, ulong newValue, bool rolling)
         {
-            foreach (ITransform t in Transforms.AliveItems)
-                if (t.GetType() == typeof(TransformCombo))
-                    t.Apply(this);
+            if (rolling)
+                OnCountRolling(currentValue, newValue);
+            else if (currentValue + 1 == newValue)
+                OnCountIncrement(newValue);
+            else
+                OnCountChange(newValue);
         }
 
-        private void removeComboTransforms()
-        {
-            Transforms.RemoveAll(t => t.GetType() == typeof(TransformCombo));
-        }
-
-        protected virtual void transformCount(
+        private void transformCount(
             ulong visibleValue,
-            ulong prevValue,
             ulong currentValue,
             ulong newValue,
             bool rolling)
         {
             if (!rolling)
             {
-                updateComboTransforms();
-                removeComboTransforms();
+                Flush(false, typeof(TransformCombo));
+                IsRolling = false;
 
-                // If was decreasing, stops roll before increasing
-                if (currentValue < prevValue)
-                    VisibleCount = currentValue;
-
+                VisibleCount = currentValue;
                 VisibleCount = newValue;
             }
             else
             {
-                transformCount(new TransformCombo(Clock), visibleValue, newValue);
+                IsRolling = true;
+                transformRoll(new TransformCombo(Clock), visibleValue, newValue);
             }
         }
 
-        /// <summary>
-        /// Intended to be used by transformCount().
-        /// </summary>
-        /// <see cref="transformCount"/>
-        protected void transformCount(TransformCombo transform, ulong currentValue, ulong newValue)
+        private void transformRoll(TransformCombo transform, ulong currentValue, ulong newValue)
         {
-            updateComboTransforms();
-            removeComboTransforms();
+            Flush(false, typeof(TransformCombo));
 
             if (Clock == null)
                 return;
@@ -222,7 +227,7 @@ namespace osu.Game.Graphics.UserInterface
 
             double rollingTotalDuration =
                 IsRollingProportional
-                    ? getProportionalDuration(currentValue, newValue)
+                    ? GetProportionalDuration(currentValue, newValue)
                     : RollingDuration;
 
             transform.StartTime = Time;
@@ -232,11 +237,6 @@ namespace osu.Game.Graphics.UserInterface
             transform.Easing = RollingEasing;
 
             Transforms.Add(transform);
-        }
-
-        protected virtual void updateTextSize()
-        {
-            countSpriteText.TextSize = TextSize;
         }
 
         protected class TransformCombo : Transform<ulong>

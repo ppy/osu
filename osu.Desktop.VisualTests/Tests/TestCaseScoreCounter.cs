@@ -12,6 +12,10 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.GameModes.Play.Catch;
+using osu.Game.GameModes.Play.Mania;
+using osu.Game.GameModes.Play.Osu;
+using osu.Game.GameModes.Play.Taiko;
 
 namespace osu.Desktop.Tests
 {
@@ -25,6 +29,8 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
 
+            int numerator = 0, denominator = 0;
+
             ScoreCounter score = new ScoreCounter(7)
             {
                 Origin = Anchor.TopRight,
@@ -35,7 +41,7 @@ namespace osu.Desktop.Tests
             };
             Add(score);
 
-            StandardComboCounter standardCombo = new StandardComboCounter
+            ComboCounter standardCombo = new OsuComboCounter
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
@@ -55,18 +61,28 @@ namespace osu.Desktop.Tests
             };
             Add(catchCombo);
 
-            AlternativeComboCounter alternativeCombo = new AlternativeComboCounter
+            ComboCounter taikoCombo = new TaikoComboCounter
             {
-                Origin = Anchor.BottomLeft,
-                Anchor = Anchor.BottomLeft,
-                Position = new Vector2(20, 80),
+                Origin = Anchor.BottomCentre,
+                Anchor = Anchor.Centre,
+                Position = new Vector2(0, -160),
                 Count = 0,
                 TextSize = 40,
             };
-            Add(alternativeCombo);
+            Add(taikoCombo);
+
+            ComboCounter maniaCombo = new ManiaComboCounter
+            {
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                Position = new Vector2(0, -80),
+                Count = 0,
+                TextSize = 40,
+            };
+            Add(maniaCombo);
 
 
-            AccuracyCounter accuracyCombo = new AccuracyCounter
+            PercentageCounter accuracyCombo = new PercentageCounter
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
@@ -95,9 +111,10 @@ namespace osu.Desktop.Tests
             {
                 score.Count = 0;
                 standardCombo.Count = 0;
-                alternativeCombo.Count = 0;
+                maniaCombo.Count = 0;
                 catchCombo.Count = 0;
-                accuracyCombo.SetCount(0, 0);
+                numerator = denominator = 0;
+                accuracyCombo.SetFraction(0, 0);
                 stars.Count = 0;
                 starsLabel.Text = stars.Count.ToString("0.00");
             });
@@ -106,23 +123,26 @@ namespace osu.Desktop.Tests
             {
                 score.Count += 300 + (ulong)(300.0 * (standardCombo.Count > 0 ? standardCombo.Count - 1 : 0) / 25.0);
                 standardCombo.Count++;
-                alternativeCombo.Count++;
+                taikoCombo.Count++;
+                maniaCombo.Count++;
                 catchCombo.CatchFruit(new Color4(
                     Math.Max(0.5f, RNG.NextSingle()),
                     Math.Max(0.5f, RNG.NextSingle()),
                     Math.Max(0.5f, RNG.NextSingle()),
                     1)
                 );
-                accuracyCombo.Numerator++;
-                accuracyCombo.Denominator++;
+                numerator++; denominator++;
+                accuracyCombo.SetFraction(numerator, denominator);
             });
 
             AddButton(@"miss...", delegate
             {
                 standardCombo.Roll();
-                alternativeCombo.Roll();
+                taikoCombo.Roll();
+                maniaCombo.Roll();
                 catchCombo.Roll();
-                accuracyCombo.Denominator++;
+                denominator++;
+                accuracyCombo.SetFraction(numerator, denominator);
             });
 
             AddButton(@"Alter stars", delegate
@@ -136,7 +156,8 @@ namespace osu.Desktop.Tests
                 score.StopRolling();
                 standardCombo.StopRolling();
                 catchCombo.StopRolling();
-                alternativeCombo.StopRolling();
+                taikoCombo.StopRolling();
+                maniaCombo.StopRolling();
                 accuracyCombo.StopRolling();
                 stars.StopAnimation();
             });
