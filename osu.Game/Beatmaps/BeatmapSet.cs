@@ -17,10 +17,12 @@ namespace osu.Game.Beatmaps
         [NotNull, Indexed]
         public int BeatmapMetadataID { get; set; }
         [Ignore]
-        public List<Beatmap> Beatmaps { get; protected set; }
+        public List<Beatmap> Beatmaps { get; protected set; } = new List<Beatmap>();
         [Ignore]
         public BeatmapMetadata Metadata { get; set; }
         [Ignore]
         public User Creator { get; set; }
+        public string Hash { get; set; }
+        public string Path { get; set; }
     }
 }
