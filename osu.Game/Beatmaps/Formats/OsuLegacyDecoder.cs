@@ -202,16 +202,16 @@ namespace osu.Game.Beatmaps.Formats
             });
         }
 
-        public override Beatmap Decode(TextReader stream)
+        public override void Decode(TextReader stream, Beatmap beatmap)
         {
-            var beatmap = new Beatmap
-            {
-                Metadata = new BeatmapMetadata(),
-                BaseDifficulty = new BaseDifficulty(),
-                HitObjects = new List<HitObject>(),
-                ControlPoints = new List<ControlPoint>(),
-                ComboColors = new List<Color4>(),
-            };
+            // We don't overwrite these two because they're DB bound
+            if (beatmap.Metadata == null) beatmap.Metadata = new BeatmapMetadata();
+            if (beatmap.BaseDifficulty == null) beatmap.BaseDifficulty = new BaseDifficulty();
+            // These are fine though
+            beatmap.HitObjects = new List<HitObject>();
+            beatmap.ControlPoints = new List<ControlPoint>();
+            beatmap.ComboColors = new List<Color4>();
+            
             var section = Section.None;
             string line;
             while (true)
@@ -266,7 +266,6 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                 }
             }
-            return beatmap;
         }
     }
 }
