@@ -3,8 +3,20 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
+    /// <summary>
+    /// An element which starts hidden and can be toggled to visible.
+    /// </summary>
     public abstract class Overlay : Container, IStateful<Visibility>
     {
+        public override void Load(BaseGame game)
+        {
+            base.Load(game);
+
+            //TODO: init code using Alpha or IsVisible override to ensure we don't call Load on children before we first get unhidden.
+            PopOut();
+            Flush();
+        }
+
         private Visibility state;
         public Visibility State
         {
@@ -30,9 +42,9 @@ namespace osu.Game.Overlays
 
         protected abstract void PopOut();
 
-        public void ToggleVisibility()
-            => State = (State == Visibility.Visible ? Visibility.Hidden : Visibility.Visible);
+        public void ToggleVisibility() => State = (State == Visibility.Visible ? Visibility.Hidden : Visibility.Visible);
     }
+
     public enum Visibility
     {
         Hidden,
