@@ -31,7 +31,7 @@ namespace osu.Game
         {
             public string Path;
         }
-    
+
         public Toolbar Toolbar;
         public ChatConsole Chat;
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
@@ -40,7 +40,7 @@ namespace osu.Game
         private IpcChannel<ImportBeatmap> BeatmapIPC;
 
         public Bindable<PlayMode> PlayMode;
-        
+
         public OsuGame(string[] args)
         {
             this.args = args;
@@ -56,7 +56,7 @@ namespace osu.Game
         public override void Load(BaseGame game)
         {
             BeatmapIPC = new IpcChannel<ImportBeatmap>(Host);
-            
+
             if (!Host.IsPrimaryInstance)
             {
                 if (args.Length == 1 && File.Exists(args[0]))
@@ -73,8 +73,7 @@ namespace osu.Game
             {
                 try
                 {
-                    var reader = ArchiveReader.GetReader(Host.Storage, message.Path);
-                    Beatmaps.AddBeatmap(reader);
+                    Beatmaps.AddBeatmap(message.Path);
                     // TODO: Switch to beatmap list and select the new song
                 }
                 catch (Exception ex)
@@ -83,7 +82,7 @@ namespace osu.Game
                     Console.WriteLine($@"Failed to import beatmap: {ex}");
                 }
             };
-            
+
             base.Load(game);
 
             //attach our bindables to the audio subsystem.
@@ -96,9 +95,8 @@ namespace osu.Game
                 Toolbar = new Toolbar
                 {
                     OnHome = delegate { MainMenu?.MakeCurrent(); },
-                    OnSettings = delegate { Options.PoppedOut = !Options.PoppedOut; },
+                    OnSettings = Options.ToggleVisibility,
                     OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
-                    Alpha = 0.001f,
                 },
                 Chat = new ChatConsole(API),
                 new VolumeControl
@@ -112,12 +110,6 @@ namespace osu.Game
                     Handler = globalHotkeyPressed
                 }
             });
-
-            Toolbar.State = ToolbarState.Hidden;
-            Toolbar.Flush();
-
-            Chat.State = ChatConsoleState.Hidden;
-            Chat.Flush();
 
             intro.ModePushed += modeAdded;
             intro.Exited += modeRemoved;
@@ -134,10 +126,10 @@ namespace osu.Game
             switch (args.Key)
             {
                 case Key.F8:
-                    Chat.State = Chat.State == ChatConsoleState.Hidden ? ChatConsoleState.Visible : ChatConsoleState.Hidden;
+                    Chat.ToggleVisibility();
                     return true;
             }
-            
+
             return base.OnKeyDown(state, args);
         }
 
@@ -152,12 +144,12 @@ namespace osu.Game
             //central game mode change logic.
             if (newMode is Player || newMode is Intro)
             {
-                Toolbar.State = ToolbarState.Hidden;
-                Chat.State = ChatConsoleState.Hidden;
+                Toolbar.State = Visibility.Hidden;
+                Chat.State = Visibility.Hidden;
             }
             else
             {
-                Toolbar.State = ToolbarState.Visible;
+                Toolbar.State = Visibility.Visible;
             }
 
             Cursor.FadeIn(100);
@@ -178,7 +170,7 @@ namespace osu.Game
                 });
                 return true;
             }
-            
+
             return base.OnExiting();
         }
 

@@ -20,6 +20,6 @@ namespace osu.Game.Beatmaps.Formats
             decoders[magic] = typeof(T);
         }
     
-        public abstract Beatmap Decode(TextReader stream);
+        public abstract void Decode(TextReader stream, Beatmap beatmap);
     }
 }

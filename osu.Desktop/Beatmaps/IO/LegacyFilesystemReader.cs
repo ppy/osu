@@ -21,7 +21,7 @@ namespace osu.Desktop.Beatmaps.IO
         private string basePath { get; set; }
         private string[] beatmaps { get; set; }
         private Beatmap firstMap { get; set; }
-    
+
         public LegacyFilesystemReader(string path)
         {
             basePath = path;
@@ -31,7 +31,8 @@ namespace osu.Desktop.Beatmaps.IO
             using (var stream = new StreamReader(ReadFile(beatmaps[0])))
             {
                 var decoder = BeatmapDecoder.GetDecoder(stream);
-                firstMap = decoder.Decode(stream);
+                firstMap = new Beatmap();
+                decoder.Decode(stream, firstMap);
             }
         }
 

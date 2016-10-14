@@ -1,24 +1,23 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using OpenTK;
+using OpenTK.Graphics;
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Drawables;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Game.Graphics;
-using osu.Game.Configuration;
-using System;
 using osu.Framework.Graphics.Transformations;
-using osu.Framework.Timing;
+using osu.Game.Configuration;
 using osu.Game.GameModes.Play;
-using osu.Framework;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class Toolbar : Container, IStateful<ToolbarState>
+    public class Toolbar : Overlay
     {
-        const float height = 50;
+        private const float height = 50;
 
         public Action OnSettings;
         public Action OnHome;
@@ -26,29 +25,18 @@ namespace osu.Game.Overlays
 
         private ToolbarModeSelector modeSelector;
 
-        private ToolbarState state;
+        private const int transition_time = 200;
 
-        public ToolbarState State
+        protected override void PopIn()
         {
-            get { return state; }
-            set
-            {
-                state = value;
+            MoveToY(0, transition_time, EasingTypes.OutQuint);
+            FadeIn(transition_time, EasingTypes.OutQuint);
+        }
 
-                const int transition_time = 200;
-
-                switch (state)
-                {
-                    case ToolbarState.Hidden:
-                        MoveToY(-Size.Y, transition_time, EasingTypes.InQuint);
-                        FadeOut(transition_time, EasingTypes.InQuint);
-                        break;
-                    case ToolbarState.Visible:
-                        MoveToY(0, transition_time, EasingTypes.OutQuint);
-                        FadeIn(transition_time, EasingTypes.OutQuint);
-                        break;
-                }
-            }
+        protected override void PopOut()
+        {
+            MoveToY(-Size.Y, transition_time, EasingTypes.InQuint);
+            FadeOut(transition_time, EasingTypes.InQuint);
         }
 
         public override void Load(BaseGame game)
@@ -118,11 +106,5 @@ namespace osu.Game.Overlays
         }
 
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
-    }
-
-    public enum ToolbarState
-    {
-        Visible,
-        Hidden,
     }
 }

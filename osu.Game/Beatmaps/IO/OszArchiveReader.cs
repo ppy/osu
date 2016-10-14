@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using Ionic.Zip;
 using osu.Game.Beatmaps.Formats;
 
@@ -32,7 +33,8 @@ namespace osu.Game.Beatmaps.IO
             using (var stream = new StreamReader(ReadFile(beatmaps[0])))
             {
                 var decoder = BeatmapDecoder.GetDecoder(stream);
-                firstMap = decoder.Decode(stream);
+                firstMap = new Beatmap();
+                decoder.Decode(stream, firstMap);
             }
         }
 
