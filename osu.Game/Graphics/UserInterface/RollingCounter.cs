@@ -25,8 +25,6 @@ namespace osu.Game.Graphics.UserInterface
         /// </remarks>
         protected virtual Type transformType => typeof(Transform<T>);
 
-        protected double rollingTotalDuration = 0;
-
         protected SpriteText countSpriteText;
 
         /// <summary>
@@ -84,10 +82,6 @@ namespace osu.Game.Graphics.UserInterface
                 count = value;
                 if (IsLoaded)
                 {
-                    rollingTotalDuration =
-                        IsRollingProportional
-                            ? getProportionalDuration(visibleCount, value)
-                            : RollingDuration;
                     transformCount(visibleCount, count);
                 }
             }
@@ -235,6 +229,11 @@ namespace osu.Game.Graphics.UserInterface
                 VisibleCount = Count;
                 return;
             }
+
+            double rollingTotalDuration =
+                IsRollingProportional
+                    ? getProportionalDuration(currentValue, newValue)
+                    : RollingDuration;
 
             transform.StartTime = Time;
             transform.EndTime = Time + rollingTotalDuration;

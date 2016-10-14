@@ -21,10 +21,6 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected Type transformType => typeof(TransformCombo);
 
-        private bool rolling = false;
-
-        protected ulong rollingTotalDuration;
-
         /// <summary>
         /// If true, the roll-down duration will be proportional to the counter.
         /// </summary>
@@ -34,7 +30,7 @@ namespace osu.Game.Graphics.UserInterface
         /// If IsRollingProportional = false, duration in milliseconds for the counter roll-up animation for each
         /// element; else duration in milliseconds for the counter roll-up animation in total.
         /// </summary>
-        public ulong RollingDuration = 20;
+        public double RollingDuration = 20;
 
         /// <summary>
         /// Easing for the counter rollover animation.
@@ -78,17 +74,18 @@ namespace osu.Game.Graphics.UserInterface
             }
             set
             {
-                prevPrevCount = prevCount;
-                prevCount = count;
-                count = value;
-                if (IsLoaded)
-                {
-                    rollingTotalDuration =
-                        IsRollingProportional
-                            ? getProportionalDuration(VisibleCount, value)
-                            : RollingDuration;
-                    transformCount(VisibleCount, prevPrevCount, prevCount, value);
-                }
+                setCount(value);
+            }
+        }
+
+        private void setCount(ulong value, bool rolling = false)
+        {
+            prevPrevCount = prevCount;
+            prevCount = count;
+            count = value;
+            if (IsLoaded)
+            {
+                transformCount(VisibleCount, prevPrevCount, prevCount, value, rolling);
             }
         }
 
@@ -146,9 +143,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="newValue">Target value.</param>
         public virtual void Roll(ulong newValue = 0)
         {
-            rolling = true;
-            Count = newValue;
-            rolling = false;
+            setCount(newValue, true);
         }
 
         /// <summary>
@@ -159,7 +154,7 @@ namespace osu.Game.Graphics.UserInterface
             Count = default(ulong);
         }
 
-        protected virtual ulong getProportionalDuration(ulong currentValue, ulong newValue)
+        protected virtual double getProportionalDuration(ulong currentValue, ulong newValue)
         {
             return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
         }
@@ -183,7 +178,12 @@ namespace osu.Game.Graphics.UserInterface
             Transforms.RemoveAll(t => t.GetType() == typeof(TransformCombo));
         }
 
-        protected virtual void transformCount(ulong visibleValue, ulong prevValue, ulong currentValue, ulong newValue)
+        protected virtual void transformCount(
+            ulong visibleValue,
+            ulong prevValue,
+            ulong currentValue,
+            ulong newValue,
+            bool rolling)
         {
             if (!rolling)
             {
@@ -219,6 +219,11 @@ namespace osu.Game.Graphics.UserInterface
                 VisibleCount = Count;
                 return;
             }
+
+            double rollingTotalDuration =
+                IsRollingProportional
+                    ? getProportionalDuration(currentValue, newValue)
+                    : RollingDuration;
 
             transform.StartTime = Time;
             transform.EndTime = Time + rollingTotalDuration;
