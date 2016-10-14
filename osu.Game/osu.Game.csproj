@@ -171,6 +171,7 @@
     <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
     <Compile Include="Beatmaps\BaseDifficulty.cs" />
     <Compile Include="Beatmaps\Events\EventType.cs" />
+    <Compile Include="VolumeMeter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
