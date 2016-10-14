@@ -52,8 +52,7 @@ namespace osu.Game
                 {
                     Text = meterName,
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Position = new Vector2(0,-20)
+                    Origin = Anchor.TopCentre
                 }
             };
         }
