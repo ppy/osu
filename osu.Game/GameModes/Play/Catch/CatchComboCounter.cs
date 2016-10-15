@@ -18,16 +18,40 @@ namespace osu.Game.GameModes.Play.Catch
     {
         protected override bool CanPopOutWhileRolling => true;
 
+        protected virtual double FadeOutDelay => 1000;
+        protected virtual double FadeOutDuration => 300;
+
         protected override string FormatCount(ulong count)
         {
-            return $@"{count:#,0}x";
+            return $@"{count:#,0}";
         }
 
-        public override void Roll(ulong newValue = 0)
+        protected override void OnCountChange(ulong currentValue, ulong newValue)
+        {
+            if (newValue != 0)
+                this.Show();
+            base.OnCountChange(currentValue, newValue);
+        }
+
+        protected override void OnCountRolling(ulong currentValue, ulong newValue)
         {
             PopOutSpriteText.Colour = CountSpriteText.Colour;
+            this.FadeOut(FadeOutDuration);
+            base.OnCountRolling(currentValue, newValue);
+        }
 
-            base.Roll(newValue);
+        protected override void OnCountIncrement(ulong currentValue, ulong newValue)
+        {
+            this.Show();
+            base.OnCountIncrement(currentValue, newValue);
+        }
+
+        protected override void transformPopOutSmall(ulong newValue)
+        {
+            base.transformPopOutSmall(newValue);
+            CountSpriteText.Delay(FadeOutDelay);
+            CountSpriteText.FadeOut(FadeOutDuration);
+            CountSpriteText.DelayReset();
         }
 
         /// <summary>

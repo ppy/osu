@@ -19,9 +19,10 @@ namespace osu.Game.GameModes.Play
 {
     public abstract class ComboCounter : Container
     {
-        protected Type transformType => typeof(TransformCombo);
-
-        protected bool IsRolling = false;
+        public bool IsRolling
+        {
+            get; protected set;
+        }
 
         protected SpriteText PopOutSpriteText;
 
@@ -134,6 +135,7 @@ namespace osu.Game.GameModes.Play
         {
             base.Load(game);
 
+            CountSpriteText.Text = FormatCount(Count);
             CountSpriteText.Anchor = this.Anchor;
             CountSpriteText.Origin = this.Origin;
 
@@ -143,10 +145,9 @@ namespace osu.Game.GameModes.Play
         /// <summary>
         /// Stops rollover animation, forcing the visible count to be the actual count.
         /// </summary>
-        public virtual void StopRolling()
+        public void StopRolling()
         {
-            Flush(false, typeof(TransformCombo));
-            VisibleCount = Count;
+            setCount(Count);
         }
 
         /// <summary>
@@ -177,18 +178,34 @@ namespace osu.Game.GameModes.Play
             return count.ToString();
         }
 
-        protected abstract void OnCountRolling(ulong currentValue, ulong newValue);
-        protected abstract void OnCountIncrement(ulong newValue);
-        protected abstract void OnCountChange(ulong newValue);
+        protected abstract void OnVisibleCountRolling(ulong currentValue, ulong newValue);
+        protected abstract void OnVisibleCountIncrement(ulong newValue);
+        protected abstract void OnVisibleCountChange(ulong newValue);
 
         private void transformVisibleCount(ulong currentValue, ulong newValue, bool rolling)
         {
             if (rolling)
-                OnCountRolling(currentValue, newValue);
+                OnVisibleCountRolling(currentValue, newValue);
             else if (currentValue + 1 == newValue)
-                OnCountIncrement(newValue);
+                OnVisibleCountIncrement(newValue);
             else
-                OnCountChange(newValue);
+                OnVisibleCountChange(newValue);
+        }
+
+        protected virtual void OnCountRolling(ulong currentValue, ulong newValue)
+        {
+            IsRolling = true;
+            transformRoll(new TransformCombo(Clock), currentValue, newValue);
+        }
+
+        protected virtual void OnCountIncrement(ulong currentValue, ulong newValue) {
+            VisibleCount = currentValue;
+            VisibleCount = newValue;
+        }
+
+        protected virtual void OnCountChange(ulong currentValue, ulong newValue) {
+            VisibleCount = currentValue;
+            VisibleCount = newValue;
         }
 
         private void transformCount(
@@ -202,14 +219,13 @@ namespace osu.Game.GameModes.Play
                 Flush(false, typeof(TransformCombo));
                 IsRolling = false;
 
-                VisibleCount = currentValue;
-                VisibleCount = newValue;
+                if (currentValue + 1 == newValue)
+                    OnCountIncrement(currentValue, newValue);
+                else
+                    OnCountChange(currentValue, newValue);
             }
             else
-            {
-                IsRolling = true;
-                transformRoll(new TransformCombo(Clock), visibleValue, newValue);
-            }
+                OnCountRolling(visibleCount, newValue);
         }
 
         private void transformRoll(TransformCombo transform, ulong currentValue, ulong newValue)

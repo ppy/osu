@@ -21,7 +21,6 @@ namespace osu.Game.GameModes.Play.Osu
         protected virtual float PopOutSmallScale => 1.1f;
         protected virtual bool CanPopOutWhileRolling => false;
         
-
         public Vector2 InnerCountPosition
         {
             get
@@ -46,13 +45,12 @@ namespace osu.Game.GameModes.Play.Osu
 
         protected override string FormatCount(ulong count)
         {
-            return $@"{count:#,0}x";
+            return $@"{count}x";
         }
 
-        protected virtual void transformPopOut(ulong currentValue, ulong newValue)
+        protected virtual void transformPopOut(ulong newValue)
         {
             PopOutSpriteText.Text = FormatCount(newValue);
-            CountSpriteText.Text = FormatCount(currentValue);
 
             PopOutSpriteText.ScaleTo(PopOutScale);
             PopOutSpriteText.FadeTo(PopOutInitialAlpha);
@@ -61,18 +59,16 @@ namespace osu.Game.GameModes.Play.Osu
             PopOutSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
             PopOutSpriteText.FadeOut(PopOutDuration, PopOutEasing);
             PopOutSpriteText.MoveTo(CountSpriteText.Position, PopOutDuration, PopOutEasing);
+        }
 
-            ScheduledPopOutCurrentId++;
-            uint newTaskId = ScheduledPopOutCurrentId;
-            Scheduler.AddDelayed(delegate
-            {
-                scheduledPopOutSmall(newTaskId, newValue);
-            }, PopOutDuration);
+        protected virtual void transformPopOutRolling(ulong newValue)
+        {
+            transformPopOut(newValue);
+            transformPopOutSmall(newValue);
         }
 
         protected virtual void transformNoPopOut(ulong newValue)
         {
-            ScheduledPopOutCurrentId++;
             CountSpriteText.Text = FormatCount(newValue);
             CountSpriteText.ScaleTo(1);
         }
@@ -84,16 +80,45 @@ namespace osu.Game.GameModes.Play.Osu
             CountSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
         }
 
-        protected virtual void scheduledPopOutSmall(uint id, ulong newValue)
+        protected virtual void scheduledPopOutSmall(uint id)
         {
             // Too late; scheduled task invalidated
             if (id != ScheduledPopOutCurrentId)
                 return;
 
-            transformPopOutSmall(newValue);
+            VisibleCount++;
         }
 
         protected override void OnCountRolling(ulong currentValue, ulong newValue)
+        {
+            ScheduledPopOutCurrentId++;
+            base.OnCountRolling(currentValue, newValue);
+        }
+
+        protected override void OnCountIncrement(ulong currentValue, ulong newValue)
+        {
+            if (VisibleCount != currentValue)
+                VisibleCount++;
+
+            CountSpriteText.Show();
+
+            transformPopOut(newValue);
+
+            ScheduledPopOutCurrentId++;
+            uint newTaskId = ScheduledPopOutCurrentId;
+            Scheduler.AddDelayed(delegate
+            {
+                scheduledPopOutSmall(newTaskId);
+            }, PopOutDuration);
+        }
+
+        protected override void OnCountChange(ulong currentValue, ulong newValue)
+        {
+            ScheduledPopOutCurrentId++;
+            base.OnCountChange(currentValue, newValue);
+        }
+
+        protected override void OnVisibleCountRolling(ulong currentValue, ulong newValue)
         {
             if (newValue == 0)
                 CountSpriteText.FadeOut(PopOutDuration);
@@ -101,23 +126,23 @@ namespace osu.Game.GameModes.Play.Osu
                 CountSpriteText.Show();
 
             if (CanPopOutWhileRolling)
-                transformPopOut(currentValue, newValue);
+                transformPopOutRolling(newValue);
             else
                 transformNoPopOut(newValue);
         }
 
-        protected override void OnCountChange(ulong newValue)
+        protected override void OnVisibleCountChange(ulong newValue)
         {
             CountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
 
             transformNoPopOut(newValue);
         }
 
-        protected override void OnCountIncrement(ulong newValue)
+        protected override void OnVisibleCountIncrement(ulong newValue)
         {
             CountSpriteText.Show();
 
-            transformPopOut(newValue - 1, newValue);
+            transformPopOutSmall(newValue);
         }
     }
 }
