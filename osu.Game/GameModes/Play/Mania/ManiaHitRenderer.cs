@@ -1,12 +1,11 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Mania;
-using OpenTK;
 using osu.Game.Beatmaps.Objects.Mania.Drawable;
-using System.Collections.Generic;
 
 namespace osu.Game.GameModes.Play.Mania
 {
@@ -19,11 +18,7 @@ namespace osu.Game.GameModes.Play.Mania
             this.columns = columns;
         }
 
-        protected override List<ManiaBaseHit> Convert(List<HitObject> objects)
-        {
-            ManiaConverter converter = new ManiaConverter(columns);
-            return converter.Convert(objects);
-        }
+        protected override HitObjectConverter<ManiaBaseHit> Converter => new ManiaConverter(columns);
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(columns);
 
