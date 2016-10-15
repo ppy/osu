@@ -20,7 +20,7 @@ namespace osu.Game.GameModes.Play.Osu
         protected uint ScheduledPopOutCurrentId = 0;
 
         protected virtual float PopOutSmallScale => 1.1f;
-        protected virtual bool CanPopOutWhenBackwards => false;
+        protected virtual bool CanPopOutWhileRolling => false;
         
 
         public Vector2 InnerCountPosition
@@ -101,7 +101,7 @@ namespace osu.Game.GameModes.Play.Osu
             else
                 CountSpriteText.Show();
 
-            if (CanPopOutWhenBackwards)
+            if (CanPopOutWhileRolling)
                 transformPopOut(currentValue, newValue);
             else
                 transformNoPopOut(newValue);
