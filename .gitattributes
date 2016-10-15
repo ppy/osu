@@ -1,10 +1,6 @@
 # This won't normalise line endings, but it will ensure that merge drivers use CRLF
 * -text eol=crlf
 
-*.cs text=auto
-*.csproj text=auto
-*.sln text=auto
-
 # Currently in-use binary file extensions
 *.blend  binary
 *.bmp    binary
