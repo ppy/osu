@@ -122,6 +122,7 @@ namespace osu.Game.Graphics.UserInterface
                 starContainer.Add(star);
             }
 
+            // Used to recreate initial state.
             StopAnimation();
         }
 
