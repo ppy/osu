@@ -3,7 +3,6 @@
 
 using OpenTK;
 using osu.Framework.Graphics.Transformations;
-using osu.Game.Graphics.UserInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;

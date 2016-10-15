@@ -15,7 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.GameModes.Play
 {
     public abstract class ComboCounter : Container
     {
