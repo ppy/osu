@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace osu.Game.GameModes.Play.Taiko
 {
+    /// <summary>
+    /// Allows tint and scaling animations. Used in osu!taiko.
+    /// </summary>
     public class TaikoComboCounter : ComboCounter
     {
         protected virtual int AnimationDuration => 300;
