@@ -35,11 +35,11 @@ namespace osu.Game.GameModes.Play.Mania
             OriginalColour = Colour;
         }
 
-        public override void Roll(ulong newValue = 0)
+        protected override void OnCountRolling(ulong currentValue, ulong newValue)
         {
-            if (!IsRolling)
+            if (!IsRolling && newValue < currentValue)
             {
-                PopOutSpriteText.Text = FormatCount(VisibleCount);
+                PopOutSpriteText.Text = FormatCount(currentValue);
 
                 PopOutSpriteText.FadeTo(PopOutInitialAlpha);
                 PopOutSpriteText.ScaleTo(1.0f);
@@ -48,7 +48,7 @@ namespace osu.Game.GameModes.Play.Mania
                 PopOutSpriteText.ScaleTo(PopOutScale, PopOutDuration, PopOutEasing);
             }
 
-            base.Roll(newValue);
+            base.OnCountRolling(currentValue, newValue);
         }
 
         protected override void transformAnimate(ulong newValue)

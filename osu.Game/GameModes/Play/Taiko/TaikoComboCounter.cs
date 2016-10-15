@@ -40,7 +40,7 @@ namespace osu.Game.GameModes.Play.Taiko
             CountSpriteText.ScaleTo(1);
         }
 
-        protected override void OnCountRolling(ulong currentValue, ulong newValue)
+        protected override void OnVisibleCountRolling(ulong currentValue, ulong newValue)
         {
             if (newValue == 0)
                 CountSpriteText.FadeOut(AnimationDuration);
@@ -50,14 +50,14 @@ namespace osu.Game.GameModes.Play.Taiko
             transformNotAnimate(newValue);
         }
 
-        protected override void OnCountChange(ulong newValue)
+        protected override void OnVisibleCountChange(ulong newValue)
         {
             CountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
 
             transformNotAnimate(newValue);
         }
 
-        protected override void OnCountIncrement(ulong newValue)
+        protected override void OnVisibleCountIncrement(ulong newValue)
         {
             CountSpriteText.Show();
 
