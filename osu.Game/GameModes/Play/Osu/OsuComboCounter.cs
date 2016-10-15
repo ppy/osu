@@ -47,7 +47,7 @@ namespace osu.Game.GameModes.Play.Osu
 
         protected override string FormatCount(ulong count)
         {
-            return count.ToString("#,0") + "x";
+            return $@"{count:#,0}x";
         }
 
         protected virtual void transformPopOut(ulong currentValue, ulong newValue)

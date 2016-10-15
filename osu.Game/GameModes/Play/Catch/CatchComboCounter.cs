@@ -20,7 +20,7 @@ namespace osu.Game.GameModes.Play.Catch
 
         protected override string FormatCount(ulong count)
         {
-            return count.ToString("#,0");
+            return $@"{count:#,0}x";
         }
 
         public override void Roll(ulong newValue = 0)

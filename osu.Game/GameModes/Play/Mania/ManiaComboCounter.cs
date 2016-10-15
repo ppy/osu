@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace osu.Game.GameModes.Play.Mania
 {
     /// <summary>
-    /// Allows tint and vertical scaling animation. Used in osu!taiko and osu!mania.
+    /// Similar to osu!taiko, with a pop-out animation when failing (rolling). Used in osu!mania.
     /// </summary>
     public class ManiaComboCounter : TaikoComboCounter
     {
