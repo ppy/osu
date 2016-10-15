@@ -138,10 +138,7 @@ namespace osu.Game.Graphics.UserInterface
             transformStartTime = Time;
 
             for (int i = 0; i < MaxStars; i++)
-            {
-                stars[i].DelayReset();
                 transformStarQuick(i, count);
-            }
         }
 
         private float getStarScale(int i, float value)
@@ -169,13 +166,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             for (int i = 0; i < MaxStars; i++)
             {
-                stars[i].DelayReset();
                 stars[i].ClearTransformations();
                 if (currentValue <= newValue)
                     stars[i].Delay(Math.Max(i - currentValue, 0) * animationDelay);
                 else
                     stars[i].Delay(Math.Max(currentValue - 1 - i, 0) * animationDelay);
                 transformStar(i, newValue);
+                stars[i].DelayReset();
             }
             transformStartTime = Time;
         }
