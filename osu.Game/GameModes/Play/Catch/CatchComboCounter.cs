@@ -16,7 +16,7 @@ namespace osu.Game.GameModes.Play.Catch
     /// </summary>
     public class CatchComboCounter : OsuComboCounter
     {
-        protected override bool CanPopOutWhenBackwards => true;
+        protected override bool CanPopOutWhileRolling => true;
 
         protected override string FormatCount(ulong count)
         {
