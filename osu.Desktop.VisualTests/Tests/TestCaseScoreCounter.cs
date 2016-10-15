@@ -16,6 +16,7 @@ using osu.Game.GameModes.Play.Catch;
 using osu.Game.GameModes.Play.Mania;
 using osu.Game.GameModes.Play.Osu;
 using osu.Game.GameModes.Play.Taiko;
+using osu.Game.GameModes.Play;
 
 namespace osu.Desktop.Tests
 {
