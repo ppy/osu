@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps.Objects.Catch
                 {
                     OsuBaseHit o = i as OsuBaseHit;
 
-                    if (o == null) throw new Exception(@"Can't convert!");
+                    if (o == null) throw new HitObjectConvertException(@"Catch", i);
 
                     h = new Fruit
                     {

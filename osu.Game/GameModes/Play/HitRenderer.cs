@@ -10,6 +10,7 @@ using osu.Framework;
 namespace osu.Game.GameModes.Play
 {
     public abstract class HitRenderer<T> : Container
+        where T : HitObject
     {
         private List<T> objects;
 
@@ -27,7 +28,9 @@ namespace osu.Game.GameModes.Play
 
         protected abstract Playfield CreatePlayfield();
 
-        protected abstract List<T> Convert(List<HitObject> objects);
+        protected abstract HitObjectConverter<T> Converter { get; }
+
+        protected virtual List<T> Convert(List<HitObject> objects) => Converter.Convert(objects);
 
         public override void Load(BaseGame game)
         {
