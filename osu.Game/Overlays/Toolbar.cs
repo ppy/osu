@@ -15,7 +15,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
-    public class Toolbar : Overlay
+    public class Toolbar : OverlayContainer
     {
         private const float height = 50;
 
