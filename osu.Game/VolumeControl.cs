@@ -4,10 +4,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game
 {
-    internal class VolumeControl : Container
+    internal class VolumeControl : AutoSizeContainer
     {
         private FlowContainer volumeMetersContainer;
         private VolumeMeter volumeMeterMaster;
@@ -15,14 +16,14 @@ namespace osu.Game
         public BindableDouble VolumeSample { get; set; }
         public BindableDouble VolumeTrack { get; set; }
 
-        public VolumeControl()
-        {
-            RelativeSizeAxes = Axes.Both;
-        }
+        public override bool Contains(Vector2 screenSpacePos) => true;
 
         private void volumeChanged(object sender, System.EventArgs e)
         {
             appear();
+
+            Anchor = Anchor.BottomRight;
+            Origin = Anchor.BottomRight;
         }
 
         public override void Load(BaseGame game)
