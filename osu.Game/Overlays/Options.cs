@@ -6,7 +6,7 @@ using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Drawables;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 
