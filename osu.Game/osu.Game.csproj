@@ -156,7 +156,6 @@
     <Compile Include="OsuGameBase.cs" />
     <Compile Include="Overlays\ChatConsole.cs" />
     <Compile Include="Overlays\Options.cs" />
-    <Compile Include="Overlays\Overlay.cs" />
     <Compile Include="Overlays\Toolbar.cs" />
     <Compile Include="Overlays\ToolbarButton.cs" />
     <Compile Include="Overlays\ToolbarModeButton.cs" />
