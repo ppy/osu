@@ -32,6 +32,8 @@ namespace osu.Desktop.Tests
 
             int numerator = 0, denominator = 0;
 
+            bool maniaHold = false;
+
             ScoreCounter score = new ScoreCounter(7)
             {
                 Origin = Anchor.TopRight,
@@ -72,7 +74,7 @@ namespace osu.Desktop.Tests
             };
             Add(taikoCombo);
 
-            ComboCounter maniaCombo = new ManiaComboCounter
+            ManiaComboCounter maniaCombo = new ManiaComboCounter
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
@@ -145,6 +147,15 @@ namespace osu.Desktop.Tests
                 catchCombo.Roll();
                 denominator++;
                 accuracyCombo.SetFraction(numerator, denominator);
+            });
+
+            AddButton(@"mania hold", delegate
+            {
+                if (!maniaHold)
+                    maniaCombo.HoldStart();
+                else
+                    maniaCombo.HoldEnd();
+                maniaHold = !maniaHold;
             });
 
             AddButton(@"Alter stars", delegate
