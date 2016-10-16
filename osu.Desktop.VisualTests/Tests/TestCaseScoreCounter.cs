@@ -93,22 +93,23 @@ namespace osu.Desktop.Tests
             };
             Add(accuracyCombo);
 
-            SpriteText starsLabel = new SpriteText
-            {
-                Origin = Anchor.BottomLeft,
-                Anchor = Anchor.BottomLeft,
-                Position = new Vector2(20, 190),
-                Text = @"- unset -",
-            };
-            Add(starsLabel);
-
             StarCounter stars = new StarCounter
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 Position = new Vector2(20, 160),
+                Count = 5,
             };
             Add(stars);
+
+            SpriteText starsLabel = new SpriteText
+            {
+                Origin = Anchor.BottomLeft,
+                Anchor = Anchor.BottomLeft,
+                Position = new Vector2(20, 190),
+                Text = stars.Count.ToString("0.00"),
+            };
+            Add(starsLabel);
 
             AddButton(@"Reset all", delegate
             {

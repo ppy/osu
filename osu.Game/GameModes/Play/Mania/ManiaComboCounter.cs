@@ -29,7 +29,7 @@ namespace osu.Game.GameModes.Play.Mania
 
         protected Color4 PopOutColor => Color4.Red;
         protected override float PopOutInitialAlpha => 1.0f;
-        protected override ulong PopOutDuration => 300;
+        protected override double PopOutDuration => 300;
 
         public override void Load(BaseGame game)
         {

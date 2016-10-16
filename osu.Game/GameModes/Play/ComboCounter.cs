@@ -26,7 +26,7 @@ namespace osu.Game.GameModes.Play
 
         protected SpriteText PopOutSpriteText;
 
-        protected virtual ulong PopOutDuration => 150;
+        protected virtual double PopOutDuration => 150;
         protected virtual float PopOutScale => 2.0f;
         protected virtual EasingTypes PopOutEasing => EasingTypes.None;
         protected virtual float PopOutInitialAlpha => 0.75f;
@@ -41,7 +41,6 @@ namespace osu.Game.GameModes.Play
         /// </summary>
         protected EasingTypes RollingEasing => EasingTypes.None;
 
-        private ulong prevDisplayedCount;
         private ulong displayedCount;
 
         /// <summary>
@@ -102,8 +101,6 @@ namespace osu.Game.GameModes.Play
             {
                 DisplayedCountSpriteText = new SpriteText
                 {
-                    Anchor = this.Anchor,
-                    Origin = this.Origin,
                     Alpha = 0,
                 },
                 PopOutSpriteText = new SpriteText
@@ -133,10 +130,18 @@ namespace osu.Game.GameModes.Play
         }
 
         /// <summary>
+        /// Animates roll-back to 0.
+        /// </summary>
+        public void Roll()
+        {
+            Roll(0);
+        }
+
+        /// <summary>
         /// Animates roll-up/roll-back to an specific value.
         /// </summary>
         /// <param name="newValue">Target value.</param>
-        public virtual void Roll(ulong newValue = 0)
+        public virtual void Roll(ulong newValue)
         {
             updateCount(newValue, true);
         }
@@ -173,13 +178,12 @@ namespace osu.Game.GameModes.Play
 
         private double getProportionalDuration(ulong currentValue, ulong newValue)
         {
-            double difference = currentValue > newValue ? currentValue - newValue : currentValue - newValue;
+            double difference = currentValue > newValue ? currentValue - newValue : newValue - currentValue;
             return difference * RollingDuration;
         }
 
         private void updateDisplayedCount(ulong currentValue, ulong newValue, bool rolling)
         {
-            prevDisplayedCount = currentValue;
             displayedCount = newValue;
             if (rolling)
                 OnDisplayedCountRolling(currentValue, newValue);
@@ -218,7 +222,7 @@ namespace osu.Game.GameModes.Play
             if (Clock == null)
                 return;
 
-            if (RollingDuration == 0)
+            if (RollingDuration < 1)
             {
                 DisplayedCount = Count;
                 return;

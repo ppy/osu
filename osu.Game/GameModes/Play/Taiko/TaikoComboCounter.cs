@@ -27,14 +27,14 @@ namespace osu.Game.GameModes.Play.Taiko
             DisplayedCountSpriteText.Anchor = Framework.Graphics.Anchor.BottomCentre;
         }
 
-        protected virtual void transformAnimate(ulong newValue)
+        protected virtual void TransformAnimate(ulong newValue)
         {
             DisplayedCountSpriteText.Text = FormatCount(newValue);
             DisplayedCountSpriteText.ScaleTo(new Vector2(1, ScaleFactor));
             DisplayedCountSpriteText.ScaleTo(new Vector2(1, 1), AnimationDuration, AnimationEasing);
         }
 
-        protected virtual void transformNotAnimate(ulong newValue)
+        protected virtual void TransformNotAnimate(ulong newValue)
         {
             DisplayedCountSpriteText.Text = FormatCount(newValue);
             DisplayedCountSpriteText.ScaleTo(1);
@@ -47,21 +47,21 @@ namespace osu.Game.GameModes.Play.Taiko
             else
                 DisplayedCountSpriteText.Show();
 
-            transformNotAnimate(newValue);
+            TransformNotAnimate(newValue);
         }
 
         protected override void OnDisplayedCountChange(ulong newValue)
         {
             DisplayedCountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
 
-            transformNotAnimate(newValue);
+            TransformNotAnimate(newValue);
         }
 
         protected override void OnDisplayedCountIncrement(ulong newValue)
         {
             DisplayedCountSpriteText.Show();
 
-            transformAnimate(newValue);
+            TransformAnimate(newValue);
         }
     }
 }
