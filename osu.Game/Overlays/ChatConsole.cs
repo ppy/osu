@@ -19,7 +19,7 @@ using osu.Game.Online.Chat.Display;
 
 namespace osu.Game.Overlays
 {
-    public class ChatConsole : Overlay
+    public class ChatConsole : OverlayContainer
     {
         private ChannelDisplay channelDisplay;
 

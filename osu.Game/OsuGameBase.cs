@@ -25,11 +25,22 @@ namespace osu.Game
         public Options Options;
         public APIAccess API;
 
-        protected override Container Content => ratioContainer?.IsLoaded == true ? ratioContainer : base.Content;
+        protected override Container Content => ratioContainer;
 
         private RatioAdjust ratioContainer;
 
         public CursorContainer Cursor;
+
+        public OsuGameBase()
+        {
+            AddInternal(ratioContainer = new RatioAdjust());
+
+            Children = new Drawable[]
+            {
+                Options = new Options(),
+                Cursor = new OsuCursorContainer()
+            };
+        }
 
         public override void Load(BaseGame game)
         {
@@ -50,18 +61,6 @@ namespace osu.Game
                 Password = Config.Get<string>(OsuConfig.Password),
                 Token = Config.Get<string>(OsuConfig.Token)
             };
-
-            Add(new Drawable[]
-            {
-                ratioContainer = new RatioAdjust
-                {
-                    Children = new Drawable[]
-                    {
-                        Options = new Options(),
-                        Cursor = new OsuCursorContainer()
-                    }
-                }
-            });
         }
 
         protected override void Update()
