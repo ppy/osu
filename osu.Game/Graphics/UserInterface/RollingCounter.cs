@@ -43,7 +43,6 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual EasingTypes RollingEasing => EasingTypes.None;
 
-        private T prevDisplayedCount;
         private T displayedCount;
 
         /// <summary>
@@ -104,18 +103,9 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         protected RollingCounter()
         {
-            Debug.Assert(
-                TransformType.IsSubclassOf(typeof(Transform<T>)) || TransformType == typeof(Transform<T>),
-                @"transformType should be a subclass of Transform<T>."
-            );
-
             Children = new Drawable[]
             {
-                DisplayedCountSpriteText = new SpriteText
-                {
-                    Anchor = this.Anchor,
-                    Origin = this.Origin,
-                },
+                DisplayedCountSpriteText = new SpriteText(),
             };
         }
 
@@ -195,6 +185,12 @@ namespace osu.Game.Graphics.UserInterface
         protected virtual void TransformCount(T currentValue, T newValue)
         {
             object[] parameters = { Clock };
+
+            Debug.Assert(
+                TransformType.IsSubclassOf(typeof(Transform<T>)) || TransformType == typeof(Transform<T>),
+                @"transformType should be a subclass of Transform<T>."
+            );
+
             TransformCount((Transform<T>)Activator.CreateInstance(TransformType, parameters), currentValue, newValue);
         }
 
@@ -210,7 +206,7 @@ namespace osu.Game.Graphics.UserInterface
             if (Clock == null)
                 return;
 
-            if (RollingDuration == 0)
+            if (RollingDuration < 1)
             {
                 DisplayedCount = Count;
                 return;

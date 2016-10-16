@@ -17,8 +17,8 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class StarCounter : AutoSizeContainer
     {
-        private Container starContainer;
-        private List<TextAwesome> stars = new List<TextAwesome>();
+        private readonly Container starContainer;
+        private readonly List<TextAwesome> stars = new List<TextAwesome>();
 
         private double transformStartTime = 0;
 
@@ -82,10 +82,16 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         /// <summary>
+        /// Shows a float count as stars (up to 10). Used as star difficulty display.
+        /// </summary>
+        public StarCounter() : this(10) {
+        }
+
+        /// <summary>
         /// Shows a float count as stars. Used as star difficulty display.
         /// </summary>
         /// <param name="maxstars">Maximum amount of stars to display.</param>
-        public StarCounter(int maxstars = 10)
+        public StarCounter(int maxstars)
         {
             MaxStars = Math.Max(maxstars, 0);
 
@@ -114,6 +120,8 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.Centre,
                     TextSize = StarSize,
+                    Scale = new Vector2(minStarScale),
+                    Alpha = minStarAlpha,
                     Position = new Vector2((StarSize + StarSpacing) * i + (StarSize + StarSpacing) / 2, 0),
                 };
 
@@ -122,8 +130,8 @@ namespace osu.Game.Graphics.UserInterface
                 starContainer.Add(star);
             }
 
-            // Used to recreate initial state.
-            StopAnimation();
+            // Animate initial state from zero.
+            transformCount(0, Count);
         }
 
         public void ResetCount()

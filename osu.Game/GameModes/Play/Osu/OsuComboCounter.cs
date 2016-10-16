@@ -48,7 +48,7 @@ namespace osu.Game.GameModes.Play.Osu
             return $@"{count}x";
         }
 
-        protected virtual void transformPopOut(ulong newValue)
+        protected virtual void TransformPopOut(ulong newValue)
         {
             PopOutSpriteText.Text = FormatCount(newValue);
 
@@ -61,26 +61,26 @@ namespace osu.Game.GameModes.Play.Osu
             PopOutSpriteText.MoveTo(DisplayedCountSpriteText.Position, PopOutDuration, PopOutEasing);
         }
 
-        protected virtual void transformPopOutRolling(ulong newValue)
+        protected virtual void TransformPopOutRolling(ulong newValue)
         {
-            transformPopOut(newValue);
-            transformPopOutSmall(newValue);
+            TransformPopOut(newValue);
+            TransformPopOutSmall(newValue);
         }
 
-        protected virtual void transformNoPopOut(ulong newValue)
+        protected virtual void TransformNoPopOut(ulong newValue)
         {
             DisplayedCountSpriteText.Text = FormatCount(newValue);
             DisplayedCountSpriteText.ScaleTo(1);
         }
 
-        protected virtual void transformPopOutSmall(ulong newValue)
+        protected virtual void TransformPopOutSmall(ulong newValue)
         {
             DisplayedCountSpriteText.Text = FormatCount(newValue);
             DisplayedCountSpriteText.ScaleTo(PopOutSmallScale);
             DisplayedCountSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
         }
 
-        protected virtual void scheduledPopOutSmall(uint id)
+        protected virtual void ScheduledPopOutSmall(uint id)
         {
             // Too late; scheduled task invalidated
             if (id != ScheduledPopOutCurrentId)
@@ -104,12 +104,12 @@ namespace osu.Game.GameModes.Play.Osu
 
             DisplayedCountSpriteText.Show();
 
-            transformPopOut(newValue);
+            TransformPopOut(newValue);
             
             uint newTaskId = ScheduledPopOutCurrentId;
             Scheduler.AddDelayed(delegate
             {
-                scheduledPopOutSmall(newTaskId);
+                ScheduledPopOutSmall(newTaskId);
             }, PopOutDuration);
         }
 
@@ -127,23 +127,23 @@ namespace osu.Game.GameModes.Play.Osu
                 DisplayedCountSpriteText.Show();
 
             if (CanPopOutWhileRolling)
-                transformPopOutRolling(newValue);
+                TransformPopOutRolling(newValue);
             else
-                transformNoPopOut(newValue);
+                TransformNoPopOut(newValue);
         }
 
         protected override void OnDisplayedCountChange(ulong newValue)
         {
             DisplayedCountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
 
-            transformNoPopOut(newValue);
+            TransformNoPopOut(newValue);
         }
 
         protected override void OnDisplayedCountIncrement(ulong newValue)
         {
             DisplayedCountSpriteText.Show();
 
-            transformPopOutSmall(newValue);
+            TransformPopOutSmall(newValue);
         }
     }
 }
