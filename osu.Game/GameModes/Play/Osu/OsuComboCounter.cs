@@ -97,14 +97,15 @@ namespace osu.Game.GameModes.Play.Osu
 
         protected override void OnCountIncrement(ulong currentValue, ulong newValue)
         {
-            while (DisplayedCount != currentValue)
+            ScheduledPopOutCurrentId++;
+
+            if (DisplayedCount < currentValue)
                 DisplayedCount++;
 
             DisplayedCountSpriteText.Show();
 
             transformPopOut(newValue);
-
-            ScheduledPopOutCurrentId++;
+            
             uint newTaskId = ScheduledPopOutCurrentId;
             Scheduler.AddDelayed(delegate
             {
