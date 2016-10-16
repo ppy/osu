@@ -54,8 +54,8 @@ namespace osu.Game.GameModes.Play.Mania
         protected override void transformAnimate(ulong newValue)
         {
             base.transformAnimate(newValue);
-            CountSpriteText.FadeColour(TintColour, 0);
-            CountSpriteText.FadeColour(OriginalColour, AnimationDuration, AnimationEasing);
+            DisplayedCountSpriteText.FadeColour(TintColour, 0);
+            DisplayedCountSpriteText.FadeColour(OriginalColour, AnimationDuration, AnimationEasing);
         }
     }
 }

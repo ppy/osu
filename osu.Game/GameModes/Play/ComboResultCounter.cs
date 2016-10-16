@@ -51,7 +51,7 @@ namespace osu.Game.GameModes.Play.UserInterface
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as ComboResultCounter).VisibleCount = CurrentValue;
+                (d as ComboResultCounter).DisplayedCount = CurrentValue;
             }
 
             public TransformComboResult(IClock clock)

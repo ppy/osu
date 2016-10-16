@@ -25,11 +25,11 @@ namespace osu.Game.GameModes.Play.Osu
         {
             get
             {
-                return CountSpriteText.Position;
+                return DisplayedCountSpriteText.Position;
             }
             set
             {
-                CountSpriteText.Position = value;
+                DisplayedCountSpriteText.Position = value;
             }
         }
 
@@ -58,7 +58,7 @@ namespace osu.Game.GameModes.Play.Osu
 
             PopOutSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
             PopOutSpriteText.FadeOut(PopOutDuration, PopOutEasing);
-            PopOutSpriteText.MoveTo(CountSpriteText.Position, PopOutDuration, PopOutEasing);
+            PopOutSpriteText.MoveTo(DisplayedCountSpriteText.Position, PopOutDuration, PopOutEasing);
         }
 
         protected virtual void transformPopOutRolling(ulong newValue)
@@ -69,15 +69,15 @@ namespace osu.Game.GameModes.Play.Osu
 
         protected virtual void transformNoPopOut(ulong newValue)
         {
-            CountSpriteText.Text = FormatCount(newValue);
-            CountSpriteText.ScaleTo(1);
+            DisplayedCountSpriteText.Text = FormatCount(newValue);
+            DisplayedCountSpriteText.ScaleTo(1);
         }
 
         protected virtual void transformPopOutSmall(ulong newValue)
         {
-            CountSpriteText.Text = FormatCount(newValue);
-            CountSpriteText.ScaleTo(PopOutSmallScale);
-            CountSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
+            DisplayedCountSpriteText.Text = FormatCount(newValue);
+            DisplayedCountSpriteText.ScaleTo(PopOutSmallScale);
+            DisplayedCountSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
         }
 
         protected virtual void scheduledPopOutSmall(uint id)
@@ -86,7 +86,7 @@ namespace osu.Game.GameModes.Play.Osu
             if (id != ScheduledPopOutCurrentId)
                 return;
 
-            VisibleCount++;
+            DisplayedCount++;
         }
 
         protected override void OnCountRolling(ulong currentValue, ulong newValue)
@@ -97,10 +97,10 @@ namespace osu.Game.GameModes.Play.Osu
 
         protected override void OnCountIncrement(ulong currentValue, ulong newValue)
         {
-            if (VisibleCount != currentValue)
-                VisibleCount++;
+            while (DisplayedCount != currentValue)
+                DisplayedCount++;
 
-            CountSpriteText.Show();
+            DisplayedCountSpriteText.Show();
 
             transformPopOut(newValue);
 
@@ -118,12 +118,12 @@ namespace osu.Game.GameModes.Play.Osu
             base.OnCountChange(currentValue, newValue);
         }
 
-        protected override void OnVisibleCountRolling(ulong currentValue, ulong newValue)
+        protected override void OnDisplayedCountRolling(ulong currentValue, ulong newValue)
         {
             if (newValue == 0)
-                CountSpriteText.FadeOut(PopOutDuration);
+                DisplayedCountSpriteText.FadeOut(PopOutDuration);
             else
-                CountSpriteText.Show();
+                DisplayedCountSpriteText.Show();
 
             if (CanPopOutWhileRolling)
                 transformPopOutRolling(newValue);
@@ -131,16 +131,16 @@ namespace osu.Game.GameModes.Play.Osu
                 transformNoPopOut(newValue);
         }
 
-        protected override void OnVisibleCountChange(ulong newValue)
+        protected override void OnDisplayedCountChange(ulong newValue)
         {
-            CountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
+            DisplayedCountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
 
             transformNoPopOut(newValue);
         }
 
-        protected override void OnVisibleCountIncrement(ulong newValue)
+        protected override void OnDisplayedCountIncrement(ulong newValue)
         {
-            CountSpriteText.Show();
+            DisplayedCountSpriteText.Show();
 
             transformPopOutSmall(newValue);
         }

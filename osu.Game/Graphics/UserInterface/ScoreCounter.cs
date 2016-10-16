@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="leading">How many leading zeroes the counter will have.</param>
         public ScoreCounter(uint leading = 0)
         {
-            CountSpriteText.FixedWidth = true;
+            DisplayedCountSpriteText.FixedWidth = true;
             LeadingZeroes = leading;
         }
 
@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as ScoreCounter).VisibleCount = CurrentValue;
+                (d as ScoreCounter).DisplayedCount = CurrentValue;
             }
 
             public TransformScore(IClock clock)

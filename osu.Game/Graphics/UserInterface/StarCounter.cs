@@ -84,10 +84,10 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Shows a float count as stars. Used as star difficulty display.
         /// </summary>
-        /// <param name="stars">Maximum amount of stars to display.</param>
-        public StarCounter(int stars = 10)
+        /// <param name="maxstars">Maximum amount of stars to display.</param>
+        public StarCounter(int maxstars = 10)
         {
-            MaxStars = Math.Max(stars, 0);
+            MaxStars = Math.Max(maxstars, 0);
 
             Children = new Drawable[]
             {

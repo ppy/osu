@@ -112,6 +112,7 @@ namespace osu.Desktop.Tests
             {
                 score.Count = 0;
                 standardCombo.Count = 0;
+                taikoCombo.Count = 0;
                 maniaCombo.Count = 0;
                 catchCombo.Count = 0;
                 numerator = denominator = 0;

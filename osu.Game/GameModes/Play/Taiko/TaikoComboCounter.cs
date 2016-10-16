@@ -23,43 +23,43 @@ namespace osu.Game.GameModes.Play.Taiko
 
         public TaikoComboCounter()
         {
-            CountSpriteText.Origin = Framework.Graphics.Anchor.BottomCentre;
-            CountSpriteText.Anchor = Framework.Graphics.Anchor.BottomCentre;
+            DisplayedCountSpriteText.Origin = Framework.Graphics.Anchor.BottomCentre;
+            DisplayedCountSpriteText.Anchor = Framework.Graphics.Anchor.BottomCentre;
         }
 
         protected virtual void transformAnimate(ulong newValue)
         {
-            CountSpriteText.Text = FormatCount(newValue);
-            CountSpriteText.ScaleTo(new Vector2(1, ScaleFactor));
-            CountSpriteText.ScaleTo(new Vector2(1, 1), AnimationDuration, AnimationEasing);
+            DisplayedCountSpriteText.Text = FormatCount(newValue);
+            DisplayedCountSpriteText.ScaleTo(new Vector2(1, ScaleFactor));
+            DisplayedCountSpriteText.ScaleTo(new Vector2(1, 1), AnimationDuration, AnimationEasing);
         }
 
         protected virtual void transformNotAnimate(ulong newValue)
         {
-            CountSpriteText.Text = FormatCount(newValue);
-            CountSpriteText.ScaleTo(1);
+            DisplayedCountSpriteText.Text = FormatCount(newValue);
+            DisplayedCountSpriteText.ScaleTo(1);
         }
 
-        protected override void OnVisibleCountRolling(ulong currentValue, ulong newValue)
+        protected override void OnDisplayedCountRolling(ulong currentValue, ulong newValue)
         {
             if (newValue == 0)
-                CountSpriteText.FadeOut(AnimationDuration);
+                DisplayedCountSpriteText.FadeOut(AnimationDuration);
             else
-                CountSpriteText.Show();
+                DisplayedCountSpriteText.Show();
 
             transformNotAnimate(newValue);
         }
 
-        protected override void OnVisibleCountChange(ulong newValue)
+        protected override void OnDisplayedCountChange(ulong newValue)
         {
-            CountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
+            DisplayedCountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
 
             transformNotAnimate(newValue);
         }
 
-        protected override void OnVisibleCountIncrement(ulong newValue)
+        protected override void OnDisplayedCountIncrement(ulong newValue)
         {
-            CountSpriteText.Show();
+            DisplayedCountSpriteText.Show();
 
             transformAnimate(newValue);
         }

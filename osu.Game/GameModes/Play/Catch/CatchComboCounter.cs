@@ -26,32 +26,35 @@ namespace osu.Game.GameModes.Play.Catch
             return $@"{count:#,0}";
         }
 
+        private void animateFade()
+        {
+            Show();
+            Delay(FadeOutDelay);
+            FadeOut(FadeOutDuration);
+            DelayReset();
+        }
+
         protected override void OnCountChange(ulong currentValue, ulong newValue)
         {
             if (newValue != 0)
-                this.Show();
+                animateFade();
             base.OnCountChange(currentValue, newValue);
         }
 
         protected override void OnCountRolling(ulong currentValue, ulong newValue)
         {
-            PopOutSpriteText.Colour = CountSpriteText.Colour;
-            this.FadeOut(FadeOutDuration);
+            if (!IsRolling)
+            {
+                PopOutSpriteText.Colour = DisplayedCountSpriteText.Colour;
+                FadeOut(FadeOutDuration);
+            }
             base.OnCountRolling(currentValue, newValue);
         }
 
         protected override void OnCountIncrement(ulong currentValue, ulong newValue)
         {
-            this.Show();
+            animateFade();
             base.OnCountIncrement(currentValue, newValue);
-        }
-
-        protected override void transformPopOutSmall(ulong newValue)
-        {
-            base.transformPopOutSmall(newValue);
-            CountSpriteText.Delay(FadeOutDelay);
-            CountSpriteText.FadeOut(FadeOutDuration);
-            CountSpriteText.DelayReset();
         }
 
         /// <summary>
