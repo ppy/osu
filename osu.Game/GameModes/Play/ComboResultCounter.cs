@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace osu.Game.GameModes.Play.UserInterface
+namespace osu.Game.GameModes.Play
 {
     /// <summary>
     /// Used to display combo with a roll-up animation in results screen.
