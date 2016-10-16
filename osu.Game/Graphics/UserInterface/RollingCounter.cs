@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </remarks>
         protected virtual Type TransformType => typeof(Transform<T>);
 
-        protected SpriteText CountSpriteText;
+        protected SpriteText DisplayedCountSpriteText;
 
         /// <summary>
         /// If true, the roll-up duration will be proportional to change in value.
@@ -43,24 +43,24 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual EasingTypes RollingEasing => EasingTypes.None;
 
-        private T prevVisibleCount;
-        private T visibleCount;
+        private T prevDisplayedCount;
+        private T displayedCount;
 
         /// <summary>
         /// Value shown at the current moment.
         /// </summary>
-        public virtual T VisibleCount
+        public virtual T DisplayedCount
         {
             get
             {
-                return visibleCount;
+                return displayedCount;
             }
             protected set
             {
-                if (visibleCount.Equals(value))
+                if (displayedCount.Equals(value))
                     return;
-                visibleCount = value;
-                CountSpriteText.Text = FormatCount(value);
+                displayedCount = value;
+                DisplayedCountSpriteText.Text = FormatCount(value);
             }
         }
 
@@ -82,7 +82,7 @@ namespace osu.Game.Graphics.UserInterface
                 count = value;
                 if (IsLoaded)
                 {
-                    TransformCount(visibleCount, count);
+                    TransformCount(displayedCount, count);
                 }
             }
         }
@@ -95,7 +95,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 textSize = value;
-                CountSpriteText.TextSize = value;
+                DisplayedCountSpriteText.TextSize = value;
             }
         }
 
@@ -111,7 +111,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                CountSpriteText = new SpriteText
+                DisplayedCountSpriteText = new SpriteText
                 {
                     Anchor = this.Anchor,
                     Origin = this.Origin,
@@ -125,11 +125,11 @@ namespace osu.Game.Graphics.UserInterface
 
             Flush(false, TransformType);
 
-            VisibleCount = Count;
+            DisplayedCount = Count;
 
-            CountSpriteText.Text = FormatCount(count);
-            CountSpriteText.Anchor = this.Anchor;
-            CountSpriteText.Origin = this.Origin;
+            DisplayedCountSpriteText.Text = FormatCount(count);
+            DisplayedCountSpriteText.Anchor = this.Anchor;
+            DisplayedCountSpriteText.Origin = this.Origin;
         }
 
         /// <summary>
@@ -143,12 +143,12 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         /// <summary>
-        /// Stops rollover animation, forcing the visible count to be the actual count.
+        /// Stops rollover animation, forcing the displayed count to be the actual count.
         /// </summary>
         public virtual void StopRolling()
         {
             Flush(false, TransformType);
-            VisibleCount = Count;
+            DisplayedCount = Count;
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (RollingDuration == 0)
             {
-                VisibleCount = Count;
+                DisplayedCount = Count;
                 return;
             }
 

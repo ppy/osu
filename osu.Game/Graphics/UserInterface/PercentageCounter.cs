@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as PercentageCounter).VisibleCount = CurrentValue;
+                (d as PercentageCounter).DisplayedCount = CurrentValue;
             }
 
             public TransformAccuracy(IClock clock)
