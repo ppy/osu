@@ -7,11 +7,11 @@ using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Configuration;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics;
-using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
@@ -21,6 +21,7 @@ namespace osu.Game.Overlays
 
         public Action OnSettings;
         public Action OnHome;
+        public Action OnProfile;
         public Action<PlayMode> OnPlayModeChange;
 
         private ToolbarModeSelector modeSelector;
@@ -85,15 +86,15 @@ namespace osu.Game.Overlays
                     Origin = Anchor.TopRight,
                     Direction = FlowDirection.HorizontalOnly,
                     RelativeSizeAxes = Axes.Y,
-                    Children = new []
+                    Children = new Drawable[]
                     {
                         new ToolbarButton
                         {
                             Icon = FontAwesome.search
                         },
-                        new ToolbarButton
+                        new UserButton(5456671)
                         {
-                            Icon = FontAwesome.user,
+                            Image = new Avatar(5456671, 48, 6),
                             Text = ((OsuGame)game).Config.Get<string>(OsuConfig.Username)
                         },
                         new ToolbarButton
