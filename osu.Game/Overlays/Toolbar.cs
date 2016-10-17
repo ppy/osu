@@ -62,9 +62,9 @@ namespace osu.Game.Overlays
                         new ToolbarButton
                         {
                             Icon = FontAwesome.gear,
-                            Action = OnSettings,
                             TooltipMain = "Settings",
                             TooltipSub = "Change your settings",
+                            Action = OnSettings
                         },
                         new ToolbarButton
                         {
