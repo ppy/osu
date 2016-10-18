@@ -24,7 +24,7 @@ namespace osu.Game.GameModes.Menu
                 if (CentreTarget == null)
                     return base.OriginPosition;
 
-                return CentreTarget.Position + CentreTarget.Size / 2;
+                return CentreTarget.DrawPosition + CentreTarget.DrawSize / 2;
             }
         }
     }

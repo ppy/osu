@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.Background
         protected override void Update()
         {
             base.Update();
-            BackgroundSprite.Scale = new Vector2(Math.Max(Size.X / BackgroundSprite.Size.X, Size.Y / BackgroundSprite.Size.Y));
+            BackgroundSprite.Scale = new Vector2(Math.Max(DrawSize.X / BackgroundSprite.DrawSize.X, DrawSize.Y / BackgroundSprite.DrawSize.Y));
         }
     }
 }
