@@ -39,7 +39,6 @@ namespace osu.Game.Overlays
         protected Avatar DrawableAvatar;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
-        private FlowContainer tooltipContainer;
 
         public UserButton(int userId)
         {
