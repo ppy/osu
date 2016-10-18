@@ -27,6 +27,8 @@ namespace osu.Game.Database
         [OneToOne]
         public BaseDifficulty BaseDifficulty { get; set; }
         
+        public string Path { get; set; }
+        
         // General
         public int AudioLeadIn { get; set; }
         public bool Countdown { get; set; }

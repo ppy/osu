@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -65,6 +66,7 @@ namespace osu.Game.Database
                 {
                     var decoder = BeatmapDecoder.GetDecoder(stream);
                     Beatmap beatmap = decoder.Decode(stream);
+                    beatmap.BeatmapInfo.Path = name;
                     // TODO: Diff beatmap metadata with set metadata and insert if necessary
                     beatmap.BeatmapInfo.Metadata = null;
                     maps.Add(beatmap.BeatmapInfo);
@@ -81,6 +83,44 @@ namespace osu.Game.Database
         public ArchiveReader GetReader(BeatmapSetInfo beatmapSet)
         {
             return ArchiveReader.GetReader(storage, beatmapSet.Path);
+        }
+        
+        public Beatmap GetBeatmap(BeatmapInfo beatmapInfo)
+        {
+            var beatmapSet = Query<BeatmapSetInfo>()
+                .Where(s => s.BeatmapSetID == beatmapInfo.BeatmapSetID).FirstOrDefault();    
+            if (beatmapSet == null)
+                throw new InvalidOperationException(
+                    $@"Beatmap set {beatmapInfo.BeatmapSetID} is not in the local database.");
+            using (var reader = GetReader(beatmapSet))
+            using (var stream = new StreamReader(reader.ReadFile(beatmapInfo.Path)))
+            {
+                var decoder = BeatmapDecoder.GetDecoder(stream);
+                return decoder.Decode(stream);
+            }
+        }
+        
+        public TableQuery<T> Query<T>() where T : class
+        {
+            return connection.Table<T>();
+        }
+
+        readonly Type[] validTypes = new[]
+        {
+            typeof(BeatmapSetInfo),
+            typeof(BeatmapInfo),
+            typeof(BeatmapMetadata),
+            typeof(BaseDifficulty),
+        };
+        
+        public void Update<T>(T record, bool cascade = true) where T : class
+        {
+            if (!validTypes.Any(t => t == typeof(T)))
+                throw new ArgumentException(nameof(T), "Must be a type managed by BeatmapDatabase");
+            if (cascade)
+                connection.UpdateWithChildren(record);
+            else
+                connection.Update(record);
         }
     }
 }
