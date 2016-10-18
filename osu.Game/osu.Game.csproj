@@ -47,16 +47,16 @@
       <HintPath>$(SolutionDir)\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
     </Reference>
     <Reference Include="SQLite.Net.Platform.Win32">
-      <HintPath>..\packages\SQLite.Net-PCL.3.0.5\lib\net4\SQLite.Net.Platform.Win32.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.0.5\lib\net4\SQLite.Net.Platform.Win32.dll</HintPath>
     </Reference>
     <Reference Include="SQLite.Net">
-      <HintPath>..\packages\SQLite.Net-PCL.3.0.5\lib\net40\SQLite.Net.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.0.5\lib\net40\SQLite.Net.dll</HintPath>
     </Reference>
     <Reference Include="SQLite.Net.Platform.Generic">
-      <HintPath>..\packages\SQLite.Net-PCL.3.0.5\lib\net40\SQLite.Net.Platform.Generic.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.0.5\lib\net40\SQLite.Net.Platform.Generic.dll</HintPath>
     </Reference>
     <Reference Include="SQLiteNetExtensions">
-      <HintPath>..\packages\SQLiteNetExtensions.1.3.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\SQLiteNetExtensions.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\SQLiteNetExtensions.1.3.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\SQLiteNetExtensions.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -200,7 +200,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.0.1\build\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.0.1\build\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets')" />
-  <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.0.1\build\SQLitePCLRaw.lib.e_sqlite3.osx.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.0.1\build\SQLitePCLRaw.lib.e_sqlite3.osx.targets')" />
-  <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.0.1\build\SQLitePCLRaw.lib.e_sqlite3.linux.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.0.1\build\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" />
 </Project>
