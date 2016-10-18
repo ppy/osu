@@ -82,6 +82,11 @@ namespace osu.Game.Database
             return ArchiveReader.GetReader(storage, beatmapSet.Path);
         }
         
+        public BeatmapSetInfo GetBeatmapSet(int id)
+        {
+            return Query<BeatmapSetInfo>().Where(s => s.BeatmapSetID == id).FirstOrDefault();
+        }
+        
         public Beatmap GetBeatmap(BeatmapInfo beatmapInfo)
         {
             var beatmapSet = Query<BeatmapSetInfo>()

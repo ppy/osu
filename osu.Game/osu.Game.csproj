@@ -61,7 +61,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Beatmap.cs" />
-    <Compile Include="Beatmaps\BeatmapSet.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchConverter.cs" />
     <Compile Include="Beatmaps\Objects\Catch\Drawable\DrawableFruit.cs" />
     <Compile Include="Beatmaps\Objects\HitObject.cs" />
