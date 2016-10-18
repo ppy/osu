@@ -26,9 +26,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new OsuLegacyDecoder();
             using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             {
-                Beatmap beatmap = new Beatmap();
-                decoder.Decode(new StreamReader(stream), beatmap);
-                var meta = beatmap.Metadata;
+                var beatmap = decoder.Decode(new StreamReader(stream));
+                var meta = beatmap.BeatmapInfo.Metadata;
                 Assert.AreEqual(241526, meta.BeatmapSetID);
                 Assert.AreEqual("Soleily", meta.Artist);
                 Assert.AreEqual("Soleily", meta.ArtistUnicode);
@@ -49,16 +48,15 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new OsuLegacyDecoder();
             using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             {
-                Beatmap beatmap = new Beatmap();
-                decoder.Decode(new StreamReader(stream), beatmap);
-                Assert.AreEqual(0, beatmap.AudioLeadIn);
-                Assert.AreEqual(false, beatmap.Countdown);
-                Assert.AreEqual(SampleSet.Soft, beatmap.SampleSet);
-                Assert.AreEqual(0.7f, beatmap.StackLeniency);
-                Assert.AreEqual(false, beatmap.SpecialStyle);
-                Assert.AreEqual(PlayMode.Osu, beatmap.Mode);
-                Assert.AreEqual(false, beatmap.LetterboxInBreaks);
-                Assert.AreEqual(false, beatmap.WidescreenStoryboard);
+                var beatmapInfo = decoder.Decode(new StreamReader(stream)).BeatmapInfo;
+                Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
+                Assert.AreEqual(false, beatmapInfo.Countdown);
+                Assert.AreEqual(SampleSet.Soft, beatmapInfo.SampleSet);
+                Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
+                Assert.AreEqual(false, beatmapInfo.SpecialStyle);
+                Assert.AreEqual(PlayMode.Osu, beatmapInfo.Mode);
+                Assert.AreEqual(false, beatmapInfo.LetterboxInBreaks);
+                Assert.AreEqual(false, beatmapInfo.WidescreenStoryboard);
             }
         }
 
@@ -68,8 +66,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new OsuLegacyDecoder();
             using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             {
-                Beatmap beatmap = new Beatmap();
-                decoder.Decode(new StreamReader(stream), beatmap);
+                var beatmap = decoder.Decode(new StreamReader(stream)).BeatmapInfo;
                 int[] expectedBookmarks =
                 {
                     11505, 22054, 32604, 43153, 53703, 64252, 74802, 85351,
@@ -92,9 +89,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new OsuLegacyDecoder();
             using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             {
-                Beatmap beatmap = new Beatmap();
-                decoder.Decode(new StreamReader(stream), beatmap);
-                var difficulty = beatmap.BaseDifficulty;
+                var beatmap = decoder.Decode(new StreamReader(stream));
+                var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
                 Assert.AreEqual(6.5f, difficulty.DrainRate);
                 Assert.AreEqual(4, difficulty.CircleSize);
                 Assert.AreEqual(8, difficulty.OverallDifficulty);
@@ -110,8 +106,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new OsuLegacyDecoder();
             using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             {
-                Beatmap beatmap = new Beatmap();
-                decoder.Decode(new StreamReader(stream), beatmap);
+                var beatmap = decoder.Decode(new StreamReader(stream));
                 Color4[] expected =
                 {
                     new Color4(142, 199, 255, 255),
@@ -132,8 +127,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new OsuLegacyDecoder();
             using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             {
-                Beatmap beatmap = new Beatmap();
-                decoder.Decode(new StreamReader(stream), beatmap);
+                var beatmap = decoder.Decode(new StreamReader(stream));
                 var slider = beatmap.HitObjects[0] as Slider;
                 Assert.IsNotNull(slider);
                 Assert.AreEqual(new Vector2(192, 168), slider.Position);

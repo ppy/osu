@@ -6,7 +6,8 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
-using SQLite;
+using SQLite.Net;
+using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Database
 {
@@ -23,11 +24,12 @@ namespace osu.Game.Database
                 connection = storage.GetDatabase(@"beatmaps");
                 connection.CreateTable<BeatmapMetadata>();
                 connection.CreateTable<BaseDifficulty>();
-                connection.CreateTable<BeatmapSet>();
-                connection.CreateTable<Beatmap>();
+                connection.CreateTable<BeatmapSetInfo>();
+                connection.CreateTable<BeatmapInfo>();
             }
         }
-        public void AddBeatmap(string path)
+
+        public void AddBeatmap(string path)
         {
             string hash = null;
             ArchiveReader reader;
@@ -47,54 +49,38 @@ namespace osu.Game.Database
             else
                 reader = ArchiveReader.GetReader(storage, path);
             var metadata = reader.ReadMetadata();
-            if (connection.Table<BeatmapSet>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
+            if (connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
                 return; // TODO: Update this beatmap instead
             string[] mapNames = reader.ReadBeatmaps();
-            var beatmapSet = new BeatmapSet
+            var beatmapSet = new BeatmapSetInfo
             {
                 BeatmapSetID = metadata.BeatmapSetID,
                 Path = path,
                 Hash = hash,
             };
-            var maps = new List<Beatmap>();
+            var maps = new List<BeatmapInfo>();
             foreach (var name in mapNames)
             {
                 using (var stream = new StreamReader(reader.ReadFile(name)))
                 {
                     var decoder = BeatmapDecoder.GetDecoder(stream);
-                    Beatmap beatmap = new Beatmap();
-                    decoder.Decode(stream, beatmap);
-                    maps.Add(beatmap);
-                    beatmap.BaseDifficultyID = connection.Insert(beatmap.BaseDifficulty);
+                    Beatmap beatmap = decoder.Decode(stream);
+                    // TODO: Diff beatmap metadata with set metadata and insert if necessary
+                    beatmap.BeatmapInfo.Metadata = null;
+                    maps.Add(beatmap.BeatmapInfo);
+                    connection.Insert(beatmap.BeatmapInfo.BaseDifficulty);
+                    connection.Insert(beatmap.BeatmapInfo);
+                    connection.UpdateWithChildren(beatmap.BeatmapInfo);
                 }
             }
-            beatmapSet.BeatmapMetadataID = connection.Insert(metadata);
             connection.Insert(beatmapSet);
-            connection.InsertAll(maps);
-        }
-        public ArchiveReader GetReader(BeatmapSet beatmapSet)
-        {
-            return ArchiveReader.GetReader(storage, beatmapSet.Path);
+            beatmapSet.BeatmapMetadataID = connection.Insert(metadata);
+            connection.UpdateWithChildren(beatmapSet);
         }
 
-        /// <summary>
-        /// Given a BeatmapSet pulled from the database, loads the rest of its data from disk.
-        /// </summary>        public void PopulateBeatmap(BeatmapSet beatmapSet)
+        public ArchiveReader GetReader(BeatmapSetInfo beatmapSet)
         {
-            using (var reader = GetReader(beatmapSet))
-            {
-                string[] mapNames = reader.ReadBeatmaps();
-                foreach (var name in mapNames)
-                {
-                    using (var stream = new StreamReader(reader.ReadFile(name)))
-                    {
-                        var decoder = BeatmapDecoder.GetDecoder(stream);
-                        Beatmap beatmap = new Beatmap();
-                        decoder.Decode(stream, beatmap);
-                        beatmapSet.Beatmaps.Add(beatmap);
-                    }
-                }
-            }
+            return ArchiveReader.GetReader(storage, beatmapSet.Path);
         }
     }
 }
