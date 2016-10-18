@@ -30,7 +30,7 @@ namespace osu.Game.Database
             }
         }
 
-        public void AddBeatmap(string path)
+        public void ImportBeatmap(string path)
         {
             string hash = null;
             var reader = ArchiveReader.GetReader(storage, path);
