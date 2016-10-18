@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 
 namespace osu.Desktop.Beatmaps.IO
 {
@@ -31,8 +32,7 @@ namespace osu.Desktop.Beatmaps.IO
             using (var stream = new StreamReader(ReadFile(beatmaps[0])))
             {
                 var decoder = BeatmapDecoder.GetDecoder(stream);
-                firstMap = new Beatmap();
-                decoder.Decode(stream, firstMap);
+                firstMap = decoder.Decode(stream);
             }
         }
 
@@ -48,11 +48,12 @@ namespace osu.Desktop.Beatmaps.IO
 
         public override BeatmapMetadata ReadMetadata()
         {
-            return firstMap.Metadata;
+            return firstMap.BeatmapInfo.Metadata;
         }
         
         public override void Dispose()
         {
             // no-op
-        }    }
+        }
+    }
 }
