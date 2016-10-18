@@ -16,8 +16,6 @@ namespace osu.Game.Overlays
 {
     class UserButton : Container
     {
-        public const float WIDTH = 60;
-
         public Sprite Image
         {
             get { return DrawableAvatar; }
@@ -36,31 +34,12 @@ namespace osu.Game.Overlays
             }
         }
 
-        public string TooltipMain
-        {
-            get { return tooltip1.Text; }
-            set
-            {
-                tooltip1.Text = value;
-            }
-        }
 
-        public string TooltipSub
-        {
-            get { return tooltip2.Text; }
-            set
-            {
-                tooltip2.Text = value;
-            }
-        }
-
-        public Action Action;
+        public const float WIDTH = 60;
         protected Avatar DrawableAvatar;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
         private FlowContainer tooltipContainer;
-        private SpriteText tooltip1;
-        private SpriteText tooltip2;
 
         public UserButton(int userId)
         {
@@ -94,24 +73,6 @@ namespace osu.Game.Overlays
                             Origin = Anchor.CentreLeft,
                         },
                     },
-                },
-                tooltipContainer = new FlowContainer
-                {
-                    Direction = FlowDirection.VerticalOnly,
-                    Anchor = Anchor.BottomLeft,
-                    Position = new Vector2(5, -5),
-                    Alpha = 0,
-                    Children = new[]
-                    {
-                        tooltip1 = new SpriteText()
-                        {
-                            TextSize = 22,
-                        },
-                        tooltip2 = new SpriteText
-                        {
-                            TextSize = 15
-                        }
-                    }
                 }
             };
 
