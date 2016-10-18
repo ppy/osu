@@ -17,8 +17,7 @@ namespace osu.Game.GameModes.Menu
     /// </summary>
     public partial class OsuLogo : AutoSizeContainer
     {
-        private Sprite logo;
-        private CircularContainer logoContainer;
+        private SpriteCircular logo;
         private Container logoBounceContainer;
         private MenuVisualisation vis;
 
@@ -30,11 +29,6 @@ namespace osu.Game.GameModes.Menu
 
         private Container rippleContainer;
 
-        public override bool Contains(Vector2 screenSpacePos)
-        {
-            return logoContainer.Contains(screenSpacePos);
-        }
-
         public bool Ripple
         {
             get { return rippleContainer.Alpha > 0; }
@@ -42,6 +36,11 @@ namespace osu.Game.GameModes.Menu
             {
                 rippleContainer.Alpha = value ? 1 : 0;
             }
+        }
+
+        public override bool Contains(Vector2 screenSpacePos)
+        {
+            return logo.Contains(screenSpacePos);
         }
 
         public bool Interactive = true;
@@ -57,17 +56,10 @@ namespace osu.Game.GameModes.Menu
                 {
                     Children = new Drawable[]
                     {
-                        logoContainer = new CircularContainer
+                        logo = new SpriteCircular()
                         {
                             Anchor = Anchor.Centre,
-                            Children = new[]
-                            {
-                                logo = new Sprite
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                },
-                            },
+                            Origin = Anchor.Centre
                         },
                         rippleContainer = new Container
                         {

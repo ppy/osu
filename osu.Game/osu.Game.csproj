@@ -130,6 +130,7 @@
     <Compile Include="GameModes\Play\Taiko\TaikoHitRenderer.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoPlayfield.cs" />
     <Compile Include="GameModes\Edit\EditSongSelect.cs" />
+    <Compile Include="Graphics\Avatar.cs" />
     <Compile Include="Input\GlobalHotkeys.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
@@ -160,6 +161,7 @@
     <Compile Include="Overlays\ToolbarButton.cs" />
     <Compile Include="Overlays\ToolbarModeButton.cs" />
     <Compile Include="Overlays\ToolbarModeSelector.cs" />
+    <Compile Include="Overlays\UserButton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="VolumeControl.cs" />

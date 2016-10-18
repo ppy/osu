@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using OpenTK;
+using osu.Framework;
 
 namespace osu.Game.Graphics
 {
@@ -22,8 +23,8 @@ namespace osu.Game.Graphics
 
         public Avatar(int userid, int avatarsize, int round)
         {
-            this.userId = uId;
-            this.avatarSize = aSize;
+            this.userId = userid;
+            this.avatarSize = avatarsize;
             this.rounding = round;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
