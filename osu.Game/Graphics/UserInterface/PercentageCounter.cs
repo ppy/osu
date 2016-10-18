@@ -20,8 +20,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override Type TransformType => typeof(TransformAccuracy);
 
-        public override double RollingDuration => 500;
-        public override EasingTypes RollingEasing => EasingTypes.Out;
+        protected override double RollingDuration => 20;
+        protected override bool IsRollingProportional => true;
 
         private float epsilon => 1e-10f;
 

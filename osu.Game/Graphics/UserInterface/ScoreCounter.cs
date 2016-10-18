@@ -17,8 +17,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override Type TransformType => typeof(TransformScore);
 
-        public override double RollingDuration => 1000;
-        public override EasingTypes RollingEasing => EasingTypes.Out;
+        protected override double RollingDuration => 1000;
+        protected override EasingTypes RollingEasing => EasingTypes.Out;
 
         /// <summary>
         /// How many leading zeroes the counter has.

@@ -30,18 +30,18 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// If true, the roll-up duration will be proportional to change in value.
         /// </summary>
-        public bool IsRollingProportional = false;
+        protected virtual bool IsRollingProportional => false;
 
         /// <summary>
         /// If IsRollingProportional = false, duration in milliseconds for the counter roll-up animation for each
         /// element; else duration in milliseconds for the counter roll-up animation in total.
         /// </summary>
-        public virtual double RollingDuration => 0;
+        protected virtual double RollingDuration => 0;
 
         /// <summary>
         /// Easing for the counter rollover animation.
         /// </summary>
-        public virtual EasingTypes RollingEasing => EasingTypes.None;
+        protected virtual EasingTypes RollingEasing => EasingTypes.None;
 
         private T displayedCount;
 

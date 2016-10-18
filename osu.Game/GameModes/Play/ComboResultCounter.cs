@@ -21,8 +21,8 @@ namespace osu.Game.GameModes.Play
     {
         protected override Type TransformType => typeof(TransformComboResult);
 
-        public override double RollingDuration => 500;
-        public override EasingTypes RollingEasing => EasingTypes.Out;
+        protected override double RollingDuration => 500;
+        protected override EasingTypes RollingEasing => EasingTypes.Out;
 
         protected override double GetProportionalDuration(ulong currentValue, ulong newValue)
         {
