@@ -33,7 +33,10 @@ namespace osu.Game.Database
         public void AddBeatmap(string path)
         {
             string hash = null;
-            ArchiveReader reader;
+            var reader = ArchiveReader.GetReader(storage, path);
+            var metadata = reader.ReadMetadata();
+            if (connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
+                return; // TODO: Update this beatmap instead
             if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
             {
                 using (var md5 = MD5.Create())
@@ -44,14 +47,8 @@ namespace osu.Game.Database
                     var outputPath = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
                     using (var output = storage.GetStream(outputPath, FileAccess.Write))
                         input.CopyTo(output);
-                    reader = ArchiveReader.GetReader(storage, path = outputPath);
                 }
             }
-            else
-                reader = ArchiveReader.GetReader(storage, path);
-            var metadata = reader.ReadMetadata();
-            if (connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
-                return; // TODO: Update this beatmap instead
             string[] mapNames = reader.ReadBeatmaps();
             var beatmapSet = new BeatmapSetInfo
             {
