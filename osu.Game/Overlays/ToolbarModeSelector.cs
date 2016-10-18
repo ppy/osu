@@ -6,12 +6,12 @@ using System.Linq;
 using osu.Framework.Cached;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.GameModes.Play;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {

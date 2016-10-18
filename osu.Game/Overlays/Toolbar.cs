@@ -7,15 +7,15 @@ using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Configuration;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
-    public class Toolbar : Overlay
+    public class Toolbar : OverlayContainer
     {
         private const float height = 50;
 
@@ -62,9 +62,9 @@ namespace osu.Game.Overlays
                         new ToolbarButton
                         {
                             Icon = FontAwesome.gear,
-                            Action = OnSettings,
                             TooltipMain = "Settings",
                             TooltipSub = "Change your settings",
+                            Action = OnSettings
                         },
                         new ToolbarButton
                         {
