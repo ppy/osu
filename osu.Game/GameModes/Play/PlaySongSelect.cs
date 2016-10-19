@@ -157,6 +157,7 @@ namespace osu.Game.GameModes.Play
             {
                 first.Collapsed = false;
                 selectedBeatmapSet = first.BeatmapSet;
+                selectedBeatmap = first.SelectedBeatmap;
             }
         }
 

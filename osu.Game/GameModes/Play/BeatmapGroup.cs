@@ -73,6 +73,7 @@ namespace osu.Game.GameModes.Play
         public BeatmapGroup(BeatmapSetInfo beatmapSet, BeatmapResourceStore beatmapStore, TextureStore resources)
         {
             BeatmapSet = beatmapSet;
+            selectedBeatmap = beatmapSet.Beatmaps[0];
             Alpha = collapsedAlpha;
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, 0);
