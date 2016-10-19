@@ -21,7 +21,7 @@ namespace osu.Game.GameModes.Play
 {
     class BeatmapGroup : AutoSizeContainer
     {
-        private const float collapsedAlpha = 0.3f;
+        private const float collapsedAlpha = 0.5f;
 
         public event Action<BeatmapSetInfo> SetSelected;
         public event Action<BeatmapSetInfo, BeatmapInfo> BeatmapSelected;
@@ -48,7 +48,7 @@ namespace osu.Game.GameModes.Play
                     EndTime = Time + 250,
                 });
                 if (collapsed)
-                    topContainer.Remove(difficulties);
+                    topContainer.Remove(difficulties, false);
                 else
                     topContainer.Add(difficulties);
                 setBox.BorderColour = new Color4(
@@ -56,6 +56,7 @@ namespace osu.Game.GameModes.Play
                     setBox.BorderColour.G,
                     setBox.BorderColour.B,
                     collapsed ? 0 : 255);
+                setBox.GlowRadius = collapsed ? 0 : 5;
             }
         }
 
@@ -108,6 +109,7 @@ namespace osu.Game.GameModes.Play
             CornerRadius = 5;
             BorderThickness = 2;
             BorderColour = new Color4(221, 255, 255, 0);
+            GlowColour = new Color4(166, 221, 251, 0.5f); // TODO: Get actual color for this
             Children = new Drawable[]
             {
                 new Box

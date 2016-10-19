@@ -98,7 +98,7 @@ namespace osu.Game.GameModes.Play
                     {
                         setList = new FlowContainer
                         {
-                            Padding = new MarginPadding { Top = 25, Bottom = 25 },
+                            Padding = new MarginPadding { Left = 25, Top = 25, Bottom = 25 },
                             RelativeSizeAxes = Axes.X,
                             Size = new Vector2(1, 0),
                             Direction = FlowDirection.VerticalOnly,
