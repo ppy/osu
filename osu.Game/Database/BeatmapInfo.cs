@@ -17,7 +17,7 @@ namespace osu.Game.Database
 
         [PrimaryKey]
         public int BeatmapID { get; set; }
-        [NotNull, Indexed]
+        [ForeignKey(typeof(BeatmapSetInfo)), NotNull]
         public int BeatmapSetID { get; set; }
         [ForeignKey(typeof(BeatmapMetadata))]
         public int BeatmapMetadataID { get; set; }
