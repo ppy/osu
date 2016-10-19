@@ -139,6 +139,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Tests\TestCaseChatDisplay.cs" />
+    <Compile Include="Tests\TestCasePlayer.cs" />
     <Compile Include="Tests\TestCaseGamefield.cs" />
     <Compile Include="Tests\TestCaseHitObjects.cs" />
     <Compile Include="Tests\TestCaseKeyCounter.cs" />
