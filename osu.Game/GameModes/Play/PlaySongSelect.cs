@@ -12,7 +12,6 @@ using osu.Game.GameModes.Backgrounds;
 using osu.Framework;
 using osu.Game.Database;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Drawables;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
@@ -23,7 +22,7 @@ namespace osu.Game.GameModes.Play
     {
         private Bindable<PlayMode> playMode;
         private BeatmapDatabase beatmaps;
-        private BeatmapSet selectedBeatmapSet;
+        private BeatmapSetInfo selectedBeatmapSet;
 
         // TODO: use currently selected track as bg
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
@@ -31,7 +30,7 @@ namespace osu.Game.GameModes.Play
         private ScrollContainer scrollContainer;
         private FlowContainer setList;
 
-        private void selectBeatmapSet(BeatmapSet beatmapSet)
+        private void selectBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             selectedBeatmapSet = beatmapSet;
             foreach (var child in setList.Children)
@@ -41,7 +40,7 @@ namespace osu.Game.GameModes.Play
             }
         }
 
-        private void addBeatmapSet(BeatmapSet beatmapSet)
+        private void addBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             var group = new BeatmapGroup(beatmapSet);
             group.SetSelected += (selectedSet) => selectBeatmapSet(selectedSet);
@@ -50,11 +49,7 @@ namespace osu.Game.GameModes.Play
 
         private void addBeatmapSets()
         {
-            var sets = beatmaps.GetBeatmapSets();
-
-            if (sets.Length == 0) return;
-
-            foreach (var beatmapSet in sets)
+            foreach (var beatmapSet in beatmaps.Query<BeatmapSetInfo>())
                 addBeatmapSet(beatmapSet);
         }
 
@@ -64,13 +59,13 @@ namespace osu.Game.GameModes.Play
             const float backgroundSlant = 25;
             Children = new Drawable[]
             {
-                new BackgroundBox(backgroundSlant)
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = new Vector2(backgroundWidth, 0.5f),
                     Colour = new Color4(0, 0, 0, 0.5f),
                 },
-                new BackgroundBox(-backgroundSlant)
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Y,
@@ -132,28 +127,6 @@ namespace osu.Game.GameModes.Play
 
         private void PlayMode_ValueChanged(object sender, EventArgs e)
         {
-        }
-
-        class BackgroundBox : Box
-        {
-            private float wedgeWidth;
-
-            public BackgroundBox(float wedgeWidth)
-            {
-                this.wedgeWidth = wedgeWidth;
-            }
-
-            protected override Quad DrawQuad
-            {
-                get
-                {
-                    Quad q = base.DrawQuad;
-                    q.TopRight.X += wedgeWidth;
-                    q.BottomRight.X -= wedgeWidth;
-                    return q;
-                }
-            }
-
         }
     }
 }

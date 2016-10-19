@@ -12,7 +12,6 @@ using osu.Game.GameModes.Backgrounds;
 using osu.Framework;
 using osu.Game.Database;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Drawables;
 using OpenTK.Graphics;
 using OpenTK;
 using osu.Game.Graphics;
@@ -21,10 +20,10 @@ namespace osu.Game.GameModes.Play
 {
     class BeatmapButton : AutoSizeContainer
     {
-        private BeatmapSet beatmapSet;
-        private Beatmap beatmap;
+        private BeatmapSetInfo beatmapSet;
+        private BeatmapInfo beatmap;
 
-        public BeatmapButton(BeatmapSet set, Beatmap beatmap)
+        public BeatmapButton(BeatmapSetInfo set, BeatmapInfo beatmap)
         {
             this.beatmapSet = set;
             this.beatmap = beatmap;

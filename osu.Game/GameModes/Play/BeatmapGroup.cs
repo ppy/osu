@@ -7,10 +7,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Framework.Graphics.Primitives;
 using OpenTK;
 using System.Linq;
-using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using OpenTK.Graphics;
@@ -21,9 +21,9 @@ namespace osu.Game.GameModes.Play
     {
         private const float collapsedAlpha = 0.3f;
 
-        public event Action<BeatmapSet> SetSelected;
-        public event Action<BeatmapSet, Beatmap> BeatmapSelected;
-        public BeatmapSet BeatmapSet;
+        public event Action<BeatmapSetInfo> SetSelected;
+        public event Action<BeatmapSetInfo, BeatmapInfo> BeatmapSelected;
+        public BeatmapSetInfo BeatmapSet;
         private FlowContainer topContainer;
         private FlowContainer difficulties;
         private bool collapsed;
@@ -51,7 +51,7 @@ namespace osu.Game.GameModes.Play
             }
         }
 
-        public BeatmapGroup(BeatmapSet beatmapSet)
+        public BeatmapGroup(BeatmapSetInfo beatmapSet)
         {
             BeatmapSet = beatmapSet;
             Alpha = collapsedAlpha;
@@ -89,9 +89,9 @@ namespace osu.Game.GameModes.Play
     
     class BeatmapSetBox : AutoSizeContainer
     {
-        private BeatmapSet beatmapSet;
+        private BeatmapSetInfo beatmapSet;
 
-        public BeatmapSetBox(BeatmapSet beatmapSet)
+        public BeatmapSetBox(BeatmapSetInfo beatmapSet)
         {
             this.beatmapSet = beatmapSet;
             RelativeSizeAxes = Axes.X;
