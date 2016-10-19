@@ -24,6 +24,7 @@ namespace osu.Game.GameModes.Play
         public event Action<BeatmapSetInfo> SetSelected;
         public event Action<BeatmapSetInfo, BeatmapInfo> BeatmapSelected;
         public BeatmapSetInfo BeatmapSet;
+        private BeatmapSetBox setBox;
         private FlowContainer topContainer;
         private FlowContainer difficulties;
         private bool collapsed;
@@ -48,6 +49,11 @@ namespace osu.Game.GameModes.Play
                     topContainer.Remove(difficulties);
                 else
                     topContainer.Add(difficulties);
+                setBox.BorderColour = new Color4(
+                    setBox.BorderColour.R,
+                    setBox.BorderColour.G,
+                    setBox.BorderColour.B,
+                    collapsed ? 0 : 255);
             }
         }
 
@@ -64,7 +70,7 @@ namespace osu.Game.GameModes.Play
                     RelativeSizeAxes = Axes.X,
                     Size = new Vector2(1, 0),
                     Direction = FlowDirection.VerticalOnly,
-                    Children = new[] { new BeatmapSetBox(beatmapSet) }
+                    Children = new[] { setBox = new BeatmapSetBox(beatmapSet) }
                 }
             };
             difficulties = new FlowContainer // Deliberately not added to children
@@ -96,6 +102,10 @@ namespace osu.Game.GameModes.Play
             this.beatmapSet = beatmapSet;
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, 0);
+            Masking = true;
+            CornerRadius = 5;
+            BorderThickness = 2;
+            BorderColour = new Color4(221, 255, 255, 0);
             Children = new Drawable[]
             {
                 new Box
