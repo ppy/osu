@@ -24,40 +24,24 @@ using osu.Framework;
 
 namespace osu.Game.GameModes.Play
 {
-    class Player : GameModeWhiteBox
+    public class Player : OsuGameMode
     {
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
-        protected override IEnumerable<Type> PossibleChildren => new[] {
-                typeof(Results)
-        };
+        public Beatmap Beatmap;
+
+        public PlayMode PlayMode;
 
         public override void Load(BaseGame game)
         {
             base.Load(game);
 
-            List<HitObject> objects = new List<HitObject>();
-
-            double time = Time + 1000;
-            for (int i = 0; i < 100; i++)
-            {
-                objects.Add(new Circle()
-                {
-                    StartTime = time,
-                    Position = new Vector2(RNG.Next(0, 512), RNG.Next(0, 384))
-                });
-
-                time += RNG.Next(50, 500);
-            }
-
             Beatmap beatmap = new Beatmap
             {
-                HitObjects = objects
+                HitObjects = Beatmap?.HitObjects ?? new List<HitObject>()
             };
 
-            OsuGame osu = game as OsuGame;
-
-            switch (osu.PlayMode.Value)
+            switch (PlayMode)
             {
                 case PlayMode.Osu:
                     Add(new OsuHitRenderer

@@ -13,8 +13,8 @@ namespace osu.Game.GameModes.Play.Osu
     {
         public OsuPlayfield()
         {
-            RelativeSizeAxes = Axes.None;
             Size = new Vector2(512, 384);
+            Scale = new Vector2(1.6f);
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
         }
