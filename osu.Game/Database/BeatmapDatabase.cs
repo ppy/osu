@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
-using SQLite;
+using SQLite.Net;
+using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Database
 {
@@ -23,14 +25,18 @@ namespace osu.Game.Database
                 connection = storage.GetDatabase(@"beatmaps");
                 connection.CreateTable<BeatmapMetadata>();
                 connection.CreateTable<BaseDifficulty>();
-                connection.CreateTable<BeatmapSet>();
-                connection.CreateTable<Beatmap>();
+                connection.CreateTable<BeatmapSetInfo>();
+                connection.CreateTable<BeatmapInfo>();
             }
         }
-        public void AddBeatmap(string path)
+
+        public void ImportBeatmap(string path)
         {
             string hash = null;
-            ArchiveReader reader;
+            var reader = ArchiveReader.GetReader(storage, path);
+            var metadata = reader.ReadMetadata();
+            if (connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
+                return; // TODO: Update this beatmap instead
             if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
             {
                 using (var md5 = MD5.Create())
@@ -41,60 +47,82 @@ namespace osu.Game.Database
                     var outputPath = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
                     using (var output = storage.GetStream(outputPath, FileAccess.Write))
                         input.CopyTo(output);
-                    reader = ArchiveReader.GetReader(storage, path = outputPath);
                 }
             }
-            else
-                reader = ArchiveReader.GetReader(storage, path);
-            var metadata = reader.ReadMetadata();
-            if (connection.Table<BeatmapSet>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
-                return; // TODO: Update this beatmap instead
             string[] mapNames = reader.ReadBeatmaps();
-            var beatmapSet = new BeatmapSet
+            var beatmapSet = new BeatmapSetInfo
             {
                 BeatmapSetID = metadata.BeatmapSetID,
                 Path = path,
                 Hash = hash,
             };
-            var maps = new List<Beatmap>();
+            var maps = new List<BeatmapInfo>();
             foreach (var name in mapNames)
             {
                 using (var stream = new StreamReader(reader.ReadFile(name)))
                 {
                     var decoder = BeatmapDecoder.GetDecoder(stream);
-                    Beatmap beatmap = new Beatmap();
-                    decoder.Decode(stream, beatmap);
-                    maps.Add(beatmap);
-                    beatmap.BaseDifficultyID = connection.Insert(beatmap.BaseDifficulty);
+                    Beatmap beatmap = decoder.Decode(stream);
+                    beatmap.BeatmapInfo.Path = name;
+                    // TODO: Diff beatmap metadata with set metadata and insert if necessary
+                    beatmap.BeatmapInfo.Metadata = null;
+                    maps.Add(beatmap.BeatmapInfo);
+                    connection.Insert(beatmap.BeatmapInfo.BaseDifficulty);
+                    connection.Insert(beatmap.BeatmapInfo);
+                    connection.UpdateWithChildren(beatmap.BeatmapInfo);
                 }
             }
-            beatmapSet.BeatmapMetadataID = connection.Insert(metadata);
             connection.Insert(beatmapSet);
-            connection.InsertAll(maps);
+            beatmapSet.BeatmapMetadataID = connection.Insert(metadata);
+            connection.UpdateWithChildren(beatmapSet);
         }
-        public ArchiveReader GetReader(BeatmapSet beatmapSet)
+
+        public ArchiveReader GetReader(BeatmapSetInfo beatmapSet)
         {
             return ArchiveReader.GetReader(storage, beatmapSet.Path);
         }
-
-        /// <summary>
-        /// Given a BeatmapSet pulled from the database, loads the rest of its data from disk.
-        /// </summary>        public void PopulateBeatmap(BeatmapSet beatmapSet)
+        
+        public BeatmapSetInfo GetBeatmapSet(int id)
         {
+            return Query<BeatmapSetInfo>().Where(s => s.BeatmapSetID == id).FirstOrDefault();
+        }
+        
+        public Beatmap GetBeatmap(BeatmapInfo beatmapInfo)
+        {
+            var beatmapSet = Query<BeatmapSetInfo>()
+                .Where(s => s.BeatmapSetID == beatmapInfo.BeatmapSetID).FirstOrDefault();    
+            if (beatmapSet == null)
+                throw new InvalidOperationException(
+                    $@"Beatmap set {beatmapInfo.BeatmapSetID} is not in the local database.");
             using (var reader = GetReader(beatmapSet))
+            using (var stream = new StreamReader(reader.ReadFile(beatmapInfo.Path)))
             {
-                string[] mapNames = reader.ReadBeatmaps();
-                foreach (var name in mapNames)
-                {
-                    using (var stream = new StreamReader(reader.ReadFile(name)))
-                    {
-                        var decoder = BeatmapDecoder.GetDecoder(stream);
-                        Beatmap beatmap = new Beatmap();
-                        decoder.Decode(stream, beatmap);
-                        beatmapSet.Beatmaps.Add(beatmap);
-                    }
-                }
+                var decoder = BeatmapDecoder.GetDecoder(stream);
+                return decoder.Decode(stream);
             }
+        }
+        
+        public TableQuery<T> Query<T>() where T : class
+        {
+            return connection.Table<T>();
+        }
+
+        readonly Type[] validTypes = new[]
+        {
+            typeof(BeatmapSetInfo),
+            typeof(BeatmapInfo),
+            typeof(BeatmapMetadata),
+            typeof(BaseDifficulty),
+        };
+        
+        public void Update<T>(T record, bool cascade = true) where T : class
+        {
+            if (!validTypes.Any(t => t == typeof(T)))
+                throw new ArgumentException(nameof(T), "Must be a type managed by BeatmapDatabase");
+            if (cascade)
+                connection.UpdateWithChildren(record);
+            else
+                connection.Update(record);
         }
     }
 }

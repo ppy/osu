@@ -74,7 +74,7 @@ namespace osu.Game
             {
                 try
                 {
-                    Beatmaps.AddBeatmap(message.Path);
+                    Beatmaps.ImportBeatmap(message.Path);
                     // TODO: Switch to beatmap list and select the new song
                 }
                 catch (Exception ex)
