@@ -12,6 +12,7 @@ namespace osu.Game.Database
         public BeatmapInfo()
         {
             BaseDifficulty = new BaseDifficulty();
+            Metadata = new BeatmapMetadata();
         }
 
         [PrimaryKey]
