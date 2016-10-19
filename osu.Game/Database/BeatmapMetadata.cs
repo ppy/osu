@@ -8,7 +8,7 @@ namespace osu.Game.Database
 {
     public class BeatmapMetadata
     {
-        [PrimaryKey]
+        [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
         
         public int BeatmapSetID { get; set; }
