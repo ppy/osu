@@ -22,13 +22,14 @@ namespace osu.Game.GameModes.Play.Mania
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(columns);
 
-        protected override Drawable GetVisualRepresentation(ManiaBaseHit h)
+        protected override DrawableHitObject GetVisualRepresentation(ManiaBaseHit h)
         {
-            return new DrawableNote(h)
-            {
-                Position = new Vector2((float)(h.Column + 0.5) / columns, -0.1f),
-                RelativePositionAxes = Axes.Both
-            };
+            return null;
+            //return new DrawableNote(h)
+            //{
+            //    Position = new Vector2((float)(h.Column + 0.5) / columns, -0.1f),
+            //    RelativePositionAxes = Axes.Both
+            //};
         }
     }
 }

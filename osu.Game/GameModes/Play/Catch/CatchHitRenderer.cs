@@ -14,6 +14,6 @@ namespace osu.Game.GameModes.Play.Catch
 
         protected override Playfield CreatePlayfield() => new CatchPlayfield();
 
-        protected override Drawable GetVisualRepresentation(CatchBaseHit h) => new DrawableFruit(h);
+        protected override DrawableHitObject GetVisualRepresentation(CatchBaseHit h) => null;// new DrawableFruit(h);
     }
 }

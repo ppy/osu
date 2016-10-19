@@ -49,6 +49,11 @@ namespace osu.Game.Graphics.UserInterface
             return count.ToString("D" + LeadingZeroes);
         }
 
+        public override void Increment(ulong amount)
+        {
+            Count = Count + amount;
+        }
+
         protected class TransformScore : Transform<ulong>
         {
             public override ulong CurrentValue

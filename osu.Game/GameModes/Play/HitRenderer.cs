@@ -6,10 +6,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.Objects;
 using osu.Framework;
+using System;
 
 namespace osu.Game.GameModes.Play
 {
-    public abstract class HitRenderer<T> : Container
+    public abstract class HitRenderer : Container
+    {
+        public Action<HitObject> OnHit;
+        public Action<HitObject> OnMiss;
+    }
+
+    public abstract class HitRenderer<T> : HitRenderer
         where T : HitObject
     {
         private List<T> objects;
@@ -50,9 +57,28 @@ namespace osu.Game.GameModes.Play
         {
             if (objects == null) return;
             foreach (T h in objects)
-                playfield.Add(GetVisualRepresentation(h));
+            {
+                var drawableObject = GetVisualRepresentation(h);
+
+                if (drawableObject == null) continue;
+
+                drawableObject.OnHit = onHit;
+                drawableObject.OnMiss = onMiss;
+
+                playfield.Add(drawableObject);
+            }
         }
 
-        protected abstract Drawable GetVisualRepresentation(T h);
+        private void onMiss(DrawableHitObject obj)
+        {
+            OnMiss?.Invoke(obj.HitObject);
+        }
+
+        private void onHit(DrawableHitObject obj)
+        {
+            OnHit?.Invoke(obj.HitObject);
+        }
+
+        protected abstract DrawableHitObject GetVisualRepresentation(T h);
     }
 }

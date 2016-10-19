@@ -12,6 +12,7 @@ using osu.Framework.Timing;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Objects.Osu.Drawable;
+using osu.Game.Beatmaps.Objects;
 
 namespace osu.Desktop.Tests
 {
@@ -50,7 +51,7 @@ namespace osu.Desktop.Tests
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Depth = -i,
-                    State = HitState.Armed,
+                    State = ArmedState.Armed,
                 });
             }
         }
@@ -59,7 +60,6 @@ namespace osu.Desktop.Tests
         {
             base.Update();
             ourClock.ProcessFrame();
-
         }
     }
 }
