@@ -24,7 +24,7 @@ namespace osu.Game.GameModes.Menu
 
         public Action Action;
 
-        public float SizeForFlow => logo == null ? 0 : logo.Size.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.8f;
+        public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.8f;
 
         private Sprite ripple;
 

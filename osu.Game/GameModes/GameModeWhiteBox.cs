@@ -39,7 +39,7 @@ namespace osu.Game.GameModes
                 popButton.Alpha = 1;
 
             Content.Alpha = 0;
-            textContainer.Position = new Vector2(Size.X / 16, 0);
+            textContainer.Position = new Vector2(DrawSize.X / 16, 0);
 
             box.ScaleTo(0.2f);
             box.RotateTo(-20);
@@ -55,7 +55,7 @@ namespace osu.Game.GameModes
 
         protected override bool OnExiting(GameMode next)
         {
-            textContainer.MoveTo(new Vector2((Size.X / 16), 0), transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2((DrawSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
 
             return base.OnExiting(next);
@@ -65,7 +65,7 @@ namespace osu.Game.GameModes
         {
             base.OnSuspending(next);
 
-            textContainer.MoveTo(new Vector2(-(Size.X / 16), 0), transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2(-(DrawSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
         }
 

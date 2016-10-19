@@ -96,7 +96,7 @@ namespace osu.Game.Overlays
             base.UpdateLayout();
 
             if (!activeMode.EnsureValid())
-                activeMode.Refresh(() => modeButtonLine.MoveToX(activeButton.Position.X + activeButton.Size.X / 2 + padding, 200, EasingTypes.OutQuint));
+                activeMode.Refresh(() => modeButtonLine.MoveToX(activeButton.DrawPosition.X + activeButton.DrawSize.X / 2 + padding, 200, EasingTypes.OutQuint));
         }
     }
 }

@@ -35,7 +35,7 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            MoveToY(-Size.Y, transition_time, EasingTypes.InQuint);
+            MoveToY(-DrawSize.Y, transition_time, EasingTypes.InQuint);
             FadeOut(transition_time, EasingTypes.InQuint);
         }
 
