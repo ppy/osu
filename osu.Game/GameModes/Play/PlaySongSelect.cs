@@ -4,21 +4,33 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.GameModes.Backgrounds;
 using osu.Framework;
 
 namespace osu.Game.GameModes.Play
 {
-    class PlaySongSelect : GameModeWhiteBox
+    class PlaySongSelect : OsuGameMode
     {
         private Bindable<PlayMode> playMode;
 
+        // TODO: use currently selected track as bg
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
-        protected override IEnumerable<Type> PossibleChildren => new[] {
-                typeof(ModSelect),
-                typeof(Player)
-        };
+        private FlowContainer setList;
+
+        private void addBeatmapSets()
+        {
+            var sets = (Game as OsuGame).Beatmaps.GetBeatmapSets();
+            foreach (var beatmapSet in sets)
+            {
+                setList.Add(new SpriteText
+                {
+                    Text = beatmapSet.Metadata.Title
+                });
+            }
+        }
 
         public override void Load(BaseGame game)
         {
@@ -28,6 +40,14 @@ namespace osu.Game.GameModes.Play
 
             playMode = osu.PlayMode;
             playMode.ValueChanged += PlayMode_ValueChanged;
+
+            Add(setList = new FlowContainer
+            {
+                Direction = FlowDirection.VerticalOnly,
+                Padding = new OpenTK.Vector2(0, osu.Toolbar.Height)
+            });
+
+            addBeatmapSets();
         }
 
         protected override void Dispose(bool isDisposing)
