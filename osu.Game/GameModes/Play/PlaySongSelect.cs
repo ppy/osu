@@ -42,6 +42,7 @@ namespace osu.Game.GameModes.Play
 
         private void addBeatmapSet(BeatmapSetInfo beatmapSet)
         {
+            beatmapSet = beatmaps.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
             var group = new BeatmapGroup(beatmapSet);
             group.SetSelected += (selectedSet) => selectBeatmapSet(selectedSet);
             setList.Add(group);
