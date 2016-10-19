@@ -56,30 +56,41 @@ namespace osu.Game.GameModes.Play
 
         public PlaySongSelect()
         {
-            const float backgroundWidth = 0.6f;
-            const float backgroundSlant = 25;
+            const float scrollWidth = 500;
             Children = new Drawable[]
             {
-                new Box
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(backgroundWidth, 0.5f),
-                    Colour = new Color4(0, 0, 0, 0.5f),
-                },
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    RelativePositionAxes = Axes.Y,
-                    Size = new Vector2(backgroundWidth, 0.5f),
-                    Position = new Vector2(0, 0.5f),
-                    Colour = new Color4(0, 0, 0, 0.5f),
+                    Size = new Vector2(1),
+                    Padding = new MarginPadding { Right = scrollWidth - 100 },
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Size = new Vector2(1, 0.5f),
+                            Colour = new Color4(0, 0, 0, 0.5f),
+                            Shear = new Vector2(0.15f, 0),
+                        },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            RelativePositionAxes = Axes.Both,
+                            Size = new Vector2(1, 0.5f),
+                            Position = new Vector2(0, 0.5f),
+                            Colour = new Color4(0, 0, 0, 0.5f),
+                            // TODO: Figure out the inverse shear problem
+                            //Shear = new Vector2(-0.15f, 0),
+                        },
+                    }
                 },
                 scrollContainer = new ScrollContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    RelativePositionAxes = Axes.Both,
-                    Size = new Vector2(0.5f, 1),
-                    Position = new Vector2(0.5f, 0),
+                    RelativeSizeAxes = Axes.Y,
+                    Size = new Vector2(scrollWidth, 1),
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
                     Children = new Drawable[]
                     {
                         setList = new FlowContainer

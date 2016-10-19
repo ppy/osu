@@ -56,13 +56,13 @@ namespace osu.Game.Database
             var beatmapSet = new BeatmapSetInfo
             {
                 BeatmapSetID = metadata.BeatmapSetID,
+                Beatmaps = new List<BeatmapInfo>(),
                 Path = path,
                 Hash = hash,
             };
-            beatmapSet.Metadata = metadata;            
-            connection.Insert(beatmapSet);
             connection.Insert(metadata);
-            var maps = new List<BeatmapInfo>();
+            beatmapSet.Metadata = metadata;
+            connection.Insert(beatmapSet);
             using (var reader = ArchiveReader.GetReader(storage, path))
             {
                 string[] mapNames = reader.ReadBeatmaps();
@@ -73,9 +73,10 @@ namespace osu.Game.Database
                         var decoder = BeatmapDecoder.GetDecoder(stream);
                         Beatmap beatmap = decoder.Decode(stream);
                         beatmap.BeatmapInfo.Path = name;
+                        beatmap.BeatmapInfo.BeatmapSetID = beatmapSet.BeatmapSetID;
                         // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
                         beatmap.BeatmapInfo.Metadata = null;
-                        maps.Add(beatmap.BeatmapInfo);
+                        beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
                         connection.Insert(beatmap.BeatmapInfo);
                     }
                 }
