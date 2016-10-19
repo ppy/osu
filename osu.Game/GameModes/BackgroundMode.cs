@@ -35,7 +35,7 @@ namespace osu.Game.GameModes
         {
             base.Load(game);
 
-            Content.Scale *= 1 + (x_movement_amount / Size.X) * 2;
+            Content.Scale *= 1 + (x_movement_amount / DrawSize.X) * 2;
         }
 
         protected override void OnEntering(GameMode last)
