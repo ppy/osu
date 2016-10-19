@@ -214,7 +214,11 @@ namespace osu.Game.Beatmaps.Formats
                 HitObjects = new List<HitObject>(),
                 ControlPoints = new List<ControlPoint>(),
                 ComboColors = new List<Color4>(),
-                BeatmapInfo = new BeatmapInfo(),
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Metadata = new BeatmapMetadata(),
+                    BaseDifficulty = new BaseDifficulty(),
+                },
             };
             
             var section = Section.None;
