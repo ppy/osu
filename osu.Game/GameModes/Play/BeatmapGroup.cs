@@ -22,6 +22,16 @@ namespace osu.Game.GameModes.Play
     class BeatmapGroup : AutoSizeContainer
     {
         private const float collapsedAlpha = 0.5f;
+        
+        private BeatmapInfo selectedBeatmap;
+        public BeatmapInfo SelectedBeatmap
+        {
+            get { return selectedBeatmap; }
+            set
+            {
+                selectedBeatmap = value;
+            }
+        }
 
         public event Action<BeatmapSetInfo> SetSelected;
         public event Action<BeatmapSetInfo, BeatmapInfo> BeatmapSelected;
@@ -84,7 +94,8 @@ namespace osu.Game.GameModes.Play
                 Padding = new MarginPadding { Left = 25 },
                 Spacing = new Vector2(0, 5),
                 Direction = FlowDirection.VerticalOnly,
-                Children = this.BeatmapSet.Beatmaps.Select(b => new BeatmapButton(this.BeatmapSet, b))
+                Children = this.BeatmapSet.Beatmaps.Select(
+                    b => new BeatmapButton(this.BeatmapSet, b) { Selected = beatmap => BeatmapSelected?.Invoke(beatmapSet, beatmap) })
             };
             collapsed = true;
         }

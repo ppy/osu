@@ -7,6 +7,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.GameModes.Backgrounds;
 using osu.Framework;
@@ -23,6 +24,8 @@ namespace osu.Game.GameModes.Play
         private BeatmapSetInfo beatmapSet;
         private BeatmapInfo beatmap;
 
+        public Action<BeatmapInfo> Selected;
+
         public BeatmapButton(BeatmapSetInfo set, BeatmapInfo beatmap)
         {
             this.beatmapSet = set;
@@ -33,7 +36,7 @@ namespace osu.Game.GameModes.Play
             {
                 new Box
                 {
-                    Colour = new Color4(40, 86, 102, 255), // TODO: texture
+                    Colour = new Color4(40, 86, 102, 255), // TODO: gradient
                     RelativeSizeAxes = Axes.Both,
                     Size = new Vector2(1),
                 },
@@ -65,6 +68,12 @@ namespace osu.Game.GameModes.Play
                     }
                 }
             };
+        }
+        
+        protected override bool OnClick(InputState state)
+        {
+            Selected?.Invoke(beatmap);
+            return true;
         }
     }
 }
