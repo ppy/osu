@@ -33,7 +33,7 @@ namespace osu.Game.Graphics
         public override async void Load(BaseGame game)
         {
             base.Load(game);
-            
+
             Texture = await game.Textures.GetAsync($@"https://a.ppy.sh/{userId}");
             Size = new Vector2(avatarSize);
             CornerRadius = rounding;

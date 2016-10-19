@@ -36,31 +36,10 @@ namespace osu.Game.Overlays
             }
         }
 
-        public string TooltipMain
-        {
-            get { return tooltip1.Text; }
-            set
-            {
-                tooltip1.Text = value;
-            }
-        }
-
-        public string TooltipSub
-        {
-            get { return tooltip2.Text; }
-            set
-            {
-                tooltip2.Text = value;
-            }
-        }
-
         public Action Action;
         protected Avatar DrawableAvatar;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
-        private FlowContainer tooltipContainer;
-        private SpriteText tooltip1;
-        private SpriteText tooltip2;
 
         public UserButton(int userId)
         {
@@ -94,24 +73,6 @@ namespace osu.Game.Overlays
                             Origin = Anchor.CentreLeft,
                         },
                     },
-                },
-                tooltipContainer = new FlowContainer
-                {
-                    Direction = FlowDirection.VerticalOnly,
-                    Anchor = Anchor.BottomLeft,
-                    Position = new Vector2(5, -5),
-                    Alpha = 0,
-                    Children = new[]
-                    {
-                        tooltip1 = new SpriteText()
-                        {
-                            TextSize = 22,
-                        },
-                        tooltip2 = new SpriteText
-                        {
-                            TextSize = 15
-                        }
-                    }
                 }
             };
 
@@ -137,14 +98,12 @@ namespace osu.Game.Overlays
         protected override bool OnHover(InputState state)
         {
             HoverBackground.FadeTo(0.4f, 200);
-            tooltipContainer.FadeIn(100);
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             HoverBackground.FadeTo(0, 200);
-            tooltipContainer.FadeOut(100);
         }
     }
 }

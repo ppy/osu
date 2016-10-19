@@ -113,6 +113,7 @@ namespace osu.Game.Online.API
 
                         //we're connected!
                         State = APIState.Online;
+                        //Queue(new MyUser() { Timeout = 5000 });
                         failureCount = 0;
                         break;
                 }
