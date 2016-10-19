@@ -19,13 +19,15 @@ namespace osu.Game.Beatmaps.IO
             });
             OsuLegacyDecoder.Register();
         }
-    
-        private ZipFile archive { get; set; }
-        private string[] beatmaps { get; set; }
-        private Beatmap firstMap { get; set; }
+
+        private Stream archiveStream;
+        private ZipFile archive;
+        private string[] beatmaps;
+        private Beatmap firstMap;
     
         public OszArchiveReader(Stream archiveStream)
         {
+            this.archiveStream = archiveStream;
             archive = ZipFile.Read(archiveStream);
             beatmaps = archive.Entries.Where(e => e.FileName.EndsWith(@".osu"))
                 .Select(e => e.FileName).ToArray();
@@ -59,6 +61,7 @@ namespace osu.Game.Beatmaps.IO
         public override void Dispose()
         {
             archive.Dispose();
+            archiveStream.Dispose();
         }
     }
 }
