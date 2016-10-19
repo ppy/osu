@@ -2,9 +2,9 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.GameModes.Play;
-using SQLite;
+using SQLite.Net.Attributes;
 
-namespace osu.Game.Beatmaps
+namespace osu.Game.Database
 {
     public class BeatmapMetadata
     {

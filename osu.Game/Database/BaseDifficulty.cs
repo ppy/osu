@@ -1,7 +1,7 @@
 ﻿using System;
-using SQLite;
+using SQLite.Net.Attributes;
 
-namespace osu.Game.Beatmaps
+namespace osu.Game.Database
 {
     public class BaseDifficulty
     {
