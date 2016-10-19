@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using OpenTK;
 using osu.Framework;
 using osu.Framework.Graphics.Sprites;
+using OpenTK.Graphics;
 
 namespace osu.Game.GameModes.Play.Osu
 {
@@ -28,6 +29,7 @@ namespace osu.Game.GameModes.Play.Osu
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
+                Colour = Color4.Black,
                 Alpha = 0.5f
             });
         }
