@@ -144,7 +144,7 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            MoveToY(-Size.Y, transition_length, EasingTypes.InQuint);
+            MoveToY(-DrawSize.Y, transition_length, EasingTypes.InQuint);
             FadeOut(transition_length, EasingTypes.InQuint);
         }
     }

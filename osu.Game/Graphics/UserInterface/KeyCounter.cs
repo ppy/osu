@@ -107,8 +107,8 @@ namespace osu.Game.Graphics.UserInterface
             };
             //Set this manually because an element with Alpha=0 won't take it size to AutoSizeContainer,
             //so the size can be changing between buttonSprite and glowSprite.
-            Height = buttonSprite.Height;
-            Width = buttonSprite.Width;
+            Height = buttonSprite.DrawHeight;
+            Width = buttonSprite.DrawWidth;
         }
 
         private void updateGlowSprite(bool show)

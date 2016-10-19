@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnMouseMove(InputState state)
         {
-            content.Position = (state.Mouse.Position - Size / 2) * ParallaxAmount;
+            content.Position = (state.Mouse.Position - DrawSize / 2) * ParallaxAmount;
             return base.OnMouseMove(state);
         }
 
