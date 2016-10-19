@@ -45,6 +45,11 @@ namespace osu.Game.Graphics.UserInterface
             return Math.Abs(currentValue - newValue) * RollingDuration * 100.0f;
         }
 
+        public override void Increment(float amount)
+        {
+            Count = Count + amount;
+        }
+
         protected class TransformAccuracy : TransformFloat
         {
             public override void Apply(Drawable d)

@@ -15,13 +15,7 @@ using osu.Framework.MathUtils;
 
 namespace osu.Game.Beatmaps.Objects.Osu.Drawable
 {
-    public enum HitState
-    {
-        Disarmed,
-        Armed
-    }
-
-    public class DrawableCircle : Container, IStateful<HitState>
+    public class DrawableCircle : DrawableHitObject
     {
         private Sprite approachCircle;
         private CirclePart circle;
@@ -32,7 +26,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
         private GlowPart glow;
         private OsuBaseHit h;
 
-        public DrawableCircle(Circle h)
+        public DrawableCircle(Circle h) : base(h)
         {
             this.h = h;
 
@@ -50,7 +44,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 circle = new CirclePart()
                 {
                     Colour = h.Colour,
-                    Hit = delegate { State = HitState.Armed; }
+                    Hit = delegate { State = ArmedState.Armed; }
                 },
                 number = new NumberPart(),
                 ring = new RingPart(),
@@ -68,8 +62,6 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             };
 
             Size = new Vector2(100);
-
-            State = HitState.Armed;
         }
 
         public override void Load(BaseGame game)
@@ -77,6 +69,13 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             base.Load(game);
 
             approachCircle.Texture = game.Textures.Get(@"Play/osu/approachcircle@2x");
+        }
+
+        protected override void UpdateState(ArmedState state)
+        {
+            if (!IsLoaded) return;
+
+            Flush(); //move to DrawableHitObject
 
             Transforms.Add(new TransformAlpha(Clock) { StartTime = h.StartTime - 1000, EndTime = h.StartTime - 800, StartValue = 0, EndValue = 1 });
 
@@ -85,35 +84,12 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
 
             glow.Transforms.Add(new TransformAlpha(Clock) { StartTime = h.StartTime, EndTime = h.StartTime + 400, StartValue = glow.Alpha, EndValue = 0 });
 
-            updateState();
-
-            Transforms.Add(new TransformScale(Clock) { StartTime = h.StartTime + h.Duration, EndTime = h.StartTime + h.Duration + 400, StartValue = Scale, EndValue = Scale * 1.5f, Easing = EasingTypes.OutQuad });
-            Expire(true);
-        }
-
-        private HitState state;
-        public HitState State
-        {
-            get { return state; }
-
-            set
-            {
-                state = value;
-
-                updateState();
-            }
-        }
-
-        private void updateState()
-        {
-            if (!IsLoaded) return;
-
             switch (state)
             {
-                case HitState.Disarmed:
+                case ArmedState.Disarmed:
                     Transforms.Add(new TransformAlpha(Clock) { StartTime = h.StartTime + h.Duration + 200, EndTime = h.StartTime + h.Duration + 400, StartValue = 1, EndValue = 0 });
                     break;
-                case HitState.Armed:
+                case ArmedState.Armed:
                     const float flashIn = 30;
                     const float fadeOut = 800;
 
@@ -130,6 +106,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
 
                     Transforms.Add(new TransformAlpha(Clock) { StartTime = h.StartTime + flashIn, EndTime = h.StartTime + flashIn + fadeOut, StartValue = 1, EndValue = 0 });
 
+                    Transforms.Add(new TransformScale(Clock) { StartTime = h.StartTime + h.Duration, EndTime = h.StartTime + h.Duration + 400, StartValue = Scale, EndValue = Scale * 1.5f, Easing = EasingTypes.OutQuad });
                     break;
             }
         }

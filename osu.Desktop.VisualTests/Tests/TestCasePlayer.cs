@@ -32,13 +32,13 @@ namespace osu.Desktop.Tests
 
             var objects = new List<HitObject>();
 
-            int time = 500;
-            for (int i = 0; i < 1; i++)
+            int time = 1500;
+            for (int i = 0; i < 50; i++)
             {
                 objects.Add(new Circle()
                 {
                     StartTime = time,
-                    Position = new Vector2(RNG.Next(0, 512), RNG.Next(0, 384))
+                    Position = new Vector2(RNG.Next(100, 400), RNG.Next(100, 200))
                 });
 
                 time += 500;

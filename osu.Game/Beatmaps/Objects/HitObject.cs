@@ -13,9 +13,9 @@ namespace osu.Game.Beatmaps.Objects
     public abstract class HitObject
     {
         public double StartTime;
-        public double? EndTime;
+        public virtual double EndTime => StartTime;
 
-        public double Duration => (EndTime ?? StartTime) - StartTime;
+        public double Duration => EndTime - StartTime;
 
         public HitSampleInfo Sample;
 
