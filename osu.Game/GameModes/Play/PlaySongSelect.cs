@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.IO;
 using osu.Game.GameModes.Backgrounds;
 using osu.Framework;
 using osu.Game.Database;
@@ -15,6 +16,7 @@ using osu.Framework.Graphics.Primitives;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.GameModes.Play
 {
@@ -23,6 +25,8 @@ namespace osu.Game.GameModes.Play
         private Bindable<PlayMode> playMode;
         private BeatmapDatabase beatmaps;
         private BeatmapSetInfo selectedBeatmapSet;
+        private BeatmapResourceStore beatmapResources;
+        private TextureStore beatmapTextureResources;
 
         // TODO: use currently selected track as bg
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
@@ -43,7 +47,7 @@ namespace osu.Game.GameModes.Play
         private void addBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             beatmapSet = beatmaps.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
-            var group = new BeatmapGroup(beatmapSet);
+            var group = new BeatmapGroup(beatmapSet, beatmapResources, beatmapTextureResources);
             group.SetSelected += (selectedSet) => selectBeatmapSet(selectedSet);
             setList.Add(group);
         }
@@ -76,12 +80,11 @@ namespace osu.Game.GameModes.Play
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            RelativePositionAxes = Axes.Both,
-                            Size = new Vector2(1, 0.5f),
-                            Position = new Vector2(0, 0.5f),
+                            RelativePositionAxes = Axes.Y,
+                            Size = new Vector2(1, -0.5f),
+                            Position = new Vector2(0, 1),
                             Colour = new Color4(0, 0, 0, 0.5f),
-                            // TODO: Figure out the inverse shear problem
-                            //Shear = new Vector2(-0.15f, 0),
+                            Shear = new Vector2(-0.15f, 0),
                         },
                     }
                 },
@@ -118,8 +121,10 @@ namespace osu.Game.GameModes.Play
                 // Temporary:
                 scrollContainer.Padding = new MarginPadding { Top = osu.Toolbar.Height };
             }
-
+            
             beatmaps = (game as OsuGameBase).Beatmaps;
+            beatmapTextureResources = new TextureStore(
+                new RawTextureLoaderStore(beatmapResources = new BeatmapResourceStore(beatmaps)));
             beatmaps.BeatmapSetAdded += bset => Scheduler.Add(() => addBeatmapSet(bset));
             addBeatmapSets();
             var first = setList.Children.FirstOrDefault() as BeatmapGroup;

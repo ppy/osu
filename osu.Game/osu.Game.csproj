@@ -190,6 +190,7 @@
     <Compile Include="Database\BeatmapMetadata.cs" />
     <Compile Include="Database\BeatmapInfo.cs" />
     <Compile Include="Database\BaseDifficulty.cs" />
+    <Compile Include="Beatmaps\IO\BeatmapResourceStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

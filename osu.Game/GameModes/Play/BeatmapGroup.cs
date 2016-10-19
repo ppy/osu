@@ -14,6 +14,8 @@ using System.Linq;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using OpenTK.Graphics;
+using osu.Game.Beatmaps.IO;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.GameModes.Play
 {
@@ -57,7 +59,7 @@ namespace osu.Game.GameModes.Play
             }
         }
 
-        public BeatmapGroup(BeatmapSetInfo beatmapSet)
+        public BeatmapGroup(BeatmapSetInfo beatmapSet, BeatmapResourceStore beatmapStore, TextureStore resources)
         {
             BeatmapSet = beatmapSet;
             Alpha = collapsedAlpha;
@@ -70,7 +72,7 @@ namespace osu.Game.GameModes.Play
                     RelativeSizeAxes = Axes.X,
                     Size = new Vector2(1, 0),
                     Direction = FlowDirection.VerticalOnly,
-                    Children = new[] { setBox = new BeatmapSetBox(beatmapSet) }
+                    Children = new[] { setBox = new BeatmapSetBox(beatmapSet, beatmapStore, resources) }
                 }
             };
             difficulties = new FlowContainer // Deliberately not added to children
@@ -97,11 +99,11 @@ namespace osu.Game.GameModes.Play
     {
         private BeatmapSetInfo beatmapSet;
 
-        public BeatmapSetBox(BeatmapSetInfo beatmapSet)
+        public BeatmapSetBox(BeatmapSetInfo beatmapSet, BeatmapResourceStore beatmapStore, TextureStore resources)
         {
             this.beatmapSet = beatmapSet;
             RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, 0);
+            Size = new Vector2(1, -1);
             Masking = true;
             CornerRadius = 5;
             BorderThickness = 2;
@@ -110,9 +112,35 @@ namespace osu.Game.GameModes.Play
             {
                 new Box
                 {
-                    Colour = new Color4(85, 85, 85, 255), // TODO: Gradient, and beatmap texture
+                    Colour = new Color4(85, 85, 85, 255),
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(1),
+                    Size = Vector2.One,
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Size = Vector2.One,
+                    Children = new Drawable[]
+                    {
+                        new DeferredSprite
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Size = new Vector2(1, 0),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            ResolveTexture = () =>
+                            {
+                                beatmapStore.AddBeatmap(beatmapSet);
+                                return resources.Get($@"{beatmapSet.BeatmapSetID}:{beatmapSet.Metadata.BackgroundFile}");
+                            },
+                        },
+                        new Box // TODO: Gradient
+                        {
+                            Colour = new Color4(0, 0, 0, 100),
+                            RelativeSizeAxes = Axes.Both,
+                            Size = Vector2.One,
+                        }
+                    }
                 },
                 new FlowContainer
                 {
