@@ -17,6 +17,7 @@ using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.GameModes.Play
 {
@@ -25,6 +26,7 @@ namespace osu.Game.GameModes.Play
         private Bindable<PlayMode> playMode;
         private BeatmapDatabase beatmaps;
         private BeatmapSetInfo selectedBeatmapSet;
+        private BeatmapInfo selectedBeatmap;
         private BeatmapResourceStore beatmapResources;
         private TextureStore beatmapTextureResources;
 
@@ -40,15 +42,28 @@ namespace osu.Game.GameModes.Play
             foreach (var child in setList.Children)
             {
                 var childGroup = child as BeatmapGroup;
-                childGroup.Collapsed = childGroup.BeatmapSet != beatmapSet;
+                if (childGroup.BeatmapSet == beatmapSet)
+                {
+                    childGroup.Collapsed = false;
+                    selectedBeatmap = childGroup.SelectedBeatmap;
+                }
+                else
+                    childGroup.Collapsed = true;
             }
+        }
+        
+        private void selectBeatmap(BeatmapSetInfo set, BeatmapInfo beatmap)
+        {
+            selectBeatmapSet(set);
+            selectedBeatmap = beatmap;
         }
 
         private void addBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             beatmapSet = beatmaps.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
             var group = new BeatmapGroup(beatmapSet, beatmapResources, beatmapTextureResources);
-            group.SetSelected += (selectedSet) => selectBeatmapSet(selectedSet);
+            group.SetSelected += selectBeatmapSet;
+            group.BeatmapSelected += selectBeatmap;
             setList.Add(group);
         }
 
@@ -105,6 +120,15 @@ namespace osu.Game.GameModes.Play
                             Spacing = new Vector2(0, 25),
                         }
                     }
+                },
+                new Button
+                {
+                    Text = "Play",
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Action = () =>
+                    {
+                    },
                 }
             };
         }
