@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Cryptography;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -58,6 +59,8 @@ namespace osu.Game.Database
                 Hash = hash,
             };
             beatmapSet.Metadata = metadata;            
+            connection.Insert(beatmapSet);
+            connection.Insert(metadata);
             var maps = new List<BeatmapInfo>();
             using (var reader = ArchiveReader.GetReader(storage, path))
             {
@@ -72,10 +75,11 @@ namespace osu.Game.Database
                         // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
                         beatmap.BeatmapInfo.Metadata = null;
                         maps.Add(beatmap.BeatmapInfo);
+                        connection.Insert(beatmap.BeatmapInfo);
                     }
                 }
             }
-            connection.InsertWithChildren(beatmapSet);
+            connection.UpdateWithChildren(beatmapSet);
             BeatmapSetAdded?.Invoke(beatmapSet);
         }
 
@@ -107,6 +111,17 @@ namespace osu.Game.Database
         public TableQuery<T> Query<T>() where T : class
         {
             return connection.Table<T>();
+        }
+        
+        public T GetWithChildren<T>(object id) where T : class
+        {
+            return connection.GetWithChildren<T>(id);
+        }
+        
+        public List<T> GetAllWithChildren<T>(Expression<Func<T, bool>> filter = null,
+            bool recursive = true) where T : class
+        {
+            return connection.GetAllWithChildren<T>(filter, recursive);
         }
 
         readonly Type[] validTypes = new[]
