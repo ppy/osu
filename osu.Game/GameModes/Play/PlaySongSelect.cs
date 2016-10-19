@@ -124,11 +124,12 @@ namespace osu.Game.GameModes.Play
                 new Button
                 {
                     Text = "Play",
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Action = () =>
-                    {
-                    },
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativePositionAxes = Axes.Both,
+                    Position = Vector2.Zero,
+                    Colour = new Color4(238, 51, 153, 255),
+                    Action = () => Console.WriteLine("Clicked!"),
                 }
             };
         }
