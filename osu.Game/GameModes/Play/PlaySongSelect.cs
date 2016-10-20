@@ -80,7 +80,7 @@ namespace osu.Game.GameModes.Play
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = new Vector2(1),
-                    Padding = new MarginPadding { Right = scrollWidth - 100 },
+                    Padding = new MarginPadding { Right = scrollWidth - 200 },
                     Children = new[]
                     {
                         new Box
