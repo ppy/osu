@@ -16,12 +16,14 @@ using osu.Framework.Input;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.IO;
 using osu.Framework.Graphics.Textures;
+using System.Threading.Tasks;
 
 namespace osu.Game.GameModes.Play
 {
     class BeatmapGroup : AutoSizeContainer
     {
         private const float collapsedAlpha = 0.5f;
+        private const float collapsedWidth = 0.8f;
         
         private BeatmapInfo selectedBeatmap;
         public BeatmapInfo SelectedBeatmap
@@ -58,9 +60,15 @@ namespace osu.Game.GameModes.Play
                     EndTime = Time + 250,
                 });
                 if (collapsed)
-                    topContainer.Remove(difficulties, false);
+                {
+                    topContainer.Remove(difficulties);
+                    setBox.Size = new Vector2(collapsedWidth, -1);
+                }
                 else
+                {
                     topContainer.Add(difficulties);
+                    setBox.Size = new Vector2(1, -1);
+                }
                 setBox.BorderColour = new Color4(
                     setBox.BorderColour.R,
                     setBox.BorderColour.G,
@@ -84,7 +92,16 @@ namespace osu.Game.GameModes.Play
                     RelativeSizeAxes = Axes.X,
                     Size = new Vector2(1, -1),
                     Direction = FlowDirection.VerticalOnly,
-                    Children = new[] { setBox = new BeatmapSetBox(beatmapSet, beatmapStore, resources) }
+                    Children = new[]
+                    {
+                        setBox = new BeatmapSetBox(beatmapSet, beatmapStore, resources)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Size = new Vector2(collapsedWidth, -1),
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                        }
+                    }
                 }
             };
             difficulties = new FlowContainer // Deliberately not added to children
@@ -111,12 +128,15 @@ namespace osu.Game.GameModes.Play
     class BeatmapSetBox : AutoSizeContainer
     {
         private BeatmapSetInfo beatmapSet;
+        private BeatmapResourceStore beatmapStore;
+        private TextureStore resources;
+        private Sprite backgroundImage;
 
         public BeatmapSetBox(BeatmapSetInfo beatmapSet, BeatmapResourceStore beatmapStore, TextureStore resources)
         {
             this.beatmapSet = beatmapSet;
-            RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, -1);
+            this.beatmapStore = beatmapStore;
+            this.resources = resources;
             Masking = true;
             CornerRadius = 5;
             BorderThickness = 2;
@@ -136,17 +156,12 @@ namespace osu.Game.GameModes.Play
                     Size = Vector2.One,
                     Children = new Drawable[]
                     {
-                        new DeferredSprite
+                        backgroundImage = new Sprite
                         {
                             RelativeSizeAxes = Axes.X,
                             Size = new Vector2(1, 0),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            ResolveTexture = () =>
-                            {
-                                beatmapStore.AddBeatmap(beatmapSet);
-                                return resources.Get($@"{beatmapSet.BeatmapSetID}:{beatmapSet.Metadata.BackgroundFile}");
-                            },
                         },
                         new Box // TODO: Gradient
                         {
@@ -185,6 +200,20 @@ namespace osu.Game.GameModes.Play
                     }
                 }
             };
+        }
+        
+        public override void Load(Framework.BaseGame game)
+        {
+            base.Load(game);
+            if (beatmapSet.Metadata.BackgroundFile != null)
+            {
+                Task.Factory.StartNew(() =>
+                {
+                    beatmapStore.AddBeatmap(beatmapSet);
+                    var texture = resources.Get($@"{beatmapSet.BeatmapSetID}:{beatmapSet.Metadata.BackgroundFile}");
+                    Scheduler.Add(() => backgroundImage.Texture = texture);
+                });
+            }
         }
     }
     
