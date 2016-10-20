@@ -16,8 +16,6 @@ namespace osu.Game.Overlays
 {
     class UserButton : Container
     {
-        public const float WIDTH = 60;
-
         public Sprite Image
         {
             get { return DrawableAvatar; }
@@ -36,13 +34,27 @@ namespace osu.Game.Overlays
             }
         }
 
+        public int UserId
+        {
+            get { return userId; }
+            set
+            {
+                userId = value;
+            }
+        }
+
+
+        public const float WIDTH = 60;
         public Action Action;
         protected Avatar DrawableAvatar;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
+        protected int userId;
+
 
         public UserButton(int userId)
         {
+            DrawableAvatar = new Avatar(userId, 48);
             Children = new Drawable[]
             {
                 HoverBackground = new Box
@@ -61,10 +73,12 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        DrawableAvatar = new Avatar(userId, 48, 6)
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                        new FlowContainer {
+                            Masking = true,
+                            CornerRadius = 6f,
+                            Children = new Drawable[] {
+                                DrawableAvatar,
+                            },
                         },
                         DrawableText = new SpriteText
                         {
@@ -78,6 +92,11 @@ namespace osu.Game.Overlays
 
             RelativeSizeAxes = Axes.Y;
             Size = new Vector2(WIDTH, 1);
+        }
+
+        public void UpdateButton(int userid)
+        {
+            DrawableAvatar.UpdateAvatar(userid);
         }
 
         protected override void Update()

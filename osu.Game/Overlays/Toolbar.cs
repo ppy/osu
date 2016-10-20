@@ -10,27 +10,21 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Threading;
-using osu.Game;
-using osu.Game.Configuration;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online;
-using System.Collections.Generic;
 
 namespace osu.Game.Overlays
 {
     public class Toolbar : OverlayContainer
     {
-        private const float height = 50;
-
-        private Scheduler scheduler = new Scheduler();
         private APIAccess api;
+        private BaseGame game;
         private User user;
 
-        protected Avatar toolbarAvatar;
-        protected BaseGame game;
+        private bool isLoaded = false;
 
         public Action OnSettings;
         public Action OnHome;
@@ -38,8 +32,10 @@ namespace osu.Game.Overlays
         public Action<PlayMode> OnPlayModeChange;
 
         private ToolbarModeSelector modeSelector;
+        private UserButton toolbarUserButton;
 
         private const int transition_time = 200;
+        private const float height = 50;
 
         protected override void PopIn()
         {
@@ -53,53 +49,53 @@ namespace osu.Game.Overlays
             FadeOut(transition_time, EasingTypes.InQuint);
         }
 
-        protected void DrawToolbar()
+        private void CheckUser()
         {
-            FlowContainer rightSide;
-
-            Add(rightSide = new FlowContainer
+            if (user == null)
+                return;
+            if (toolbarUserButton.Image == null)
             {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                Direction = FlowDirection.HorizontalOnly,
-                RelativeSizeAxes = Axes.Y,
-                Children = new Drawable[]
-                {
-                    new ToolbarButton
-                    {
-                        Icon = FontAwesome.search
-                    },
-                    new UserButton(user.UserId)
-                    {
-                        Image = toolbarAvatar,
-                        Text = ((OsuGame)game).Config.Get<string>(OsuConfig.Username)
-                    },
-                    new ToolbarButton
-                    {
-                        Icon = FontAwesome.bars
-                    },
-                }
-            });
+                toolbarUserButton.Image = new Avatar(1, 48);
+                toolbarUserButton.Text = "Not signed in";
+                toolbarUserButton.UserId = 0;
+            }
+            if (user.UserId != toolbarUserButton.UserId)
+            {
+                toolbarUserButton.UpdateButton(user.UserId);
+                toolbarUserButton.Text = user.Name;
+                toolbarUserButton.UserId = user.UserId;
+            }
         }
 
-        private void SetUser()
+        private void InitUser()
         {
             MyUser req = new MyUser();
+            api.Queue(req);
             req.Success += delegate (User MyUser)
             {
                 this.user = MyUser;
+                CheckUser();
             };
-
-            api.Queue(req);
-            
-            api.Scheduler.Update();
-            Update();
         }
 
 
         public override void Load(BaseGame game)
         {
             base.Load(game);
+
+            this.api = ((OsuGameBase)game).API;
+            this.game = game;
+            this.user = new User();
+
+            if (isLoaded == false)
+            {
+                InitUser();
+                Scheduler.AddDelayed(delegate {
+                    InitUser();
+                }, 10000, true);
+            }
+            isLoaded = true;
+
 
             Children = new Drawable[]
             {
@@ -108,7 +104,6 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = new Color4(0.1f, 0.1f, 0.1f, 0.4f)
                 },
-
                 new FlowContainer
                 {
                     Direction = FlowDirection.HorizontalOnly,
@@ -132,19 +127,30 @@ namespace osu.Game.Overlays
                         modeSelector = new ToolbarModeSelector
                         {
                             OnPlayModeChange = OnPlayModeChange
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
-            this.api = ((OsuGameBase)game).API;
-            this.game = game;
-            this.user = new User();
-            ///scheduler.Add(delegate { SetUser(); });
-            SetUser();
-            this.toolbarAvatar = new Avatar(user.UserId, 48, 6);
-
-            scheduler.AddDelayed(() => DrawToolbar(), 1000);
+            Add(new FlowContainer
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                Direction = FlowDirection.HorizontalOnly,
+                RelativeSizeAxes = Axes.Y,
+                Children = new Drawable[]
+                    {
+                        new ToolbarButton
+                        {
+                            Icon = FontAwesome.search
+                        },
+                        toolbarUserButton = new UserButton(user.UserId),
+                        new ToolbarButton
+                        {
+                            Icon = FontAwesome.bars
+                        }
+                    }
+            });
 
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, height);
@@ -154,9 +160,7 @@ namespace osu.Game.Overlays
         {
             base.Update();
             api.Update();
-            scheduler.Update();
         }
-
         
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
     }
