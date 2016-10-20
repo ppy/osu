@@ -115,7 +115,7 @@ namespace osu.Game.GameModes.Play
                             RelativeSizeAxes = Axes.X,
                             Size = new Vector2(1, -1),
                             Direction = FlowDirection.VerticalOnly,
-                            Spacing = new Vector2(0, 25),
+                            Spacing = new Vector2(0, 5),
                         }
                     }
                 }
