@@ -43,21 +43,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="DotNetZip">
-      <HintPath>$(SolutionDir)\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLite.Net.Platform.Win32">
-      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.0.5\lib\net4\SQLite.Net.Platform.Win32.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLite.Net">
-      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.0.5\lib\net40\SQLite.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLite.Net.Platform.Generic">
-      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.0.5\lib\net40\SQLite.Net.Platform.Generic.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLiteNetExtensions">
-      <HintPath>$(SolutionDir)\packages\SQLiteNetExtensions.1.3.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\SQLiteNetExtensions.dll</HintPath>
-    </Reference>
     <Reference Include="SQLitePCLRaw.core">
       <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.core.1.0.1\lib\net45\SQLitePCLRaw.core.dll</HintPath>
     </Reference>
@@ -76,7 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Beatmap.cs" />
-    <Compile Include="Beatmaps\BeatmapSet.cs" />		
+    <Compile Include="Beatmaps\BeatmapSet.cs" />
     <Compile Include="Beatmaps\BeatmapMetadata.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchConverter.cs" />
     <Compile Include="Beatmaps\Objects\Catch\Drawable\DrawableFruit.cs" />
@@ -223,7 +208,7 @@
   <ItemGroup />
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
