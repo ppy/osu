@@ -127,6 +127,11 @@ namespace osu.Game.Database
         {
             return connection.GetAllWithChildren<T>(filter, recursive);
         }
+        
+        public void GetChildren<T>(T item, bool recursive = true)
+        {
+            connection.GetChildren<T>(item, recursive);
+        }
 
         readonly Type[] validTypes = new[]
         {
