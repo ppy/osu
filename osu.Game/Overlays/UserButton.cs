@@ -73,18 +73,18 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
+                        DrawableText = new SpriteText
+                        {
+                            Margin = new MarginPadding { Left = 5 },
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
                         new FlowContainer {
                             Masking = true,
                             CornerRadius = 6f,
                             Children = new Drawable[] {
                                 DrawableAvatar,
                             },
-                        },
-                        DrawableText = new SpriteText
-                        {
-                            Margin = new MarginPadding { Left = 5 },
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
                         },
                     },
                 }
