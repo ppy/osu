@@ -77,6 +77,8 @@ namespace osu.Game.Database
                         // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
                         beatmap.BeatmapInfo.Metadata = null;
                         beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
+                        connection.Insert(beatmap.BeatmapInfo.BaseDifficulty);
+                        beatmap.BeatmapInfo.BaseDifficultyID = beatmap.BeatmapInfo.BaseDifficulty.ID;
                         connection.Insert(beatmap.BeatmapInfo);
                     }
                 }

@@ -17,6 +17,7 @@ using OpenTK.Graphics;
 using OpenTK;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.GameModes.Play
 {
@@ -73,19 +74,28 @@ namespace osu.Game.GameModes.Play
                         new FlowContainer
                         {
                             Padding = new MarginPadding { Left = 10 },
-                            Direction = FlowDirection.HorizontalOnly,
-                            Children = new[]
+                            Direction = FlowDirection.VerticalOnly,
+                            Children = new Drawable[]
                             {
-                                new SpriteText
+                                new FlowContainer
                                 {
-                                    Text = beatmap.Version,
-                                    TextSize = 20,
+                                    Direction = FlowDirection.HorizontalOnly,
+                                    Children = new[]
+                                    {
+                                        new SpriteText
+                                        {
+                                            Text = beatmap.Version,
+                                            TextSize = 20,
+                                        },
+                                        new SpriteText
+                                        {
+                                            Text = string.Format(" mapped by {0}",
+                                                (beatmap.Metadata ?? set.Metadata).Author),
+                                            TextSize = 16,
+                                        },
+                                    }
                                 },
-                                new SpriteText
-                                {
-                                    Text = string.Format(" mapped by {0}", (beatmap.Metadata ?? set.Metadata).Author),
-                                    TextSize = 16,
-                                },
+                                new StarCounter { Count = beatmap.BaseDifficulty?.OverallDifficulty ?? 5, StarSize = 8 }
                             }
                         }
                     }
