@@ -76,13 +76,13 @@ namespace osu.Game.GameModes.Play
             selectedBeatmap = beatmapSet.Beatmaps[0];
             Alpha = collapsedAlpha;
             RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, 0);
+            Size = new Vector2(1, -1);
             Children = new[]
             {
                 topContainer = new FlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(1, 0),
+                    Size = new Vector2(1, -1),
                     Direction = FlowDirection.VerticalOnly,
                     Children = new[] { setBox = new BeatmapSetBox(beatmapSet, beatmapStore, resources) }
                 }
@@ -90,7 +90,7 @@ namespace osu.Game.GameModes.Play
             difficulties = new FlowContainer // Deliberately not added to children
             {
                 RelativeSizeAxes = Axes.X,
-                Size = new Vector2(1, 0),
+                Size = new Vector2(1, -1),
                 Margin = new MarginPadding { Top = 5 },
                 Padding = new MarginPadding { Left = 25 },
                 Spacing = new Vector2(0, 5),
@@ -200,7 +200,6 @@ namespace osu.Game.GameModes.Play
                 {
                     Anchor = Anchor.Centre,
                     TextSize = size,
-                    Size = new Vector2(size),
                     Colour = color,
                     Icon = icon
                 }

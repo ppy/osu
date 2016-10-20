@@ -29,10 +29,8 @@ namespace osu.Game.GameModes.Play
         private BeatmapInfo selectedBeatmap;
         private BeatmapResourceStore beatmapResources;
         private TextureStore beatmapTextureResources;
-
         // TODO: use currently selected track as bg
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
-
         private ScrollContainer scrollContainer;
         private FlowContainer setList;
 
@@ -75,7 +73,7 @@ namespace osu.Game.GameModes.Play
 
         public PlaySongSelect()
         {
-            const float scrollWidth = 500;
+            const float scrollWidth = 640;
             Children = new Drawable[]
             {
                 new Container
@@ -115,21 +113,11 @@ namespace osu.Game.GameModes.Play
                         {
                             Padding = new MarginPadding { Left = 25, Top = 25, Bottom = 25 },
                             RelativeSizeAxes = Axes.X,
-                            Size = new Vector2(1, 0),
+                            Size = new Vector2(1, -1),
                             Direction = FlowDirection.VerticalOnly,
                             Spacing = new Vector2(0, 25),
                         }
                     }
-                },
-                new Button
-                {
-                    Text = "Play",
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativePositionAxes = Axes.Both,
-                    Position = Vector2.Zero,
-                    Colour = new Color4(238, 51, 153, 255),
-                    Action = () => Console.WriteLine("Clicked!"),
                 }
             };
         }
