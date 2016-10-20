@@ -60,15 +60,17 @@ namespace osu.Game.GameModes.Play
                     EndTime = Time + 250,
                 });
                 if (collapsed)
-                {
                     topContainer.Remove(difficulties);
-                    setBox.Size = new Vector2(collapsedWidth, -1);
-                }
                 else
-                {
                     topContainer.Add(difficulties);
-                    setBox.Size = new Vector2(1, -1);
-                }
+                setBox.ClearTransformations();
+                setBox.Transforms.Add(new TransformSize(Clock)
+                {
+                    StartValue = new Vector2(collapsed ? 1 : collapsedWidth, -1),
+                    EndValue = new Vector2(collapsed ? collapsedWidth : 1, -1),
+                    StartTime = Time,
+                    EndTime = Time + 200,
+                });
                 setBox.BorderColour = new Color4(
                     setBox.BorderColour.R,
                     setBox.BorderColour.G,
@@ -76,6 +78,27 @@ namespace osu.Game.GameModes.Play
                     collapsed ? 0 : 255);
                 setBox.GlowRadius = collapsed ? 0 : 5;
             }
+        }
+        
+        private void updateSelected(BeatmapInfo map)
+        {
+            int selected = BeatmapSet.Beatmaps.IndexOf(map);
+            var buttons = difficulties.Children.ToList();
+            for (int i = 0; i < buttons.Count; i++)
+            {
+                var button = buttons[i] as BeatmapButton;
+                float targetWidth = 1 - Math.Abs((selected - i) * 0.025f);
+                targetWidth = MathHelper.Clamp(targetWidth, 0.8f, 1);
+                button.Transforms.Add(new TransformSize(Clock)
+                {
+                    StartValue = new Vector2(button.Size.X, -1),
+                    EndValue = new Vector2(targetWidth, -1),
+                    StartTime = Time,
+                    EndTime = Time + 100,
+                });
+                button.Selected = selected == i;
+            }
+            BeatmapSelected?.Invoke(BeatmapSet, map);
         }
 
         public BeatmapGroup(BeatmapSetInfo beatmapSet, BeatmapResourceStore beatmapStore, TextureStore resources)
@@ -85,6 +108,7 @@ namespace osu.Game.GameModes.Play
             Alpha = collapsedAlpha;
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, -1);
+            float difficultyWidth = 1;
             Children = new[]
             {
                 topContainer = new FlowContainer
@@ -109,11 +133,23 @@ namespace osu.Game.GameModes.Play
                 RelativeSizeAxes = Axes.X,
                 Size = new Vector2(1, -1),
                 Margin = new MarginPadding { Top = 5 },
-                Padding = new MarginPadding { Left = 25 },
+                Padding = new MarginPadding { Left = 75 },
                 Spacing = new Vector2(0, 5),
                 Direction = FlowDirection.VerticalOnly,
                 Children = this.BeatmapSet.Beatmaps.Select(
-                    b => new BeatmapButton(this.BeatmapSet, b) { Selected = beatmap => BeatmapSelected?.Invoke(beatmapSet, beatmap) })
+                    b => {
+                        float width = difficultyWidth;
+                        if (difficultyWidth > 0.8f) difficultyWidth -= 0.025f;
+                        return new BeatmapButton(this.BeatmapSet, b)
+                        {
+                            MapSelected = beatmap => updateSelected(beatmap),
+                            Selected = width == 1,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            RelativeSizeAxes = Axes.X,
+                            Size = new Vector2(width, -1),
+                        };
+                    })
             };
             collapsed = true;
         }

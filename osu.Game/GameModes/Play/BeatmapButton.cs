@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Primitives;
 using OpenTK.Graphics;
 using OpenTK;
 using osu.Game.Graphics;
+using osu.Framework.Graphics.Transformations;
 
 namespace osu.Game.GameModes.Play
 {
@@ -24,14 +25,36 @@ namespace osu.Game.GameModes.Play
         private BeatmapSetInfo beatmapSet;
         private BeatmapInfo beatmap;
 
-        public Action<BeatmapInfo> Selected;
+        public Action<BeatmapInfo> MapSelected;
+        
+        private bool selected;
+
+        public bool Selected
+        {
+            get { return selected; }
+            set
+            {
+                if (selected == value)
+                    return;
+                selected = value;
+                BorderColour = new Color4(
+                    BorderColour.R,
+                    BorderColour.G,
+                    BorderColour.B,
+                    selected ? 255 : 0);
+                GlowRadius = selected ? 3 : 0;
+            }
+        }
 
         public BeatmapButton(BeatmapSetInfo set, BeatmapInfo beatmap)
         {
             this.beatmapSet = set;
             this.beatmap = beatmap;
-            RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, -1);
+            Masking = true;
+            CornerRadius = 5;
+            BorderThickness = 2;
+            BorderColour = new Color4(221, 255, 255, 0);
+            GlowColour = new Color4(166, 221, 251, 0.75f); // TODO: Get actual color for this
             Children = new Drawable[]
             {
                 new Box
@@ -72,7 +95,7 @@ namespace osu.Game.GameModes.Play
         
         protected override bool OnClick(InputState state)
         {
-            Selected?.Invoke(beatmap);
+            MapSelected?.Invoke(beatmap);
             return true;
         }
     }
