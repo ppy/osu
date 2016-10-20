@@ -59,6 +59,9 @@ namespace osu.Game.GameModes.Play
         private void addBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             beatmapSet = beatmaps.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
+            beatmapSet.Beatmaps.ForEach(b => beatmaps.GetChildren(b));
+            beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty)
+                .ToList();
             var group = new BeatmapGroup(beatmapSet, beatmapResources, beatmapTextureResources);
             group.SetSelected += selectBeatmapSet;
             group.BeatmapSelected += selectBeatmap;

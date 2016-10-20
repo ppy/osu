@@ -217,12 +217,12 @@ namespace osu.Game.GameModes.Play
                         // TODO: Make these italic
                         new SpriteText
                         {
-                            Text = this.beatmapSet.Metadata.TitleUnicode ?? this.beatmapSet.Metadata.Title,
+                            Text = this.beatmapSet.Metadata.Title ?? this.beatmapSet.Metadata.TitleUnicode,
                             TextSize = 20
                         },
                         new SpriteText
                         {
-                            Text = this.beatmapSet.Metadata.ArtistUnicode ?? this.beatmapSet.Metadata.Artist,
+                            Text = this.beatmapSet.Metadata.Artist ?? this.beatmapSet.Metadata.ArtistUnicode,
                             TextSize = 16
                         },
                         new FlowContainer
