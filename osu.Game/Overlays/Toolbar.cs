@@ -49,6 +49,7 @@ namespace osu.Game.Overlays
             FadeOut(transition_time, EasingTypes.InQuint);
         }
 
+        //Compares the currently logged in user to the one which the toolbar shows
         private void CheckUser()
         {
             if (user == null)
@@ -67,6 +68,7 @@ namespace osu.Game.Overlays
             }
         }
 
+        //Gets the currently logged in
         private void InitUser()
         {
             MyUser req = new MyUser();
@@ -86,16 +88,9 @@ namespace osu.Game.Overlays
             this.api = ((OsuGameBase)game).API;
             this.game = game;
             this.user = new User();
-
-            if (isLoaded == false)
-            {
-                InitUser();
-                Scheduler.AddDelayed(delegate {
-                    InitUser();
-                }, 10000, true);
-            }
-            isLoaded = true;
-
+            
+            InitUser();
+            Scheduler.AddDelayed(delegate { InitUser(); }, 10000, true);
 
             Children = new Drawable[]
             {
