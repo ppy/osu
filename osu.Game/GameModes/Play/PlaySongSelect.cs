@@ -154,6 +154,8 @@ namespace osu.Game.GameModes.Play
             base.Dispose(isDisposing);
             if (playMode != null)
                 playMode.ValueChanged -= PlayMode_ValueChanged;
+            if (beatmapResources != null)
+                beatmapResources.Dispose();
         }
 
         private void PlayMode_ValueChanged(object sender, EventArgs e)
