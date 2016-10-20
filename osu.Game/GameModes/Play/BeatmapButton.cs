@@ -31,7 +31,7 @@ namespace osu.Game.GameModes.Play
             this.beatmapSet = set;
             this.beatmap = beatmap;
             RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, 0);
+            Size = new Vector2(1, -1);
             Children = new Drawable[]
             {
                 new Box
