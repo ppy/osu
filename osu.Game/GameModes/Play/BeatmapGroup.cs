@@ -101,7 +101,7 @@ namespace osu.Game.GameModes.Play
             BeatmapSelected?.Invoke(BeatmapSet, map);
         }
 
-        public BeatmapGroup(BeatmapSetInfo beatmapSet, BeatmapResourceStore beatmapStore, TextureStore resources)
+        public BeatmapGroup(BeatmapSetInfo beatmapSet)
         {
             BeatmapSet = beatmapSet;
             selectedBeatmap = beatmapSet.Beatmaps[0];
@@ -118,7 +118,7 @@ namespace osu.Game.GameModes.Play
                     Direction = FlowDirection.VerticalOnly,
                     Children = new[]
                     {
-                        setBox = new BeatmapSetBox(beatmapSet, beatmapStore, resources)
+                        setBox = new BeatmapSetBox(beatmapSet)
                         {
                             RelativeSizeAxes = Axes.X,
                             Size = new Vector2(collapsedWidth, -1),
@@ -164,15 +164,11 @@ namespace osu.Game.GameModes.Play
     class BeatmapSetBox : AutoSizeContainer
     {
         private BeatmapSetInfo beatmapSet;
-        private BeatmapResourceStore beatmapStore;
-        private TextureStore resources;
         private Sprite backgroundImage;
 
-        public BeatmapSetBox(BeatmapSetInfo beatmapSet, BeatmapResourceStore beatmapStore, TextureStore resources)
+        public BeatmapSetBox(BeatmapSetInfo beatmapSet)
         {
             this.beatmapSet = beatmapSet;
-            this.beatmapStore = beatmapStore;
-            this.resources = resources;
             Masking = true;
             CornerRadius = 5;
             BorderThickness = 2;
@@ -236,20 +232,6 @@ namespace osu.Game.GameModes.Play
                     }
                 }
             };
-        }
-        
-        public override void Load(Framework.BaseGame game)
-        {
-            base.Load(game);
-            if (beatmapSet.Metadata.BackgroundFile != null)
-            {
-                Task.Factory.StartNew(() =>
-                {
-                    beatmapStore.AddBeatmap(beatmapSet);
-                    var texture = resources.Get($@"{beatmapSet.BeatmapSetID}:{beatmapSet.Metadata.BackgroundFile}");
-                    Scheduler.Add(() => backgroundImage.Texture = texture);
-                });
-            }
         }
     }
     
