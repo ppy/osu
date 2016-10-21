@@ -6,8 +6,10 @@ using System.IO;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Desktop;
+using osu.Framework.Desktop.Platform;
 using osu.Framework.Platform;
 using osu.Game;
+using osu.Game.IPC;
 
 namespace osu.Desktop
 {
@@ -16,19 +18,24 @@ namespace osu.Desktop
         [STAThread]
         public static int Main(string[] args)
         {
-            BasicGameHost host = Host.GetSuitableHost(@"osu");
-            BaseGame osuGame = new OsuGame();
-            if (args.Length != 0 && args.All(File.Exists))
+            DesktopGameHost host = Host.GetSuitableHost(@"osu", true);
+
+            if (!host.IsPrimaryInstance)
             {
-                host.Load(osuGame);
-                var beatmapIPC = new IpcChannel<OsuGame.ImportBeatmap>(host);
+                var importer = new BeatmapImporter(host);
+                
                 foreach (var file in args)
-                    beatmapIPC.SendMessage(new OsuGame.ImportBeatmap { Path = file }).Wait();
-                Console.WriteLine(@"Sent file to running instance");
-                return 0;
+                    if (importer.Import(file).Wait(1000))
+                        throw new TimeoutException(@"IPC took too long to send");
+                Console.WriteLine(@"Sent import requests to running instance");
             }
-            host.Add(osuGame);
-            host.Run();
+            else
+            {
+                BaseGame osu = new OsuGame(args);
+                host.Add(osu);
+                host.Run();
+            }
+
             return 0;
         }
     }
