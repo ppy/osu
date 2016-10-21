@@ -37,10 +37,13 @@ namespace osu.Game.Database
         {
             string hash = null;
             BeatmapMetadata metadata;
+
             using (var reader = ArchiveReader.GetReader(storage, path))
                 metadata = reader.ReadMetadata();
+
             if (connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
                 return; // TODO: Update this beatmap instead
+
             if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
             {
                 using (var md5 = MD5.Create())
@@ -48,8 +51,8 @@ namespace osu.Game.Database
                 {
                     hash = BitConverter.ToString(md5.ComputeHash(input)).Replace("-", "").ToLowerInvariant();
                     input.Seek(0, SeekOrigin.Begin);
-                    var outputPath = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
-                    using (var output = storage.GetStream(outputPath, FileAccess.Write))
+                    path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
+                    using (var output = storage.GetStream(path, FileAccess.Write))
                         input.CopyTo(output);
                 }
             }
@@ -59,10 +62,9 @@ namespace osu.Game.Database
                 Beatmaps = new List<BeatmapInfo>(),
                 Path = path,
                 Hash = hash,
+                Metadata = metadata
             };
-            connection.Insert(metadata);
-            beatmapSet.Metadata = metadata;
-            connection.Insert(beatmapSet);
+
             using (var reader = ArchiveReader.GetReader(storage, path))
             {
                 string[] mapNames = reader.ReadBeatmaps();
@@ -73,17 +75,15 @@ namespace osu.Game.Database
                         var decoder = BeatmapDecoder.GetDecoder(stream);
                         Beatmap beatmap = decoder.Decode(stream);
                         beatmap.BeatmapInfo.Path = name;
-                        beatmap.BeatmapInfo.BeatmapSetID = beatmapSet.BeatmapSetID;
+
                         // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
                         beatmap.BeatmapInfo.Metadata = null;
+
                         beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
-                        connection.Insert(beatmap.BeatmapInfo.BaseDifficulty);
-                        beatmap.BeatmapInfo.BaseDifficultyID = beatmap.BeatmapInfo.BaseDifficulty.ID;
-                        connection.Insert(beatmap.BeatmapInfo);
                     }
                 }
             }
-            connection.UpdateWithChildren(beatmapSet);
+            connection.InsertWithChildren(beatmapSet, true);
             BeatmapSetAdded?.Invoke(beatmapSet);
         }
 
