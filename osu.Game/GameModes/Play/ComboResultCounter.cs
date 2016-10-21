@@ -34,6 +34,11 @@ namespace osu.Game.GameModes.Play
             return $@"{count}x";
         }
 
+        public override void Increment(ulong amount)
+        {
+            Count = Count + amount;
+        }
+
         protected class TransformComboResult : Transform<ulong>
         {
             public override ulong CurrentValue

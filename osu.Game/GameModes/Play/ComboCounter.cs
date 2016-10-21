@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace osu.Game.GameModes.Play
 {
-    public abstract class ComboCounter : Container
+    public abstract class ComboCounter : AutoSizeContainer
     {
         public bool IsRolling
         {
@@ -78,9 +78,14 @@ namespace osu.Game.GameModes.Play
             }
         }
 
+        public void Increment(ulong amount = 1)
+        {
+            Count = Count + amount;
+        }
+
         protected SpriteText DisplayedCountSpriteText;
 
-        private float textSize = 20.0f;
+        private float textSize;
         public float TextSize
         {
             get { return textSize; }
@@ -108,6 +113,8 @@ namespace osu.Game.GameModes.Play
                     Alpha = 0,
                 }
             };
+
+            TextSize = 80;
         }
 
         public override void Load(BaseGame game)

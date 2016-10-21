@@ -86,7 +86,14 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected float textSize = 20.0f;
+        public void Set(T value)
+        {
+            Count = value;
+        }
+
+        public abstract void Increment(T amount);
+
+        protected float textSize;
 
         public float TextSize
         {
@@ -107,6 +114,8 @@ namespace osu.Game.Graphics.UserInterface
             {
                 DisplayedCountSpriteText = new SpriteText(),
             };
+
+            TextSize = 40;
         }
 
         public override void Load(BaseGame game)

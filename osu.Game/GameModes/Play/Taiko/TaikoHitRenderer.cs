@@ -14,6 +14,6 @@ namespace osu.Game.GameModes.Play.Taiko
 
         protected override Playfield CreatePlayfield() => new TaikoPlayfield();
 
-        protected override Drawable GetVisualRepresentation(TaikoBaseHit h) => new DrawableTaikoHit(h);
+        protected override DrawableHitObject GetVisualRepresentation(TaikoBaseHit h) => null;// new DrawableTaikoHit(h);
     }
 }
