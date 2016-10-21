@@ -142,7 +142,7 @@ namespace osu.Game.GameModes.Play
                             Size = new Vector2(100, 1),
                             Text = "Play",
                             Colour = new Color4(238, 51, 153, 255),
-                            Action = () => Push(new Player { /*Beatmap = selectedBeatmap*/ }),
+                            Action = () => Push(new Player { Beatmap = beatmaps.GetBeatmap(selectedBeatmap) }),
                         },
                     }
                 }
