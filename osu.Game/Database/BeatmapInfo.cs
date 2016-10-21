@@ -11,17 +11,23 @@ namespace osu.Game.Database
     {
         [PrimaryKey]
         public int BeatmapID { get; set; }
+
         [ForeignKey(typeof(BeatmapSetInfo))]
         public int BeatmapSetID { get; set; }
+
         [ManyToOne]
         public BeatmapSetInfo BeatmapSet { get; set; }
+        
         [ForeignKey(typeof(BeatmapMetadata))]
         public int BeatmapMetadataID { get; set; }
+
+        [OneToOne(CascadeOperations = CascadeOperation.All)]
+        public BeatmapMetadata Metadata { get; set; }
+
         [ForeignKey(typeof(BaseDifficulty)), NotNull]
         public int BaseDifficultyID { get; set; }
-        [OneToOne]
-        public BeatmapMetadata Metadata { get; set; }
-        [OneToOne]
+
+        [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BaseDifficulty BaseDifficulty { get; set; }
         
         public string Path { get; set; }

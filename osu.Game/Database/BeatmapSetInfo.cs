@@ -9,13 +9,18 @@ namespace osu.Game.Database
     {
         [PrimaryKey]
         public int BeatmapSetID { get; set; }
-        [OneToOne]
+
+        [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BeatmapMetadata Metadata { get; set; }
+
         [NotNull, ForeignKey(typeof(BeatmapMetadata))]
         public int BeatmapMetadataID { get; set; }
-        [OneToMany]
+
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<BeatmapInfo> Beatmaps { get; set; }
+
         public string Hash { get; set; }
+
         public string Path { get; set; }
     }
 }
