@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.Processing
         protected override void Update()
         {
             base.Update();
-            Vector2 parent = Parent.Size;
+            Vector2 parent = Parent.DrawSize;
 
             Scale = new Vector2(Math.Min(parent.Y / 768f, parent.X / 1024f));
             Size = new Vector2(1 / Scale.X);

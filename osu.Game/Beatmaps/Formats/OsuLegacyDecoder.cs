@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using OpenTK.Graphics;
+using osu.Game.Database;
 using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Samples;
@@ -38,37 +39,38 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleGeneral(Beatmap beatmap, string key, string val)
         {
+            var metadata = beatmap.BeatmapInfo.Metadata;
             switch (key)
             {
                 case @"AudioFilename":
-                    beatmap.Metadata.AudioFile = val;
+                    metadata.AudioFile = val;
                     break;
                 case @"AudioLeadIn":
-                    beatmap.AudioLeadIn = int.Parse(val);
+                    beatmap.BeatmapInfo.AudioLeadIn = int.Parse(val);
                     break;
                 case @"PreviewTime":
-                    beatmap.Metadata.PreviewTime = int.Parse(val);
+                    metadata.PreviewTime = int.Parse(val);
                     break;
                 case @"Countdown":
-                    beatmap.Countdown = int.Parse(val) == 1;
+                    beatmap.BeatmapInfo.Countdown = int.Parse(val) == 1;
                     break;
                 case @"SampleSet":
-                    beatmap.SampleSet = (SampleSet)Enum.Parse(typeof(SampleSet), val);
+                    beatmap.BeatmapInfo.SampleSet = (SampleSet)Enum.Parse(typeof(SampleSet), val);
                     break;
                 case @"StackLeniency":
-                    beatmap.StackLeniency = float.Parse(val, NumberFormatInfo.InvariantInfo);
+                    beatmap.BeatmapInfo.StackLeniency = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"Mode":
-                    beatmap.Mode = (PlayMode)int.Parse(val);
+                    beatmap.BeatmapInfo.Mode = (PlayMode)int.Parse(val);
                     break;
                 case @"LetterboxInBreaks":
-                    beatmap.LetterboxInBreaks = int.Parse(val) == 1;
+                    beatmap.BeatmapInfo.LetterboxInBreaks = int.Parse(val) == 1;
                     break;
                 case @"SpecialStyle":
-                    beatmap.SpecialStyle = int.Parse(val) == 1;
+                    beatmap.BeatmapInfo.SpecialStyle = int.Parse(val) == 1;
                     break;
                 case @"WidescreenStoryboard":
-                    beatmap.WidescreenStoryboard = int.Parse(val) == 1;
+                    beatmap.BeatmapInfo.WidescreenStoryboard = int.Parse(val) == 1;
                     break;
             }
         }
@@ -78,82 +80,84 @@ namespace osu.Game.Beatmaps.Formats
             switch (key)
             {
                 case @"Bookmarks":
-                    beatmap.StoredBookmarks = val;
+                    beatmap.BeatmapInfo.StoredBookmarks = val;
                     break;
                 case @"DistanceSpacing":
-                    beatmap.DistanceSpacing = double.Parse(val, NumberFormatInfo.InvariantInfo);
+                    beatmap.BeatmapInfo.DistanceSpacing = double.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"BeatDivisor":
-                    beatmap.BeatDivisor = int.Parse(val);
+                    beatmap.BeatmapInfo.BeatDivisor = int.Parse(val);
                     break;
                 case @"GridSize":
-                    beatmap.GridSize = int.Parse(val);
+                    beatmap.BeatmapInfo.GridSize = int.Parse(val);
                     break;
                 case @"TimelineZoom":
-                    beatmap.TimelineZoom = double.Parse(val, NumberFormatInfo.InvariantInfo);
+                    beatmap.BeatmapInfo.TimelineZoom = double.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
             }
         }
 
         private void handleMetadata(Beatmap beatmap, string key, string val)
         {
+            var metadata = beatmap.BeatmapInfo.Metadata;
             switch (key)
             {
                 case @"Title":
-                    beatmap.Metadata.Title = val;
+                    metadata.Title = val;
                     break;
                 case @"TitleUnicode":
-                    beatmap.Metadata.TitleUnicode = val;
+                    metadata.TitleUnicode = val;
                     break;
                 case @"Artist":
-                    beatmap.Metadata.Artist = val;
+                    metadata.Artist = val;
                     break;
                 case @"ArtistUnicode":
-                    beatmap.Metadata.ArtistUnicode = val;
+                    metadata.ArtistUnicode = val;
                     break;
                 case @"Creator":
-                    beatmap.Metadata.Author = val;
+                    metadata.Author = val;
                     break;
                 case @"Version":
-                    beatmap.Version = val;
+                    beatmap.BeatmapInfo.Version = val;
                     break;
                 case @"Source":
-                    beatmap.Metadata.Source = val;
+                    beatmap.BeatmapInfo.Metadata.Source = val;
                     break;
                 case @"Tags":
-                    beatmap.Metadata.Tags = val;
+                    beatmap.BeatmapInfo.Metadata.Tags = val;
                     break;
                 case @"BeatmapID":
-                    beatmap.BeatmapID = int.Parse(val);
+                    beatmap.BeatmapInfo.BeatmapID = int.Parse(val);
                     break;
                 case @"BeatmapSetID":
-                    beatmap.BeatmapSetID = int.Parse(val);
-                    beatmap.Metadata.BeatmapSetID = int.Parse(val);
+                    beatmap.BeatmapInfo.BeatmapSetID = int.Parse(val);
+                    metadata.BeatmapSetID = int.Parse(val);
                     break;
             }
         }
 
         private void handleDifficulty(Beatmap beatmap, string key, string val)
         {
+            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
             switch (key)
             {
                 case @"HPDrainRate":
-                    beatmap.BaseDifficulty.DrainRate = float.Parse(val, NumberFormatInfo.InvariantInfo);
+                    difficulty.DrainRate = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"CircleSize":
-                    beatmap.BaseDifficulty.CircleSize = float.Parse(val, NumberFormatInfo.InvariantInfo);
+                    difficulty.CircleSize = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"OverallDifficulty":
-                    beatmap.BaseDifficulty.OverallDifficulty = float.Parse(val, NumberFormatInfo.InvariantInfo);
+                    difficulty.OverallDifficulty = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"ApproachRate":
-                    beatmap.BaseDifficulty.ApproachRate = float.Parse(val, NumberFormatInfo.InvariantInfo);
+                    difficulty.ApproachRate = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"SliderMultiplier":
-                    beatmap.BaseDifficulty.SliderMultiplier = float.Parse(val, NumberFormatInfo.InvariantInfo);
+                    difficulty.SliderMultiplier = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"SliderTickRate":
-                    beatmap.BaseDifficulty.SliderTickRate = float.Parse(val, NumberFormatInfo.InvariantInfo);
+                    difficulty.SliderTickRate = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
             }
         }
@@ -176,7 +180,7 @@ namespace osu.Game.Beatmaps.Formats
                 type = (EventType)_type;
             // TODO: Parse and store the rest of the event
             if (type == EventType.Background)
-                beatmap.Metadata.BackgroundFile = split[2].Trim('"');
+                beatmap.BeatmapInfo.Metadata.BackgroundFile = split[2].Trim('"');
         }
 
         private void handleTimingPoints(Beatmap beatmap, string val)
@@ -206,12 +210,12 @@ namespace osu.Game.Beatmaps.Formats
         {
             var beatmap = new Beatmap
             {
-                Metadata = new BeatmapMetadata(),
-                BaseDifficulty = new BaseDifficulty(),
                 HitObjects = new List<HitObject>(),
                 ControlPoints = new List<ControlPoint>(),
                 ComboColors = new List<Color4>(),
+                BeatmapInfo = new BeatmapInfo(),
             };
+            
             var section = Section.None;
             string line;
             while (true)
@@ -262,10 +266,11 @@ namespace osu.Game.Beatmaps.Formats
                         handleColours(beatmap, key, val);
                         break;
                     case Section.HitObjects:
-                        beatmap.HitObjects.Add(HitObject.Parse(beatmap.Mode, val));
+                        beatmap.HitObjects.Add(HitObject.Parse(beatmap.BeatmapInfo.Mode, val));
                         break;
                 }
             }
+            
             return beatmap;
         }
     }

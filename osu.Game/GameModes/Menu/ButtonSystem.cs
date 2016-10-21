@@ -6,13 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Drawables;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -213,7 +210,7 @@ namespace osu.Game.GameModes.Menu
                     case MenuState.TopLevel:
                         buttonAreaBackground.ScaleTo(Vector2.One, 200, EasingTypes.Out);
 
-                        osuLogo.MoveTo(buttonFlow.Position, 200, EasingTypes.In);
+                        osuLogo.MoveTo(buttonFlow.DrawPosition, 200, EasingTypes.In);
                         osuLogo.ScaleTo(0.5f, 200, EasingTypes.In);
 
                         buttonArea.FadeIn(300);

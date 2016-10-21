@@ -1,21 +1,21 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Drawables;
-using osu.Framework.Graphics.Transformations;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Framework;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transformations;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays
 {
-    public class Options : Container
+    public class Options : OverlayContainer
     {
-        const float width = 300;
+        private const float width = 300;
 
         public override void Load(BaseGame game)
         {
@@ -41,36 +41,22 @@ namespace osu.Game.Overlays
             switch (args.Key)
             {
                 case Key.Escape:
-                    if (!poppedOut) return false;
+                    if (State == Visibility.Hidden) return false;
 
-                    PoppedOut = false;
+                    State = Visibility.Hidden;
                     return true;
             }
             return base.OnKeyDown(state, args);
         }
 
-        private bool poppedOut;
-
-        public bool PoppedOut
+        protected override void PopIn()
         {
-            get { return poppedOut; }
+            MoveToX(0, 300, EasingTypes.Out);
+        }
 
-            set
-            {
-                if (value == poppedOut) return;
-
-                poppedOut = value;
-
-                if (poppedOut)
-                {
-                    MoveTo(new Vector2(0, 0), 300, EasingTypes.Out);
-                }
-                else
-                {
-                    MoveTo(new Vector2(-width, 0), 300, EasingTypes.Out);
-                }
-
-            }
+        protected override void PopOut()
+        {
+            MoveToX(-width, 300, EasingTypes.Out);
         }
     }
 }

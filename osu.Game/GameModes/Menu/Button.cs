@@ -4,7 +4,6 @@ using OpenTK.Input;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
@@ -21,7 +20,7 @@ namespace osu.Game.GameModes.Menu
     public class Button : AutoSizeContainer, IStateful<ButtonState>
     {
         private Container iconText;
-        private WedgedBox box;
+        private Box box;
         private Color4 colour;
         private TextAwesome icon;
         private string internalName;
@@ -31,7 +30,10 @@ namespace osu.Game.GameModes.Menu
         private Key triggerKey;
         private string text;
 
-        public override Quad ScreenSpaceInputQuad => box.ScreenSpaceInputQuad;
+        public override bool Contains(Vector2 screenSpacePos)
+        {
+            return box.Contains(screenSpacePos);
+        }
 
         public Button(string text, string internalName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {
@@ -49,14 +51,18 @@ namespace osu.Game.GameModes.Menu
             base.Load(game);
             Alpha = 0;
 
+            Vector2 boxSize = new Vector2(ButtonSystem.button_width + Math.Abs(extraWidth), ButtonSystem.button_area_height);
+
             Children = new Drawable[]
             {
-                    box = new WedgedBox(new Vector2(ButtonSystem.button_width + Math.Abs(extraWidth), ButtonSystem.button_area_height), ButtonSystem.wedge_width)
+                    box = new Box
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Colour = colour,
-                        Scale = new Vector2(0, 1)
+                        Scale = new Vector2(0, 1),
+                        Size = boxSize,
+                        Shear = new Vector2(ButtonSystem.wedge_width / boxSize.Y, 0),
                     },
                     iconText = new AutoSizeContainer
                     {
@@ -130,7 +136,7 @@ namespace osu.Game.GameModes.Menu
                 LoopDelay = duration
             });
 
-            icon.Transforms.Add(new TransformScaleVector(Clock)
+            icon.Transforms.Add(new TransformScale(Clock)
             {
                 StartValue = new Vector2(1, 0.9f),
                 EndValue = Vector2.One,
@@ -152,7 +158,7 @@ namespace osu.Game.GameModes.Menu
                 LoopDelay = duration
             });
 
-            icon.Transforms.Add(new TransformScaleVector(Clock)
+            icon.Transforms.Add(new TransformScale(Clock)
             {
                 StartValue = Vector2.One,
                 EndValue = new Vector2(1, 0.9f),
@@ -264,42 +270,6 @@ namespace osu.Game.GameModes.Menu
                         box.ScaleTo(new Vector2(2, 1), explode_duration, EasingTypes.OutExpo);
                         FadeOut(explode_duration / 4 * 3);
                         break;
-                }
-            }
-        }
-
-        /// <summary>
-        ///    ________
-        ///   /       /
-        ///  /       /
-        /// /_______/
-        /// </summary>
-        class WedgedBox : Box
-        {
-            float wedgeWidth;
-
-            public WedgedBox(Vector2 boxSize, float wedgeWidth)
-            {
-                Size = boxSize;
-                this.wedgeWidth = wedgeWidth;
-            }
-
-            /// <summary>
-            /// Custom DrawQuad used to create the slanted effect.
-            /// </summary>
-            protected override Quad DrawQuad
-            {
-                get
-                {
-                    Quad q = base.DrawQuad;
-
-                    //Will become infinite if we don't limit its maximum size.
-                    float wedge = Math.Min(q.Width, wedgeWidth / Scale.X);
-
-                    q.TopLeft.X += wedge;
-                    q.BottomRight.X -= wedge;
-
-                    return q;
                 }
             }
         }

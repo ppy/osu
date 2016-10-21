@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using Ionic.Zip;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.IO
 {
@@ -51,9 +53,10 @@ namespace osu.Game.Beatmaps.IO
 
         public override BeatmapMetadata ReadMetadata()
         {
-            return firstMap.Metadata;
+            return firstMap.BeatmapInfo.Metadata;
         }
-        public override void Dispose()
+
+        public override void Dispose()
         {
             archive.Dispose();
         }

@@ -6,12 +6,12 @@ using System.Linq;
 using osu.Framework.Cached;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.GameModes.Play;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
@@ -96,7 +96,7 @@ namespace osu.Game.Overlays
             base.UpdateLayout();
 
             if (!activeMode.EnsureValid())
-                activeMode.Refresh(() => modeButtonLine.MoveToX(activeButton.Position.X + activeButton.Size.X / 2 + padding, 200, EasingTypes.OutQuint));
+                activeMode.Refresh(() => modeButtonLine.MoveToX(activeButton.DrawPosition.X + activeButton.DrawSize.X / 2 + padding, 200, EasingTypes.OutQuint));
         }
     }
 }
