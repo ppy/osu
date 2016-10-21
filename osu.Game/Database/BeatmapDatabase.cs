@@ -33,7 +33,18 @@ namespace osu.Game.Database
             }
         }
 
-        public void ImportBeatmap(string path)
+        public void Reset()
+        {
+            foreach (var setInfo in Query<BeatmapSetInfo>())
+                storage.Delete(setInfo.Path);
+
+            connection.DeleteAll<BeatmapMetadata>();
+            connection.DeleteAll<BaseDifficulty>();
+            connection.DeleteAll<BeatmapSetInfo>();
+            connection.DeleteAll<BeatmapInfo>();
+        }
+
+        public void Import(string path)
         {
             string hash = null;
             BeatmapMetadata metadata;
