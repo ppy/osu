@@ -27,8 +27,6 @@ namespace osu.Game.GameModes.Play
         private BeatmapDatabase beatmaps;
         private BeatmapSetInfo selectedBeatmapSet;
         private BeatmapInfo selectedBeatmap;
-        private BeatmapResourceStore beatmapResources;
-        private TextureStore beatmapTextureResources;
         // TODO: use currently selected track as bg
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
         private ScrollContainer scrollContainer;
@@ -62,7 +60,7 @@ namespace osu.Game.GameModes.Play
             beatmapSet.Beatmaps.ForEach(b => beatmaps.GetChildren(b));
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty)
                 .ToList();
-            var group = new BeatmapGroup(beatmapSet, beatmapResources, beatmapTextureResources);
+            var group = new BeatmapGroup(beatmapSet);
             group.SetSelected += selectBeatmapSet;
             group.BeatmapSelected += selectBeatmap;
             setList.Add(group);
@@ -121,6 +119,32 @@ namespace osu.Game.GameModes.Play
                             Spacing = new Vector2(0, 5),
                         }
                     }
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Size = new Vector2(1, 50),
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Size = Vector2.One,
+                            Colour = new Color4(0, 0, 0, 0.5f),
+                        },
+                        new Button
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            RelativeSizeAxes = Axes.Y,
+                            Size = new Vector2(100, 1),
+                            Text = "Play",
+                            Colour = new Color4(238, 51, 153, 255),
+                            Action = () => Push(new Player { /*Beatmap = selectedBeatmap*/ }),
+                        },
+                    }
                 }
             };
         }
@@ -139,8 +163,6 @@ namespace osu.Game.GameModes.Play
             }
             
             beatmaps = (game as OsuGameBase).Beatmaps;
-            beatmapTextureResources = new TextureStore(
-                new RawTextureLoaderStore(beatmapResources = new BeatmapResourceStore(beatmaps)));
             beatmaps.BeatmapSetAdded += bset => Scheduler.Add(() => addBeatmapSet(bset));
             addBeatmapSets();
             var first = setList.Children.FirstOrDefault() as BeatmapGroup;
@@ -157,8 +179,6 @@ namespace osu.Game.GameModes.Play
             base.Dispose(isDisposing);
             if (playMode != null)
                 playMode.ValueChanged -= PlayMode_ValueChanged;
-            if (beatmapResources != null)
-                beatmapResources.Dispose();
         }
 
         private void PlayMode_ValueChanged(object sender, EventArgs e)
