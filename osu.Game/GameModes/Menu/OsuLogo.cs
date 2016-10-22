@@ -62,6 +62,7 @@ namespace osu.Game.GameModes.Menu
                     {
                         logoContainer = new CircularContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
                             Children = new[]
                             {
