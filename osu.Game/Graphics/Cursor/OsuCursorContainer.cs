@@ -29,11 +29,12 @@ namespace osu.Game.Graphics.Cursor
             return base.OnMouseUp(state, args);
         }
 
-        class OsuCursor : AutoSizeContainer
+        class OsuCursor : Container
         {
             public OsuCursor()
             {
                 Origin = Anchor.Centre;
+                AutoSizeAxes = Axes.Both;
             }
 
             public override void Load(BaseGame game)

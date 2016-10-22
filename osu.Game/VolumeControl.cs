@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game
 {
-    internal class VolumeControl : AutoSizeContainer
+    internal class VolumeControl : Container
     {
         private FlowContainer volumeMetersContainer;
         private VolumeMeter volumeMeterMaster;
@@ -24,6 +24,11 @@ namespace osu.Game
 
             Anchor = Anchor.BottomRight;
             Origin = Anchor.BottomRight;
+        }
+
+        public VolumeControl()
+        {
+            AutoSizeAxes = Axes.Both;
         }
 
         public override void Load(BaseGame game)

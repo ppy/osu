@@ -15,7 +15,7 @@ namespace osu.Game.GameModes.Menu
     /// <summary>
     /// osu! logo and its attachments (pulsing, visualiser etc.)
     /// </summary>
-    public partial class OsuLogo : AutoSizeContainer
+    public partial class OsuLogo : Container
     {
         private Sprite logo;
         private CircularContainer logoContainer;
@@ -51,10 +51,13 @@ namespace osu.Game.GameModes.Menu
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
+            AutoSizeAxes = Axes.Both;
+
             Children = new Drawable[]
             {
-                logoBounceContainer = new AutoSizeContainer
+                logoBounceContainer = new Container
                 {
+                    AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
                         logoContainer = new CircularContainer
