@@ -45,6 +45,7 @@ namespace osu.Game.Online.Chat.Display
                         {
                             Direction = FlowDirection.VerticalOnly,
                             RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Spacing = new Vector2(1, 1)
                         }
                     }

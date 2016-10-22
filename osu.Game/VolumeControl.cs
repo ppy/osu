@@ -42,6 +42,7 @@ namespace osu.Game
             {
                 volumeMetersContainer = new FlowContainer
                 {
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Position = new Vector2(10, 30),

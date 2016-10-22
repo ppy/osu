@@ -77,6 +77,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding { Left = 5, Right = 5 },
                     RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         DrawableIcon = new TextAwesome
@@ -95,6 +96,7 @@ namespace osu.Game.Overlays
                 tooltipContainer = new FlowContainer
                 {
                     Direction = FlowDirection.VerticalOnly,
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomLeft,
                     Position = new Vector2(5, -5),
                     Alpha = 0,
