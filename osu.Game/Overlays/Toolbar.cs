@@ -57,6 +57,7 @@ namespace osu.Game.Overlays
                 {
                     Direction = FlowDirection.HorizontalOnly,
                     RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         new ToolbarButton
@@ -85,6 +86,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.TopRight,
                     Direction = FlowDirection.HorizontalOnly,
                     RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Children = new []
                     {
                         new ToolbarButton

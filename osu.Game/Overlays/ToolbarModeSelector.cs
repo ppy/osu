@@ -44,6 +44,7 @@ namespace osu.Game.Overlays
                 modeButtons = new FlowContainer
                 {
                     RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Direction = FlowDirection.HorizontalOnly,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
