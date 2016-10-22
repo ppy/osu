@@ -15,7 +15,7 @@ namespace osu.Game.Online.Chat.Display
 {
     namespace osu.Online.Social
     {
-        public class ChatLine : AutoSizeContainer
+        public class ChatLine : Container
         {
             public readonly Message Message;
 
@@ -32,6 +32,7 @@ namespace osu.Game.Online.Chat.Display
                 base.Load(game);
 
                 RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
 
                 Children = new Drawable[]
                 {
@@ -55,9 +56,10 @@ namespace osu.Game.Online.Chat.Display
                             }
                         }
                     },
-                    new AutoSizeContainer
+                    new Container
                     {
                         RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
                         Padding = new MarginPadding { Left = padding + 10 },
                         Children = new Drawable[]
                         {

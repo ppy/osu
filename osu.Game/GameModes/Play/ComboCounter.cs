@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace osu.Game.GameModes.Play
 {
-    public abstract class ComboCounter : AutoSizeContainer
+    public abstract class ComboCounter : Container
     {
         public bool IsRolling
         {
@@ -102,6 +102,8 @@ namespace osu.Game.GameModes.Play
         /// </summary>
         protected ComboCounter()
         {
+            AutoSizeAxes = Axes.Both;
+
             Children = new Drawable[]
             {
                 DisplayedCountSpriteText = new SpriteText
