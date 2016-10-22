@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class StarCounter : AutoSizeContainer
+    public class StarCounter : Container
     {
         private readonly Container starContainer;
         private readonly List<TextAwesome> stars = new List<TextAwesome>();
@@ -84,7 +84,9 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Shows a float count as stars (up to 10). Used as star difficulty display.
         /// </summary>
-        public StarCounter() : this(10) {
+        public StarCounter() : this(10)
+        {
+            AutoSizeAxes = Axes.Both;
         }
 
         /// <summary>

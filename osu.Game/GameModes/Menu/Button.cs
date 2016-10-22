@@ -17,7 +17,7 @@ namespace osu.Game.GameModes.Menu
     /// Button designed specifically for the osu!next main menu.
     /// In order to correctly flow, we have to use a negative margin on the parent container (due to the parallelogram shape).
     /// </summary>
-    public class Button : AutoSizeContainer, IStateful<ButtonState>
+    public class Button : Container, IStateful<ButtonState>
     {
         private Container iconText;
         private Box box;
@@ -44,6 +44,8 @@ namespace osu.Game.GameModes.Menu
             this.extraWidth = extraWidth;
             this.triggerKey = triggerKey;
             this.text = text;
+
+            AutoSizeAxes = Axes.Both;
         }
 
         public override void Load(BaseGame game)
@@ -64,8 +66,9 @@ namespace osu.Game.GameModes.Menu
                         Size = boxSize,
                         Shear = new Vector2(ButtonSystem.wedge_width / boxSize.Y, 0),
                     },
-                    iconText = new AutoSizeContainer
+                    iconText = new Container
                     {
+                        AutoSizeAxes = Axes.Both,
                         Position = new Vector2(extraWidth / 2, 0),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
