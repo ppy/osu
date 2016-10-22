@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 
 namespace osu.Game
 {
@@ -54,6 +55,12 @@ namespace osu.Game
                     Origin = Anchor.TopCentre
                 }
             };
+        }
+
+        public override void Load(BaseGame game)
+        {
+            base.Load(game);
+            updateFill();
         }
 
         public double Volume
