@@ -93,8 +93,9 @@ namespace osu.Game.GameModes
                         Alpha = 1,
                         Additive = false
                     },
-                    textContainer = new AutoSizeContainer
+                    textContainer = new Container
                     {
+                        AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Children = new[]

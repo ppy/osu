@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class RollingCounter<T> : AutoSizeContainer
+    public abstract class RollingCounter<T> : Container
     {
         /// <summary>
         /// Type of the Transform to use.
@@ -116,6 +116,7 @@ namespace osu.Game.Graphics.UserInterface
             };
 
             TextSize = 40;
+            AutoSizeAxes = Axes.Both;
         }
 
         public override void Load(BaseGame game)
