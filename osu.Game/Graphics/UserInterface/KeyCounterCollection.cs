@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,6 +14,7 @@ namespace osu.Game.Graphics.UserInterface
         public KeyCounterCollection()
         {
             Direction = FlowDirection.HorizontalOnly;
+            AutoSizeAxes = Axes.Both;
         }
 
         private List<KeyCounter> counters = new List<KeyCounter>();
