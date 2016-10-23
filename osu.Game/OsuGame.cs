@@ -194,8 +194,8 @@ namespace osu.Game
 
             if (Parent != null)
             {
-                Config.Set(OsuConfig.Width, Size.X);
-                Config.Set(OsuConfig.Height, Size.Y);
+                Config.Set(OsuConfig.Width, DrawSize.X);
+                Config.Set(OsuConfig.Height, DrawSize.Y);
             }
             return true;
         }
