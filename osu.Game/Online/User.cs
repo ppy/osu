@@ -10,7 +10,16 @@ namespace osu.Game.Online
         [JsonProperty(@"username")]
         public string Name;
 
-        [JsonProperty(@"colour")]
+        [JsonProperty(@"profileColour")]
         public string Colour;
+
+        [JsonProperty(@"id")]
+        public int UserId;
+
+        //public User MyUser = new User();
+        [JsonConstructor]
+        public User()
+        {
+        }
     }
 }
