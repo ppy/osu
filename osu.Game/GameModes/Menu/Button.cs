@@ -139,7 +139,7 @@ namespace osu.Game.GameModes.Menu
                 LoopDelay = duration
             });
 
-            icon.Transforms.Add(new TransformScaleVector(Clock)
+            icon.Transforms.Add(new TransformScale(Clock)
             {
                 StartValue = new Vector2(1, 0.9f),
                 EndValue = Vector2.One,
@@ -161,7 +161,7 @@ namespace osu.Game.GameModes.Menu
                 LoopDelay = duration
             });
 
-            icon.Transforms.Add(new TransformScaleVector(Clock)
+            icon.Transforms.Add(new TransformScale(Clock)
             {
                 StartValue = Vector2.One,
                 EndValue = new Vector2(1, 0.9f),

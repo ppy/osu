@@ -128,7 +128,7 @@ namespace osu.Desktop.Tests
 
                 lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
 
-                Debug.Write(fetchReq);
+                Debug.Write("success!");
                 fetchReq = null;
             };
             fetchReq.Failure += delegate
