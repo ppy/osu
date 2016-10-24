@@ -77,6 +77,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding { Left = 5, Right = 5 },
                     RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         DrawableIcon = new TextAwesome
@@ -95,6 +96,7 @@ namespace osu.Game.Overlays
                 tooltipContainer = new FlowContainer
                 {
                     Direction = FlowDirection.VerticalOnly,
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomLeft,
                     Position = new Vector2(5, -5),
                     Alpha = 0,
@@ -121,7 +123,7 @@ namespace osu.Game.Overlays
             base.Update();
 
             //todo: find a way to avoid using this (autosize needs to be able to ignore certain drawables.. in this case the tooltip)
-            Size = new Vector2(WIDTH + (DrawableText.IsVisible ? DrawableText.Size.X : 0), 1);
+            Size = new Vector2(WIDTH + (DrawableText.IsVisible ? DrawableText.DrawSize.X : 0), 1);
         }
 
         protected override bool OnClick(InputState state)

@@ -14,8 +14,6 @@ namespace osu.Framework.VisualTests
             base.Load(game);
 
             Add(new TestBrowser());
-
-            ShowPerformanceOverlay = true;
         }
     }
 }

@@ -80,8 +80,9 @@ namespace osu.Game.GameModes.Menu
                         {
                             Direction = FlowDirection.HorizontalOnly,
                             Anchor = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
                             Spacing = new Vector2(-wedge_width, 0),
-                            Children = new Drawable[]
+                            Children = new[]
                             {
                                 settingsButton = new Button(@"settings", @"options", FontAwesome.gear, new Color4(85, 85, 85, 255), OnSettings, -wedge_width, Key.O),
                                 backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -wedge_width, Key.Escape),
@@ -210,7 +211,7 @@ namespace osu.Game.GameModes.Menu
                     case MenuState.TopLevel:
                         buttonAreaBackground.ScaleTo(Vector2.One, 200, EasingTypes.Out);
 
-                        osuLogo.MoveTo(buttonFlow.Position, 200, EasingTypes.In);
+                        osuLogo.MoveTo(buttonFlow.DrawPosition, 200, EasingTypes.In);
                         osuLogo.ScaleTo(0.5f, 200, EasingTypes.In);
 
                         buttonArea.FadeIn(300);
