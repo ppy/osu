@@ -163,7 +163,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 10,
-                    Width = 0.5f,//placeholder
+                    Width = 0,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Colour = Color4.Orange
@@ -174,6 +174,14 @@ namespace osu.Game.Overlays
                 playButton.Icon=FontAwesome.pause;
                 play(currentPlay, null);
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            if (currentTrack == null) return;
+            progress.Width = (float)(currentTrack.CurrentTime / currentTrack.Length);
+            if (currentTrack.HasCompleted) next();
         }
 
         private void prev()
