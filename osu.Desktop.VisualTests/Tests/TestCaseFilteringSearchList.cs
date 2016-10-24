@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,8 +16,8 @@ namespace osu.Desktop.Tests
 
         public override string Description => @"Tests filtering search list";
 
-        public TextBox Tb { get; set; }
-        public FilteringSearchList<SpriteText> FilteringSearchList { get; set; }
+        private TextBox tb;
+        private FilteringSearchList<SpriteText> filteringSearchList;
 
         public override void Reset()
         {
@@ -40,7 +41,6 @@ namespace osu.Desktop.Tests
                     Text = "Possibly more I've missed"
                 }
             };
-            var property = typeof(SpriteText).GetProperty("Text");
             Children = new Drawable[]
             {
                 new FlowContainer
@@ -48,24 +48,27 @@ namespace osu.Desktop.Tests
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     Direction = FlowDirection.VerticalOnly,
-                    RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        Tb = new TextBox
+                        tb = new TextBox
                         {
                             Size = new Vector2(300, 30)
                         },
-                        FilteringSearchList = new FilteringSearchList<SpriteText>(items, property)
+                        filteringSearchList = new FilteringSearchList<SpriteText>(items)
+                        {
+                            Size = new Vector2(300, 400)
+                        }
                     }
                 }
             };
-            Tb.OnChange += Tb_OnChange;
+            tb.OnChange += tb_OnChange;
         }
 
-        private void Tb_OnChange(TextBox sender, bool newText)
+        private void tb_OnChange(TextBox sender, bool newText)
         {
             if (newText)
-                FilteringSearchList.Filter(Tb.Text);
+                filteringSearchList.Filter(
+                    item => item.Text.IndexOf(tb.Text, StringComparison.OrdinalIgnoreCase) >= 0);
         }
     }
 }
