@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -63,6 +63,7 @@
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchConverter.cs" />
     <Compile Include="Beatmaps\Objects\Catch\Drawable\DrawableFruit.cs" />
+    <Compile Include="Beatmaps\Objects\DrawableHitObject.cs" />
     <Compile Include="Beatmaps\Objects\HitObject.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchBaseHit.cs" />
     <Compile Include="Beatmaps\Objects\Catch\Droplet.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="GameModes\Multiplayer\MatchSongSelect.cs" />
     <Compile Include="GameModes\OsuGameMode.cs" />
     <Compile Include="GameModes\Play\ModSelect.cs" />
+    <Compile Include="GameModes\Play\Osu\ScoreOverlayOsu.cs" />
     <Compile Include="GameModes\Play\Player.cs" />
     <Compile Include="GameModes\Charts\ChartListing.cs" />
     <Compile Include="GameModes\Play\PlayMode.cs" />
@@ -125,15 +127,16 @@
     <Compile Include="GameModes\Play\Osu\OsuHitRenderer.cs" />
     <Compile Include="GameModes\Play\Osu\OsuPlayfield.cs" />
     <Compile Include="GameModes\Play\Playfield.cs" />
+    <Compile Include="GameModes\Play\ScoreOverlay.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoHitRenderer.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoPlayfield.cs" />
     <Compile Include="GameModes\Edit\EditSongSelect.cs" />
     <Compile Include="GameModes\Play\ComboCounter.cs" />
     <Compile Include="GameModes\Play\ComboResultCounter.cs" />
+    <Compile Include="Graphics\Avatar.cs" />
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoComboCounter.cs" />
     <Compile Include="Input\GlobalHotkeys.cs" />
-    <Compile Include="Graphics\Avatar.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
@@ -154,9 +157,9 @@
     <Compile Include="Online\API\OAuth.cs" />
     <Compile Include="Online\API\OAuthToken.cs" />
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
+    <Compile Include="Online\API\Requests\MyUser.cs" />
     <Compile Include="Online\API\SecurePassword.cs" />
     <Compile Include="Online\API\Requests\ListChannels.cs" />
-    <Compile Include="Online\API\Requests\MyUser.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\Display\ChannelDisplay.cs" />
     <Compile Include="Online\Chat\Display\ChatLine.cs" />
@@ -205,7 +208,7 @@
   <ItemGroup />
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

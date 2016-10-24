@@ -9,6 +9,7 @@ using osu.Framework;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.OpenGL;
 using System.Net;
+using System.Collections.Generic;
 
 namespace osu.Game.Graphics
 {
@@ -22,28 +23,33 @@ namespace osu.Game.Graphics
         {
             this.userId = userid;
             this.avatarSize = avatarsize;
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
         }
 
-        public void UpdateAvatar(int userid)
+        /// <summary>
+        /// Update a given avatar sprite with a new user ID. If the user ID is 1 it will use the guest avatar.
+        /// </summary>
+        /// <param name="userid">The user ID of the desired avatar</param>
+        public async void UpdateAvatar(int userid)
         {
             string url = "https://a.ppy.sh/" + userid.ToString();
 
             byte[] imageData = null;
 
-            using (var wc = new System.Net.WebClient())
-                imageData = wc.DownloadData(url);
-
+            if (userid != 1)
+            {
+                try
+                {
+                    using (var wc = new System.Net.WebClient())
+                        imageData = await wc.DownloadDataTaskAsync(new System.Uri(url));
+                }
+                catch { }
+            }
             Scheduler.Add(delegate
             {
-                if (imageData == null)
+                if (imageData != null)
                 {
-                    return;
+                    Texture = TextureLoader.FromBytes(imageData);
                 }
-                Texture = TextureLoader.FromBytes(imageData);
-                Size = new Vector2(avatarSize);
-                Alpha = 1f;
             });
         }
 
@@ -51,7 +57,8 @@ namespace osu.Game.Graphics
         {
             this.game = game;
             base.Load(game);
-
+            Texture = game.Textures.Get(@"Menu/avatar-guest");
+            Size = new Vector2(avatarSize);
             UpdateAvatar(userId);
         }
     }

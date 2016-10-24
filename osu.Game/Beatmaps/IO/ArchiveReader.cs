@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Platform;
+using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.IO
 {

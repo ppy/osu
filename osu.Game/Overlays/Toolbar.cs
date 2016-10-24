@@ -24,8 +24,6 @@ namespace osu.Game.Overlays
         private BaseGame game;
         private User user;
 
-        private bool isLoaded = false;
-
         public Action OnSettings;
         public Action OnHome;
         public Action OnProfile;
@@ -53,16 +51,13 @@ namespace osu.Game.Overlays
         {
             if (user == null)
                 return;
-            if (toolbarUserButton.Image == null)
+            if (user.UserId == 0)
             {
-                toolbarUserButton.Image = new Avatar(1, 48);
-                toolbarUserButton.Text = "Not signed in";
-                toolbarUserButton.UserId = 0;
+                toolbarUserButton.UpdateButton(1, "Not signed in");
             }
-            if (user.UserId != toolbarUserButton.UserId)
+            else if (user.UserId != toolbarUserButton.UserId)
             {
-                toolbarUserButton.UpdateButton(user.UserId);
-                toolbarUserButton.Text = user.Name;
+                toolbarUserButton.UpdateButton(user.UserId, user.Name);
                 toolbarUserButton.UserId = user.UserId;
             }
         }
@@ -82,21 +77,9 @@ namespace osu.Game.Overlays
         public override void Load(BaseGame game)
         {
             base.Load(game);
-
-            this.api = ((OsuGameBase)game).API;
+            api = ((OsuGameBase)game).API;
             this.game = game;
-            this.user = new User();
-
-            if (isLoaded == false)
-            {
-                InitUser();
-                Scheduler.AddDelayed(delegate {
-                    InitUser();
-                }, 10000, true);
-            }
-            isLoaded = true;
-
-
+            user = new User();
             Children = new Drawable[]
             {
                 new Box
@@ -108,6 +91,7 @@ namespace osu.Game.Overlays
                 {
                     Direction = FlowDirection.HorizontalOnly,
                     RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         new ToolbarButton
@@ -127,30 +111,35 @@ namespace osu.Game.Overlays
                         modeSelector = new ToolbarModeSelector
                         {
                             OnPlayModeChange = OnPlayModeChange
-                        },
-                    },
+                        }
+                    }
                 },
-            };
-
-            Add(new FlowContainer
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                Direction = FlowDirection.HorizontalOnly,
-                RelativeSizeAxes = Axes.Y,
-                Children = new Drawable[]
+                new FlowContainer
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Direction = FlowDirection.HorizontalOnly,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Children = new Drawable[]
                     {
                         new ToolbarButton
                         {
                             Icon = FontAwesome.search
                         },
-                        toolbarUserButton = new UserButton(user.UserId),
+                        toolbarUserButton = new UserButton(1),
                         new ToolbarButton
                         {
                             Icon = FontAwesome.bars
-                        }
+                        },
                     }
-            });
+                }
+            };
+
+            InitUser();
+            Scheduler.AddDelayed(delegate {
+                InitUser();
+            }, 10000, true);
 
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, height);
