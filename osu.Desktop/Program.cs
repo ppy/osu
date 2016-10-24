@@ -25,7 +25,7 @@ namespace osu.Desktop
                 var importer = new BeatmapImporter(host);
                 
                 foreach (var file in args)
-                    if (importer.Import(file).Wait(1000))
+                    if (!importer.Import(file).Wait(1000))
                         throw new TimeoutException(@"IPC took too long to send");
                 Console.WriteLine(@"Sent import requests to running instance");
             }

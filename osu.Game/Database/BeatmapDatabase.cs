@@ -17,7 +17,7 @@ namespace osu.Game.Database
 {
     public class BeatmapDatabase
     {
-        private static SQLiteConnection connection { get; set; }
+        public static SQLiteConnection Connection { get; set; }
         private BasicStorage storage;
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
 
@@ -29,13 +29,13 @@ namespace osu.Game.Database
 
             ipc = new BeatmapImporter(host, this);
 
-            if (connection == null)
+            if (Connection == null)
             {
-                connection = storage.GetDatabase(@"beatmaps");
-                connection.CreateTable<BeatmapMetadata>();
-                connection.CreateTable<BaseDifficulty>();
-                connection.CreateTable<BeatmapSetInfo>();
-                connection.CreateTable<BeatmapInfo>();
+                Connection = storage.GetDatabase(@"beatmaps");
+                Connection.CreateTable<BeatmapMetadata>();
+                Connection.CreateTable<BaseDifficulty>();
+                Connection.CreateTable<BeatmapSetInfo>();
+                Connection.CreateTable<BeatmapInfo>();
             }
         }
 
@@ -44,10 +44,10 @@ namespace osu.Game.Database
             foreach (var setInfo in Query<BeatmapSetInfo>())
                 storage.Delete(setInfo.Path);
 
-            connection.DeleteAll<BeatmapMetadata>();
-            connection.DeleteAll<BaseDifficulty>();
-            connection.DeleteAll<BeatmapSetInfo>();
-            connection.DeleteAll<BeatmapInfo>();
+            Connection.DeleteAll<BeatmapMetadata>();
+            Connection.DeleteAll<BaseDifficulty>();
+            Connection.DeleteAll<BeatmapSetInfo>();
+            Connection.DeleteAll<BeatmapInfo>();
         }
 
         public void Import(params string[] paths)
@@ -62,7 +62,7 @@ namespace osu.Game.Database
                 using (var reader = ArchiveReader.GetReader(storage, path))
                     metadata = reader.ReadMetadata();
 
-                if (connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
+                if (Connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
                     return; // TODO: Update this beatmap instead
 
                 if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
@@ -104,7 +104,7 @@ namespace osu.Game.Database
                         }
                     }
                 }
-                connection.InsertWithChildren(beatmapSet, true);
+                Connection.InsertWithChildren(beatmapSet, true);
                 BeatmapSetAdded?.Invoke(beatmapSet);
             }
         }
@@ -136,25 +136,25 @@ namespace osu.Game.Database
         
         public TableQuery<T> Query<T>() where T : class
         {
-            return connection.Table<T>();
+            return Connection.Table<T>();
         }
         
         public T GetWithChildren<T>(object id) where T : class
         {
-            return connection.GetWithChildren<T>(id);
+            return Connection.GetWithChildren<T>(id);
         }
         
         public List<T> GetAllWithChildren<T>(Expression<Func<T, bool>> filter = null,
             bool recursive = true) where T : class
         {
-            return connection.GetAllWithChildren<T>(filter, recursive);
+            return Connection.GetAllWithChildren<T>(filter, recursive);
         }
         
         public T GetChildren<T>(T item, bool recursive = true)
         {
             if (item == null) return default(T);
 
-            connection.GetChildren(item, recursive);
+            Connection.GetChildren(item, recursive);
             return item;
         }
 
@@ -171,9 +171,9 @@ namespace osu.Game.Database
             if (!validTypes.Any(t => t == typeof(T)))
                 throw new ArgumentException(nameof(T), "Must be a type managed by BeatmapDatabase");
             if (cascade)
-                connection.UpdateWithChildren(record);
+                Connection.UpdateWithChildren(record);
             else
-                connection.Update(record);
+                Connection.Update(record);
         }
     }
 }
