@@ -2,6 +2,8 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
@@ -10,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Game.Database;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays
@@ -19,9 +22,13 @@ namespace osu.Game.Overlays
         private Sprite backgroundSprite;
         private Box progress;
         private SpriteText title, artist;
+        private List<BeatmapSetInfo> playList;
+        private BeatmapSetInfo currentPlay;
         public override void Load(BaseGame game)
         {
             base.Load(game);
+            playList = (game as OsuGameBase).Beatmaps.Query<BeatmapSetInfo>().ToList();
+            currentPlay = playList.FirstOrDefault();
             Width = 400;
             Height = 130;
             CornerRadius = 5;
@@ -41,7 +48,7 @@ namespace osu.Game.Overlays
                     Position = new Vector2(0, 40),
                     TextSize = 20,
                     Colour = Color4.White,
-                    Text = @"Title Title Title"//placeholder
+                    Text = currentPlay?.Metadata.TitleUnicode ?? currentPlay?.Metadata.Title ?? @"Nothing to play"
                 },
                 artist = new SpriteText
                 {
@@ -50,7 +57,7 @@ namespace osu.Game.Overlays
                     Position = new Vector2(0, 45),
                     TextSize = 12,
                     Colour = Color4.White,
-                    Text = @"Artist Artist Artist"//placeholder
+                    Text = currentPlay?.Metadata.ArtistUnicode ?? currentPlay?.Metadata.Artist ?? @"Nothing to play"
                 },
                 new Box
                 {
