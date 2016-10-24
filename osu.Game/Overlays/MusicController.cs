@@ -8,6 +8,7 @@ using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 
@@ -15,7 +16,7 @@ namespace osu.Game.Overlays
 {
     public class MusicController : OverlayContainer
     {
-        private Sprite background;
+        private Sprite backgroundSprite;
         private Box progress;
         private SpriteText title, artist;
         public override void Load(BaseGame game)
@@ -27,11 +28,7 @@ namespace osu.Game.Overlays
             Masking = true;
             Children = new Drawable[]
             {
-                background = new Sprite
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Texture = game.Textures.Get(@"Backgrounds/bg4")//placeholder
-                },
+                backgroundSprite = getScaledSprite(game.Textures.Get(@"Backgrounds/bg4")),//placeholder
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -105,6 +102,19 @@ namespace osu.Game.Overlays
                     Colour = Color4.Orange
                 }
             };
+        }
+
+        private Sprite getScaledSprite(Texture background)
+        {
+            Sprite scaledSprite = new Sprite
+            {
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                Texture = background,
+                Depth = float.MinValue
+            };
+            scaledSprite.Scale = new Vector2(Math.Max(DrawSize.X / scaledSprite.DrawSize.X, DrawSize.Y / scaledSprite.DrawSize.Y));
+            return scaledSprite;
         }
 
         //placeholder for toggling
