@@ -8,10 +8,10 @@ namespace osu.Game.Tests.Resources
     {
         public static Stream OpenResource(string name)
         {
-            return Assembly.GetExecutingAssembly().GetManifestResourceStream(
-                $@"osu.Game.Tests.Resources.{name}") ??
-                Assembly.LoadFrom("osu.Game.Resources.dll").GetManifestResourceStream(
-                $@"osu.Game.Resources.{name}");
+            var localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
+
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream($@"osu.Game.Tests.Resources.{name}") ??
+                Assembly.LoadFrom(Path.Combine(localPath, @"osu.Game.Resources.dll")).GetManifestResourceStream($@"osu.Game.Resources.{name}");
         }
     }
 }
