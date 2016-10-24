@@ -22,6 +22,8 @@ namespace osu.Desktop.Tests
         IFrameBasedClock ourClock;
         protected override IFrameBasedClock Clock => ourClock;
 
+        protected MusicController mc;
+
         public override void Load(BaseGame game)
         {
             base.Load(game);
@@ -32,7 +34,8 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
             ourClock.ProcessFrame();
-            MusicController mc = new MusicController
+            mc?.CurrentTrack?.Stop();
+            mc = new MusicController
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre

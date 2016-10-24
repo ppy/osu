@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
         private OsuGameBase osuGame;
         private List<BeatmapSetInfo> playList;
         private BeatmapSetInfo currentPlay;
-        private AudioTrack currentTrack;
+        public AudioTrack CurrentTrack { get; set; }//TODO:gets exterally
         public override void Load(BaseGame game)
         {
             base.Load(game);
@@ -83,15 +83,15 @@ namespace osu.Game.Overlays
                     Position = new Vector2(0, 30),
                     Action = () =>
                     {
-                        if (currentTrack == null) return;
-                        if (currentTrack.IsRunning)
+                        if (CurrentTrack == null) return;
+                        if (CurrentTrack.IsRunning)
                         {
-                            currentTrack.Stop();
+                            CurrentTrack.Stop();
                             playButton.Icon = FontAwesome.play_circle_o;
                         }
                         else
                         {
-                            currentTrack.Start();
+                            CurrentTrack.Start();
                             playButton.Icon = FontAwesome.pause;
                         }
                     },
@@ -179,9 +179,9 @@ namespace osu.Game.Overlays
         protected override void Update()
         {
             base.Update();
-            if (currentTrack == null) return;
-            progress.Width = (float)(currentTrack.CurrentTime / currentTrack.Length);
-            if (currentTrack.HasCompleted) next();
+            if (CurrentTrack == null) return;
+            progress.Width = (float)(CurrentTrack.CurrentTime / CurrentTrack.Length);
+            if (CurrentTrack.HasCompleted) next();
         }
 
         private void prev()
@@ -208,9 +208,9 @@ namespace osu.Game.Overlays
             title.Text = metadata.TitleUnicode ?? metadata.Title;
             artist.Text = metadata.ArtistUnicode ?? metadata.Artist;
             ArchiveReader reader = osuGame.Beatmaps.GetReader(currentPlay);
-            currentTrack?.Stop();
-            currentTrack = new AudioTrackBass(reader.ReadFile(metadata.AudioFile));
-            currentTrack.Start();
+            CurrentTrack?.Stop();
+            CurrentTrack = new AudioTrackBass(reader.ReadFile(metadata.AudioFile));
+            CurrentTrack.Start();
             Sprite newBackground = getScaledSprite(TextureLoader.FromStream(reader.ReadFile(metadata.BackgroundFile)));
             Add(newBackground);
             if (isNext == true)
