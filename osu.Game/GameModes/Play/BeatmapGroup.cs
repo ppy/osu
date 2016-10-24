@@ -96,7 +96,6 @@ namespace osu.Game.GameModes.Play
             Alpha = collapsedAlpha;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-            Width = 1;
             float difficultyWidth = 1;
             Children = new[]
             {
@@ -104,7 +103,6 @@ namespace osu.Game.GameModes.Play
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Width = 1,
                     Direction = FlowDirection.VerticalOnly,
                     Children = new[]
                     {
@@ -122,7 +120,6 @@ namespace osu.Game.GameModes.Play
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Width = 1,
                 Margin = new MarginPadding { Top = 5 },
                 Padding = new MarginPadding { Left = 75 },
                 Spacing = new Vector2(0, 5),
@@ -183,7 +180,6 @@ namespace osu.Game.GameModes.Play
                         backgroundImage = new Sprite
                         {
                             RelativeSizeAxes = Axes.X,
-                            Width = 1,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
