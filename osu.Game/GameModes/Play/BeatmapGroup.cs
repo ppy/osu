@@ -212,6 +212,7 @@ namespace osu.Game.GameModes.Play
                         },
                         new FlowContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Children = new[]
                             {
                                 new DifficultyIcon(FontAwesome.dot_circle_o, new Color4(159, 198, 0, 255)),
