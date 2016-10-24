@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using osu.Framework.Graphics;
 using osu.Framework.GameModes.Testing;
 using osu.Game.Overlays;
+using osu.Framework.Timing;
+using osu.Framework;
 
 namespace osu.Desktop.Tests
 {
@@ -17,9 +19,19 @@ namespace osu.Desktop.Tests
         public override string Name => @"Music Controller";
         public override string Description => @"Tests music controller ui.";
 
+        IFrameBasedClock ourClock;
+        protected override IFrameBasedClock Clock => ourClock;
+
+        public override void Load(BaseGame game)
+        {
+            base.Load(game);
+            ourClock = new FramedClock();
+        }
+
         public override void Reset()
         {
             base.Reset();
+            ourClock.ProcessFrame();
             MusicController mc = new MusicController
             {
                 Origin = Anchor.Centre,
@@ -27,6 +39,12 @@ namespace osu.Desktop.Tests
             };
             Add(mc);
             AddToggle(@"Show", mc.ToggleVisibility);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            ourClock.ProcessFrame();
         }
     }
 }

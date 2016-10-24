@@ -216,21 +216,22 @@ namespace osu.Game.Overlays
             if (isNext == true)
             {
                 newBackground.Position = new Vector2(400, 0);
-                newBackground.MoveToX(0, 200, EasingTypes.Out);
-                backgroundSprite.MoveToX(-400, 200, EasingTypes.Out);
+                newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
+                backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
                 backgroundSprite.Expire();
             }
             else if (isNext == false)
             {
                 newBackground.Position = new Vector2(-400, 0);
-                newBackground.MoveToX(0, 200, EasingTypes.Out);
-                backgroundSprite.MoveToX(400, 200, EasingTypes.Out);
+                newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
+                backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
                 backgroundSprite.Expire();
             }
             else
             {
                 Remove(backgroundSprite);
             }
+            backgroundSprite = newBackground;
         }
 
         private Sprite getScaledSprite(Texture background)
