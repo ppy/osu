@@ -35,6 +35,7 @@
       <HintPath>..\packages\ppy.OpenTK.2.0.50727.1337\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
