@@ -21,7 +21,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.GameModes.Play
 {
-    class BeatmapButton : AutoSizeContainer
+    class BeatmapButton : Container
     {
         private BeatmapSetInfo beatmapSet;
         private BeatmapInfo beatmap;
@@ -51,6 +51,7 @@ namespace osu.Game.GameModes.Play
         {
             this.beatmapSet = set;
             this.beatmap = beatmap;
+            AutoSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = 5;
             BorderThickness = 2;
@@ -62,12 +63,13 @@ namespace osu.Game.GameModes.Play
                 {
                     Colour = new Color4(40, 86, 102, 255), // TODO: gradient
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(1),
+                    Size = Vector2.One,
                 },
                 new FlowContainer
                 {
                     Padding = new MarginPadding(5),
                     Direction = FlowDirection.HorizontalOnly,
+                    AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
                         new DifficultyIcon(FontAwesome.dot_circle_o, new Color4(159, 198, 0, 255)),
@@ -75,11 +77,13 @@ namespace osu.Game.GameModes.Play
                         {
                             Padding = new MarginPadding { Left = 10 },
                             Direction = FlowDirection.VerticalOnly,
+                            AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
                                 new FlowContainer
                                 {
                                     Direction = FlowDirection.HorizontalOnly,
+                                    AutoSizeAxes = Axes.Both,
                                     Children = new[]
                                     {
                                         new SpriteText

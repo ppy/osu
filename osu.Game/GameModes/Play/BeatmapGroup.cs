@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace osu.Game.GameModes.Play
 {
-    class BeatmapGroup : AutoSizeContainer
+    class BeatmapGroup : Container
     {
         private const float collapsedAlpha = 0.5f;
         private const float collapsedWidth = 0.8f;
@@ -64,13 +64,7 @@ namespace osu.Game.GameModes.Play
                 else
                     topContainer.Add(difficulties);
                 setBox.ClearTransformations();
-                setBox.Transforms.Add(new TransformSize(Clock)
-                {
-                    StartValue = new Vector2(collapsed ? 1 : collapsedWidth, -1),
-                    EndValue = new Vector2(collapsed ? collapsedWidth : 1, -1),
-                    StartTime = Time,
-                    EndTime = Time + 200,
-                });
+                setBox.Width = collapsed ? collapsedWidth : 1; // TODO: Transform
                 setBox.BorderColour = new Color4(
                     setBox.BorderColour.R,
                     setBox.BorderColour.G,
@@ -89,13 +83,7 @@ namespace osu.Game.GameModes.Play
                 var button = buttons[i] as BeatmapButton;
                 float targetWidth = 1 - Math.Abs((selected - i) * 0.025f);
                 targetWidth = MathHelper.Clamp(targetWidth, 0.8f, 1);
-                button.Transforms.Add(new TransformSize(Clock)
-                {
-                    StartValue = new Vector2(button.Size.X, -1),
-                    EndValue = new Vector2(targetWidth, -1),
-                    StartTime = Time,
-                    EndTime = Time + 100,
-                });
+                button.Width = targetWidth; // TODO: Transform
                 button.Selected = selected == i;
             }
             BeatmapSelected?.Invoke(BeatmapSet, map);
@@ -106,22 +94,24 @@ namespace osu.Game.GameModes.Play
             BeatmapSet = beatmapSet;
             selectedBeatmap = beatmapSet.Beatmaps[0];
             Alpha = collapsedAlpha;
+            AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, -1);
+            Width = 1;
             float difficultyWidth = 1;
             Children = new[]
             {
                 topContainer = new FlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(1, -1),
+                    AutoSizeAxes = Axes.Y,
+                    Width = 1,
                     Direction = FlowDirection.VerticalOnly,
                     Children = new[]
                     {
                         setBox = new BeatmapSetBox(beatmapSet)
                         {
                             RelativeSizeAxes = Axes.X,
-                            Size = new Vector2(collapsedWidth, -1),
+                            Width = collapsedWidth,
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                         }
@@ -131,7 +121,8 @@ namespace osu.Game.GameModes.Play
             difficulties = new FlowContainer // Deliberately not added to children
             {
                 RelativeSizeAxes = Axes.X,
-                Size = new Vector2(1, -1),
+                AutoSizeAxes = Axes.Y,
+                Width = 1,
                 Margin = new MarginPadding { Top = 5 },
                 Padding = new MarginPadding { Left = 75 },
                 Spacing = new Vector2(0, 5),
@@ -147,7 +138,7 @@ namespace osu.Game.GameModes.Play
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.X,
-                            Size = new Vector2(width, -1),
+                            Width = width,
                         };
                     })
             };
@@ -161,7 +152,7 @@ namespace osu.Game.GameModes.Play
         }
     }
     
-    class BeatmapSetBox : AutoSizeContainer
+    class BeatmapSetBox : Container
     {
         private BeatmapSetInfo beatmapSet;
         private Sprite backgroundImage;
@@ -169,6 +160,7 @@ namespace osu.Game.GameModes.Play
         public BeatmapSetBox(BeatmapSetInfo beatmapSet)
         {
             this.beatmapSet = beatmapSet;
+            AutoSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = 5;
             BorderThickness = 2;
@@ -191,7 +183,7 @@ namespace osu.Game.GameModes.Play
                         backgroundImage = new Sprite
                         {
                             RelativeSizeAxes = Axes.X,
-                            Size = new Vector2(1, 0),
+                            Width = 1,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
@@ -208,6 +200,7 @@ namespace osu.Game.GameModes.Play
                     Direction = FlowDirection.VerticalOnly,
                     Spacing = new Vector2(0, 2),
                     Padding = new MarginPadding { Top = 3, Left = 20, Right = 20, Bottom = 3 },
+                    AutoSizeAxes = Axes.Both,
                     Children = new[]
                     {
                         // TODO: Make these italic
