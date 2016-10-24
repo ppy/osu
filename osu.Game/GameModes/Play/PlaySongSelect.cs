@@ -80,7 +80,7 @@ namespace osu.Game.GameModes.Play
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(1),
+                    Size = Vector2.One,
                     Padding = new MarginPadding { Right = scrollWidth - 200 },
                     Children = new[]
                     {
@@ -114,7 +114,7 @@ namespace osu.Game.GameModes.Play
                         {
                             Padding = new MarginPadding { Left = 25, Top = 25, Bottom = 25 },
                             RelativeSizeAxes = Axes.X,
-                            Size = new Vector2(1, -1),
+                            AutoSizeAxes = Axes.X,
                             Direction = FlowDirection.VerticalOnly,
                             Spacing = new Vector2(0, 5),
                         }
