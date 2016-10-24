@@ -252,15 +252,4 @@ namespace osu.Game.Overlays
 
         protected override void PopOut() => FadeOut(500);
     }
-
-    public class ClickableTextAwesome : TextAwesome
-    {
-        public Action Action;
-
-        protected override bool OnClick(InputState state)
-        {
-            Action?.Invoke();
-            return true;
-        }
-    }
 }
