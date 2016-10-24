@@ -139,6 +139,7 @@
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoComboCounter.cs" />
     <Compile Include="Input\GlobalHotkeys.cs" />
+    <Compile Include="Graphics\Avatar.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
@@ -158,8 +159,9 @@
     <Compile Include="Online\API\APIRequest.cs" />
     <Compile Include="Online\API\OAuth.cs" />
     <Compile Include="Online\API\OAuthToken.cs" />
-    <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
     <Compile Include="Online\API\SecurePassword.cs" />
+    <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
+    <Compile Include="Online\API\Requests\MyUser.cs" />
     <Compile Include="Online\API\Requests\ListChannels.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\Display\ChannelDisplay.cs" />
@@ -174,6 +176,7 @@
     <Compile Include="Overlays\ToolbarButton.cs" />
     <Compile Include="Overlays\ToolbarModeButton.cs" />
     <Compile Include="Overlays\ToolbarModeSelector.cs" />
+    <Compile Include="Overlays\UserButton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="VolumeControl.cs" />
