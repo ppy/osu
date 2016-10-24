@@ -75,6 +75,7 @@ namespace osu.Game.GameModes.Play
         public PlaySongSelect()
         {
             const float scrollWidth = 640;
+            const float bottomToolHeight = 50;
             Children = new Drawable[]
             {
                 new Container
@@ -112,9 +113,9 @@ namespace osu.Game.GameModes.Play
                     {
                         setList = new FlowContainer
                         {
-                            Padding = new MarginPadding { Left = 25, Top = 25, Bottom = 25 },
+                            Padding = new MarginPadding { Left = 25, Top = 25, Bottom = 25 + bottomToolHeight },
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Direction = FlowDirection.VerticalOnly,
                             Spacing = new Vector2(0, 5),
                         }
@@ -123,7 +124,7 @@ namespace osu.Game.GameModes.Play
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(1, 50),
+                    Height = bottomToolHeight,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Children = new Drawable[]
@@ -139,7 +140,7 @@ namespace osu.Game.GameModes.Play
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             RelativeSizeAxes = Axes.Y,
-                            Size = new Vector2(100, 1),
+                            Width = 100,
                             Text = "Play",
                             Colour = new Color4(238, 51, 153, 255),
                             Action = () => Push(new Player { Beatmap = beatmaps.GetBeatmap(selectedBeatmap) }),
