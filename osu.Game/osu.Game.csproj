@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -64,8 +64,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Beatmap.cs" />
-    <Compile Include="Beatmaps\BeatmapSet.cs" />
-    <Compile Include="Beatmaps\BeatmapMetadata.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchConverter.cs" />
     <Compile Include="Beatmaps\Objects\Catch\Drawable\DrawableFruit.cs" />
     <Compile Include="Beatmaps\Objects\DrawableHitObject.cs" />
@@ -138,10 +136,10 @@
     <Compile Include="GameModes\Edit\EditSongSelect.cs" />
     <Compile Include="GameModes\Play\ComboCounter.cs" />
     <Compile Include="GameModes\Play\ComboResultCounter.cs" />
-    <Compile Include="Graphics\Avatar.cs" />
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoComboCounter.cs" />
     <Compile Include="Input\GlobalHotkeys.cs" />
+    <Compile Include="Graphics\Avatar.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
@@ -187,7 +185,6 @@
     <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
-    <Compile Include="Beatmaps\BaseDifficulty.cs" />
     <Compile Include="Beatmaps\Events\EventType.cs" />
     <Compile Include="VolumeMeter.cs" />
     <Compile Include="Database\BeatmapSetInfo.cs" />
