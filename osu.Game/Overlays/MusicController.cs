@@ -24,7 +24,7 @@ namespace osu.Game.Overlays
     {
         private Sprite backgroundSprite;
         private Box progress;
-        private ClickableTextAwesome playButton, listButton;
+        private TextAwesome playButton, listButton;
         private SpriteText title, artist;
         private OsuGameBase osuGame;
         private List<BeatmapSetInfo> playList;
@@ -75,10 +75,9 @@ namespace osu.Game.Overlays
                     Anchor = Anchor.BottomCentre,
                     Colour = new Color4(0, 0, 0, 127)
                 },
-                playButton = new ClickableTextAwesome
+                new ClickableContainer
                 {
-                    TextSize = 30,
-                    Icon = FontAwesome.play_circle_o,
+                    AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.BottomCentre,
                     Position = new Vector2(0, 30),
@@ -95,33 +94,70 @@ namespace osu.Game.Overlays
                             currentTrack.Start();
                             playButton.Icon = FontAwesome.pause;
                         }
+                    },
+                    Children = new Drawable[]
+                    {
+                        playButton = new TextAwesome
+                        {
+                            TextSize = 30,
+                            Icon = FontAwesome.play_circle_o,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre
+                        }
                     }
                 },
-                new ClickableTextAwesome
+                new ClickableContainer
                 {
-                    TextSize = 15,
-                    Icon = FontAwesome.step_backward,
+                    AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.BottomCentre,
                     Position = new Vector2(-30, 30),
-                    Action = prev
+                    Action = prev,
+                    Children = new Drawable[]
+                    {
+                        new TextAwesome
+                        {
+                            TextSize = 15,
+                            Icon = FontAwesome.step_backward,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre
+                        }
+                    }
                 },
-                new ClickableTextAwesome
+                new ClickableContainer
                 {
-                    TextSize = 15,
-                    Icon = FontAwesome.step_forward,
+                    AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.BottomCentre,
                     Position = new Vector2(30, 30),
-                    Action = next
+                    Action = next,
+                    Children = new Drawable[]
+                    {
+                        new TextAwesome
+                        {
+                            TextSize = 15,
+                            Icon = FontAwesome.step_forward,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre
+                        }
+                    }
                 },
-                listButton = new ClickableTextAwesome
+                new ClickableContainer
                 {
-                    TextSize = 15,
-                    Icon = FontAwesome.bars,
+                    AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.BottomRight,
-                    Position = new Vector2(20, 30)
+                    Position = new Vector2(20, 30),
+                    Children = new Drawable[]
+                    {
+                        listButton = new TextAwesome
+                        {
+                            TextSize = 15,
+                            Icon = FontAwesome.bars,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre
+                        }
+                    }
                 },
                 progress = new Box
                 {
@@ -133,7 +169,11 @@ namespace osu.Game.Overlays
                     Colour = Color4.Orange
                 }
             };
-            if (currentPlay != null) play(currentPlay, null);
+            if (currentPlay != null)
+            {
+                playButton.Icon=FontAwesome.pause;
+                play(currentPlay, null);
+            }
         }
 
         private void prev()
@@ -156,13 +196,14 @@ namespace osu.Game.Overlays
 
         private void play(BeatmapSetInfo beatmap, bool? isNext)
         {
-            title.Text = beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title;
-            artist.Text = beatmap.Metadata.ArtistUnicode ?? beatmap.Metadata.Artist;
+            BeatmapMetadata metadata = osuGame.Beatmaps.Query<BeatmapMetadata>().Where(x => x.ID == beatmap.BeatmapMetadataID).First();
+            title.Text = metadata.TitleUnicode ?? metadata.Title;
+            artist.Text = metadata.ArtistUnicode ?? metadata.Artist;
             ArchiveReader reader = osuGame.Beatmaps.GetReader(currentPlay);
             currentTrack?.Stop();
-            currentTrack = new AudioTrackBass(reader.ReadFile(beatmap.Metadata.AudioFile));
+            currentTrack = new AudioTrackBass(reader.ReadFile(metadata.AudioFile));
             currentTrack.Start();
-            Sprite newBackground = getScaledSprite(TextureLoader.FromStream(reader.ReadFile(beatmap.Metadata.BackgroundFile)));
+            Sprite newBackground = getScaledSprite(TextureLoader.FromStream(reader.ReadFile(metadata.BackgroundFile)));
             Add(newBackground);
             if (isNext == true)
             {
