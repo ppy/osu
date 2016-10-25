@@ -88,17 +88,14 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(SolutionDir)\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="SQLite.Net.Platform.Win32">
-      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.0.5\lib\net4\SQLite.Net.Platform.Win32.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLite.Net">
-      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.0.5\lib\net40\SQLite.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLite.Net.Platform.Generic">
-      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.0.5\lib\net40\SQLite.Net.Platform.Generic.dll</HintPath>
-    </Reference>
     <Reference Include="SQLiteNetExtensions">
       <HintPath>$(SolutionDir)\packages\SQLiteNetExtensions.1.3.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\SQLiteNetExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLite.Net.Platform.Win32">
+      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.1.1\lib\net4\SQLite.Net.Platform.Win32.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLite.Net.Platform.Generic">
+      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.1.1\lib\net40\SQLite.Net.Platform.Generic.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
