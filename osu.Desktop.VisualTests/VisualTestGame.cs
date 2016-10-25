@@ -11,6 +11,7 @@ using System.IO;
 using System.Collections.Generic;
 using osu.Game.GameModes.Play;
 using SQLiteNetExtensions.Extensions;
+using osu.Desktop.Platform;
 
 namespace osu.Framework.VisualTests
 {
@@ -72,7 +73,7 @@ namespace osu.Framework.VisualTests
     
         public override void Load(BaseGame game)
         {
-            (Host.Storage as DesktopStorage).InMemorySQL = true;
+            Host.Storage = new TestStorage(@"visual-tests");
             base.Load(game);
             for (int i = 0; i < 100; i += 10)
                 InsertTestMap(i);
