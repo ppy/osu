@@ -247,6 +247,28 @@ namespace osu.Game.Overlays
             return scaledSprite;
         }
 
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            trySeek(state);
+            return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseMove(InputState state)
+        {
+            trySeek(state);
+            return base.OnMouseMove(state);
+        }
+
+        private void trySeek(InputState state)
+        {
+            if (state.Mouse.LeftButton)
+            {
+                Vector2 pos = GetLocalPosition(state.Mouse.NativeState.Position);
+                if (pos.Y > 120)
+                    CurrentTrack?.Seek(CurrentTrack.Length * pos.X / 400f);
+            }
+        }
+
         //placeholder for toggling
         protected override void PopIn() => FadeIn(500);
 
