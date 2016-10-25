@@ -207,11 +207,14 @@ namespace osu.Game.Overlays
             BeatmapMetadata metadata = osuGame.Beatmaps.Query<BeatmapMetadata>().Where(x => x.ID == beatmap.BeatmapMetadataID).First();
             title.Text = metadata.TitleUnicode ?? metadata.Title;
             artist.Text = metadata.ArtistUnicode ?? metadata.Artist;
-            ArchiveReader reader = osuGame.Beatmaps.GetReader(currentPlay);
-            CurrentTrack?.Stop();
-            CurrentTrack = new AudioTrackBass(reader.ReadFile(metadata.AudioFile));
-            CurrentTrack.Start();
-            Sprite newBackground = getScaledSprite(TextureLoader.FromStream(reader.ReadFile(metadata.BackgroundFile)));
+            Sprite newBackground;
+            using (ArchiveReader reader = osuGame.Beatmaps.GetReader(currentPlay))
+            {
+                CurrentTrack?.Stop();
+                CurrentTrack = new AudioTrackBass(reader.ReadFile(metadata.AudioFile));
+                CurrentTrack.Start();
+                newBackground = getScaledSprite(TextureLoader.FromStream(reader.ReadFile(metadata.BackgroundFile)));
+            }
             Add(newBackground);
             if (isNext == true)
             {
