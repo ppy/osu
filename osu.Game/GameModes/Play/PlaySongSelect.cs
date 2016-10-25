@@ -18,6 +18,8 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace osu.Game.GameModes.Play
 {
@@ -54,16 +56,29 @@ namespace osu.Game.GameModes.Play
             selectedBeatmap = beatmap;
         }
 
+        private Stopwatch watch = new Stopwatch();
+
         private void addBeatmapSet(BeatmapSetInfo beatmapSet)
         {
+            watch.Reset();
+            watch.Start();
             beatmapSet = beatmaps.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
             beatmapSet.Beatmaps.ForEach(b => beatmaps.GetChildren(b));
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty)
                 .ToList();
-            var group = new BeatmapGroup(beatmapSet);
-            group.SetSelected += selectBeatmapSet;
-            group.BeatmapSelected += selectBeatmap;
-            setList.Add(group);
+            Scheduler.Add(() =>
+            {
+                var group = new BeatmapGroup(beatmapSet);
+                group.SetSelected += selectBeatmapSet;
+                group.BeatmapSelected += selectBeatmap;
+                setList.Add(group);
+                if (setList.Children.Count() == 1)
+                {
+                    selectedBeatmapSet = group.BeatmapSet;
+                    selectedBeatmap = group.SelectedBeatmap;
+                    group.Collapsed = false;
+                }
+            });
         }
 
         private void addBeatmapSets()
@@ -165,14 +180,7 @@ namespace osu.Game.GameModes.Play
             
             beatmaps = (game as OsuGameBase).Beatmaps;
             beatmaps.BeatmapSetAdded += bset => Scheduler.Add(() => addBeatmapSet(bset));
-            addBeatmapSets();
-            var first = setList.Children.FirstOrDefault() as BeatmapGroup;
-            if (first != null)
-            {
-                first.Collapsed = false;
-                selectedBeatmapSet = first.BeatmapSet;
-                selectedBeatmap = first.SelectedBeatmap;
-            }
+            Task.Factory.StartNew(addBeatmapSets);
         }
 
         protected override void Dispose(bool isDisposing)
