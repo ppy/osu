@@ -138,6 +138,7 @@
     <Compile Include="GameModes\Play\ComboResultCounter.cs" />
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoComboCounter.cs" />
+    <Compile Include="Graphics\UserInterface\SearchTextBox.cs" />
     <Compile Include="Input\GlobalHotkeys.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
