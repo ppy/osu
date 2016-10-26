@@ -1,20 +1,15 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.GameModes.Testing;
-using osu.Framework.Timing;
 using osu.Framework.Graphics;
+using osu.Framework.Timing;
+using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Objects.Osu.Drawable;
-using osu.Game.Beatmaps.Objects;
 
-namespace osu.Desktop.Tests
+namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseHitObjects : TestCase
     {

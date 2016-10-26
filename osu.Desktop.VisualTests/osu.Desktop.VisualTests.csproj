@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>osu.Desktop</RootNamespace>
+    <RootNamespace>osu.Desktop.VisualTests</RootNamespace>
     <AssemblyName>osu!</AssemblyName>
     <ManifestCertificateThumbprint>3CF060CD28877D0E3112948951A64B2A7CEEC909</ManifestCertificateThumbprint>
     <ManifestKeyFile>codesigning.pfx</ManifestKeyFile>
@@ -18,7 +18,7 @@
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <StartupObject>osu.Framework.VisualTests.Program</StartupObject>
+    <StartupObject>osu.Desktop.VisualTests.Program</StartupObject>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <SignAssembly>false</SignAssembly>
     <TargetZone>LocalIntranet</TargetZone>
