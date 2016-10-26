@@ -34,59 +34,6 @@ namespace osu.Game.GameModes.Play
         private ScrollContainer scrollContainer;
         private FlowContainer setList;
 
-        private void selectBeatmapSet(BeatmapSetInfo beatmapSet)
-        {
-            selectedBeatmapSet = beatmapSet;
-            foreach (var child in setList.Children)
-            {
-                var childGroup = child as BeatmapGroup;
-                if (childGroup.BeatmapSet == beatmapSet)
-                {
-                    childGroup.Collapsed = false;
-                    selectedBeatmap = childGroup.SelectedBeatmap;
-                }
-                else
-                    childGroup.Collapsed = true;
-            }
-        }
-        
-        private void selectBeatmap(BeatmapSetInfo set, BeatmapInfo beatmap)
-        {
-            selectBeatmapSet(set);
-            selectedBeatmap = beatmap;
-        }
-
-        private Stopwatch watch = new Stopwatch();
-
-        private void addBeatmapSet(BeatmapSetInfo beatmapSet)
-        {
-            watch.Reset();
-            watch.Start();
-            beatmapSet = beatmaps.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
-            beatmapSet.Beatmaps.ForEach(b => beatmaps.GetChildren(b));
-            beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty)
-                .ToList();
-            Scheduler.Add(() =>
-            {
-                var group = new BeatmapGroup(beatmapSet);
-                group.SetSelected += selectBeatmapSet;
-                group.BeatmapSelected += selectBeatmap;
-                setList.Add(group);
-                if (setList.Children.Count() == 1)
-                {
-                    selectedBeatmapSet = group.BeatmapSet;
-                    selectedBeatmap = group.SelectedBeatmap;
-                    group.Collapsed = false;
-                }
-            });
-        }
-
-        private void addBeatmapSets()
-        {
-            foreach (var beatmapSet in beatmaps.Query<BeatmapSetInfo>())
-                addBeatmapSet(beatmapSet);
-        }
-
         public PlaySongSelect()
         {
             const float scrollWidth = 640;
@@ -169,13 +116,13 @@ namespace osu.Game.GameModes.Play
         {
             base.Load(game);
 
-            OsuGame osu = game as OsuGame;
-            if (osu != null)
+            OsuGame osuGame = game as OsuGame;
+            if (osuGame != null)
             {
-                playMode = osu.PlayMode;
+                playMode = osuGame.PlayMode;
                 playMode.ValueChanged += PlayMode_ValueChanged;
                 // Temporary:
-                scrollContainer.Padding = new MarginPadding { Top = osu.Toolbar.Height };
+                scrollContainer.Padding = new MarginPadding { Top = osuGame.Toolbar.Height };
             }
             
             beatmaps = (game as OsuGameBase).Beatmaps;
@@ -192,6 +139,61 @@ namespace osu.Game.GameModes.Play
 
         private void PlayMode_ValueChanged(object sender, EventArgs e)
         {
+        }
+        
+        private void selectBeatmapSet(BeatmapSetInfo beatmapSet)
+        {
+            if (selectedBeatmapSet == beatmapSet)
+                return;
+            selectedBeatmapSet = beatmapSet;
+            foreach (var child in setList.Children)
+            {
+                var childGroup = child as BeatmapGroup;
+                if (childGroup.BeatmapSet == beatmapSet)
+                {
+                    childGroup.Collapsed = false;
+                    selectedBeatmap = childGroup.SelectedBeatmap;
+                }
+                else
+                    childGroup.Collapsed = true;
+            }
+        }
+        
+        private void selectBeatmap(BeatmapSetInfo set, BeatmapInfo beatmap)
+        {
+            if (selectedBeatmap == beatmap)
+                return;
+            selectBeatmapSet(set);
+            selectedBeatmap = beatmap;
+        }
+
+        private void addBeatmapSet(BeatmapSetInfo beatmapSet)
+        {
+            beatmapSet = beatmaps.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
+            beatmapSet.Beatmaps.ForEach(b => beatmaps.GetChildren(b));
+            beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty)
+                .ToList();
+            Scheduler.Add(() =>
+            {
+                var group = new BeatmapGroup(beatmapSet)
+                {
+                    SetSelected = selectBeatmapSet,
+                    BeatmapSelected = selectBeatmap,
+                };
+                setList.Add(group);
+                if (setList.Children.Count() == 1)
+                {
+                    selectedBeatmapSet = group.BeatmapSet;
+                    selectedBeatmap = group.SelectedBeatmap;
+                    group.Collapsed = false;
+                }
+            });
+        }
+
+        private void addBeatmapSets()
+        {
+            foreach (var beatmapSet in beatmaps.Query<BeatmapSetInfo>())
+                addBeatmapSet(beatmapSet);
         }
     }
 }
