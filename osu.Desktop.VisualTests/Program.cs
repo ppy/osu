@@ -5,7 +5,7 @@ using System;
 using osu.Framework.Desktop;
 using osu.Framework.Platform;
 
-namespace osu.Framework.VisualTests
+namespace osu.Desktop.VisualTests
 {
     public static class Program
     {
