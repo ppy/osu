@@ -23,6 +23,7 @@ using OpenTK.Input;
 using System.IO;
 using osu.Game.Beatmaps.IO;
 using osu.Framework.Logging;
+using osu.Game.Graphics.UserInterface.Volume;
 
 namespace osu.Game
 {
@@ -39,6 +40,8 @@ namespace osu.Game
         private Intro intro;
         private string[] args;
         private IpcChannel<ImportBeatmap> BeatmapIPC;
+
+        private VolumeControl volume;
 
         public Bindable<PlayMode> PlayMode;
 
@@ -92,6 +95,11 @@ namespace osu.Game
             Audio.VolumeTrack.Weld(Config.GetBindable<double>(OsuConfig.VolumeMusic));
 
             Add(new Drawable[] {
+                new VolumeControlReceptor
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    ActivateRequested = delegate { volume.Show(); }
+                },
                 intro = new Intro(),
                 Toolbar = new Toolbar
                 {
@@ -100,7 +108,7 @@ namespace osu.Game
                     OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
                 },
                 Chat = new ChatConsole(API),
-                new VolumeControl
+                volume = new VolumeControl
                 {
                     VolumeGlobal = Audio.Volume,
                     VolumeSample = Audio.VolumeSample,
