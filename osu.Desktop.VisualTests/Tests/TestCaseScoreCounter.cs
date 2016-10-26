@@ -2,23 +2,20 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK.Input;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Graphics.Transformations;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.MathUtils;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.MathUtils;
+using osu.Game.GameModes.Play;
 using osu.Game.GameModes.Play.Catch;
 using osu.Game.GameModes.Play.Mania;
 using osu.Game.GameModes.Play.Osu;
 using osu.Game.GameModes.Play.Taiko;
-using osu.Game.GameModes.Play;
+using osu.Game.Graphics.UserInterface;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Desktop.Tests
+namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseScoreCounter : TestCase
     {

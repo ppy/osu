@@ -1,13 +1,12 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using OpenTK.Input;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
+using OpenTK.Input;
 
-namespace osu.Desktop.Tests
+namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseKeyCounter : TestCase
     {
