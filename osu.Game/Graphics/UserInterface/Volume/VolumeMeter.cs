@@ -1,4 +1,5 @@
-﻿using osu.Framework.Configuration;
+﻿using osu.Framework;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -6,9 +7,8 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework;
 
-namespace osu.Game
+namespace osu.Game.Graphics.UserInterface.Volume
 {
     internal class VolumeMeter : Container
     {
