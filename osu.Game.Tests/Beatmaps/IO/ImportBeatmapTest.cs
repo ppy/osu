@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Beatmaps.IO
     {
         const string osz_path = @"../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
         }
@@ -35,8 +35,8 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestImportOverIPC()
         {
-            HeadlessGameHost host = new HeadlessGameHost(true);
-            HeadlessGameHost client = new HeadlessGameHost(true);
+            HeadlessGameHost host = new HeadlessGameHost("host", true);
+            HeadlessGameHost client = new HeadlessGameHost("client", true);
 
             Assert.IsTrue(host.IsPrimaryInstance);
             Assert.IsTrue(!client.IsPrimaryInstance);
