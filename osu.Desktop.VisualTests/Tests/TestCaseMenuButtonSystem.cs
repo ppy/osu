@@ -4,7 +4,7 @@
 using osu.Framework.GameModes.Testing;
 using osu.Game.GameModes.Menu;
 
-namespace osu.Desktop.Tests
+namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseMenuButtonSystem : TestCase
     {
