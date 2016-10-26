@@ -17,11 +17,18 @@ using OpenTK.Graphics;
 using osu.Game.Beatmaps.IO;
 using osu.Framework.Graphics.Textures;
 using System.Threading.Tasks;
+using osu.Framework;
 
 namespace osu.Game.GameModes.Play
 {
-    class BeatmapGroup : Container
+    class BeatmapGroup : Container, IStateful<BeatmapGroup.GroupState>
     {
+        public enum GroupState
+        {
+            Collapsed,
+            Expanded,
+        }
+    
         private const float collapsedAlpha = 0.5f;
         private const float collapsedWidth = 0.8f;
         
@@ -35,21 +42,20 @@ namespace osu.Game.GameModes.Play
             }
         }
 
-        public Action<BeatmapSetInfo> SetSelected;
-        public Action<BeatmapSetInfo, BeatmapInfo> BeatmapSelected;
+        public Action<BeatmapGroup, BeatmapInfo> BeatmapSelected;
         public BeatmapSetInfo BeatmapSet;
-        private BeatmapSetBox setBox;
-        private FlowContainer topContainer;
+        private BeatmapSetHeader setBox;
         private FlowContainer difficulties;
         private bool collapsed;
-        public bool Collapsed
+        public GroupState State
         {
-            get { return collapsed; }
+            get { return collapsed ? GroupState.Collapsed : GroupState.Expanded; }
             set
             {
-                if (collapsed == value)
+                bool val = value == GroupState.Collapsed;
+                if (collapsed == val)
                     return;
-                collapsed = value;
+                collapsed = val;
                 ClearTransformations();
                 const float uncollapsedAlpha = 1;
                 FadeTo(collapsed ? collapsedAlpha : uncollapsedAlpha, 250);
@@ -78,14 +84,14 @@ namespace osu.Game.GameModes.Play
             float difficultyWidth = 1;
             Children = new[]
             {
-                topContainer = new FlowContainer
+                new FlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FlowDirection.VerticalOnly,
                     Children = new Drawable[]
                     {
-                        setBox = new BeatmapSetBox(beatmapSet)
+                        setBox = new BeatmapSetHeader(beatmapSet)
                         {
                             RelativeSizeAxes = Axes.X,
                             Width = collapsedWidth,
@@ -127,19 +133,19 @@ namespace osu.Game.GameModes.Play
         {
             foreach (BeatmapPanel panel in difficulties.Children)
                 panel.Selected = panel.Beatmap == map;
-            BeatmapSelected?.Invoke(BeatmapSet, map);
+            BeatmapSelected?.Invoke(this, map);
         }
         
         protected override bool OnClick(InputState state)
         {
-            SetSelected?.Invoke(BeatmapSet);
+            BeatmapSelected?.Invoke(this, selectedBeatmap);
             return true;
         }
     }
     
-    class BeatmapSetBox : Container
+    class BeatmapSetHeader : Container
     {
-        public BeatmapSetBox(BeatmapSetInfo beatmapSet)
+        public BeatmapSetHeader(BeatmapSetInfo beatmapSet)
         {
             AutoSizeAxes = Axes.Y;
             Masking = true;

@@ -2,13 +2,10 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.IO;
 using osu.Game.GameModes.Backgrounds;
 using osu.Framework;
 using osu.Game.Database;
@@ -16,10 +13,8 @@ using osu.Framework.Graphics.Primitives;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
 using System.Threading.Tasks;
-using System.Diagnostics;
 
 namespace osu.Game.GameModes.Play
 {
@@ -27,7 +22,7 @@ namespace osu.Game.GameModes.Play
     {
         private Bindable<PlayMode> playMode;
         private BeatmapDatabase beatmaps;
-        private BeatmapSetInfo selectedBeatmapSet;
+        private BeatmapGroup selectedBeatmapGroup;
         private BeatmapInfo selectedBeatmap;
         // TODO: use currently selected track as bg
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
@@ -141,29 +136,20 @@ namespace osu.Game.GameModes.Play
         {
         }
         
-        private void selectBeatmapSet(BeatmapSetInfo beatmapSet)
+        private void selectBeatmapSet(BeatmapGroup group)
         {
-            if (selectedBeatmapSet == beatmapSet)
+            if (selectedBeatmapGroup == group)
                 return;
-            selectedBeatmapSet = beatmapSet;
-            foreach (var child in setList.Children)
-            {
-                var childGroup = child as BeatmapGroup;
-                if (childGroup.BeatmapSet == beatmapSet)
-                {
-                    childGroup.Collapsed = false;
-                    selectedBeatmap = childGroup.SelectedBeatmap;
-                }
-                else
-                    childGroup.Collapsed = true;
-            }
+            selectedBeatmapGroup.State = BeatmapGroup.GroupState.Collapsed;
+            selectedBeatmapGroup = group;
+            selectedBeatmapGroup.State = BeatmapGroup.GroupState.Expanded;
         }
         
-        private void selectBeatmap(BeatmapSetInfo set, BeatmapInfo beatmap)
+        private void selectBeatmap(BeatmapGroup group, BeatmapInfo beatmap)
         {
             if (selectedBeatmap == beatmap)
                 return;
-            selectBeatmapSet(set);
+            selectBeatmapSet(group);
             selectedBeatmap = beatmap;
         }
 
@@ -173,19 +159,15 @@ namespace osu.Game.GameModes.Play
             beatmapSet.Beatmaps.ForEach(b => beatmaps.GetChildren(b));
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty)
                 .ToList();
-            Scheduler.Add(() =>
+            Schedule(() =>
             {
-                var group = new BeatmapGroup(beatmapSet)
-                {
-                    SetSelected = selectBeatmapSet,
-                    BeatmapSelected = selectBeatmap,
-                };
+                var group = new BeatmapGroup(beatmapSet) { BeatmapSelected = selectBeatmap };
                 setList.Add(group);
                 if (setList.Children.Count() == 1)
                 {
-                    selectedBeatmapSet = group.BeatmapSet;
+                    selectedBeatmapGroup = group;
                     selectedBeatmap = group.SelectedBeatmap;
-                    group.Collapsed = false;
+                    group.State = BeatmapGroup.GroupState.Expanded;
                 }
             });
         }
