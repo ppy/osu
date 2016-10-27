@@ -18,7 +18,7 @@ namespace osu.Desktop.Tests
         private TestStorage storage;
 
         public override string Name => @"Song Select";
-        public override string Description => @"Testing song selection UI";
+        public override string Description => @"with fake data";
 
         public override void Reset()
         {
