@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -15,42 +14,23 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawable
 {
-    class BeatmapPanel : Container
+    class BeatmapPanel : Panel
     {
         public BeatmapInfo Beatmap;
 
         public Action<BeatmapPanel> GainedSelection;
-        
-        private bool selected;
 
-        public bool Selected
+        protected override void Selected()
         {
-            get { return selected; }
-            set
-            {
-                if (selected == value)
-                    return;
-                selected = value;
-                BorderColour = new Color4(
-                    BorderColour.R,
-                    BorderColour.G,
-                    BorderColour.B,
-                    selected ? 255 : 0);
-                GlowRadius = selected ? 3 : 0;
-
-                if (selected) GainedSelection?.Invoke(this);
-            }
+            base.Selected();
+            GainedSelection?.Invoke(this);
         }
 
         public BeatmapPanel(BeatmapSetInfo set, BeatmapInfo beatmap)
         {
             Beatmap = beatmap;
-            AutoSizeAxes = Axes.Y;
-            Masking = true;
-            CornerRadius = 5;
-            BorderThickness = 2;
-            BorderColour = new Color4(221, 255, 255, 0);
-            GlowColour = new Color4(166, 221, 251, 0.75f); // TODO: Get actual color for this
+            Height *= 0.75f;
+
             Children = new Framework.Graphics.Drawable[]
             {
                 new Box
@@ -87,8 +67,7 @@ namespace osu.Game.Beatmaps.Drawable
                                         },
                                         new SpriteText
                                         {
-                                            Text = string.Format(" mapped by {0}",
-                                                (beatmap.Metadata ?? set.Metadata).Author),
+                                            Text = $" mapped by {(beatmap.Metadata ?? set.Metadata).Author}",
                                             TextSize = 16,
                                         },
                                     }
@@ -99,12 +78,6 @@ namespace osu.Game.Beatmaps.Drawable
                     }
                 }
             };
-        }
-        
-        protected override bool OnClick(InputState state)
-        {
-            Selected = true;
-            return true;
         }
     }
 }

@@ -26,7 +26,6 @@ namespace osu.Game.GameModes.Play
         private Bindable<PlayMode> playMode;
         private BeatmapDatabase database;
         private BeatmapGroup selectedBeatmapGroup;
-        private BeatmapInfo selectedBeatmap;
         // TODO: use currently selected track as bg
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
         private ScrollContainer scrollContainer;
@@ -106,7 +105,7 @@ namespace osu.Game.GameModes.Play
                             Width = 100,
                             Text = "Play",
                             Colour = new Color4(238, 51, 153, 255),
-                            Action = () => Push(new Player { BeatmapInfo = selectedBeatmap }),
+                            Action = () => Push(new Player { BeatmapInfo = selectedBeatmapGroup.SelectedPanel.Beatmap }),
                         },
                     }
                 }
@@ -129,7 +128,7 @@ namespace osu.Game.GameModes.Play
             if (database == null)
                 database = (game as OsuGameBase).Beatmaps;
 
-            database.BeatmapSetAdded += s => Scheduler.Add(() => addBeatmapSet(s));
+            database.BeatmapSetAdded += s => Schedule(() => addBeatmapSet(s));
 
             Task.Factory.StartNew(addBeatmapSets);
         }
@@ -154,7 +153,6 @@ namespace osu.Game.GameModes.Play
                 selectedBeatmapGroup.State = BeatmapGroupState.Collapsed;
 
             selectedBeatmapGroup = group;
-            selectedBeatmap = beatmap;
         }
 
         private void addBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -167,9 +165,7 @@ namespace osu.Game.GameModes.Play
                 var group = new BeatmapGroup(beatmapSet) { SelectionChanged = selectBeatmap };
                 setList.Add(group);
                 if (setList.Children.Count() == 1)
-                {
                     group.State = BeatmapGroupState.Expanded;
-                }
             });
         }
 
