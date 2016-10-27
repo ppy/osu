@@ -24,15 +24,18 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
 
-            storage = new TestStorage(@"TestCasePlaySongSelect");
-            db = new BeatmapDatabase(storage);
+            if (db == null)
+            {
+                storage = new TestStorage(@"TestCasePlaySongSelect");
+                db = new BeatmapDatabase(storage);
 
-            var sets = new List<BeatmapSetInfo>();
+                var sets = new List<BeatmapSetInfo>();
 
-            for (int i = 0; i < 100; i += 10)
-                sets.Add(createTestBeatmapSet(i));
+                for (int i = 0; i < 100; i += 10)
+                    sets.Add(createTestBeatmapSet(i));
 
-            db.Import(sets);
+                db.Import(sets);
+            }
 
             Add(new PlaySongSelect(db));
         }
