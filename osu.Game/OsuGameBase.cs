@@ -48,7 +48,7 @@ namespace osu.Game
             base.Load(game);
 
             OszArchiveReader.Register();
-            Beatmaps = new BeatmapDatabase(Host);
+            Beatmaps = new BeatmapDatabase(Host.Storage, Host);
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
             Fonts = new TextureStore() { ScaleAdjust = 0.01f };

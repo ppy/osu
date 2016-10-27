@@ -17,37 +17,41 @@ namespace osu.Game.Database
 {
     public class BeatmapDatabase
     {
-        public static SQLiteConnection Connection { get; set; }
+        private SQLiteConnection connection { get; set; }
         private BasicStorage storage;
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
 
         private BeatmapImporter ipc;
 
-        public BeatmapDatabase(BasicGameHost host)
+        public BeatmapDatabase(BasicStorage storage, BasicGameHost importHost = null)
         {
-            this.storage = host.Storage;
+            this.storage = storage;
 
-            ipc = new BeatmapImporter(host, this);
+            if (importHost != null)
+                ipc = new BeatmapImporter(importHost, this);
 
-            if (Connection == null)
+            if (connection == null)
             {
-                Connection = storage.GetDatabase(@"beatmaps");
-                Connection.CreateTable<BeatmapMetadata>();
-                Connection.CreateTable<BaseDifficulty>();
-                Connection.CreateTable<BeatmapSetInfo>();
-                Connection.CreateTable<BeatmapInfo>();
+                connection = storage.GetDatabase(@"beatmaps");
+                connection.CreateTable<BeatmapMetadata>();
+                connection.CreateTable<BaseDifficulty>();
+                connection.CreateTable<BeatmapSetInfo>();
+                connection.CreateTable<BeatmapInfo>();
             }
         }
 
         public void Reset()
         {
             foreach (var setInfo in Query<BeatmapSetInfo>())
-                storage.Delete(setInfo.Path);
+            {
+                if (storage.Exists(setInfo.Path))
+                    storage.Delete(setInfo.Path);
+            }
 
-            Connection.DeleteAll<BeatmapMetadata>();
-            Connection.DeleteAll<BaseDifficulty>();
-            Connection.DeleteAll<BeatmapSetInfo>();
-            Connection.DeleteAll<BeatmapInfo>();
+            connection.DeleteAll<BeatmapMetadata>();
+            connection.DeleteAll<BaseDifficulty>();
+            connection.DeleteAll<BeatmapSetInfo>();
+            connection.DeleteAll<BeatmapInfo>();
         }
 
         public void Import(params string[] paths)
@@ -62,7 +66,7 @@ namespace osu.Game.Database
                 using (var reader = ArchiveReader.GetReader(storage, path))
                     metadata = reader.ReadMetadata();
 
-                if (Connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
+                if (connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
                     return; // TODO: Update this beatmap instead
 
                 if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
@@ -104,9 +108,22 @@ namespace osu.Game.Database
                         }
                     }
                 }
-                Connection.InsertWithChildren(beatmapSet, true);
-                BeatmapSetAdded?.Invoke(beatmapSet);
+
+                Import(new[] { beatmapSet });
             }
+        }
+
+        public void Import(IEnumerable<BeatmapSetInfo> beatmapSets)
+        {
+            connection.BeginTransaction();
+
+            foreach (var s in beatmapSets)
+            {
+                connection.InsertWithChildren(s, true);
+                BeatmapSetAdded?.Invoke(s);
+            }
+
+            connection.Commit();
         }
 
         public ArchiveReader GetReader(BeatmapSetInfo beatmapSet)
@@ -136,25 +153,25 @@ namespace osu.Game.Database
         
         public TableQuery<T> Query<T>() where T : class
         {
-            return Connection.Table<T>();
+            return connection.Table<T>();
         }
         
         public T GetWithChildren<T>(object id) where T : class
         {
-            return Connection.GetWithChildren<T>(id);
+            return connection.GetWithChildren<T>(id);
         }
         
         public List<T> GetAllWithChildren<T>(Expression<Func<T, bool>> filter = null,
             bool recursive = true) where T : class
         {
-            return Connection.GetAllWithChildren<T>(filter, recursive);
+            return connection.GetAllWithChildren<T>(filter, recursive);
         }
         
         public T GetChildren<T>(T item, bool recursive = true)
         {
             if (item == null) return default(T);
 
-            Connection.GetChildren(item, recursive);
+            connection.GetChildren(item, recursive);
             return item;
         }
 
@@ -171,9 +188,9 @@ namespace osu.Game.Database
             if (!validTypes.Any(t => t == typeof(T)))
                 throw new ArgumentException(nameof(T), "Must be a type managed by BeatmapDatabase");
             if (cascade)
-                Connection.UpdateWithChildren(record);
+                connection.UpdateWithChildren(record);
             else
-                Connection.Update(record);
+                connection.Update(record);
         }
     }
 }

@@ -1,6 +1,7 @@
 //Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -12,35 +13,42 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawable
 {
-    class BeatmapSetHeader : Container
+    class BeatmapSetHeader : Panel
     {
+        public Action<BeatmapSetHeader> GainedSelection;
+
+        protected override void Selected()
+        {
+            base.Selected();
+
+            Width = 1;
+            GainedSelection?.Invoke(this);
+        }
+
+        protected override void Deselected()
+        {
+            base.Deselected();
+            Width = 0.8f;
+        }
+
         public BeatmapSetHeader(BeatmapSetInfo beatmapSet)
         {
-            AutoSizeAxes = Axes.Y;
-            Masking = true;
-            CornerRadius = 5;
-            BorderThickness = 2;
-            BorderColour = new Color4(221, 255, 255, 0);
-            GlowColour = new Color4(166, 221, 251, 0.5f); // TODO: Get actual color for this
             Children = new Framework.Graphics.Drawable[]
             {
                 new Box
                 {
                     Colour = new Color4(85, 85, 85, 255),
                     RelativeSizeAxes = Axes.Both,
-                    Size = Vector2.One,
                 },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Size = Vector2.One,
                     Children = new Framework.Graphics.Drawable[]
                     {
                         new Box // TODO: Gradient
                         {
                             Colour = new Color4(0, 0, 0, 100),
                             RelativeSizeAxes = Axes.Both,
-                            Size = Vector2.One,
                         }
                     }
                 },
@@ -48,7 +56,7 @@ namespace osu.Game.Beatmaps.Drawable
                 {
                     Direction = FlowDirection.VerticalOnly,
                     Spacing = new Vector2(0, 2),
-                    Padding = new MarginPadding { Top = 3, Left = 20, Right = 20, Bottom = 3 },
+                    Padding = new MarginPadding { Top = 10, Left = 15, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
                     {
@@ -75,6 +83,8 @@ namespace osu.Game.Beatmaps.Drawable
                     }
                 }
             };
+
+            Deselected();
         }
     }
 }
