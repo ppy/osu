@@ -28,13 +28,20 @@ namespace osu.Game.Overlays
         private SpriteText title, artist;
         private OsuGameBase osuGame;
         private List<BeatmapSetInfo> playList;
+        private BeatmapDatabase database;
         private BeatmapSetInfo currentPlay;
         public AudioTrack CurrentTrack { get; set; }//TODO:gets exterally
+
+        public MusicController(BeatmapDatabase db = null)
+        {
+            database = db;
+        }
         public override void Load(BaseGame game)
         {
             base.Load(game);
             osuGame = game as OsuGameBase;
-            playList = osuGame.Beatmaps.Query<BeatmapSetInfo>().ToList();
+            if (database == null) database = osuGame.Beatmaps;
+            playList = database.Query<BeatmapSetInfo>().ToList();
             currentPlay = playList.FirstOrDefault();
             Width = 400;
             Height = 130;
