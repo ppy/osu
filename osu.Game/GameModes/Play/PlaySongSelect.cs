@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,6 +17,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using System.Threading.Tasks;
 using osu.Game.Beatmaps.Drawable;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.GameModes.Play
 {
@@ -122,7 +124,7 @@ namespace osu.Game.GameModes.Play
             }
 
             beatmaps = (game as OsuGameBase).Beatmaps;
-            beatmaps.BeatmapSetAdded += bset => Scheduler.Add(() => addBeatmapSet(bset));
+            beatmaps.BeatmapSetAdded += s => Scheduler.Add(() => addBeatmapSet(s));
             Task.Factory.StartNew(addBeatmapSets);
         }
 

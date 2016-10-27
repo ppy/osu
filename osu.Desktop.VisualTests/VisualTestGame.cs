@@ -18,66 +18,9 @@ namespace osu.Desktop.VisualTests
 {
     class VisualTestGame : OsuGameBase
     {
-        private void InsertTestMap(int i)
-        {
-            var beatmapSet = new BeatmapSetInfo
-            {
-                BeatmapSetID = 1234 + i,
-                Hash = "d8e8fca2dc0f896fd7cb4cb0031ba249",
-                Path = "/foo/bar/baz",
-                Metadata = new BeatmapMetadata
-                {
-                    BeatmapSetID = 1234 + i,
-                    Artist = "MONACA",
-                    Title = "Black Song",
-                    Author = "Some Guy",
-                },
-                Beatmaps = new List<BeatmapInfo>(new[]
-                {
-                    new BeatmapInfo
-                    {
-                        BeatmapID = 1234 + i,
-                        Mode = PlayMode.Osu,
-                        Path = "normal.osu",
-                        Version = "Normal",
-                        BaseDifficulty = new BaseDifficulty
-                        {
-                            OverallDifficulty = 3.5f,
-                        }
-                    },
-                    new BeatmapInfo
-                    {
-                        BeatmapID = 1235 + i,
-                        Mode = PlayMode.Osu,
-                        Path = "hard.osu",
-                        Version = "Hard",
-                        BaseDifficulty = new BaseDifficulty
-                        {
-                            OverallDifficulty = 5,
-                        }
-                    },
-                    new BeatmapInfo
-                    {
-                        BeatmapID = 1236 + i,
-                        Mode = PlayMode.Osu,
-                        Path = "insane.osu",
-                        Version = "Insane",
-                        BaseDifficulty = new BaseDifficulty
-                        {
-                            OverallDifficulty = 7,
-                        }
-                    },
-                }),
-            };
-            BeatmapDatabase.Connection.InsertWithChildren(beatmapSet, true);
-        }
-    
         public override void Load(BaseGame game)
         {
-            Host.Storage = new TestStorage(@"visual-tests");
             base.Load(game);
-            for (int i = 0; i < 100; i += 10)
-                InsertTestMap(i);
             Add(new TestBrowser());
         }
     }
