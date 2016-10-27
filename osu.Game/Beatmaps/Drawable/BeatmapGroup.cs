@@ -32,10 +32,12 @@ namespace osu.Game.Beatmaps.Drawable
         /// </summary>
         public Action<BeatmapGroup, BeatmapInfo> SelectionChanged;
 
-        public BeatmapSetInfo BeatmapSet;
+        private BeatmapSetInfo beatmapSet;
         private BeatmapSetHeader header;
         private FlowContainer difficulties;
+
         private GroupState state;
+
         public GroupState State
         {
             get { return state; }
@@ -72,7 +74,7 @@ namespace osu.Game.Beatmaps.Drawable
 
         public BeatmapGroup(BeatmapSetInfo beatmapSet)
         {
-            BeatmapSet = beatmapSet;
+            this.beatmapSet = beatmapSet;
             Alpha = 0;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
@@ -101,8 +103,8 @@ namespace osu.Game.Beatmaps.Drawable
                             Spacing = new Vector2(0, 5),
                             Direction = FlowDirection.VerticalOnly,
                             Alpha = 0,
-                            Children = BeatmapSet.Beatmaps.Select(b =>
-                                new BeatmapPanel(BeatmapSet, b)
+                            Children = this.beatmapSet.Beatmaps.Select(b =>
+                                new BeatmapPanel(this.beatmapSet, b)
                                 {
                                     GainedSelection = panelGainedSelection,
                                     Anchor = Anchor.TopRight,
