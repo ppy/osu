@@ -143,7 +143,7 @@ namespace osu.Game.GameModes.Play
                 return;
 
             if (selectedBeatmapGroup != null)
-                selectedBeatmapGroup.State = BeatmapGroup.GroupState.Collapsed;
+                selectedBeatmapGroup.State = BeatmapGroupState.Collapsed;
 
             selectedBeatmapGroup = group;
             selectedBeatmap = beatmap;
@@ -160,7 +160,7 @@ namespace osu.Game.GameModes.Play
                 setList.Add(group);
                 if (setList.Children.Count() == 1)
                 {
-                    group.State = BeatmapGroup.GroupState.Expanded;
+                    group.State = BeatmapGroupState.Expanded;
                 }
             });
         }

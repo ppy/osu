@@ -14,14 +14,8 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawable
 {
-    class BeatmapGroup : Container, IStateful<BeatmapGroup.GroupState>
+    class BeatmapGroup : Container, IStateful<BeatmapGroupState>
     {
-        public enum GroupState
-        {
-            Collapsed,
-            Expanded,
-        }
-
         private const float collapsedAlpha = 0.5f;
         private const float collapsedWidth = 0.8f;
 
@@ -36,9 +30,9 @@ namespace osu.Game.Beatmaps.Drawable
         private BeatmapSetHeader header;
         private FlowContainer difficulties;
 
-        private GroupState state;
+        private BeatmapGroupState state;
 
-        public GroupState State
+        public BeatmapGroupState State
         {
             get { return state; }
             set
@@ -46,7 +40,7 @@ namespace osu.Game.Beatmaps.Drawable
                 state = value;
                 switch (state)
                 {
-                    case GroupState.Expanded:
+                    case BeatmapGroupState.Expanded:
                         FadeTo(1, 250);
                         difficulties.Show();
 
@@ -59,7 +53,7 @@ namespace osu.Game.Beatmaps.Drawable
                             (difficulties.Children.FirstOrDefault() as BeatmapPanel).Selected = true;
                         SelectionChanged?.Invoke(this, selectedPanel?.Beatmap);
                         break;
-                    case GroupState.Collapsed:
+                    case BeatmapGroupState.Collapsed:
                         FadeTo(collapsedAlpha, 250);
                         difficulties.Hide();
 
@@ -121,7 +115,7 @@ namespace osu.Game.Beatmaps.Drawable
         public override void Load(BaseGame game)
         {
             base.Load(game);
-            State = GroupState.Collapsed;
+            State = BeatmapGroupState.Collapsed;
         }
 
         private void panelGainedSelection(BeatmapPanel panel)
@@ -134,8 +128,14 @@ namespace osu.Game.Beatmaps.Drawable
 
         protected override bool OnClick(InputState state)
         {
-            State = GroupState.Expanded;
+            State = BeatmapGroupState.Expanded;
             return true;
         }
+    }
+
+    public enum BeatmapGroupState
+    {
+        Collapsed,
+        Expanded,
     }
 }
