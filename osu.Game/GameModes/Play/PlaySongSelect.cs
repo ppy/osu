@@ -24,7 +24,7 @@ namespace osu.Game.GameModes.Play
     public class PlaySongSelect : OsuGameMode
     {
         private Bindable<PlayMode> playMode;
-        private BeatmapDatabase beatmaps;
+        private BeatmapDatabase database;
         private BeatmapGroup selectedBeatmapGroup;
         private BeatmapInfo selectedBeatmap;
         // TODO: use currently selected track as bg
@@ -32,8 +32,10 @@ namespace osu.Game.GameModes.Play
         private ScrollContainer scrollContainer;
         private FlowContainer setList;
 
-        public PlaySongSelect()
+        public PlaySongSelect(BeatmapDatabase database = null)
         {
+            this.database = database;
+
             const float scrollWidth = 640;
             const float bottomToolHeight = 50;
             Children = new Drawable[]
@@ -103,7 +105,7 @@ namespace osu.Game.GameModes.Play
                             Width = 100,
                             Text = "Play",
                             Colour = new Color4(238, 51, 153, 255),
-                            Action = () => Push(new Player { Beatmap = beatmaps.GetBeatmap(selectedBeatmap) }),
+                            Action = () => Push(new Player { Beatmap = this.database.GetBeatmap(selectedBeatmap) }),
                         },
                     }
                 }
@@ -123,8 +125,11 @@ namespace osu.Game.GameModes.Play
                 scrollContainer.Padding = new MarginPadding { Top = osuGame.Toolbar.Height };
             }
 
-            beatmaps = (game as OsuGameBase).Beatmaps;
-            beatmaps.BeatmapSetAdded += s => Scheduler.Add(() => addBeatmapSet(s));
+            if (database == null)
+                database = (game as OsuGameBase).Beatmaps;
+
+            database.BeatmapSetAdded += s => Scheduler.Add(() => addBeatmapSet(s));
+
             Task.Factory.StartNew(addBeatmapSets);
         }
 
@@ -153,8 +158,8 @@ namespace osu.Game.GameModes.Play
 
         private void addBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            beatmapSet = beatmaps.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
-            beatmapSet.Beatmaps.ForEach(b => beatmaps.GetChildren(b));
+            beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
+            beatmapSet.Beatmaps.ForEach(b => database.GetChildren(b));
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty).ToList();
             Schedule(() =>
             {
@@ -169,7 +174,7 @@ namespace osu.Game.GameModes.Play
 
         private void addBeatmapSets()
         {
-            foreach (var beatmapSet in beatmaps.Query<BeatmapSetInfo>())
+            foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
                 addBeatmapSet(beatmapSet);
         }
     }
