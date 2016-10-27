@@ -17,17 +17,18 @@ namespace osu.Game.Database
 {
     public class BeatmapDatabase
     {
-        private static SQLiteConnection connection { get; set; }
+        private SQLiteConnection connection { get; set; }
         private BasicStorage storage;
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
 
         private BeatmapImporter ipc;
 
-        public BeatmapDatabase(BasicGameHost host)
+        public BeatmapDatabase(BasicStorage storage, BasicGameHost importHost = null)
         {
-            this.storage = host.Storage;
+            this.storage = storage;
 
-            ipc = new BeatmapImporter(host, this);
+            if (importHost != null)
+                ipc = new BeatmapImporter(importHost, this);
 
             if (connection == null)
             {
