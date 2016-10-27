@@ -11,6 +11,7 @@ using osu.Game.GameModes.Play.Mania;
 using osu.Game.GameModes.Play.Osu;
 using osu.Game.GameModes.Play.Taiko;
 using osu.Framework;
+using osu.Game.Database;
 
 namespace osu.Game.GameModes.Play
 {
@@ -18,6 +19,7 @@ namespace osu.Game.GameModes.Play
     {
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
+        public BeatmapInfo BeatmapInfo;
         public Beatmap Beatmap;
 
         public PlayMode PlayMode;
@@ -26,10 +28,8 @@ namespace osu.Game.GameModes.Play
         {
             base.Load(game);
 
-            Beatmap beatmap = new Beatmap
-            {
-                HitObjects = Beatmap?.HitObjects ?? new List<HitObject>()
-            };
+            if (Beatmap == null)
+                Beatmap = ((OsuGame)game).Beatmaps.GetBeatmap(BeatmapInfo);
 
             HitRenderer hitRenderer;
             ScoreOverlay scoreOverlay;
@@ -41,7 +41,7 @@ namespace osu.Game.GameModes.Play
 
                     hitRenderer = new OsuHitRenderer
                     {
-                        Objects = beatmap.HitObjects,
+                        Objects = Beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
@@ -51,7 +51,7 @@ namespace osu.Game.GameModes.Play
 
                     hitRenderer = new TaikoHitRenderer
                     {
-                        Objects = beatmap.HitObjects,
+                        Objects = Beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
@@ -61,7 +61,7 @@ namespace osu.Game.GameModes.Play
 
                     hitRenderer = new CatchHitRenderer
                     {
-                        Objects = beatmap.HitObjects,
+                        Objects = Beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
@@ -71,7 +71,7 @@ namespace osu.Game.GameModes.Play
 
                     hitRenderer = new ManiaHitRenderer
                     {
-                        Objects = beatmap.HitObjects,
+                        Objects = Beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
