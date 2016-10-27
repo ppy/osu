@@ -56,7 +56,7 @@ namespace osu.Game.GameModes.Play
                     };
                     break;
                 case PlayMode.Taiko:
-                    scoreOverlay = null;
+                    scoreOverlay = new ScoreOverlayOsu();
 
                     hitRenderer = new TaikoHitRenderer
                     {
@@ -66,7 +66,7 @@ namespace osu.Game.GameModes.Play
                     };
                     break;
                 case PlayMode.Catch:
-                    scoreOverlay = null;
+                    scoreOverlay = new ScoreOverlayOsu();
 
                     hitRenderer = new CatchHitRenderer
                     {
@@ -76,7 +76,7 @@ namespace osu.Game.GameModes.Play
                     };
                     break;
                 case PlayMode.Mania:
-                    scoreOverlay = null;
+                    scoreOverlay = new ScoreOverlayOsu();
 
                     hitRenderer = new ManiaHitRenderer
                     {
