@@ -10,6 +10,7 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
+using osu.Game.IPC;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 
@@ -18,7 +19,7 @@ namespace osu.Game
     public class OsuGameBase : BaseGame
     {
         internal OsuConfigManager Config = new OsuConfigManager();
-        internal BeatmapDatabase Beatmaps { get; private set; }
+        public BeatmapDatabase Beatmaps { get; private set; }
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -47,7 +48,7 @@ namespace osu.Game
             base.Load(game);
 
             OszArchiveReader.Register();
-            Beatmaps = new BeatmapDatabase(Host.Storage);
+            Beatmaps = new BeatmapDatabase(Host);
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
             Fonts = new TextureStore() { ScaleAdjust = 0.01f };
@@ -72,8 +73,11 @@ namespace osu.Game
         protected override void Dispose(bool isDisposing)
         {
             //refresh token may have changed.
-            Config.Set(OsuConfig.Token, API.Token);
-            Config.Save();
+            if (Config != null && API != null)
+            {
+                Config.Set(OsuConfig.Token, API.Token);
+                Config.Save();
+            }
 
             base.Dispose(isDisposing);
         }
