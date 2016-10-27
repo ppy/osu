@@ -138,6 +138,7 @@
     <Compile Include="GameModes\Play\ComboResultCounter.cs" />
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoComboCounter.cs" />
+    <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
     <Compile Include="Input\GlobalHotkeys.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
@@ -176,14 +177,14 @@
     <Compile Include="Overlays\ToolbarModeSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\User.cs" />
-    <Compile Include="VolumeControl.cs" />
+    <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
     <Compile Include="Beatmaps\Events\EventType.cs" />
-    <Compile Include="VolumeMeter.cs" />
+    <Compile Include="Graphics\UserInterface\Volume\VolumeMeter.cs" />
     <Compile Include="Database\BeatmapSetInfo.cs" />
     <Compile Include="Database\BeatmapMetadata.cs" />
     <Compile Include="Database\BeatmapInfo.cs" />
