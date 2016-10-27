@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
-using osu.Framework.Input;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -23,9 +22,10 @@ namespace osu.Game.Overlays
     public class MusicController : OverlayContainer
     {
         private Sprite backgroundSprite;
-        private Box progress;
+        private DragBar progress;
         private TextAwesome playButton, listButton;
         private SpriteText title, artist;
+
         private OsuGameBase osuGame;
         private List<BeatmapSetInfo> playList;
         private BeatmapDatabase database;
@@ -170,14 +170,13 @@ namespace osu.Game.Overlays
                         }
                     }
                 },
-                progress = new Box
+                progress = new DragBar
                 {
-                    RelativeSizeAxes = Axes.X,
+                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomCentre,
                     Height = 10,
-                    Width = 0,
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    Colour = Color4.Orange
+                    Colour = Color4.Orange,
+                    SeekRequested = seek
                 }
             };
 
@@ -192,7 +191,7 @@ namespace osu.Game.Overlays
         {
             base.Update();
             if (CurrentTrack == null) return;
-            progress.Width = (float)(CurrentTrack.CurrentTime / CurrentTrack.Length);
+            progress.UpdatePosition((float)(CurrentTrack.CurrentTime / CurrentTrack.Length));
             if (CurrentTrack.HasCompleted) next();
         }
 
@@ -267,27 +266,7 @@ namespace osu.Game.Overlays
             return scaledSprite;
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-        {
-            trySeek(state);
-            return base.OnMouseDown(state, args);
-        }
-
-        protected override bool OnMouseMove(InputState state)
-        {
-            trySeek(state);
-            return base.OnMouseMove(state);
-        }
-
-        private void trySeek(InputState state)
-        {
-            if (state.Mouse.LeftButton)
-            {
-                Vector2 pos = GetLocalPosition(state.Mouse.NativeState.Position);
-                if (pos.Y > 120)
-                    CurrentTrack?.Seek(CurrentTrack.Length * pos.X / 400f);
-            }
-        }
+        private void seek(float position) => CurrentTrack?.Seek(CurrentTrack.Length * position);
 
         //placeholder for toggling
         protected override void PopIn() => FadeIn(500);
