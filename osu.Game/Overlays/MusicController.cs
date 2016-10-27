@@ -266,7 +266,11 @@ namespace osu.Game.Overlays
             return scaledSprite;
         }
 
-        private void seek(float position) => CurrentTrack?.Seek(CurrentTrack.Length * position);
+        private void seek(float position)
+        {
+            CurrentTrack?.Seek(CurrentTrack.Length * position);
+            CurrentTrack?.Start();
+        }
 
         //placeholder for toggling
         protected override void PopIn() => FadeIn(500);
