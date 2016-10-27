@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,22 +17,25 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using System.Threading.Tasks;
 using osu.Game.Beatmaps.Drawable;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.GameModes.Play
 {
     public class PlaySongSelect : OsuGameMode
     {
         private Bindable<PlayMode> playMode;
-        private BeatmapDatabase beatmaps;
+        private BeatmapDatabase database;
         private BeatmapGroup selectedBeatmapGroup;
-        private BeatmapInfo selectedBeatmap;
         // TODO: use currently selected track as bg
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
         private ScrollContainer scrollContainer;
         private FlowContainer setList;
 
-        public PlaySongSelect()
+        /// <param name="database">Optionally provide a database to use instead of the OsuGame one.</param>
+        public PlaySongSelect(BeatmapDatabase database = null)
         {
+            this.database = database;
+
             const float scrollWidth = 640;
             const float bottomToolHeight = 50;
             Children = new Drawable[]
@@ -101,7 +105,10 @@ namespace osu.Game.GameModes.Play
                             Width = 100,
                             Text = "Play",
                             Colour = new Color4(238, 51, 153, 255),
-                            Action = () => Push(new Player { Beatmap = beatmaps.GetBeatmap(selectedBeatmap) }),
+                            Action = () => Push(new Player {
+                                BeatmapInfo = selectedBeatmapGroup.SelectedPanel.Beatmap,
+                                PlayMode = playMode.Value
+                            }),
                         },
                     }
                 }
@@ -121,8 +128,11 @@ namespace osu.Game.GameModes.Play
                 scrollContainer.Padding = new MarginPadding { Top = osuGame.Toolbar.Height };
             }
 
-            beatmaps = (game as OsuGameBase).Beatmaps;
-            beatmaps.BeatmapSetAdded += bset => Scheduler.Add(() => addBeatmapSet(bset));
+            if (database == null)
+                database = (game as OsuGameBase).Beatmaps;
+
+            database.BeatmapSetAdded += s => Schedule(() => addBeatmapSet(s));
+
             Task.Factory.StartNew(addBeatmapSets);
         }
 
@@ -146,28 +156,25 @@ namespace osu.Game.GameModes.Play
                 selectedBeatmapGroup.State = BeatmapGroupState.Collapsed;
 
             selectedBeatmapGroup = group;
-            selectedBeatmap = beatmap;
         }
 
         private void addBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            beatmapSet = beatmaps.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
-            beatmapSet.Beatmaps.ForEach(b => beatmaps.GetChildren(b));
+            beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
+            beatmapSet.Beatmaps.ForEach(b => database.GetChildren(b));
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty).ToList();
             Schedule(() =>
             {
                 var group = new BeatmapGroup(beatmapSet) { SelectionChanged = selectBeatmap };
                 setList.Add(group);
                 if (setList.Children.Count() == 1)
-                {
                     group.State = BeatmapGroupState.Expanded;
-                }
             });
         }
 
         private void addBeatmapSets()
         {
-            foreach (var beatmapSet in beatmaps.Query<BeatmapSetInfo>())
+            foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
                 addBeatmapSet(beatmapSet);
         }
     }

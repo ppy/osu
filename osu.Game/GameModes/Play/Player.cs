@@ -11,6 +11,7 @@ using osu.Game.GameModes.Play.Mania;
 using osu.Game.GameModes.Play.Osu;
 using osu.Game.GameModes.Play.Taiko;
 using osu.Framework;
+using osu.Game.Database;
 
 namespace osu.Game.GameModes.Play
 {
@@ -18,6 +19,7 @@ namespace osu.Game.GameModes.Play
     {
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
+        public BeatmapInfo BeatmapInfo;
         public Beatmap Beatmap;
 
         public PlayMode PlayMode;
@@ -26,10 +28,17 @@ namespace osu.Game.GameModes.Play
         {
             base.Load(game);
 
-            Beatmap beatmap = new Beatmap
+            try
             {
-                HitObjects = Beatmap?.HitObjects ?? new List<HitObject>()
-            };
+                if (Beatmap == null)
+                    Beatmap = ((OsuGame)game).Beatmaps.GetBeatmap(BeatmapInfo);
+            }
+            catch
+            {
+                //couldn't load, hard abort!
+                Exit();
+                return;
+            }
 
             HitRenderer hitRenderer;
             ScoreOverlay scoreOverlay;
@@ -41,37 +50,37 @@ namespace osu.Game.GameModes.Play
 
                     hitRenderer = new OsuHitRenderer
                     {
-                        Objects = beatmap.HitObjects,
+                        Objects = Beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
                     break;
                 case PlayMode.Taiko:
-                    scoreOverlay = null;
+                    scoreOverlay = new ScoreOverlayOsu();
 
                     hitRenderer = new TaikoHitRenderer
                     {
-                        Objects = beatmap.HitObjects,
+                        Objects = Beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
                     break;
                 case PlayMode.Catch:
-                    scoreOverlay = null;
+                    scoreOverlay = new ScoreOverlayOsu();
 
                     hitRenderer = new CatchHitRenderer
                     {
-                        Objects = beatmap.HitObjects,
+                        Objects = Beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
                     break;
                 case PlayMode.Mania:
-                    scoreOverlay = null;
+                    scoreOverlay = new ScoreOverlayOsu();
 
                     hitRenderer = new ManiaHitRenderer
                     {
-                        Objects = beatmap.HitObjects,
+                        Objects = Beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
