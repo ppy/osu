@@ -105,7 +105,10 @@ namespace osu.Game.GameModes.Play
                             Width = 100,
                             Text = "Play",
                             Colour = new Color4(238, 51, 153, 255),
-                            Action = () => Push(new Player { BeatmapInfo = selectedBeatmapGroup.SelectedPanel.Beatmap }),
+                            Action = () => Push(new Player {
+                                BeatmapInfo = selectedBeatmapGroup.SelectedPanel.Beatmap,
+                                PlayMode = playMode.Value
+                            }),
                         },
                     }
                 }
