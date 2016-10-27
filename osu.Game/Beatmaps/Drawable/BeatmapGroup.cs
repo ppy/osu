@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -22,60 +21,61 @@ namespace osu.Game.Beatmaps.Drawable
             Collapsed,
             Expanded,
         }
-    
+
         private const float collapsedAlpha = 0.5f;
         private const float collapsedWidth = 0.8f;
-        
-        private BeatmapInfo selectedBeatmap;
-        public BeatmapInfo SelectedBeatmap
-        {
-            get { return selectedBeatmap; }
-            set
-            {
-                selectedBeatmap = value;
-            }
-        }
 
-        public Action<BeatmapGroup, BeatmapInfo> BeatmapSelected;
+        private BeatmapInfo selectedBeatmap;
+
+        /// <summary>
+        /// Fires when one of our difficulties was selected. Will fire on first expand.
+        /// </summary>
+        public Action<BeatmapGroup, BeatmapInfo> SelectionChanged;
+
         public BeatmapSetInfo BeatmapSet;
         private BeatmapSetHeader header;
         private FlowContainer difficulties;
-        private bool collapsed;
+        private GroupState state;
         public GroupState State
         {
-            get { return collapsed ? GroupState.Collapsed : GroupState.Expanded; }
+            get { return state; }
             set
             {
-                bool val = value == GroupState.Collapsed;
-                if (collapsed == val)
-                    return;
-                collapsed = val;
-                ClearTransformations();
-                const float uncollapsedAlpha = 1;
-                FadeTo(collapsed ? collapsedAlpha : uncollapsedAlpha, 250);
-                if (collapsed)
-                    difficulties.Hide();
-                else
-                    difficulties.Show();
-                header.ClearTransformations();
-                header.Width = collapsed ? collapsedWidth : 1; // TODO: Transform
-                header.BorderColour = new Color4(
-                    header.BorderColour.R,
-                    header.BorderColour.G,
-                    header.BorderColour.B,
-                    collapsed ? 0 : 255);
-                header.GlowRadius = collapsed ? 0 : 5;
+                state = value;
+                switch (state)
+                {
+                    case GroupState.Expanded:
+                        FadeTo(1, 250);
+                        difficulties.Show();
+
+                        //todo: header should probably have a state, with this logic moved inside it.
+                        header.Width = 1;
+                        header.GlowRadius = 5;
+                        header.BorderColour = new Color4(header.BorderColour.R, header.BorderColour.G, header.BorderColour.B, 255);
+
+                        if (selectedBeatmap == null)
+                            (difficulties.Children.FirstOrDefault() as BeatmapPanel).Selected = true;
+                        SelectionChanged?.Invoke(this, selectedBeatmap);
+                        break;
+                    case GroupState.Collapsed:
+                        FadeTo(collapsedAlpha, 250);
+                        difficulties.Hide();
+
+                        //todo: header should probably have a state, with this logic moved inside it.
+                        header.Width = collapsedWidth;
+                        header.GlowRadius = 0;
+                        header.BorderColour = new Color4(header.BorderColour.R, header.BorderColour.G, header.BorderColour.B, 0);
+                        break;
+                }
             }
         }
 
         public BeatmapGroup(BeatmapSetInfo beatmapSet)
         {
             BeatmapSet = beatmapSet;
-            selectedBeatmap = beatmapSet.Beatmaps[0];
-            Alpha = collapsedAlpha;
+            Alpha = 0;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-            float difficultyWidth = 1;
             Children = new[]
             {
                 new FlowContainer
@@ -101,38 +101,40 @@ namespace osu.Game.Beatmaps.Drawable
                             Spacing = new Vector2(0, 5),
                             Direction = FlowDirection.VerticalOnly,
                             Alpha = 0,
-                            Children = BeatmapSet.Beatmaps.Select(
-                                b => {
-                                    float width = difficultyWidth;
-                                    if (difficultyWidth > 0.8f) difficultyWidth -= 0.025f;
-                                    return new BeatmapPanel(BeatmapSet, b)
-                                    {
-                                        MapSelected = updateSelected,
-                                        Selected = width == 1,
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        RelativeSizeAxes = Axes.X,
-                                        Width = width,
-                                    };
-                                })
+                            Children = BeatmapSet.Beatmaps.Select(b =>
+                                new BeatmapPanel(BeatmapSet, b)
+                                {
+                                    GainedSelection = panelGainedSelection,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    RelativeSizeAxes = Axes.X,
+                                }
+                            )
                         }
                     }
                 }
             };
-            
-            collapsed = true;
         }
-        
-        private void updateSelected(BeatmapInfo map)
+
+        public override void Load(BaseGame game)
         {
-            foreach (BeatmapPanel panel in difficulties.Children)
-                panel.Selected = panel.Beatmap == map;
-            BeatmapSelected?.Invoke(this, map);
+            base.Load(game);
+            State = GroupState.Collapsed;
         }
-        
+
+        private void panelGainedSelection(BeatmapInfo map)
+        {
+            selectedBeatmap = map;
+
+            foreach (BeatmapPanel panel in difficulties.Children)
+                if (panel.Beatmap != map) panel.Selected = false;
+            
+            SelectionChanged?.Invoke(this, map);
+        }
+
         protected override bool OnClick(InputState state)
         {
-            BeatmapSelected?.Invoke(this, selectedBeatmap);
+            State = GroupState.Expanded;
             return true;
         }
     }
