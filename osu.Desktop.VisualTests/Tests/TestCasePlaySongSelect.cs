@@ -3,6 +3,7 @@
 
 using osu.Framework.GameModes.Testing;
 using System.Collections.Generic;
+using osu.Desktop.Platform;
 using osu.Game.Database;
 using osu.Game.GameModes.Play;
 using SQLiteNetExtensions.Extensions;
@@ -14,21 +15,17 @@ namespace osu.Desktop.Tests
     class TestCasePlaySongSelect : TestCase
     {
         private BeatmapDatabase db;
+        private TestStorage storage;
+
         public override string Name => @"Song Select";
         public override string Description => @"Testing song selection UI";
-
-        public override void Load(BaseGame game)
-        {
-            base.Load(game);
-
-            db = (game as OsuGameBase).Beatmaps;
-        }
 
         public override void Reset()
         {
             base.Reset();
 
-            db.Reset();
+            storage = new TestStorage(@"TestCasePlaySongSelect");
+            db = new BeatmapDatabase(storage);
 
             var sets = new List<BeatmapSetInfo>();
 
@@ -37,7 +34,7 @@ namespace osu.Desktop.Tests
 
             db.Import(sets);
 
-            Add(new PlaySongSelect());
+            Add(new PlaySongSelect(db));
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)
