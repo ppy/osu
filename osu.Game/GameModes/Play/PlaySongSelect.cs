@@ -15,6 +15,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using System.Threading.Tasks;
+using osu.Game.Beatmaps.Drawable;
 
 namespace osu.Game.GameModes.Play
 {

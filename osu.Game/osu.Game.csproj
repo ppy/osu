@@ -64,6 +64,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Beatmap.cs" />
+    <Compile Include="Beatmaps\Drawable\BeatmapSetHeader.cs" />
+    <Compile Include="Beatmaps\Drawable\DifficultyIcon.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchConverter.cs" />
     <Compile Include="Beatmaps\Objects\Catch\Drawable\DrawableFruit.cs" />
     <Compile Include="Beatmaps\Objects\DrawableHitObject.cs" />
@@ -116,8 +118,8 @@
     <Compile Include="GameModes\OsuGameMode.cs" />
     <Compile Include="GameModes\Play\ModSelect.cs" />
     <Compile Include="GameModes\Play\Osu\ScoreOverlayOsu.cs" />
-    <Compile Include="GameModes\Play\BeatmapGroup.cs" />
-    <Compile Include="GameModes\Play\BeatmapPanel.cs" />
+    <Compile Include="Beatmaps\Drawable\BeatmapGroup.cs" />
+    <Compile Include="Beatmaps\Drawable\BeatmapPanel.cs" />
     <Compile Include="GameModes\Play\Player.cs" />
     <Compile Include="GameModes\Charts\ChartListing.cs" />
     <Compile Include="GameModes\Play\PlayMode.cs" />

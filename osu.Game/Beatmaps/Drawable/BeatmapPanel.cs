@@ -4,16 +4,16 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Database;
-using osu.Framework.Graphics.Primitives;
-using OpenTK.Graphics;
-using OpenTK;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.GameModes.Play
+namespace osu.Game.Beatmaps.Drawable
 {
     class BeatmapPanel : Container
     {
@@ -49,7 +49,7 @@ namespace osu.Game.GameModes.Play
             BorderThickness = 2;
             BorderColour = new Color4(221, 255, 255, 0);
             GlowColour = new Color4(166, 221, 251, 0.75f); // TODO: Get actual color for this
-            Children = new Drawable[]
+            Children = new Framework.Graphics.Drawable[]
             {
                 new Box
                 {
@@ -62,7 +62,7 @@ namespace osu.Game.GameModes.Play
                     Padding = new MarginPadding(5),
                     Direction = FlowDirection.HorizontalOnly,
                     AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Children = new Framework.Graphics.Drawable[]
                     {
                         new DifficultyIcon(FontAwesome.dot_circle_o, new Color4(159, 198, 0, 255)),
                         new FlowContainer
@@ -70,7 +70,7 @@ namespace osu.Game.GameModes.Play
                             Padding = new MarginPadding { Left = 10 },
                             Direction = FlowDirection.VerticalOnly,
                             AutoSizeAxes = Axes.Both,
-                            Children = new Drawable[]
+                            Children = new Framework.Graphics.Drawable[]
                             {
                                 new FlowContainer
                                 {
