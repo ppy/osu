@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps.Drawable
         private const float collapsedAlpha = 0.5f;
         private const float collapsedWidth = 0.8f;
 
-        private BeatmapInfo selectedBeatmap;
+        private BeatmapPanel selectedPanel;
 
         /// <summary>
         /// Fires when one of our difficulties was selected. Will fire on first expand.
@@ -53,9 +53,9 @@ namespace osu.Game.Beatmaps.Drawable
                         header.GlowRadius = 5;
                         header.BorderColour = new Color4(header.BorderColour.R, header.BorderColour.G, header.BorderColour.B, 255);
 
-                        if (selectedBeatmap == null)
+                        if (selectedPanel == null)
                             (difficulties.Children.FirstOrDefault() as BeatmapPanel).Selected = true;
-                        SelectionChanged?.Invoke(this, selectedBeatmap);
+                        SelectionChanged?.Invoke(this, selectedPanel?.Beatmap);
                         break;
                     case GroupState.Collapsed:
                         FadeTo(collapsedAlpha, 250);
@@ -122,14 +122,12 @@ namespace osu.Game.Beatmaps.Drawable
             State = GroupState.Collapsed;
         }
 
-        private void panelGainedSelection(BeatmapInfo map)
+        private void panelGainedSelection(BeatmapPanel panel)
         {
-            selectedBeatmap = map;
-
-            foreach (BeatmapPanel panel in difficulties.Children)
-                if (panel.Beatmap != map) panel.Selected = false;
+            if (selectedPanel != null) selectedPanel.Selected = false;
+            selectedPanel = panel;
             
-            SelectionChanged?.Invoke(this, map);
+            SelectionChanged?.Invoke(this, panel.Beatmap);
         }
 
         protected override bool OnClick(InputState state)
