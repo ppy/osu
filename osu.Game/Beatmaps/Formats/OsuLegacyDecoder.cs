@@ -21,6 +21,7 @@ namespace osu.Game.Beatmaps.Formats
             AddDecoder<OsuLegacyDecoder>(@"osu file format v12");
             AddDecoder<OsuLegacyDecoder>(@"osu file format v11");
             AddDecoder<OsuLegacyDecoder>(@"osu file format v10");
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v9");
             // TODO: Not sure how far back to go, or differences between versions
         }
 
@@ -213,7 +214,11 @@ namespace osu.Game.Beatmaps.Formats
                 HitObjects = new List<HitObject>(),
                 ControlPoints = new List<ControlPoint>(),
                 ComboColors = new List<Color4>(),
-                BeatmapInfo = new BeatmapInfo(),
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Metadata = new BeatmapMetadata(),
+                    BaseDifficulty = new BaseDifficulty(),
+                },
             };
             
             var section = Section.None;
@@ -223,7 +228,6 @@ namespace osu.Game.Beatmaps.Formats
                 line = stream.ReadLine();
                 if (line == null)
                     break;
-                line = line.Trim();
                 if (string.IsNullOrEmpty(line))
                     continue;
                 if (line.StartsWith(@"osu file format v"))

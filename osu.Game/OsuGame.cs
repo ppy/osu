@@ -9,19 +9,13 @@ using osu.Game.GameModes.Menu;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
-using osu.Game.GameModes;
-using osu.Game.Graphics.Background;
 using osu.Game.GameModes.Play;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Framework;
 using osu.Framework.Input;
 using osu.Game.Input;
 using OpenTK.Input;
-using System.IO;
-using osu.Game.Beatmaps.IO;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 
@@ -29,23 +23,18 @@ namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
-        private class ImportBeatmap
-        {
-            public string Path;
-        }
-
         public Toolbar Toolbar;
         public ChatConsole Chat;
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
         private Intro intro;
-        private string[] args;
-        private IpcChannel<ImportBeatmap> BeatmapIPC;
 
         private VolumeControl volume;
 
         public Bindable<PlayMode> PlayMode;
 
-        public OsuGame(string[] args)
+        string[] args;
+
+        public OsuGame(string[] args = null)
         {
             this.args = args;
         }
@@ -59,35 +48,16 @@ namespace osu.Game
 
         public override void Load(BaseGame game)
         {
-            BeatmapIPC = new IpcChannel<ImportBeatmap>(Host);
-
             if (!Host.IsPrimaryInstance)
             {
-                if (args.Length == 1 && File.Exists(args[0]))
-                {
-                    BeatmapIPC.SendMessage(new ImportBeatmap { Path = args[0] }).Wait();
-                    Logger.Log(@"Sent file to running instance");
-                }
-                else
-                    Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
+                Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
                 Environment.Exit(0);
             }
 
-            BeatmapIPC.MessageReceived += message =>
-            {
-                try
-                {
-                    Beatmaps.ImportBeatmap(message.Path);
-                    // TODO: Switch to beatmap list and select the new song
-                }
-                catch (Exception ex)
-                {
-                    // TODO: Show the user some info?
-                    Logger.Log($@"Failed to import beatmap: {ex}", LoggingTarget.Runtime, LogLevel.Error);
-                }
-            };
-
             base.Load(game);
+
+            if (args?.Length > 0)
+                Schedule(delegate { Beatmaps.Import(args); });
 
             //attach our bindables to the audio subsystem.
             Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeGlobal));

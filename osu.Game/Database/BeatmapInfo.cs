@@ -9,23 +9,25 @@ namespace osu.Game.Database
 {
     public class BeatmapInfo
     {
-        public BeatmapInfo()
-        {
-            BaseDifficulty = new BaseDifficulty();
-            Metadata = new BeatmapMetadata();
-        }
-
         [PrimaryKey]
         public int BeatmapID { get; set; }
-        [NotNull, Indexed]
+
+        [ForeignKey(typeof(BeatmapSetInfo))]
         public int BeatmapSetID { get; set; }
+
+        [ManyToOne]
+        public BeatmapSetInfo BeatmapSet { get; set; }
+        
         [ForeignKey(typeof(BeatmapMetadata))]
         public int BeatmapMetadataID { get; set; }
+
+        [OneToOne(CascadeOperations = CascadeOperation.All)]
+        public BeatmapMetadata Metadata { get; set; }
+
         [ForeignKey(typeof(BaseDifficulty)), NotNull]
         public int BaseDifficultyID { get; set; }
-        [OneToOne]
-        public BeatmapMetadata Metadata { get; set; }
-        [OneToOne]
+
+        [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BaseDifficulty BaseDifficulty { get; set; }
         
         public string Path { get; set; }
