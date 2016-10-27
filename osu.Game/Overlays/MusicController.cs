@@ -30,19 +30,23 @@ namespace osu.Game.Overlays
         private List<BeatmapSetInfo> playList;
         private BeatmapDatabase database;
         private BeatmapSetInfo currentPlay;
+
         public AudioTrack CurrentTrack { get; set; }//TODO:gets exterally
 
         public MusicController(BeatmapDatabase db = null)
         {
             database = db;
         }
+
         public override void Load(BaseGame game)
         {
             base.Load(game);
             osuGame = game as OsuGameBase;
+
             if (database == null) database = osuGame.Beatmaps;
             playList = database.Query<BeatmapSetInfo>().ToList();
             currentPlay = playList.FirstOrDefault();
+
             Width = 400;
             Height = 130;
             CornerRadius = 5;
@@ -176,9 +180,10 @@ namespace osu.Game.Overlays
                     Colour = Color4.Orange
                 }
             };
+
             if (currentPlay != null)
             {
-                playButton.Icon=FontAwesome.pause;
+                playButton.Icon = FontAwesome.pause;
                 play(currentPlay, null);
             }
         }
@@ -214,7 +219,9 @@ namespace osu.Game.Overlays
             BeatmapMetadata metadata = osuGame.Beatmaps.Query<BeatmapMetadata>().Where(x => x.ID == beatmap.BeatmapMetadataID).First();
             title.Text = metadata.TitleUnicode ?? metadata.Title;
             artist.Text = metadata.ArtistUnicode ?? metadata.Artist;
+
             Sprite newBackground;
+
             using (ArchiveReader reader = osuGame.Beatmaps.GetReader(currentPlay))
             {
                 CurrentTrack?.Stop();
@@ -222,7 +229,9 @@ namespace osu.Game.Overlays
                 CurrentTrack.Start();
                 newBackground = getScaledSprite(TextureLoader.FromStream(reader.ReadFile(metadata.BackgroundFile)));
             }
+
             Add(newBackground);
+
             if (isNext == true)
             {
                 newBackground.Position = new Vector2(400, 0);
@@ -241,6 +250,7 @@ namespace osu.Game.Overlays
             {
                 Remove(backgroundSprite);
             }
+
             backgroundSprite = newBackground;
         }
 
