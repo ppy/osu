@@ -28,8 +28,17 @@ namespace osu.Game.GameModes.Play
         {
             base.Load(game);
 
-            if (Beatmap == null)
-                Beatmap = ((OsuGame)game).Beatmaps.GetBeatmap(BeatmapInfo);
+            try
+            {
+                if (Beatmap == null)
+                    Beatmap = ((OsuGame)game).Beatmaps.GetBeatmap(BeatmapInfo);
+            }
+            catch
+            {
+                //couldn't load, hard abort!
+                Exit();
+                return;
+            }
 
             HitRenderer hitRenderer;
             ScoreOverlay scoreOverlay;
