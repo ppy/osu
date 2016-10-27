@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps.Drawable
     {
         public BeatmapInfo Beatmap;
 
-        public Action<BeatmapInfo> MapSelected;
+        public Action<BeatmapInfo> GainedSelection;
         
         private bool selected;
 
@@ -37,6 +37,8 @@ namespace osu.Game.Beatmaps.Drawable
                     BorderColour.B,
                     selected ? 255 : 0);
                 GlowRadius = selected ? 3 : 0;
+
+                if (selected) GainedSelection?.Invoke(Beatmap);
             }
         }
 
@@ -101,7 +103,7 @@ namespace osu.Game.Beatmaps.Drawable
         
         protected override bool OnClick(InputState state)
         {
-            MapSelected?.Invoke(Beatmap);
+            Selected = true;
             return true;
         }
     }

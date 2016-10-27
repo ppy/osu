@@ -120,7 +120,7 @@ namespace osu.Game.GameModes.Play
                 // Temporary:
                 scrollContainer.Padding = new MarginPadding { Top = osuGame.Toolbar.Height };
             }
-            
+
             beatmaps = (game as OsuGameBase).Beatmaps;
             beatmaps.BeatmapSetAdded += bset => Scheduler.Add(() => addBeatmapSet(bset));
             Task.Factory.StartNew(addBeatmapSets);
@@ -136,21 +136,16 @@ namespace osu.Game.GameModes.Play
         private void PlayMode_ValueChanged(object sender, EventArgs e)
         {
         }
-        
-        private void selectBeatmapSet(BeatmapGroup group)
+
+        private void selectBeatmap(BeatmapGroup group, BeatmapInfo beatmap)
         {
             if (selectedBeatmapGroup == group)
                 return;
-            selectedBeatmapGroup.State = BeatmapGroup.GroupState.Collapsed;
+
+            if (selectedBeatmapGroup != null)
+                selectedBeatmapGroup.State = BeatmapGroup.GroupState.Collapsed;
+
             selectedBeatmapGroup = group;
-            selectedBeatmapGroup.State = BeatmapGroup.GroupState.Expanded;
-        }
-        
-        private void selectBeatmap(BeatmapGroup group, BeatmapInfo beatmap)
-        {
-            if (selectedBeatmap == beatmap)
-                return;
-            selectBeatmapSet(group);
             selectedBeatmap = beatmap;
         }
 
@@ -158,16 +153,13 @@ namespace osu.Game.GameModes.Play
         {
             beatmapSet = beatmaps.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
             beatmapSet.Beatmaps.ForEach(b => beatmaps.GetChildren(b));
-            beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty)
-                .ToList();
+            beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty).ToList();
             Schedule(() =>
             {
-                var group = new BeatmapGroup(beatmapSet) { BeatmapSelected = selectBeatmap };
+                var group = new BeatmapGroup(beatmapSet) { SelectionChanged = selectBeatmap };
                 setList.Add(group);
                 if (setList.Children.Count() == 1)
                 {
-                    selectedBeatmapGroup = group;
-                    selectedBeatmap = group.SelectedBeatmap;
                     group.State = BeatmapGroup.GroupState.Expanded;
                 }
             });
