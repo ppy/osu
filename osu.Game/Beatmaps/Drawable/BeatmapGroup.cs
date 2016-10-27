@@ -7,19 +7,14 @@ using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Input;
 using osu.Game.Database;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawable
 {
     class BeatmapGroup : Container, IStateful<BeatmapGroupState>
     {
-        private const float collapsedAlpha = 0.5f;
-        private const float collapsedWidth = 0.8f;
-
-        private BeatmapPanel selectedPanel;
+        public BeatmapPanel SelectedPanel;
 
         /// <summary>
         /// Fires when one of our difficulties was selected. Will fire on first expand.
@@ -44,23 +39,16 @@ namespace osu.Game.Beatmaps.Drawable
                         FadeTo(1, 250);
                         difficulties.Show();
 
-                        //todo: header should probably have a state, with this logic moved inside it.
-                        header.Width = 1;
-                        header.GlowRadius = 5;
-                        header.BorderColour = new Color4(header.BorderColour.R, header.BorderColour.G, header.BorderColour.B, 255);
+                        header.State = PanelSelectedState.Selected;
 
-                        if (selectedPanel == null)
-                            (difficulties.Children.FirstOrDefault() as BeatmapPanel).Selected = true;
-                        SelectionChanged?.Invoke(this, selectedPanel?.Beatmap);
+                        if (SelectedPanel == null)
+                            ((BeatmapPanel)difficulties.Children.FirstOrDefault()).State = PanelSelectedState.Selected;
                         break;
                     case BeatmapGroupState.Collapsed:
-                        FadeTo(collapsedAlpha, 250);
-                        difficulties.Hide();
+                        FadeTo(0.5f, 250);
 
-                        //todo: header should probably have a state, with this logic moved inside it.
-                        header.Width = collapsedWidth;
-                        header.GlowRadius = 0;
-                        header.BorderColour = new Color4(header.BorderColour.R, header.BorderColour.G, header.BorderColour.B, 0);
+                        header.State = PanelSelectedState.NotSelected;
+                        difficulties.Hide();
                         break;
                 }
             }
@@ -69,9 +57,11 @@ namespace osu.Game.Beatmaps.Drawable
         public BeatmapGroup(BeatmapSetInfo beatmapSet)
         {
             this.beatmapSet = beatmapSet;
+
             Alpha = 0;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
+
             Children = new[]
             {
                 new FlowContainer
@@ -83,8 +73,8 @@ namespace osu.Game.Beatmaps.Drawable
                     {
                         header = new BeatmapSetHeader(beatmapSet)
                         {
+                            GainedSelection = headerGainedSelection,
                             RelativeSizeAxes = Axes.X,
-                            Width = collapsedWidth,
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                         },
@@ -118,18 +108,21 @@ namespace osu.Game.Beatmaps.Drawable
             State = BeatmapGroupState.Collapsed;
         }
 
-        private void panelGainedSelection(BeatmapPanel panel)
-        {
-            if (selectedPanel != null) selectedPanel.Selected = false;
-            selectedPanel = panel;
-            
-            SelectionChanged?.Invoke(this, panel.Beatmap);
-        }
-
-        protected override bool OnClick(InputState state)
+        private void headerGainedSelection(BeatmapSetHeader panel)
         {
             State = BeatmapGroupState.Expanded;
-            return true;
+
+            SelectionChanged?.Invoke(this, SelectedPanel.Beatmap);
+        }
+
+        private void panelGainedSelection(BeatmapPanel panel)
+        {
+            State = BeatmapGroupState.Expanded;
+
+            if (SelectedPanel != null) SelectedPanel.State = PanelSelectedState.NotSelected;
+            SelectedPanel = panel;
+
+            SelectionChanged?.Invoke(this, panel.Beatmap);
         }
     }
 
