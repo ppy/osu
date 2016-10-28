@@ -43,20 +43,13 @@ namespace osu.Game.Beatmaps
             {
                 track?.Dispose();
                 Reader?.Dispose();
-
                 isDisposed = true;
             }
-        }
-
-        ~WorkingBeatmap()
-        {
-            Dispose(false);
         }
 
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }
