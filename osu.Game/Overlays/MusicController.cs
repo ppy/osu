@@ -181,9 +181,6 @@ namespace osu.Game.Overlays
                     SeekRequested = seek
                 }
             };
-
-            if (current == null && playList.Count > 0)
-                play(playList[0].Beatmaps[0], null);
         }
 
         protected override void Update()
@@ -200,6 +197,7 @@ namespace osu.Game.Overlays
         private void workingChanged(object sender = null, EventArgs e = null)
         {
             if (beatmapSource.Value == current) return;
+            current = beatmapSource.Value;
             updateCurrent(current, null);
         }
 
@@ -215,7 +213,12 @@ namespace osu.Game.Overlays
         private void prev()
         {
             int i = findInPlaylist(current?.Beatmap);
-            if (i == -1) return;
+            if (i == -1)
+            {
+                if (playList.Count > 0)
+                    play(playList[0].Beatmaps[0], null);
+                else return;
+            }
             i = (i - 1 + playList.Count) % playList.Count;
             play(playList[i].Beatmaps[0], false);
         }
@@ -223,7 +226,12 @@ namespace osu.Game.Overlays
         private void next()
         {
             int i = findInPlaylist(current?.Beatmap);
-            if (i == -1) return;
+            if (i == -1)
+            {
+                if (playList.Count > 0)
+                    play(playList[0].Beatmaps[0], null);
+                else return;
+            }
             i = (i + 1) % playList.Count;
             play(playList[i].Beatmaps[0], true);
         }
