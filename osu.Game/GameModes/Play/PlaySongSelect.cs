@@ -181,7 +181,7 @@ namespace osu.Game.GameModes.Play
                 return;
 
             //this is VERY temporary logic.
-            beatmapSetFlow.Children.Cast<BeatmapGroup>().First(b =>
+            beatmapSetFlow.Children.Cast<BeatmapGroup>().Any(b =>
             {
                 var panel = b.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
                 if (panel != null)
