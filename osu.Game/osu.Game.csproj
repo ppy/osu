@@ -141,11 +141,11 @@
     <Compile Include="GameModes\Edit\EditSongSelect.cs" />
     <Compile Include="GameModes\Play\ComboCounter.cs" />
     <Compile Include="GameModes\Play\ComboResultCounter.cs" />
+    <Compile Include="Graphics\Avatar.cs" />
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoComboCounter.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
     <Compile Include="Input\GlobalHotkeys.cs" />
-    <Compile Include="Graphics\Avatar.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
@@ -166,9 +166,9 @@
     <Compile Include="Online\API\APIRequest.cs" />
     <Compile Include="Online\API\OAuth.cs" />
     <Compile Include="Online\API\OAuthToken.cs" />
-    <Compile Include="Online\API\SecurePassword.cs" />
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
     <Compile Include="Online\API\Requests\MyUser.cs" />
+    <Compile Include="Online\API\SecurePassword.cs" />
     <Compile Include="Online\API\Requests\ListChannels.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\Display\ChannelDisplay.cs" />
@@ -180,7 +180,6 @@
     <Compile Include="OsuGameBase.cs" />
     <Compile Include="Overlays\ChatConsole.cs" />
     <Compile Include="Overlays\Options.cs" />
-    <Compile Include="Overlays\SettingsSidebarButton.cs" />
     <Compile Include="Overlays\Toolbar.cs" />
     <Compile Include="Overlays\ToolbarButton.cs" />
     <Compile Include="Overlays\ToolbarModeButton.cs" />

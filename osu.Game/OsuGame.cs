@@ -18,11 +18,13 @@ using osu.Game.Input;
 using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
+using osu.Game.Online;
 
 namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
+        public LocalUser LocalUser;
         public Toolbar Toolbar;
         public ChatConsole Chat;
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
@@ -55,6 +57,13 @@ namespace osu.Game
             }
 
             base.Load(game);
+
+            LocalUser = new LocalUser(API);
+            LocalUser.CheckUser();
+            Scheduler.AddDelayed(delegate {
+                LocalUser.CheckUser();
+                Toolbar.toolbarUserButton.UpdateButton(LocalUser);
+            }, 10000, true);
 
             if (args?.Length > 0)
                 Schedule(delegate { Beatmaps.Import(args); });
