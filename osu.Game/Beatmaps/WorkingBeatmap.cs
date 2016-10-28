@@ -12,7 +12,7 @@ namespace osu.Game.Beatmaps
 {
     public class WorkingBeatmap : IDisposable
     {
-        private BeatmapInfo beatmapInfo;
+        public BeatmapInfo BeatmapInfo;
 
         public readonly ArchiveReader Reader;
 
@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    using (var stream = new StreamReader(Reader.ReadFile(beatmapInfo.Path)))
+                    using (var stream = new StreamReader(Reader.ReadFile(BeatmapInfo.Path)))
                         beatmap = BeatmapDecoder.GetDecoder(stream)?.Decode(stream);
                 }
                 catch { }
@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    var trackData = Reader.ReadFile(beatmapInfo.Metadata.AudioFile);
+                    var trackData = Reader.ReadFile(BeatmapInfo.Metadata.AudioFile);
                     if (trackData != null)
                         track = new AudioTrackBass(trackData);
                 }
@@ -57,7 +57,7 @@ namespace osu.Game.Beatmaps
 
         public WorkingBeatmap(BeatmapInfo beatmapInfo = null, ArchiveReader reader = null)
         {
-            this.beatmapInfo = beatmapInfo;
+            this.BeatmapInfo = beatmapInfo;
             Reader = reader;
         }
 
@@ -80,7 +80,7 @@ namespace osu.Game.Beatmaps
 
         public void TransferTo(WorkingBeatmap working)
         {
-            if (track != null && working.beatmapInfo.Metadata.AudioFile == beatmapInfo.Metadata.AudioFile && working.beatmapInfo.BeatmapSet.Path == beatmapInfo.BeatmapSet.Path)
+            if (track != null && working.BeatmapInfo.Metadata.AudioFile == BeatmapInfo.Metadata.AudioFile && working.BeatmapInfo.BeatmapSet.Path == BeatmapInfo.BeatmapSet.Path)
                 working.track = track;
         }
     }
