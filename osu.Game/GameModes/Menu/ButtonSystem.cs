@@ -133,7 +133,7 @@ namespace osu.Game.GameModes.Menu
                     return true;
             }
 
-            return true;
+            return false;
         }
 
         private void onPlay()

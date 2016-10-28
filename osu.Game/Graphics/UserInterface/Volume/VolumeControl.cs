@@ -1,53 +1,52 @@
-﻿using osu.Framework;
+﻿using System;
+using osu.Framework;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.Threading;
 using OpenTK;
-using osu.Framework.Graphics.Primitives;
 
-namespace osu.Game
+namespace osu.Game.Graphics.UserInterface.Volume
 {
-    internal class VolumeControl : Container
+    internal class VolumeControl : OverlayContainer
     {
-        private FlowContainer volumeMetersContainer;
-        private VolumeMeter volumeMeterMaster;
         public BindableDouble VolumeGlobal { get; set; }
         public BindableDouble VolumeSample { get; set; }
         public BindableDouble VolumeTrack { get; set; }
 
+        private VolumeMeter volumeMeterMaster;
+
         public override bool Contains(Vector2 screenSpacePos) => true;
 
-        private void volumeChanged(object sender, System.EventArgs e)
+        private void volumeChanged(object sender, EventArgs e)
         {
-            appear();
-
-            Anchor = Anchor.BottomRight;
-            Origin = Anchor.BottomRight;
+            Show();
+            schedulePopOut();
         }
 
         public VolumeControl()
         {
             AutoSizeAxes = Axes.Both;
+            Anchor = Anchor.BottomRight;
+            Origin = Anchor.BottomRight;
         }
 
         public override void Load(BaseGame game)
         {
-            base.Load(game);
             VolumeGlobal.ValueChanged += volumeChanged;
             VolumeSample.ValueChanged += volumeChanged;
             VolumeTrack.ValueChanged += volumeChanged;
 
             Children = new Drawable[]
             {
-                volumeMetersContainer = new FlowContainer
+                new FlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Position = new Vector2(10, 30),
                     Spacing = new Vector2(15,0),
-                    Alpha = 0,
                     Children = new Drawable[]
                     {
                         volumeMeterMaster = new VolumeMeter("Master", VolumeGlobal),
@@ -56,6 +55,8 @@ namespace osu.Game
                     }
                 }
             };
+
+            base.Load(game);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -68,22 +69,42 @@ namespace osu.Game
 
         protected override bool OnWheelDown(InputState state)
         {
+            if (!IsVisible)
+                return false;
+
             volumeMeterMaster.TriggerWheelDown(state);
             return true;
         }
 
         protected override bool OnWheelUp(InputState state)
         {
+            if (!IsVisible)
+                return false;
+
             volumeMeterMaster.TriggerWheelUp(state);
             return true;
         }
 
-        private void appear()
+        ScheduledDelegate popOutDelegate;
+
+        protected override void PopIn()
         {
-            volumeMetersContainer.ClearTransformations();
-            volumeMetersContainer.FadeIn(100);
-            volumeMetersContainer.Delay(1000);
-            volumeMetersContainer.FadeOut(100);
+            ClearTransformations();
+            FadeIn(100);
+
+            schedulePopOut();
+        }
+
+        protected override void PopOut()
+        {
+            FadeOut(100);
+        }
+
+        private void schedulePopOut()
+        {
+            popOutDelegate?.Cancel();
+            Delay(1000);
+            popOutDelegate = Schedule(Hide);
         }
     }
 }

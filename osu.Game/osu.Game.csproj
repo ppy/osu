@@ -38,7 +38,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="OpenTK, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>..\packages\ppy.OpenTK.2.0.50727.1337\lib\net20\OpenTK.dll</HintPath>
+      <HintPath>..\packages\ppy.OpenTK.2.0.50727.1339\lib\net45\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SQLite.Net, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -53,17 +53,12 @@
       <HintPath>..\packages\SQLite.Net-PCL.3.1.1\lib\net4\SQLite.Net.Platform.Win32.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="DotNetZip">
-      <HintPath>$(SolutionDir)\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLiteNetExtensions">
-      <HintPath>$(SolutionDir)\packages\SQLiteNetExtensions.1.3.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\SQLiteNetExtensions.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Beatmap.cs" />
+    <Compile Include="Beatmaps\Drawable\BeatmapSetHeader.cs" />
+    <Compile Include="Beatmaps\Drawable\DifficultyIcon.cs" />
+    <Compile Include="Beatmaps\Drawable\Panel.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchConverter.cs" />
     <Compile Include="Beatmaps\Objects\Catch\Drawable\DrawableFruit.cs" />
     <Compile Include="Beatmaps\Objects\DrawableHitObject.cs" />
@@ -116,6 +111,8 @@
     <Compile Include="GameModes\OsuGameMode.cs" />
     <Compile Include="GameModes\Play\ModSelect.cs" />
     <Compile Include="GameModes\Play\Osu\ScoreOverlayOsu.cs" />
+    <Compile Include="Beatmaps\Drawable\BeatmapGroup.cs" />
+    <Compile Include="Beatmaps\Drawable\BeatmapPanel.cs" />
     <Compile Include="GameModes\Play\Player.cs" />
     <Compile Include="GameModes\Charts\ChartListing.cs" />
     <Compile Include="GameModes\Play\PlayMode.cs" />
@@ -138,6 +135,7 @@
     <Compile Include="GameModes\Play\ComboResultCounter.cs" />
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoComboCounter.cs" />
+    <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
     <Compile Include="Input\GlobalHotkeys.cs" />
     <Compile Include="Graphics\Avatar.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
@@ -155,6 +153,7 @@
     <Compile Include="GameModes\Play\Catch\CatchComboCounter.cs" />
     <Compile Include="GameModes\Play\Osu\OsuComboCounter.cs" />
     <Compile Include="Graphics\UserInterface\StarCounter.cs" />
+    <Compile Include="IPC\BeatmapImporter.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
     <Compile Include="Online\API\APIRequest.cs" />
     <Compile Include="Online\API\OAuth.cs" />
@@ -180,14 +179,14 @@
     <Compile Include="Overlays\UserButton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\User.cs" />
-    <Compile Include="VolumeControl.cs" />
+    <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
     <Compile Include="Beatmaps\Events\EventType.cs" />
-    <Compile Include="VolumeMeter.cs" />
+    <Compile Include="Graphics\UserInterface\Volume\VolumeMeter.cs" />
     <Compile Include="Database\BeatmapSetInfo.cs" />
     <Compile Include="Database\BeatmapMetadata.cs" />
     <Compile Include="Database\BeatmapInfo.cs" />

@@ -14,6 +14,7 @@ namespace osu.Game.GameModes.Play.Osu
 
         protected override Playfield CreatePlayfield() => new OsuPlayfield();
 
-        protected override DrawableHitObject GetVisualRepresentation(OsuBaseHit h) => new DrawableCircle(h as Circle);
+        protected override DrawableHitObject GetVisualRepresentation(OsuBaseHit h)
+            => h is Circle ? new DrawableCircle(h as Circle) : null;
     }
 }
