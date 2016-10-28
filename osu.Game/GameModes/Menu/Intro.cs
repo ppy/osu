@@ -10,6 +10,8 @@ using osu.Framework.Graphics.Transformations;
 using osu.Game.GameModes.Backgrounds;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Configuration;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.GameModes.Menu
 {

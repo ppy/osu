@@ -17,7 +17,6 @@ namespace osu.Desktop.Platform
         
         public override SQLiteConnection GetDatabase(string name)
         {
-            Directory.CreateDirectory(BasePath);
             ISQLitePlatform platform;
             if (RuntimeInfo.IsWindows)
                 platform = new SQLitePlatformWin32();
