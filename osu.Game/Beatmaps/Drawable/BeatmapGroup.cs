@@ -117,6 +117,8 @@ namespace osu.Game.Beatmaps.Drawable
             //we want to make sure one of our children is selected in the case none have been selected yet.
             if (SelectedPanel == null)
                 BeatmapPanels.First().State = PanelSelectedState.Selected;
+            else
+                SelectionChanged?.Invoke(this, SelectedPanel.Beatmap);
         }
 
         private void panelGainedSelection(BeatmapPanel panel)
