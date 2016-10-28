@@ -18,11 +18,13 @@ using osu.Game.Input;
 using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
+using osu.Game.Online;
 
 namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
+        public LocalUser LocalUser;
         public Toolbar Toolbar;
         public ChatConsole Chat;
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
@@ -56,8 +58,24 @@ namespace osu.Game
 
             base.Load(game);
 
+            LocalUser = new LocalUser(API);
+            LocalUser.CheckUser();
+            Scheduler.AddDelayed(delegate {
+                LocalUser.CheckUser();
+                Toolbar.toolbarUserButton.UpdateButton(LocalUser);
+            }, 10000, true);
+
             if (args?.Length > 0)
                 Schedule(delegate { Beatmaps.Import(args); });
+
+            //todo: Some intelligent comment
+            LocalUser = new LocalUser(API);
+            LocalUser.CheckUser();
+            Scheduler.AddDelayed(delegate {
+                LocalUser.CheckUser();
+                Toolbar.toolbarUserButton.UpdateButton(LocalUser);
+                //Debug.Write("Checked!");
+            }, 10000, true);
 
             //attach our bindables to the audio subsystem.
             Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeGlobal));
@@ -89,6 +107,7 @@ namespace osu.Game
                     Handler = globalHotkeyPressed
                 }
             });
+            Toolbar.toolbarUserButton.UpdateButton(LocalUser);
 
             intro.ModePushed += modeAdded;
             intro.Exited += modeRemoved;
