@@ -46,7 +46,8 @@ namespace osu.Game.Overlays
             osuGame = game as OsuGameBase;
 
             beatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
-            current = beatmapSource.Value;
+            beatmapSource.ValueChanged += workingChanged;
+            workingChanged();
             if (database == null) database = osuGame.Beatmaps;
             trackManager = osuGame.Audio.Track;
             playList = database.GetAllWithChildren<BeatmapSetInfo>();
@@ -100,15 +101,9 @@ namespace osu.Game.Overlays
                     {
                         if (current?.Track == null) return;
                         if (current.Track.IsRunning)
-                        {
                             current.Track.Stop();
-                            playButton.Icon = FontAwesome.play_circle_o;
-                        }
                         else
-                        {
                             current.Track.Start();
-                            playButton.Icon = FontAwesome.pause;
-                        }
                     },
                     Children = new Drawable[]
                     {
@@ -184,23 +179,25 @@ namespace osu.Game.Overlays
                 }
             };
 
-            if (current != null)
-            {
-                playButton.Icon = FontAwesome.pause;
-                updateCurrent(current, null);
-            }
-            else if (playList.Count > 0)
-            {
+            if (current == null && playList.Count > 0)
                 play(playList[0].Beatmaps[0], null);
-            }
         }
 
         protected override void Update()
         {
             base.Update();
             if (current?.Track == null) return;
+
             progress.UpdatePosition((float)(current.Track.CurrentTime / current.Track.Length));
+            playButton.Icon = current.Track.IsRunning ? FontAwesome.pause : FontAwesome.play_circle_o;
+
             if (current.Track.HasCompleted) next();
+        }
+
+        private void workingChanged(object sender = null, EventArgs e = null)
+        {
+            if (beatmapSource.Value == current) return;
+            updateCurrent(current, null);
         }
 
         private int findInPlaylist(Beatmap beatmap)
