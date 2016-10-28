@@ -169,7 +169,7 @@ namespace osu.Game.GameModes.Play
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
             base.OnBeatmapChanged(beatmap);
-            selectBeatmap(beatmap.Beatmap.BeatmapInfo);
+            selectBeatmap(beatmap.BeatmapInfo);
         }
 
         private void selectBeatmap(BeatmapInfo beatmap)
@@ -192,7 +192,7 @@ namespace osu.Game.GameModes.Play
         {
             selectedBeatmapInfo = beatmap;
 
-            if (!beatmap.Equals(Beatmap?.Beatmap?.BeatmapInfo))
+            if (!beatmap.Equals(Beatmap?.BeatmapInfo))
             {
                 Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
             }
