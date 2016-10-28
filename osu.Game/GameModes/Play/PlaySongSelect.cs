@@ -152,7 +152,6 @@ namespace osu.Game.GameModes.Play
         protected override void OnResuming(GameMode last)
         {
             ensurePlayingSelected();
-
             base.OnResuming(last);
         }
 
@@ -195,7 +194,7 @@ namespace osu.Game.GameModes.Play
 
             if (!beatmap.Equals(Beatmap?.Beatmap?.BeatmapInfo))
             {
-                Beatmap = database.GetWorkingBeatmap(beatmap);
+                Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
             }
 
             ensurePlayingSelected();
