@@ -34,7 +34,6 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
             ourClock.ProcessFrame();
-            mc?.CurrentTrack?.Stop();
             mc = new MusicController
             {
                 Origin = Anchor.Centre,
