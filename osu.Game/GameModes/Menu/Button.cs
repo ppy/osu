@@ -128,7 +128,7 @@ namespace osu.Game.GameModes.Menu
                 LoopDelay = duration * 2
             });
 
-            icon.Transforms.Add(new TransformPosition()
+            icon.Transforms.Add(new TransformPosition
             {
                 StartValue = Vector2.Zero,
                 EndValue = new Vector2(0, -10),
@@ -139,7 +139,7 @@ namespace osu.Game.GameModes.Menu
                 LoopDelay = duration
             });
 
-            icon.Transforms.Add(new TransformScale()
+            icon.Transforms.Add(new TransformScale
             {
                 StartValue = new Vector2(1, 0.9f),
                 EndValue = Vector2.One,
@@ -150,7 +150,7 @@ namespace osu.Game.GameModes.Menu
                 LoopDelay = duration
             });
 
-            icon.Transforms.Add(new TransformPosition()
+            icon.Transforms.Add(new TransformPosition
             {
                 StartValue = new Vector2(0, -10),
                 EndValue = Vector2.Zero,
@@ -161,7 +161,7 @@ namespace osu.Game.GameModes.Menu
                 LoopDelay = duration
             });
 
-            icon.Transforms.Add(new TransformScale()
+            icon.Transforms.Add(new TransformScale
             {
                 StartValue = Vector2.One,
                 EndValue = new Vector2(1, 0.9f),
