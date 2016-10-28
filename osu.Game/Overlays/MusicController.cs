@@ -32,7 +32,7 @@ namespace osu.Game.Overlays
         private List<BeatmapSetInfo> playList;
         private BeatmapDatabase database;
         private Bindable<WorkingBeatmap> beatmapSource;
-        private AudioTrack CurrentTrack => beatmapSource.Value?.Track;
+        private WorkingBeatmap current;
 
         public MusicController(BeatmapDatabase db = null)
         {
@@ -44,7 +44,8 @@ namespace osu.Game.Overlays
             base.Load(game);
             osuGame = game as OsuGameBase;
 
-            beatmapSource = osuGame.Beatmap;
+            beatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
+            current = beatmapSource.Value;
             if (database == null) database = osuGame.Beatmaps;
             playList = database.Query<BeatmapSetInfo>().ToList();
 
@@ -95,15 +96,15 @@ namespace osu.Game.Overlays
                     Position = new Vector2(0, 30),
                     Action = () =>
                     {
-                        if (CurrentTrack == null) return;
-                        if (CurrentTrack.IsRunning)
+                        if (current?.Track == null) return;
+                        if (current.Track.IsRunning)
                         {
-                            CurrentTrack.Stop();
+                            current.Track.Stop();
                             playButton.Icon = FontAwesome.play_circle_o;
                         }
                         else
                         {
-                            CurrentTrack.Start();
+                            current.Track.Start();
                             playButton.Icon = FontAwesome.pause;
                         }
                     },
@@ -181,10 +182,10 @@ namespace osu.Game.Overlays
                 }
             };
 
-            if (beatmapSource.Value != null)
+            if (current != null)
             {
                 playButton.Icon = FontAwesome.pause;
-                updateCurrent(beatmapSource, null);
+                updateCurrent(current, null);
             }
             else if (playList.Count > 0)
             {
@@ -195,9 +196,9 @@ namespace osu.Game.Overlays
         protected override void Update()
         {
             base.Update();
-            if (CurrentTrack == null) return;
-            progress.UpdatePosition((float)(CurrentTrack.CurrentTime / CurrentTrack.Length));
-            if (CurrentTrack.HasCompleted) next();
+            if (current?.Track == null) return;
+            progress.UpdatePosition((float)(current.Track.CurrentTime / current.Track.Length));
+            if (current.Track.HasCompleted) next();
         }
 
         private int findInPlaylist(Beatmap beatmap)
@@ -211,7 +212,7 @@ namespace osu.Game.Overlays
 
         private void prev()
         {
-            int i = findInPlaylist(beatmapSource.Value?.Beatmap);
+            int i = findInPlaylist(current?.Beatmap);
             if (i == -1) return;
             i = (i - 1 + playList.Count) % playList.Count;
             play(playList[i].Beatmaps[0], false);
@@ -219,7 +220,7 @@ namespace osu.Game.Overlays
 
         private void next()
         {
-            int i = findInPlaylist(beatmapSource.Value?.Beatmap);
+            int i = findInPlaylist(current?.Beatmap);
             if (i == -1) return;
             i = (i + 1) % playList.Count;
             play(playList[i].Beatmaps[0], true);
@@ -227,9 +228,9 @@ namespace osu.Game.Overlays
 
         private void play(BeatmapInfo info, bool? isNext)
         {
-            WorkingBeatmap working = database.GetWorkingBeatmap(info, beatmapSource.Value);
-            beatmapSource.Value = working;
-            updateCurrent(working, isNext);
+            current = database.GetWorkingBeatmap(info, current);
+            beatmapSource.Value = current;
+            updateCurrent(current, isNext);
         }
 
         private void updateCurrent(WorkingBeatmap beatmap, bool? isNext)
@@ -282,8 +283,8 @@ namespace osu.Game.Overlays
 
         private void seek(float position)
         {
-            CurrentTrack?.Seek(CurrentTrack.Length * position);
-            CurrentTrack?.Start();
+            current?.Track?.Seek(current.Track.Length * position);
+            current?.Track?.Start();
         }
 
         //placeholder for toggling
