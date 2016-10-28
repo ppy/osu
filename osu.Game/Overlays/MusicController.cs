@@ -186,6 +186,10 @@ namespace osu.Game.Overlays
                 playButton.Icon = FontAwesome.pause;
                 updateCurrent(beatmapSource, null);
             }
+            else if (playList.Count > 0)
+            {
+                play(playList[0].Beatmaps[0], null);
+            }
         }
 
         protected override void Update()
@@ -196,22 +200,36 @@ namespace osu.Game.Overlays
             if (CurrentTrack.HasCompleted) next();
         }
 
+        private int findInPlaylist(Beatmap beatmap)
+        {
+            if (beatmap == null) return -1;
+            for (int i = 0; i < playList.Count; i++)
+                if (beatmap.BeatmapInfo.BeatmapSetID == playList[i].BeatmapSetID)
+                    return i;
+            return -1;
+        }
+
         private void prev()
         {
-            int i = playList.IndexOf(currentPlay);
+            int i = findInPlaylist(beatmapSource.Value?.Beatmap);
             if (i == -1) return;
             i = (i - 1 + playList.Count) % playList.Count;
-            currentPlay = playList[i];
-            play(currentPlay, false);
+            play(playList[i].Beatmaps[0], false);
         }
 
         private void next()
         {
-            int i = playList.IndexOf(currentPlay);
+            int i = findInPlaylist(beatmapSource.Value?.Beatmap);
             if (i == -1) return;
             i = (i + 1) % playList.Count;
-            currentPlay = playList[i];
-            play(currentPlay, true);
+            play(playList[i].Beatmaps[0], true);
+        }
+
+        private void play(BeatmapInfo info, bool? isNext)
+        {
+            WorkingBeatmap working = database.GetWorkingBeatmap(info, beatmapSource.Value);
+            beatmapSource.Value = working;
+            updateCurrent(working, isNext);
         }
 
         private void updateCurrent(WorkingBeatmap beatmap, bool? isNext)
