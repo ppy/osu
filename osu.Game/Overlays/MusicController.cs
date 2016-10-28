@@ -29,6 +29,7 @@ namespace osu.Game.Overlays
         private SpriteText title, artist;
 
         private OsuGameBase osuGame;
+        private TrackManager trackManager;
         private List<BeatmapSetInfo> playList;
         private BeatmapDatabase database;
         private Bindable<WorkingBeatmap> beatmapSource;
@@ -47,7 +48,8 @@ namespace osu.Game.Overlays
             beatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
             current = beatmapSource.Value;
             if (database == null) database = osuGame.Beatmaps;
-            playList = database.Query<BeatmapSetInfo>().ToList();
+            trackManager = osuGame.Audio.Track;
+            playList = database.GetAllWithChildren<BeatmapSetInfo>();
 
             Width = 400;
             Height = 130;
@@ -229,6 +231,8 @@ namespace osu.Game.Overlays
         private void play(BeatmapInfo info, bool? isNext)
         {
             current = database.GetWorkingBeatmap(info, current);
+            trackManager.SetExclusive(current.Track);
+            current.Track.Start();
             beatmapSource.Value = current;
             updateCurrent(current, isNext);
         }
