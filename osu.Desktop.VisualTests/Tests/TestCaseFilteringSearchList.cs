@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -7,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Desktop.Tests
 {
@@ -22,25 +24,15 @@ namespace osu.Desktop.Tests
         public override void Reset()
         {
             base.Reset();
-            var items = new List<SpriteText>
-            {
-                new SpriteText
-                {
-                    Text = "A search textbox"
-                },
-                new SpriteText
-                {
-                    Text = "A filtering search list"
-                },
-                new SpriteText
-                {
-                    Text = "A dropdown menu"
-                },
-                new SpriteText
-                {
-                    Text = "Possibly more I've missed"
-                }
-            };
+
+            var items = new DirectoryInfo(Environment.CurrentDirectory)
+                .GetFiles()
+                .Select(
+                    f =>
+                        new SpriteText
+                        {
+                            Text = f.Name
+                        }).ToList();
             Children = new Drawable[]
             {
                 new FlowContainer
@@ -54,7 +46,7 @@ namespace osu.Desktop.Tests
                         {
                             Size = new Vector2(300, 30)
                         },
-                        filteringSearchList = new FilteringSearchList<SpriteText>(items)
+                        filteringSearchList = new FilteringSearchList<SpriteText>(items, si => si.Colour = Color4.Orange, nsi => nsi.Colour = Color4.White)
                         {
                             Size = new Vector2(300, 400)
                         }
