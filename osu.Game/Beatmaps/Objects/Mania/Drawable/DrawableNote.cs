@@ -25,8 +25,8 @@ namespace osu.Game.Beatmaps.Objects.Mania.Drawable
             base.Load(game);
             Texture = game.Textures.Get(@"Menu/logo");
 
-            Transforms.Add(new TransformPositionY(Clock) { StartTime = note.StartTime - 200, EndTime = note.StartTime, StartValue = -0.1f, EndValue = 0.9f });
-            Transforms.Add(new TransformAlpha(Clock) { StartTime = note.StartTime + note.Duration + 200, EndTime = note.StartTime + note.Duration + 400, StartValue = 1, EndValue = 0 });
+            Transforms.Add(new TransformPositionY() { StartTime = note.StartTime - 200, EndTime = note.StartTime, StartValue = -0.1f, EndValue = 0.9f });
+            Transforms.Add(new TransformAlpha() { StartTime = note.StartTime + note.Duration + 200, EndTime = note.StartTime + note.Duration + 400, StartValue = 1, EndValue = 0 });
             Expire(true);
         }
     }

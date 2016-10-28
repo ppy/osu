@@ -46,10 +46,11 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(new Player()
             {
-                Beatmap = new Beatmap
-                {
-                    HitObjects = objects
-                }
+                Beatmap = new WorkingBeatmap(
+                    new Beatmap
+                    {
+                        HitObjects = objects
+                    })
             });
         }
 
