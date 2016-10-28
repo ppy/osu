@@ -19,9 +19,13 @@ namespace osu.Game.Beatmaps
             {
                 if (track == null)
                 {
-                    var trackData = Reader.ReadFile(Beatmap.Metadata.AudioFile);
-                    if (trackData != null)
-                        track = new AudioTrackBass(trackData);
+                    try
+                    {
+                        var trackData = Reader.ReadFile(Beatmap.Metadata.AudioFile);
+                        if (trackData != null)
+                            track = new AudioTrackBass(trackData);
+                    }
+                    catch { }
                 }
 
                 return track;
