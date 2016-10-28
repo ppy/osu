@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps.Drawable
 
         private BeatmapGroupState state;
 
-        public IEnumerable<BeatmapPanel> BeatmapPanels;
+        public List<BeatmapPanel> BeatmapPanels;
 
         public BeatmapGroupState State
         {
@@ -43,9 +43,6 @@ namespace osu.Game.Beatmaps.Drawable
                         difficulties.Show();
 
                         header.State = PanelSelectedState.Selected;
-
-                        if (SelectedPanel == null)
-                            ((BeatmapPanel)difficulties.Children.FirstOrDefault()).State = PanelSelectedState.Selected;
                         break;
                     case BeatmapGroupState.Collapsed:
                         FadeTo(0.5f, 250);
@@ -66,13 +63,13 @@ namespace osu.Game.Beatmaps.Drawable
             RelativeSizeAxes = Axes.X;
 
             BeatmapPanels = beatmapSet.Beatmaps.Select(b =>
-                new BeatmapPanel(this.beatmapSet, b)
+                new BeatmapPanel(b)
                 {
                     GainedSelection = panelGainedSelection,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.X,
-                });
+                }).ToList();
                 
 
             Children = new[]
@@ -117,17 +114,25 @@ namespace osu.Game.Beatmaps.Drawable
         {
             State = BeatmapGroupState.Expanded;
 
-            SelectionChanged?.Invoke(this, SelectedPanel.Beatmap);
+            if (SelectedPanel == null)
+                BeatmapPanels.First().State = PanelSelectedState.Selected;
         }
 
         private void panelGainedSelection(BeatmapPanel panel)
         {
-            State = BeatmapGroupState.Expanded;
+            try
+            {
+                if (SelectedPanel == panel) return;
 
-            if (SelectedPanel != null) SelectedPanel.State = PanelSelectedState.NotSelected;
-            SelectedPanel = panel;
-
-            SelectionChanged?.Invoke(this, panel.Beatmap);
+                if (SelectedPanel != null)
+                    SelectedPanel.State = PanelSelectedState.NotSelected;
+                SelectedPanel = panel;
+            }
+            finally
+            {
+                State = BeatmapGroupState.Expanded;
+                SelectionChanged?.Invoke(this, panel.Beatmap);
+            }
         }
     }
 

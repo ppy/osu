@@ -180,8 +180,13 @@ namespace osu.Game.GameModes.Play
             beatmapSetFlow.Children.Cast<BeatmapGroup>().First(b =>
             {
                 var panel = b.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
-                panel?.TriggerClick();
-                return panel != null;
+                if (panel != null)
+                {
+                    panel.State = PanelSelectedState.Selected;
+                    return true;
+                }
+
+                return false;
             });
         }
 
@@ -228,8 +233,20 @@ namespace osu.Game.GameModes.Play
             {
                 var group = new BeatmapGroup(beatmapSet) { SelectionChanged = selectionChanged };
                 beatmapSetFlow.Add(group);
-                if (beatmapSetFlow.Children.Count() == 1)
-                    group.State = BeatmapGroupState.Expanded;
+                if (Beatmap == null)
+                {
+                    if (beatmapSetFlow.Children.Count() == 1)
+                        group.State = BeatmapGroupState.Expanded;
+                }
+                else
+                {
+                    if (selectedBeatmapInfo?.Equals(Beatmap.BeatmapInfo) != true)
+                    {
+                        var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(Beatmap.BeatmapInfo));
+                        if (panel != null)
+                            panel.State = PanelSelectedState.Selected;
+                    }
+                }
             });
         }
 
