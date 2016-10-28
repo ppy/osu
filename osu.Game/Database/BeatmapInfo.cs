@@ -7,7 +7,7 @@ using SQLiteNetExtensions.Attributes;
 
 namespace osu.Game.Database
 {
-    public class BeatmapInfo
+    public class BeatmapInfo : IEquatable<BeatmapInfo>
     {
         [PrimaryKey]
         public int BeatmapID { get; set; }
@@ -64,5 +64,10 @@ namespace osu.Game.Database
         
         // Metadata
         public string Version { get; set; }
+
+        public bool Equals(BeatmapInfo other)
+        {
+            return BeatmapID == other?.BeatmapID;
+        }
     }
 }

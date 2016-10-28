@@ -17,16 +17,15 @@ namespace osu.Game.Beatmaps
         {
             get
             {
-                if (track == null)
+                if (track != null) return track;
+
+                try
                 {
-                    try
-                    {
-                        var trackData = Reader.ReadFile(Beatmap.Metadata.AudioFile);
-                        if (trackData != null)
-                            track = new AudioTrackBass(trackData);
-                    }
-                    catch { }
+                    var trackData = Reader.ReadFile(Beatmap.Metadata.AudioFile);
+                    if (trackData != null)
+                        track = new AudioTrackBass(trackData);
                 }
+                catch { }
 
                 return track;
             }

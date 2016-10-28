@@ -3,17 +3,20 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework.Configuration;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Background;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.GameModes
 {
-    public class OsuGameMode : GameMode
+    public abstract class OsuGameMode : GameMode
     {
         internal BackgroundMode Background { get; private set; }
 
@@ -22,6 +25,64 @@ namespace osu.Game.GameModes
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
         protected virtual BackgroundMode CreateBackground() => null;
+
+        private bool boundToBeatmap;
+        private Bindable<WorkingBeatmap> beatmap;
+
+        public WorkingBeatmap Beatmap
+        {
+            get
+            {
+                bindBeatmap();
+                return beatmap.Value;
+            }
+            set
+            {
+                bindBeatmap();
+                beatmap.Value = value;
+            }
+        }
+
+        private void bindBeatmap()
+        {
+            if (beatmap == null)
+                beatmap = new Bindable<WorkingBeatmap>();
+
+            if (!boundToBeatmap)
+            {
+                beatmap.ValueChanged += beatmap_ValueChanged;
+                boundToBeatmap = true;
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (boundToBeatmap)
+                beatmap.ValueChanged -= beatmap_ValueChanged;
+
+            base.Dispose(isDisposing);
+        }
+
+        private void beatmap_ValueChanged(object sender, EventArgs e)
+        {
+            OnBeatmapChanged(beatmap.Value);
+        }
+
+        public override bool Push(GameMode mode)
+        {
+            OsuGameMode nextOsu = mode as OsuGameMode;
+            if (nextOsu != null)
+            {
+                nextOsu.beatmap = beatmap;
+            }
+
+            return base.Push(mode);
+        }
+
+        protected virtual void OnBeatmapChanged(WorkingBeatmap beatmap)
+        {
+
+        }
 
         protected override void OnEntering(GameMode last)
         {
