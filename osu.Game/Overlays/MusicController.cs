@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
@@ -15,7 +14,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Graphics;
 
@@ -28,7 +26,6 @@ namespace osu.Game.Overlays
         private TextAwesome playButton, listButton;
         private SpriteText title, artist;
 
-        private OsuGameBase osuGame;
         private TrackManager trackManager;
         private List<BeatmapSetInfo> playList;
         private BeatmapDatabase database;
@@ -43,13 +40,17 @@ namespace osu.Game.Overlays
         public override void Load(BaseGame game)
         {
             base.Load(game);
-            osuGame = game as OsuGameBase;
+            var osuGame = game as OsuGameBase;
 
-            beatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
+            if (osuGame != null)
+            {
+                if (database == null) database = osuGame.Beatmaps;
+                trackManager = osuGame.Audio.Track;
+            }
+
+            beatmapSource = osuGame?.Beatmap ?? new Bindable<WorkingBeatmap>();
             beatmapSource.ValueChanged += workingChanged;
             workingChanged();
-            if (database == null) database = osuGame.Beatmaps;
-            trackManager = osuGame.Audio.Track;
             playList = database.GetAllWithChildren<BeatmapSetInfo>();
 
             Width = 400;
