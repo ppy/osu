@@ -2,15 +2,38 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.IO;
 using osu.Framework.Audio.Track;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
+using osu.Game.Database;
 
 namespace osu.Game.Beatmaps
 {
     public class WorkingBeatmap : IDisposable
     {
+        private BeatmapInfo beatmapInfo;
+
         public readonly ArchiveReader Reader;
-        public readonly Beatmap Beatmap;
+
+        private Beatmap beatmap;
+        public Beatmap Beatmap
+        {
+            get
+            {
+                if (beatmap != null) return beatmap;
+
+                try
+                {
+                    using (var stream = new StreamReader(Reader.ReadFile(beatmapInfo.Path)))
+                        beatmap = BeatmapDecoder.GetDecoder(stream)?.Decode(stream);
+                }
+                catch { }
+
+                return beatmap;
+            }
+            set { beatmap = value; }
+        }
 
         private AudioTrack track;
         public AudioTrack Track
@@ -21,7 +44,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    var trackData = Reader.ReadFile(Beatmap.Metadata.AudioFile);
+                    var trackData = Reader.ReadFile(beatmapInfo.Metadata.AudioFile);
                     if (trackData != null)
                         track = new AudioTrackBass(trackData);
                 }
@@ -32,9 +55,9 @@ namespace osu.Game.Beatmaps
             set { track = value; }
         }
 
-        public WorkingBeatmap(Beatmap beatmap, ArchiveReader reader = null)
+        public WorkingBeatmap(BeatmapInfo beatmapInfo = null, ArchiveReader reader = null)
         {
-            Beatmap = beatmap;
+            this.beatmapInfo = beatmapInfo;
             Reader = reader;
         }
 
@@ -53,6 +76,12 @@ namespace osu.Game.Beatmaps
         public void Dispose()
         {
             Dispose(true);
+        }
+
+        public void TransferTo(WorkingBeatmap working)
+        {
+            if (track != null && working.beatmapInfo.Metadata.AudioFile == beatmapInfo.Metadata.AudioFile && working.beatmapInfo.BeatmapSet.Path == beatmapInfo.BeatmapSet.Path)
+                working.track = track;
         }
     }
 }
