@@ -166,6 +166,9 @@ namespace osu.Game.GameModes.Play
         {
         }
 
+        /// <summary>
+        /// The global Beatmap was changed.
+        /// </summary>
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
             base.OnBeatmapChanged(beatmap);
@@ -177,6 +180,7 @@ namespace osu.Game.GameModes.Play
             if (beatmap.Equals(selectedBeatmapInfo))
                 return;
 
+            //this is VERY temporary logic.
             beatmapSetFlow.Children.Cast<BeatmapGroup>().First(b =>
             {
                 var panel = b.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
