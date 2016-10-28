@@ -136,7 +136,7 @@ namespace osu.Game.Database
             return Query<BeatmapSetInfo>().Where(s => s.BeatmapSetID == id).FirstOrDefault();
         }
 
-        public WorkingBeatmap GetBeatmapData(BeatmapInfo beatmapInfo)
+        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {
             var beatmapSet = Query<BeatmapSetInfo>().Where(s => s.BeatmapSetID == beatmapInfo.BeatmapSetID).FirstOrDefault();
             if (beatmapSet == null)
@@ -150,7 +150,7 @@ namespace osu.Game.Database
 
         public Beatmap GetBeatmap(BeatmapInfo beatmapInfo)
         {
-            using (WorkingBeatmap data = GetBeatmapData(beatmapInfo))
+            using (WorkingBeatmap data = GetWorkingBeatmap(beatmapInfo))
                 return data.Beatmap;
         }
 

@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Graphics;
@@ -26,6 +27,8 @@ namespace osu.Game.Beatmaps.Drawable
         private FlowContainer difficulties;
 
         private BeatmapGroupState state;
+
+        public IEnumerable<BeatmapPanel> BeatmapPanels;
 
         public BeatmapGroupState State
         {
@@ -62,6 +65,16 @@ namespace osu.Game.Beatmaps.Drawable
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
+            BeatmapPanels = beatmapSet.Beatmaps.Select(b =>
+                new BeatmapPanel(this.beatmapSet, b)
+                {
+                    GainedSelection = panelGainedSelection,
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.X,
+                });
+                
+
             Children = new[]
             {
                 new FlowContainer
@@ -87,15 +100,7 @@ namespace osu.Game.Beatmaps.Drawable
                             Spacing = new Vector2(0, 5),
                             Direction = FlowDirection.VerticalOnly,
                             Alpha = 0,
-                            Children = this.beatmapSet.Beatmaps.Select(b =>
-                                new BeatmapPanel(this.beatmapSet, b)
-                                {
-                                    GainedSelection = panelGainedSelection,
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
-                                    RelativeSizeAxes = Axes.X,
-                                }
-                            )
+                            Children = BeatmapPanels
                         }
                     }
                 }

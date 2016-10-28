@@ -22,7 +22,6 @@ namespace osu.Game.GameModes.Play
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
         public BeatmapInfo BeatmapInfo;
-        public WorkingBeatmap Beatmap;
 
         public PlayMode PreferredPlayMode;
 
@@ -31,16 +30,13 @@ namespace osu.Game.GameModes.Play
         private InterpolatingFramedClock playerClock;
         private IAdjustableClock sourceClock;
 
-        protected override void Dispose(bool isDisposing)
-        {
-            Beatmap?.Dispose();
-            base.Dispose(isDisposing);
-        }
-
         protected override bool OnExiting(GameMode next)
         {
-            //eagerly dispose as the finalizer runs too late right now.
-            Beatmap?.Dispose();
+            if (next == null)
+            {
+                //eagerly dispose as the finalizer runs too late right now.
+                Beatmap?.Dispose();
+            }
 
             return base.OnExiting(next);
         }
@@ -52,7 +48,7 @@ namespace osu.Game.GameModes.Play
             try
             {
                 if (Beatmap == null)
-                    Beatmap = ((OsuGame)game).Beatmaps.GetBeatmapData(BeatmapInfo);
+                    Beatmap = ((OsuGame)game).Beatmaps.GetWorkingBeatmap(BeatmapInfo);
             }
             catch
             {
@@ -69,27 +65,28 @@ namespace osu.Game.GameModes.Play
                 sourceClock = track;
             }
 
-            sourceClock = (IAdjustableClock)Beatmap.Track ?? new StopwatchClock();
+            sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
             playerClock = new InterpolatingFramedClock(sourceClock);
 
             Schedule(() =>
             {
+                sourceClock.Reset();
                 sourceClock.Start();
             });
 
             HitRenderer hitRenderer;
             ScoreOverlay scoreOverlay;
 
-            if (Beatmap.Beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
+            var beatmap = Beatmap.Beatmap;
+
+            if (beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
             {
                 //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
                 Exit();
                 return;
             }
 
-            PlayMode usablePlayMode = Beatmap.Beatmap.BeatmapInfo?.Mode > PlayMode.Osu ? Beatmap.Beatmap.BeatmapInfo.Mode : PreferredPlayMode;
-
-
+            PlayMode usablePlayMode = beatmap.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode;
 
             switch (usablePlayMode)
             {
@@ -98,7 +95,7 @@ namespace osu.Game.GameModes.Play
 
                     hitRenderer = new OsuHitRenderer
                     {
-                        Objects = Beatmap.Beatmap.HitObjects,
+                        Objects = beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
@@ -108,7 +105,7 @@ namespace osu.Game.GameModes.Play
 
                     hitRenderer = new TaikoHitRenderer
                     {
-                        Objects = Beatmap.Beatmap.HitObjects,
+                        Objects = beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
@@ -118,7 +115,7 @@ namespace osu.Game.GameModes.Play
 
                     hitRenderer = new CatchHitRenderer
                     {
-                        Objects = Beatmap.Beatmap.HitObjects,
+                        Objects = beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
@@ -128,7 +125,7 @@ namespace osu.Game.GameModes.Play
 
                     hitRenderer = new ManiaHitRenderer
                     {
-                        Objects = Beatmap.Beatmap.HitObjects,
+                        Objects = beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
