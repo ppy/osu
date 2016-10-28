@@ -52,7 +52,6 @@ namespace osu.Game
 
         private void Beatmap_ValueChanged(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         public override void Load(BaseGame game)
