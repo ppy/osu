@@ -174,7 +174,7 @@ namespace osu.Game.GameModes.Play
 
         protected virtual void OnCountRolling(ulong currentValue, ulong newValue)
         {
-            transformRoll(new TransformComboRoll(Clock), currentValue, newValue);
+            transformRoll(new TransformComboRoll(), currentValue, newValue);
         }
 
         protected virtual void OnCountIncrement(ulong currentValue, ulong newValue) {
@@ -248,11 +248,11 @@ namespace osu.Game.GameModes.Play
 
         protected class TransformComboRoll : Transform<ulong>
         {
-            public override ulong CurrentValue
+            protected override ulong CurrentValue
             {
                 get
                 {
-                    double time = Time;
+                    double time = CurrentTime ?? 0;
                     if (time < StartTime) return StartValue;
                     if (time >= EndTime) return EndValue;
 
@@ -264,11 +264,6 @@ namespace osu.Game.GameModes.Play
             {
                 base.Apply(d);
                 (d as ComboCounter).DisplayedCount = CurrentValue;
-            }
-
-            public TransformComboRoll(IClock clock)
-                : base(clock)
-            {
             }
         }
     }
