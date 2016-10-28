@@ -20,24 +20,13 @@ namespace osu.Game.Overlays
 {
     public class Toolbar : OverlayContainer
     {
-<<<<<<< HEAD
-=======
-        private APIAccess api;
-        private BaseGame game;
-        private User user;
-
->>>>>>> master
         public Action OnSettings;
         public Action OnHome;
         public Action OnProfile;
         public Action<PlayMode> OnPlayModeChange;
 
         private ToolbarModeSelector modeSelector;
-<<<<<<< HEAD
         public UserButton toolbarUserButton;
-=======
-        private UserButton toolbarUserButton;
->>>>>>> master
 
         private const int transition_time = 200;
         private const float height = 50;
@@ -54,42 +43,10 @@ namespace osu.Game.Overlays
             FadeOut(transition_time, EasingTypes.InQuint);
         }
 
-        private void CheckUser()
-        {
-            if (user == null)
-                return;
-            if (user.UserId == 0)
-            {
-                toolbarUserButton.UpdateButton(1, "Not signed in");
-            }
-            else if (user.UserId != toolbarUserButton.UserId)
-            {
-                toolbarUserButton.UpdateButton(user.UserId, user.Name);
-                toolbarUserButton.UserId = user.UserId;
-            }
-        }
-
-<<<<<<< HEAD
-=======
-        private void InitUser()
-        {
-            MyUser req = new MyUser();
-            api.Queue(req);
-            req.Success += delegate (User MyUser)
-            {
-                this.user = MyUser;
-                CheckUser();
-            };
-        }
-
-
         public override void Load(BaseGame game)
         {
             base.Load(game);
-            api = ((OsuGameBase)game).API;
-            this.game = game;
-            user = new User();
->>>>>>> master
+
             Children = new Drawable[]
             {
                 new Box
@@ -137,11 +94,7 @@ namespace osu.Game.Overlays
                         {
                             Icon = FontAwesome.search
                         },
-<<<<<<< HEAD
                         toolbarUserButton = new UserButton(((OsuGame)game).LocalUser),
-=======
-                        toolbarUserButton = new UserButton(1),
->>>>>>> master
                         new ToolbarButton
                         {
                             Icon = FontAwesome.bars
@@ -149,15 +102,6 @@ namespace osu.Game.Overlays
                     }
                 }
             };
-<<<<<<< HEAD
-=======
-
-            InitUser();
-            Scheduler.AddDelayed(delegate {
-                InitUser();
-            }, 10000, true);
-
->>>>>>> master
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, height);
         }
@@ -165,10 +109,6 @@ namespace osu.Game.Overlays
         protected override void Update()
         {
             base.Update();
-<<<<<<< HEAD
-=======
-            api.Update();
->>>>>>> master
         }
         
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
