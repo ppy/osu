@@ -24,7 +24,7 @@ namespace osu.Game.GameModes.Play
         public BeatmapInfo BeatmapInfo;
         public WorkingBeatmap Beatmap;
 
-        public PlayMode PlayMode;
+        public PlayMode PreferredPlayMode;
 
         protected override IFrameBasedClock Clock => playerClock;
 
@@ -80,7 +80,18 @@ namespace osu.Game.GameModes.Play
             HitRenderer hitRenderer;
             ScoreOverlay scoreOverlay;
 
-            switch (PlayMode)
+            if (Beatmap.Beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
+            {
+                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
+                Exit();
+                return;
+            }
+
+            PlayMode usablePlayMode = Beatmap.Beatmap.BeatmapInfo?.Mode > PlayMode.Osu ? Beatmap.Beatmap.BeatmapInfo.Mode : PreferredPlayMode;
+
+
+
+            switch (usablePlayMode)
             {
                 default:
                     scoreOverlay = new ScoreOverlayOsu();
