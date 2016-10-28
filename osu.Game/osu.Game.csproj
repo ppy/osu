@@ -53,12 +53,27 @@
       <HintPath>..\packages\SQLite.Net-PCL.3.1.1\lib\net4\SQLite.Net.Platform.Win32.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="DotNetZip">
+      <HintPath>$(SolutionDir)\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLiteNetExtensions">
+      <HintPath>$(SolutionDir)\packages\SQLiteNetExtensions.1.3.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\SQLiteNetExtensions.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\Drawable\BeatmapSetHeader.cs" />
+    <Compile Include="Beatmaps\Drawable\BeatmapGroup.cs" />
+    <Compile Include="Beatmaps\Drawable\BeatmapPanel.cs" />
     <Compile Include="Beatmaps\Drawable\DifficultyIcon.cs" />
     <Compile Include="Beatmaps\Drawable\Panel.cs" />
+    <Compile Include="Beatmaps\Events\EventType.cs" />
+    <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
+    <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
+    <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
+    <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
     <Compile Include="Beatmaps\Objects\Catch\CatchConverter.cs" />
     <Compile Include="Beatmaps\Objects\Catch\Drawable\DrawableFruit.cs" />
     <Compile Include="Beatmaps\Objects\DrawableHitObject.cs" />
@@ -90,12 +105,20 @@
     <Compile Include="Beatmaps\Timing\SampleChange.cs" />
     <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
+    <Compile Include="Database\BaseDifficulty.cs" />
+    <Compile Include="Database\BeatmapDatabase.cs" />
+    <Compile Include="Database\BeatmapInfo.cs" />
+    <Compile Include="Database\BeatmapMetadata.cs" />
+    <Compile Include="Database\BeatmapSetInfo.cs" />
     <Compile Include="GameModes\BackgroundMode.cs" />
     <Compile Include="GameModes\Backgrounds\BackgroundModeCustom.cs" />
     <Compile Include="GameModes\Backgrounds\BackgroundModeDefault.cs" />
     <Compile Include="GameModes\Backgrounds\BackgroundModeEmpty.cs" />
     <Compile Include="GameModes\Charts\ChartInfo.cs" />
+    <Compile Include="GameModes\Charts\ChartListing.cs" />
+    <Compile Include="GameModes\Direct\OnlineListing.cs" />
     <Compile Include="GameModes\Edit\Editor.cs" />
+    <Compile Include="GameModes\Edit\EditSongSelect.cs" />
     <Compile Include="GameModes\GameModeWhiteBox.cs" />
     <Compile Include="GameModes\Menu\Button.cs" />
     <Compile Include="GameModes\Menu\FlowContainerWithOrigin.cs" />
@@ -111,57 +134,54 @@
     <Compile Include="GameModes\OsuGameMode.cs" />
     <Compile Include="GameModes\Play\ModSelect.cs" />
     <Compile Include="GameModes\Play\Osu\ScoreOverlayOsu.cs" />
-    <Compile Include="Beatmaps\Drawable\BeatmapGroup.cs" />
-    <Compile Include="Beatmaps\Drawable\BeatmapPanel.cs" />
     <Compile Include="GameModes\Play\Player.cs" />
-    <Compile Include="GameModes\Charts\ChartListing.cs" />
     <Compile Include="GameModes\Play\PlayMode.cs" />
     <Compile Include="GameModes\Play\Results.cs" />
-    <Compile Include="GameModes\Direct\OnlineListing.cs" />
     <Compile Include="GameModes\Play\PlaySongSelect.cs" />
+    <Compile Include="GameModes\Play\Catch\CatchComboCounter.cs" />
     <Compile Include="GameModes\Play\Catch\CatchHitRenderer.cs" />
     <Compile Include="GameModes\Play\Catch\CatchPlayfield.cs" />
     <Compile Include="GameModes\Play\HitRenderer.cs" />
+    <Compile Include="GameModes\Play\Mania\ManiaComboCounter.cs" />
     <Compile Include="GameModes\Play\Mania\ManiaHitRenderer.cs" />
     <Compile Include="GameModes\Play\Mania\ManiaPlayfield.cs" />
+    <Compile Include="GameModes\Play\Osu\OsuComboCounter.cs" />
     <Compile Include="GameModes\Play\Osu\OsuHitRenderer.cs" />
     <Compile Include="GameModes\Play\Osu\OsuPlayfield.cs" />
     <Compile Include="GameModes\Play\Playfield.cs" />
     <Compile Include="GameModes\Play\ScoreOverlay.cs" />
+    <Compile Include="GameModes\Play\Taiko\TaikoComboCounter.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoHitRenderer.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoPlayfield.cs" />
-    <Compile Include="GameModes\Edit\EditSongSelect.cs" />
     <Compile Include="GameModes\Play\ComboCounter.cs" />
     <Compile Include="GameModes\Play\ComboResultCounter.cs" />
-    <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
-    <Compile Include="GameModes\Play\Taiko\TaikoComboCounter.cs" />
-    <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
-    <Compile Include="Input\GlobalHotkeys.cs" />
     <Compile Include="Graphics\Avatar.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\TextAwesome.cs" />
-    <Compile Include="GameModes\Play\Mania\ManiaComboCounter.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounter.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounterKeyboard.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounterCollection.cs" />
     <Compile Include="Graphics\UserInterface\KeyCounterMouse.cs" />
     <Compile Include="Graphics\UserInterface\PercentageCounter.cs" />
+    <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="Graphics\UserInterface\ScoreCounter.cs" />
-    <Compile Include="GameModes\Play\Catch\CatchComboCounter.cs" />
-    <Compile Include="GameModes\Play\Osu\OsuComboCounter.cs" />
     <Compile Include="Graphics\UserInterface\StarCounter.cs" />
+    <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
+    <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
+    <Compile Include="Graphics\UserInterface\Volume\VolumeMeter.cs" />
+    <Compile Include="Input\GlobalHotkeys.cs" />
     <Compile Include="IPC\BeatmapImporter.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
     <Compile Include="Online\API\APIRequest.cs" />
     <Compile Include="Online\API\OAuth.cs" />
     <Compile Include="Online\API\OAuthToken.cs" />
-    <Compile Include="Online\API\SecurePassword.cs" />
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
-    <Compile Include="Online\API\Requests\MyUser.cs" />
     <Compile Include="Online\API\Requests\ListChannels.cs" />
+    <Compile Include="Online\API\Requests\MyUser.cs" />
+    <Compile Include="Online\API\SecurePassword.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\Display\ChannelDisplay.cs" />
     <Compile Include="Online\Chat\Display\ChatLine.cs" />
@@ -179,18 +199,6 @@
     <Compile Include="Overlays\UserButton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\User.cs" />
-    <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
-    <Compile Include="Database\BeatmapDatabase.cs" />
-    <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
-    <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
-    <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
-    <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
-    <Compile Include="Beatmaps\Events\EventType.cs" />
-    <Compile Include="Graphics\UserInterface\Volume\VolumeMeter.cs" />
-    <Compile Include="Database\BeatmapSetInfo.cs" />
-    <Compile Include="Database\BeatmapMetadata.cs" />
-    <Compile Include="Database\BeatmapInfo.cs" />
-    <Compile Include="Database\BaseDifficulty.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
