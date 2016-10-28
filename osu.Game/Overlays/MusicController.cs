@@ -8,11 +8,13 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -29,9 +31,8 @@ namespace osu.Game.Overlays
         private OsuGameBase osuGame;
         private List<BeatmapSetInfo> playList;
         private BeatmapDatabase database;
-        private BeatmapSetInfo currentPlay;
-
-        public AudioTrack CurrentTrack { get; set; }//TODO:gets exterally
+        private Bindable<WorkingBeatmap> beatmapSource;
+        private AudioTrack CurrentTrack => beatmapSource.Value?.Track;
 
         public MusicController(BeatmapDatabase db = null)
         {
@@ -43,9 +44,9 @@ namespace osu.Game.Overlays
             base.Load(game);
             osuGame = game as OsuGameBase;
 
+            beatmapSource = osuGame.Beatmap;
             if (database == null) database = osuGame.Beatmaps;
             playList = database.Query<BeatmapSetInfo>().ToList();
-            currentPlay = playList.FirstOrDefault();
 
             Width = 400;
             Height = 130;
@@ -180,10 +181,10 @@ namespace osu.Game.Overlays
                 }
             };
 
-            if (currentPlay != null)
+            if (beatmapSource.Value != null)
             {
                 playButton.Icon = FontAwesome.pause;
-                play(currentPlay, null);
+                updateCurrent(beatmapSource, null);
             }
         }
 
@@ -213,21 +214,16 @@ namespace osu.Game.Overlays
             play(currentPlay, true);
         }
 
-        private void play(BeatmapSetInfo beatmap, bool? isNext)
+        private void updateCurrent(WorkingBeatmap beatmap, bool? isNext)
         {
-            BeatmapMetadata metadata = osuGame.Beatmaps.Query<BeatmapMetadata>().Where(x => x.ID == beatmap.BeatmapMetadataID).First();
+            BeatmapMetadata metadata = beatmap.Beatmap.Metadata;
             title.Text = metadata.TitleUnicode ?? metadata.Title;
             artist.Text = metadata.ArtistUnicode ?? metadata.Artist;
 
             Sprite newBackground;
 
-            using (ArchiveReader reader = osuGame.Beatmaps.GetReader(currentPlay))
-            {
-                CurrentTrack?.Stop();
-                CurrentTrack = new AudioTrackBass(reader.ReadFile(metadata.AudioFile));
-                CurrentTrack.Start();
-                newBackground = getScaledSprite(TextureLoader.FromStream(reader.ReadFile(metadata.BackgroundFile)));
-            }
+
+            newBackground = getScaledSprite(TextureLoader.FromStream(beatmap.Reader.ReadFile(metadata.BackgroundFile)));
 
             Add(newBackground);
 
