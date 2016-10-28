@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Beatmap.cs" />
+    <Compile Include="Beatmaps\WorkingBeatmap.cs" />
     <Compile Include="Beatmaps\Drawable\BeatmapSetHeader.cs" />
     <Compile Include="Beatmaps\Drawable\DifficultyIcon.cs" />
     <Compile Include="Beatmaps\Drawable\Panel.cs" />
