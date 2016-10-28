@@ -136,16 +136,26 @@ namespace osu.Game.Database
             return Query<BeatmapSetInfo>().Where(s => s.BeatmapSetID == id).FirstOrDefault();
         }
 
-        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
+        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
-            var beatmapSet = Query<BeatmapSetInfo>().Where(s => s.BeatmapSetID == beatmapInfo.BeatmapSetID).FirstOrDefault();
-            if (beatmapSet == null)
+            var beatmapSetInfo = Query<BeatmapSetInfo>().FirstOrDefault(s => s.BeatmapSetID == beatmapInfo.BeatmapSetID);
+
+            //we need metadata
+            GetChildren(beatmapSetInfo);
+
+            if (beatmapSetInfo == null)
                 throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetID} is not in the local database.");
 
-            var reader = GetReader(beatmapSet);
+            var reader = GetReader(beatmapSetInfo);
 
-            using (var stream = new StreamReader(reader.ReadFile(beatmapInfo.Path)))
-                return new WorkingBeatmap(BeatmapDecoder.GetDecoder(stream)?.Decode(stream), reader);
+            if (beatmapInfo.Metadata == null)
+                beatmapInfo.Metadata = beatmapSetInfo.Metadata;
+
+            var working = new WorkingBeatmap(beatmapInfo, reader);
+
+            previous?.TransferTo(working);
+
+            return working;
         }
 
         public Beatmap GetBeatmap(BeatmapInfo beatmapInfo)
