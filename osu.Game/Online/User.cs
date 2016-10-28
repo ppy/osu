@@ -22,20 +22,27 @@ namespace osu.Game.Online
         [JsonProperty(@"id")]
         public int UserId;
 
+<<<<<<< HEAD
         public Sprite Avatar;
         public BaseGame game;
 
         //protected Scheduler Scheduler;
 
+=======
+        //public User MyUser = new User();
+>>>>>>> master
         [JsonConstructor]
         public User()
         {
         }
+<<<<<<< HEAD
 
         public void GetAvatar()
         {
             //todo: find a more permanent solution to accessing LocalUser
             Avatar = new Avatar(this);
         }
+=======
+>>>>>>> master
     }
 }

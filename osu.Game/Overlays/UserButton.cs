@@ -11,6 +11,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Graphics.Primitives;
+<<<<<<< HEAD
 using osu.Game.Online;
 
 namespace osu.Game.Overlays
@@ -23,14 +24,59 @@ namespace osu.Game.Overlays
         protected Container AvatarContainer;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
+=======
+
+namespace osu.Game.Overlays
+{
+    class UserButton : Container
+    {
+        /// <summary>
+        /// Set the text of the user button.
+        /// </summary>
+        public string Text
+        {
+            get { return DrawableText.Text; }
+            set
+            {
+                DrawableText.Text = value;
+            }
+        }
+
+        /// <summary>
+        /// Set the user ID for the current User. Compared to the logged in user during user checks.
+        /// </summary>
+        public int UserId
+        {
+            get { return userId; }
+            set
+            {
+                userId = value;
+            }
+        }
+
+
+        public const float WIDTH = 60;
+        public Action Action;
+        protected Avatar DrawableAvatar;
+        protected SpriteText DrawableText;
+        protected Box HoverBackground;
+        protected int userId;
+>>>>>>> master
 
         /// <summary>
         /// Create a new user button.
         /// </summary>
+<<<<<<< HEAD
         public UserButton(User user)
         {
             DrawableAvatar = new Avatar(user);
             DrawableAvatar.Size = new Vector2(48);
+=======
+        /// <param name="userId">The ID of the desired user</param>
+        public UserButton(int userId)
+        {
+            DrawableAvatar = new Avatar(userId, 48);
+>>>>>>> master
             Children = new Drawable[]
             {
                 HoverBackground = new Box
@@ -51,11 +97,18 @@ namespace osu.Game.Overlays
                     Children = new Drawable[] {
                         DrawableText = new SpriteText
                         {
+<<<<<<< HEAD
                             Text = "Not signed in",
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
                         AvatarContainer = new Container {
+=======
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
+                        new Container {
+>>>>>>> master
                             Margin = new MarginPadding { Left = 5 },
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
@@ -66,7 +119,11 @@ namespace osu.Game.Overlays
                                 DrawableAvatar,
                             },
                         },
+<<<<<<< HEAD
                     }
+=======
+                    },
+>>>>>>> master
                 }
             };
 
@@ -74,6 +131,7 @@ namespace osu.Game.Overlays
             Size = new Vector2(WIDTH, 1);
         }
 
+<<<<<<< HEAD
         public void UpdateButton(LocalUser user)
         {
             AvatarContainer.Clear();
@@ -81,11 +139,21 @@ namespace osu.Game.Overlays
             DrawableAvatar.Size = new Vector2(48);
             if(user.Name != null)
                 DrawableText.Text = user.Name;
+=======
+        public void UpdateButton(int userid, string text)
+        {
+            DrawableAvatar.UpdateAvatar(userid);
+            DrawableText.Text = text;
+>>>>>>> master
         }
 
         protected override void Update()
         {
             base.Update();
+<<<<<<< HEAD
+=======
+            //todo: find a way to avoid using this (autosize needs to be able to ignore certain drawables.. in this case the tooltip)
+>>>>>>> master
             Size = new Vector2(WIDTH + (DrawableText.IsVisible ? DrawableText.Size.X : 0), 1);
         }
 

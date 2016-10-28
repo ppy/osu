@@ -53,14 +53,6 @@
       <HintPath>..\packages\SQLite.Net-PCL.3.1.1\lib\net4\SQLite.Net.Platform.Win32.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="DotNetZip">
-      <HintPath>$(SolutionDir)\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLiteNetExtensions">
-      <HintPath>$(SolutionDir)\packages\SQLiteNetExtensions.1.3.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\SQLiteNetExtensions.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Beatmap.cs" />
@@ -146,6 +138,7 @@
     <Compile Include="GameModes\Play\Taiko\TaikoComboCounter.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
     <Compile Include="Input\GlobalHotkeys.cs" />
+    <Compile Include="Graphics\Avatar.cs" />
     <Compile Include="Graphics\Background\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
@@ -169,6 +162,8 @@
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
     <Compile Include="Online\API\Requests\MyUser.cs" />
     <Compile Include="Online\API\SecurePassword.cs" />
+    <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
+    <Compile Include="Online\API\Requests\MyUser.cs" />
     <Compile Include="Online\API\Requests\ListChannels.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\Display\ChannelDisplay.cs" />
