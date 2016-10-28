@@ -24,7 +24,6 @@ using System.IO;
 using osu.Game.Beatmaps.IO;
 using osu.Framework.Logging;
 using osu.Game.Online;
-using System.Diagnostics;
 
 namespace osu.Game
 {
@@ -89,13 +88,11 @@ namespace osu.Game
 
             base.Load(game);
 
-            //todo: Some intelligent comment
             LocalUser = new LocalUser(API);
             LocalUser.CheckUser();
             Scheduler.AddDelayed(delegate {
                 LocalUser.CheckUser();
                 Toolbar.toolbarUserButton.UpdateButton(LocalUser);
-                //Debug.Write("Checked!");
             }, 10000, true);
 
             //attach our bindables to the audio subsystem.
