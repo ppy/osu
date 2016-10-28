@@ -25,6 +25,7 @@ namespace osu.Game
     {
         public Toolbar Toolbar;
         public ChatConsole Chat;
+        public MusicController MusicController;
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
         private Intro intro;
 
@@ -74,11 +75,13 @@ namespace osu.Game
                 {
                     Beatmap = Beatmap
                 },
+                MusicController = new MusicController(),
                 Toolbar = new Toolbar
                 {
                     OnHome = delegate { MainMenu?.MakeCurrent(); },
                     OnSettings = Options.ToggleVisibility,
                     OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
+                    OnMusicController = MusicController.ToggleVisibility,
                 },
                 Chat = new ChatConsole(API),
                 volume = new VolumeControl

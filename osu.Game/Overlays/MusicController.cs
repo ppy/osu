@@ -35,6 +35,13 @@ namespace osu.Game.Overlays
         public MusicController(BeatmapDatabase db = null)
         {
             database = db;
+            Width = 400;
+            Height = 130;
+            CornerRadius = 5;
+            Masking = true;
+            Anchor = Anchor.TopRight;//placeholder
+            Origin = Anchor.TopRight;
+            Position = new Vector2(10, 50);
         }
 
         public override void Load(BaseGame game)
@@ -52,11 +59,6 @@ namespace osu.Game.Overlays
             beatmapSource.ValueChanged += workingChanged;
             workingChanged();
             playList = database.GetAllWithChildren<BeatmapSetInfo>();
-
-            Width = 400;
-            Height = 130;
-            CornerRadius = 5;
-            Masking = true;
 
             Children = new Drawable[]
             {
