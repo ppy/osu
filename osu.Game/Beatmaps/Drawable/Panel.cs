@@ -37,7 +37,6 @@ namespace osu.Game.Beatmaps.Drawable
             set
             {
                 if (state == value) return;
-
                 state = value;
 
                 switch (state)
