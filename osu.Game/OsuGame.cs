@@ -59,6 +59,15 @@ namespace osu.Game
             if (args?.Length > 0)
                 Schedule(delegate { Beatmaps.Import(args); });
 
+            //todo: Some intelligent comment
+            LocalUser = new LocalUser(API);
+            LocalUser.CheckUser();
+            Scheduler.AddDelayed(delegate {
+                LocalUser.CheckUser();
+                Toolbar.toolbarUserButton.UpdateButton(LocalUser);
+                //Debug.Write("Checked!");
+            }, 10000, true);
+
             //attach our bindables to the audio subsystem.
             Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeGlobal));
             Audio.VolumeSample.Weld(Config.GetBindable<double>(OsuConfig.VolumeEffect));
@@ -89,6 +98,7 @@ namespace osu.Game
                     Handler = globalHotkeyPressed
                 }
             });
+            Toolbar.toolbarUserButton.UpdateButton(LocalUser);
 
             intro.ModePushed += modeAdded;
             intro.Exited += modeRemoved;

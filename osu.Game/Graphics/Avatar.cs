@@ -2,64 +2,56 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using osu.Framework;
-using osu.Framework.Graphics.OpenGL.Textures;
-using osu.Framework.Graphics.OpenGL;
-using System.Net;
-using System.Collections.Generic;
+using osu.Game.Online;
 
 namespace osu.Game.Graphics
 {
     public class Avatar : Sprite
     {
-        private int userId;
-        private int avatarSize = 50;
+        private int? userId;
         private BaseGame game;
 
-        public Avatar(int userid, int avatarsize)
+        public Avatar(User user)
         {
-            this.userId = userid;
-            this.avatarSize = avatarsize;
+            try
+            {
+                userId = user.UserId;
+            }
+            catch { }
         }
 
-        /// <summary>
-        /// Update a given avatar sprite with a new user ID. If the user ID is 1 it will use the guest avatar.
-        /// </summary>
-        /// <param name="userid">The user ID of the desired avatar</param>
-        public async void UpdateAvatar(int userid)
+        public override async void Load(BaseGame game)
         {
-            string url = "https://a.ppy.sh/" + userid.ToString();
+            base.Load(game);
+            this.game = game;
 
-            byte[] imageData = null;
+            Texture tex = null;
 
-            if (userid != 1)
+            if (userId != 0)
             {
                 try
                 {
-                    using (var wc = new System.Net.WebClient())
-                        imageData = await wc.DownloadDataTaskAsync(new System.Uri(url));
+                    tex = await game.Textures.GetAsync($@"https://a.ppy.sh/{userId}");
                 }
                 catch { }
             }
+            else
+            {
+                tex = game.Textures.Get(@"Menu/avatar-guest");
+            }
+
             Scheduler.Add(delegate
             {
-                if (imageData != null)
+                if (tex == null)
                 {
-                    Texture = TextureLoader.FromBytes(imageData);
+                    Expire();
+                    return;
                 }
-            });
-        }
-
-        public override void Load(BaseGame game)
-        {
-            this.game = game;
-            base.Load(game);
-            Texture = game.Textures.Get(@"Menu/avatar-guest");
-            Size = new Vector2(avatarSize);
-            UpdateAvatar(userId);
+                Texture = tex;
+            }, true);
         }
     }
 }
