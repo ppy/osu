@@ -43,7 +43,7 @@ namespace osu.Game.GameModes.Play.Taiko
         protected override void OnDisplayedCountRolling(ulong currentValue, ulong newValue)
         {
             if (newValue == 0)
-                DisplayedCountSpriteText.FadeOut(AnimationDuration);
+                DisplayedCountSpriteText.FadeOut(FadeOutDuration);
             else
                 DisplayedCountSpriteText.Show();
 
