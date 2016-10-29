@@ -70,7 +70,10 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                     ActivateRequested = delegate { volume.Show(); }
                 },
-                intro = new Intro(),
+                intro = new Intro
+                {
+                    Beatmap = Beatmap
+                },
                 Toolbar = new Toolbar
                 {
                     OnHome = delegate { MainMenu?.MakeCurrent(); },

@@ -41,11 +41,11 @@ namespace osu.Game.GameModes.Play
 
         protected class TransformComboResult : Transform<ulong>
         {
-            public override ulong CurrentValue
+            protected override ulong CurrentValue
             {
                 get
                 {
-                    double time = Time;
+                    double time = CurrentTime ?? 0;
                     if (time < StartTime) return StartValue;
                     if (time >= EndTime) return EndValue;
 
@@ -57,11 +57,6 @@ namespace osu.Game.GameModes.Play
             {
                 base.Apply(d);
                 (d as ComboResultCounter).DisplayedCount = CurrentValue;
-            }
-
-            public TransformComboResult(IClock clock)
-                : base(clock)
-            {
             }
         }
     }

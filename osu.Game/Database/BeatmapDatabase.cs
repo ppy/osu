@@ -130,43 +130,56 @@ namespace osu.Game.Database
         {
             return ArchiveReader.GetReader(storage, beatmapSet.Path);
         }
-        
+
         public BeatmapSetInfo GetBeatmapSet(int id)
         {
             return Query<BeatmapSetInfo>().Where(s => s.BeatmapSetID == id).FirstOrDefault();
         }
-        
+
+        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
+        {
+            var beatmapSetInfo = Query<BeatmapSetInfo>().FirstOrDefault(s => s.BeatmapSetID == beatmapInfo.BeatmapSetID);
+
+            //we need metadata
+            GetChildren(beatmapSetInfo);
+
+            if (beatmapSetInfo == null)
+                throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetID} is not in the local database.");
+
+            var reader = GetReader(beatmapSetInfo);
+
+            if (beatmapInfo.Metadata == null)
+                beatmapInfo.Metadata = beatmapSetInfo.Metadata;
+
+            var working = new WorkingBeatmap(beatmapInfo, reader);
+
+            previous?.TransferTo(working);
+
+            return working;
+        }
+
         public Beatmap GetBeatmap(BeatmapInfo beatmapInfo)
         {
-            var beatmapSet = Query<BeatmapSetInfo>()
-                .Where(s => s.BeatmapSetID == beatmapInfo.BeatmapSetID).FirstOrDefault();    
-            if (beatmapSet == null)
-                throw new InvalidOperationException(
-                    $@"Beatmap set {beatmapInfo.BeatmapSetID} is not in the local database.");
-            using (var reader = GetReader(beatmapSet))
-            using (var stream = new StreamReader(reader.ReadFile(beatmapInfo.Path)))
-            {
-                var decoder = BeatmapDecoder.GetDecoder(stream);
-                return decoder.Decode(stream);
-            }
+            using (WorkingBeatmap data = GetWorkingBeatmap(beatmapInfo))
+                return data.Beatmap;
         }
-        
+
         public TableQuery<T> Query<T>() where T : class
         {
             return connection.Table<T>();
         }
-        
+
         public T GetWithChildren<T>(object id) where T : class
         {
             return connection.GetWithChildren<T>(id);
         }
-        
+
         public List<T> GetAllWithChildren<T>(Expression<Func<T, bool>> filter = null,
             bool recursive = true) where T : class
         {
             return connection.GetAllWithChildren<T>(filter, recursive);
         }
-        
+
         public T GetChildren<T>(T item, bool recursive = true)
         {
             if (item == null) return default(T);

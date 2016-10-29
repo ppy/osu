@@ -56,11 +56,11 @@ namespace osu.Game.Graphics.UserInterface
 
         protected class TransformScore : Transform<ulong>
         {
-            public override ulong CurrentValue
+            protected override ulong CurrentValue
             {
                 get
                 {
-                    double time = Time;
+                    double time = CurrentTime ?? 0;
                     if (time < StartTime) return StartValue;
                     if (time >= EndTime) return EndValue;
 
@@ -72,11 +72,6 @@ namespace osu.Game.Graphics.UserInterface
             {
                 base.Apply(d);
                 (d as ScoreCounter).DisplayedCount = CurrentValue;
-            }
-
-            public TransformScore(IClock clock)
-                : base(clock)
-            {
             }
         }
     }

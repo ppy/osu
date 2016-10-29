@@ -44,11 +44,14 @@ namespace osu.Desktop.VisualTests.Tests
                 time += 500;
             }
 
-            Add(new Player()
+            Add(new Player
             {
-                Beatmap = new Beatmap
+                Beatmap = new WorkingBeatmap
                 {
-                    HitObjects = objects
+                    Beatmap = new Beatmap
+                    {
+                        HitObjects = objects
+                    }
                 }
             });
         }

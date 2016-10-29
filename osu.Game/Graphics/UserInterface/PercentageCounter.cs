@@ -57,11 +57,6 @@ namespace osu.Game.Graphics.UserInterface
                 base.Apply(d);
                 (d as PercentageCounter).DisplayedCount = CurrentValue;
             }
-
-            public TransformAccuracy(IClock clock)
-                : base(clock)
-            {
-            }
         }
     }
 }

@@ -29,8 +29,8 @@ namespace osu.Game.Beatmaps.Objects.Taiko.Drawable
 
             Texture = game.Textures.Get(@"Menu/logo");
 
-            Transforms.Add(new TransformPositionX(Clock) { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = 1.1f, EndValue = 0.1f });
-            Transforms.Add(new TransformAlpha(Clock) { StartTime = h.StartTime + h.Duration + 200, EndTime = h.StartTime + h.Duration + 400, StartValue = 1, EndValue = 0 });
+            Transforms.Add(new TransformPositionX { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = 1.1f, EndValue = 0.1f });
+            Transforms.Add(new TransformAlpha { StartTime = h.StartTime + h.Duration + 200, EndTime = h.StartTime + h.Duration + 400, StartValue = 1, EndValue = 0 });
             Expire(true);
         }
     }
