@@ -1,7 +1,6 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Objects;
@@ -12,6 +11,9 @@ using osu.Game.GameModes.Play.Osu;
 using osu.Game.GameModes.Play.Taiko;
 using osu.Framework;
 using osu.Game.Database;
+using osu.Framework.Timing;
+using osu.Framework.GameModes;
+using osu.Framework.Audio.Track;
 
 namespace osu.Game.GameModes.Play
 {
@@ -20,9 +22,13 @@ namespace osu.Game.GameModes.Play
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
         public BeatmapInfo BeatmapInfo;
-        public Beatmap Beatmap;
 
-        public PlayMode PlayMode;
+        public PlayMode PreferredPlayMode;
+
+        protected override IFrameBasedClock Clock => playerClock;
+
+        private InterpolatingFramedClock playerClock;
+        private IAdjustableClock sourceClock;
 
         public override void Load(BaseGame game)
         {
@@ -31,7 +37,7 @@ namespace osu.Game.GameModes.Play
             try
             {
                 if (Beatmap == null)
-                    Beatmap = ((OsuGame)game).Beatmaps.GetBeatmap(BeatmapInfo);
+                    Beatmap = ((OsuGame)game).Beatmaps.GetWorkingBeatmap(BeatmapInfo);
             }
             catch
             {
@@ -40,17 +46,45 @@ namespace osu.Game.GameModes.Play
                 return;
             }
 
+            AudioTrack track = Beatmap.Track;
+
+            if (track != null)
+            {
+                game.Audio.Track.SetExclusive(track);
+                sourceClock = track;
+            }
+
+            sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
+            playerClock = new InterpolatingFramedClock(sourceClock);
+
+            Schedule(() =>
+            {
+                sourceClock.Reset();
+                sourceClock.Start();
+            });
+
             HitRenderer hitRenderer;
             ScoreOverlay scoreOverlay;
 
-            switch (PlayMode)
+            var beatmap = Beatmap.Beatmap;
+
+            if (beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
+            {
+                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
+                Exit();
+                return;
+            }
+
+            PlayMode usablePlayMode = beatmap.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode;
+
+            switch (usablePlayMode)
             {
                 default:
                     scoreOverlay = new ScoreOverlayOsu();
 
                     hitRenderer = new OsuHitRenderer
                     {
-                        Objects = Beatmap.HitObjects,
+                        Objects = beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
@@ -60,7 +94,7 @@ namespace osu.Game.GameModes.Play
 
                     hitRenderer = new TaikoHitRenderer
                     {
-                        Objects = Beatmap.HitObjects,
+                        Objects = beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
@@ -70,7 +104,7 @@ namespace osu.Game.GameModes.Play
 
                     hitRenderer = new CatchHitRenderer
                     {
-                        Objects = Beatmap.HitObjects,
+                        Objects = beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
@@ -80,7 +114,7 @@ namespace osu.Game.GameModes.Play
 
                     hitRenderer = new ManiaHitRenderer
                     {
-                        Objects = Beatmap.HitObjects,
+                        Objects = beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
@@ -95,6 +129,12 @@ namespace osu.Game.GameModes.Play
                 hitRenderer,
                 scoreOverlay,
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            playerClock.ProcessFrame();
         }
     }
 }

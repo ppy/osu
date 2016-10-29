@@ -194,14 +194,12 @@ namespace osu.Game.Graphics.UserInterface
         /// <seealso cref="TransformType"/>
         protected virtual void TransformCount(T currentValue, T newValue)
         {
-            object[] parameters = { Clock };
-
             Debug.Assert(
                 TransformType.IsSubclassOf(typeof(Transform<T>)) || TransformType == typeof(Transform<T>),
                 @"transformType should be a subclass of Transform<T>."
             );
 
-            TransformCount((Transform<T>)Activator.CreateInstance(TransformType, parameters), currentValue, newValue);
+            TransformCount((Transform<T>)Activator.CreateInstance(TransformType), currentValue, newValue);
         }
 
         /// <summary>

@@ -16,8 +16,11 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using System.Threading.Tasks;
+using osu.Framework.Audio.Track;
 using osu.Game.Beatmaps.Drawable;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Beatmaps;
+using osu.Framework.GameModes;
 
 namespace osu.Game.GameModes.Play
 {
@@ -26,10 +29,12 @@ namespace osu.Game.GameModes.Play
         private Bindable<PlayMode> playMode;
         private BeatmapDatabase database;
         private BeatmapGroup selectedBeatmapGroup;
+        private BeatmapInfo selectedBeatmapInfo;
         // TODO: use currently selected track as bg
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
         private ScrollContainer scrollContainer;
-        private FlowContainer setList;
+        private FlowContainer beatmapSetFlow;
+        private TrackManager trackManager;
 
         /// <param name="database">Optionally provide a database to use instead of the OsuGame one.</param>
         public PlaySongSelect(BeatmapDatabase database = null)
@@ -73,7 +78,7 @@ namespace osu.Game.GameModes.Play
                     Origin = Anchor.CentreRight,
                     Children = new Drawable[]
                     {
-                        setList = new FlowContainer
+                        beatmapSetFlow = new FlowContainer
                         {
                             Padding = new MarginPadding { Left = 25, Top = 25, Bottom = 25 + bottomToolHeight },
                             RelativeSizeAxes = Axes.X,
@@ -107,7 +112,7 @@ namespace osu.Game.GameModes.Play
                             Colour = new Color4(238, 51, 153, 255),
                             Action = () => Push(new Player {
                                 BeatmapInfo = selectedBeatmapGroup.SelectedPanel.Beatmap,
-                                PlayMode = playMode.Value
+                                PreferredPlayMode = playMode.Value
                             }),
                         },
                     }
@@ -123,7 +128,7 @@ namespace osu.Game.GameModes.Play
             if (osuGame != null)
             {
                 playMode = osuGame.PlayMode;
-                playMode.ValueChanged += PlayMode_ValueChanged;
+                playMode.ValueChanged += playMode_ValueChanged;
                 // Temporary:
                 scrollContainer.Padding = new MarginPadding { Top = osuGame.Toolbar.Height };
             }
@@ -133,22 +138,76 @@ namespace osu.Game.GameModes.Play
 
             database.BeatmapSetAdded += s => Schedule(() => addBeatmapSet(s));
 
+            trackManager = game.Audio.Track;
+
             Task.Factory.StartNew(addBeatmapSets);
+        }
+
+        protected override void OnEntering(GameMode last)
+        {
+            base.OnEntering(last);
+            ensurePlayingSelected();
+        }
+
+        protected override void OnResuming(GameMode last)
+        {
+            ensurePlayingSelected();
+            base.OnResuming(last);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
             if (playMode != null)
-                playMode.ValueChanged -= PlayMode_ValueChanged;
+                playMode.ValueChanged -= playMode_ValueChanged;
         }
 
-        private void PlayMode_ValueChanged(object sender, EventArgs e)
+        private void playMode_ValueChanged(object sender, EventArgs e)
         {
         }
 
-        private void selectBeatmap(BeatmapGroup group, BeatmapInfo beatmap)
+        /// <summary>
+        /// The global Beatmap was changed.
+        /// </summary>
+        protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
+            base.OnBeatmapChanged(beatmap);
+            selectBeatmap(beatmap.BeatmapInfo);
+        }
+
+        private void selectBeatmap(BeatmapInfo beatmap)
+        {
+            if (beatmap.Equals(selectedBeatmapInfo))
+                return;
+
+            //this is VERY temporary logic.
+            beatmapSetFlow.Children.Cast<BeatmapGroup>().Any(b =>
+            {
+                var panel = b.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
+                if (panel != null)
+                {
+                    panel.State = PanelSelectedState.Selected;
+                    return true;
+                }
+
+                return false;
+            });
+        }
+
+        /// <summary>
+        /// selection has been changed as the result of interaction with the carousel.
+        /// </summary>
+        private void selectionChanged(BeatmapGroup group, BeatmapInfo beatmap)
+        {
+            selectedBeatmapInfo = beatmap;
+
+            if (!beatmap.Equals(Beatmap?.BeatmapInfo))
+            {
+                Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
+            }
+
+            ensurePlayingSelected();
+
             if (selectedBeatmapGroup == group)
                 return;
 
@@ -158,6 +217,17 @@ namespace osu.Game.GameModes.Play
             selectedBeatmapGroup = group;
         }
 
+        private void ensurePlayingSelected()
+        {
+            var track = Beatmap?.Track;
+
+            if (track != null)
+            {
+                trackManager.SetExclusive(track);
+                track.Start();
+            }
+        }
+
         private void addBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
@@ -165,10 +235,22 @@ namespace osu.Game.GameModes.Play
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty).ToList();
             Schedule(() =>
             {
-                var group = new BeatmapGroup(beatmapSet) { SelectionChanged = selectBeatmap };
-                setList.Add(group);
-                if (setList.Children.Count() == 1)
-                    group.State = BeatmapGroupState.Expanded;
+                var group = new BeatmapGroup(beatmapSet) { SelectionChanged = selectionChanged };
+                beatmapSetFlow.Add(group);
+                if (Beatmap == null)
+                {
+                    if (beatmapSetFlow.Children.Count() == 1)
+                        group.State = BeatmapGroupState.Expanded;
+                }
+                else
+                {
+                    if (selectedBeatmapInfo?.Equals(Beatmap.BeatmapInfo) != true)
+                    {
+                        var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(Beatmap.BeatmapInfo));
+                        if (panel != null)
+                            panel.State = PanelSelectedState.Selected;
+                    }
+                }
             });
         }
 

@@ -10,7 +10,7 @@ namespace osu.Game.Tests.Beatmaps.IO
     [TestFixture]
     public class OszArchiveReaderTest
     {
-        [TestFixtureSetUp]
+        [OneTimeSetUpAttribute]
         public void SetUp()
         {
             OszArchiveReader.Register();
