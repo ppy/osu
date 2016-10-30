@@ -3,6 +3,7 @@
 
 using System;
 using OpenTK;
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -16,9 +17,8 @@ namespace osu.Game.Graphics.TimeDisplay
         private float textSize;
         private Vector2 textPos;
 
-        public override void Load()
+        public TimeDisplay()
         {
-            base.Load();
             Children = new Drawable[]
             {
                 timeText = new SpriteText()
@@ -26,6 +26,12 @@ namespace osu.Game.Graphics.TimeDisplay
                     Direction = FlowDirection.HorizontalOnly,
                 }
             };
+        }
+
+        public override void Load(BaseGame game)
+        {
+            base.Load(game);
+
         }
 
         protected override void Update()
