@@ -13,9 +13,10 @@ namespace osu.Game.Graphics.TimeDisplay
     public class TimeDisplay : Container
     {
         private SpriteText timeText;
-        private string format;
-        private float textSize;
-        private Vector2 textPos;
+
+        public string Format;
+        public float TextSize;
+        public Vector2 TextPosition;
 
         public TimeDisplay()
         {
@@ -41,28 +42,5 @@ namespace osu.Game.Graphics.TimeDisplay
             timeText.Position = textPos;
         }
 
-        public string Format
-        {
-            set
-            {
-                format = value;
-            }
-        }
-
-        public float TextSize
-        {
-            set
-            {
-                textSize = value;
-            }
-        }
-
-        public Vector2 TextPosition
-        {
-            set
-            {
-                textPos = value;
-            }
-        }
     }
 }
