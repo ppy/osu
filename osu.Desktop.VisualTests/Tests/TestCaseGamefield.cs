@@ -1,10 +1,11 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
+using System.Collections.Generic;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
@@ -12,10 +13,9 @@ using osu.Game.GameModes.Play.Catch;
 using osu.Game.GameModes.Play.Mania;
 using osu.Game.GameModes.Play.Osu;
 using osu.Game.GameModes.Play.Taiko;
-using System.Collections.Generic;
-using osu.Framework.Timing;
+using OpenTK;
 
-namespace osu.Desktop.Tests
+namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseGamefield : TestCase
     {
@@ -23,7 +23,7 @@ namespace osu.Desktop.Tests
 
         public override string Description => @"Showing hitobjects and what not.";
 
-        FramedOffsetClock localClock;
+        FramedClock localClock;
 
         protected override IFrameBasedClock Clock => localClock;
 
@@ -32,9 +32,7 @@ namespace osu.Desktop.Tests
             base.Reset();
 
             //ensure we are at offset 0
-            if (localClock == null)
-                localClock = new FramedOffsetClock(base.Clock);
-            localClock.Offset = -base.Clock.CurrentTime;
+            localClock = new FramedClock();
 
             List<HitObject> objects = new List<HitObject>();
 

@@ -2,18 +2,20 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK.Input;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.MathUtils;
+using osu.Game.GameModes.Play;
+using osu.Game.GameModes.Play.Catch;
+using osu.Game.GameModes.Play.Mania;
+using osu.Game.GameModes.Play.Osu;
+using osu.Game.GameModes.Play.Taiko;
 using osu.Game.Graphics.UserInterface;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Graphics.Transformations;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.MathUtils;
-using osu.Framework.Graphics.Sprites;
 
-namespace osu.Desktop.Tests
+namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseScoreCounter : TestCase
     {
@@ -25,134 +27,150 @@ namespace osu.Desktop.Tests
         {
             base.Reset();
 
-            ScoreCounter uc = new ScoreCounter
+            int numerator = 0, denominator = 0;
+
+            bool maniaHold = false;
+
+            ScoreCounter score = new ScoreCounter(7)
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
                 TextSize = 40,
-                RollingDuration = 1000,
-                RollingEasing = EasingTypes.Out,
                 Count = 0,
                 Position = new Vector2(20, 20),
-                LeadingZeroes = 7,
             };
-            Add(uc);
+            Add(score);
 
-            StandardComboCounter sc = new StandardComboCounter
+            ComboCounter standardCombo = new OsuComboCounter
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
-                Position = new Vector2(20, 20),
-                IsRollingProportional = true,
-                RollingDuration = 20,
-                PopOutDuration = 250,
+                Position = new Vector2(10, 10),
+                InnerCountPosition = new Vector2(10, 10),
                 Count = 0,
                 TextSize = 40,
             };
-            Add(sc);
+            Add(standardCombo);
 
-            CatchComboCounter cc = new CatchComboCounter
+            CatchComboCounter catchCombo = new CatchComboCounter
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                IsRollingProportional = true,
-                RollingDuration = 20,
-                PopOutDuration = 250,
                 Count = 0,
                 TextSize = 40,
             };
-            Add(cc);
+            Add(catchCombo);
 
-            AlternativeComboCounter ac = new AlternativeComboCounter
+            ComboCounter taikoCombo = new TaikoComboCounter
             {
-                Origin = Anchor.BottomLeft,
-                Anchor = Anchor.BottomLeft,
-                Position = new Vector2(20, 80),
-                IsRollingProportional = true,
-                RollingDuration = 20,
-                ScaleFactor = 2,
+                Origin = Anchor.BottomCentre,
+                Anchor = Anchor.Centre,
+                Position = new Vector2(0, -160),
                 Count = 0,
                 TextSize = 40,
             };
-            Add(ac);
+            Add(taikoCombo);
+
+            ManiaComboCounter maniaCombo = new ManiaComboCounter
+            {
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                Position = new Vector2(0, -80),
+                Count = 0,
+                TextSize = 40,
+            };
+            Add(maniaCombo);
 
 
-            AccuracyCounter pc = new AccuracyCounter
+            PercentageCounter accuracyCombo = new PercentageCounter
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
-                RollingDuration = 1000,
-                RollingEasing = EasingTypes.Out,
-                Count = 100.0f,
                 Position = new Vector2(20, 60),
             };
-            Add(pc);
+            Add(accuracyCombo);
 
-            SpriteText text = new SpriteText
-            {
-                Origin = Anchor.BottomLeft,
-                Anchor = Anchor.BottomLeft,
-                Position = new Vector2(20, 190),
-                Text = @"- unset -",
-            };
-            Add(text);
-
-            StarCounter tc = new StarCounter
+            StarCounter stars = new StarCounter
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 Position = new Vector2(20, 160),
+                Count = 5,
             };
-            Add(tc);
+            Add(stars);
+
+            SpriteText starsLabel = new SpriteText
+            {
+                Origin = Anchor.BottomLeft,
+                Anchor = Anchor.BottomLeft,
+                Position = new Vector2(20, 190),
+                Text = stars.Count.ToString("0.00"),
+            };
+            Add(starsLabel);
 
             AddButton(@"Reset all", delegate
             {
-                uc.Count = 0;
-                sc.Count = 0;
-                ac.Count = 0;
-                cc.Count = 0;
-                pc.SetCount(0, 0);
-                tc.Count = 0;
-                text.Text = tc.Count.ToString("0.00");
+                score.Count = 0;
+                standardCombo.Count = 0;
+                taikoCombo.Count = 0;
+                maniaCombo.Count = 0;
+                catchCombo.Count = 0;
+                numerator = denominator = 0;
+                accuracyCombo.SetFraction(0, 0);
+                stars.Count = 0;
+                starsLabel.Text = stars.Count.ToString("0.00");
             });
 
             AddButton(@"Hit! :D", delegate
             {
-                uc.Count += 300 + (ulong)(300.0 * (sc.Count > 0 ? sc.Count - 1 : 0) / 25.0);
-                sc.Count++;
-                ac.Count++;
-                cc.CatchFruit(new Color4(
+                score.Count += 300 + (ulong)(300.0 * (standardCombo.Count > 0 ? standardCombo.Count - 1 : 0) / 25.0);
+                standardCombo.Count++;
+                taikoCombo.Count++;
+                maniaCombo.Count++;
+                catchCombo.CatchFruit(new Color4(
                     Math.Max(0.5f, RNG.NextSingle()),
                     Math.Max(0.5f, RNG.NextSingle()),
                     Math.Max(0.5f, RNG.NextSingle()),
                     1)
                 );
-                pc.Numerator++;
-                pc.Denominator++;
+                numerator++; denominator++;
+                accuracyCombo.SetFraction(numerator, denominator);
             });
 
             AddButton(@"miss...", delegate
             {
-                sc.Count = 0;
-                ac.Count = 0;
-                cc.Count = 0;
-                pc.Denominator++;
+                standardCombo.Roll();
+                taikoCombo.Roll();
+                maniaCombo.Roll();
+                catchCombo.Roll();
+                denominator++;
+                accuracyCombo.SetFraction(numerator, denominator);
+            });
+
+            AddButton(@"mania hold", delegate
+            {
+                if (!maniaHold)
+                    maniaCombo.HoldStart();
+                else
+                    maniaCombo.HoldEnd();
+                maniaHold = !maniaHold;
             });
 
             AddButton(@"Alter stars", delegate
             {
-                tc.Count = RNG.NextSingle() * (tc.MaxStars + 1);
-                text.Text = tc.Count.ToString("0.00");
+                stars.Count = RNG.NextSingle() * (stars.MaxStars + 1);
+                starsLabel.Text = stars.Count.ToString("0.00");
             });
 
             AddButton(@"Stop counters", delegate
             {
-                uc.StopRolling();
-                sc.StopRolling();
-                cc.StopRolling();
-                ac.StopRolling();
-                pc.StopRolling();
-                tc.StopRolling();
+                score.StopRolling();
+                standardCombo.StopRolling();
+                catchCombo.StopRolling();
+                taikoCombo.StopRolling();
+                maniaCombo.StopRolling();
+                accuracyCombo.StopRolling();
+                stars.StopAnimation();
             });
         }
     }

@@ -1,112 +1,140 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Objects;
-using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.GameModes.Backgrounds;
 using osu.Game.GameModes.Play.Catch;
 using osu.Game.GameModes.Play.Mania;
 using osu.Game.GameModes.Play.Osu;
 using osu.Game.GameModes.Play.Taiko;
-using osu.Game.Graphics.UserInterface;
-using OpenTK;
-using OpenTK.Input;
+using osu.Framework;
+using osu.Game.Database;
+using osu.Framework.Timing;
+using osu.Framework.GameModes;
+using osu.Framework.Audio.Track;
 
 namespace osu.Game.GameModes.Play
 {
-    class Player : GameModeWhiteBox
+    public class Player : OsuGameMode
     {
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
-        protected override IEnumerable<Type> PossibleChildren => new[] {
-                typeof(Results)
-        };
+        public BeatmapInfo BeatmapInfo;
 
-        public override void Load()
+        public PlayMode PreferredPlayMode;
+
+        protected override IFrameBasedClock Clock => playerClock;
+
+        private InterpolatingFramedClock playerClock;
+        private IAdjustableClock sourceClock;
+
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
-            List<HitObject> objects = new List<HitObject>();
-
-            double time = Time + 1000;
-            for (int i = 0; i < 100; i++)
+            try
             {
-                objects.Add(new Circle()
-                {
-                    StartTime = time,
-                    Position = new Vector2(RNG.Next(0, 512), RNG.Next(0, 384))
-                });
-
-                time += RNG.Next(50, 500);
+                if (Beatmap == null)
+                    Beatmap = ((OsuGame)game).Beatmaps.GetWorkingBeatmap(BeatmapInfo);
+            }
+            catch
+            {
+                //couldn't load, hard abort!
+                Exit();
+                return;
             }
 
-            Beatmap beatmap = new Beatmap
-            {
-                HitObjects = objects
-            };
+            AudioTrack track = Beatmap.Track;
 
-            OsuGame osu = Game as OsuGame;
-
-            switch (osu.PlayMode.Value)
+            if (track != null)
             {
-                case PlayMode.Osu:
-                    Add(new OsuHitRenderer
+                game.Audio.Track.SetExclusive(track);
+                sourceClock = track;
+            }
+
+            sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
+            playerClock = new InterpolatingFramedClock(sourceClock);
+
+            Schedule(() =>
+            {
+                sourceClock.Reset();
+                sourceClock.Start();
+            });
+
+            HitRenderer hitRenderer;
+            ScoreOverlay scoreOverlay;
+
+            var beatmap = Beatmap.Beatmap;
+
+            if (beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
+            {
+                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
+                Exit();
+                return;
+            }
+
+            PlayMode usablePlayMode = beatmap.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode;
+
+            switch (usablePlayMode)
+            {
+                default:
+                    scoreOverlay = new ScoreOverlayOsu();
+
+                    hitRenderer = new OsuHitRenderer
                     {
                         Objects = beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
-                    });
+                    };
                     break;
                 case PlayMode.Taiko:
-                    Add(new TaikoHitRenderer
+                    scoreOverlay = new ScoreOverlayOsu();
+
+                    hitRenderer = new TaikoHitRenderer
                     {
                         Objects = beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
-                    });
+                    };
                     break;
                 case PlayMode.Catch:
-                    Add(new CatchHitRenderer
+                    scoreOverlay = new ScoreOverlayOsu();
+
+                    hitRenderer = new CatchHitRenderer
                     {
                         Objects = beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
-                    });
+                    };
                     break;
                 case PlayMode.Mania:
-                    Add(new ManiaHitRenderer
+                    scoreOverlay = new ScoreOverlayOsu();
+
+                    hitRenderer = new ManiaHitRenderer
                     {
                         Objects = beatmap.HitObjects,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
-                    });
+                    };
                     break;
             }
 
-            Add(new KeyCounterCollection
+            hitRenderer.OnHit += delegate (HitObject h) { scoreOverlay.OnHit(h); };
+            hitRenderer.OnMiss += delegate (HitObject h) { scoreOverlay.OnMiss(h); };
+
+            Children = new Drawable[]
             {
-                IsCounting = true,
-                FadeTime = 50,
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight,
-                Position = new Vector2(10, 50),
-                Counters = new KeyCounter[]
-                {
-                    new KeyCounterKeyboard(@"Z", Key.Z),
-                    new KeyCounterKeyboard(@"X", Key.X),
-                    new KeyCounterMouse(@"M1", MouseButton.Left),
-                    new KeyCounterMouse(@"M2", MouseButton.Right),
-                }
-            });
+                hitRenderer,
+                scoreOverlay,
+            };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            playerClock.ProcessFrame();
         }
     }
 }

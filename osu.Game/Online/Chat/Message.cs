@@ -12,13 +12,13 @@ namespace osu.Game.Online.Chat
         public long Id;
 
         [JsonProperty(@"user_id")]
-        public string UserId;
+        public int UserId;
 
         [JsonProperty(@"channel_id")]
-        public string ChannelId;
+        public int ChannelId;
 
         [JsonProperty(@"timestamp")]
-        public DateTime Timestamp;
+        public DateTimeOffset Timestamp;
 
         [JsonProperty(@"content")]
         public string Content;

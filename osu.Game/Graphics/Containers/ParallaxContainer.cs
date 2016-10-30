@@ -2,6 +2,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using OpenTK;
+using osu.Framework;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -26,14 +27,14 @@ namespace osu.Game.Graphics.Containers
 
         protected override Container Content => content;
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
         }
 
         protected override bool OnMouseMove(InputState state)
         {
-            content.Position = (state.Mouse.Position - Size / 2) * ParallaxAmount;
+            content.Position = (state.Mouse.Position - DrawSize / 2) * ParallaxAmount;
             return base.OnMouseMove(state);
         }
 

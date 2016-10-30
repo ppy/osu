@@ -1,5 +1,10 @@
-﻿using osu.Framework.Graphics;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using System;
 using System.Collections.Generic;
@@ -10,14 +15,6 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    /// <summary>
-    /// Skeleton for a counter which value rolls-up in a lapse of time.
-    /// </summary>
-    /// <remarks>
-    /// This class only abstracts the basics to roll-up a value in a lapse of time by using Transforms.
-    /// In order to show a value, you must implement a way to display it, i.e., as a numeric counter or a bar.
-    /// </remarks>
-    /// <typeparam name="T">Type of the actual counter.</typeparam>
     public abstract class RollingCounter<T> : Container
     {
         /// <summary>
@@ -26,51 +23,43 @@ namespace osu.Game.Graphics.UserInterface
         /// <remarks>
         /// Must be a subclass of Transform<T>
         /// </remarks>
-        protected virtual Type transformType => typeof(Transform<T>);
+        protected virtual Type TransformType => typeof(Transform<T>);
 
-        protected ulong RollingTotalDuration = 0;
-
-        /// <summary>
-        /// If true, each time the Count is updated, it will roll over from the current visible value.
-        /// Else, it will roll up from the current count value.
-        /// </summary>
-        public bool IsRollingContinuous = true;
+        protected SpriteText DisplayedCountSpriteText;
 
         /// <summary>
-        /// If true, the roll-up duration will be proportional to the counter.
+        /// If true, the roll-up duration will be proportional to change in value.
         /// </summary>
-        public bool IsRollingProportional = false;
+        protected virtual bool IsRollingProportional => false;
 
         /// <summary>
         /// If IsRollingProportional = false, duration in milliseconds for the counter roll-up animation for each
         /// element; else duration in milliseconds for the counter roll-up animation in total.
         /// </summary>
-        public ulong RollingDuration = 0;
+        protected virtual double RollingDuration => 0;
 
         /// <summary>
         /// Easing for the counter rollover animation.
         /// </summary>
-        public EasingTypes RollingEasing = EasingTypes.None;
+        protected virtual EasingTypes RollingEasing => EasingTypes.None;
 
-        protected T prevVisibleCount;
-        protected T visibleCount;
+        private T displayedCount;
 
         /// <summary>
         /// Value shown at the current moment.
         /// </summary>
-        public virtual T VisibleCount
+        public virtual T DisplayedCount
         {
             get
             {
-                return visibleCount;
+                return displayedCount;
             }
             protected set
             {
-                prevVisibleCount = visibleCount;
-                if (visibleCount.Equals(value))
+                if (displayedCount.Equals(value))
                     return;
-                visibleCount = value;
-                transformVisibleCount(prevVisibleCount, value);
+                displayedCount = value;
+                DisplayedCountSpriteText.Text = FormatCount(value);
             }
         }
 
@@ -90,32 +79,57 @@ namespace osu.Game.Graphics.UserInterface
             {
                 prevCount = count;
                 count = value;
-                if (Clock != null)
+                if (IsLoaded)
                 {
-                    RollingTotalDuration =
-                        IsRollingProportional
-                            ? getProportionalDuration(VisibleCount, value)
-                            : RollingDuration;
-                    transformCount(IsRollingContinuous ? VisibleCount : prevCount, value);
+                    TransformCount(displayedCount, count);
                 }
             }
         }
 
-        protected RollingCounter()
+        public void Set(T value)
         {
-            Debug.Assert(
-                transformType.IsSubclassOf(typeof(Transform<T>)) || transformType == typeof(Transform<T>),
-                @"transformType should be a subclass of Transform<T>."
-            );
+            Count = value;
         }
 
-        public override void Load()
+        public abstract void Increment(T amount);
+
+        protected float textSize;
+
+        public float TextSize
         {
-            base.Load();
-            removeTransforms(transformType);
-            if (Count == null)
-                ResetCount();
-            VisibleCount = Count;
+            get { return textSize; }
+            set
+            {
+                textSize = value;
+                DisplayedCountSpriteText.TextSize = value;
+            }
+        }
+
+        /// <summary>
+        /// Skeleton of a numeric counter which value rolls over time.
+        /// </summary>
+        protected RollingCounter()
+        {
+            Children = new Drawable[]
+            {
+                DisplayedCountSpriteText = new SpriteText(),
+            };
+
+            TextSize = 40;
+            AutoSizeAxes = Axes.Both;
+        }
+
+        public override void Load(BaseGame game)
+        {
+            base.Load(game);
+
+            Flush(false, TransformType);
+
+            DisplayedCount = Count;
+
+            DisplayedCountSpriteText.Text = FormatCount(count);
+            DisplayedCountSpriteText.Anchor = this.Anchor;
+            DisplayedCountSpriteText.Origin = this.Origin;
         }
 
         /// <summary>
@@ -129,18 +143,21 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         /// <summary>
-        /// Stops rollover animation, forcing the visible count to be the actual count.
+        /// Stops rollover animation, forcing the displayed count to be the actual count.
         /// </summary>
         public virtual void StopRolling()
         {
-            removeTransforms(transformType);
-            VisibleCount = Count;
+            Flush(false, TransformType);
+            DisplayedCount = Count;
         }
 
         /// <summary>
         /// Resets count to default value.
         /// </summary>
-        public abstract void ResetCount();
+        public virtual void ResetCount()
+        {
+            SetCountWithoutRolling(default(T));
+        }
 
         /// <summary>
         /// Calculates the duration of the roll-up animation by using the difference between the current visible value
@@ -153,7 +170,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="currentValue">Current visible value.</param>
         /// <param name="newValue">New final value.</param>
         /// <returns>Calculated rollover duration in milliseconds.</returns>
-        protected virtual ulong getProportionalDuration(T currentValue, T newValue)
+        protected virtual double GetProportionalDuration(T currentValue, T newValue)
         {
             return RollingDuration;
         }
@@ -163,21 +180,9 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         /// <param name="count">Count to format.</param>
         /// <returns>Count formatted as a string.</returns>
-        protected virtual string formatCount(T count)
+        protected virtual string FormatCount(T count)
         {
             return count.ToString();
-        }
-
-        protected void updateTransforms(Type type)
-        {
-            foreach (ITransform t in Transforms.AliveItems)
-                if (t.GetType() == type)
-                    t.Apply(this);
-        }
-
-        protected void removeTransforms(Type type)
-        {
-            Transforms.RemoveAll(t => t.GetType() == type);
         }
 
         /// <summary>
@@ -186,55 +191,47 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         /// <param name="currentValue">Count value before modification.</param>
         /// <param name="newValue">Expected count value after modification-</param>
-        /// <remarks>
-        /// Unless you need to set a custom animation according to the current or new value of the count, the
-        /// recommended approach is to call transformCount(CustomTransformer(Clock), currentValue, newValue), where
-        /// CustomTransformer is of type transformerType.
-        /// By using this approach, there is no need to check if the Clock is not null; this validation is done before
-        /// adding the transformer.
-        /// </remarks>
-        /// <seealso cref="transformType"/>
-        protected virtual void transformCount(T currentValue, T newValue)
+        /// <seealso cref="TransformType"/>
+        protected virtual void TransformCount(T currentValue, T newValue)
         {
-            object[] parameters = { Clock };
-            transformCount((Transform<T>)Activator.CreateInstance(transformType, parameters), currentValue, newValue);
+            Debug.Assert(
+                TransformType.IsSubclassOf(typeof(Transform<T>)) || TransformType == typeof(Transform<T>),
+                @"transformType should be a subclass of Transform<T>."
+            );
+
+            TransformCount((Transform<T>)Activator.CreateInstance(TransformType), currentValue, newValue);
         }
 
         /// <summary>
-        /// Intended to be used by transformCount().
+        /// Intended to be used by TransformCount(T currentValue, T newValue).
         /// </summary>
-        /// <see cref="transformCount"/>
-        protected void transformCount(Transform<T> transform, T currentValue, T newValue)
+        protected void TransformCount(Transform<T> transform, T currentValue, T newValue)
         {
             Type type = transform.GetType();
 
-            updateTransforms(type);
-            removeTransforms(type);
+            Flush(false, type);
 
             if (Clock == null)
                 return;
 
-            if (RollingDuration == 0)
+            if (RollingDuration < 1)
             {
-                VisibleCount = Count;
+                DisplayedCount = Count;
                 return;
             }
 
+            double rollingTotalDuration =
+                IsRollingProportional
+                    ? GetProportionalDuration(currentValue, newValue)
+                    : RollingDuration;
+
             transform.StartTime = Time;
-            transform.EndTime = Time + RollingTotalDuration;
+            transform.EndTime = Time + rollingTotalDuration;
             transform.StartValue = currentValue;
             transform.EndValue = newValue;
             transform.Easing = RollingEasing;
 
             Transforms.Add(transform);
         }
-
-        /// <summary>
-        /// This procedure is called each time the visible count value is updated.
-        /// Override to create custom animations.
-        /// </summary>
-        /// <param name="currentValue">Visible count value before modification.</param>
-        /// <param name="newValue">Expected visible count value after modification-</param>
-        protected abstract void transformVisibleCount(T currentValue, T newValue);
     }
 }

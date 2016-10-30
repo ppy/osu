@@ -7,25 +7,33 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using osu.Framework;
+using OpenTK;
 
 namespace osu.Game.GameModes.Menu
 {
     /// <summary>
     /// osu! logo and its attachments (pulsing, visualiser etc.)
     /// </summary>
-    public partial class OsuLogo : AutoSizeContainer
+    public partial class OsuLogo : Container
     {
         private Sprite logo;
+        private CircularContainer logoContainer;
         private Container logoBounceContainer;
-        private ButtonSystem.MenuVisualisation vis;
+        private MenuVisualisation vis;
 
         public Action Action;
 
-        public float SizeForFlow => logo == null ? 0 : logo.Size.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.8f;
+        public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.8f;
 
         private Sprite ripple;
 
         private Container rippleContainer;
+
+        public override bool Contains(Vector2 screenSpacePos)
+        {
+            return logoContainer.Contains(screenSpacePos);
+        }
 
         public bool Ripple
         {
@@ -43,16 +51,27 @@ namespace osu.Game.GameModes.Menu
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
+            AutoSizeAxes = Axes.Both;
+
             Children = new Drawable[]
             {
-                logoBounceContainer = new AutoSizeContainer
+                logoBounceContainer = new Container
                 {
+                    AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        logo = new Sprite()
+                        logoContainer = new CircularContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre
+                            Children = new[]
+                            {
+                                logo = new Sprite
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                },
+                            },
                         },
                         rippleContainer = new Container
                         {
@@ -69,7 +88,7 @@ namespace osu.Game.GameModes.Menu
                                 }
                             }
                         },
-                        vis = new ButtonSystem.MenuVisualisation
+                        vis = new MenuVisualisation
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -82,12 +101,12 @@ namespace osu.Game.GameModes.Menu
             };
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
-            logo.Texture = Game.Textures.Get(@"Menu/logo");
-            ripple.Texture = Game.Textures.Get(@"Menu/logo");
+            logo.Texture = game.Textures.Get(@"Menu/logo");
+            ripple.Texture = game.Textures.Get(@"Menu/logo");
 
             ripple.ScaleTo(1.1f, 500);
             ripple.FadeOut(500);

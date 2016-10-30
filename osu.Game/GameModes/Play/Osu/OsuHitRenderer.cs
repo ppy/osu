@@ -1,62 +1,20 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
-using OpenTK;
+using osu.Game.Beatmaps.Objects.Osu.Drawable;
 
 namespace osu.Game.GameModes.Play.Osu
 {
-    public class OsuHitRenderer : HitRenderer
+    public class OsuHitRenderer : HitRenderer<OsuBaseHit>
     {
-        List<OsuBaseHit> objects;
-        private OsuPlayfield playfield;
+        protected override HitObjectConverter<OsuBaseHit> Converter => new OsuConverter();
 
-        public override List<HitObject> Objects
-        {
-            set
-            {
-                //osu! mode requires all objects to be of OsuBaseHit type.
-                objects = value.ConvertAll(o => (OsuBaseHit)o);
+        protected override Playfield CreatePlayfield() => new OsuPlayfield();
 
-                if (Parent != null)
-                    Load();
-            }
-        }
-
-        public override void Load()
-        {
-            base.Load();
-
-            if (playfield == null)
-                Add(playfield = new OsuPlayfield());
-            else
-                playfield.Clear();
-
-            if (objects == null) return;
-
-            foreach (OsuBaseHit h in objects)
-            {
-                //render stuff!
-                Sprite s = new Sprite
-                {
-                    Texture = Game.Textures.Get(@"Menu/logo"),
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.1f),
-                    Alpha = 0,
-                    Position = h.Position
-                };
-
-                s.Transforms.Add(new TransformAlpha(Clock) { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = 0, EndValue = 1 });
-                s.Transforms.Add(new TransformAlpha(Clock) { StartTime = h.StartTime + h.Duration + 200, EndTime = h.StartTime + h.Duration + 400, StartValue = 1, EndValue = 0 });
-                s.Expire(true);
-
-                playfield.Add(s);
-            }
-        }
+        protected override DrawableHitObject GetVisualRepresentation(OsuBaseHit h)
+            => h is Circle ? new DrawableCircle(h as Circle) : null;
     }
 }

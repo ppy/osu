@@ -3,8 +3,10 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Drawables;
 using OpenTK;
+using osu.Framework;
+using osu.Framework.Graphics.Sprites;
+using OpenTK.Graphics;
 
 namespace osu.Game.GameModes.Play.Osu
 {
@@ -12,21 +14,22 @@ namespace osu.Game.GameModes.Play.Osu
     {
         public OsuPlayfield()
         {
-            RelativeSizeAxes = Axes.None;
             Size = new Vector2(512, 384);
+            Scale = new Vector2(1.6f);
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Add(new Box()
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
+                Colour = Color4.Black,
                 Alpha = 0.5f
             });
         }

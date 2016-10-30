@@ -6,13 +6,13 @@ using System.Collections.Generic;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Drawables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.GameModes.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 
 namespace osu.Game.GameModes
 {
@@ -39,7 +39,7 @@ namespace osu.Game.GameModes
                 popButton.Alpha = 1;
 
             Content.Alpha = 0;
-            textContainer.Position = new Vector2(Size.X / 16, 0);
+            textContainer.Position = new Vector2(DrawSize.X / 16, 0);
 
             box.ScaleTo(0.2f);
             box.RotateTo(-20);
@@ -55,7 +55,7 @@ namespace osu.Game.GameModes
 
         protected override bool OnExiting(GameMode next)
         {
-            textContainer.MoveTo(new Vector2((Size.X / 16), 0), transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2((DrawSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
 
             return base.OnExiting(next);
@@ -65,7 +65,7 @@ namespace osu.Game.GameModes
         {
             base.OnSuspending(next);
 
-            textContainer.MoveTo(new Vector2(-(Size.X / 16), 0), transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2(-(DrawSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
         }
 
@@ -77,9 +77,9 @@ namespace osu.Game.GameModes
             Content.FadeIn(transition_time, EasingTypes.OutExpo);
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Children = new Drawable[]
             {
@@ -93,8 +93,9 @@ namespace osu.Game.GameModes
                         Alpha = 1,
                         Additive = false
                     },
-                    textContainer = new AutoSizeContainer
+                    textContainer = new Container
                     {
+                        AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Children = new[]

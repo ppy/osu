@@ -3,16 +3,17 @@
 
 using System;
 using osu.Framework.Desktop;
+using osu.Framework.Desktop.Platform;
 using osu.Framework.Platform;
 
-namespace osu.Framework.VisualTests
+namespace osu.Desktop.VisualTests
 {
     public static class Program
     {
         [STAThread]
         public static void Main(string[] args)
         {
-            BasicGameHost host = Host.GetSuitableHost(@"visual-tests");
+            BasicGameHost host = Host.GetSuitableHost(@"osu-visual-tests");
             host.Add(new VisualTestGame());
             host.Run();
         }

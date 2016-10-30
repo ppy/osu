@@ -2,19 +2,19 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using OpenTK.Graphics;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Users;
+using osu.Game.Database;
 
 namespace osu.Game.Beatmaps
 {
     public class Beatmap
     {
-        public List<HitObject> HitObjects;
-
-        public List<ControlPoint> ControlPoints;
-
-        public string Difficulty;
-        public User Creator;
+        public BeatmapInfo BeatmapInfo { get; set; }
+        public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
+        public List<HitObject> HitObjects { get; set; }
+        public List<ControlPoint> ControlPoints { get; set; }
+        public List<Color4> ComboColors { get; set; }
     }
 }

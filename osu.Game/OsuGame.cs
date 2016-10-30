@@ -8,23 +8,36 @@ using osu.Game.Configuration;
 using osu.Game.GameModes.Menu;
 using OpenTK;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
-using osu.Game.GameModes;
-using osu.Game.Graphics.Background;
 using osu.Game.GameModes.Play;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Framework;
+using osu.Framework.Input;
+using osu.Game.Input;
+using OpenTK.Input;
+using osu.Framework.Logging;
+using osu.Game.Graphics.UserInterface.Volume;
 
 namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
         public Toolbar Toolbar;
+        public ChatConsole Chat;
         public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
         private Intro intro;
 
+        private VolumeControl volume;
+
         public Bindable<PlayMode> PlayMode;
+
+        string[] args;
+
+        public OsuGame(string[] args = null)
+        {
+            this.args = args;
+        }
 
         public override void SetHost(BasicGameHost host)
         {
@@ -33,9 +46,18 @@ namespace osu.Game
             host.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            if (!Host.IsPrimaryInstance)
+            {
+                Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
+                Environment.Exit(0);
+            }
+
+            base.Load(game);
+
+            if (args?.Length > 0)
+                Schedule(delegate { Beatmaps.Import(args); });
 
             //attach our bindables to the audio subsystem.
             Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeGlobal));
@@ -43,23 +65,33 @@ namespace osu.Game
             Audio.VolumeTrack.Weld(Config.GetBindable<double>(OsuConfig.VolumeMusic));
 
             Add(new Drawable[] {
-                intro = new Intro(),
+                new VolumeControlReceptor
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    ActivateRequested = delegate { volume.Show(); }
+                },
+                intro = new Intro
+                {
+                    Beatmap = Beatmap
+                },
                 Toolbar = new Toolbar
                 {
                     OnHome = delegate { MainMenu?.MakeCurrent(); },
-                    OnSettings = delegate { Options.PoppedOut = !Options.PoppedOut; },
+                    OnSettings = Options.ToggleVisibility,
                     OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
-                    Alpha = 0.001f,
                 },
-                new VolumeControl
+                Chat = new ChatConsole(API),
+                volume = new VolumeControl
                 {
                     VolumeGlobal = Audio.Volume,
                     VolumeSample = Audio.VolumeSample,
                     VolumeTrack = Audio.VolumeTrack
+                },
+                new GlobalHotkeys //exists because UserInputManager is at a level below us.
+                {
+                    Handler = globalHotkeyPressed
                 }
             });
-
-            Toolbar.SetState(ToolbarState.Hidden, true);
 
             intro.ModePushed += modeAdded;
             intro.Exited += modeRemoved;
@@ -69,6 +101,18 @@ namespace osu.Game
             PlayMode.TriggerChange();
 
             Cursor.Alpha = 0;
+        }
+
+        private bool globalHotkeyPressed(InputState state, KeyDownEventArgs args)
+        {
+            switch (args.Key)
+            {
+                case Key.F8:
+                    Chat.ToggleVisibility();
+                    return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
 
         public Action<GameMode> ModeChanged;
@@ -82,11 +126,12 @@ namespace osu.Game
             //central game mode change logic.
             if (newMode is Player || newMode is Intro)
             {
-                Toolbar.SetState(ToolbarState.Hidden);
+                Toolbar.State = Visibility.Hidden;
+                Chat.State = Visibility.Hidden;
             }
             else
             {
-                Toolbar.SetState(ToolbarState.Visible);
+                Toolbar.State = Visibility.Visible;
             }
 
             Cursor.FadeIn(100);
@@ -101,10 +146,13 @@ namespace osu.Game
         {
             if (!intro.DidLoadMenu || intro.ChildGameMode != null)
             {
-                intro.MakeCurrent();
+                Scheduler.Add(delegate
+                {
+                    intro.MakeCurrent();
+                });
                 return true;
             }
-            
+
             return base.OnExiting();
         }
 
@@ -127,8 +175,8 @@ namespace osu.Game
 
             if (Parent != null)
             {
-                Config.Set(OsuConfig.Width, Size.X);
-                Config.Set(OsuConfig.Height, Size.Y);
+                Config.Set(OsuConfig.Width, DrawSize.X);
+                Config.Set(OsuConfig.Height, DrawSize.Y);
             }
             return true;
         }

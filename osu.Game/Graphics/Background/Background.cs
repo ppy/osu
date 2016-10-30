@@ -8,6 +8,7 @@ using osu.Game.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework;
 
 namespace osu.Game.Graphics.Background
 {
@@ -24,13 +25,13 @@ namespace osu.Game.Graphics.Background
             Depth = float.MinValue;
         }
 
-        public override void Load()
+        public override void Load(BaseGame game)
         {
-            base.Load();
+            base.Load(game);
 
             Add(BackgroundSprite = new Sprite
             {
-                Texture = Game.Textures.Get(textureName),
+                Texture = game.Textures.Get(textureName),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Colour = Color4.DarkGray
@@ -40,7 +41,7 @@ namespace osu.Game.Graphics.Background
         protected override void Update()
         {
             base.Update();
-            BackgroundSprite.Scale = new Vector2(Math.Max(Size.X / BackgroundSprite.Size.X, Size.Y / BackgroundSprite.Size.Y));
+            BackgroundSprite.Scale = new Vector2(Math.Max(DrawSize.X / BackgroundSprite.DrawSize.X, DrawSize.Y / BackgroundSprite.DrawSize.Y));
         }
     }
 }

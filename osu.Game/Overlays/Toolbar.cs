@@ -1,25 +1,24 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Drawables;
+using System;
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Graphics;
-using osu.Game.Configuration;
-using System;
+using osu.Framework;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
-using osu.Framework.Timing;
+using osu.Game.Configuration;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics.TimeDisplay;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
-    public class Toolbar : Container
+    public class Toolbar : OverlayContainer
     {
-        const float height = 50;
+        private const float height = 50;
 
         public Action OnSettings;
         public Action OnHome;
@@ -27,26 +26,23 @@ namespace osu.Game.Overlays
 
         private ToolbarModeSelector modeSelector;
 
-        public void SetState(ToolbarState state, bool instant = false)
-        {
-            int time = instant ? 0 : 200;
+        private const int transition_time = 200;
 
-            switch (state)
-            {
-                case ToolbarState.Hidden:
-                    MoveToY(-Size.Y, time, EasingTypes.InQuint);
-                    FadeOut(time);
-                    break;
-                case ToolbarState.Visible:
-                    MoveToY(0, time, EasingTypes.OutQuint);
-                    FadeIn(time);
-                    break;
-            }
+        protected override void PopIn()
+        {
+            MoveToY(0, transition_time, EasingTypes.OutQuint);
+            FadeIn(transition_time, EasingTypes.OutQuint);
         }
 
-        public override void Load()
+        protected override void PopOut()
         {
-            base.Load();
+            MoveToY(-DrawSize.Y, transition_time, EasingTypes.InQuint);
+            FadeOut(transition_time, EasingTypes.InQuint);
+        }
+
+        public override void Load(BaseGame game)
+        {
+            base.Load(game);
 
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, height);
@@ -62,14 +58,15 @@ namespace osu.Game.Overlays
                 {
                     Direction = FlowDirection.HorizontalOnly,
                     RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         new ToolbarButton
                         {
                             Icon = FontAwesome.gear,
-                            Action = OnSettings,
                             TooltipMain = "Settings",
                             TooltipSub = "Change your settings",
+                            Action = OnSettings
                         },
                         new ToolbarButton
                         {
@@ -100,7 +97,7 @@ namespace osu.Game.Overlays
                         new ToolbarButton
                         {
                             Icon = FontAwesome.user,
-                            Text = ((OsuGame)Game).Config.Get<string>(OsuConfig.Username)
+                            Text = ((OsuGame)game).Config.Get<string>(OsuConfig.Username)
                         },
                         new ToolbarButton
                         {
@@ -119,11 +116,5 @@ namespace osu.Game.Overlays
         }
 
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
-    }
-
-    public enum ToolbarState
-    {
-        Visible,
-        Hidden,
     }
 }
