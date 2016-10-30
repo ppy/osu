@@ -29,12 +29,6 @@ namespace osu.Game.Graphics.TimeDisplay
             };
         }
 
-        public override void Load(BaseGame game)
-        {
-            base.Load(game);
-
-        }
-
         protected override void Update()
         {
             timeText.Text = DateTime.Now.ToString(format);
