@@ -29,12 +29,6 @@ namespace osu.Game.Graphics.TimeDisplay
             };
         }
 
-        protected override void Update()
-        {
-            timeText.Text = DateTime.Now.ToString(format);
-            timeText.TextSize = textSize;
-            timeText.Position = textPos;
-        }
-
+        protected override void Update() => timeText.Text = DateTime.Now.ToString(Format);
     }
 }
