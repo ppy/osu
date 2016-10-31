@@ -19,7 +19,7 @@ namespace osu.Game.GameModes.Play.Catch
         protected override bool CanPopOutWhileRolling => true;
 
         protected virtual double FadeOutDelay => 1000;
-        protected virtual double FadeOutDuration => 300;
+        protected override double FadeOutDuration => 300;
 
         protected override string FormatCount(ulong count)
         {

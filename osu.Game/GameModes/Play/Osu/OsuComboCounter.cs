@@ -92,6 +92,11 @@ namespace osu.Game.GameModes.Play.Osu
         protected override void OnCountRolling(ulong currentValue, ulong newValue)
         {
             ScheduledPopOutCurrentId++;
+
+            // Hides displayed count if was increasing from 0 to 1 but didn't finish
+            if (currentValue == 0 && newValue == 0)
+                DisplayedCountSpriteText.FadeOut(FadeOutDuration);
+
             base.OnCountRolling(currentValue, newValue);
         }
 
@@ -116,13 +121,17 @@ namespace osu.Game.GameModes.Play.Osu
         protected override void OnCountChange(ulong currentValue, ulong newValue)
         {
             ScheduledPopOutCurrentId++;
+
+            if (newValue == 0)
+                DisplayedCountSpriteText.FadeOut();
+
             base.OnCountChange(currentValue, newValue);
         }
 
         protected override void OnDisplayedCountRolling(ulong currentValue, ulong newValue)
         {
             if (newValue == 0)
-                DisplayedCountSpriteText.FadeOut(PopOutDuration);
+                DisplayedCountSpriteText.FadeOut(FadeOutDuration);
             else
                 DisplayedCountSpriteText.Show();
 
