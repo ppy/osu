@@ -35,6 +35,7 @@ namespace osu.Game.GameModes.Play
         private ScrollContainer scrollContainer;
         private FlowContainer beatmapSetFlow;
         private TrackManager trackManager;
+        private Container wedgeContainer;
 
         /// <param name="database">Optionally provide a database to use instead of the OsuGame one.</param>
         public PlaySongSelect(BeatmapDatabase database = null)
@@ -45,7 +46,7 @@ namespace osu.Game.GameModes.Play
             const float bottomToolHeight = 50;
             Children = new Drawable[]
             {
-                new Container
+                wedgeContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = Vector2.One,
@@ -141,6 +142,8 @@ namespace osu.Game.GameModes.Play
             trackManager = game.Audio.Track;
 
             Task.Factory.StartNew(addBeatmapSets);
+
+            wedgeContainer.FadeInFromZero(250);
         }
 
         protected override void OnEntering(GameMode last)
