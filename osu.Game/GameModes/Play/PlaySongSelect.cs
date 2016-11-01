@@ -142,14 +142,13 @@ namespace osu.Game.GameModes.Play
             trackManager = game.Audio.Track;
 
             Task.Factory.StartNew(addBeatmapSets);
-
-            wedgeContainer.FadeInFromZero(250);
         }
 
         protected override void OnEntering(GameMode last)
         {
             base.OnEntering(last);
             ensurePlayingSelected();
+            wedgeContainer.FadeInFromZero(250);
         }
 
         protected override void OnResuming(GameMode last)
