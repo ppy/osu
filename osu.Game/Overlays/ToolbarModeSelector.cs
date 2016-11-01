@@ -90,7 +90,7 @@ namespace osu.Game.Overlays
             activeMode.Invalidate();
         }
 
-        private Cached<Drawable> activeMode = new Cached<Drawable>();
+        private Cached activeMode = new Cached();
 
         protected override void UpdateLayout()
         {
