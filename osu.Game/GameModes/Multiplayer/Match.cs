@@ -26,12 +26,12 @@ namespace osu.Game.GameModes.Multiplayer
         {
             base.OnEntering(last);
 
-            Background.FadeColour(Color4.DarkGray, 500);
+            Background.Schedule(() => Background.FadeColour(Color4.DarkGray, 500));
         }
 
         protected override bool OnExiting(GameMode next)
         {
-            Background.FadeColour(Color4.White, 500);
+            Background.Schedule(() => Background.FadeColour(Color4.White, 500));
             return base.OnExiting(next);
         }
     }
