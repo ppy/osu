@@ -59,27 +59,27 @@ namespace osu.Game.GameModes.Menu
             Scheduler.Add(delegate
             {
                 welcome.Play();
+
+                Scheduler.AddDelayed(delegate
+                {
+                    bgm.Start();
+
+                    mainMenu = new MainMenu();
+                    mainMenu.Preload(Game);
+
+                    Scheduler.AddDelayed(delegate
+                    {
+                        DidLoadMenu = true;
+                        Push(mainMenu);
+                    }, 2300);
+                }, 600);
             });
-
-            Scheduler.AddDelayed(delegate
-            {
-                bgm.Start();
-            }, 600);
-
-            Scheduler.AddDelayed(delegate
-            {
-                DidLoadMenu = true;
-                Push(mainMenu);
-            }, 2900);
 
             logo.ScaleTo(0.4f);
             logo.FadeOut();
 
             logo.ScaleTo(1, 4400, EasingTypes.OutQuint);
             logo.FadeIn(20000, EasingTypes.OutQuint);
-
-            mainMenu = new MainMenu();
-            mainMenu.Preload(Game);
         }
 
         protected override void OnSuspending(GameMode next)
