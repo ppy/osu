@@ -39,7 +39,7 @@ namespace osu.Game.GameModes.Play
 
         protected virtual List<T> Convert(List<HitObject> objects) => Converter.Convert(objects);
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 

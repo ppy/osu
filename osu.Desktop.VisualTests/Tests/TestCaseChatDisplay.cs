@@ -34,7 +34,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private ChannelDisplay channelDisplay;
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 

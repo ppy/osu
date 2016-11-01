@@ -20,7 +20,7 @@ namespace osu.Game.Beatmaps.Objects.Mania.Drawable
             Scale = new Vector2(0.1f);
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
             Texture = game.Textures.Get(@"Menu/logo");

@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps.Objects.Taiko.Drawable
             Position = new Vector2(1.1f, 0.5f);
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 

@@ -30,7 +30,7 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.Y;
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 
