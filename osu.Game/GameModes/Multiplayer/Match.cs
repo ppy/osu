@@ -25,6 +25,7 @@ namespace osu.Game.GameModes.Multiplayer
         protected override void OnEntering(GameMode last)
         {
             base.OnEntering(last);
+
             Background.FadeColour(Color4.DarkGray, 500);
         }
 

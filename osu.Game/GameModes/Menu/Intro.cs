@@ -1,7 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using System.Threading;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.GameModes;
@@ -10,8 +10,6 @@ using osu.Framework.Graphics.Transformations;
 using osu.Game.GameModes.Backgrounds;
 using OpenTK.Graphics;
 using osu.Framework;
-using osu.Framework.Configuration;
-using osu.Game.Beatmaps;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -24,12 +22,14 @@ namespace osu.Game.GameModes.Menu
         /// </summary>
         internal bool DidLoadMenu;
 
+        MainMenu mainMenu;
+        private AudioSample welcome;
+        private AudioTrack bgm;
+
         protected override BackgroundMode CreateBackground() => new BackgroundModeEmpty();
 
-        public override void Load(BaseGame game)
+        public Intro()
         {
-            base.Load(game);
-
             Children = new Drawable[]
             {
                 logo = new OsuLogo()
@@ -41,12 +41,21 @@ namespace osu.Game.GameModes.Menu
                     Ripple = false
                 }
             };
+        }
 
-            AudioSample welcome = game.Audio.Sample.Get(@"welcome");
+        protected override void Load(BaseGame game)
+        {
+            base.Load(game);
 
-            AudioTrack bgm = game.Audio.Track.Get(@"circles");
+            welcome = game.Audio.Sample.Get(@"welcome");
+
+            bgm = game.Audio.Track.Get(@"circles");
             bgm.Looping = true;
+        }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             Scheduler.Add(delegate
             {
                 welcome.Play();
@@ -60,13 +69,17 @@ namespace osu.Game.GameModes.Menu
             Scheduler.AddDelayed(delegate
             {
                 DidLoadMenu = true;
-                Push(new MainMenu());
+                Push(mainMenu);
             }, 2900);
 
-            logo.ScaleTo(0);
+            logo.ScaleTo(0.4f);
+            logo.FadeOut();
 
-            logo.ScaleTo(1, 5900, EasingTypes.OutQuint);
-            logo.FadeIn(30000, EasingTypes.OutQuint);
+            logo.ScaleTo(1, 4400, EasingTypes.OutQuint);
+            logo.FadeIn(20000, EasingTypes.OutQuint);
+
+            mainMenu = new MainMenu();
+            mainMenu.Preload(Game);
         }
 
         protected override void OnSuspending(GameMode next)

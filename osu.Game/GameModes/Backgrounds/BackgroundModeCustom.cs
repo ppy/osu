@@ -15,7 +15,7 @@ namespace osu.Game.GameModes.Backgrounds
             this.textureName = textureName;
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
             Add(new Background(textureName));

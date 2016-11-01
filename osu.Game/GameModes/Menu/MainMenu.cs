@@ -1,6 +1,7 @@
 //Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.GameModes;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
@@ -15,6 +16,7 @@ using osu.Game.Graphics.Containers;
 using OpenTK;
 using osu.Framework;
 using osu.Game.Overlays;
+using System.Threading.Tasks;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -23,13 +25,13 @@ namespace osu.Game.GameModes.Menu
         private ButtonSystem buttons;
         public override string Name => @"Main Menu";
 
-        protected override BackgroundMode CreateBackground() => new BackgroundModeDefault();
+        private BackgroundMode background;
 
-        public override void Load(BaseGame game)
+        protected override BackgroundMode CreateBackground() => background;
+
+        public MainMenu()
         {
-            base.Load(game);
-
-            OsuGame osu = (OsuGame)game;
+            background = new BackgroundModeDefault();
 
             Children = new Drawable[]
             {
@@ -40,7 +42,6 @@ namespace osu.Game.GameModes.Menu
                     {
                         buttons = new ButtonSystem()
                         {
-                            Alpha = 0,
                             OnChart = delegate { Push(new ChartListing()); },
                             OnDirect = delegate { Push(new OnlineListing()); },
                             OnEdit = delegate { Push(new EditSongSelect()); },
@@ -48,13 +49,26 @@ namespace osu.Game.GameModes.Menu
                             OnMulti = delegate { Push(new Lobby()); },
                             OnTest  = delegate { Push(new TestBrowser()); },
                             OnExit = delegate { Scheduler.AddDelayed(Exit, ButtonSystem.EXIT_DELAY); },
-                            OnSettings = osu.Options.ToggleVisibility,
                         }
                     }
                 }
             };
+        }
 
-            buttons.FadeIn(500);
+        protected override void Load(BaseGame game)
+        {
+            base.Load(game);
+
+            background.Preload(game);
+
+            OsuGame osu = (OsuGame)game;
+            buttons.OnSettings = osu.Options.ToggleVisibility;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            buttons.FadeInFromZero(500);
         }
 
         protected override void OnSuspending(GameMode next)

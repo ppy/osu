@@ -120,7 +120,7 @@ namespace osu.Game.GameModes.Play
             };
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 
@@ -217,15 +217,20 @@ namespace osu.Game.GameModes.Play
             selectedBeatmapGroup = group;
         }
 
-        private void ensurePlayingSelected()
+        private async Task ensurePlayingSelected()
         {
-            var track = Beatmap?.Track;
+            AudioTrack track = null;
 
-            if (track != null)
+            await Task.Run(() => track = Beatmap?.Track);
+
+            Schedule(delegate
             {
-                trackManager.SetExclusive(track);
-                track.Start();
-            }
+                if (track != null)
+                {
+                    trackManager.SetExclusive(track);
+                    track.Start();
+                }
+            });
         }
 
         private void addBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -233,14 +238,19 @@ namespace osu.Game.GameModes.Play
             beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
             beatmapSet.Beatmaps.ForEach(b => database.GetChildren(b));
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty).ToList();
-            Schedule(() =>
+            var group = new BeatmapGroup(beatmapSet) { SelectionChanged = selectionChanged };
+
+            group.Preload(Game, g =>
             {
-                var group = new BeatmapGroup(beatmapSet) { SelectionChanged = selectionChanged };
                 beatmapSetFlow.Add(group);
+
                 if (Beatmap == null)
                 {
                     if (beatmapSetFlow.Children.Count() == 1)
+                    {
                         group.State = BeatmapGroupState.Expanded;
+                        return;
+                    }
                 }
                 else
                 {
@@ -248,9 +258,14 @@ namespace osu.Game.GameModes.Play
                     {
                         var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(Beatmap.BeatmapInfo));
                         if (panel != null)
+                        {
                             panel.State = PanelSelectedState.Selected;
+                            return;
+                        }
                     }
                 }
+
+                group.State = BeatmapGroupState.Collapsed;
             });
         }
 

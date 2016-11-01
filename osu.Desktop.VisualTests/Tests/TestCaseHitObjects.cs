@@ -19,7 +19,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         protected override IFrameBasedClock Clock => ourClock;
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 

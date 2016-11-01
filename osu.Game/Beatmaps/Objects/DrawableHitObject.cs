@@ -37,10 +37,9 @@ namespace osu.Game.Beatmaps.Objects
             }
         }
 
-        public override void Load(BaseGame game)
+        protected override void LoadComplete()
         {
-            base.Load(game);
-
+            base.LoadComplete();
             UpdateState(state);
         }
 
