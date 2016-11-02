@@ -58,6 +58,9 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                     Colour = h.Colour
                 }
             };
+
+            //may not be so correct
+            Size = circle.DrawSize;
         }
 
         protected override void Load(BaseGame game)
