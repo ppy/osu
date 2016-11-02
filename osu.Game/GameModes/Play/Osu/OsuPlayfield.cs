@@ -12,25 +12,28 @@ namespace osu.Game.GameModes.Play.Osu
 {
     public class OsuPlayfield : Playfield
     {
+        protected override Container Content => hitObjectContainer;
+
+        private Container hitObjectContainer;
+
         public OsuPlayfield()
         {
-            Size = new Vector2(512, 384);
-            Scale = new Vector2(1.6f);
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-        }
+            Size = new Vector2(512, 384);
 
-        protected override void Load(BaseGame game)
-        {
-            base.Load(game);
-
-            Add(new Box()
+            AddInternal(new Box
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 Colour = Color4.Black,
                 Alpha = 0.5f
+            });
+
+            AddInternal(hitObjectContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both
             });
         }
     }

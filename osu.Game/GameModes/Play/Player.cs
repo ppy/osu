@@ -2,7 +2,6 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.GameModes.Backgrounds;
 using osu.Game.GameModes.Play.Catch;
@@ -12,13 +11,15 @@ using osu.Game.GameModes.Play.Taiko;
 using osu.Framework;
 using osu.Game.Database;
 using osu.Framework.Timing;
-using osu.Framework.GameModes;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.GameModes.Play
 {
     public class Player : OsuGameMode
     {
+        const bool autoplay = false;
+
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
         public BeatmapInfo BeatmapInfo;
@@ -123,6 +124,9 @@ namespace osu.Game.GameModes.Play
 
             hitRenderer.OnHit += delegate (HitObject h) { scoreOverlay.OnHit(h); };
             hitRenderer.OnMiss += delegate (HitObject h) { scoreOverlay.OnMiss(h); };
+
+            if (autoplay)
+                hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Armed));
 
             Children = new Drawable[]
             {
