@@ -30,9 +30,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             this.h = h;
 
             Origin = Anchor.Centre;
-            Alpha = 0;
             Position = h.Position;
-            Scale = new Vector2(0.4f);
 
             Children = new Framework.Graphics.Drawable[]
             {
@@ -50,7 +48,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 flash = new FlashLayer(),
                 explode = new ExplodeLayer
                 {
-                    Colour = h.Colour
+                    Colour = h.Colour,
                 },
                 approachCircle = new Sprite
                 {
@@ -88,6 +86,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
 
             //sane defaults
             ring.Alpha = circle.Alpha = number.Alpha = approachCircle.Alpha = glow.Alpha = 1;
+            explode.Alpha = 0;
 
             //always-present transforms
             Transforms.Add(new TransformAlpha { StartTime = t - 1000, EndTime = t - 800, StartValue = 0, EndValue = 1 });
