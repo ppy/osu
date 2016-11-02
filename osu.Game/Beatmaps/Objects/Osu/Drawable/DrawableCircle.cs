@@ -43,7 +43,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 circle = new CircleLayer
                 {
                     Colour = h.Colour,
-                    Hit = delegate { State = ArmedState.Armed; }
+                    Hit = Hit,
                 },
                 number = new NumberLayer(),
                 ring = new RingLayer(),
@@ -84,36 +84,36 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
 
             Flush(); //move to DrawableHitObject
 
-            Transforms.Add(new TransformAlpha { StartTime = h.StartTime - 1000, EndTime = h.StartTime - 800, StartValue = 0, EndValue = 1 });
+            double armTime = HitTime ?? h.StartTime;
 
-            approachCircle.Transforms.Add(new TransformScale { StartTime = h.StartTime - 1000, EndTime = h.StartTime, StartValue = new Vector2(2f), EndValue = new Vector2(0.6f) });
-            approachCircle.Transforms.Add(new TransformAlpha { StartTime = h.StartTime, EndTime = h.StartTime, StartValue = 1, EndValue = 0 });
+            Transforms.Add(new TransformAlpha { StartTime = armTime - 1000, EndTime = armTime - 800, StartValue = 0, EndValue = 1 });
 
-            glow.Transforms.Add(new TransformAlpha { StartTime = h.StartTime, EndTime = h.StartTime + 400, StartValue = glow.Alpha, EndValue = 0 });
+            approachCircle.Transforms.Add(new TransformScale { StartTime = armTime - 1000, EndTime = armTime, StartValue = new Vector2(2f), EndValue = new Vector2(0.6f) });
+            approachCircle.Transforms.Add(new TransformAlpha { StartTime = armTime, EndTime = armTime, StartValue = 1, EndValue = 0 });
+
+            glow.Transforms.Add(new TransformAlpha { StartTime = armTime, EndTime = armTime + 400, StartValue = glow.Alpha, EndValue = 0 });
 
             switch (state)
             {
                 case ArmedState.Disarmed:
-                    Transforms.Add(new TransformAlpha { StartTime = h.StartTime + h.Duration + 200, EndTime = h.StartTime + h.Duration + 400, StartValue = 1, EndValue = 0 });
+                    Transforms.Add(new TransformAlpha { StartTime = armTime + h.Duration + 200, EndTime = armTime + h.Duration + 400, StartValue = 1, EndValue = 0 });
                     break;
                 case ArmedState.Armed:
                     const float flashIn = 30;
                     const float fadeOut = 800;
 
-                    //Transforms.Add(new TransformScale() { StartTime = h.StartTime, EndTime = h.StartTime + 400, StartValue = Scale, EndValue = Scale * 1.1f });
+                    ring.Transforms.Add(new TransformAlpha { StartTime = armTime + flashIn, EndTime = armTime + flashIn, StartValue = 0, EndValue = 0 });
+                    circle.Transforms.Add(new TransformAlpha { StartTime = armTime + flashIn, EndTime = armTime + flashIn, StartValue = 0, EndValue = 0 });
+                    number.Transforms.Add(new TransformAlpha { StartTime = armTime + flashIn, EndTime = armTime + flashIn, StartValue = 0, EndValue = 0 });
 
-                    ring.Transforms.Add(new TransformAlpha { StartTime = h.StartTime + flashIn, EndTime = h.StartTime + flashIn, StartValue = 0, EndValue = 0 });
-                    circle.Transforms.Add(new TransformAlpha { StartTime = h.StartTime + flashIn, EndTime = h.StartTime + flashIn, StartValue = 0, EndValue = 0 });
-                    number.Transforms.Add(new TransformAlpha { StartTime = h.StartTime + flashIn, EndTime = h.StartTime + flashIn, StartValue = 0, EndValue = 0 });
+                    flash.Transforms.Add(new TransformAlpha { StartTime = armTime, EndTime = armTime + flashIn, StartValue = 0, EndValue = 0.8f });
+                    flash.Transforms.Add(new TransformAlpha { StartTime = armTime + flashIn, EndTime = armTime + flashIn + 100, StartValue = 0.8f, EndValue = 0 });
 
-                    flash.Transforms.Add(new TransformAlpha { StartTime = h.StartTime, EndTime = h.StartTime + flashIn, StartValue = 0, EndValue = 0.8f });
-                    flash.Transforms.Add(new TransformAlpha { StartTime = h.StartTime + flashIn, EndTime = h.StartTime + flashIn + 100, StartValue = 0.8f, EndValue = 0 });
+                    explode.Transforms.Add(new TransformAlpha { StartTime = armTime, EndTime = armTime + flashIn, StartValue = 0, EndValue = 1 });
 
-                    explode.Transforms.Add(new TransformAlpha { StartTime = h.StartTime, EndTime = h.StartTime + flashIn, StartValue = 0, EndValue = 1 });
+                    Transforms.Add(new TransformAlpha { StartTime = armTime + flashIn, EndTime = armTime + flashIn + fadeOut, StartValue = 1, EndValue = 0 });
 
-                    Transforms.Add(new TransformAlpha { StartTime = h.StartTime + flashIn, EndTime = h.StartTime + flashIn + fadeOut, StartValue = 1, EndValue = 0 });
-
-                    Transforms.Add(new TransformScale { StartTime = h.StartTime + h.Duration, EndTime = h.StartTime + h.Duration + 400, StartValue = Scale, EndValue = Scale * 1.5f, Easing = EasingTypes.OutQuad });
+                    Transforms.Add(new TransformScale { StartTime = armTime + h.Duration, EndTime = armTime + h.Duration + 400, StartValue = Scale, EndValue = Scale * 1.5f, Easing = EasingTypes.OutQuad });
                     break;
             }
         }
@@ -283,7 +283,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             private Sprite disc;
             private Triangles triangles;
 
-            public Action Hit;
+            public Func<bool> Hit;
 
             public CircleLayer()
             {

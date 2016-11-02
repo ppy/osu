@@ -14,8 +14,11 @@ namespace osu.Game.Beatmaps.Objects
 {
     public abstract class DrawableHitObject : Container, IStateful<ArmedState>
     {
+        //todo: move to a more central implementation. this logic should not be at a drawable level.
         public Action<DrawableHitObject> OnHit;
         public Action<DrawableHitObject> OnMiss;
+
+        public Func<DrawableHitObject, bool> AllowHit;
 
         public HitObject HitObject;
 
@@ -36,6 +39,22 @@ namespace osu.Game.Beatmaps.Objects
 
                 UpdateState(state);
             }
+        }
+
+        protected double? HitTime;
+
+        protected virtual bool Hit()
+        {
+            if (State != ArmedState.Disarmed)
+                return false;
+
+            if (AllowHit?.Invoke(this) == false)
+                return false;
+
+            HitTime = Time;
+
+            State = ArmedState.Armed;
+            return true;
         }
 
         protected override void LoadComplete()
