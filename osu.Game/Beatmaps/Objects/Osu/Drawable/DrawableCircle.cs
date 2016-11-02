@@ -82,38 +82,47 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
         {
             if (!IsLoaded) return;
 
-            Flush(); //move to DrawableHitObject
+            Flush(true); //move to DrawableHitObject
 
-            double armTime = HitTime ?? h.StartTime;
+            double t = HitTime ?? h.StartTime;
 
-            Transforms.Add(new TransformAlpha { StartTime = armTime - 1000, EndTime = armTime - 800, StartValue = 0, EndValue = 1 });
+            //sane defaults
+            ring.Alpha = circle.Alpha = number.Alpha = approachCircle.Alpha = glow.Alpha = 1;
 
-            approachCircle.Transforms.Add(new TransformScale { StartTime = armTime - 1000, EndTime = armTime, StartValue = new Vector2(2f), EndValue = new Vector2(0.6f) });
-            approachCircle.Transforms.Add(new TransformAlpha { StartTime = armTime, EndTime = armTime, StartValue = 1, EndValue = 0 });
+            //always-present transforms
+            Transforms.Add(new TransformAlpha { StartTime = t - 1000, EndTime = t - 800, StartValue = 0, EndValue = 1 });
+            approachCircle.Transforms.Add(new TransformScale { StartTime = t - 1000, EndTime = t, StartValue = new Vector2(2f), EndValue = new Vector2(0.6f) });
 
-            glow.Transforms.Add(new TransformAlpha { StartTime = armTime, EndTime = armTime + 400, StartValue = glow.Alpha, EndValue = 0 });
+            //set transform delay to t==hitTime
+            Delay(t - Time, true);
+
+            approachCircle.FadeOut();
+            glow.FadeOut(400);
 
             switch (state)
             {
                 case ArmedState.Disarmed:
-                    Transforms.Add(new TransformAlpha { StartTime = armTime + h.Duration + 200, EndTime = armTime + h.Duration + 400, StartValue = 1, EndValue = 0 });
+                    Delay(h.Duration + 200);
+                    FadeOut(200);
                     break;
                 case ArmedState.Armed:
-                    const float flashIn = 30;
-                    const float fadeOut = 800;
+                    const double flash_in = 30;
 
-                    ring.Transforms.Add(new TransformAlpha { StartTime = armTime + flashIn, EndTime = armTime + flashIn, StartValue = 0, EndValue = 0 });
-                    circle.Transforms.Add(new TransformAlpha { StartTime = armTime + flashIn, EndTime = armTime + flashIn, StartValue = 0, EndValue = 0 });
-                    number.Transforms.Add(new TransformAlpha { StartTime = armTime + flashIn, EndTime = armTime + flashIn, StartValue = 0, EndValue = 0 });
+                    flash.FadeTo(0.8f, flash_in);
+                    flash.Delay(flash_in);
+                    flash.FadeOut(100);
 
-                    flash.Transforms.Add(new TransformAlpha { StartTime = armTime, EndTime = armTime + flashIn, StartValue = 0, EndValue = 0.8f });
-                    flash.Transforms.Add(new TransformAlpha { StartTime = armTime + flashIn, EndTime = armTime + flashIn + 100, StartValue = 0.8f, EndValue = 0 });
+                    explode.FadeIn(flash_in);
 
-                    explode.Transforms.Add(new TransformAlpha { StartTime = armTime, EndTime = armTime + flashIn, StartValue = 0, EndValue = 1 });
+                    Delay(flash_in, true);
 
-                    Transforms.Add(new TransformAlpha { StartTime = armTime + flashIn, EndTime = armTime + flashIn + fadeOut, StartValue = 1, EndValue = 0 });
+                    //after the flash, we can hide some elements that were behind it
+                    ring.FadeOut();
+                    circle.FadeOut();
+                    number.FadeOut();
 
-                    Transforms.Add(new TransformScale { StartTime = armTime + h.Duration, EndTime = armTime + h.Duration + 400, StartValue = Scale, EndValue = Scale * 1.5f, Easing = EasingTypes.OutQuad });
+                    FadeOut(800);
+                    ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
                     break;
             }
         }
