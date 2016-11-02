@@ -40,7 +40,7 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     StartTime = time,
                     Position = new Vector2(RNG.Next(0, 512), RNG.Next(0, 384)),
-                    NewCombo = (i + 1) % 4 == 0
+                    NewCombo = i % 4 == 0
                 });
 
                 time += 500;

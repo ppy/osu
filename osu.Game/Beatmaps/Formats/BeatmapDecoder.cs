@@ -48,12 +48,12 @@ namespace osu.Game.Beatmaps.Formats
                 new Color4(121,9,13, 255),
             };
 
-            int i = 0;
+            int i = -1;
 
             foreach (HitObject h in b.HitObjects)
             {
-                h.Colour = colours[i];
                 if (h.NewCombo) i = (i + 1) % colours.Count;
+                h.Colour = colours[i];
             }
         }
     }
