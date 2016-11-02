@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.Objects;
 using osu.Framework;
 using System;
+using System.Linq;
 
 namespace osu.Game.GameModes.Play
 {
@@ -14,6 +15,10 @@ namespace osu.Game.GameModes.Play
     {
         public Action<HitObject> OnHit;
         public Action<HitObject> OnMiss;
+
+        protected Playfield Playfield;
+
+        public IEnumerable<DrawableHitObject> DrawableObjects => Playfield.Children.Cast<DrawableHitObject>();
     }
 
     public abstract class HitRenderer<T> : HitRenderer
@@ -31,8 +36,6 @@ namespace osu.Game.GameModes.Play
             }
         }
 
-        private Playfield playfield;
-
         protected abstract Playfield CreatePlayfield();
 
         protected abstract HitObjectConverter<T> Converter { get; }
@@ -47,7 +50,7 @@ namespace osu.Game.GameModes.Play
 
             Children = new Drawable[]
             {
-                playfield = CreatePlayfield()
+                Playfield = CreatePlayfield()
             };
 
             loadObjects();
@@ -65,7 +68,7 @@ namespace osu.Game.GameModes.Play
                 drawableObject.OnHit = onHit;
                 drawableObject.OnMiss = onMiss;
 
-                playfield.Add(drawableObject);
+                Playfield.Add(drawableObject);
             }
         }
 
