@@ -46,6 +46,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Left = 5, Right = 5, Top = 50 },
+                    ScrollDraggerOnLeft = true,
                     Children = new[]
                     {
                         optionsContainer = new FlowContainer
