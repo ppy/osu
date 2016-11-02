@@ -34,15 +34,127 @@ namespace osu.Game.Configuration
 
     enum OsuConfig
     {
-        Width,
-        Height,
-        MouseSensitivity,
+        // General
+        //  Sign in
         Username,
         Password,
-        Token,
-        PlayMode,
+        //  Language
+        Language,
+        PreferOriginalForMetadata,
+        AlternativeChatFont,
+        //  Updates
+        ReleaseStream,
+        // Graphics
+        //  Renderer
+        FrameLimiter,
+        FPSCounter,
+        ReduceDroppedFrames,
+        DetectPerformanceIssues,
+        //  Layout
+        Width,
+        Height,
+        EnableFullscreen,
+        EnableLetterboxing,
+        HorizontalPosition,
+        VerticalPosition,
+        //  Detail settings
+        EnableSnakingSliders,
+        EnableBackgroundVideo,
+        EnableStoryboards,
+        EnableComboBursts,
+        EnableHitLighting,
+        EnableShaders,
+        EnableSofteningFilter,
+        ScreenshotFormat,
+        //  Main menu
+        EnableMenuSnow,
+        EnableMenuParallax,
+        EnableMenuTips,
+        EnableInterfaceVoices,
+        EnableOsuMusicTheme,
+        //  Song select
+        EnableSongSelectThumbnails,
+        // Gameplay
+        //  General
+        BackgroundDim,
+        ProgressDisplay,
+        ScoreMeterType,
+        ScoreMeterSize,
+        AlwaysShowKeyOverlay,
+        ShowFirstHiddenApproachCircle,
+        ScaleManiaScrollSpeed,
+        RememberManiaScrollSpeed,
+        //  Song select
+        SongSelectMinimumStars,
+        SongSelectMaximumStars,
+        // Audio
+        //  Devices
+        OutputDevice,
+        //  Volume
         VolumeGlobal,
         VolumeEffect,
-        VolumeMusic
+        VolumeMusic,
+        IgnoreBeatmapHitsounds,
+        //  Offset
+        UniversalOffset,
+        // Skin
+        SelectedSkin,
+        IgnoreBeatmapSkins,
+        UseSkinAudioSamples,
+        UseTaikoSkin,
+        UseSkinCursor,
+        CursorSize,
+        EnableAutomaticCursorSize,
+        // Input
+        //  Mouse
+        MouseSensitivity,
+        EnableRawInput,
+        EnableMapRawInputToWindow,
+        MouseConfinementMode,
+        DisableMouseWheelInPlay,
+        DisableMouseButtonsInPlay,
+        EnableCursorRipples,
+        //  Keyboard
+        // TODO
+        //  Other
+        UseOSTabletSupport,
+        EnableWiimoteDrumSupport,
+        // Editor
+        EnableEditorBackgroundVideo,
+        EnableEditorDefaultSkin,
+        EnableEditorSnakingSliders,
+        EnableEditorHitAnimations,
+        EnableEditorFollowPoints,
+        EnableEditorStacking,
+        // Online
+        //  Alerts and Privacy
+        EnableChatTicker,
+        HideChatDuringPlay,
+        EnableNotifyOnMention,
+        EnableSoundOnMention,
+        EnableChatNotifications,
+        EnableCitySharing,
+        EnableSpectators,
+        AutoLinkBeatmapsToSpectators,
+        ShowNotificationsDuringPlay,
+        ShowFriendOnlineStatusNotifications,
+        AllowAnyMultiplayerInvites,
+        //  Integration
+        EnableYahooIntegration,
+        EnableMSNLiveIntegration,
+        AutoStartOsuDirect,
+        PreferNoVideo,
+        //  In-game chat
+        EnableWordFilter,
+        EnableForeignFilter,
+        EnablePrivateMessageLog,
+        BlockStrangerPrivateMessages,
+        ChatIgnoreList,
+        ChatHighlightList,
+        // Maintenance
+        // (no persisted options)
+        // Misc (not mapped to user-visible options)
+        Token,
+        PlayMode,
     }
 }
