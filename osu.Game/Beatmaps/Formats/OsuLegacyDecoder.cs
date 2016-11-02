@@ -270,7 +270,9 @@ namespace osu.Game.Beatmaps.Formats
                         handleColours(beatmap, key, val);
                         break;
                     case Section.HitObjects:
-                        beatmap.HitObjects.Add(HitObject.Parse(beatmap.BeatmapInfo.Mode, val));
+                        var h = HitObject.Parse(beatmap.BeatmapInfo.Mode, val);
+                        if (h != null)
+                            beatmap.HitObjects.Add(h);
                         break;
                 }
             }
