@@ -31,6 +31,7 @@ namespace osu.Game.Beatmaps.Objects
 
             set
             {
+                if (state == value) return;
                 state = value;
 
                 UpdateState(state);

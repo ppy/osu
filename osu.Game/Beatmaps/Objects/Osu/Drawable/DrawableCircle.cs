@@ -70,6 +70,14 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             approachCircle.Texture = game.Textures.Get(@"Play/osu/approachcircle@2x");
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            //force application of the state that was set before we loaded.
+            UpdateState(State);
+        }
+
         protected override void UpdateState(ArmedState state)
         {
             if (!IsLoaded) return;
