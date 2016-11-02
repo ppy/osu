@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
@@ -10,7 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Configuration;
 using osu.Game.GameModes.Play;
-using osu.Game.Graphics;
+using osu.Game.Graphics.TimeDisplay;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
@@ -86,8 +87,8 @@ namespace osu.Game.Overlays
                     Origin = Anchor.TopRight,
                     Direction = FlowDirection.HorizontalOnly,
                     RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Children = new []
+
+                    Children = new Drawable[]
                     {
                         new ToolbarButton
                         {
@@ -101,6 +102,13 @@ namespace osu.Game.Overlays
                         new ToolbarButton
                         {
                             Icon = FontAwesome.bars
+                        },
+                        new TimeDisplay
+                        {
+                            Size = new Vector2(110, 0),
+                            TextPosition = new Vector2(0, 12),
+                            TextSize = 24,
+                            Format = "hh:mm:ss tt"
                         },
                     }
                 }
