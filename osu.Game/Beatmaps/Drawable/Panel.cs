@@ -58,7 +58,7 @@ namespace osu.Game.Beatmaps.Drawable
             EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Glow,
-                Colour = new Color4(150, 204, 255, 150),
+                Colour = new Color4(130, 204, 255, 150),
                 Radius = 20,
                 Roundness = 10,
             };
