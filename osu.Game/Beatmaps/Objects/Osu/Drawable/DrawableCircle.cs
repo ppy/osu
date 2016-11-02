@@ -86,6 +86,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             //sane defaults
             ring.Alpha = circle.Alpha = number.Alpha = approachCircle.Alpha = glow.Alpha = 1;
             explode.Alpha = 0;
+            Scale = Vector2.One;
 
             //always-present transforms
             Transforms.Add(new TransformAlpha { StartTime = t - 1000, EndTime = t - 800, StartValue = 0, EndValue = 1 });

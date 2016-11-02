@@ -32,7 +32,7 @@ namespace osu.Game.GameModes.Play.Osu
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
-            Size = new Vector2(0.86f);
+            Size = new Vector2(0.75f);
 
             AddInternal(new Box
             {
@@ -43,13 +43,17 @@ namespace osu.Game.GameModes.Play.Osu
                 Alpha = 0.5f,
             });
 
-            AddInternal(hitObjectContainer = new Container
+            AddInternal(hitObjectContainer = new HitObjectContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Scale = new Vector2(0.4f),
             });
+        }
+
+        class HitObjectContainer : Container
+        {
+            protected override Vector2 ChildScale => new Vector2(0.625f);
         }
     }
 }
