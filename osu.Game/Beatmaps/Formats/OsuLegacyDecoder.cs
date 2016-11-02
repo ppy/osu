@@ -207,7 +207,7 @@ namespace osu.Game.Beatmaps.Formats
             });
         }
 
-        public override Beatmap Decode(TextReader stream)
+        protected override Beatmap ParseFile(TextReader stream)
         {
             var beatmap = new Beatmap
             {
