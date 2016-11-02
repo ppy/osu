@@ -16,24 +16,39 @@ namespace osu.Game.GameModes.Play.Osu
 
         private Container hitObjectContainer;
 
+        public override Vector2 Size
+        {
+            get
+            {
+                var parentSize = Parent.DrawSize;
+                var aspectSize = parentSize.X * 0.75f < parentSize.Y ? new Vector2(parentSize.X, parentSize.X * 0.75f) : new Vector2(parentSize.Y * 4f / 3f, parentSize.Y);
+
+                return new Vector2(aspectSize.X / parentSize.X, aspectSize.Y / parentSize.Y) * base.Size;
+            }
+        }
+
         public OsuPlayfield()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            Size = new Vector2(512, 384);
+            RelativeSizeAxes = Axes.Both;
+            Size = new Vector2(0.86f);
 
             AddInternal(new Box
             {
+                RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
                 Colour = Color4.Black,
-                Alpha = 0.5f
+                Alpha = 0.5f,
             });
 
             AddInternal(hitObjectContainer = new Container
             {
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Scale = new Vector2(0.4f),
             });
         }
     }

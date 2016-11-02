@@ -30,7 +30,8 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             this.h = h;
 
             Origin = Anchor.Centre;
-            Position = h.Position;
+            RelativePositionAxes = Axes.Both;
+            Position = new Vector2(h.Position.X / 512, h.Position.Y / 384);
 
             Children = new Framework.Graphics.Drawable[]
             {
@@ -57,8 +58,6 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                     Colour = h.Colour
                 }
             };
-
-            Size = new Vector2(100);
         }
 
         protected override void Load(BaseGame game)

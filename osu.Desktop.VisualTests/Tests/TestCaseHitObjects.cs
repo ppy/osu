@@ -34,19 +34,20 @@ namespace osu.Desktop.VisualTests.Tests
 
             ourClock.ProcessFrame();
 
-            for (int i = 0; i < 20; i++)
+            const int count = 10;
+
+            for (int i = 0; i < count; i++)
             {
                 var h = new Circle
                 {
                     StartTime = ourClock.CurrentTime + 1000 + i * 80,
-                    Position = new Vector2(i * 14),
+                    Position = new Vector2((i - count / 2) * 14),
                 };
 
                 Add(new DrawableCircle(h)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Scale = new Vector2(1.2f),
                     Depth = -i,
                     State = ArmedState.Armed,
                 });
