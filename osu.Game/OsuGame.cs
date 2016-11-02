@@ -61,7 +61,7 @@ namespace osu.Game
                 Schedule(delegate { Beatmaps.Import(args); });
 
             //attach our bindables to the audio subsystem.
-            Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeGlobal));
+            Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeUniversal));
             Audio.VolumeSample.Weld(Config.GetBindable<double>(OsuConfig.VolumeEffect));
             Audio.VolumeTrack.Weld(Config.GetBindable<double>(OsuConfig.VolumeMusic));
 
