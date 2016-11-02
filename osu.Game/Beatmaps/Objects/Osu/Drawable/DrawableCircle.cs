@@ -8,22 +8,21 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
+using OpenTK;
 
 namespace osu.Game.Beatmaps.Objects.Osu.Drawable
 {
     public class DrawableCircle : DrawableHitObject
     {
         private Sprite approachCircle;
-        private CirclePart circle;
-        private RingPart ring;
-        private FlashPart flash;
-        private ExplodePart explode;
-        private NumberPart number;
-        private GlowPart glow;
+        private CircleLayer circle;
+        private RingLayer ring;
+        private FlashLayer flash;
+        private ExplodeLayer explode;
+        private NumberLayer number;
+        private GlowLayer glow;
         private OsuBaseHit h;
 
         public DrawableCircle(Circle h) : base(h)
@@ -37,19 +36,19 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
 
             Children = new Framework.Graphics.Drawable[]
             {
-                glow = new GlowPart()
+                glow = new GlowLayer
                 {
-                    Colour = h.Colour,
+                    Colour = h.Colour
                 },
-                circle = new CirclePart()
+                circle = new CircleLayer
                 {
                     Colour = h.Colour,
                     Hit = delegate { State = ArmedState.Armed; }
                 },
-                number = new NumberPart(),
-                ring = new RingPart(),
-                flash = new FlashPart(),
-                explode = new ExplodePart()
+                number = new NumberLayer(),
+                ring = new RingLayer(),
+                flash = new FlashLayer(),
+                explode = new ExplodeLayer
                 {
                     Colour = h.Colour
                 },
@@ -111,11 +110,11 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             }
         }
 
-        class NumberPart : Container
+        class NumberLayer : Container
         {
             private Sprite number;
 
-            public NumberPart()
+            public NumberLayer()
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
@@ -126,7 +125,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Alpha = 1,
+                            Alpha = 1
                         }
                 };
             }
@@ -138,11 +137,11 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             }
         }
 
-        class GlowPart : Container
+        class GlowLayer : Container
         {
             private Sprite layer3;
 
-            public GlowPart()
+            public GlowLayer()
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
@@ -154,7 +153,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Additive = true,
-                            Alpha = 0.5f,
+                            Alpha = 0.5f
                         }
                 };
             }
@@ -166,11 +165,11 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             }
         }
 
-        class RingPart : Container
+        class RingLayer : Container
         {
             private Sprite ring;
 
-            public RingPart()
+            public RingLayer()
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
@@ -180,8 +179,8 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                     ring = new Sprite
                     {
                         Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
+                        Origin = Anchor.Centre
+                    }
                 };
             }
 
@@ -192,9 +191,9 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             }
         }
 
-        class FlashPart : Container
+        class FlashLayer : Container
         {
-            public FlashPart()
+            public FlashLayer()
             {
                 Size = new Vector2(144);
                 Masking = true;
@@ -210,15 +209,15 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 {
                     new Box
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        RelativeSizeAxes = Axes.Both
                     }
                 };
             }
         }
 
-        class ExplodePart : Container
+        class ExplodeLayer : Container
         {
-            public ExplodePart()
+            public ExplodeLayer()
             {
                 Size = new Vector2(144);
 
@@ -232,8 +231,8 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 {
                     new Triangles
                     {
-                        RelativeSizeAxes = Axes.Both,
-                    },
+                        RelativeSizeAxes = Axes.Both
+                    }
                 };
             }
 
@@ -255,7 +254,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                             Origin = Anchor.Centre,
                             Position = new Vector2(RNG.NextSingle() * DrawSize.X, RNG.NextSingle() * DrawSize.Y),
                             Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
-                            Alpha = RNG.NextSingle() * 0.3f,
+                            Alpha = RNG.NextSingle() * 0.3f
                         });
                     }
                 }
@@ -270,7 +269,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             }
         }
 
-        class CirclePart : Container
+        class CircleLayer : Container
         {
 
             private Sprite disc;
@@ -278,7 +277,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
 
             public Action Hit;
 
-            public CirclePart()
+            public CircleLayer()
             {
                 Size = new Vector2(144);
                 Masking = true;
@@ -292,13 +291,13 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                     disc = new Sprite
                     {
                         Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
+                        Origin = Anchor.Centre
                     },
                     triangles = new Triangles
                     {
                         Additive = true,
-                        RelativeSizeAxes = Axes.Both,
-                    },
+                        RelativeSizeAxes = Axes.Both
+                    }
                 };
             }
 
@@ -332,7 +331,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                             Origin = Anchor.Centre,
                             Position = new Vector2(RNG.NextSingle() * DrawSize.X, RNG.NextSingle() * DrawSize.Y),
                             Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
-                            Alpha = RNG.NextSingle() * 0.3f,
+                            Alpha = RNG.NextSingle() * 0.3f
                         });
                     }
                 }
