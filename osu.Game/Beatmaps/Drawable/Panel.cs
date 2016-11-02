@@ -52,7 +52,7 @@ namespace osu.Game.Beatmaps.Drawable
 
         protected virtual void Selected()
         {
-            BorderColour = new Color4(BorderColour.R, BorderColour.G, BorderColour.B, 255);
+            BorderColour = new Color4(BorderColour.R, BorderColour.G, BorderColour.B, 1f);
             BorderThickness = 2.5f;
 
             EdgeEffect = new EdgeEffect
