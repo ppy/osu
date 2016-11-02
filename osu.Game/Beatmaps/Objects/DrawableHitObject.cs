@@ -25,6 +25,7 @@ namespace osu.Game.Beatmaps.Objects
         public DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
+            Depth = -(float)hitObject.StartTime;
         }
 
         private ArmedState state;
