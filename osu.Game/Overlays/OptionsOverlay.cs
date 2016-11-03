@@ -14,21 +14,33 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Platform;
+using osu.Game.Configuration;
+using osu.Game.Online.API;
+using osu.Game.Overlays.Options;
 
 namespace osu.Game.Overlays
 {
-    public class Options : OverlayContainer
+    public class OptionsOverlay : OverlayContainer
     {
         internal const float SideMargins = 10;
         private const float width = 400;
         private FlowContainer optionsContainer;
         private BasicStorage storage;
+        private OsuConfigManager configManager;
+        private APIAccess api;
 
         protected override void Load(BaseGame game)
         {
             base.Load(game);
 
             storage = game.Host.Storage;
+
+            var osuGame = game as OsuGameBase;
+            if (osuGame != null)
+            {
+                configManager = osuGame.Config;
+                api = osuGame.API;
+            }
 
             Depth = float.MaxValue;
             RelativeSizeAxes = Axes.Y;
@@ -54,7 +66,7 @@ namespace osu.Game.Overlays
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                             Direction = FlowDirection.VerticalOnly,
-                            Children = new[]
+                            Children = new Drawable[]
                             {
                                 new SpriteText
                                 {
@@ -68,65 +80,13 @@ namespace osu.Game.Overlays
                                     Text = "Change the way osu! behaves",
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = SideMargins, Bottom = 30 },
-                                }
+                                },
+                                new GeneralOptions(storage, api),
                             }
                         }
                     }
                 }
             };
-            addGeneral();
-        }
-
-        private void addGeneral()
-        {
-            optionsContainer.Add(new OptionsSection
-            {
-                Header = "General",
-                Children = new[]
-                {
-                    new OptionsSubsection
-                    {
-                        Header = "Sign In",
-                        Children = new[]
-                        {
-                            new SpriteText { Text = "TODO" }
-                        }
-                    },
-                    new OptionsSubsection
-                    {
-                        Header = "Language",
-                        Children = new Drawable[]
-                        {
-                            new SpriteText { Text = "TODO: Dropdown" },
-                            new BasicCheckBox
-                            {
-                                Children = new[] { new SpriteText { Text = "Prefer metadata in original language" } }
-                            },
-                            new BasicCheckBox
-                            {
-                                Children = new[] { new SpriteText { Text = "Use alternative font for chat display" } }
-                            },
-                        }
-                    },
-                    new OptionsSubsection
-                    {
-                        Header = "Updates",
-                        Children = new Drawable[]
-                        {
-                            new SpriteText { Text = "TODO: Dropdown" },
-                            new SpriteText { Text = "Your osu! is up to date" }, // TODO: map this to reality
-                            new Button
-                            {
-                                AutoSizeAxes = Axes.Y,
-                                RelativeSizeAxes = Axes.X,
-                                Colour = new Color4(14, 132, 165, 255),
-                                Text = "Open osu! folder",
-                                Action = storage.OpenInNativeExplorer,
-                            }
-                        }
-                    }
-                }
-            });
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -153,7 +113,7 @@ namespace osu.Game.Overlays
         }
     }
 
-    class OptionsSection : Container
+    public class OptionsSection : Container
     {
         private SpriteText header;
         private FlowContainer content;
@@ -184,8 +144,8 @@ namespace osu.Game.Overlays
                     Padding = new MarginPadding
                     {
                         Top = 10 + borderSize,
-                        Left = Options.SideMargins,
-                        Right = Options.SideMargins,
+                        Left = OptionsOverlay.SideMargins,
+                        Right = OptionsOverlay.SideMargins,
                     },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -210,7 +170,7 @@ namespace osu.Game.Overlays
         }
     }
 
-    class OptionsSubsection : Container
+    public class OptionsSubsection : Container
     {
         private SpriteText header;
         private Container content;
@@ -233,6 +193,7 @@ namespace osu.Game.Overlays
                     Direction = FlowDirection.VerticalOnly,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(0, 5),
                     Children = new[]
                     {
                         header = new SpriteText

@@ -16,13 +16,13 @@ namespace osu.Desktop.VisualTests.Tests
 
         public override string Description => @"Tests the options overlay";
 
-        private Options options;
+        private OptionsOverlay options;
 
         public override void Reset()
         {
             base.Reset();
 
-            Children = new[] { options = new Options() };
+            Children = new[] { options = new OptionsOverlay() };
             options.ToggleVisibility();
         }
     }
