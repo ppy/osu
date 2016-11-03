@@ -225,6 +225,8 @@
     <Compile Include="Overlays\Options\OnlineIntegrationOptions.cs" />
     <Compile Include="Overlays\Options\InGameChatOptions.cs" />
     <Compile Include="Overlays\Options\MaintenanceOptions.cs" />
+    <Compile Include="Overlays\Options\OptionsSection.cs" />
+    <Compile Include="Overlays\Options\OptionsSubsection.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
