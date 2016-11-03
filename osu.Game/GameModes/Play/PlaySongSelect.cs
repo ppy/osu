@@ -35,6 +35,7 @@ namespace osu.Game.GameModes.Play
         private ScrollContainer scrollContainer;
         private FlowContainer beatmapSetFlow;
         private TrackManager trackManager;
+        private Container wedgeContainer;
 
         /// <param name="database">Optionally provide a database to use instead of the OsuGame one.</param>
         public PlaySongSelect(BeatmapDatabase database = null)
@@ -45,7 +46,7 @@ namespace osu.Game.GameModes.Play
             const float bottomToolHeight = 50;
             Children = new Drawable[]
             {
-                new Container
+                wedgeContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = Vector2.One,
@@ -120,7 +121,7 @@ namespace osu.Game.GameModes.Play
             };
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 
@@ -147,6 +148,7 @@ namespace osu.Game.GameModes.Play
         {
             base.OnEntering(last);
             ensurePlayingSelected();
+            wedgeContainer.FadeInFromZero(250);
         }
 
         protected override void OnResuming(GameMode last)
@@ -166,10 +168,13 @@ namespace osu.Game.GameModes.Play
         {
         }
 
+        /// <summary>
+        /// The global Beatmap was changed.
+        /// </summary>
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
             base.OnBeatmapChanged(beatmap);
-            selectBeatmap(beatmap.Beatmap.BeatmapInfo);
+            selectBeatmap(beatmap.BeatmapInfo);
         }
 
         private void selectBeatmap(BeatmapInfo beatmap)
@@ -177,11 +182,17 @@ namespace osu.Game.GameModes.Play
             if (beatmap.Equals(selectedBeatmapInfo))
                 return;
 
-            beatmapSetFlow.Children.Cast<BeatmapGroup>().First(b =>
+            //this is VERY temporary logic.
+            beatmapSetFlow.Children.Cast<BeatmapGroup>().Any(b =>
             {
                 var panel = b.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
-                panel?.TriggerClick();
-                return panel != null;
+                if (panel != null)
+                {
+                    panel.State = PanelSelectedState.Selected;
+                    return true;
+                }
+
+                return false;
             });
         }
 
@@ -192,7 +203,7 @@ namespace osu.Game.GameModes.Play
         {
             selectedBeatmapInfo = beatmap;
 
-            if (!beatmap.Equals(Beatmap?.Beatmap?.BeatmapInfo))
+            if (!beatmap.Equals(Beatmap?.BeatmapInfo))
             {
                 Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
             }
@@ -208,15 +219,20 @@ namespace osu.Game.GameModes.Play
             selectedBeatmapGroup = group;
         }
 
-        private void ensurePlayingSelected()
+        private async Task ensurePlayingSelected()
         {
-            var track = Beatmap?.Track;
+            AudioTrack track = null;
 
-            if (track != null)
+            await Task.Run(() => track = Beatmap?.Track);
+
+            Schedule(delegate
             {
-                trackManager.SetExclusive(track);
-                track.Start();
-            }
+                if (track != null)
+                {
+                    trackManager.SetExclusive(track);
+                    track.Start();
+                }
+            });
         }
 
         private void addBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -224,12 +240,34 @@ namespace osu.Game.GameModes.Play
             beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
             beatmapSet.Beatmaps.ForEach(b => database.GetChildren(b));
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty).ToList();
-            Schedule(() =>
+            var group = new BeatmapGroup(beatmapSet) { SelectionChanged = selectionChanged };
+
+            group.Preload(Game, g =>
             {
-                var group = new BeatmapGroup(beatmapSet) { SelectionChanged = selectionChanged };
                 beatmapSetFlow.Add(group);
-                if (beatmapSetFlow.Children.Count() == 1)
-                    group.State = BeatmapGroupState.Expanded;
+
+                if (Beatmap == null)
+                {
+                    if (beatmapSetFlow.Children.Count() == 1)
+                    {
+                        group.State = BeatmapGroupState.Expanded;
+                        return;
+                    }
+                }
+                else
+                {
+                    if (selectedBeatmapInfo?.Equals(Beatmap.BeatmapInfo) != true)
+                    {
+                        var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(Beatmap.BeatmapInfo));
+                        if (panel != null)
+                        {
+                            panel.State = PanelSelectedState.Selected;
+                            return;
+                        }
+                    }
+                }
+
+                group.State = BeatmapGroupState.Collapsed;
             });
         }
 

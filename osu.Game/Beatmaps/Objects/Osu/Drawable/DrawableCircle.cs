@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             Size = new Vector2(100);
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 
@@ -131,7 +131,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 };
             }
 
-            public override void Load(BaseGame game)
+            protected override void Load(BaseGame game)
             {
                 base.Load(game);
                 number.Texture = game.Textures.Get(@"Play/osu/number@2x");
@@ -159,7 +159,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 };
             }
 
-            public override void Load(BaseGame game)
+            protected override void Load(BaseGame game)
             {
                 base.Load(game);
                 layer3.Texture = game.Textures.Get(@"Play/osu/ring-glow@2x");
@@ -185,7 +185,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 };
             }
 
-            public override void Load(BaseGame game)
+            protected override void Load(BaseGame game)
             {
                 base.Load(game);
                 ring.Texture = game.Textures.Get(@"Play/osu/ring@2x");
@@ -241,7 +241,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             {
                 private Texture tex;
 
-                public override void Load(BaseGame game)
+                protected override void Load(BaseGame game)
                 {
                     base.Load(game);
 
@@ -302,7 +302,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 };
             }
 
-            public override void Load(BaseGame game)
+            protected override void Load(BaseGame game)
             {
                 base.Load(game);
                 disc.Texture = game.Textures.Get(@"Play/osu/disc@2x");
@@ -318,7 +318,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             {
                 private Texture tex;
 
-                public override void Load(BaseGame game)
+                protected override void Load(BaseGame game)
                 {
                     base.Load(game);
 

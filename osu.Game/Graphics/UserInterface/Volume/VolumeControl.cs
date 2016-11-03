@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
             Origin = Anchor.BottomRight;
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             VolumeGlobal.ValueChanged += volumeChanged;
             VolumeSample.ValueChanged += volumeChanged;

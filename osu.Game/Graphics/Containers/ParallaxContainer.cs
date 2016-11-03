@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override Container Content => content;
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
         }

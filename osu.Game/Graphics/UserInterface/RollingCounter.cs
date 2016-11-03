@@ -119,7 +119,7 @@ namespace osu.Game.Graphics.UserInterface
             AutoSizeAxes = Axes.Both;
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 

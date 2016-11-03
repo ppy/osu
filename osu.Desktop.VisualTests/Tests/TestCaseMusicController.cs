@@ -24,7 +24,7 @@ namespace osu.Desktop.Tests
 
         protected MusicController mc;
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
             ourClock = new FramedClock();

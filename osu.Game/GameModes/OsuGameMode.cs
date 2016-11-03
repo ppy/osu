@@ -69,7 +69,7 @@ namespace osu.Game.GameModes
             OnBeatmapChanged(beatmap.Value);
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
             beatmap = (game as OsuGameBase)?.Beatmap;

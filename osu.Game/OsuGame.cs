@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Threading;
 using osu.Framework.Configuration;
 using osu.Framework.GameModes;
 using osu.Game.Configuration;
@@ -47,7 +48,7 @@ namespace osu.Game
             host.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             if (!Host.IsPrimaryInstance)
             {
@@ -65,25 +66,18 @@ namespace osu.Game
             Audio.VolumeSample.Weld(Config.GetBindable<double>(OsuConfig.VolumeEffect));
             Audio.VolumeTrack.Weld(Config.GetBindable<double>(OsuConfig.VolumeMusic));
 
+            PlayMode = Config.GetBindable<PlayMode>(OsuConfig.PlayMode);
+
             Add(new Drawable[] {
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
                     ActivateRequested = delegate { volume.Show(); }
                 },
-                intro = new Intro
+                mainContent = new Container
                 {
-                    Beatmap = Beatmap
+                    RelativeSizeAxes = Axes.Both,
                 },
-                MusicController = new MusicController(),
-                Toolbar = new Toolbar
-                {
-                    OnHome = delegate { MainMenu?.MakeCurrent(); },
-                    OnSettings = Options.ToggleVisibility,
-                    OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
-                    OnMusicController = MusicController.ToggleVisibility,
-                },
-                Chat = new ChatConsole(API),
                 volume = new VolumeControl
                 {
                     VolumeGlobal = Audio.Volume,
@@ -96,12 +90,31 @@ namespace osu.Game
                 }
             });
 
-            intro.ModePushed += modeAdded;
-            intro.Exited += modeRemoved;
+            (intro = new Intro
+            {
+                Beatmap = Beatmap
+            }).Preload(game, d =>
+            {
+                mainContent.Add(d);
 
-            PlayMode = Config.GetBindable<PlayMode>(OsuConfig.PlayMode);
-            PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
-            PlayMode.TriggerChange();
+                intro.ModePushed += modeAdded;
+                intro.Exited += modeRemoved;
+                intro.DisplayAsRoot();
+            });
+
+            (Chat = new ChatConsole(API)).Preload(game, Add);
+
+            (Toolbar = new Toolbar
+            {
+                OnHome = delegate { MainMenu?.MakeCurrent(); },
+                OnSettings = Options.ToggleVisibility,
+                OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
+            }).Preload(game, t =>
+            {
+                PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
+                PlayMode.TriggerChange();
+                Add(Toolbar);
+            });
 
             Cursor.Alpha = 0;
         }
@@ -119,6 +132,8 @@ namespace osu.Game
         }
 
         public Action<GameMode> ModeChanged;
+
+        private Container mainContent;
 
         private void modeChanged(GameMode newMode)
         {
