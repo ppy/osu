@@ -23,7 +23,6 @@ namespace osu.Game.Beatmaps.Drawable
             Masking = true;
             CornerRadius = 10;
             BorderColour = new Color4(221, 255, 255, 0);
-            GlowColour = new Color4(102, 204, 255, 100);
 
             RelativeSizeAxes = Axes.X;
         }
@@ -53,16 +52,24 @@ namespace osu.Game.Beatmaps.Drawable
 
         protected virtual void Selected()
         {
-            BorderColour = new Color4(BorderColour.R, BorderColour.G, BorderColour.B, 255);
-            GlowRadius = 10;
+            BorderColour = new Color4(BorderColour.R, BorderColour.G, BorderColour.B, 1f);
             BorderThickness = 2.5f;
+
+            EdgeEffect = new EdgeEffect
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = new Color4(130, 204, 255, 150),
+                Radius = 20,
+                Roundness = 10,
+            };
         }
 
         protected virtual void Deselected()
         {
             BorderColour = new Color4(BorderColour.R, BorderColour.G, BorderColour.B, 0);
-            GlowRadius = 0;
             BorderThickness = 0;
+
+            EdgeEffect = new EdgeEffect { Type = EdgeEffectType.None };
         }
 
         protected override bool OnClick(InputState state)
