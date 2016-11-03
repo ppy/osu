@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
+using osu.Framework.Platform;
 using osu.Game.GameModes.Play;
 using osu.Game.Online.API;
 
@@ -9,6 +10,10 @@ namespace osu.Game.Configuration
 {
     class OsuConfigManager : ConfigManager<OsuConfig>
     {
+        public OsuConfigManager(BasicStorage storage) : base(storage)
+        {
+        }
+
         protected override void InitialiseDefaults()
         {
             Set(OsuConfig.Width, 1366, 640);

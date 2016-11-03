@@ -27,8 +27,6 @@ namespace osu.Game.Graphics.Background
             Depth = float.MinValue;
         }
 
-        Texture texture;
-
         protected override void Load(BaseGame game)
         {
             base.Load(game);
@@ -38,7 +36,9 @@ namespace osu.Game.Graphics.Background
                 Texture = game.Textures.Get(textureName),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Colour = Color4.DarkGray
+                Colour = Color4.DarkGray,
+                UseSimpleShader = true,
+                BlendingMode = BlendingMode.None,
             });
         }
 
