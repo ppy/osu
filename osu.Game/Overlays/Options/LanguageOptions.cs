@@ -13,14 +13,8 @@ namespace osu.Game.Overlays.Options
             Children = new Drawable[]
             {
                 new SpriteText { Text = "TODO: Dropdown" },
-                new BasicCheckBox
-                {
-                    Children = new[] { new SpriteText { Text = "Prefer metadata in original language" } }
-                },
-                new BasicCheckBox
-                {
-                    Children = new[] { new SpriteText { Text = "Use alternative font for chat display" } }
-                },
+                new BasicCheckBox { LabelText = "Prefer metadata in original language" },
+                new BasicCheckBox { LabelText = "Use alternative font for chat display" },
             };
         }
     }

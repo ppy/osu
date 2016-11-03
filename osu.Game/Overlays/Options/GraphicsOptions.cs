@@ -1,4 +1,6 @@
 ﻿using System;
+using osu.Framework.Graphics;
+
 namespace osu.Game.Overlays.Options
 {
     public class GraphicsOptions : OptionsSection
@@ -6,6 +8,14 @@ namespace osu.Game.Overlays.Options
         public GraphicsOptions()
         {
             Header = "Graphics";
+            Children = new Drawable[]
+            {
+                new RendererOptions(),
+                new LayoutOptions(),
+                new DetailSettings(),
+                new MainMenuOptions(),
+                new SongSelectGraphicsOptions(),
+            };
         }
     }
 }

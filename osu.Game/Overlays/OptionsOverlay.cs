@@ -82,6 +82,7 @@ namespace osu.Game.Overlays
                                     Margin = new MarginPadding { Left = SideMargins, Bottom = 30 },
                                 },
                                 new GeneralOptions(storage, api),
+                                new GraphicsOptions(),
                             }
                         }
                     }
@@ -146,6 +147,7 @@ namespace osu.Game.Overlays
                         Top = 10 + borderSize,
                         Left = OptionsOverlay.SideMargins,
                         Right = OptionsOverlay.SideMargins,
+                        Bottom = 10,
                     },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
