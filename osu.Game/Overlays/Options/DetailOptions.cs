@@ -5,9 +5,9 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class DetailSettings : OptionsSubsection
+    public class DetailOptions : OptionsSubsection
     {
-        public DetailSettings()
+        public DetailOptions()
         {
             Header = "Detail Settings";
             Children = new Drawable[]

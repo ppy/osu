@@ -204,9 +204,21 @@
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />
     <Compile Include="Overlays\Options\RendererOptions.cs" />
     <Compile Include="Overlays\Options\LayoutOptions.cs" />
-    <Compile Include="Overlays\Options\DetailSettings.cs" />
+    <Compile Include="Overlays\Options\DetailOptions.cs" />
     <Compile Include="Overlays\Options\MainMenuOptions.cs" />
     <Compile Include="Overlays\Options\SongSelectGraphicsOptions.cs" />
+    <Compile Include="Overlays\Options\GameplayOptions.cs" />
+    <Compile Include="Overlays\Options\GeneralGameplayOptions.cs" />
+    <Compile Include="Overlays\Options\SongSelectGameplayOptions.cs" />
+    <Compile Include="Overlays\Options\AudioOptions.cs" />
+    <Compile Include="Overlays\Options\AudioDevicesOptions.cs" />
+    <Compile Include="Overlays\Options\VolumeOptions.cs" />
+    <Compile Include="Overlays\Options\OffsetAdjustmentOptions.cs" />
+    <Compile Include="Overlays\Options\SkinOptions.cs" />
+    <Compile Include="Overlays\Options\InputOptions.cs" />
+    <Compile Include="Overlays\Options\MouseOptions.cs" />
+    <Compile Include="Overlays\Options\KeyboardOptions.cs" />
+    <Compile Include="Overlays\Options\OtherInputOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

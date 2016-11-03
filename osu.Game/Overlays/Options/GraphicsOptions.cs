@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Options
             {
                 new RendererOptions(),
                 new LayoutOptions(),
-                new DetailSettings(),
+                new DetailOptions(),
                 new MainMenuOptions(),
                 new SongSelectGraphicsOptions(),
             };
