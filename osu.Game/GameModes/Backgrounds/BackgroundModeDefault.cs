@@ -8,7 +8,7 @@ namespace osu.Game.GameModes.Backgrounds
 {
     public class BackgroundModeDefault : BackgroundMode
     {
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 

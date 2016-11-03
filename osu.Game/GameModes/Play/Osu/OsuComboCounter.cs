@@ -33,7 +33,7 @@ namespace osu.Game.GameModes.Play.Osu
             }
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 

@@ -20,7 +20,7 @@ namespace osu.Game.GameModes.Play.Osu
             Origin = Anchor.Centre;
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 

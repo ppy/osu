@@ -48,7 +48,7 @@ namespace osu.Game.GameModes.Menu
             AutoSizeAxes = Axes.Both;
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
             Alpha = 0;

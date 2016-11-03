@@ -12,6 +12,7 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework;
+using System.Threading;
 
 namespace osu.Game.GameModes
 {
@@ -31,11 +32,32 @@ namespace osu.Game.GameModes
             return false;
         }
 
-        public override void Load(BaseGame game)
+        BaseGame game;
+
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
+            this.game = game;
+        }
 
-            Content.Scale *= 1 + (x_movement_amount / DrawSize.X) * 2;
+        public override bool Push(GameMode mode)
+        {
+            //don't actually push until we've finished loading.
+            if (!mode.IsLoaded)
+            {
+                mode.Preload(game, d => Push((BackgroundMode)d));
+                return true;
+            }
+
+            base.Push(mode);
+
+            return true;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            Content.Scale = new Vector2(1 + (x_movement_amount / DrawSize.X) * 2);
         }
 
         protected override void OnEntering(GameMode last)

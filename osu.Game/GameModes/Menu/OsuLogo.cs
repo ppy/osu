@@ -101,12 +101,16 @@ namespace osu.Game.GameModes.Menu
             };
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
-
             logo.Texture = game.Textures.Get(@"Menu/logo");
             ripple.Texture = game.Textures.Get(@"Menu/logo");
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             ripple.ScaleTo(1.1f, 500);
             ripple.FadeOut(500);

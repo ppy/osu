@@ -17,7 +17,7 @@ namespace osu.Game.Overlays
     {
         private const float width = 300;
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 

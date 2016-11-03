@@ -107,7 +107,7 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 
@@ -131,7 +131,11 @@ namespace osu.Game.Graphics.UserInterface
                 stars.Add(star);
                 starContainer.Add(star);
             }
+        }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             // Animate initial state from zero.
             transformCount(0, Count);
         }
