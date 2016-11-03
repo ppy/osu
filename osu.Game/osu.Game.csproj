@@ -202,6 +202,11 @@
     <Compile Include="Overlays\Options\UpdateOptions.cs" />
     <Compile Include="Overlays\Options\GraphicsOptions.cs" />
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />
+    <Compile Include="Overlays\Options\RendererOptions.cs" />
+    <Compile Include="Overlays\Options\LayoutOptions.cs" />
+    <Compile Include="Overlays\Options\DetailSettings.cs" />
+    <Compile Include="Overlays\Options\MainMenuOptions.cs" />
+    <Compile Include="Overlays\Options\SongSelectGraphicsOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
