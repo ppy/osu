@@ -87,6 +87,9 @@ namespace osu.Game.Overlays
                                 new AudioOptions(),
                                 new SkinOptions(),
                                 new InputOptions(),
+                                new EditorOptions(),
+                                new OnlineOptions(),
+                                new MaintenanceOptions(),
                             }
                         }
                     }

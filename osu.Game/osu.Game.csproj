@@ -219,6 +219,12 @@
     <Compile Include="Overlays\Options\MouseOptions.cs" />
     <Compile Include="Overlays\Options\KeyboardOptions.cs" />
     <Compile Include="Overlays\Options\OtherInputOptions.cs" />
+    <Compile Include="Overlays\Options\EditorOptions.cs" />
+    <Compile Include="Overlays\Options\OnlineOptions.cs" />
+    <Compile Include="Overlays\Options\AlertsPrivacyOptions.cs" />
+    <Compile Include="Overlays\Options\OnlineIntegrationOptions.cs" />
+    <Compile Include="Overlays\Options\InGameChatOptions.cs" />
+    <Compile Include="Overlays\Options\MaintenanceOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
