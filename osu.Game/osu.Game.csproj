@@ -200,6 +200,8 @@
     <Compile Include="Overlays\Options\GeneralOptions.cs" />
     <Compile Include="Overlays\Options\LanguageOptions.cs" />
     <Compile Include="Overlays\Options\UpdateOptions.cs" />
+    <Compile Include="Overlays\Options\GraphicsOptions.cs" />
+    <Compile Include="Graphics\UserInterface\OsuButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

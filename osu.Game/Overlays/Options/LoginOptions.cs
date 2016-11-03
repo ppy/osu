@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Options
@@ -53,7 +54,7 @@ namespace osu.Game.Overlays.Options
                 new TextBox { Height = 20, RelativeSizeAxes = Axes.X },
                 new SpriteText { Text = "Password" },
                 new TextBox { Height = 20, RelativeSizeAxes = Axes.X },
-                new Button
+                new OsuButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Log in",
