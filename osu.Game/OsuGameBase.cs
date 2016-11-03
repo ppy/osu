@@ -27,7 +27,7 @@ namespace osu.Game
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
-        public Options Options;
+        public OptionsOverlay Options;
         public APIAccess API;
 
         protected override Container Content => ratioContainer;
@@ -44,7 +44,7 @@ namespace osu.Game
 
             Children = new Drawable[]
             {
-                Options = new Options(),
+                Options = new OptionsOverlay(),
                 Cursor = new OsuCursorContainer()
             };
 

@@ -177,7 +177,7 @@
     <Compile Include="OsuGame.cs" />
     <Compile Include="OsuGameBase.cs" />
     <Compile Include="Overlays\ChatConsole.cs" />
-    <Compile Include="Overlays\Options.cs" />
+    <Compile Include="Overlays\OptionsOverlay.cs" />
     <Compile Include="Overlays\Toolbar.cs" />
     <Compile Include="Overlays\ToolbarButton.cs" />
     <Compile Include="Overlays\ToolbarModeButton.cs" />
@@ -196,6 +196,10 @@
     <Compile Include="Database\BeatmapMetadata.cs" />
     <Compile Include="Database\BeatmapInfo.cs" />
     <Compile Include="Database\BaseDifficulty.cs" />
+    <Compile Include="Overlays\Options\LoginOptions.cs" />
+    <Compile Include="Overlays\Options\GeneralOptions.cs" />
+    <Compile Include="Overlays\Options\LanguageOptions.cs" />
+    <Compile Include="Overlays\Options\UpdateOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -215,6 +219,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Overlays\Options\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
