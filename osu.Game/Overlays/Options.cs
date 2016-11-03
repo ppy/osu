@@ -19,6 +19,7 @@ namespace osu.Game.Overlays
 {
     public class Options : OverlayContainer
     {
+        internal const float SideMargins = 10;
         private const float width = 400;
         private FlowContainer optionsContainer;
         private BasicStorage storage;
@@ -39,13 +40,12 @@ namespace osu.Game.Overlays
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0.1f, 0.1f, 0.1f, 0.9f)
+                    Colour = new Color4(51, 51, 51, 255)
                 },
                 // TODO: Links on the side to jump to a section
                 new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = 5, Right = 5, Top = 50 },
                     ScrollDraggerOnLeft = true,
                     Children = new[]
                     {
@@ -58,25 +58,16 @@ namespace osu.Game.Overlays
                             {
                                 new SpriteText
                                 {
-                                    Text = "Options",
+                                    Text = "settings",
                                     TextSize = 40,
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
+                                    Margin = new MarginPadding { Left = SideMargins, Top = 30 },
                                 },
                                 new SpriteText
                                 {
                                     Colour = new Color4(235, 117, 139, 255),
                                     Text = "Change the way osu! behaves",
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Margin = new MarginPadding { Bottom = 25 },
-                                },
-                                new SpriteText
-                                {
-                                    Text = "TODO: SEARCH",
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Margin = new MarginPadding { Bottom = 25 },
+                                    TextSize = 18,
+                                    Margin = new MarginPadding { Left = SideMargins, Bottom = 30 },
                                 }
                             }
                         }
@@ -130,7 +121,7 @@ namespace osu.Game.Overlays
                                 RelativeSizeAxes = Axes.X,
                                 Colour = new Color4(14, 132, 165, 255),
                                 Text = "Open osu! folder",
-                                Action = storage.OpenOsuDirectory,
+                                Action = storage.OpenInNativeExplorer,
                             }
                         }
                     }
@@ -171,30 +162,49 @@ namespace osu.Game.Overlays
         public string Header
         {
             get { return header.Text; }
-            set { header.Text = value.ToUpper(); }
+            set { header.Text = value; }
         }
         
         public OptionsSection()
         {
-            const int headerSize = 40, headerMargin = 25;
+            const int headerSize = 30, headerMargin = 25;
+            const int borderSize = 2;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-            AddInternal(new[]
+            AddInternal(new Drawable[]
             {
-                header = new SpriteText
+                new Box
                 {
-                    TextSize = headerSize,
-                    Colour = new Color4(88, 218, 254, 255),
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                },
-                content = new FlowContainer
-                {
-                    Margin = new MarginPadding { Top = headerSize + headerMargin, Left = 10 },
-                    Direction = FlowDirection.VerticalOnly,
-                    Spacing = new Vector2(0, 25),
-                    AutoSizeAxes = Axes.Y,
+                    Colour = new Color4(3, 3, 3, 255),
                     RelativeSizeAxes = Axes.X,
+                    Height = borderSize,
+                },
+                new Container
+                {
+                    Padding = new MarginPadding
+                    {
+                        Top = 10 + borderSize,
+                        Left = Options.SideMargins,
+                        Right = Options.SideMargins,
+                    },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new[]
+                    {
+                        header = new SpriteText
+                        {
+                            TextSize = headerSize,
+                            Colour = new Color4(247, 198, 35, 255),
+                        },
+                        content = new FlowContainer
+                        {
+                            Margin = new MarginPadding { Top = headerSize + headerMargin },
+                            Direction = FlowDirection.VerticalOnly,
+                            Spacing = new Vector2(0, 25),
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                        },
+                    }
                 },
             });
         }
@@ -214,23 +224,15 @@ namespace osu.Game.Overlays
     
         public OptionsSubsection()
         {
-            const int borderWidth = 3, borderMargin = 10;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             AddInternal(new Drawable[]
             {
-                new Box
-                {
-                    Colour = new Color4(50, 50, 50, 255),
-                    RelativeSizeAxes = Axes.Y,
-                    Width = borderWidth,
-                },
                 content = new FlowContainer
                 {
                     Direction = FlowDirection.VerticalOnly,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = borderWidth + borderMargin },
                     Children = new[]
                     {
                         header = new SpriteText
