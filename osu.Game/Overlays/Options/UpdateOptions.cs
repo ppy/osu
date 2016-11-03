@@ -4,6 +4,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
@@ -16,7 +17,7 @@ namespace osu.Game.Overlays.Options
             {
                 new SpriteText { Text = "TODO: Dropdown" },
                 new SpriteText { Text = "Your osu! is up to date" }, // TODO: map this to reality
-                new Button
+                new OsuButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Open osu! folder",
