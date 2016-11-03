@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps.Objects.Catch.Drawable
             Position = new Vector2(h.Position, -0.1f);
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 

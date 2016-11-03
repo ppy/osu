@@ -27,7 +27,7 @@ namespace osu.Game.Online.Chat.Display
             const float padding = 200;
             const float text_size = 20;
 
-            public override void Load(BaseGame game)
+            protected override void Load(BaseGame game)
             {
                 base.Load(game);
 

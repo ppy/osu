@@ -25,6 +25,7 @@ namespace osu.Game.Overlays
         public Action OnMusicController;
 
         private ToolbarModeSelector modeSelector;
+        private ToolbarButton userButton;
 
         private const int transition_time = 200;
 
@@ -40,13 +41,8 @@ namespace osu.Game.Overlays
             FadeOut(transition_time, EasingTypes.InQuint);
         }
 
-        public override void Load(BaseGame game)
+        public Toolbar()
         {
-            base.Load(game);
-
-            RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, height);
-
             Children = new Drawable[]
             {
                 new Box
@@ -99,10 +95,9 @@ namespace osu.Game.Overlays
                         {
                             Icon = FontAwesome.search
                         },
-                        new ToolbarButton
+                        userButton = new ToolbarButton
                         {
                             Icon = FontAwesome.user,
-                            Text = ((OsuGame)game).Config.Get<string>(OsuConfig.Username)
                         },
                         new ToolbarButton
                         {
@@ -111,6 +106,15 @@ namespace osu.Game.Overlays
                     }
                 }
             };
+
+            RelativeSizeAxes = Axes.X;
+            Size = new Vector2(1, height);
+        }
+
+        protected override void Load(BaseGame game)
+        {
+            base.Load(game);
+            userButton.Text = ((OsuGame)game).Config.Get<string>(OsuConfig.Username);
         }
 
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);

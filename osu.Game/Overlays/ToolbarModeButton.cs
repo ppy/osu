@@ -43,7 +43,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
             DrawableIcon.TextSize *= 1.4f;

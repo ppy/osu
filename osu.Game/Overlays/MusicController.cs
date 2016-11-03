@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
             Position = new Vector2(10, 50);
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
             var osuGame = game as OsuGameBase;

@@ -59,7 +59,7 @@ namespace osu.Game.Online.Chat.Display
             channel.NewMessagesArrived -= newMessages;
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
             newMessages(channel.Messages);

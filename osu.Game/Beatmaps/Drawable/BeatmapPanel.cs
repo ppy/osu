@@ -26,7 +26,7 @@ namespace osu.Game.Beatmaps.Drawable
             GainedSelection?.Invoke(this);
         }
 
-        public BeatmapPanel(BeatmapSetInfo set, BeatmapInfo beatmap)
+        public BeatmapPanel(BeatmapInfo beatmap)
         {
             Beatmap = beatmap;
             Height *= 0.75f;
@@ -67,7 +67,7 @@ namespace osu.Game.Beatmaps.Drawable
                                         },
                                         new SpriteText
                                         {
-                                            Text = $" mapped by {(beatmap.Metadata ?? set.Metadata).Author}",
+                                            Text = $" mapped by {(beatmap.Metadata ?? beatmap.BeatmapSet.Metadata).Author}",
                                             TextSize = 16,
                                         },
                                     }

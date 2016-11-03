@@ -128,6 +128,9 @@ namespace osu.Game.Database
 
         public ArchiveReader GetReader(BeatmapSetInfo beatmapSet)
         {
+            if (string.IsNullOrEmpty(beatmapSet.Path))
+                return null;
+
             return ArchiveReader.GetReader(storage, beatmapSet.Path);
         }
 

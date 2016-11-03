@@ -30,18 +30,7 @@ namespace osu.Game.GameModes.Play
         private InterpolatingFramedClock playerClock;
         private IAdjustableClock sourceClock;
 
-        protected override bool OnExiting(GameMode next)
-        {
-            if (next == null)
-            {
-                //eagerly dispose as the finalizer runs too late right now.
-                Beatmap?.Dispose();
-            }
-
-            return base.OnExiting(next);
-        }
-
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 

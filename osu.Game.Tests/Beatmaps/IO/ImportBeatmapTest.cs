@@ -55,6 +55,9 @@ namespace osu.Game.Tests.Beatmaps.IO
             var osu = new OsuGameBase();
             host.Add(osu);
 
+            while (!osu.IsLoaded)
+                Thread.Sleep(1);
+
             //reset beatmap database (sqlite and storage backing)
             osu.Beatmaps.Reset();
 

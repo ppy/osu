@@ -31,6 +31,8 @@ namespace osu.Game.GameModes.Play
         protected virtual EasingTypes PopOutEasing => EasingTypes.None;
         protected virtual float PopOutInitialAlpha => 0.75f;
 
+        protected virtual double FadeOutDuration => 100;
+
         /// <summary>
         /// Duration in milliseconds for the counter roll-up animation for each element.
         /// </summary>
@@ -60,7 +62,6 @@ namespace osu.Game.GameModes.Play
             }
         }
 
-        protected ulong prevCount;
         protected ulong count;
 
         /// <summary>
@@ -119,7 +120,7 @@ namespace osu.Game.GameModes.Play
             TextSize = 80;
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 
@@ -204,7 +205,7 @@ namespace osu.Game.GameModes.Play
 
         private void updateCount(ulong value, bool rolling = false)
         {
-            prevCount = count;
+            ulong prevCount = count;
             count = value;
             if (!rolling)
             {
