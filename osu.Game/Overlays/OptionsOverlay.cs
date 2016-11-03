@@ -83,6 +83,10 @@ namespace osu.Game.Overlays
                                 },
                                 new GeneralOptions(storage, api),
                                 new GraphicsOptions(),
+                                new GameplayOptions(),
+                                new AudioOptions(),
+                                new SkinOptions(),
+                                new InputOptions(),
                             }
                         }
                     }
