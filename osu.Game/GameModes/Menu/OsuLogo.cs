@@ -70,6 +70,7 @@ namespace osu.Game.GameModes.Menu
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
+                                    UseSimpleShader = true,
                                 },
                             },
                         },
@@ -83,8 +84,9 @@ namespace osu.Game.GameModes.Menu
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Additive = true,
-                                    Alpha = 0.05f
+                                    BlendingMode = BlendingMode.Additive,
+                                    Alpha = 0.05f,
+                                    UseSimpleShader = true,
                                 }
                             }
                         },
@@ -93,7 +95,7 @@ namespace osu.Game.GameModes.Menu
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = logo.Size,
-                            Additive = true,
+                            BlendingMode = BlendingMode.Additive,
                             Alpha = 0.2f,
                         }
                     }

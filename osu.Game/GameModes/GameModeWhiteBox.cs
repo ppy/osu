@@ -91,7 +91,6 @@ namespace osu.Game.GameModes
                         Origin = Anchor.Centre,
                         Colour = getColourFor(GetType()),
                         Alpha = 1,
-                        Additive = false
                     },
                     textContainer = new Container
                     {
