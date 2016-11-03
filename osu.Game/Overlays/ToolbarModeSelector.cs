@@ -30,7 +30,7 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.Y;
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 
@@ -90,7 +90,7 @@ namespace osu.Game.Overlays
             activeMode.Invalidate();
         }
 
-        private Cached<Drawable> activeMode = new Cached<Drawable>();
+        private Cached activeMode = new Cached();
 
         protected override void UpdateLayout()
         {

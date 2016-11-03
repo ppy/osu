@@ -4,7 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -40,6 +43,10 @@ namespace osu.Game.Beatmaps.Drawable
                 {
                     case BeatmapGroupState.Expanded:
                         FadeTo(1, 250);
+
+                        //if (!difficulties.Children.All(d => IsLoaded))
+                        //    Task.WhenAll(difficulties.Children.Select(d => d.Preload(Game))).ContinueWith(t => difficulties.Show());
+                        //else
                         difficulties.Show();
 
                         header.State = PanelSelectedState.Selected;
@@ -61,16 +68,6 @@ namespace osu.Game.Beatmaps.Drawable
             Alpha = 0;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-
-            BeatmapPanels = beatmapSet.Beatmaps.Select(b =>
-                new BeatmapPanel(b)
-                {
-                    GainedSelection = panelGainedSelection,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    RelativeSizeAxes = Axes.X,
-                }).ToList();
-                
 
             Children = new[]
             {
@@ -96,18 +93,27 @@ namespace osu.Game.Beatmaps.Drawable
                             Padding = new MarginPadding { Left = 75 },
                             Spacing = new Vector2(0, 5),
                             Direction = FlowDirection.VerticalOnly,
-                            Alpha = 0,
-                            Children = BeatmapPanels
                         }
                     }
                 }
             };
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
-            State = BeatmapGroupState.Collapsed;
+
+            BeatmapPanels = beatmapSet.Beatmaps.Select(b => new BeatmapPanel(b)
+            {
+                GainedSelection = panelGainedSelection,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                RelativeSizeAxes = Axes.X,
+            }).ToList();
+
+            //for the time being, let's completely load the difficulty panels in the background.
+            //this likely won't scale so well, but allows us to completely async the loading flow.
+            Task.WhenAll(BeatmapPanels.Select(panel => panel.Preload(game, p => difficulties.Add(panel)))).Wait();
         }
 
         private void headerGainedSelection(BeatmapSetHeader panel)

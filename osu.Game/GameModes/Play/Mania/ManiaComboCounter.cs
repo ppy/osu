@@ -31,7 +31,7 @@ namespace osu.Game.GameModes.Play.Mania
         protected override float PopOutInitialAlpha => 1.0f;
         protected override double PopOutDuration => 300;
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 

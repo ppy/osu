@@ -120,7 +120,7 @@ namespace osu.Game.GameModes.Play
             TextSize = 80;
         }
 
-        public override void Load(BaseGame game)
+        protected override void Load(BaseGame game)
         {
             base.Load(game);
 
