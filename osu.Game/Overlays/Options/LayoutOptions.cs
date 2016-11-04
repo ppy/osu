@@ -7,9 +7,10 @@ namespace osu.Game.Overlays.Options
 {
     public class LayoutOptions : OptionsSubsection
     {
+        protected override string Header => "Layout";
+    
         public LayoutOptions()
         {
-            Header = "Layout";
             Children = new Drawable[]
             {
                 new SpriteText { Text = "Resolution: TODO dropdown" },

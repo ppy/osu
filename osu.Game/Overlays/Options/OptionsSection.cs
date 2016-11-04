@@ -8,19 +8,12 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionsSection : Container
+    public abstract class OptionsSection : Container
     {
-        private SpriteText header;
-        private FlowContainer content;
+        protected FlowContainer content;
         protected override Container Content => content;
 
-
-        public string Header
-        {
-            get { return header.Text; }
-            set { header.Text = value; }
-        }
-
+        protected abstract string Header { get; }
 
         public OptionsSection()
         {
@@ -49,10 +42,11 @@ namespace osu.Game.Overlays.Options
                     AutoSizeAxes = Axes.Y,
                     Children = new[]
                     {
-                        header = new SpriteText
+                        new SpriteText
                         {
                             TextSize = headerSize,
                             Colour = new Color4(247, 198, 35, 255),
+                            Text = Header,
                         },
                         content = new FlowContainer
                         {

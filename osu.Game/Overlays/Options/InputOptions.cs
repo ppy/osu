@@ -5,9 +5,10 @@ namespace osu.Game.Overlays.Options
 {
     public class InputOptions : OptionsSection
     {
+        protected override string Header => "Input";
+    
         public InputOptions()
         {
-            Header = "Input";
             Children = new Drawable[]
             {
                 new MouseOptions(),

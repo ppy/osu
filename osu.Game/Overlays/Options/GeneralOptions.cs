@@ -10,9 +10,10 @@ namespace osu.Game.Overlays.Options
 {
     public class GeneralOptions : OptionsSection
     {
+        protected override string Header => "General";
+    
         public GeneralOptions()
         {
-            Header = "General";
             Children = new Drawable[]
             {
                 new LoginOptions(),

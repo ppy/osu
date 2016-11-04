@@ -7,9 +7,10 @@ namespace osu.Game.Overlays.Options
 {
     public class LanguageOptions : OptionsSubsection
     {
+        protected override string Header => "Language";
+    
         public LanguageOptions()
         {
-            Header = "Language";
             Children = new Drawable[]
             {
                 new SpriteText { Text = "TODO: Dropdown" },

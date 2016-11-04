@@ -5,9 +5,10 @@ namespace osu.Game.Overlays.Options
 {
     public class SongSelectGraphicsOptions : OptionsSubsection
     {
+        protected override string Header => "Song Select";
+    
         public SongSelectGraphicsOptions()
         {
-            Header = "Song Select";
             Children = new[]
             {
                 new BasicCheckBox { LabelText = "Show thumbnails" }

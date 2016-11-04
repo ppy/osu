@@ -14,10 +14,10 @@ namespace osu.Game.Overlays.Options
     public class LoginOptions : OptionsSubsection
     {
         private Container loginForm;
+        protected override string Header => "Sign In";
     
         public LoginOptions()
         {
-            Header = "Sign In";
             Children = new[]
             {
                 loginForm = new Container

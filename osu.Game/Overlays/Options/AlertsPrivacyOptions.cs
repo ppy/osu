@@ -6,10 +6,11 @@ namespace osu.Game.Overlays.Options
 {
     public class AlertsPrivacyOptions : OptionsSubsection
     {
+        protected override string Header => "Alerts & Privacy";
+    
         public AlertsPrivacyOptions()
         {
             // TODO: this should probably be split into Alerts and Privacy
-            Header = "Alerts & Privacy";
             Children = new Drawable[]
             {
                 new BasicCheckBox { LabelText = "Chat ticker" },

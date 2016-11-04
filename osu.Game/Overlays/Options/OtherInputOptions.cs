@@ -6,9 +6,10 @@ namespace osu.Game.Overlays.Options
 {
     public class OtherInputOptions : OptionsSubsection
     {
+        protected override string Header => "Other";
+    
         public OtherInputOptions()
         {
-            Header = "Other";
             Children = new Drawable[]
             {
                 new BasicCheckBox { LabelText = "OS TabletPC support" },

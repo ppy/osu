@@ -5,9 +5,10 @@ namespace osu.Game.Overlays.Options
 {
     public class GraphicsOptions : OptionsSection
     {
+        protected override string Header => "Graphics";
+    
         public GraphicsOptions()
         {
-            Header = "Graphics";
             Children = new Drawable[]
             {
                 new RendererOptions(),

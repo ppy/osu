@@ -7,9 +7,10 @@ namespace osu.Game.Overlays.Options
 {
     public class MouseOptions : OptionsSubsection
     {
+        protected override string Header => "Mouse";
+    
         public MouseOptions()
         {
-            Header = "Mouse";
             Children = new Drawable[]
             {
                 new SpriteText { Text = "Sensitivity: TODO slider" },

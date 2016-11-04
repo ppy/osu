@@ -6,9 +6,10 @@ namespace osu.Game.Overlays.Options
 {
     public class SongSelectGameplayOptions : OptionsSubsection
     {
+        protected override string Header => "Song Select";
+    
         public SongSelectGameplayOptions()
         {
-            Header = "Song Select";
             Children = new Drawable[]
             {
                 new SpriteText { Text = "Display beatmaps from: TODO slider" },

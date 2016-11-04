@@ -7,9 +7,10 @@ namespace osu.Game.Overlays.Options
 {
     public class DetailOptions : OptionsSubsection
     {
+        protected override string Header => "Detail Settings";
+    
         public DetailOptions()
         {
-            Header = "Detail Settings";
             Children = new Drawable[]
             {
                 new BasicCheckBox { LabelText = "Snaking sliders" },

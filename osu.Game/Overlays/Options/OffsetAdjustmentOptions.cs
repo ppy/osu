@@ -7,9 +7,10 @@ namespace osu.Game.Overlays.Options
 {
     public class OffsetAdjustmentOptions : OptionsSubsection
     {
+        protected override string Header => "Offset Adjustment";
+    
         public OffsetAdjustmentOptions()
         {
-            Header = "Offset Adjustment";
             Children = new Drawable[]
             {
                 new SpriteText { Text = "Universal Offset: TODO slider" },

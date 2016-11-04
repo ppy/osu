@@ -6,9 +6,10 @@ namespace osu.Game.Overlays.Options
 {
     public class OnlineIntegrationOptions : OptionsSubsection
     {
+        protected override string Header => "Integration";
+    
         public OnlineIntegrationOptions()
         {
-            Header = "Integration";
             Children = new Drawable[]
             {
                 new BasicCheckBox { LabelText = "Integrate with Yahoo! status display" },
