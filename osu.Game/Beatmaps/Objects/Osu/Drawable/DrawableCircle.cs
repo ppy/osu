@@ -255,39 +255,6 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                     }
                 };
             }
-
-            class Triangles : Container
-            {
-                private Texture tex;
-
-                protected override void Load(BaseGame game)
-                {
-                    base.Load(game);
-
-                    tex = game.Textures.Get(@"Play/osu/triangle@2x");
-
-                    for (int i = 0; i < 10; i++)
-                    {
-                        Add(new Sprite
-                        {
-                            Texture = tex,
-                            Origin = Anchor.Centre,
-                            Position = new Vector2(RNG.NextSingle(), RNG.NextSingle()),
-                            RelativePositionAxes = Axes.Both,
-                            Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
-                            Alpha = RNG.NextSingle() * 0.3f
-                        });
-                    }
-                }
-
-                protected override void Update()
-                {
-                    base.Update();
-
-                    foreach (Framework.Graphics.Drawable d in Children)
-                        d.Position -= new Vector2(0, (float)(d.Scale.X * (Clock.ElapsedFrameTime / 2880)));
-                }
-            }
         }
 
         class CircleLayer : Container
@@ -333,38 +300,38 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 Hit?.Invoke();
                 return true;
             }
+        }
 
-            class Triangles : Container
+        class Triangles : Container
+        {
+            private Texture tex;
+
+            protected override void Load(BaseGame game)
             {
-                private Texture tex;
+                base.Load(game);
 
-                protected override void Load(BaseGame game)
+                tex = game.Textures.Get(@"Play/osu/triangle@2x");
+
+                for (int i = 0; i < 10; i++)
                 {
-                    base.Load(game);
-
-                    tex = game.Textures.Get(@"Play/osu/triangle@2x");
-
-                    for (int i = 0; i < 10; i++)
+                    Add(new Sprite
                     {
-                        Add(new Sprite
-                        {
-                            Texture = tex,
-                            Origin = Anchor.Centre,
-                            RelativePositionAxes = Axes.Both,
-                            Position = new Vector2(RNG.NextSingle(), RNG.NextSingle()),
-                            Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
-                            Alpha = RNG.NextSingle() * 0.3f
-                        });
-                    }
+                        Texture = tex,
+                        Origin = Anchor.Centre,
+                        RelativePositionAxes = Axes.Both,
+                        Position = new Vector2(RNG.NextSingle(), RNG.NextSingle()),
+                        Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
+                        Alpha = RNG.NextSingle() * 0.3f
+                    });
                 }
+            }
 
-                protected override void Update()
-                {
-                    base.Update();
+            protected override void Update()
+            {
+                base.Update();
 
-                    foreach (Framework.Graphics.Drawable d in Children)
-                        d.Position -= new Vector2(0, (float)(d.Scale.X * (Clock.ElapsedFrameTime / 2880)));
-                }
+                foreach (Framework.Graphics.Drawable d in Children)
+                    d.Position -= new Vector2(0, (float)(d.Scale.X * (Clock.ElapsedFrameTime / 2880)));
             }
         }
     }
