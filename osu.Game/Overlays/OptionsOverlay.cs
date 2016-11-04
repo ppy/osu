@@ -83,6 +83,8 @@ namespace osu.Game.Overlays
             };
         }
 
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             switch (args.Key)
