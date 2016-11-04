@@ -24,6 +24,21 @@ namespace osu.Game.Overlays
     {
         internal const float SideMargins = 10;
         private const float width = 400;
+        private const float sideNavWidth = 60;
+        private const float sideNavPadding = 0;
+
+        private ScrollContainer scrollContainer;
+        private FlowContainer flowContainer;
+        
+        private GeneralOptions generalOptions;
+        private GraphicsOptions graphicsOptions;
+        private GameplayOptions gameplayOptions;
+        private AudioOptions audioOptions;
+        private SkinOptions skinOptions;
+        private InputOptions inputOptions;
+        private EditorOptions editorOptions;
+        private OnlineOptions onlineOptions;
+        private MaintenanceOptions maintenanceOptions;
 
         public OptionsOverlay()
         {
@@ -40,14 +55,16 @@ namespace osu.Game.Overlays
                     Colour = Color4.Black,
                     Alpha = 0.8f,
                 },
-                // TODO: Links on the side to jump to a section
-                new ScrollContainer
+                scrollContainer = new ScrollContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
                     ScrollDraggerAnchor = Anchor.TopLeft,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = width - (sideNavWidth + sideNavPadding * 2),
+                    Position = new Vector2(sideNavWidth + sideNavPadding * 2, 0),
+                    // Note: removing this comment causes... compiler bugs? It's weird.2
                     Children = new[]
                     {
-                        new FlowContainer
+                        flowContainer = new FlowContainer
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
@@ -67,18 +84,32 @@ namespace osu.Game.Overlays
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = SideMargins, Bottom = 30 },
                                 },
-                                new GeneralOptions(),
-                                new GraphicsOptions(),
-                                new GameplayOptions(),
-                                new AudioOptions(),
-                                new SkinOptions(),
-                                new InputOptions(),
-                                new EditorOptions(),
-                                new OnlineOptions(),
-                                new MaintenanceOptions(),
+                                generalOptions = new GeneralOptions(),
+                                graphicsOptions = new GraphicsOptions(),
+                                gameplayOptions = new GameplayOptions(),
+                                audioOptions = new AudioOptions(),
+                                skinOptions = new SkinOptions(),
+                                inputOptions = new InputOptions(),
+                                editorOptions = new EditorOptions(),
+                                onlineOptions = new OnlineOptions(),
+                                maintenanceOptions = new MaintenanceOptions(),
                             }
                         }
                     }
+                },
+                new OptionsSideNav
+                {
+                    Padding = new MarginPadding { Left = sideNavPadding, Right = sideNavPadding },
+                    Width = sideNavWidth + sideNavPadding * 2,
+                    GeneralAction = () => scrollContainer.ScrollIntoView(generalOptions),
+                    GraphicsAction = () => scrollContainer.ScrollIntoView(graphicsOptions),
+                    GameplayAction = () => scrollContainer.ScrollIntoView(gameplayOptions),
+                    AudioAction = () => scrollContainer.ScrollIntoView(audioOptions),
+                    SkinAction = () => scrollContainer.ScrollIntoView(skinOptions),
+                    InputAction = () => scrollContainer.ScrollIntoView(inputOptions),
+                    EditorAction = () => scrollContainer.ScrollIntoView(editorOptions),
+                    OnlineAction = () => scrollContainer.ScrollIntoView(onlineOptions),
+                    MaintenanceAction = () => scrollContainer.ScrollIntoView(maintenanceOptions),
                 }
             };
         }
@@ -91,8 +122,7 @@ namespace osu.Game.Overlays
             {
                 case Key.Escape:
                     if (State == Visibility.Hidden) return false;
-
-                    State = Visibility.Hidden;
+                    Hide();
                     return true;
             }
             return base.OnKeyDown(state, args);

@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Options
             {
                 new Box
                 {
-                    Colour = new Color4(3, 3, 3, 255),
+                    Colour = new Color4(30, 30, 30, 255),
                     RelativeSizeAxes = Axes.X,
                     Height = borderSize,
                 },
