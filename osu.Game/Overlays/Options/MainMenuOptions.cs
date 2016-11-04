@@ -5,9 +5,10 @@ namespace osu.Game.Overlays.Options
 {
     public class MainMenuOptions : OptionsSubsection
     {
+        protected override string Header => "Main Menu";
+    
         public MainMenuOptions()
         {
-            Header = "Main Menu";
             Children = new[]
             {
                 new BasicCheckBox { LabelText = "Snow" },

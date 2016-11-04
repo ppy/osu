@@ -6,9 +6,10 @@ namespace osu.Game.Overlays.Options
 {
     public class KeyboardOptions : OptionsSubsection
     {
+        protected override string Header => "Keyboard";
+    
         public KeyboardOptions()
         {
-            Header = "Keyboard";
             Children = new Drawable[]
             {
                 new OsuButton

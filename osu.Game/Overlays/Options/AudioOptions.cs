@@ -5,9 +5,10 @@ namespace osu.Game.Overlays.Options
 {
     public class AudioOptions : OptionsSection
     {
+        protected override string Header => "Audio";
+    
         public AudioOptions()
         {
-            Header = "Audio";
             Children = new Drawable[]
             {
                 new AudioDevicesOptions(),

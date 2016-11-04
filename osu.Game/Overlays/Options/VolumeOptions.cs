@@ -7,9 +7,10 @@ namespace osu.Game.Overlays.Options
 {
     public class VolumeOptions : OptionsSubsection
     {
+        protected override string Header => "Volume";
+
         public VolumeOptions()
         {
-            Header = "Volume";
             Children = new Drawable[]
             {
                 new SpriteText { Text = "Master: TODO slider" },

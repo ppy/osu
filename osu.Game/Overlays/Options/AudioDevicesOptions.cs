@@ -5,9 +5,10 @@ namespace osu.Game.Overlays.Options
 {
     public class AudioDevicesOptions : OptionsSubsection
     {
+        protected override string Header => "Devices";
+    
         public AudioDevicesOptions()
         {
-            Header = "Devices";
             Children = new[]
             {
                 new SpriteText { Text = "Output device: TODO dropdown" }

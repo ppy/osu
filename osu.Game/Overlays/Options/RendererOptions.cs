@@ -7,9 +7,10 @@ namespace osu.Game.Overlays.Options
 {
     public class RendererOptions : OptionsSubsection
     {
+        protected override string Header => "Renderer";
+    
         public RendererOptions()
         {
-            Header = "Renderer";
             // NOTE: Compatability mode omitted
             Children = new Drawable[]
             {

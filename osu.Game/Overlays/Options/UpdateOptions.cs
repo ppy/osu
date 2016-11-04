@@ -12,10 +12,10 @@ namespace osu.Game.Overlays.Options
     public class UpdateOptions : OptionsSubsection
     {
         private BasicStorage storage;
+        protected override string Header => "Updates";
     
         public UpdateOptions()
         {
-            Header = "Updates";
             Children = new Drawable[]
             {
                 new SpriteText { Text = "TODO: Dropdown" },

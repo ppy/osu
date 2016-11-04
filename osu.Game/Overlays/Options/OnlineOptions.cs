@@ -5,9 +5,10 @@ namespace osu.Game.Overlays.Options
 {
     public class OnlineOptions : OptionsSection
     {
+        protected override string Header => "Online";
+    
         public OnlineOptions()
         {
-            Header = "Online";
             Children = new Drawable[]
             {
                 new AlertsPrivacyOptions(),

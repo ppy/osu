@@ -7,9 +7,10 @@ namespace osu.Game.Overlays.Options
 {
     public class InGameChatOptions : OptionsSubsection
     {
+        protected override string Header => "In-game Chat";
+    
         public InGameChatOptions()
         {
-            Header = "In-game Chat";
             Children = new Drawable[]
             {
                 new BasicCheckBox { LabelText = "Filter offensive words" },

@@ -7,9 +7,10 @@ namespace osu.Game.Overlays.Options
 {
     public class GeneralGameplayOptions : OptionsSubsection
     {
+        protected override string Header => "General";
+        
         public GeneralGameplayOptions()
         {
-            Header = "General";
             Children = new Drawable[]
             {
                 new SpriteText { Text = "Background dim: TODO slider" },
