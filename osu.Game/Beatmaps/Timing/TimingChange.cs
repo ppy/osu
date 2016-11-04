@@ -13,6 +13,11 @@ namespace osu.Game.Beatmaps.Timing
     {
         public double BeatLength;
 
+        public TimingChange(double beatLength)
+        {
+            BeatLength = beatLength;
+        }
+
         public double BPM => 60000 / BeatLength;
     }
 }

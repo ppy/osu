@@ -27,8 +27,6 @@ namespace osu.Game.Graphics.Background
             Depth = float.MinValue;
         }
 
-        Texture texture;
-
         protected override void Load(BaseGame game)
         {
             base.Load(game);
