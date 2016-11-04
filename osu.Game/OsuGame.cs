@@ -19,6 +19,7 @@ using osu.Game.Input;
 using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
+using osu.Game.Database;
 
 namespace osu.Game
 {
@@ -61,7 +62,7 @@ namespace osu.Game
             base.Load(game);
 
             if (args?.Length > 0)
-                Schedule(delegate { Beatmaps.Import(args); });
+                Schedule(delegate { Dependencies.Get<BeatmapDatabase>().Import(args); });
 
             //attach our bindables to the audio subsystem.
             Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeUniversal));

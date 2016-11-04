@@ -37,8 +37,9 @@ namespace osu.Game.GameModes.Play
 
             try
             {
+                var beatmaps = Game.Dependencies.Get<BeatmapDatabase>();
                 if (Beatmap == null)
-                    Beatmap = ((OsuGame)game).Beatmaps.GetWorkingBeatmap(BeatmapInfo);
+                    Beatmap = beatmaps.GetWorkingBeatmap(BeatmapInfo);
             }
             catch
             {

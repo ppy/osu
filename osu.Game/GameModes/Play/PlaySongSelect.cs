@@ -137,7 +137,7 @@ namespace osu.Game.GameModes.Play
             }
 
             if (database == null)
-                database = (game as OsuGameBase).Beatmaps;
+                database = game.Dependencies.Get<BeatmapDatabase>();
 
             database.BeatmapSetAdded += s => Schedule(() => addBeatmapSet(s));
 
