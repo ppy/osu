@@ -84,7 +84,7 @@ namespace osu.Game.GameModes.Menu
                             Spacing = new Vector2(-wedge_width, 0),
                             Children = new[]
                             {
-                                settingsButton = new Button(@"settings", @"options", FontAwesome.gear, new Color4(85, 85, 85, 255), OnSettings, -wedge_width, Key.O),
+                                settingsButton = new Button(@"settings", @"options", FontAwesome.gear, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -wedge_width, Key.O),
                                 backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -wedge_width, Key.Escape),
                                 iconFacade = new Container //need a container to make the osu! icon flow properly.
 								{

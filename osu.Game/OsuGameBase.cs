@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Configuration;
@@ -21,12 +22,12 @@ namespace osu.Game
 {
     public class OsuGameBase : BaseGame
     {
-        internal OsuConfigManager Config = new OsuConfigManager();
+        internal OsuConfigManager Config;
         public BeatmapDatabase Beatmaps { get; private set; }
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
-        public Options Options;
+        public OptionsOverlay Options;
         public APIAccess API;
 
         protected override Container Content => ratioContainer;
@@ -43,7 +44,7 @@ namespace osu.Game
 
             Children = new Drawable[]
             {
-                Options = new Options(),
+                Options = new OptionsOverlay(),
                 Cursor = new OsuCursorContainer()
             };
 
@@ -74,6 +75,13 @@ namespace osu.Game
                 Password = Config.Get<string>(OsuConfig.Password),
                 Token = Config.Get<string>(OsuConfig.Token)
             };
+        }
+
+        public override void SetHost(BasicGameHost host)
+        {
+            if (Config == null)
+                Config = new OsuConfigManager(host.Storage);
+            base.SetHost(host);
         }
 
         protected override void Update()
