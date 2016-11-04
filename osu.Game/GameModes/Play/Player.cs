@@ -30,6 +30,12 @@ namespace osu.Game.GameModes.Play
 
         private InterpolatingFramedClock playerClock;
         private IAdjustableClock sourceClock;
+        private BeatmapDatabase beatmaps;
+        
+        public Player(BeatmapDatabase beatmaps)
+        {
+            this.beatmaps = beatmaps;
+        }
 
         protected override void Load(BaseGame game)
         {
@@ -37,7 +43,6 @@ namespace osu.Game.GameModes.Play
 
             try
             {
-                var beatmaps = Game.Dependencies.Get<BeatmapDatabase>();
                 if (Beatmap == null)
                     Beatmap = beatmaps.GetWorkingBeatmap(BeatmapInfo);
             }

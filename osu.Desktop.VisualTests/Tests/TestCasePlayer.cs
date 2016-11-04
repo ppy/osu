@@ -11,6 +11,7 @@ using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.GameModes.Play;
 using OpenTK;
+using osu.Framework;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -23,6 +24,14 @@ namespace osu.Desktop.VisualTests.Tests
         FramedClock localClock;
 
         protected override IFrameBasedClock Clock => localClock;
+
+        private BaseGame game;
+        
+        protected override void Load(BaseGame game)
+        {
+            base.Load(game);
+            this.game = game;
+        }
 
         public override void Reset()
         {
@@ -55,10 +64,9 @@ namespace osu.Desktop.VisualTests.Tests
 
             decoder.Process(b);
 
-            Add(new Player
-            {
-                Beatmap = new WorkingBeatmap(b)
-            });
+            var player = game.Dependencies.Get<Player>();
+            player.Beatmap = new WorkingBeatmap(b);
+            Add(player);
         }
 
         protected override void Update()
