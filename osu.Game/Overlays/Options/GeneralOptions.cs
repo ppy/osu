@@ -10,14 +10,14 @@ namespace osu.Game.Overlays.Options
 {
     public class GeneralOptions : OptionsSection
     {
-        public GeneralOptions(BasicStorage storage, APIAccess api)
+        public GeneralOptions()
         {
             Header = "General";
             Children = new Drawable[]
             {
-                new LoginOptions(api),
+                new LoginOptions(),
                 new LanguageOptions(),
-                new UpdateOptions(storage),
+                new UpdateOptions(),
             };
         }
     }

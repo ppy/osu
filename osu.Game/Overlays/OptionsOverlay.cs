@@ -24,24 +24,9 @@ namespace osu.Game.Overlays
     {
         internal const float SideMargins = 10;
         private const float width = 400;
-        private FlowContainer optionsContainer;
-        private BasicStorage storage;
-        private OsuConfigManager configManager;
-        private APIAccess api;
-
-        protected override void Load(BaseGame game)
+        
+        public OptionsOverlay()
         {
-            base.Load(game);
-
-            storage = game.Host.Storage;
-
-            var osuGame = game as OsuGameBase;
-            if (osuGame != null)
-            {
-                configManager = osuGame.Config;
-                api = osuGame.API;
-            }
-
             Depth = float.MaxValue;
             RelativeSizeAxes = Axes.Y;
             Size = new Vector2(width, 1);
@@ -61,7 +46,7 @@ namespace osu.Game.Overlays
                     ScrollDraggerOnLeft = true,
                     Children = new[]
                     {
-                        optionsContainer = new FlowContainer
+                        new FlowContainer
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
@@ -81,7 +66,7 @@ namespace osu.Game.Overlays
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = SideMargins, Bottom = 30 },
                                 },
-                                new GeneralOptions(storage, api),
+                                new GeneralOptions(),
                                 new GraphicsOptions(),
                                 new GameplayOptions(),
                                 new AudioOptions(),

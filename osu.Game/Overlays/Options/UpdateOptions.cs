@@ -1,5 +1,6 @@
 ﻿using System;
 using OpenTK.Graphics;
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -10,7 +11,9 @@ namespace osu.Game.Overlays.Options
 {
     public class UpdateOptions : OptionsSubsection
     {
-        public UpdateOptions(BasicStorage storage)
+        private BasicStorage storage;
+    
+        public UpdateOptions()
         {
             Header = "Updates";
             Children = new Drawable[]
@@ -21,9 +24,15 @@ namespace osu.Game.Overlays.Options
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Open osu! folder",
-                    Action = storage.OpenInNativeExplorer,
+                    Action = () => storage?.OpenInNativeExplorer(),
                 }
             };
+        }
+        
+        protected override void Load(BaseGame game)
+        {
+            base.Load(game);
+            this.storage = game.Host.Storage;
         }
     }
 }
