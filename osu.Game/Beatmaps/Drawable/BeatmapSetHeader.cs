@@ -60,14 +60,15 @@ namespace osu.Game.Beatmaps.Drawable
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        // TODO: Make these italic
                         new SpriteText
                         {
+                            Font = @"Exo2.0-SemiBoldItalic",
                             Text = beatmapSet.Metadata.Title ?? beatmapSet.Metadata.TitleUnicode,
-                            TextSize = 20
+                            TextSize = 22
                         },
                         new SpriteText
                         {
+                            Font = @"Exo2.0-MediumItalic",
                             Text = beatmapSet.Metadata.Artist ?? beatmapSet.Metadata.ArtistUnicode,
                             TextSize = 16
                         },
