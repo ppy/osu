@@ -215,6 +215,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             public FlashLayer()
             {
                 Size = new Vector2(144);
+
                 Masking = true;
                 CornerRadius = Size.X / 2;
 
@@ -271,7 +272,8 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                         {
                             Texture = tex,
                             Origin = Anchor.Centre,
-                            Position = new Vector2(RNG.NextSingle() * DrawSize.X, RNG.NextSingle() * DrawSize.Y),
+                            Position = new Vector2(RNG.NextSingle(), RNG.NextSingle()),
+                            RelativePositionAxes = Axes.Both,
                             Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
                             Alpha = RNG.NextSingle() * 0.3f
                         });
@@ -283,7 +285,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                     base.Update();
 
                     foreach (Framework.Graphics.Drawable d in Children)
-                        d.Position -= new Vector2(0, (float)(d.Scale.X * (Clock.ElapsedFrameTime / 20)));
+                        d.Position -= new Vector2(0, (float)(d.Scale.X * (Clock.ElapsedFrameTime / 2880)));
                 }
             }
         }
@@ -348,7 +350,8 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                         {
                             Texture = tex,
                             Origin = Anchor.Centre,
-                            Position = new Vector2(RNG.NextSingle() * DrawSize.X, RNG.NextSingle() * DrawSize.Y),
+                            RelativePositionAxes = Axes.Both,
+                            Position = new Vector2(RNG.NextSingle(), RNG.NextSingle()),
                             Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
                             Alpha = RNG.NextSingle() * 0.3f
                         });
@@ -360,7 +363,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                     base.Update();
 
                     foreach (Framework.Graphics.Drawable d in Children)
-                        d.Position -= new Vector2(0, (float)(d.Scale.X * (Clock.ElapsedFrameTime / 20)));
+                        d.Position -= new Vector2(0, (float)(d.Scale.X * (Clock.ElapsedFrameTime / 2880)));
                 }
             }
         }
