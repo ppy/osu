@@ -24,7 +24,7 @@ namespace osu.Game.Overlays
     {
         internal const float SideMargins = 10;
         private const float width = 400;
-        
+
         public OptionsOverlay()
         {
             Depth = float.MaxValue;
@@ -37,7 +37,8 @@ namespace osu.Game.Overlays
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(51, 51, 51, 255)
+                    Colour = Color4.Black,
+                    Alpha = 0.8f,
                 },
                 // TODO: Links on the side to jump to a section
                 new ScrollContainer
