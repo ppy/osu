@@ -129,7 +129,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             }
         }
 
-        class NumberLayer : Container
+        private class NumberLayer : Container
         {
             private Sprite number;
 
@@ -156,7 +156,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             }
         }
 
-        class GlowLayer : Container
+        private class GlowLayer : Container
         {
             private Sprite layer3;
 
@@ -184,7 +184,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             }
         }
 
-        class RingLayer : Container
+        private class RingLayer : Container
         {
             private Sprite ring;
 
@@ -210,7 +210,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             }
         }
 
-        class FlashLayer : Container
+        private class FlashLayer : Container
         {
             public FlashLayer()
             {
@@ -235,7 +235,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             }
         }
 
-        class ExplodeLayer : Container
+        private class ExplodeLayer : Container
         {
             public ExplodeLayer()
             {
@@ -257,7 +257,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             }
         }
 
-        class CircleLayer : Container
+        private class CircleLayer : Container
         {
 
             private Sprite disc;
@@ -302,7 +302,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             }
         }
 
-        class Triangles : Container
+        private class Triangles : Container
         {
             private Texture tex;
 
