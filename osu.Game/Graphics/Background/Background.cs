@@ -37,7 +37,6 @@ namespace osu.Game.Graphics.Background
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Colour = Color4.DarkGray,
-                UseSimpleShader = true,
                 BlendingMode = BlendingMode.None,
             });
         }
