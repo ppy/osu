@@ -95,7 +95,7 @@ namespace osu.Game.Database
                     string[] mapNames = reader.ReadBeatmaps();
                     foreach (var name in mapNames)
                     {
-                        using (var stream = new StreamReader(reader.ReadFile(name)))
+                        using (var stream = new StreamReader(reader.GetStream(name)))
                         {
                             var decoder = BeatmapDecoder.GetDecoder(stream);
                             Beatmap beatmap = decoder.Decode(stream);
