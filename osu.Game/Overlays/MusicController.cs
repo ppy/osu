@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
@@ -177,11 +178,16 @@ namespace osu.Game.Overlays
 
             beatmapSource = osuGame?.Beatmap ?? new Bindable<WorkingBeatmap>();
             beatmapSource.ValueChanged += workingChanged;
-            workingChanged();
             playList = database.GetAllWithChildren<BeatmapSetInfo>();
 
             backgroundSprite = getScaledSprite(game.Textures.Get(@"Backgrounds/bg4"));
             AddInternal(backgroundSprite);
+        }
+
+        protected override void LoadComplete()
+        {
+            workingChanged();
+            base.LoadComplete();
         }
 
         protected override void Update()
@@ -240,10 +246,13 @@ namespace osu.Game.Overlays
         private void play(BeatmapInfo info, bool? isNext)
         {
             current = database.GetWorkingBeatmap(info, current);
-            trackManager.SetExclusive(current.Track);
-            current.Track.Start();
-            beatmapSource.Value = current;
-            updateCurrent(current, isNext);
+            Task.Factory.StartNew(() =>
+            {
+                trackManager.SetExclusive(current.Track);
+                current.Track.Start();
+                beatmapSource.Value = current;
+                updateCurrent(current, isNext);
+            });
         }
 
         private void updateCurrent(WorkingBeatmap beatmap, bool? isNext)
