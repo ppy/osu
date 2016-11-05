@@ -179,7 +179,7 @@
     <Compile Include="OsuGame.cs" />
     <Compile Include="OsuGameBase.cs" />
     <Compile Include="Overlays\ChatConsole.cs" />
-    <Compile Include="Overlays\Options.cs" />
+    <Compile Include="Overlays\OptionsOverlay.cs" />
     <Compile Include="Overlays\Toolbar.cs" />
     <Compile Include="Overlays\ToolbarButton.cs" />
     <Compile Include="Overlays\ToolbarModeButton.cs" />
@@ -198,6 +198,38 @@
     <Compile Include="Database\BeatmapMetadata.cs" />
     <Compile Include="Database\BeatmapInfo.cs" />
     <Compile Include="Database\BaseDifficulty.cs" />
+    <Compile Include="Overlays\Options\LoginOptions.cs" />
+    <Compile Include="Overlays\Options\GeneralOptions.cs" />
+    <Compile Include="Overlays\Options\LanguageOptions.cs" />
+    <Compile Include="Overlays\Options\UpdateOptions.cs" />
+    <Compile Include="Overlays\Options\GraphicsOptions.cs" />
+    <Compile Include="Graphics\UserInterface\OsuButton.cs" />
+    <Compile Include="Overlays\Options\RendererOptions.cs" />
+    <Compile Include="Overlays\Options\LayoutOptions.cs" />
+    <Compile Include="Overlays\Options\DetailOptions.cs" />
+    <Compile Include="Overlays\Options\MainMenuOptions.cs" />
+    <Compile Include="Overlays\Options\SongSelectGraphicsOptions.cs" />
+    <Compile Include="Overlays\Options\GameplayOptions.cs" />
+    <Compile Include="Overlays\Options\GeneralGameplayOptions.cs" />
+    <Compile Include="Overlays\Options\SongSelectGameplayOptions.cs" />
+    <Compile Include="Overlays\Options\AudioOptions.cs" />
+    <Compile Include="Overlays\Options\AudioDevicesOptions.cs" />
+    <Compile Include="Overlays\Options\VolumeOptions.cs" />
+    <Compile Include="Overlays\Options\OffsetAdjustmentOptions.cs" />
+    <Compile Include="Overlays\Options\SkinOptions.cs" />
+    <Compile Include="Overlays\Options\InputOptions.cs" />
+    <Compile Include="Overlays\Options\MouseOptions.cs" />
+    <Compile Include="Overlays\Options\KeyboardOptions.cs" />
+    <Compile Include="Overlays\Options\OtherInputOptions.cs" />
+    <Compile Include="Overlays\Options\EditorOptions.cs" />
+    <Compile Include="Overlays\Options\OnlineOptions.cs" />
+    <Compile Include="Overlays\Options\AlertsPrivacyOptions.cs" />
+    <Compile Include="Overlays\Options\OnlineIntegrationOptions.cs" />
+    <Compile Include="Overlays\Options\InGameChatOptions.cs" />
+    <Compile Include="Overlays\Options\MaintenanceOptions.cs" />
+    <Compile Include="Overlays\Options\OptionsSection.cs" />
+    <Compile Include="Overlays\Options\OptionsSubsection.cs" />
+    <Compile Include="Graphics\UserInterface\LoadingAnimation.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -217,6 +249,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Overlays\Options\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
