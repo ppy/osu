@@ -35,7 +35,7 @@ namespace osu.Game.GameModes.Menu
                 logo = new OsuLogo()
                 {
                     Alpha = 0,
-                    Additive = true,
+                    BlendingMode = BlendingMode.Additive,
                     Interactive = false,
                     Colour = Color4.DarkGray,
                     Ripple = false

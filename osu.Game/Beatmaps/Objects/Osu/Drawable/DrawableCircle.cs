@@ -153,7 +153,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Additive = true,
+                            BlendingMode = BlendingMode.Additive,
                             Alpha = 0.5f,
                         }
                 };
@@ -203,7 +203,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
 
-                Additive = true;
+                BlendingMode = BlendingMode.Additive;
                 Alpha = 0;
 
                 Children = new Framework.Graphics.Drawable[]
@@ -225,7 +225,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
 
-                Additive = true;
+                BlendingMode = BlendingMode.Additive;
                 Alpha = 0;
 
                 Children = new Framework.Graphics.Drawable[]
@@ -296,7 +296,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                     },
                     triangles = new Triangles
                     {
-                        Additive = true,
+                        BlendingMode = BlendingMode.Additive,
                         RelativeSizeAxes = Axes.Both,
                     },
                 };
