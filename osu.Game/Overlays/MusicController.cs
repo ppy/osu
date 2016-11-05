@@ -251,10 +251,7 @@ namespace osu.Game.Overlays
             title.Text = metadata.TitleUnicode ?? metadata.Title;
             artist.Text = metadata.ArtistUnicode ?? metadata.Artist;
 
-            Sprite newBackground;
-
-
-            newBackground = getScaledSprite(TextureLoader.FromStream(beatmap.Reader.ReadFile(metadata.BackgroundFile)));
+            Sprite newBackground = getScaledSprite(beatmap.Background);
 
             Add(newBackground);
 
