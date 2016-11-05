@@ -43,7 +43,7 @@ namespace osu.Game.Beatmaps
         }
 
         private Beatmap beatmap;
-        private object beatmapLock;
+        private object beatmapLock = new object();
         public Beatmap Beatmap
         {
             get
