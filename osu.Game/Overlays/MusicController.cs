@@ -42,27 +42,8 @@ namespace osu.Game.Overlays
             Anchor = Anchor.TopRight;//placeholder
             Origin = Anchor.TopRight;
             Position = new Vector2(10, 50);
-        }
-
-        protected override void Load(BaseGame game)
-        {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
-
-            if (osuGame != null)
-            {
-                if (database == null) database = osuGame.Beatmaps;
-                trackManager = osuGame.Audio.Track;
-            }
-
-            beatmapSource = osuGame?.Beatmap ?? new Bindable<WorkingBeatmap>();
-            beatmapSource.ValueChanged += workingChanged;
-            workingChanged();
-            playList = database.GetAllWithChildren<BeatmapSetInfo>();
-
             Children = new Drawable[]
             {
-                backgroundSprite = getScaledSprite(game.Textures.Get(@"Backgrounds/bg4")),//placeholder
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -181,6 +162,26 @@ namespace osu.Game.Overlays
                     SeekRequested = seek
                 }
             };
+        }
+
+        protected override void Load(BaseGame game)
+        {
+            base.Load(game);
+            var osuGame = game as OsuGameBase;
+
+            if (osuGame != null)
+            {
+                if (database == null) database = osuGame.Beatmaps;
+                trackManager = osuGame.Audio.Track;
+            }
+
+            beatmapSource = osuGame?.Beatmap ?? new Bindable<WorkingBeatmap>();
+            beatmapSource.ValueChanged += workingChanged;
+            workingChanged();
+            playList = database.GetAllWithChildren<BeatmapSetInfo>();
+
+            backgroundSprite = getScaledSprite(game.Textures.Get(@"Backgrounds/bg4"));
+            AddInternal(backgroundSprite);
         }
 
         protected override void Update()
