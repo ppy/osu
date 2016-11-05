@@ -57,7 +57,8 @@ namespace osu.Game.Overlays
                     Position = new Vector2(0, 40),
                     TextSize = 20,
                     Colour = Color4.White,
-                    Text = @"Nothing to play"
+                    Text = @"Nothing to play",
+                    Font = @"Exo2.0-MediumItalic"
                 },
                 artist = new SpriteText
                 {
@@ -66,7 +67,8 @@ namespace osu.Game.Overlays
                     Position = new Vector2(0, 45),
                     TextSize = 12,
                     Colour = Color4.White,
-                    Text = @"Nothing to play"
+                    Text = @"Nothing to play",
+                    Font = @"Exo2.0-BoldItalic"
                 },
                 new Box
                 {
