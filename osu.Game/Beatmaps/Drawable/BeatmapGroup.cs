@@ -52,7 +52,7 @@ namespace osu.Game.Beatmaps.Drawable
                         header.State = PanelSelectedState.Selected;
                         break;
                     case BeatmapGroupState.Collapsed:
-                        FadeTo(0.5f, 250);
+                        FadeTo(0.8f, 250);
 
                         header.State = PanelSelectedState.NotSelected;
                         difficulties.Hide();
@@ -61,7 +61,7 @@ namespace osu.Game.Beatmaps.Drawable
             }
         }
 
-        public BeatmapGroup(BeatmapSetInfo beatmapSet)
+        public BeatmapGroup(BeatmapSetInfo beatmapSet, WorkingBeatmap working)
         {
             this.beatmapSet = beatmapSet;
 
@@ -78,7 +78,7 @@ namespace osu.Game.Beatmaps.Drawable
                     Direction = FlowDirection.VerticalOnly,
                     Children = new Framework.Graphics.Drawable[]
                     {
-                        header = new BeatmapSetHeader(beatmapSet)
+                        header = new BeatmapSetHeader(beatmapSet, working)
                         {
                             GainedSelection = headerGainedSelection,
                             RelativeSizeAxes = Axes.X,
