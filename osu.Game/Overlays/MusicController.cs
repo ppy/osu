@@ -42,7 +42,7 @@ namespace osu.Game.Overlays
             Masking = true;
             Anchor = Anchor.TopRight;//placeholder
             Origin = Anchor.TopRight;
-            Position = new Vector2(10, 50);
+            Position = new Vector2(10, 60);
             Children = new Drawable[]
             {
                 new Box
@@ -309,8 +309,8 @@ namespace osu.Game.Overlays
         }
 
         //placeholder for toggling
-        protected override void PopIn() => FadeIn(500);
+        protected override void PopIn() => FadeIn(100);
 
-        protected override void PopOut() => FadeOut(500);
+        protected override void PopOut() => FadeOut(100);
     }
 }
