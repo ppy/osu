@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using osu.Framework.Audio.Track;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
@@ -12,9 +13,30 @@ namespace osu.Game.Beatmaps
 {
     public class WorkingBeatmap : IDisposable
     {
-        public BeatmapInfo BeatmapInfo;
+        public readonly BeatmapInfo BeatmapInfo;
 
-        public readonly ArchiveReader Reader;
+        public readonly BeatmapSetInfo BeatmapSetInfo;
+        private readonly BeatmapDatabase database;
+
+        private ArchiveReader reader => database.GetReader(BeatmapSetInfo);
+
+        private Texture background;
+        public Texture Background
+        {
+            get
+            {
+                if (background != null) return background;
+
+                try
+                {
+                    background = new TextureStore(new RawTextureLoaderStore(reader)).Get(BeatmapInfo.Metadata.BackgroundFile);
+                }
+                catch { }
+
+                return background;
+            }
+            set { background = value; }
+        }
 
         private Beatmap beatmap;
         public Beatmap Beatmap
@@ -25,7 +47,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    using (var stream = new StreamReader(Reader.ReadFile(BeatmapInfo.Path)))
+                    using (var stream = new StreamReader(reader.GetStream(BeatmapInfo.Path)))
                         beatmap = BeatmapDecoder.GetDecoder(stream)?.Decode(stream);
                 }
                 catch { }
@@ -44,7 +66,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    var trackData = Reader.ReadFile(BeatmapInfo.Metadata.AudioFile);
+                    var trackData = reader.GetStream(BeatmapInfo.Metadata.AudioFile);
                     if (trackData != null)
                         track = new AudioTrackBass(trackData);
                 }
@@ -55,10 +77,16 @@ namespace osu.Game.Beatmaps
             set { track = value; }
         }
 
-        public WorkingBeatmap(BeatmapInfo beatmapInfo = null, ArchiveReader reader = null)
+        public WorkingBeatmap(Beatmap beatmap)
+        {
+            this.beatmap = beatmap;
+        }
+
+        public WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, BeatmapDatabase database)
         {
             this.BeatmapInfo = beatmapInfo;
-            Reader = reader;
+            this.BeatmapSetInfo = beatmapSetInfo;
+            this.database = database;
         }
 
         private bool isDisposed;
@@ -68,7 +96,7 @@ namespace osu.Game.Beatmaps
             if (!isDisposed)
             {
                 track?.Dispose();
-                Reader?.Dispose();
+                reader?.Dispose();
                 isDisposed = true;
             }
         }

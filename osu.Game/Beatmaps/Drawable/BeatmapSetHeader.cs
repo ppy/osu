@@ -31,26 +31,17 @@ namespace osu.Game.Beatmaps.Drawable
             Width = 0.8f;
         }
 
-        public BeatmapSetHeader(BeatmapSetInfo beatmapSet)
+        public BeatmapSetHeader(BeatmapSetInfo beatmapSet, WorkingBeatmap working)
         {
             Children = new Framework.Graphics.Drawable[]
             {
-                new Box
+                working.Background == null ? new Box{ RelativeSizeAxes = Axes.Both, Colour = new Color4(20, 20, 20, 255) } : new Sprite
                 {
-                    Colour = new Color4(85, 85, 85, 255),
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Framework.Graphics.Drawable[]
-                    {
-                        new Box // TODO: Gradient
-                        {
-                            Colour = new Color4(0, 0, 0, 100),
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    }
+                    Texture = working.Background,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(0.5f),
+                    Colour = new Color4(200, 200, 200, 255),
                 },
                 new FlowContainer
                 {
@@ -60,14 +51,15 @@ namespace osu.Game.Beatmaps.Drawable
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        // TODO: Make these italic
                         new SpriteText
                         {
+                            Font = @"Exo2.0-SemiBoldItalic",
                             Text = beatmapSet.Metadata.Title ?? beatmapSet.Metadata.TitleUnicode,
-                            TextSize = 20
+                            TextSize = 22
                         },
                         new SpriteText
                         {
+                            Font = @"Exo2.0-MediumItalic",
                             Text = beatmapSet.Metadata.Artist ?? beatmapSet.Metadata.ArtistUnicode,
                             TextSize = 16
                         },

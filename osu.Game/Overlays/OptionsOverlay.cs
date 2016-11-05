@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
                 new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ScrollDraggerOnLeft = true,
+                    ScrollDraggerAnchor = Anchor.TopLeft,
                     Children = new[]
                     {
                         new FlowContainer

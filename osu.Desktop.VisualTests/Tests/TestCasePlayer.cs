@@ -57,10 +57,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(new Player
             {
-                Beatmap = new WorkingBeatmap
-                {
-                    Beatmap = b
-                }
+                Beatmap = new WorkingBeatmap(b)
             });
         }
 
