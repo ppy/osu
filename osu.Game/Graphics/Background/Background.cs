@@ -10,7 +10,6 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework;
 using System.Threading.Tasks;
-using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Graphics.Background
 {
@@ -26,8 +25,6 @@ namespace osu.Game.Graphics.Background
             RelativeSizeAxes = Axes.Both;
             Depth = float.MinValue;
         }
-
-        Texture texture;
 
         protected override void Load(BaseGame game)
         {

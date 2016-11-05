@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.IO
 {
-    public abstract class ArchiveReader : IDisposable
+    public abstract class ArchiveReader : IDisposable, IResourceStore<byte[]>
     {
         private class Reader
         {
@@ -42,8 +43,23 @@ namespace osu.Game.Beatmaps.IO
         /// <summary>
         /// Opens a stream for reading a specific file from this archive.
         /// </summary>
-        public abstract Stream ReadFile(string name);
+        public abstract Stream GetStream(string name);
 
         public abstract void Dispose();
+
+        public virtual byte[] Get(string name)
+        {
+            using (Stream input = GetStream(name))
+            {
+                if (input == null)
+                    return null;
+
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    input.CopyTo(ms);
+                    return ms.ToArray();
+                }
+            }
+        }
     }
 }

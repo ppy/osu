@@ -10,6 +10,7 @@ using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawable
@@ -69,7 +70,13 @@ namespace osu.Game.Beatmaps.Drawable
             BorderColour = new Color4(BorderColour.R, BorderColour.G, BorderColour.B, 0);
             BorderThickness = 0;
 
-            EdgeEffect = new EdgeEffect { Type = EdgeEffectType.None };
+            EdgeEffect = new EdgeEffect
+            {
+                Type = EdgeEffectType.Shadow,
+                Offset = new Vector2(1),
+                Radius = 10,
+                Colour = new Color4(0, 0, 0, 100),
+            };
         }
 
         protected override bool OnClick(InputState state)
