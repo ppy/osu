@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             {
                 var reader = new OszArchiveReader(osz);
                 using (var stream = new StreamReader(
-                    reader.ReadFile("Soleily - Renatus (Deif) [Platter].osu")))
+                    reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                 {
                     Assert.AreEqual("osu file format v13", stream.ReadLine().Trim());
                 }

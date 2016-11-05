@@ -6,6 +6,7 @@ using osu.Framework.GameModes.Testing;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.GameModes.Play;
@@ -38,21 +39,25 @@ namespace osu.Desktop.VisualTests.Tests
                 objects.Add(new Circle()
                 {
                     StartTime = time,
-                    Position = new Vector2(RNG.Next(100, 400), RNG.Next(100, 200))
+                    Position = new Vector2(RNG.Next(0, 512), RNG.Next(0, 384)),
+                    NewCombo = i % 4 == 0
                 });
 
                 time += 500;
             }
 
+            var decoder = new ConstructableBeatmapDecoder();
+
+            Beatmap b = new Beatmap
+            {
+                HitObjects = objects
+            };
+
+            decoder.Process(b);
+
             Add(new Player
             {
-                Beatmap = new WorkingBeatmap
-                {
-                    Beatmap = new Beatmap
-                    {
-                        HitObjects = objects
-                    }
-                }
+                Beatmap = new WorkingBeatmap(b)
             });
         }
 

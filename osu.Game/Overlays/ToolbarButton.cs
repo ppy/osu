@@ -66,7 +66,7 @@ namespace osu.Game.Overlays
                 HoverBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Additive = true,
+                    BlendingMode = BlendingMode.Additive,
                     Colour = new Color4(60, 60, 60, 255),
                     Alpha = 0,
                 },

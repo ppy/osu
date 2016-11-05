@@ -240,7 +240,10 @@ namespace osu.Game.GameModes.Play
             beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
             beatmapSet.Beatmaps.ForEach(b => database.GetChildren(b));
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty).ToList();
-            var group = new BeatmapGroup(beatmapSet) { SelectionChanged = selectionChanged };
+
+            var working = database.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault());
+
+            var group = new BeatmapGroup(beatmapSet, working) { SelectionChanged = selectionChanged };
 
             group.Preload(Game, g =>
             {
