@@ -26,6 +26,7 @@ namespace osu.Game.Overlays
         private DragBar progress;
         private TextAwesome playButton, listButton;
         private SpriteText title, artist;
+        private Texture fallbackTexture;
 
         private TrackManager trackManager;
         private List<BeatmapSetInfo> playList;
@@ -182,7 +183,7 @@ namespace osu.Game.Overlays
             beatmapSource.ValueChanged += workingChanged;
             playList = database.GetAllWithChildren<BeatmapSetInfo>();
 
-            backgroundSprite = getScaledSprite(game.Textures.Get(@"Backgrounds/bg4"));
+            backgroundSprite = getScaledSprite(fallbackTexture = game.Textures.Get(@"Backgrounds/bg4"));
             AddInternal(backgroundSprite);
         }
 
@@ -263,7 +264,7 @@ namespace osu.Game.Overlays
             title.Text = metadata.TitleUnicode ?? metadata.Title;
             artist.Text = metadata.ArtistUnicode ?? metadata.Artist;
 
-            Sprite newBackground = getScaledSprite(beatmap.Background);
+            Sprite newBackground = getScaledSprite(beatmap.Background ?? fallbackTexture);
 
             Add(newBackground);
 
