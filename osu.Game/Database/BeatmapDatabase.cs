@@ -149,12 +149,10 @@ namespace osu.Game.Database
             if (beatmapSetInfo == null)
                 throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetID} is not in the local database.");
 
-            var reader = GetReader(beatmapSetInfo);
-
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapSetInfo.Metadata;
 
-            var working = new WorkingBeatmap(beatmapInfo, reader);
+            var working = new WorkingBeatmap(beatmapInfo, beatmapSetInfo, this);
 
             previous?.TransferTo(working);
 
