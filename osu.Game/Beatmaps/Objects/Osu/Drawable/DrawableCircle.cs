@@ -140,12 +140,12 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
 
                 Children = new[]
                 {
-                        number = new Sprite
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Alpha = 1
-                        }
+                    number = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Alpha = 1
+                    }
                 };
             }
 
@@ -158,7 +158,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
 
         private class GlowLayer : Container
         {
-            private Sprite layer3;
+            private Sprite layer;
 
             public GlowLayer()
             {
@@ -167,20 +167,20 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
 
                 Children = new[]
                 {
-                        layer3 = new Sprite
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            BlendingMode = BlendingMode.Additive,
-                            Alpha = 0.5f
-                        }
+                    layer = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        BlendingMode = BlendingMode.Additive,
+                        Alpha = 0.5f
+                    }
                 };
             }
 
             protected override void Load(BaseGame game)
             {
                 base.Load(game);
-                layer3.Texture = game.Textures.Get(@"Play/osu/ring-glow@2x");
+                layer.Texture = game.Textures.Get(@"Play/osu/ring-glow@2x");
             }
         }
 
