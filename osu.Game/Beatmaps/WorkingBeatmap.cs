@@ -21,60 +21,72 @@ namespace osu.Game.Beatmaps
         private ArchiveReader reader => database.GetReader(BeatmapSetInfo);
 
         private Texture background;
+        private object backgroundLock = new object();
         public Texture Background
         {
             get
             {
-                if (background != null) return background;
-
-                try
+                lock (backgroundLock)
                 {
-                    background = new TextureStore(new RawTextureLoaderStore(reader)).Get(BeatmapInfo.Metadata.BackgroundFile);
-                }
-                catch { }
+                    if (background != null) return background;
 
-                return background;
+                    try
+                    {
+                        background = new TextureStore(new RawTextureLoaderStore(reader)).Get(BeatmapInfo.Metadata.BackgroundFile);
+                    }
+                    catch { }
+
+                    return background;
+                }
             }
-            set { background = value; }
+            set { lock (backgroundLock) background = value; }
         }
 
         private Beatmap beatmap;
+        private object beatmapLock = new object();
         public Beatmap Beatmap
         {
             get
             {
-                if (beatmap != null) return beatmap;
-
-                try
+                lock (beatmapLock)
                 {
-                    using (var stream = new StreamReader(reader.GetStream(BeatmapInfo.Path)))
-                        beatmap = BeatmapDecoder.GetDecoder(stream)?.Decode(stream);
-                }
-                catch { }
+                    if (beatmap != null) return beatmap;
 
-                return beatmap;
+                    try
+                    {
+                        using (var stream = new StreamReader(reader.GetStream(BeatmapInfo.Path)))
+                            beatmap = BeatmapDecoder.GetDecoder(stream)?.Decode(stream);
+                    }
+                    catch { }
+
+                    return beatmap;
+                }
             }
-            set { beatmap = value; }
+            set { lock (beatmapLock) beatmap = value; }
         }
 
         private AudioTrack track;
+        private object trackLock = new object();
         public AudioTrack Track
         {
             get
             {
-                if (track != null) return track;
-
-                try
+                lock (trackLock)
                 {
-                    var trackData = reader.GetStream(BeatmapInfo.Metadata.AudioFile);
-                    if (trackData != null)
-                        track = new AudioTrackBass(trackData);
-                }
-                catch { }
+                    if (track != null) return track;
 
-                return track;
+                    try
+                    {
+                        var trackData = reader.GetStream(BeatmapInfo.Metadata.AudioFile);
+                        if (trackData != null)
+                            track = new AudioTrackBass(trackData);
+                    }
+                    catch { }
+
+                    return track;
+                }
             }
-            set { track = value; }
+            set { lock (trackLock) track = value; }
         }
 
         public WorkingBeatmap(Beatmap beatmap)
