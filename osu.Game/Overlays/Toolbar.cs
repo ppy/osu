@@ -62,14 +62,14 @@ namespace osu.Game.Overlays
                             Icon = FontAwesome.gear,
                             TooltipMain = "Settings",
                             TooltipSub = "Change your settings",
-                            Action = OnSettings
+                            Action = () => OnSettings?.Invoke()
                         },
                         new ToolbarButton
                         {
                             Icon = FontAwesome.home,
                             TooltipMain = "Home",
                             TooltipSub = "Return to the main menu",
-                            Action = OnHome
+                            Action = () => OnHome?.Invoke()
                         },
                         modeSelector = new ToolbarModeSelector
                         {
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays
                         new ToolbarButton
                         {
                             Icon = FontAwesome.music,
-                            Action = OnMusicController
+                            Action = () => OnMusicController?.Invoke()
                         },
                         new ToolbarButton
                         {
