@@ -55,7 +55,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.TopCentre,
                     Position = new Vector2(0, 40),
-                    TextSize = 20,
+                    TextSize = 25,
                     Colour = Color4.White,
                     Text = @"Nothing to play",
                     Font = @"Exo2.0-MediumItalic"
@@ -65,7 +65,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.TopCentre,
                     Position = new Vector2(0, 45),
-                    TextSize = 12,
+                    TextSize = 15,
                     Colour = Color4.White,
                     Text = @"Nothing to play",
                     Font = @"Exo2.0-BoldItalic"
