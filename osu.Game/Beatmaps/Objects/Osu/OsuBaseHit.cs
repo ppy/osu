@@ -10,7 +10,6 @@ namespace osu.Game.Beatmaps.Objects.Osu
     public abstract class OsuBaseHit : HitObject
     {
         public Vector2 Position { get; set; }
-        public bool NewCombo { get; set; }
 
         [Flags]
         private enum HitObjectType

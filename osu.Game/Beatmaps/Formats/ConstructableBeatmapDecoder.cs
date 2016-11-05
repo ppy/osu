@@ -3,21 +3,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace osu.Game.Beatmaps.Timing
+namespace osu.Game.Beatmaps.Formats
 {
-    class TimingChange : ControlPoint
+    public class ConstructableBeatmapDecoder : BeatmapDecoder
     {
-        public double BeatLength;
-
-        public TimingChange(double beatLength)
+        protected override Beatmap ParseFile(TextReader stream)
         {
-            BeatLength = beatLength;
+            throw new NotImplementedException();
         }
-
-        public double BPM => 60000 / BeatLength;
     }
 }

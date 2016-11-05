@@ -8,6 +8,7 @@ using osu.Framework.Desktop.Platform;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.IPC;
+using osu.Game.GameModes.Play;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -45,7 +46,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var importer = new BeatmapImporter(client);
             if (!importer.Import(osz_path).Wait(1000))
-                    Assert.Fail(@"IPC took too long to send");
+                Assert.Fail(@"IPC took too long to send");
 
             ensureLoaded(osu, 10000);
         }
@@ -78,7 +79,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 @"BeatmapSet did not import to the database");
 
             //ensure we were stored to beatmap database backing...
-            
+
             Assert.IsTrue(resultSets.Count() == 1);
 
             IEnumerable<BeatmapInfo> resultBeatmaps = null;
@@ -103,7 +104,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Assert.IsTrue(set.Beatmaps.Count > 0);
 
-            var beatmap = osu.Beatmaps.GetBeatmap(set.Beatmaps[0]);
+            var beatmap = osu.Beatmaps.GetBeatmap(set.Beatmaps.First(b => b.Mode == PlayMode.Osu));
 
             Assert.IsTrue(beatmap.HitObjects.Count > 0);
         }
