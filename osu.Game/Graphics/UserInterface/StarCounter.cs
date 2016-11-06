@@ -70,14 +70,16 @@ namespace osu.Game.Graphics.UserInterface
             {
                 return count;
             }
+
             set
             {
-                prevCount = VisibleValue;
-                count = value;
                 if (IsLoaded)
                 {
-                    transformCount(prevCount, count);
+                    prevCount = VisibleValue;
+                    transformCount(prevCount, value);
                 }
+
+                count = value;
             }
         }
 

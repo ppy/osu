@@ -57,9 +57,9 @@ namespace osu.Game.Graphics.UserInterface.Volume
             };
         }
 
-        protected override void Load(BaseGame game)
+        protected override void LoadComplete()
         {
-            base.Load(game);
+            base.LoadComplete();
             updateFill();
         }
 

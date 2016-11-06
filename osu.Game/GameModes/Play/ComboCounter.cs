@@ -205,8 +205,13 @@ namespace osu.Game.GameModes.Play
 
         private void updateCount(ulong value, bool rolling = false)
         {
-            ulong prevCount = count;
             count = value;
+
+            if (!IsLoaded)
+                return;
+
+            ulong prevCount = count;
+
             if (!rolling)
             {
                 Flush(false, typeof(TransformComboRoll));
