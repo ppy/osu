@@ -12,26 +12,48 @@ namespace osu.Game.GameModes.Play.Osu
 {
     public class OsuPlayfield : Playfield
     {
-        public OsuPlayfield()
+        protected override Container Content => hitObjectContainer;
+
+        private Container hitObjectContainer;
+
+        public override Vector2 Size
         {
-            Size = new Vector2(512, 384);
-            Scale = new Vector2(1.6f);
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
+            get
+            {
+                var parentSize = Parent.DrawSize;
+                var aspectSize = parentSize.X * 0.75f < parentSize.Y ? new Vector2(parentSize.X, parentSize.X * 0.75f) : new Vector2(parentSize.Y * 4f / 3f, parentSize.Y);
+
+                return new Vector2(aspectSize.X / parentSize.X, aspectSize.Y / parentSize.Y) * base.Size;
+            }
         }
 
-        protected override void Load(BaseGame game)
+        public OsuPlayfield()
         {
-            base.Load(game);
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+            RelativeSizeAxes = Axes.Both;
+            Size = new Vector2(0.75f);
 
-            Add(new Box()
+            AddInternal(new Box
             {
+                RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
                 Colour = Color4.Black,
-                Alpha = 0.5f
+                Alpha = 0.5f,
             });
+
+            AddInternal(hitObjectContainer = new HitObjectContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+        }
+
+        class HitObjectContainer : Container
+        {
+            protected override Vector2 ChildScale => new Vector2(0.625f);
         }
     }
 }

@@ -8,6 +8,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Objects.Osu.Drawable;
+using OpenTK;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -33,12 +34,14 @@ namespace osu.Desktop.VisualTests.Tests
 
             ourClock.ProcessFrame();
 
-            for (int i = 0; i < 20; i++)
+            const int count = 10;
+
+            for (int i = 0; i < count; i++)
             {
                 var h = new Circle
                 {
                     StartTime = ourClock.CurrentTime + 1000 + i * 80,
-                    Position = new OpenTK.Vector2(i * 14),
+                    Position = new Vector2((i - count / 2) * 14),
                 };
 
                 Add(new DrawableCircle(h)
