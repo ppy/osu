@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             get
             {
-                double elapsedTime = Time - transformStartTime;
+                double elapsedTime = Time.Current - transformStartTime;
                 double expectedElapsedTime = Math.Abs(prevCount - count) * animationDelay;
                 if (elapsedTime >= expectedElapsedTime)
                     return count;
@@ -149,7 +149,7 @@ namespace osu.Game.Graphics.UserInterface
         public void StopAnimation()
         {
             prevCount = count;
-            transformStartTime = Time;
+            transformStartTime = Time.Current;
 
             for (int i = 0; i < MaxStars; i++)
                 transformStarQuick(i, count);
@@ -188,7 +188,7 @@ namespace osu.Game.Graphics.UserInterface
                 transformStar(i, newValue);
                 stars[i].DelayReset();
             }
-            transformStartTime = Time;
+            transformStartTime = Time.Current;
         }
     }
 }

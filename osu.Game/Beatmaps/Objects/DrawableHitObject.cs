@@ -49,7 +49,7 @@ namespace osu.Game.Beatmaps.Objects
         {
             base.Update();
 
-            if (Time >= HitObject.EndTime && !counted)
+            if (Time.Current >= HitObject.EndTime && !counted)
             {
                 counted = true;
                 if (state == ArmedState.Armed)

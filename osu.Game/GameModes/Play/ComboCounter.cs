@@ -238,8 +238,8 @@ namespace osu.Game.GameModes.Play
                 return;
             }
 
-            transform.StartTime = Time;
-            transform.EndTime = Time + getProportionalDuration(currentValue, newValue);
+            transform.StartTime = Time.Current;
+            transform.EndTime = Time.Current + getProportionalDuration(currentValue, newValue);
             transform.StartValue = currentValue;
             transform.EndValue = newValue;
             transform.Easing = RollingEasing;
@@ -253,7 +253,7 @@ namespace osu.Game.GameModes.Play
             {
                 get
                 {
-                    double time = CurrentTime ?? 0;
+                    double time = Time?.Current ?? 0;
                     if (time < StartTime) return StartValue;
                     if (time >= EndTime) return EndValue;
 
