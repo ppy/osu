@@ -7,6 +7,5 @@ namespace osu.Game.Beatmaps.Objects.Osu
 {
     public class Circle : OsuBaseHit
     {
-        public Color4 Colour = new Color4(17, 136, 170, 255);
     }
 }
