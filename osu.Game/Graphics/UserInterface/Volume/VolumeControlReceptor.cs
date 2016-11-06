@@ -14,13 +14,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
     {
         public Action ActivateRequested;
 
-        protected override bool OnWheelDown(InputState state)
-        {
-            ActivateRequested?.Invoke();
-            return true;
-        }
-
-        protected override bool OnWheelUp(InputState state)
+        protected override bool OnWheel(InputState state)
         {
             ActivateRequested?.Invoke();
             return true;
