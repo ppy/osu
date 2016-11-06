@@ -249,13 +249,13 @@ namespace osu.Game.Overlays
         private void play(BeatmapInfo info, bool? isNext)
         {
             current = database.GetWorkingBeatmap(info, current);
-            Task.Factory.StartNew(() =>
+            Task.Run(() =>
             {
                 trackManager.SetExclusive(current.Track);
                 current.Track.Start();
                 beatmapSource.Value = current;
-                updateCurrent(current, isNext);
             });
+            updateCurrent(current, isNext);
         }
 
         private void updateCurrent(WorkingBeatmap beatmap, bool? isNext)
@@ -284,7 +284,7 @@ namespace osu.Game.Overlays
             }
             else
             {
-                Remove(backgroundSprite);
+                backgroundSprite.Expire();
             }
 
             backgroundSprite = newBackground;
