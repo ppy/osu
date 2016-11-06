@@ -225,8 +225,8 @@ namespace osu.Game.Graphics.UserInterface
                     ? GetProportionalDuration(currentValue, newValue)
                     : RollingDuration;
 
-            transform.StartTime = Time;
-            transform.EndTime = Time + rollingTotalDuration;
+            transform.StartTime = Time.Current;
+            transform.EndTime = Time.Current + rollingTotalDuration;
             transform.StartValue = currentValue;
             transform.EndValue = newValue;
             transform.Easing = RollingEasing;
