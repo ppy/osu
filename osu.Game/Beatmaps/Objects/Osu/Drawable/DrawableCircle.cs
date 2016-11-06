@@ -96,7 +96,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             approachCircle.Transforms.Add(new TransformScale { StartTime = t - 1000, EndTime = t, StartValue = new Vector2(2f), EndValue = new Vector2(0.6f) });
 
             //set transform delay to t==hitTime
-            Delay(t - Time, true);
+            Delay(t - Time.Current, true);
 
             approachCircle.FadeOut();
             glow.FadeOut(400);

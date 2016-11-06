@@ -123,13 +123,18 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Load(game);
 
-            Flush(false, TransformType);
-
             DisplayedCount = Count;
 
             DisplayedCountSpriteText.Text = FormatCount(count);
             DisplayedCountSpriteText.Anchor = this.Anchor;
             DisplayedCountSpriteText.Origin = this.Origin;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Flush(false, TransformType);
         }
 
         /// <summary>

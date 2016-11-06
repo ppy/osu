@@ -52,7 +52,7 @@ namespace osu.Game.Beatmaps.Objects
             if (AllowHit?.Invoke(this) == false)
                 return false;
 
-            HitTime = Time;
+            HitTime = Time.Current;
 
             State = ArmedState.Armed;
             return true;
