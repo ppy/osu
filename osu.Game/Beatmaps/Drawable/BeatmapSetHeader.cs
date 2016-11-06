@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps.Drawable
                     Texture = working.Background,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Scale = new Vector2(0.5f),
+                    Scale = new Vector2((working.Background.Width >= 1366) ? 0.5f : 0.6f),
                     Colour = new Color4(200, 200, 200, 255),
                 },
                 new FlowContainer
