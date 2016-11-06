@@ -69,6 +69,7 @@ namespace osu.Game.GameModes.Play
                             Size = new Vector2(1, 0.5f),
                             Colour = new Color4(0, 0, 0, 0.5f),
                             Shear = new Vector2(0.15f, 0),
+                            EdgeSmoothness = new Vector2(2, 0),
                         },
                         new Box
                         {
@@ -78,6 +79,7 @@ namespace osu.Game.GameModes.Play
                             Position = new Vector2(0, 1),
                             Colour = new Color4(0, 0, 0, 0.5f),
                             Shear = new Vector2(-0.15f, 0),
+                            EdgeSmoothness = new Vector2(2, 0),
                         },
                     }
                 },

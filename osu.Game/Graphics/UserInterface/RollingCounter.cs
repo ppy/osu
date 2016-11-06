@@ -123,13 +123,18 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Load(game);
 
-            Flush(false, TransformType);
-
             DisplayedCount = Count;
 
             DisplayedCountSpriteText.Text = FormatCount(count);
             DisplayedCountSpriteText.Anchor = this.Anchor;
             DisplayedCountSpriteText.Origin = this.Origin;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Flush(false, TransformType);
         }
 
         /// <summary>
@@ -211,9 +216,6 @@ namespace osu.Game.Graphics.UserInterface
 
             Flush(false, type);
 
-            if (Clock == null)
-                return;
-
             if (RollingDuration < 1)
             {
                 DisplayedCount = Count;
@@ -225,8 +227,8 @@ namespace osu.Game.Graphics.UserInterface
                     ? GetProportionalDuration(currentValue, newValue)
                     : RollingDuration;
 
-            transform.StartTime = Time;
-            transform.EndTime = Time + rollingTotalDuration;
+            transform.StartTime = Time.Current;
+            transform.EndTime = Time.Current + rollingTotalDuration;
             transform.StartValue = currentValue;
             transform.EndValue = newValue;
             transform.Easing = RollingEasing;
