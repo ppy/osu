@@ -265,7 +265,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                     base.Update();
 
                     foreach (Framework.Graphics.Drawable d in Children)
-                        d.Position -= new Vector2(0, (float)(d.Scale.X * (Clock.ElapsedFrameTime / 20)));
+                        d.Position -= new Vector2(0, (float)(d.Scale.X * (Time.Elapsed / 20)));
                 }
             }
         }
@@ -342,7 +342,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                     base.Update();
 
                     foreach (Framework.Graphics.Drawable d in Children)
-                        d.Position -= new Vector2(0, (float)(d.Scale.X * (Clock.ElapsedFrameTime / 20)));
+                        d.Position -= new Vector2(0, (float)(d.Scale.X * (Time.Elapsed / 20)));
                 }
             }
         }

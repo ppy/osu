@@ -229,9 +229,6 @@ namespace osu.Game.GameModes.Play
         {
             Flush(false, typeof(TransformComboRoll));
 
-            if (Clock == null)
-                return;
-
             if (RollingDuration < 1)
             {
                 DisplayedCount = Count;

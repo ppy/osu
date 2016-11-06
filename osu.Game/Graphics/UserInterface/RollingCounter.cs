@@ -211,9 +211,6 @@ namespace osu.Game.Graphics.UserInterface
 
             Flush(false, type);
 
-            if (Clock == null)
-                return;
-
             if (RollingDuration < 1)
             {
                 DisplayedCount = Count;
