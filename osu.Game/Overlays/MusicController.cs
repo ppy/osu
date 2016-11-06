@@ -180,7 +180,6 @@ namespace osu.Game.Overlays
             }
 
             beatmapSource = osuGame?.Beatmap ?? new Bindable<WorkingBeatmap>();
-            beatmapSource.ValueChanged += workingChanged;
             playList = database.GetAllWithChildren<BeatmapSetInfo>();
 
             backgroundSprite = getScaledSprite(fallbackTexture = game.Textures.Get(@"Backgrounds/bg4"));
@@ -189,6 +188,7 @@ namespace osu.Game.Overlays
 
         protected override void LoadComplete()
         {
+            beatmapSource.ValueChanged += workingChanged;
             workingChanged();
             base.LoadComplete();
         }
@@ -201,7 +201,7 @@ namespace osu.Game.Overlays
             progress.UpdatePosition((float)(current.Track.CurrentTime / current.Track.Length));
             playButton.Icon = current.Track.IsRunning ? FontAwesome.pause : FontAwesome.play_circle_o;
 
-            if (current.Track.HasCompleted) next();
+            if (current.Track.HasCompleted && !current.Track.Looping) next();
         }
 
         private void workingChanged(object sender = null, EventArgs e = null)
@@ -273,19 +273,14 @@ namespace osu.Game.Overlays
                 newBackground.Position = new Vector2(400, 0);
                 newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
                 backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
-                backgroundSprite.Expire();
             }
             else if (isNext == false)
             {
                 newBackground.Position = new Vector2(-400, 0);
                 newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
                 backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
-                backgroundSprite.Expire();
             }
-            else
-            {
-                backgroundSprite.Expire();
-            }
+            backgroundSprite.Expire();
 
             backgroundSprite = newBackground;
         }
