@@ -112,7 +112,7 @@ namespace osu.Game.GameModes.Menu
             icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
 
             double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
-            double startTime = Time + offset;
+            double startTime = Time.Current + offset;
 
             icon.RotateTo(10, offset, EasingTypes.InOutSine);
             icon.ScaleTo(new Vector2(1, 0.9f), offset, EasingTypes.Out);

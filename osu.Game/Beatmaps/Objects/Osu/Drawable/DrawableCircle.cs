@@ -96,7 +96,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             approachCircle.Transforms.Add(new TransformScale { StartTime = t - 1000, EndTime = t, StartValue = new Vector2(2f), EndValue = new Vector2(0.6f) });
 
             //set transform delay to t==hitTime
-            Delay(t - Time, true);
+            Delay(t - Time.Current, true);
 
             approachCircle.FadeOut();
             glow.FadeOut(400);
@@ -331,7 +331,7 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 base.Update();
 
                 foreach (Framework.Graphics.Drawable d in Children)
-                    d.Position -= new Vector2(0, (float)(d.Scale.X * (Clock.ElapsedFrameTime / 2880)));
+                    d.Position -= new Vector2(0, (float)(d.Scale.X * (Time.Elapsed / 2880)));
             }
         }
     }

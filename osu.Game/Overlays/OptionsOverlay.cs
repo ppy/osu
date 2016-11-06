@@ -101,11 +101,13 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             MoveToX(0, 300, EasingTypes.Out);
+            FadeTo(1, 300);
         }
 
         protected override void PopOut()
         {
             MoveToX(-width, 300, EasingTypes.Out);
+            FadeTo(0, 300);
         }
     }
 }
