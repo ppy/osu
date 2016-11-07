@@ -2,6 +2,7 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
@@ -9,6 +10,7 @@ namespace osu.Game.Overlays.Options
     public class MaintenanceOptions : OptionsSection
     {
         protected override string Header => "Maintenance";
+        public override FontAwesome Icon => FontAwesome.fa_wrench;
     
         public MaintenanceOptions()
         {

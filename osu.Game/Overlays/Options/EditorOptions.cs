@@ -2,12 +2,14 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
     public class EditorOptions : OptionsSection
     {
         protected override string Header => "Editor";
+        public override FontAwesome Icon => FontAwesome.fa_pencil;
     
         public EditorOptions()
         {
