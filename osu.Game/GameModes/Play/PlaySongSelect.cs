@@ -21,6 +21,7 @@ using osu.Game.Beatmaps.Drawable;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Framework.GameModes;
+using osu.Framework.Graphics.Transformations;
 
 namespace osu.Game.GameModes.Play
 {
@@ -83,6 +84,8 @@ namespace osu.Game.GameModes.Play
                     {
                         beatmapSetFlow = new FlowContainer
                         {
+                            LayoutDuration = 500,
+                            LayoutEasing = EasingTypes.Out,
                             Padding = new MarginPadding { Left = 25, Top = 25, Bottom = 25 + bottomToolHeight },
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
