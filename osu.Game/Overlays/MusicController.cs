@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -242,6 +243,15 @@ namespace osu.Game.Overlays
                 play(playHistory[++playHistoryIndex], true);
             else
             {
+                //shuffle
+                int j = RNG.Next(playListIndex, playList.Count);
+                if (j != playListIndex)
+                {
+                    BeatmapSetInfo temp = playList[playListIndex];
+                    playList[playListIndex] = playList[j];
+                    playList[j] = temp;
+                }
+
                 BeatmapInfo nextToPlay = playList[playListIndex++].Beatmaps[0];
                 if (playListIndex == playList.Count) playListIndex = 0;
                 play(nextToPlay, true);
