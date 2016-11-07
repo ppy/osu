@@ -67,21 +67,12 @@ namespace osu.Game.Graphics.UserInterface.Volume
             base.Dispose(isDisposing);
         }
 
-        protected override bool OnWheelDown(InputState state)
+        protected override bool OnWheel(InputState state)
         {
             if (!IsVisible)
                 return false;
 
-            volumeMeterMaster.TriggerWheelDown(state);
-            return true;
-        }
-
-        protected override bool OnWheelUp(InputState state)
-        {
-            if (!IsVisible)
-                return false;
-
-            volumeMeterMaster.TriggerWheelUp(state);
+            volumeMeterMaster.TriggerWheel(state);
             return true;
         }
 
