@@ -50,7 +50,8 @@ namespace osu.Game.GameModes.Play
 
             AudioTrack track = Beatmap.Track;
 
-            background = new BackgroundModeCustom(Beatmap.Background);
+            if (Beatmap.Background != null)
+                background = new BackgroundModeCustom(Beatmap.Background);
 
             if (track != null)
             {
