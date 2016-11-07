@@ -17,7 +17,7 @@ namespace osu.Game.Database
 
         [ManyToOne]
         public BeatmapSetInfo BeatmapSet { get; set; }
-        
+
         [ForeignKey(typeof(BeatmapMetadata))]
         public int BeatmapMetadataID { get; set; }
 
@@ -29,9 +29,9 @@ namespace osu.Game.Database
 
         [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BaseDifficulty BaseDifficulty { get; set; }
-        
+
         public string Path { get; set; }
-        
+
         // General
         public int AudioLeadIn { get; set; }
         public bool Countdown { get; set; }
@@ -41,7 +41,7 @@ namespace osu.Game.Database
         public PlayMode Mode { get; set; }
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
-        
+
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
         public string StoredBookmarks { get; internal set; }
@@ -61,7 +61,7 @@ namespace osu.Game.Database
         public int BeatDivisor { get; set; }
         public int GridSize { get; set; }
         public double TimelineZoom { get; set; }
-        
+
         // Metadata
         public string Version { get; set; }
 
@@ -69,5 +69,7 @@ namespace osu.Game.Database
         {
             return BeatmapID == other?.BeatmapID;
         }
+
+        public bool AudioEquals(BeatmapInfo other) => BeatmapSet.Path == other.BeatmapSet.Path && Metadata.AudioFile == other.Metadata.AudioFile;
     }
 }
