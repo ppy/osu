@@ -8,7 +8,7 @@ namespace osu.Game.Overlays.Options
 {
     public abstract class OptionsSubsection : Container
     {
-        private Container content;
+        private Container<Drawable> content;
         protected override Container<Drawable> Content => content;
         
         protected abstract string Header { get; }
