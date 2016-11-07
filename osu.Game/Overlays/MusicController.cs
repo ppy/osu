@@ -243,17 +243,25 @@ namespace osu.Game.Overlays
                 play(playHistory[++playHistoryIndex], true);
             else
             {
+                if (playList.Count == 0) return;
+                if (current != null && playList.Count == 1) return;
                 //shuffle
-                int j = RNG.Next(playListIndex, playList.Count);
-                if (j != playListIndex)
+                BeatmapInfo nextToPlay;
+                do
                 {
-                    BeatmapSetInfo temp = playList[playListIndex];
-                    playList[playListIndex] = playList[j];
-                    playList[j] = temp;
-                }
+                    int j = RNG.Next(playListIndex, playList.Count);
+                    if (j != playListIndex)
+                    {
+                        BeatmapSetInfo temp = playList[playListIndex];
+                        playList[playListIndex] = playList[j];
+                        playList[j] = temp;
+                    }
 
-                BeatmapInfo nextToPlay = playList[playListIndex++].Beatmaps[0];
-                if (playListIndex == playList.Count) playListIndex = 0;
+                    nextToPlay = playList[playListIndex++].Beatmaps[0];
+                    if (playListIndex == playList.Count) playListIndex = 0;
+                }
+                while (current?.BeatmapInfo.AudioEquals(nextToPlay) == true);
+
                 play(nextToPlay, true);
                 appendToHistory(nextToPlay);
             }
