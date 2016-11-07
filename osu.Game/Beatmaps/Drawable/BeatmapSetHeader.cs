@@ -68,8 +68,8 @@ namespace osu.Game.Beatmaps.Drawable
                             AutoSizeAxes = Axes.Both,
                             Children = new[]
                             {
-                                new DifficultyIcon(FontAwesome.dot_circle_o, new Color4(159, 198, 0, 255)),
-                                new DifficultyIcon(FontAwesome.dot_circle_o, new Color4(246, 101, 166, 255)),
+                                new DifficultyIcon(FontAwesome.fa_dot_circle_o, new Color4(159, 198, 0, 255)),
+                                new DifficultyIcon(FontAwesome.fa_dot_circle_o, new Color4(246, 101, 166, 255)),
                             }
                         }
                     }

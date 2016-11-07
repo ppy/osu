@@ -58,14 +58,14 @@ namespace osu.Game.Overlays
                     {
                         new ToolbarButton
                         {
-                            Icon = FontAwesome.gear,
+                            Icon = FontAwesome.fa_gear,
                             TooltipMain = "Settings",
                             TooltipSub = "Change your settings",
                             Action = () => OnSettings?.Invoke()
                         },
                         new ToolbarButton
                         {
-                            Icon = FontAwesome.home,
+                            Icon = FontAwesome.fa_home,
                             TooltipMain = "Home",
                             TooltipSub = "Return to the main menu",
                             Action = () => OnHome?.Invoke()
@@ -87,15 +87,15 @@ namespace osu.Game.Overlays
                     {
                         new ToolbarButton
                         {
-                            Icon = FontAwesome.search
+                            Icon = FontAwesome.fa_search
                         },
                         userButton = new ToolbarButton
                         {
-                            Icon = FontAwesome.user,
+                            Icon = FontAwesome.fa_user,
                         },
                         new ToolbarButton
                         {
-                            Icon = FontAwesome.bars
+                            Icon = FontAwesome.fa_bars
                         },
                     }
                 }
