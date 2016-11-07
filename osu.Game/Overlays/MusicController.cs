@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
                         playButton = new TextAwesome
                         {
                             TextSize = 30,
-                            Icon = FontAwesome.play_circle_o,
+                            Icon = FontAwesome.fa_play_circle_o,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre
                         }
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays
                         new TextAwesome
                         {
                             TextSize = 15,
-                            Icon = FontAwesome.step_backward,
+                            Icon = FontAwesome.fa_step_backward,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre
                         }
@@ -134,7 +134,7 @@ namespace osu.Game.Overlays
                         new TextAwesome
                         {
                             TextSize = 15,
-                            Icon = FontAwesome.step_forward,
+                            Icon = FontAwesome.fa_step_forward,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre
                         }
@@ -151,7 +151,7 @@ namespace osu.Game.Overlays
                         listButton = new TextAwesome
                         {
                             TextSize = 15,
-                            Icon = FontAwesome.bars,
+                            Icon = FontAwesome.fa_bars,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre
                         }
@@ -199,7 +199,7 @@ namespace osu.Game.Overlays
             if (current?.Track == null) return;
 
             progress.UpdatePosition((float)(current.Track.CurrentTime / current.Track.Length));
-            playButton.Icon = current.Track.IsRunning ? FontAwesome.pause : FontAwesome.play_circle_o;
+            playButton.Icon = current.Track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
             if (current.Track.HasCompleted && !current.Track.Looping) next();
         }
