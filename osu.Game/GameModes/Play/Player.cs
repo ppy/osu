@@ -20,7 +20,8 @@ namespace osu.Game.GameModes.Play
     {
         const bool autoplay = false;
 
-        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
+        private BackgroundMode background;
+        protected override BackgroundMode CreateBackground() => background;
 
         public BeatmapInfo BeatmapInfo;
 
@@ -48,6 +49,8 @@ namespace osu.Game.GameModes.Play
             }
 
             AudioTrack track = Beatmap.Track;
+
+            background = new BackgroundModeCustom(Beatmap.Background);
 
             if (track != null)
             {

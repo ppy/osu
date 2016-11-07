@@ -21,7 +21,7 @@ using osu.Game.Beatmaps.Drawable;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Framework.GameModes;
-using osu.Game.Graphics;
+using osu.Game.Graphics.Background;
 
 namespace osu.Game.GameModes.Play
 {
@@ -36,30 +36,25 @@ namespace osu.Game.GameModes.Play
         private FlowContainer beatmapSetFlow;
         private TrackManager trackManager;
         private Container wedgeContainer;
-        private Sprite background;
+
+        private BackgroundMode background;
+        protected override BackgroundMode CreateBackground() => background;
 
         /// <param name="database">Optionally provide a database to use instead of the OsuGame one.</param>
         public PlaySongSelect(BeatmapDatabase database = null)
         {
             this.database = database;
 
+            background = new BackgroundModeDefault();
+
             const float scrollWidth = 640;
             const float bottomToolHeight = 50;
             const float topToolHeight = 50;
             Children = new Drawable[]
             {
-                background = new Sprite {
-                    RelativeSizeAxes = Axes.Both,
-                    RelativePositionAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = Vector2.One,
-                    Alpha = 0.5f,
-                },
                 wedgeContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Size = Vector2.One,
                     Padding = new MarginPadding { Right = scrollWidth - 200, Bottom = bottomToolHeight, Top = topToolHeight },
                     Children = new[]
                     {
@@ -230,7 +225,6 @@ namespace osu.Game.GameModes.Play
             if (!beatmap.Equals(Beatmap?.BeatmapInfo))
             {
                 Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
-                background.Texture = Beatmap.Background;
             }
 
             ensurePlayingSelected();
@@ -304,7 +298,7 @@ namespace osu.Game.GameModes.Play
             if (database.Query<BeatmapSetInfo>().Count() > 0)
                 foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
                     addBeatmapSet(beatmapSet);
-            else playButton.Dispose(); // not sure about this
+            else playButton.Hide();
         }
     }
 }

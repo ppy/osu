@@ -10,6 +10,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework;
 using System.Threading.Tasks;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Graphics.Background
 {
@@ -17,11 +18,19 @@ namespace osu.Game.Graphics.Background
     {
         protected Sprite BackgroundSprite;
 
+        Texture texture;
         string textureName;
 
         public Background(string textureName = @"Backgrounds/bg1")
         {
             this.textureName = textureName;
+            RelativeSizeAxes = Axes.Both;
+            Depth = float.MinValue;
+        }
+
+        public Background(Texture texture)
+        {
+            this.texture = texture;
             RelativeSizeAxes = Axes.Both;
             Depth = float.MinValue;
         }
@@ -32,7 +41,7 @@ namespace osu.Game.Graphics.Background
 
             Add(BackgroundSprite = new Sprite
             {
-                Texture = game.Textures.Get(textureName),
+                Texture = texture != null ? texture : game.Textures.Get(textureName),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Colour = Color4.DarkGray
