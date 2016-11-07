@@ -120,7 +120,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 TextAwesome star = new TextAwesome
                 {
-                    Icon = FontAwesome.star,
+                    Icon = FontAwesome.fa_star,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.Centre,
                     TextSize = StarSize,

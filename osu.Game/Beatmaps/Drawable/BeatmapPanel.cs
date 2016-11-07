@@ -48,7 +48,7 @@ namespace osu.Game.Beatmaps.Drawable
                     Origin = Anchor.CentreLeft,
                     Children = new Framework.Graphics.Drawable[]
                     {
-                        new DifficultyIcon(FontAwesome.dot_circle_o, new Color4(159, 198, 0, 255))
+                        new DifficultyIcon(FontAwesome.fa_dot_circle_o, new Color4(159, 198, 0, 255))
                         {
                             Scale = new Vector2(1.8f),
                             Anchor = Anchor.CentreLeft,
