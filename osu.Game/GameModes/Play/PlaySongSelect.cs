@@ -296,8 +296,11 @@ namespace osu.Game.GameModes.Play
         private void addBeatmapSets()
         {
             if (database.Query<BeatmapSetInfo>().Count() > 0)
+            {
+                if (playButton.IsVisible == false) playButton.Show();
                 foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
                     addBeatmapSet(beatmapSet);
+            }
             else playButton.Hide();
         }
     }
