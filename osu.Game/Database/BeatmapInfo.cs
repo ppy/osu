@@ -70,6 +70,8 @@ namespace osu.Game.Database
             return BeatmapID == other?.BeatmapID;
         }
 
-        public bool AudioEquals(BeatmapInfo other) => BeatmapSet.Path == other.BeatmapSet.Path && Metadata.AudioFile == other.Metadata.AudioFile;
+        public bool AudioEquals(BeatmapInfo other) => other != null &&
+            BeatmapSet.Path == other.BeatmapSet.Path &&
+            (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
     }
 }

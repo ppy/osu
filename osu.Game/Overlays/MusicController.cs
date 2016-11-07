@@ -260,7 +260,7 @@ namespace osu.Game.Overlays
                     nextToPlay = playList[playListIndex++].Beatmaps[0];
                     if (playListIndex == playList.Count) playListIndex = 0;
                 }
-                while (current?.BeatmapInfo.AudioEquals(nextToPlay) == true);
+                while (nextToPlay.AudioEquals(current?.BeatmapInfo));
 
                 play(nextToPlay, true);
                 appendToHistory(nextToPlay);
