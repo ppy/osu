@@ -57,9 +57,9 @@ namespace osu.Game.Graphics.UserInterface.Volume
             };
         }
 
-        protected override void Load(BaseGame game)
+        protected override void LoadComplete()
         {
-            base.Load(game);
+            base.LoadComplete();
             updateFill();
         }
 
@@ -73,15 +73,9 @@ namespace osu.Game.Graphics.UserInterface.Volume
             }
         }
 
-        protected override bool OnWheelUp(InputState state)
+        protected override bool OnWheel(InputState state)
         {
-            Volume += 0.05f;
-            return true;
-        }
-
-        protected override bool OnWheelDown(InputState state)
-        {
-            Volume -= 0.05f;
+            Volume += 0.05f * state.Mouse.WheelDiff;
             return true;
         }
 

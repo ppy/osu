@@ -65,6 +65,7 @@ namespace osu.Game.GameModes.Menu
                         Scale = new Vector2(0, 1),
                         Size = boxSize,
                         Shear = new Vector2(ButtonSystem.wedge_width / boxSize.Y, 0),
+                        EdgeSmoothness = new Vector2(2, 0),
                     },
                     iconText = new Container
                     {
@@ -112,7 +113,7 @@ namespace osu.Game.GameModes.Menu
             icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
 
             double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
-            double startTime = Time + offset;
+            double startTime = Time.Current + offset;
 
             icon.RotateTo(10, offset, EasingTypes.InOutSine);
             icon.ScaleTo(new Vector2(1, 0.9f), offset, EasingTypes.Out);

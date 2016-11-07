@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             get
             {
-                double elapsedTime = Time - transformStartTime;
+                double elapsedTime = Time.Current - transformStartTime;
                 double expectedElapsedTime = Math.Abs(prevCount - count) * animationDelay;
                 if (elapsedTime >= expectedElapsedTime)
                     return count;
@@ -70,14 +70,16 @@ namespace osu.Game.Graphics.UserInterface
             {
                 return count;
             }
+
             set
             {
-                prevCount = VisibleValue;
-                count = value;
                 if (IsLoaded)
                 {
-                    transformCount(prevCount, count);
+                    prevCount = VisibleValue;
+                    transformCount(prevCount, value);
                 }
+
+                count = value;
             }
         }
 
@@ -118,7 +120,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 TextAwesome star = new TextAwesome
                 {
-                    Icon = FontAwesome.star,
+                    Icon = FontAwesome.fa_star,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.Centre,
                     TextSize = StarSize,
@@ -149,7 +151,7 @@ namespace osu.Game.Graphics.UserInterface
         public void StopAnimation()
         {
             prevCount = count;
-            transformStartTime = Time;
+            transformStartTime = Time.Current;
 
             for (int i = 0; i < MaxStars; i++)
                 transformStarQuick(i, count);
@@ -188,7 +190,7 @@ namespace osu.Game.Graphics.UserInterface
                 transformStar(i, newValue);
                 stars[i].DelayReset();
             }
-            transformStartTime = Time;
+            transformStartTime = Time.Current;
         }
     }
 }
