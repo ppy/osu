@@ -30,9 +30,9 @@ namespace osu.Game.Overlays
         private Texture fallbackTexture;
 
         private List<BeatmapSetInfo> playList;
-        private List<BeatmapInfo> playHistory;
+        private List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
         private int playListIndex;
-        private int playHistoryIndex;
+        private int playHistoryIndex = -1;
 
         private TrackManager trackManager;
         private BeatmapDatabase database;
@@ -216,39 +216,36 @@ namespace osu.Game.Overlays
             updateCurrent(current, null);
         }
 
-        private int findInPlaylist(Beatmap beatmap)
+        private void appendToHistory(BeatmapInfo beatmap)
         {
-            if (beatmap == null) return -1;
-            for (int i = 0; i < playList.Count; i++)
-                if (beatmap.BeatmapInfo.BeatmapSetID == playList[i].BeatmapSetID)
-                    return i;
-            return -1;
+            if (playHistoryIndex >= 0)
+            {
+                BeatmapInfo stackHead = playHistory[playHistoryIndex];
+                if (beatmap.BeatmapSet.Path == stackHead.BeatmapSet.Path && beatmap.Metadata.AudioFile == stackHead.Metadata.AudioFile)
+                    return;
+                if (playHistoryIndex < playHistory.Count - 1)
+                    playHistory.RemoveRange(playHistoryIndex + 1, playHistory.Count - playHistoryIndex - 1);
+            }
+            playHistory.Insert(++playHistoryIndex, beatmap);
         }
 
         private void prev()
         {
-            int i = findInPlaylist(current?.Beatmap);
-            if (i == -1)
-            {
-                if (playList.Count > 0)
-                    play(playList[0].Beatmaps[0], null);
-                else return;
-            }
-            i = (i - 1 + playList.Count) % playList.Count;
-            play(playList[i].Beatmaps[0], false);
+            if (playHistoryIndex > 0)
+                play(playHistory[--playHistoryIndex], false);
         }
 
         private void next()
         {
-            int i = findInPlaylist(current?.Beatmap);
-            if (i == -1)
+            if (playHistoryIndex < playHistory.Count - 1)
+                play(playHistory[++playHistoryIndex], true);
+            else
             {
-                if (playList.Count > 0)
-                    play(playList[0].Beatmaps[0], null);
-                else return;
+                BeatmapInfo nextToPlay = playList[playListIndex++].Beatmaps[0];
+                if (playListIndex == playList.Count) playListIndex = 0;
+                play(nextToPlay, true);
+                appendToHistory(nextToPlay);
             }
-            i = (i + 1) % playList.Count;
-            play(playList[i].Beatmaps[0], true);
         }
 
         private void play(BeatmapInfo info, bool? isNext)
