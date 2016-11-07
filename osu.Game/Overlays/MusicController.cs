@@ -29,8 +29,12 @@ namespace osu.Game.Overlays
         private SpriteText title, artist;
         private Texture fallbackTexture;
 
-        private TrackManager trackManager;
         private List<BeatmapSetInfo> playList;
+        private List<BeatmapInfo> playHistory;
+        private int playListIndex;
+        private int playHistoryIndex;
+
+        private TrackManager trackManager;
         private BeatmapDatabase database;
         private Bindable<WorkingBeatmap> beatmapSource;
         private WorkingBeatmap current;
