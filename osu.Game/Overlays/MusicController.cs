@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
+using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -303,6 +304,12 @@ namespace osu.Game.Overlays
             current?.Track?.Seek(current.Track.Length * position);
             current?.Track?.Start();
         }
+
+        protected override bool OnClick(InputState state) => true;
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+
+        protected override bool OnDragStart(InputState state) => true;
 
         //placeholder for toggling
         protected override void PopIn() => FadeIn(100);
