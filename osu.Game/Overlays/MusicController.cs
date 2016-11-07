@@ -213,7 +213,8 @@ namespace osu.Game.Overlays
         {
             if (beatmapSource.Value == current) return;
             current = beatmapSource.Value;
-            updateCurrent(current, null);
+            updateCurrent(current, true);
+            appendToHistory(current.BeatmapInfo);
         }
 
         private void appendToHistory(BeatmapInfo beatmap)
@@ -248,7 +249,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void play(BeatmapInfo info, bool? isNext)
+        private void play(BeatmapInfo info, bool isNext)
         {
             current = database.GetWorkingBeatmap(info, current);
             Task.Run(() =>
@@ -260,7 +261,7 @@ namespace osu.Game.Overlays
             updateCurrent(current, isNext);
         }
 
-        private void updateCurrent(WorkingBeatmap beatmap, bool? isNext)
+        private void updateCurrent(WorkingBeatmap beatmap, bool isNext)
         {
             BeatmapMetadata metadata = beatmap.Beatmap.Metadata;
             title.Text = metadata.TitleUnicode ?? metadata.Title;
@@ -270,13 +271,13 @@ namespace osu.Game.Overlays
 
             Add(newBackground);
 
-            if (isNext == true)
+            if (isNext)
             {
                 newBackground.Position = new Vector2(400, 0);
                 newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
                 backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
             }
-            else if (isNext == false)
+            else
             {
                 newBackground.Position = new Vector2(-400, 0);
                 newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
