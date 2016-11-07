@@ -221,8 +221,7 @@ namespace osu.Game.Overlays
         {
             if (playHistoryIndex >= 0)
             {
-                BeatmapInfo stackHead = playHistory[playHistoryIndex];
-                if (beatmap.BeatmapSet.Path == stackHead.BeatmapSet.Path && beatmap.Metadata.AudioFile == stackHead.Metadata.AudioFile)
+                if (beatmap.AudioEquals(playHistory[playHistoryIndex]))
                     return;
                 if (playHistoryIndex < playHistory.Count - 1)
                     playHistory.RemoveRange(playHistoryIndex + 1, playHistory.Count - playHistoryIndex - 1);
