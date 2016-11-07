@@ -88,7 +88,7 @@ namespace osu.Game.Overlays
                     {
                         new ToolbarButton
                         {
-                            Icon = FontAwesome.music,
+                            Icon = FontAwesome.fa_music,
                             Action = () => OnMusicController?.Invoke()
                         },
                         new ToolbarButton
