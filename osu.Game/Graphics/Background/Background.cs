@@ -18,19 +18,11 @@ namespace osu.Game.Graphics.Background
     {
         protected Sprite BackgroundSprite;
 
-        Texture texture;
         string textureName;
 
         public Background(string textureName = @"Backgrounds/bg1")
         {
             this.textureName = textureName;
-            RelativeSizeAxes = Axes.Both;
-            Depth = float.MinValue;
-        }
-
-        public Background(Texture texture)
-        {
-            this.texture = texture;
             RelativeSizeAxes = Axes.Both;
             Depth = float.MinValue;
         }
@@ -41,7 +33,7 @@ namespace osu.Game.Graphics.Background
 
             Add(BackgroundSprite = new Sprite
             {
-                Texture = texture != null ? texture : game.Textures.Get(textureName),
+                Texture = game.Textures.Get(textureName),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Colour = Color4.DarkGray
