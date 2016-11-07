@@ -3,6 +3,7 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
@@ -10,6 +11,7 @@ namespace osu.Game.Overlays.Options
     public class SkinOptions : OptionsSection
     {
         protected override string Header => "Skin";
+        public override FontAwesome Icon => FontAwesome.fa_paint_brush;
 
         public SkinOptions()
         {

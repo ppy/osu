@@ -5,83 +5,29 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
     public class OptionsSideNav : Container
     {
-        public Action GeneralAction;
-        public Action GraphicsAction;
-        public Action GameplayAction;
-        public Action AudioAction;
-        public Action SkinAction;
-        public Action InputAction;
-        public Action EditorAction;
-        public Action OnlineAction;
-        public Action MaintenanceAction;
-    
+        private FlowContainer content;
+        protected override Container Content => content;
+
         public OptionsSideNav()
         {
             RelativeSizeAxes = Axes.Y;
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
-                new FlowContainer
+                content = new FlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
-                    Direction = FlowDirection.VerticalOnly,
-                    Children = new[]
-                    {
-                        new SidebarButton
-                        {
-                            Icon = Graphics.FontAwesome.gear,
-                            Action = () => GeneralAction(),
-                        },
-                        new SidebarButton
-                        {
-                            Icon = Graphics.FontAwesome.laptop,
-                            Action = () => GraphicsAction(),
-                        },
-                        new SidebarButton
-                        {
-                            Icon = Graphics.FontAwesome.circle_o,
-                            Action = () => GameplayAction(),
-                        },
-                        new SidebarButton
-                        {
-                            Icon = Graphics.FontAwesome.headphones,
-                            Action = () => AudioAction(),
-                        },
-                        new SidebarButton
-                        {
-                            Icon = Graphics.FontAwesome.fa_paint_brush,
-                            Action = () => SkinAction(),
-                        },
-                        new SidebarButton
-                        {
-                            Icon = Graphics.FontAwesome.keyboard_o,
-                            Action = () => InputAction(),
-                        },
-                        new SidebarButton
-                        {
-                            Icon = Graphics.FontAwesome.pencil,
-                            Action = () => EditorAction(),
-                        },
-                        new SidebarButton
-                        {
-                            Icon = Graphics.FontAwesome.globe,
-                            Action = () => {
-                                OnlineAction();
-                            }
-                        },
-                        new SidebarButton
-                        {
-                            Icon = Graphics.FontAwesome.wrench,
-                            Action = () => MaintenanceAction(),
-                        }
-                    }
+                    Direction = FlowDirection.VerticalOnly
                 },
                 new Box
                 {
@@ -94,26 +40,54 @@ namespace osu.Game.Overlays.Options
             };
         }
 
-        private class SidebarButton : Container
+        public class SidebarButton : Container
         {
-            private ToolbarButton button;
+            private TextAwesome drawableIcon;
+            private Box backgroundBox;
+            public Action Action;
             
-            public Action Action
+            public FontAwesome Icon
             {
-                get { return button.Action; }
-                set { button.Action = value; }
-            }
-            
-            public Graphics.FontAwesome Icon
-            {
-                get { return button.Icon; }
-                set { button.Icon = value; }
+                get { return drawableIcon.Icon; }
+                set { drawableIcon.Icon = value; }
             }
             
             public SidebarButton()
             {
                 Size = new Vector2(60);
-                Children = new[] { button = new ToolbarButton() };
+                Children = new Drawable[]
+                {
+                    backgroundBox = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        BlendingMode = BlendingMode.Additive,
+                        Colour = new Color4(60, 60, 60, 255),
+                        Alpha = 0,
+                    },
+                    drawableIcon = new TextAwesome
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                };
+            }
+            
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs e)
+            {
+                Action?.Invoke();
+                backgroundBox.FlashColour(Color4.White, 400);
+                return true;
+            }
+            
+            protected override bool OnHover(InputState state)
+            {
+                backgroundBox.FadeTo(0.4f, 200);
+                return true;
+            }
+    
+            protected override void OnHoverLost(InputState state)
+            {
+                backgroundBox.FadeTo(0, 200);
             }
         }
     }

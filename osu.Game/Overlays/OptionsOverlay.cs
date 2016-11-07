@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Diagnostics;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -29,16 +30,6 @@ namespace osu.Game.Overlays
 
         private ScrollContainer scrollContainer;
         private FlowContainer flowContainer;
-        
-        private GeneralOptions generalOptions;
-        private GraphicsOptions graphicsOptions;
-        private GameplayOptions gameplayOptions;
-        private AudioOptions audioOptions;
-        private SkinOptions skinOptions;
-        private InputOptions inputOptions;
-        private EditorOptions editorOptions;
-        private OnlineOptions onlineOptions;
-        private MaintenanceOptions maintenanceOptions;
 
         public OptionsOverlay()
         {
@@ -46,6 +37,19 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.Y;
             Size = new Vector2(width, 1);
             Position = new Vector2(-width, 0);
+
+            var sections = new OptionsSection[]
+            {
+                new GeneralOptions(),
+                new GraphicsOptions(),
+                new GameplayOptions(),
+                new AudioOptions(),
+                new SkinOptions(),
+                new InputOptions(),
+                new EditorOptions(),
+                new OnlineOptions(),
+                new MaintenanceOptions(),
+            };
 
             Children = new Drawable[]
             {
@@ -61,10 +65,9 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Y,
                     Width = width - (sideNavWidth + sideNavPadding * 2),
                     Position = new Vector2(sideNavWidth + sideNavPadding * 2, 0),
-                    // Note: removing this comment causes... compiler bugs? It's weird.2
                     Children = new[]
                     {
-                        flowContainer = new FlowContainer
+                        new FlowContainer
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
@@ -84,15 +87,12 @@ namespace osu.Game.Overlays
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = SideMargins, Bottom = 30 },
                                 },
-                                generalOptions = new GeneralOptions(),
-                                graphicsOptions = new GraphicsOptions(),
-                                gameplayOptions = new GameplayOptions(),
-                                audioOptions = new AudioOptions(),
-                                skinOptions = new SkinOptions(),
-                                inputOptions = new InputOptions(),
-                                editorOptions = new EditorOptions(),
-                                onlineOptions = new OnlineOptions(),
-                                maintenanceOptions = new MaintenanceOptions(),
+                                flowContainer = new FlowContainer
+                                {
+                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.X,
+                                    Direction = FlowDirection.VerticalOnly,
+                                }
                             }
                         }
                     }
@@ -101,17 +101,16 @@ namespace osu.Game.Overlays
                 {
                     Padding = new MarginPadding { Left = sideNavPadding, Right = sideNavPadding },
                     Width = sideNavWidth + sideNavPadding * 2,
-                    GeneralAction = () => scrollContainer.ScrollIntoView(generalOptions),
-                    GraphicsAction = () => scrollContainer.ScrollIntoView(graphicsOptions),
-                    GameplayAction = () => scrollContainer.ScrollIntoView(gameplayOptions),
-                    AudioAction = () => scrollContainer.ScrollIntoView(audioOptions),
-                    SkinAction = () => scrollContainer.ScrollIntoView(skinOptions),
-                    InputAction = () => scrollContainer.ScrollIntoView(inputOptions),
-                    EditorAction = () => scrollContainer.ScrollIntoView(editorOptions),
-                    OnlineAction = () => scrollContainer.ScrollIntoView(onlineOptions),
-                    MaintenanceAction = () => scrollContainer.ScrollIntoView(maintenanceOptions),
+                    Children = sections.Select(section =>
+                        new OptionsSideNav.SidebarButton
+                        {
+                            Icon = section.Icon,
+                            Action = () => scrollContainer.ScrollIntoView(section)
+                        }
+                    )
                 }
             };
+            flowContainer.Add(sections);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
