@@ -163,7 +163,16 @@ namespace osu.Game.Configuration
             Set(OsuConfig.LetterboxPositionX, 0, -100, 100);
             Set(OsuConfig.LetterboxPositionY, 0, -100, 100);
             //Set(OsuConfig.FrameSync, FrameSync.Limit120);
-            //Set(OsuConfig.ShowUnicode, unicodeDefault);
+            bool unicodeDefault = false;
+            switch (Get<string>(OsuConfig.Language))
+            {
+                case @"zh":
+                case @"ja":
+                case @"ko":
+                    unicodeDefault = true;
+                    break;
+            }
+            Set(OsuConfig.ShowUnicode, unicodeDefault);
             Set(OsuConfig.PermanentSongInfo, false);
             Set(OsuConfig.Ticker, false);
             Set(OsuConfig.CompatibilityContext, false);
