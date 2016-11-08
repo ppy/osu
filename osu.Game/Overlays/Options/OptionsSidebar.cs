@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Options
                 };
             }
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs e)
+            protected override bool OnClick(InputState state)
             {
                 Action?.Invoke();
                 backgroundBox.FlashColour(Color4.White, 400);
