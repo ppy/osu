@@ -24,20 +24,18 @@ namespace osu.Game.Overlays
 {
     public class OptionsOverlay : OverlayContainer
     {
-        internal const float SideMargins = 10;
+        internal const float CONTENT_MARGINS = 10;
+
         private const float width = 400;
-        private const float sideNavWidth = 60;
-        private const float sideNavPadding = 0;
+        private const float sidebar_width = 60;
+        private const float sidebar_padding = 10;
+        private const float sidebar_total = sidebar_width + sidebar_padding;
 
         private ScrollContainer scrollContainer;
-        private FlowContainer flowContainer;
+        private OptionsSidebar sidebar;
 
         public OptionsOverlay()
         {
-            RelativeSizeAxes = Axes.Y;
-            Size = new Vector2(width, 1);
-            Position = new Vector2(-width, 0);
-
             var sections = new OptionsSection[]
             {
                 new GeneralSection(),
@@ -51,20 +49,23 @@ namespace osu.Game.Overlays
                 new MaintenanceSection(),
             };
 
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
+
             Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
-                    Alpha = 0.8f,
+                    Alpha = 0.6f,
                 },
-                scrollContainer = new ScrollContainer
+                scrollContainer = new PaddedScrollContainer
                 {
                     ScrollDraggerAnchor = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.Y,
-                    Width = width - (sideNavWidth + sideNavPadding * 2),
-                    Position = new Vector2(sideNavWidth + sideNavPadding * 2, 0),
+                    Width = width,
+                    Padding = new MarginPadding { Left = sidebar_width },
                     Children = new[]
                     {
                         new FlowContainer
@@ -78,29 +79,29 @@ namespace osu.Game.Overlays
                                 {
                                     Text = "settings",
                                     TextSize = 40,
-                                    Margin = new MarginPadding { Left = SideMargins, Top = 30 },
+                                    Margin = new MarginPadding { Left = CONTENT_MARGINS, Top = 30 },
                                 },
                                 new SpriteText
                                 {
                                     Colour = new Color4(235, 117, 139, 255),
                                     Text = "Change the way osu! behaves",
                                     TextSize = 18,
-                                    Margin = new MarginPadding { Left = SideMargins, Bottom = 30 },
+                                    Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
                                 },
-                                flowContainer = new FlowContainer
+                                new FlowContainer
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
                                     Direction = FlowDirection.VerticalOnly,
+                                    Children = sections,
                                 }
                             }
                         }
                     }
                 },
-                new OptionsSidebar
+                sidebar = new OptionsSidebar
                 {
-                    Padding = new MarginPadding { Left = sideNavPadding, Right = sideNavPadding },
-                    Width = sideNavWidth + sideNavPadding * 2,
+                    Width = sidebar_width,
                     Children = sections.Select(section =>
                         new OptionsSidebar.SidebarButton
                         {
@@ -110,7 +111,6 @@ namespace osu.Game.Overlays
                     )
                 }
             };
-            flowContainer.Add(sections);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
@@ -129,14 +129,24 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            MoveToX(0, 300, EasingTypes.Out);
+            scrollContainer.MoveToX(0, 600, EasingTypes.OutQuint);
+            sidebar.MoveToX(0, 800, EasingTypes.OutQuint);
             FadeTo(1, 300);
         }
 
         protected override void PopOut()
         {
-            MoveToX(-width, 300, EasingTypes.Out);
+            scrollContainer.MoveToX(-width, 600, EasingTypes.OutQuint);
+            sidebar.MoveToX(-sidebar_width, 600, EasingTypes.OutQuint);
             FadeTo(0, 300);
+        }
+
+        private class PaddedScrollContainer : ScrollContainer
+        {
+            public PaddedScrollContainer()
+            {
+                Content.Padding = new MarginPadding { Left = sidebar_padding };
+            }
         }
     }
 }
