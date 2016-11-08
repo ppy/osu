@@ -35,6 +35,8 @@ namespace osu.Game
 
         string[] args;
 
+        public OptionsOverlay Options;
+
         public OsuGame(string[] args = null)
         {
             this.args = args;
@@ -88,6 +90,8 @@ namespace osu.Game
                     Handler = globalHotkeyPressed
                 }
             });
+
+            (Options = new OptionsOverlay { Depth = float.MaxValue / 2 }).Preload(game, Add);
 
             (intro = new Intro
             {
