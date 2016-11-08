@@ -26,12 +26,6 @@ namespace osu.Desktop.VisualTests.Tests
 
         protected override IFrameBasedClock Clock => localClock;
 
-        [Initializer]
-        private void Load()
-        {
-            // TODO: Do we even need this here?
-        }
-
         public override void Reset()
         {
             base.Reset();
