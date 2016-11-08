@@ -80,7 +80,7 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
 
-            (Options = new OptionsOverlay { Depth = float.MaxValue / 2}).Preload(game, Add);
+            (Options = new OptionsOverlay { Depth = float.MaxValue / 2 }).Preload(game, Add);
 
             API = new APIAccess()
             {

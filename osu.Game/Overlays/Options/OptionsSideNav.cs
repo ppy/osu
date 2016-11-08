@@ -19,13 +19,19 @@ namespace osu.Game.Overlays.Options
             RelativeSizeAxes = Axes.Y;
             InternalChildren = new Drawable[]
             {
-                content = new FlowContainer
+                new SidebarScrollContainer
                 {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.CentreLeft,
-                    Anchor = Anchor.CentreLeft,
-                    Direction = FlowDirection.VerticalOnly
+                    Children = new []
+                    {
+                        content = new FlowContainer
+                        {
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.CentreLeft,
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Direction = FlowDirection.VerticalOnly
+                        }
+                    }
                 },
                 new Box
                 {
@@ -38,18 +44,27 @@ namespace osu.Game.Overlays.Options
             };
         }
 
+        private class SidebarScrollContainer : ScrollContainer
+        {
+            public SidebarScrollContainer()
+            {
+                Content.Anchor = Anchor.CentreLeft;
+                Content.Origin = Anchor.CentreLeft;
+            }
+        }
+
         public class SidebarButton : Container
         {
             private TextAwesome drawableIcon;
             private Box backgroundBox;
             public Action Action;
-            
+
             public FontAwesome Icon
             {
                 get { return drawableIcon.Icon; }
                 set { drawableIcon.Icon = value; }
             }
-            
+
             public SidebarButton()
             {
                 Size = new Vector2(60);
@@ -69,20 +84,20 @@ namespace osu.Game.Overlays.Options
                     },
                 };
             }
-            
+
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs e)
             {
                 Action?.Invoke();
                 backgroundBox.FlashColour(Color4.White, 400);
                 return true;
             }
-            
+
             protected override bool OnHover(InputState state)
             {
                 backgroundBox.FadeTo(0.4f, 200);
                 return true;
             }
-    
+
             protected override void OnHoverLost(InputState state)
             {
                 backgroundBox.FadeTo(0, 200);
