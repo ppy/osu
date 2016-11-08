@@ -18,25 +18,25 @@ namespace osu.Desktop
         [STAThread]
         public static int Main(string[] args)
         {
-            DesktopGameHost host = Host.GetSuitableHost(@"osu", true);
-
-            if (!host.IsPrimaryInstance)
+            using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
             {
-                var importer = new BeatmapImporter(host);
-                
-                foreach (var file in args)
-                    if (!importer.Import(file).Wait(1000))
-                        throw new TimeoutException(@"IPC took too long to send");
-                Console.WriteLine(@"Sent import requests to running instance");
-            }
-            else
-            {
-                BaseGame osu = new OsuGame(args);
-                host.Add(osu);
-                host.Run();
-            }
+                if (!host.IsPrimaryInstance)
+                {
+                    var importer = new BeatmapImporter(host);
 
-            return 0;
+                    foreach (var file in args)
+                        if (!importer.Import(file).Wait(1000))
+                            throw new TimeoutException(@"IPC took too long to send");
+                    Console.WriteLine(@"Sent import requests to running instance");
+                }
+                else
+                {
+                    BaseGame osu = new OsuGame(args);
+                    host.Add(osu);
+                    host.Run();
+                }
+                return 0;
+            }
         }
     }
 }

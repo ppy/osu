@@ -13,9 +13,11 @@ namespace osu.Desktop.VisualTests
         [STAThread]
         public static void Main(string[] args)
         {
-            BasicGameHost host = Host.GetSuitableHost(@"osu-visual-tests");
-            host.Add(new VisualTestGame());
-            host.Run();
+            using (BasicGameHost host = Host.GetSuitableHost(@"osu-visual-tests"))
+            {
+                host.Add(new VisualTestGame());
+                host.Run();
+            }
         }
     }
 }
