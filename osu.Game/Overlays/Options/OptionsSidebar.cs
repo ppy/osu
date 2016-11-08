@@ -9,12 +9,12 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionsSideNav : Container
+    public class OptionsSidebar : Container
     {
         private FlowContainer content;
         protected override Container Content => content;
 
-        public OptionsSideNav()
+        public OptionsSidebar()
         {
             RelativeSizeAxes = Axes.Y;
             InternalChildren = new Drawable[]
