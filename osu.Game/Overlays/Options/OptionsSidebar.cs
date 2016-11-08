@@ -19,6 +19,11 @@ namespace osu.Game.Overlays.Options
             RelativeSizeAxes = Axes.Y;
             InternalChildren = new Drawable[]
             {
+                new Box
+                {
+                    Colour = Color4.Black,
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new SidebarScrollContainer
                 {
                     Children = new []
@@ -33,14 +38,6 @@ namespace osu.Game.Overlays.Options
                         }
                     }
                 },
-                new Box
-                {
-                    Colour = new Color4(30, 30, 30, 255),
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 2,
-                    Origin = Anchor.TopRight,
-                    Anchor = Anchor.TopRight,
-                }
             };
         }
 

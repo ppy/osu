@@ -35,8 +35,8 @@ namespace osu.Game.Overlays.Options
                     Padding = new MarginPadding
                     {
                         Top = 10 + borderSize,
-                        Left = OptionsOverlay.SideMargins,
-                        Right = OptionsOverlay.SideMargins,
+                        Left = OptionsOverlay.CONTENT_MARGINS,
+                        Right = OptionsOverlay.CONTENT_MARGINS,
                         Bottom = 10,
                     },
                     RelativeSizeAxes = Axes.X,
