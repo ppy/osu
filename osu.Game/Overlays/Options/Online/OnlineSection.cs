@@ -2,14 +2,14 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.Options
+namespace osu.Game.Overlays.Options.Online
 {
-    public class OnlineOptions : OptionsSection
+    public class OnlineSection : OptionsSection
     {
         protected override string Header => "Online";
         public override FontAwesome Icon => FontAwesome.fa_globe;
     
-        public OnlineOptions()
+        public OnlineSection()
         {
             Children = new Drawable[]
             {

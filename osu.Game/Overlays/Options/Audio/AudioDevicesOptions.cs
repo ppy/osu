@@ -1,7 +1,7 @@
 ﻿using System;
 using osu.Framework.Graphics.Sprites;
 
-namespace osu.Game.Overlays.Options
+namespace osu.Game.Overlays.Options.Audio
 {
     public class AudioDevicesOptions : OptionsSubsection
     {

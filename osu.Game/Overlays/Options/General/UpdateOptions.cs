@@ -7,7 +7,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Options
+namespace osu.Game.Overlays.Options.General
 {
     public class UpdateOptions : OptionsSubsection
     {

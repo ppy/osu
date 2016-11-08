@@ -6,12 +6,12 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
-    public class EditorOptions : OptionsSection
+    public class EditorSection : OptionsSection
     {
         protected override string Header => "Editor";
         public override FontAwesome Icon => FontAwesome.fa_pencil;
     
-        public EditorOptions()
+        public EditorSection()
         {
             content.Spacing = new Vector2(0, 5);
             Children = new Drawable[]

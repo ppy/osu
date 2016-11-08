@@ -18,6 +18,12 @@ using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Options;
+using osu.Game.Overlays.Options.Audio;
+using osu.Game.Overlays.Options.Gameplay;
+using osu.Game.Overlays.Options.General;
+using osu.Game.Overlays.Options.Graphics;
+using osu.Game.Overlays.Options.Input;
+using osu.Game.Overlays.Options.Online;
 
 namespace osu.Game.Overlays
 {
@@ -40,15 +46,15 @@ namespace osu.Game.Overlays
 
             var sections = new OptionsSection[]
             {
-                new GeneralOptions(),
-                new GraphicsOptions(),
-                new GameplayOptions(),
-                new AudioOptions(),
-                new SkinOptions(),
-                new InputOptions(),
-                new EditorOptions(),
-                new OnlineOptions(),
-                new MaintenanceOptions(),
+                new GeneralSection(),
+                new GraphicsSection(),
+                new GameplaySection(),
+                new AudioSection(),
+                new SkinSection(),
+                new InputSection(),
+                new EditorSection(),
+                new OnlineSection(),
+                new MaintenanceSection(),
             };
 
             Children = new Drawable[]

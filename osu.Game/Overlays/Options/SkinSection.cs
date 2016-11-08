@@ -8,12 +8,12 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class SkinOptions : OptionsSection
+    public class SkinSection : OptionsSection
     {
         protected override string Header => "Skin";
         public override FontAwesome Icon => FontAwesome.fa_paint_brush;
 
-        public SkinOptions()
+        public SkinSection()
         {
             content.Spacing = new Vector2(0, 5);
             Children = new Drawable[]

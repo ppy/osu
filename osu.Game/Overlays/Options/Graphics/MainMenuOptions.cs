@@ -1,7 +1,7 @@
 ﻿using System;
 using osu.Framework.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Options
+namespace osu.Game.Overlays.Options.Graphics
 {
     public class MainMenuOptions : OptionsSubsection
     {

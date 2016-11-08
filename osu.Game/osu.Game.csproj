@@ -197,39 +197,39 @@
     <Compile Include="Database\BeatmapMetadata.cs" />
     <Compile Include="Database\BeatmapInfo.cs" />
     <Compile Include="Database\BaseDifficulty.cs" />
-    <Compile Include="Overlays\Options\LoginOptions.cs" />
-    <Compile Include="Overlays\Options\GeneralOptions.cs" />
-    <Compile Include="Overlays\Options\LanguageOptions.cs" />
-    <Compile Include="Overlays\Options\UpdateOptions.cs" />
-    <Compile Include="Overlays\Options\GraphicsOptions.cs" />
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />
-    <Compile Include="Overlays\Options\RendererOptions.cs" />
-    <Compile Include="Overlays\Options\LayoutOptions.cs" />
-    <Compile Include="Overlays\Options\DetailOptions.cs" />
-    <Compile Include="Overlays\Options\MainMenuOptions.cs" />
-    <Compile Include="Overlays\Options\SongSelectGraphicsOptions.cs" />
-    <Compile Include="Overlays\Options\GameplayOptions.cs" />
-    <Compile Include="Overlays\Options\GeneralGameplayOptions.cs" />
-    <Compile Include="Overlays\Options\SongSelectGameplayOptions.cs" />
-    <Compile Include="Overlays\Options\AudioOptions.cs" />
-    <Compile Include="Overlays\Options\AudioDevicesOptions.cs" />
-    <Compile Include="Overlays\Options\VolumeOptions.cs" />
-    <Compile Include="Overlays\Options\OffsetAdjustmentOptions.cs" />
-    <Compile Include="Overlays\Options\SkinOptions.cs" />
-    <Compile Include="Overlays\Options\InputOptions.cs" />
-    <Compile Include="Overlays\Options\MouseOptions.cs" />
-    <Compile Include="Overlays\Options\KeyboardOptions.cs" />
-    <Compile Include="Overlays\Options\OtherInputOptions.cs" />
-    <Compile Include="Overlays\Options\EditorOptions.cs" />
-    <Compile Include="Overlays\Options\OnlineOptions.cs" />
-    <Compile Include="Overlays\Options\AlertsPrivacyOptions.cs" />
-    <Compile Include="Overlays\Options\OnlineIntegrationOptions.cs" />
-    <Compile Include="Overlays\Options\InGameChatOptions.cs" />
-    <Compile Include="Overlays\Options\MaintenanceOptions.cs" />
+    <Compile Include="Overlays\Options\MaintenanceSection.cs" />
     <Compile Include="Overlays\Options\OptionsSection.cs" />
     <Compile Include="Overlays\Options\OptionsSubsection.cs" />
     <Compile Include="Graphics\UserInterface\LoadingAnimation.cs" />
     <Compile Include="Overlays\Options\OptionsSideNav.cs" />
+    <Compile Include="Overlays\Options\General\GeneralSection.cs" />
+    <Compile Include="Overlays\Options\General\LoginOptions.cs" />
+    <Compile Include="Overlays\Options\General\UpdateOptions.cs" />
+    <Compile Include="Overlays\Options\General\LanguageOptions.cs" />
+    <Compile Include="Overlays\Options\Graphics\GraphicsSection.cs" />
+    <Compile Include="Overlays\Options\Graphics\RendererOptions.cs" />
+    <Compile Include="Overlays\Options\Graphics\LayoutOptions.cs" />
+    <Compile Include="Overlays\Options\Graphics\DetailOptions.cs" />
+    <Compile Include="Overlays\Options\Graphics\MainMenuOptions.cs" />
+    <Compile Include="Overlays\Options\Graphics\SongSelectGraphicsOptions.cs" />
+    <Compile Include="Overlays\Options\Gameplay\GameplaySection.cs" />
+    <Compile Include="Overlays\Options\Gameplay\GeneralGameplayOptions.cs" />
+    <Compile Include="Overlays\Options\Gameplay\SongSelectGameplayOptions.cs" />
+    <Compile Include="Overlays\Options\Audio\AudioSection.cs" />
+    <Compile Include="Overlays\Options\Audio\AudioDevicesOptions.cs" />
+    <Compile Include="Overlays\Options\Audio\VolumeOptions.cs" />
+    <Compile Include="Overlays\Options\Audio\OffsetAdjustmentOptions.cs" />
+    <Compile Include="Overlays\Options\Input\InputSection.cs" />
+    <Compile Include="Overlays\Options\Input\MouseOptions.cs" />
+    <Compile Include="Overlays\Options\Input\KeyboardOptions.cs" />
+    <Compile Include="Overlays\Options\Input\OtherInputOptions.cs" />
+    <Compile Include="Overlays\Options\Online\OnlineSection.cs" />
+    <Compile Include="Overlays\Options\Online\AlertsPrivacyOptions.cs" />
+    <Compile Include="Overlays\Options\Online\OnlineIntegrationOptions.cs" />
+    <Compile Include="Overlays\Options\Online\InGameChatOptions.cs" />
+    <Compile Include="Overlays\Options\EditorSection.cs" />
+    <Compile Include="Overlays\Options\SkinSection.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -251,6 +251,12 @@
   <ItemGroup />
   <ItemGroup>
     <Folder Include="Overlays\Options\" />
+    <Folder Include="Overlays\Options\General\" />
+    <Folder Include="Overlays\Options\Graphics\" />
+    <Folder Include="Overlays\Options\Gameplay\" />
+    <Folder Include="Overlays\Options\Audio\" />
+    <Folder Include="Overlays\Options\Input\" />
+    <Folder Include="Overlays\Options\Online\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

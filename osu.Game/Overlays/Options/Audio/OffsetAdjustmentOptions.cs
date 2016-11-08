@@ -3,7 +3,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Options
+namespace osu.Game.Overlays.Options.Audio
 {
     public class OffsetAdjustmentOptions : OptionsSubsection
     {
