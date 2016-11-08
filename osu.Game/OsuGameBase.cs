@@ -27,7 +27,6 @@ namespace osu.Game
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
-        public OptionsOverlay Options;
         public APIAccess API;
 
         protected override Container Content => ratioContainer;
@@ -79,8 +78,6 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
-
-            (Options = new OptionsOverlay { Depth = float.MaxValue / 2 }).Preload(game, Add);
 
             API = new APIAccess()
             {
