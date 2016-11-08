@@ -66,7 +66,6 @@ namespace osu.Game.Overlays.Options
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
                     },
                 };
             }
