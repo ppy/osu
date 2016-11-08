@@ -34,7 +34,6 @@ namespace osu.Game.Overlays
 
         public OptionsOverlay()
         {
-            Depth = float.MaxValue;
             RelativeSizeAxes = Axes.Y;
             Size = new Vector2(width, 1);
             Position = new Vector2(-width, 0);
