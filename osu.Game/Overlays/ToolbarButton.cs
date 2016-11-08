@@ -102,7 +102,7 @@ namespace osu.Game.Overlays
                     Alpha = 0,
                     Children = new[]
                     {
-                        tooltip1 = new SpriteText()
+                        tooltip1 = new SpriteText
                         {
                             TextSize = 22,
                         },
@@ -126,7 +126,7 @@ namespace osu.Game.Overlays
             Size = new Vector2(WIDTH + (DrawableText.IsVisible ? DrawableText.DrawSize.X : 0), 1);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs e)
         {
             Action?.Invoke();
             HoverBackground.FlashColour(Color4.White, 400);
