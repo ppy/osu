@@ -225,11 +225,12 @@
     <Compile Include="Overlays\Options\Input\KeyboardOptions.cs" />
     <Compile Include="Overlays\Options\Input\OtherInputOptions.cs" />
     <Compile Include="Overlays\Options\Online\OnlineSection.cs" />
-    <Compile Include="Overlays\Options\Online\AlertsPrivacyOptions.cs" />
     <Compile Include="Overlays\Options\Online\OnlineIntegrationOptions.cs" />
     <Compile Include="Overlays\Options\Online\InGameChatOptions.cs" />
     <Compile Include="Overlays\Options\EditorSection.cs" />
     <Compile Include="Overlays\Options\SkinSection.cs" />
+    <Compile Include="Overlays\Options\Online\PrivacyOptions.cs" />
+    <Compile Include="Overlays\Options\Online\NotificationsOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

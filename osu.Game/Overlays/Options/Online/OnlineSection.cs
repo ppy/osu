@@ -12,9 +12,10 @@ namespace osu.Game.Overlays.Options.Online
         {
             Children = new Drawable[]
             {
-                new AlertsPrivacyOptions(),
-                new OnlineIntegrationOptions(),
                 new InGameChatOptions(),
+                new PrivacyOptions(),
+                new NotificationsOptions(),
+                new OnlineIntegrationOptions(),
             };
         }
     }
