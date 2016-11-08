@@ -10,6 +10,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Online.Chat.Display
 {
@@ -27,10 +28,9 @@ namespace osu.Game.Online.Chat.Display
             const float padding = 200;
             const float text_size = 20;
 
-            protected override void Load(BaseGame game)
+            [Initializer]
+            private void Load()
             {
-                base.Load(game);
-
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 

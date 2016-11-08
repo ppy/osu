@@ -13,6 +13,8 @@ using osu.Game.Database;
 using osu.Framework.Timing;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
 
 namespace osu.Game.GameModes.Play
 {
@@ -30,17 +32,10 @@ namespace osu.Game.GameModes.Play
 
         private InterpolatingFramedClock playerClock;
         private IAdjustableClock sourceClock;
-        private BeatmapDatabase beatmaps;
-        
-        public Player(BeatmapDatabase beatmaps)
-        {
-            this.beatmaps = beatmaps;
-        }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load(AudioManager audio, BeatmapDatabase beatmaps)
         {
-            base.Load(game);
-
             try
             {
                 if (Beatmap == null)
@@ -57,7 +52,7 @@ namespace osu.Game.GameModes.Play
 
             if (track != null)
             {
-                game.Audio.Track.SetExclusive(track);
+                audio.Track.SetExclusive(track);
                 sourceClock = track;
             }
 

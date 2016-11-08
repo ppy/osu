@@ -14,6 +14,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework;
+using osu.Framework.Allocation;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -53,10 +54,9 @@ namespace osu.Game.GameModes.Menu
             RelativeSizeAxes = Axes.Both;
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
-            base.Load(game);
-
             Children = new Drawable[]
             {
                 buttonArea = new Container

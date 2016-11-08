@@ -6,6 +6,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using OpenTK;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Beatmaps.Objects.Mania.Drawable
 {
@@ -20,10 +22,10 @@ namespace osu.Game.Beatmaps.Objects.Mania.Drawable
             Scale = new Vector2(0.1f);
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load(TextureStore textures)
         {
-            base.Load(game);
-            Texture = game.Textures.Get(@"Menu/logo");
+            Texture = textures.Get(@"Menu/logo");
 
             Transforms.Add(new TransformPositionY() { StartTime = note.StartTime - 200, EndTime = note.StartTime, StartValue = -0.1f, EndValue = 0.9f });
             Transforms.Add(new TransformAlpha() { StartTime = note.StartTime + note.Duration + 200, EndTime = note.StartTime + note.Duration + 400, StartValue = 1, EndValue = 0 });

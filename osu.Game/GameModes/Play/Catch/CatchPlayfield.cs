@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Allocation;
 
 namespace osu.Game.GameModes.Play.Catch
 {
@@ -20,10 +21,9 @@ namespace osu.Game.GameModes.Play.Catch
             Origin = Anchor.BottomCentre;
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
-            base.Load(game);
-
             Add(new Box { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
         }
     }

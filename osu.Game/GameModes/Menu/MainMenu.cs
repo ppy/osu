@@ -17,6 +17,8 @@ using OpenTK;
 using osu.Framework;
 using osu.Game.Overlays;
 using System.Threading.Tasks;
+using osu.Game.Configuration;
+using osu.Framework.Allocation;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -55,14 +57,11 @@ namespace osu.Game.GameModes.Menu
             };
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load(BaseGame game, OptionsOverlay options)
         {
-            base.Load(game);
-
             background.Preload(game);
-
-            OsuGame osu = (OsuGame)game;
-            buttons.OnSettings = osu.Options.ToggleVisibility;
+            buttons.OnSettings = options.ToggleVisibility;
         }
 
         protected override void LoadComplete()

@@ -7,6 +7,7 @@ using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -55,9 +56,9 @@ namespace osu.Game.Overlays
             });
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
-            base.Load(game);
             initializeChannels();
         }
 

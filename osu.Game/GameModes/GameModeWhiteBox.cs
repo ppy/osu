@@ -13,6 +13,7 @@ using osu.Game.GameModes.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Allocation;
 
 namespace osu.Game.GameModes
 {
@@ -77,10 +78,9 @@ namespace osu.Game.GameModes
             Content.FadeIn(transition_time, EasingTypes.OutExpo);
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
-            base.Load(game);
-
             Children = new Drawable[]
             {
                     box = new Box

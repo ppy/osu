@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -109,10 +110,9 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
-            base.Load(game);
-
             starContainer.Width = MaxStars * StarSize + Math.Max(MaxStars - 1, 0) * StarSpacing;
             starContainer.Height = StarSize;
 

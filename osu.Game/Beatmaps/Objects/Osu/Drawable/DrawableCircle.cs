@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using OpenTK;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Beatmaps.Objects.Osu.Drawable
 {
@@ -63,10 +64,9 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             Size = circle.DrawSize;
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load(BaseGame game)
         {
-            base.Load(game);
-
             approachCircle.Texture = game.Textures.Get(@"Play/osu/approachcircle@2x");
         }
 
@@ -149,10 +149,10 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 };
             }
 
-            protected override void Load(BaseGame game)
+            [Initializer]
+            private void Load(TextureStore textures)
             {
-                base.Load(game);
-                number.Texture = game.Textures.Get(@"Play/osu/number@2x");
+                number.Texture = textures.Get(@"Play/osu/number@2x");
             }
         }
 
@@ -177,10 +177,10 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 };
             }
 
-            protected override void Load(BaseGame game)
+            [Initializer]
+            private void Load(TextureStore textures)
             {
-                base.Load(game);
-                layer.Texture = game.Textures.Get(@"Play/osu/ring-glow@2x");
+                layer.Texture = textures.Get(@"Play/osu/ring-glow@2x");
             }
         }
 
@@ -203,10 +203,10 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 };
             }
 
-            protected override void Load(BaseGame game)
+            [Initializer]
+            private void Load(TextureStore textures)
             {
-                base.Load(game);
-                ring.Texture = game.Textures.Get(@"Play/osu/ring@2x");
+                ring.Texture = textures.Get(@"Play/osu/ring@2x");
             }
         }
 
@@ -289,10 +289,10 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 };
             }
 
-            protected override void Load(BaseGame game)
+            [Initializer]
+            private void Load(TextureStore textures)
             {
-                base.Load(game);
-                disc.Texture = game.Textures.Get(@"Play/osu/disc@2x");
+                disc.Texture = textures.Get(@"Play/osu/disc@2x");
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -306,11 +306,10 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
         {
             private Texture tex;
 
-            protected override void Load(BaseGame game)
+            [Initializer]
+            private void Load(TextureStore textures)
             {
-                base.Load(game);
-
-                tex = game.Textures.Get(@"Play/osu/triangle@2x");
+                tex = textures.Get(@"Play/osu/triangle@2x");
 
                 for (int i = 0; i < 10; i++)
                 {

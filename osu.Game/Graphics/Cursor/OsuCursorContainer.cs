@@ -2,10 +2,12 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 
@@ -37,15 +39,14 @@ namespace osu.Game.Graphics.Cursor
                 AutoSizeAxes = Axes.Both;
             }
 
-            protected override void Load(BaseGame game)
+            [Initializer]
+            private void Load(TextureStore textures)
             {
-                base.Load(game);
-
                 Children = new Drawable[]
                 {
                     new Sprite
                     {
-                        Texture = game.Textures.Get(@"Cursor/cursor")
+                        Texture = textures.Get(@"Cursor/cursor")
                     }
                 };
             }

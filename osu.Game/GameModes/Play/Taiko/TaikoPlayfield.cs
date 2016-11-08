@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.GameModes.Play.Taiko
 {
@@ -20,15 +22,14 @@ namespace osu.Game.GameModes.Play.Taiko
             Origin = Anchor.Centre;
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load(TextureStore textures)
         {
-            base.Load(game);
-
             Add(new Box { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
 
             Add(new Sprite
             {
-                Texture = game.Textures.Get(@"Menu/logo"),
+                Texture = textures.Get(@"Menu/logo"),
                 Origin = Anchor.Centre,
                 Scale = new Vector2(0.2f),
                 RelativePositionAxes = Axes.Both,
