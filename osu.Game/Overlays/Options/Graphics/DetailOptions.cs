@@ -3,7 +3,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Options
+namespace osu.Game.Overlays.Options.Graphics
 {
     public class DetailOptions : OptionsSubsection
     {

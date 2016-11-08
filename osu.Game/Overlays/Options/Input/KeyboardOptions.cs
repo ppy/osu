@@ -2,7 +2,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Options
+namespace osu.Game.Overlays.Options.Input
 {
     public class KeyboardOptions : OptionsSubsection
     {

@@ -2,14 +2,14 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.Options
+namespace osu.Game.Overlays.Options.Audio
 {
-    public class AudioOptions : OptionsSection
+    public class AudioSection : OptionsSection
     {
         protected override string Header => "Audio";
         public override FontAwesome Icon => FontAwesome.fa_headphones;
     
-        public AudioOptions()
+        public AudioSection()
         {
             Children = new Drawable[]
             {

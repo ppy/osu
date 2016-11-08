@@ -9,7 +9,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 
-namespace osu.Game.Overlays.Options
+namespace osu.Game.Overlays.Options.General
 {
     public class LoginOptions : OptionsSubsection
     {

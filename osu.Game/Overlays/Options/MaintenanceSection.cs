@@ -7,12 +7,12 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class MaintenanceOptions : OptionsSection
+    public class MaintenanceSection : OptionsSection
     {
         protected override string Header => "Maintenance";
         public override FontAwesome Icon => FontAwesome.fa_wrench;
     
-        public MaintenanceOptions()
+        public MaintenanceSection()
         {
             content.Spacing = new Vector2(0, 5);
             Children = new Drawable[]

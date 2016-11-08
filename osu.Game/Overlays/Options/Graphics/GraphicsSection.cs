@@ -2,14 +2,14 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.Options
+namespace osu.Game.Overlays.Options.Graphics
 {
-    public class GraphicsOptions : OptionsSection
+    public class GraphicsSection : OptionsSection
     {
         protected override string Header => "Graphics";
         public override FontAwesome Icon => FontAwesome.fa_laptop;
     
-        public GraphicsOptions()
+        public GraphicsSection()
         {
             Children = new Drawable[]
             {
