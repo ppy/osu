@@ -45,25 +45,11 @@ namespace osu.Game
         private void Load()
         {
             Dependencies.Cache(this);
-            Dependencies.Cache<OsuConfigManager>(new OsuConfigManager(Host.Storage));
+            Dependencies.Cache(new OsuConfigManager(Host.Storage));
             Dependencies.Cache(new BeatmapDatabase(Host.Storage, Host));
             
-            AddInternal(ratioContainer = new RatioAdjust());
-            
-            Children = new Drawable[]
-            {
-                Options = new OptionsOverlay(),
-                Cursor = new OsuCursorContainer { Depth = float.MaxValue }
-            };
-            
-            Dependencies.Cache(Options);
-
-            Beatmap.ValueChanged += Beatmap_ValueChanged;
-
-            OszArchiveReader.Register();
-
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            Fonts = new FontStore { ScaleAdjust = 0.01f };
+            Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 0.01f });
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
@@ -79,6 +65,20 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
+            
+            AddInternal(ratioContainer = new RatioAdjust());
+            
+            Children = new Drawable[]
+            {
+                Options = new OptionsOverlay(),
+                Cursor = new OsuCursorContainer { Depth = float.MaxValue }
+            };
+            
+            Dependencies.Cache(Options);
+
+            Beatmap.ValueChanged += Beatmap_ValueChanged;
+
+            OszArchiveReader.Register();
 
             Dependencies.Cache(API = new APIAccess
             {
