@@ -9,7 +9,6 @@ namespace osu.Game.Overlays.Options.Online
     
         public PrivacyOptions()
         {
-            // TODO: this should probably be split into Alerts and Privacy
             Children = new Drawable[]
             {
                 new BasicCheckBox { LabelText = "Share your city location with others" },
