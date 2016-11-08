@@ -131,6 +131,16 @@ namespace osu.Game
                     return true;
             }
 
+            if (state.Keyboard.ControlPressed)
+            {
+                switch (args.Key)
+                {
+                    case Key.O:
+                        Options.ToggleVisibility();
+                        return true;
+                }
+            }
+
             return base.OnKeyDown(state, args);
         }
 
