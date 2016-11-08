@@ -1,5 +1,4 @@
-﻿using System;
-using osu.Framework.Graphics.Sprites;
+﻿using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options.Audio
 {
