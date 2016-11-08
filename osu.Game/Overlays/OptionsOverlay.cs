@@ -29,7 +29,6 @@ namespace osu.Game.Overlays
         private const float width = 400;
         private const float sidebar_width = 60;
         private const float sidebar_padding = 10;
-        private const float sidebar_total = sidebar_width + sidebar_padding;
 
         private ScrollContainer scrollContainer;
         private OptionsSidebar sidebar;
