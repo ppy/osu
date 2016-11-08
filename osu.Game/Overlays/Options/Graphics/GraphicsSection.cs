@@ -1,5 +1,4 @@
-﻿using System;
-using osu.Framework.Graphics;
+﻿using osu.Framework.Graphics;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options.Graphics

@@ -1,6 +1,4 @@
-﻿using System;
-using OpenTK;
-using OpenTK.Graphics;
+﻿using OpenTK;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
