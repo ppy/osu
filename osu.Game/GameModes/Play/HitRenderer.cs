@@ -8,6 +8,7 @@ using osu.Game.Beatmaps.Objects;
 using osu.Framework;
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
 
 namespace osu.Game.GameModes.Play
 {
@@ -42,10 +43,9 @@ namespace osu.Game.GameModes.Play
 
         protected virtual List<T> Convert(List<HitObject> objects) => Converter.Convert(objects);
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
-            base.Load(game);
-
             RelativeSizeAxes = Axes.Both;
 
             Children = new Drawable[]

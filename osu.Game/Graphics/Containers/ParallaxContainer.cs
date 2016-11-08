@@ -3,6 +3,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using OpenTK;
 using osu.Framework;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -15,21 +16,21 @@ namespace osu.Game.Graphics.Containers
         public ParallaxContainer()
         {
             RelativeSizeAxes = Axes.Both;
-            AddInternal(content = new Container()
-            {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
-            });
         }
 
         private Container content;
 
         protected override Container<Drawable> Content => content;
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
-            base.Load(game);
+            AddInternal(content = new Container()
+            {
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
+            });
         }
 
         protected override bool OnMouseMove(InputState state)

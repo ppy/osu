@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Framework;
 using OpenTK;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -101,11 +103,11 @@ namespace osu.Game.GameModes.Menu
             };
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load(TextureStore textures)
         {
-            base.Load(game);
-            logo.Texture = game.Textures.Get(@"Menu/logo");
-            ripple.Texture = game.Textures.Get(@"Menu/logo");
+            logo.Texture = textures.Get(@"Menu/logo");
+            ripple.Texture = textures.Get(@"Menu/logo");
         }
 
         protected override void LoadComplete()

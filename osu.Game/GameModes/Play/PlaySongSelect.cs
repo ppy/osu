@@ -21,6 +21,8 @@ using osu.Game.Beatmaps.Drawable;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Framework.GameModes;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
 
 namespace osu.Game.GameModes.Play
 {
@@ -126,11 +128,11 @@ namespace osu.Game.GameModes.Play
             };
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load(BeatmapDatabase beatmaps, AudioManager audio, BaseGame game)
         {
-            base.Load(game);
-
-            OsuGame osuGame = game as OsuGame;
+            // TODO: Load(..., [PermitNull] OsuGame osuGame) or some such
+            var osuGame = game as OsuGame;
             if (osuGame != null)
             {
                 playMode = osuGame.PlayMode;
@@ -140,11 +142,11 @@ namespace osu.Game.GameModes.Play
             }
 
             if (database == null)
-                database = game.Dependencies.Get<BeatmapDatabase>();
+                database = beatmaps;
 
             database.BeatmapSetAdded += s => Schedule(() => addBeatmapSet(s));
 
-            trackManager = game.Audio.Track;
+            trackManager = audio.Track;
 
             Task.Factory.StartNew(addBeatmapSets);
         }

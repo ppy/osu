@@ -2,16 +2,16 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Game.Graphics.Background;
 
 namespace osu.Game.GameModes.Backgrounds
 {
     public class BackgroundModeDefault : BackgroundMode
     {
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load(BaseGame game)
         {
-            base.Load(game);
-
             Add(new Background());
         }
     }

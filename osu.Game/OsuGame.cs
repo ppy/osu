@@ -20,6 +20,7 @@ using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Game.Database;
+using osu.Framework.Allocation;
 
 namespace osu.Game
 {
@@ -51,15 +52,14 @@ namespace osu.Game
             host.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
             if (!Host.IsPrimaryInstance)
             {
                 Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
                 Environment.Exit(0);
             }
-
-            base.Load(game);
 
             if (args?.Length > 0)
                 Schedule(delegate { Dependencies.Get<BeatmapDatabase>().Import(args); });
@@ -98,7 +98,7 @@ namespace osu.Game
             (intro = new Intro
             {
                 Beatmap = Beatmap
-            }).Preload(game, d =>
+            }).Preload(this, d =>
             {
                 mainContent.Add(d);
 
@@ -107,8 +107,8 @@ namespace osu.Game
                 intro.DisplayAsRoot();
             });
 
-            (Chat = new ChatConsole(API)).Preload(game, Add);
-            (MusicController = new MusicController()).Preload(game, Add);
+            (Chat = new ChatConsole(API)).Preload(this, Add);
+            (MusicController = new MusicController()).Preload(this, Add);
 
             (Toolbar = new Toolbar
             {
@@ -116,7 +116,7 @@ namespace osu.Game
                 OnSettings = Options.ToggleVisibility,
                 OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
                 OnMusicController = MusicController.ToggleVisibility
-            }).Preload(game, t =>
+            }).Preload(this, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
                 PlayMode.TriggerChange();

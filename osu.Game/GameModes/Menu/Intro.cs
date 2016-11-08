@@ -10,6 +10,8 @@ using osu.Framework.Graphics.Transformations;
 using osu.Game.GameModes.Backgrounds;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -43,13 +45,12 @@ namespace osu.Game.GameModes.Menu
             };
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load(AudioManager audio)
         {
-            base.Load(game);
+            welcome = audio.Sample.Get(@"welcome");
 
-            welcome = game.Audio.Sample.Get(@"welcome");
-
-            bgm = game.Audio.Track.Get(@"circles");
+            bgm = audio.Track.Get(@"circles");
             bgm.Looping = true;
         }
 

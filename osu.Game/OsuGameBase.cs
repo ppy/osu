@@ -1,5 +1,6 @@
 ﻿using System;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics;
@@ -52,10 +53,9 @@ namespace osu.Game
         {
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
-            base.Load(game);
-
             Dependencies.Cache(this);
             Dependencies.Cache<OsuConfigManager>();
             Dependencies.Cache(new BeatmapDatabase(Host.Storage, Host));
@@ -63,7 +63,7 @@ namespace osu.Game
             OszArchiveReader.Register();
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            Fonts = new TextureStore() { ScaleAdjust = 0.01f };
+            Fonts = new FontStore { ScaleAdjust = 0.01f };
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));

@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using System;
+using osu.Framework.Allocation;
 
 namespace osu.Game.GameModes.Menu
 {
@@ -48,9 +49,9 @@ namespace osu.Game.GameModes.Menu
             AutoSizeAxes = Axes.Both;
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
-            base.Load(game);
             Alpha = 0;
 
             Vector2 boxSize = new Vector2(ButtonSystem.button_width + Math.Abs(extraWidth), ButtonSystem.button_area_height);

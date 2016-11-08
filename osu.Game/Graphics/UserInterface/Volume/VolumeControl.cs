@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using OpenTK;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
@@ -32,7 +33,8 @@ namespace osu.Game.Graphics.UserInterface.Volume
             Origin = Anchor.BottomRight;
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
             VolumeGlobal.ValueChanged += volumeChanged;
             VolumeSample.ValueChanged += volumeChanged;
@@ -55,8 +57,6 @@ namespace osu.Game.Graphics.UserInterface.Volume
                     }
                 }
             };
-
-            base.Load(game);
         }
 
         protected override void Dispose(bool isDisposing)

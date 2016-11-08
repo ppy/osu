@@ -9,6 +9,7 @@ using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Objects.Osu.Drawable;
 using OpenTK;
+using osu.Framework.Allocation;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -20,10 +21,9 @@ namespace osu.Desktop.VisualTests.Tests
 
         protected override IFrameBasedClock Clock => ourClock;
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
-            base.Load(game);
-
             var swClock = new StopwatchClock(true) { Rate = 1 };
             ourClock = new FramedClock(swClock);
         }
