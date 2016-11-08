@@ -1,10 +1,10 @@
-﻿using System;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
@@ -13,6 +13,7 @@ namespace osu.Game.Overlays.Options
         protected FlowContainer content;
         protected override Container Content => content;
 
+        public abstract FontAwesome Icon { get; }
         protected abstract string Header { get; }
 
         public OptionsSection()
@@ -25,7 +26,7 @@ namespace osu.Game.Overlays.Options
             {
                 new Box
                 {
-                    Colour = new Color4(3, 3, 3, 255),
+                    Colour = new Color4(30, 30, 30, 255),
                     RelativeSizeAxes = Axes.X,
                     Height = borderSize,
                 },
