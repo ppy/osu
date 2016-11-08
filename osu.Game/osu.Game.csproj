@@ -202,7 +202,7 @@
     <Compile Include="Overlays\Options\OptionsSection.cs" />
     <Compile Include="Overlays\Options\OptionsSubsection.cs" />
     <Compile Include="Graphics\UserInterface\LoadingAnimation.cs" />
-    <Compile Include="Overlays\Options\OptionsSideNav.cs" />
+    <Compile Include="Overlays\Options\OptionsSidebar.cs" />
     <Compile Include="Overlays\Options\General\GeneralSection.cs" />
     <Compile Include="Overlays\Options\General\LoginOptions.cs" />
     <Compile Include="Overlays\Options\General\UpdateOptions.cs" />
@@ -251,15 +251,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Overlays\Options\" />
-    <Folder Include="Overlays\Options\General\" />
-    <Folder Include="Overlays\Options\Graphics\" />
-    <Folder Include="Overlays\Options\Gameplay\" />
-    <Folder Include="Overlays\Options\Audio\" />
-    <Folder Include="Overlays\Options\Input\" />
-    <Folder Include="Overlays\Options\Online\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -97,12 +97,12 @@ namespace osu.Game.Overlays
                         }
                     }
                 },
-                new OptionsSideNav
+                new OptionsSidebar
                 {
                     Padding = new MarginPadding { Left = sideNavPadding, Right = sideNavPadding },
                     Width = sideNavWidth + sideNavPadding * 2,
                     Children = sections.Select(section =>
-                        new OptionsSideNav.SidebarButton
+                        new OptionsSidebar.SidebarButton
                         {
                             Icon = section.Icon,
                             Action = () => scrollContainer.ScrollIntoView(section)
