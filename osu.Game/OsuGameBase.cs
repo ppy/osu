@@ -37,18 +37,6 @@ namespace osu.Game
 
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        public OsuGameBase()
-        {
-            AddInternal(ratioContainer = new RatioAdjust());
-
-            Children = new Drawable[]
-            {
-                Cursor = new OsuCursorContainer { Depth = float.MaxValue }
-            };
-
-            Beatmap.ValueChanged += Beatmap_ValueChanged;
-        }
-
         private void Beatmap_ValueChanged(object sender, EventArgs e)
         {
         }
@@ -57,8 +45,20 @@ namespace osu.Game
         private void Load()
         {
             Dependencies.Cache(this);
-            Dependencies.Cache<OsuConfigManager>();
+            Dependencies.Cache<OsuConfigManager>(new OsuConfigManager(Host.Storage));
             Dependencies.Cache(new BeatmapDatabase(Host.Storage, Host));
+            
+            AddInternal(ratioContainer = new RatioAdjust());
+            
+            Children = new Drawable[]
+            {
+                Options = new OptionsOverlay(),
+                Cursor = new OsuCursorContainer { Depth = float.MaxValue }
+            };
+            
+            Dependencies.Cache(Options);
+
+            Beatmap.ValueChanged += Beatmap_ValueChanged;
 
             OszArchiveReader.Register();
 
@@ -80,12 +80,12 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
 
-            API = new APIAccess()
+            Dependencies.Cache(API = new APIAccess
             {
                 Username = Config.Get<string>(OsuConfig.Username),
                 Password = Config.Get<string>(OsuConfig.Password),
                 Token = Config.Get<string>(OsuConfig.Token)
-            };
+            });
         }
 
         public override void SetHost(BasicGameHost host)
