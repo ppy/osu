@@ -28,7 +28,6 @@ namespace osu.Game.Overlays
 
         private const float width = 400;
         private const float sidebar_width = 60;
-        private const float sidebar_padding = 10;
 
         private ScrollContainer scrollContainer;
         private OptionsSidebar sidebar;
@@ -65,7 +64,7 @@ namespace osu.Game.Overlays
                     ScrollDraggerAnchor = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
-                    Padding = new MarginPadding { Left = sidebar_width },
+                    Margin = new MarginPadding { Left = sidebar_width },
                     Children = new[]
                     {
                         new FlowContainer
