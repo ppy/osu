@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Options
     {
         protected override string Header => "Maintenance";
         public override FontAwesome Icon => FontAwesome.fa_wrench;
-    
+
         public MaintenanceSection()
         {
             content.Spacing = new Vector2(0, 5);

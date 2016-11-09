@@ -7,7 +7,7 @@ namespace osu.Game.Overlays.Options.Graphics
     {
         protected override string Header => "Graphics";
         public override FontAwesome Icon => FontAwesome.fa_laptop;
-    
+
         public GraphicsSection()
         {
             Children = new Drawable[]

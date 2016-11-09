@@ -7,7 +7,7 @@ namespace osu.Game.Overlays.Options.Input
     {
         protected override string Header => "Input";
         public override FontAwesome Icon => FontAwesome.fa_keyboard_o;
-    
+
         public InputSection()
         {
             Children = new Drawable[]

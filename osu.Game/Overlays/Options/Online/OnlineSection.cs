@@ -7,7 +7,7 @@ namespace osu.Game.Overlays.Options.Online
     {
         protected override string Header => "Online";
         public override FontAwesome Icon => FontAwesome.fa_globe;
-    
+
         public OnlineSection()
         {
             Children = new Drawable[]
