@@ -4,7 +4,9 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
@@ -12,6 +14,7 @@ namespace osu.Game.Overlays.Options
     public class OptionsSidebar : Container
     {
         private FlowContainer content;
+        internal const int default_width = 60, expanded_width = 200;
         protected override Container<Drawable> Content => content;
 
         public OptionsSidebar()
@@ -41,6 +44,25 @@ namespace osu.Game.Overlays.Options
             };
         }
 
+        private ScheduledDelegate expandEvent;
+        
+        protected override bool OnHover(InputState state)
+        {
+            expandEvent = Scheduler.AddDelayed(() =>
+            {
+                expandEvent = null;
+                ResizeTo(new Vector2(expanded_width, Height), 150, EasingTypes.OutQuad);
+            }, 750);
+            return true;
+        }
+        
+        protected override void OnHoverLost(InputState state)
+        {
+            expandEvent?.Cancel();
+            ResizeTo(new Vector2(default_width, Height), 150, EasingTypes.OutQuad);
+            base.OnHoverLost(state);
+        }
+
         private class SidebarScrollContainer : ScrollContainer
         {
             public SidebarScrollContainer()
@@ -53,6 +75,7 @@ namespace osu.Game.Overlays.Options
         public class SidebarButton : Container
         {
             private TextAwesome drawableIcon;
+            private SpriteText headerText;
             private Box backgroundBox;
             public Action Action;
 
@@ -61,10 +84,17 @@ namespace osu.Game.Overlays.Options
                 get { return drawableIcon.Icon; }
                 set { drawableIcon.Icon = value; }
             }
+            
+            public string Header
+            {
+                get { return headerText.Text; }
+                set { headerText.Text = value; }
+            }
 
             public SidebarButton()
             {
-                Size = new Vector2(60);
+                Height = default_width;
+                RelativeSizeAxes = Axes.X;
                 Children = new Drawable[]
                 {
                     backgroundBox = new Box
@@ -74,11 +104,25 @@ namespace osu.Game.Overlays.Options
                         Colour = new Color4(60, 60, 60, 255),
                         Alpha = 0,
                     },
-                    drawableIcon = new TextAwesome
+                    new Container
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
+                        Width = default_width,
+                        RelativeSizeAxes = Axes.Y,
+                        Children = new[]
+                        {
+                            drawableIcon = new TextAwesome
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
+                        }
                     },
+                    headerText = new SpriteText
+                    {
+                        Position = new Vector2(default_width + 10, 0),
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    }
                 };
             }
 
@@ -92,12 +136,13 @@ namespace osu.Game.Overlays.Options
             protected override bool OnHover(InputState state)
             {
                 backgroundBox.FadeTo(0.4f, 200);
-                return true;
+                return base.OnHover(state);
             }
 
             protected override void OnHoverLost(InputState state)
             {
                 backgroundBox.FadeTo(0, 200);
+                base.OnHoverLost(state);
             }
         }
     }

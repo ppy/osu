@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Options
 {
     public class EditorSection : OptionsSection
     {
-        protected override string Header => "Editor";
+        public override string Header => "Editor";
         public override FontAwesome Icon => FontAwesome.fa_pencil;
 
         private CheckBoxOption backgroundVideo, defaultSkin, snakingSliders, hitAnimations, followPoints, stacking;
