@@ -6,7 +6,7 @@ namespace osu.Game.Overlays.Options.Input
     public class KeyboardOptions : OptionsSubsection
     {
         protected override string Header => "Keyboard";
-    
+
         public KeyboardOptions()
         {
             Children = new Drawable[]

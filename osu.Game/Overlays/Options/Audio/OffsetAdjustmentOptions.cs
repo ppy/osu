@@ -7,7 +7,7 @@ namespace osu.Game.Overlays.Options.Audio
     public class OffsetAdjustmentOptions : OptionsSubsection
     {
         protected override string Header => "Offset Adjustment";
-    
+
         public OffsetAdjustmentOptions()
         {
             Children = new Drawable[]

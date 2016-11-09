@@ -1,6 +1,7 @@
 ﻿using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Options.General
 {
@@ -8,7 +9,7 @@ namespace osu.Game.Overlays.Options.General
     {
         protected override string Header => "Language";
         private CheckBoxOption showUnicode, altChatFont;
-    
+
         public LanguageOptions()
         {
             Children = new Drawable[]
@@ -18,15 +19,15 @@ namespace osu.Game.Overlays.Options.General
                 altChatFont = new CheckBoxOption { LabelText = "Use alternative font for chat display" },
             };
         }
-        
+
         protected override void Load(BaseGame game)
         {
             base.Load(game);
             var osuGame = game as OsuGameBase;
             if (osuGame != null)
             {
-                showUnicode.Bindable = osuGame.Config.GetBindable<bool>(Configuration.OsuConfig.ShowUnicode);
-                altChatFont.Bindable = osuGame.Config.GetBindable<bool>(Configuration.OsuConfig.AlternativeChatFont);
+                showUnicode.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.ShowUnicode);
+                altChatFont.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.AlternativeChatFont);
             }
         }
     }

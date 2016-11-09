@@ -6,7 +6,7 @@ namespace osu.Game.Overlays.Options.Gameplay
     public class SongSelectGameplayOptions : OptionsSubsection
     {
         protected override string Header => "Song Select";
-    
+
         public SongSelectGameplayOptions()
         {
             Children = new Drawable[]

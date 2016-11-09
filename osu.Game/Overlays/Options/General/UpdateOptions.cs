@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Options.General
     {
         private BasicStorage storage;
         protected override string Header => "Updates";
-    
+
         public UpdateOptions()
         {
             Children = new Drawable[]
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Options.General
                 }
             };
         }
-        
+
         protected override void Load(BaseGame game)
         {
             base.Load(game);

@@ -7,7 +7,7 @@ namespace osu.Game.Overlays.Options.Audio
     {
         protected override string Header => "Audio";
         public override FontAwesome Icon => FontAwesome.fa_headphones;
-    
+
         public AudioSection()
         {
             Children = new Drawable[]
