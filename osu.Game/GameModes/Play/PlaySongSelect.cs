@@ -115,13 +115,11 @@ namespace osu.Game.GameModes.Play
                             Width = 100,
                             Text = "Play",
                             Colour = new Color4(238, 51, 153, 255),
-                            Action = () =>
+                            Action = () => Push(new Player
                             {
-                                var player = Game.Dependencies.Get<Player>();
-                                player.BeatmapInfo = selectedBeatmapGroup.SelectedPanel.Beatmap;
-                                player.PreferredPlayMode = playMode.Value;
-                                Push(player);
-                            }
+                                BeatmapInfo = selectedBeatmapGroup.SelectedPanel.Beatmap,
+                                PreferredPlayMode = playMode.Value
+                            })
                         },
                     }
                 }
