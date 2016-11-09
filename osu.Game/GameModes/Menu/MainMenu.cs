@@ -25,6 +25,8 @@ namespace osu.Game.GameModes.Menu
         private ButtonSystem buttons;
         public override string Name => @"Main Menu";
 
+        internal override bool ShowToolbar => true;
+
         private BackgroundMode background;
 
         protected override BackgroundMode CreateBackground() => background;
