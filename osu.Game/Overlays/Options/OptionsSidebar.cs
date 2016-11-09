@@ -9,33 +9,45 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionsSideNav : Container
+    public class OptionsSidebar : Container
     {
         private FlowContainer content;
         protected override Container<Drawable> Content => content;
 
-        public OptionsSideNav()
+        public OptionsSidebar()
         {
             RelativeSizeAxes = Axes.Y;
             InternalChildren = new Drawable[]
             {
-                content = new FlowContainer
-                {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.CentreLeft,
-                    Anchor = Anchor.CentreLeft,
-                    Direction = FlowDirection.VerticalOnly
-                },
                 new Box
                 {
-                    Colour = new Color4(30, 30, 30, 255),
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 2,
-                    Origin = Anchor.TopRight,
-                    Anchor = Anchor.TopRight,
-                }
+                    Colour = Color4.Black,
+                    RelativeSizeAxes = Axes.Both,
+                },
+                new SidebarScrollContainer
+                {
+                    Children = new []
+                    {
+                        content = new FlowContainer
+                        {
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.CentreLeft,
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Direction = FlowDirection.VerticalOnly
+                        }
+                    }
+                },
             };
+        }
+
+        private class SidebarScrollContainer : ScrollContainer
+        {
+            public SidebarScrollContainer()
+            {
+                Content.Anchor = Anchor.CentreLeft;
+                Content.Origin = Anchor.CentreLeft;
+            }
         }
 
         public class SidebarButton : Container
@@ -43,13 +55,13 @@ namespace osu.Game.Overlays.Options
             private TextAwesome drawableIcon;
             private Box backgroundBox;
             public Action Action;
-            
+
             public FontAwesome Icon
             {
                 get { return drawableIcon.Icon; }
                 set { drawableIcon.Icon = value; }
             }
-            
+
             public SidebarButton()
             {
                 Size = new Vector2(60);
@@ -69,20 +81,20 @@ namespace osu.Game.Overlays.Options
                     },
                 };
             }
-            
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs e)
+
+            protected override bool OnClick(InputState state)
             {
                 Action?.Invoke();
                 backgroundBox.FlashColour(Color4.White, 400);
                 return true;
             }
-            
+
             protected override bool OnHover(InputState state)
             {
                 backgroundBox.FadeTo(0.4f, 200);
                 return true;
             }
-    
+
             protected override void OnHoverLost(InputState state)
             {
                 backgroundBox.FadeTo(0, 200);

@@ -35,6 +35,8 @@ namespace osu.Game
 
         string[] args;
 
+        public OptionsOverlay Options;
+
         public OsuGame(string[] args = null)
         {
             this.args = args;
@@ -89,6 +91,8 @@ namespace osu.Game
                 }
             });
 
+            (Options = new OptionsOverlay { Depth = float.MaxValue / 2 }).Preload(game, Add);
+
             (intro = new Intro
             {
                 Beatmap = Beatmap
@@ -125,6 +129,16 @@ namespace osu.Game
                 case Key.F8:
                     Chat.ToggleVisibility();
                     return true;
+            }
+
+            if (state.Keyboard.ControlPressed)
+            {
+                switch (args.Key)
+                {
+                    case Key.O:
+                        Options.ToggleVisibility();
+                        return true;
+                }
             }
 
             return base.OnKeyDown(state, args);
