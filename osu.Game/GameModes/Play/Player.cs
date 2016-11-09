@@ -15,8 +15,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Platform;
 using OpenTK.Input;
 using MouseState = osu.Framework.Input.MouseState;
@@ -72,6 +70,7 @@ namespace osu.Game.GameModes.Play
 
         private InterpolatingFramedClock playerClock;
         private IAdjustableClock sourceClock;
+        private Ruleset Ruleset;
 
         protected override void Load(BaseGame game)
         {
@@ -120,49 +119,11 @@ namespace osu.Game.GameModes.Play
 
             PlayMode usablePlayMode = beatmap.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode;
 
-            switch (usablePlayMode)
-            {
-                default:
-                    scoreOverlay = new ScoreOverlayOsu();
+            Ruleset = Ruleset.GetRuleset(usablePlayMode);
 
-                    hitRenderer = new OsuHitRenderer
-                    {
-                        Objects = beatmap.HitObjects,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    };
-                    break;
-                case PlayMode.Taiko:
-                    scoreOverlay = new ScoreOverlayOsu();
+            scoreOverlay = Ruleset.CreateScoreOverlay();
 
-                    hitRenderer = new TaikoHitRenderer
-                    {
-                        Objects = beatmap.HitObjects,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    };
-                    break;
-                case PlayMode.Catch:
-                    scoreOverlay = new ScoreOverlayOsu();
-
-                    hitRenderer = new CatchHitRenderer
-                    {
-                        Objects = beatmap.HitObjects,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    };
-                    break;
-                case PlayMode.Mania:
-                    scoreOverlay = new ScoreOverlayOsu();
-
-                    hitRenderer = new ManiaHitRenderer
-                    {
-                        Objects = beatmap.HitObjects,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    };
-                    break;
-            }
+            hitRenderer = Ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
             hitRenderer.OnHit += delegate (HitObject h) { scoreOverlay.OnHit(h); };
             hitRenderer.OnMiss += delegate (HitObject h) { scoreOverlay.OnMiss(h); };
