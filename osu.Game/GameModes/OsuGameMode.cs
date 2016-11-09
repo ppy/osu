@@ -26,6 +26,12 @@ namespace osu.Game.GameModes
         /// </summary>
         protected virtual BackgroundMode CreateBackground() => null;
 
+        internal virtual bool ShowToolbar => true;
+
+        protected new OsuGame Game => base.Game as OsuGame;
+
+        protected float ToolbarPadding => ShowToolbar ? Game.Toolbar.DrawHeight : 0;
+
         private bool boundToBeatmap;
         private Bindable<WorkingBeatmap> beatmap;
 
