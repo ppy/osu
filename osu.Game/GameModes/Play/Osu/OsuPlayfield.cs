@@ -12,7 +12,7 @@ namespace osu.Game.GameModes.Play.Osu
 {
     public class OsuPlayfield : Playfield
     {
-        protected override Container Content => hitObjectContainer;
+        protected override Container<Drawable> Content => hitObjectContainer;
 
         private Container hitObjectContainer;
 
@@ -53,7 +53,7 @@ namespace osu.Game.GameModes.Play.Osu
 
         class HitObjectContainer : Container
         {
-            protected override Vector2 ChildScale => new Vector2(0.625f);
+            public override Vector2 ChildScale => new Vector2(0.625f);
         }
     }
 }

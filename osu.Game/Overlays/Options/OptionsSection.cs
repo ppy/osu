@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Options
     public abstract class OptionsSection : Container
     {
         protected FlowContainer content;
-        protected override Container Content => content;
+        protected override Container<Drawable> Content => content;
 
         public abstract FontAwesome Icon { get; }
         protected abstract string Header { get; }
