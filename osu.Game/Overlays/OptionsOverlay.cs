@@ -59,8 +59,9 @@ namespace osu.Game.Overlays
                     Colour = Color4.Black,
                     Alpha = 0.6f,
                 },
-                scrollContainer = new PaddedScrollContainer
+                scrollContainer = new ScrollContainer
                 {
+                    ScrollbarOverlapsContent = false,
                     ScrollDraggerAnchor = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
@@ -138,14 +139,6 @@ namespace osu.Game.Overlays
             scrollContainer.MoveToX(-width, 600, EasingTypes.OutQuint);
             sidebar.MoveToX(-sidebar_width, 600, EasingTypes.OutQuint);
             FadeTo(0, 300);
-        }
-
-        private class PaddedScrollContainer : ScrollContainer
-        {
-            public PaddedScrollContainer()
-            {
-                Content.Padding = new MarginPadding { Left = sidebar_padding };
-            }
         }
     }
 }
