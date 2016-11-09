@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.Containers
 
         private Container content;
 
-        protected override Container Content => content;
+        protected override Container<Drawable> Content => content;
 
         protected override void Load(BaseGame game)
         {

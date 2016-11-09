@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Options
     public class OptionsSidebar : Container
     {
         private FlowContainer content;
-        protected override Container Content => content;
+        protected override Container<Drawable> Content => content;
 
         public OptionsSidebar()
         {
