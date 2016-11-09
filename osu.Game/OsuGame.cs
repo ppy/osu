@@ -18,6 +18,7 @@ using osu.Framework.Input;
 using osu.Game.Input;
 using OpenTK.Input;
 using osu.Framework.Logging;
+using osu.Game.GameModes;
 using osu.Game.Graphics.UserInterface.Volume;
 
 namespace osu.Game
@@ -25,9 +26,13 @@ namespace osu.Game
     public class OsuGame : OsuGameBase
     {
         public Toolbar Toolbar;
-        public ChatConsole Chat;
-        public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
-        private Intro intro;
+
+        private ChatConsole chat;
+
+        private MainMenu mainMenu => modeStack?.ChildGameMode as MainMenu;
+        private Intro intro => modeStack as Intro;
+
+        private OsuGameMode modeStack;
 
         private VolumeControl volume;
 
@@ -85,38 +90,39 @@ namespace osu.Game
                     VolumeSample = Audio.VolumeSample,
                     VolumeTrack = Audio.VolumeTrack
                 },
+                overlayContent = new Container{ RelativeSizeAxes = Axes.Both },
                 new GlobalHotkeys //exists because UserInputManager is at a level below us.
                 {
                     Handler = globalHotkeyPressed
                 }
             });
 
-            (Options = new OptionsOverlay { Depth = float.MaxValue / 2 }).Preload(game, Add);
-
-            (intro = new Intro
+            (modeStack = new Intro
             {
                 Beatmap = Beatmap
             }).Preload(game, d =>
             {
                 mainContent.Add(d);
 
-                intro.ModePushed += modeAdded;
-                intro.Exited += modeRemoved;
-                intro.DisplayAsRoot();
+                modeStack.ModePushed += modeAdded;
+                modeStack.Exited += modeRemoved;
+                modeStack.DisplayAsRoot();
             });
 
-            (Chat = new ChatConsole(API)).Preload(game, Add);
-
+            //overlay elements
+            (chat = new ChatConsole(API) { Depth = 0 }).Preload(game, overlayContent.Add);
+            (Options = new OptionsOverlay { Depth = 1 }).Preload(game, overlayContent.Add);
             (Toolbar = new Toolbar
             {
-                OnHome = delegate { MainMenu?.MakeCurrent(); },
+                Depth = 2,
+                OnHome = delegate { mainMenu?.MakeCurrent(); },
                 OnSettings = Options.ToggleVisibility,
                 OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
             }).Preload(game, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
                 PlayMode.TriggerChange();
-                Add(Toolbar);
+                overlayContent.Add(Toolbar);
             });
 
             Cursor.Alpha = 0;
@@ -127,7 +133,7 @@ namespace osu.Game
             switch (args.Key)
             {
                 case Key.F8:
-                    Chat.ToggleVisibility();
+                    chat.ToggleVisibility();
                     return true;
             }
 
@@ -147,6 +153,8 @@ namespace osu.Game
         public Action<GameMode> ModeChanged;
 
         private Container mainContent;
+
+        private Container overlayContent;
 
         private void modeChanged(GameMode newMode)
         {
