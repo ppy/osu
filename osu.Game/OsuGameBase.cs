@@ -30,7 +30,7 @@ namespace osu.Game
         public OptionsOverlay Options;
         public APIAccess API;
 
-        protected override Container Content => ratioContainer;
+        protected override Container<Drawable> Content => ratioContainer;
 
         private RatioAdjust ratioContainer;
 

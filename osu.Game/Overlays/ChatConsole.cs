@@ -27,7 +27,7 @@ namespace osu.Game.Overlays
 
         private Container content;
 
-        protected override Container Content => content;
+        protected override Container<Drawable> Content => content;
 
         private APIAccess api;
 
