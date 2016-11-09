@@ -143,6 +143,7 @@
     <Compile Include="GameModes\Edit\EditSongSelect.cs" />
     <Compile Include="GameModes\Play\ComboCounter.cs" />
     <Compile Include="GameModes\Play\ComboResultCounter.cs" />
+    <Compile Include="Graphics\UserInterface\FilteringSearchList.cs" />
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="GameModes\Play\Taiko\TaikoComboCounter.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
