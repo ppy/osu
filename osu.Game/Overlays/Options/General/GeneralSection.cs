@@ -7,7 +7,7 @@ namespace osu.Game.Overlays.Options.General
     {
         protected override string Header => "General";
         public override FontAwesome Icon => FontAwesome.fa_gear;
-    
+
         public GeneralSection()
         {
             Children = new Drawable[]

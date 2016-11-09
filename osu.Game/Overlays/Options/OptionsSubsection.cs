@@ -9,9 +9,9 @@ namespace osu.Game.Overlays.Options
     {
         private Container<Drawable> content;
         protected override Container<Drawable> Content => content;
-        
+
         protected abstract string Header { get; }
-    
+
         public OptionsSubsection()
         {
             RelativeSizeAxes = Axes.X;
