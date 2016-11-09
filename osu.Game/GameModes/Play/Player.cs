@@ -13,6 +13,14 @@ using osu.Game.Database;
 using osu.Framework.Timing;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Input;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Platform;
+using OpenTK.Input;
+using MouseState = osu.Framework.Input.MouseState;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.GameModes.Play
 {
@@ -25,6 +33,38 @@ namespace osu.Game.GameModes.Play
         internal override bool ShowToolbar => false;
 
         public BeatmapInfo BeatmapInfo;
+
+        PlayerInputManager inputManager;
+
+        class PlayerInputManager : UserInputManager
+        {
+            public PlayerInputManager(BasicGameHost host)
+                : base(host)
+            {
+            }
+
+            protected override void UpdateMouseState(InputState state)
+            {
+                base.UpdateMouseState(state);
+
+                MouseState mouse = (MouseState)state.Mouse;
+
+                foreach (Key k in state.Keyboard.Keys)
+                {
+                    switch (k)
+                    {
+                        case Key.Z:
+                            mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = true;
+                            break;
+                        case Key.X:
+                            mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = true;
+                            break;
+                    }
+                }
+                
+            }
+        }
+
 
         public PlayMode PreferredPlayMode;
 
@@ -132,7 +172,14 @@ namespace osu.Game.GameModes.Play
 
             Children = new Drawable[]
             {
-                hitRenderer,
+                inputManager = new PlayerInputManager(game.Host)
+                {
+                    PassThrough = false,
+                    Children = new Drawable[]
+                    {
+                        hitRenderer,
+                    }
+                },
                 scoreOverlay,
             };
         }
