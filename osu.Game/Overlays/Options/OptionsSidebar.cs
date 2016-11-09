@@ -77,18 +77,36 @@ namespace osu.Game.Overlays.Options
             private TextAwesome drawableIcon;
             private SpriteText headerText;
             private Box backgroundBox;
+            private Box selectionIndicator;
             public Action Action;
 
-            public FontAwesome Icon
+            private OptionsSection section;
+            public OptionsSection Section
             {
-                get { return drawableIcon.Icon; }
-                set { drawableIcon.Icon = value; }
+                get
+                {
+                    return section;
+                }
+                set
+                {
+                    section = value;
+                    headerText.Text = value.Header;
+                    drawableIcon.Icon = value.Icon;
+                }
             }
-            
-            public string Header
+
+            private bool selected;
+            public bool Selected
             {
-                get { return headerText.Text; }
-                set { headerText.Text = value; }
+                get { return selected; }
+                set
+                {
+                    selected = value;
+                    if (selected)
+                        selectionIndicator.FadeIn(50);
+                    else
+                        selectionIndicator.FadeOut(50);
+                }
             }
 
             public SidebarButton()
@@ -122,6 +140,15 @@ namespace osu.Game.Overlays.Options
                         Position = new Vector2(default_width + 10, 0),
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
+                    },
+                    selectionIndicator = new Box
+                    {
+                        Alpha = 0,
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 5,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Colour = new Color4(233, 103, 161, 255)
                     }
                 };
             }
