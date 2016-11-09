@@ -6,6 +6,7 @@ using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -72,6 +73,7 @@ namespace osu.Game.Overlays
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                             Direction = FlowDirection.VerticalOnly,
+
                             Children = new Drawable[]
                             {
                                 new SpriteText
@@ -110,6 +112,13 @@ namespace osu.Game.Overlays
                     )
                 }
             };
+        }
+
+        protected override void Load(BaseGame game)
+        {
+            base.Load(game);
+
+            scrollContainer.Padding = new MarginPadding { Top = (game as OsuGame)?.Toolbar.DrawHeight ?? 0 };
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
