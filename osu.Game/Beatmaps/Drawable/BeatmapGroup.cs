@@ -11,6 +11,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Transformations;
 using osu.Game.Database;
 using OpenTK;
 
@@ -44,18 +45,16 @@ namespace osu.Game.Beatmaps.Drawable
                     case BeatmapGroupState.Expanded:
                         FadeTo(1, 250);
 
-                        //if (!difficulties.Children.All(d => IsLoaded))
-                        //    Task.WhenAll(difficulties.Children.Select(d => d.Preload(Game))).ContinueWith(t => difficulties.Show());
-                        //else
-                        difficulties.Show();
+                        difficulties.FadeIn(250);
 
                         header.State = PanelSelectedState.Selected;
                         break;
                     case BeatmapGroupState.Collapsed:
                         FadeTo(0.8f, 250);
 
+                        difficulties.FadeOut(100);
+
                         header.State = PanelSelectedState.NotSelected;
-                        difficulties.Hide();
                         break;
                 }
             }
@@ -73,6 +72,8 @@ namespace osu.Game.Beatmaps.Drawable
             {
                 new FlowContainer
                 {
+                    LayoutDuration = 300,
+                    LayoutEasing = EasingTypes.Out,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FlowDirection.VerticalOnly,
@@ -89,6 +90,7 @@ namespace osu.Game.Beatmaps.Drawable
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Alpha = 0,
                             Margin = new MarginPadding { Top = 5 },
                             Padding = new MarginPadding { Left = 75 },
                             Spacing = new Vector2(0, 5),
