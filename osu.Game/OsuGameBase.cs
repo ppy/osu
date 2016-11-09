@@ -27,7 +27,6 @@ namespace osu.Game
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
-        public OptionsOverlay Options;
         public APIAccess API;
 
         protected override Container<Drawable> Content => ratioContainer;
@@ -44,8 +43,7 @@ namespace osu.Game
 
             Children = new Drawable[]
             {
-                Options = new OptionsOverlay(),
-                Cursor = new OsuCursorContainer()
+                Cursor = new OsuCursorContainer { Depth = float.MaxValue }
             };
 
             Beatmap.ValueChanged += Beatmap_ValueChanged;
