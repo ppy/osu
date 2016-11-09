@@ -7,7 +7,7 @@ namespace osu.Game.Overlays.Options.Gameplay
     {
         protected override string Header => "Gameplay";
         public override FontAwesome Icon => FontAwesome.fa_circle_o;
-    
+
         public GameplaySection()
         {
             Children = new Drawable[]

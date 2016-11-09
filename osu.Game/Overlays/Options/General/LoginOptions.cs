@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Options.General
     {
         private Container loginForm;
         protected override string Header => "Sign In";
-    
+
         public LoginOptions()
         {
             Children = new[]
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Options.General
                 }
             };
         }
-        
+
         protected override void Load(BaseGame game)
         {
             base.Load(game);
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Options.General
                 new LoginForm(osuGame.API)
             };
         }
-        
+
         class LoginForm : FlowContainer
         {
             public LoginForm(APIAccess api)
