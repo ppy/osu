@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -174,21 +176,16 @@ namespace osu.Game.Overlays
             };
         }
 
-        protected override void Load(BaseGame game)
+        [Initializer(permitNulls: true)]
+        private void Load(OsuGame osuGame, BeatmapDatabase beatmaps, AudioManager audio, TextureStore textures)
         {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
-
-            if (osuGame != null)
-            {
-                if (database == null) database = osuGame.Beatmaps;
-                trackManager = osuGame.Audio.Track;
-            }
+            if (database == null) database = beatmaps;
+            trackManager = audio.Track;
 
             beatmapSource = osuGame?.Beatmap ?? new Bindable<WorkingBeatmap>();
             playList = database.GetAllWithChildren<BeatmapSetInfo>();
 
-            backgroundSprite = getScaledSprite(fallbackTexture = game.Textures.Get(@"Backgrounds/bg4"));
+            backgroundSprite = getScaledSprite(fallbackTexture = textures.Get(@"Backgrounds/bg4"));
             AddInternal(backgroundSprite);
         }
 

@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -13,10 +14,9 @@ namespace osu.Game.Overlays.Options
     {
         protected override string Header => "Skin";
         public override FontAwesome Icon => FontAwesome.fa_paint_brush;
-
-        private CheckBoxOption ignoreSkins, useSkinSoundSamples, useTaikoSkin, useSkinCursor, autoCursorSize;
-
-        public SkinSection()
+        
+        [Initializer]
+        private void Load(OsuConfigManager config)
         {
             content.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
@@ -38,27 +38,33 @@ namespace osu.Game.Overlays.Options
                     RelativeSizeAxes = Axes.X,
                     Text = "Export as .osk",
                 },
-                ignoreSkins = new CheckBoxOption { LabelText = "Ignore all beatmap skins" },
-                useSkinSoundSamples = new CheckBoxOption { LabelText = "Use skin's sound samples" },
-                useTaikoSkin = new CheckBoxOption { LabelText = "Use Taiko skin for Taiko mode" },
-                useSkinCursor = new CheckBoxOption { LabelText = "Always use skin cursor" },
+                new CheckBoxOption
+                {
+                    LabelText = "Ignore all beatmap skins",
+                    Bindable = config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSkins)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Use skin's sound samples",
+                    Bindable = config.GetBindable<bool>(OsuConfig.SkinSamples)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Use Taiko skin for Taiko mode",
+                    Bindable = config.GetBindable<bool>(OsuConfig.UseTaikoSkin)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Always use skin cursor",
+                    Bindable = config.GetBindable<bool>(OsuConfig.UseSkinCursor)
+                },
                 new SpriteText { Text = "Cursor size: TODO slider" },
-                autoCursorSize = new CheckBoxOption { LabelText = "Automatic cursor size" },
+                new CheckBoxOption
+                {
+                    LabelText = "Automatic cursor size",
+                    Bindable = config.GetBindable<bool>(OsuConfig.AutomaticCursorSizing)
+                },
             };
-        }
-        
-        protected override void Load(BaseGame game)
-        {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
-            if (osuGame != null)
-            {
-                ignoreSkins.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSkins);
-                useSkinSoundSamples.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.SkinSamples);
-                useTaikoSkin.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.UseTaikoSkin);
-                useSkinCursor.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.UseSkinCursor);
-                autoCursorSize.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.AutomaticCursorSizing);
-            }
         }
     }
 }

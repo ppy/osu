@@ -1,4 +1,5 @@
 ﻿using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 
@@ -8,32 +9,37 @@ namespace osu.Game.Overlays.Options.Graphics
     {
         protected override string Header => "Main Menu";
 
-        private CheckBoxOption snow, parallax, tips, voices, musicTheme;
-
-        public MainMenuOptions()
+        [Initializer]
+        private void Load(OsuConfigManager config)
         {
             Children = new[]
             {
-                snow = new CheckBoxOption { LabelText = "Snow" },
-                parallax = new CheckBoxOption { LabelText = "Parallax" },
-                tips = new CheckBoxOption { LabelText = "Menu tips" },
-                voices = new CheckBoxOption { LabelText = "Interface voices" },
-                musicTheme = new CheckBoxOption { LabelText = "osu! music theme" },
+                new CheckBoxOption
+                {
+                    LabelText = "Snow",
+                    Bindable = config.GetBindable<bool>(OsuConfig.MenuSnow)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Parallax",
+                    Bindable = config.GetBindable<bool>(OsuConfig.MenuParallax)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Menu tips",
+                    Bindable = config.GetBindable<bool>(OsuConfig.ShowMenuTips)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Interface voices",
+                    Bindable = config.GetBindable<bool>(OsuConfig.MenuVoice)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "osu! music theme",
+                    Bindable = config.GetBindable<bool>(OsuConfig.MenuMusic)
+                },
             };
-        }
-
-        protected override void Load(BaseGame game)
-        {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
-            if (osuGame != null)
-            {
-                snow.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.MenuSnow);
-                parallax.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.MenuParallax);
-                tips.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.ShowMenuTips);
-                voices.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.MenuVoice);
-                musicTheme.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.MenuMusic);
-            }
         }
     }
 }

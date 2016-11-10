@@ -1,4 +1,5 @@
 ﻿using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -10,38 +11,48 @@ namespace osu.Game.Overlays.Options.Graphics
     {
         protected override string Header => "Detail Settings";
 
-        private CheckBoxOption snakingSliders, backgroundVideo, storyboards, comboBursts,
-            hitLighting, shaders, softeningFilter;
-
-        public DetailOptions()
+        [Initializer]
+        private void Load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {
-                snakingSliders = new CheckBoxOption { LabelText = "Snaking sliders" },
-                backgroundVideo = new CheckBoxOption { LabelText = "Background video" },
-                storyboards = new CheckBoxOption { LabelText = "Storyboards" },
-                comboBursts = new CheckBoxOption { LabelText = "Combo bursts" },
-                hitLighting = new CheckBoxOption { LabelText = "Hit lighting" },
-                shaders = new CheckBoxOption { LabelText = "Shaders" },
-                softeningFilter = new CheckBoxOption { LabelText = "Softening filter" },
+                new CheckBoxOption
+                {
+                    LabelText = "Snaking sliders",
+                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingSliders)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Background video",
+                    Bindable = config.GetBindable<bool>(OsuConfig.Video)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Storyboards",
+                    Bindable = config.GetBindable<bool>(OsuConfig.ShowStoryboard)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Combo bursts",
+                    Bindable = config.GetBindable<bool>(OsuConfig.ComboBurst)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Hit lighting",
+                    Bindable = config.GetBindable<bool>(OsuConfig.HitLighting)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Shaders",
+                    Bindable = config.GetBindable<bool>(OsuConfig.Bloom)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Softening filter",
+                    Bindable = config.GetBindable<bool>(OsuConfig.BloomSoftening)
+                },
                 new SpriteText { Text = "Screenshot format TODO: dropdown" }
             };
-        }
-
-        protected override void Load(BaseGame game)
-        {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
-            if (osuGame != null)
-            {
-                snakingSliders.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.SnakingSliders);
-                backgroundVideo.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.Video);
-                storyboards.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.ShowStoryboard);
-                comboBursts.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.ComboBurst);
-                hitLighting.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.HitLighting);
-                shaders.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.Bloom);
-                softeningFilter.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.BloomSoftening);
-            }
         }
     }
 }

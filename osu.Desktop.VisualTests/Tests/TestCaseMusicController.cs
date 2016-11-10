@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.GameModes.Testing;
 using osu.Game.Overlays;
@@ -24,9 +25,9 @@ namespace osu.Desktop.Tests
 
         protected MusicController mc;
 
-        protected override void Load(BaseGame game)
+        [Initializer]
+        private void Load()
         {
-            base.Load(game);
             ourClock = new FramedClock();
         }
 
