@@ -22,6 +22,7 @@ namespace osu.Game.Overlays
         public Action OnSettings;
         public Action OnHome;
         public Action<PlayMode> OnPlayModeChange;
+        public Action OnMusicController;
 
         private ToolbarModeSelector modeSelector;
         private ToolbarButton userButton;
@@ -85,6 +86,11 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.X,
                     Children = new []
                     {
+                        new ToolbarButton
+                        {
+                            Icon = FontAwesome.fa_music,
+                            Action = () => OnMusicController?.Invoke()
+                        },
                         new ToolbarButton
                         {
                             Icon = FontAwesome.fa_search

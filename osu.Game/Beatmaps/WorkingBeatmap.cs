@@ -120,7 +120,7 @@ namespace osu.Game.Beatmaps
 
         public void TransferTo(WorkingBeatmap working)
         {
-            if (track != null && working.BeatmapInfo.Metadata.AudioFile == BeatmapInfo.Metadata.AudioFile && working.BeatmapInfo.BeatmapSet.Path == BeatmapInfo.BeatmapSet.Path)
+            if (track != null && BeatmapInfo.AudioEquals(working.BeatmapInfo))
                 working.track = track;
         }
     }
