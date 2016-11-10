@@ -232,6 +232,7 @@
     <Compile Include="Overlays\Options\Online\PrivacyOptions.cs" />
     <Compile Include="Overlays\Options\Online\NotificationsOptions.cs" />
     <Compile Include="Overlays\Options\CheckBoxOption.cs" />
+    <Compile Include="Overlays\Options\TextBoxOption.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
