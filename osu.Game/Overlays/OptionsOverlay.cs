@@ -35,6 +35,7 @@ namespace osu.Game.Overlays
         private OptionsSidebar sidebar;
         private OptionsSidebar.SidebarButton[] sidebarButtons;
         private OptionsSection[] sections;
+        private float lastKnownScroll;
 
         public OptionsOverlay()
         {
@@ -69,7 +70,6 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
                     Margin = new MarginPadding { Left = sidebar_width },
-                    Scrolled = ScrollContainer_Scrolled,
                     Children = new[]
                     {
                         new FlowContainer
@@ -113,7 +113,7 @@ namespace osu.Game.Overlays
                             Selected = sections[0] == section,
                             Section = section,
                             Action = () => scrollContainer.ScrollTo(
-                                scrollContainer.GetChildY(section) - scrollContainer.DrawSize.Y / 2),
+                                scrollContainer.GetChildYInContent(section) - scrollContainer.DrawSize.Y / 2),
                         }
                     ).ToArray()
                 }
@@ -127,22 +127,26 @@ namespace osu.Game.Overlays
             scrollContainer.Padding = new MarginPadding { Top = (game as OsuGame)?.Toolbar.DrawHeight ?? 0 };
         }
 
-        private void ScrollContainer_Scrolled(float value)
+        protected override void Update()
         {
-            for (int i = sections.Length - 1; i >= 0; i--)
+            base.Update();
+            if (scrollContainer.Current != lastKnownScroll)
             {
-                var section = sections[i];
-                float y = scrollContainer.GetChildY(section) - value;
-                if (y <= scrollContainer.DrawSize.Y / 2)
+                for (int i = sections.Length - 1; i >= 0; i--)
                 {
-                    var previous = sidebarButtons.SingleOrDefault(sb => sb.Selected);
-                    var next = sidebarButtons.SingleOrDefault(sb => sb.Section == section);
-                    if (next != null)
+                    var section = sections[i];
+                    float y = scrollContainer.GetChildYInContent(section) - scrollContainer.Current;
+                    if (y <= scrollContainer.DrawSize.Y / 2 + 25)
                     {
-                        previous.Selected = false;
-                        next.Selected = true;
+                        var previous = sidebarButtons.SingleOrDefault(sb => sb.Selected);
+                        var next = sidebarButtons.SingleOrDefault(sb => sb.Section == section);
+                        if (next != null)
+                        {
+                            previous.Selected = false;
+                            next.Selected = true;
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
