@@ -64,6 +64,8 @@ namespace osu.Game
             if (args?.Length > 0)
                 Schedule(delegate { Dependencies.Get<BeatmapDatabase>().Import(args); });
 
+            Dependencies.Cache(this);
+
             //attach our bindables to the audio subsystem.
             Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeUniversal));
             Audio.VolumeSample.Weld(Config.GetBindable<double>(OsuConfig.VolumeEffect));
@@ -93,7 +95,7 @@ namespace osu.Game
                 }
             });
 
-            (Options = new OptionsOverlay { Depth = float.MaxValue / 2 }).Preload(game, Add);
+            (Options = new OptionsOverlay { Depth = float.MaxValue / 2 }).Preload(this, Add);
 
             (intro = new Intro
             {

@@ -16,22 +16,17 @@ namespace osu.Game.Graphics.Containers
         public ParallaxContainer()
         {
             RelativeSizeAxes = Axes.Both;
-        }
-
-        private Container content;
-
-        protected override Container<Drawable> Content => content;
-
-        [Initializer]
-        private void Load()
-        {
-            AddInternal(content = new Container()
+            AddInternal(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
             });
         }
+
+        private Container content;
+
+        protected override Container<Drawable> Content => content;
 
         protected override bool OnMouseMove(InputState state)
         {

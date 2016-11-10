@@ -1,4 +1,5 @@
 ﻿using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -14,23 +15,22 @@ namespace osu.Game.Overlays.Options.Audio
 
         public VolumeOptions()
         {
+        }
+        
+        [Initializer]
+        private void Load(OsuConfigManager config)
+        {
             Children = new Drawable[]
             {
                 new SpriteText { Text = "Master: TODO slider" },
                 new SpriteText { Text = "Music: TODO slider" },
                 new SpriteText { Text = "Effect: TODO slider" },
-                ignoreHitsounds = new CheckBoxOption { LabelText = "Ignore beatmap hitsounds" }
+                new CheckBoxOption
+                {
+                    LabelText = "Ignore beatmap hitsounds",
+                    Bindable = config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSamples)
+                }
             };
-        }
-        
-        protected override void Load(BaseGame game)
-        {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
-            if (osuGame != null)
-            {
-                ignoreHitsounds.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSamples);
-            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -10,34 +11,36 @@ namespace osu.Game.Overlays.Options.Online
     {
         protected override string Header => "In-game Chat";
 
-        private CheckBoxOption filterWords, filterForeign, logPMs, blockPMs;
-
-        public InGameChatOptions()
+        [Initializer]
+        private void Load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {
-                filterWords = new CheckBoxOption { LabelText = "Filter offensive words" },
-                filterForeign = new CheckBoxOption { LabelText = "Filter foreign characters" },
-                logPMs = new CheckBoxOption { LabelText = "Log private messages" },
-                blockPMs = new CheckBoxOption { LabelText = "Block private messages from non-friends" },
+                new CheckBoxOption
+                {
+                    LabelText = "Filter offensive words",
+                    Bindable = config.GetBindable<bool>(OsuConfig.ChatFilter)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Filter foreign characters",
+                    Bindable = config.GetBindable<bool>(OsuConfig.ChatRemoveForeign)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Log private messages",
+                    Bindable = config.GetBindable<bool>(OsuConfig.LogPrivateMessages)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Block private messages from non-friends",
+                    Bindable = config.GetBindable<bool>(OsuConfig.BlockNonFriendPM)
+                },
                 new SpriteText { Text = "Chat ignore list (space-seperated list)" },
                 new TextBox { Height = 20, RelativeSizeAxes = Axes.X },
                 new SpriteText { Text = "Chat highlight words (space-seperated list)" },
                 new TextBox { Height = 20, RelativeSizeAxes = Axes.X },
             };
-        }
-
-        protected override void Load(BaseGame game)
-        {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
-            if (osuGame != null)
-            {
-                filterWords.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.ChatFilter);
-                filterForeign.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.ChatRemoveForeign);
-                logPMs.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.LogPrivateMessages);
-                blockPMs.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.BlockNonFriendPM);
-            }
         }
     }
 }

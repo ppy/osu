@@ -67,14 +67,14 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
             
             AddInternal(ratioContainer = new RatioAdjust());
-            
+
+            var options = new OptionsOverlay();
             Children = new Drawable[]
             {
-                Options = new OptionsOverlay(),
+                options,
                 Cursor = new OsuCursorContainer { Depth = float.MaxValue }
             };
-            
-            Dependencies.Cache(Options);
+            Dependencies.Cache(options);
 
             Beatmap.ValueChanged += Beatmap_ValueChanged;
 
