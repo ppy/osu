@@ -23,12 +23,12 @@ namespace osu.Game.Overlays.Options
             }
         }
         
-        protected override string internalText
+        protected override string InternalText
         {
-            get { return base.internalText; }
+            get { return base.InternalText; }
             set
             {
-                base.internalText = value;
+                base.InternalText = value;
                 if (bindable != null)
                     bindable.Value = value;
             }
