@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 
@@ -38,6 +39,8 @@ namespace osu.Game.Overlays
         private TrackManager trackManager;
         private BeatmapDatabase database;
         private Bindable<WorkingBeatmap> beatmapSource;
+        private Bindable<bool> preferUnicode;
+        private OsuConfigManager config;
         private WorkingBeatmap current;
 
         public MusicController(BeatmapDatabase db = null)
@@ -183,6 +186,9 @@ namespace osu.Game.Overlays
             {
                 if (database == null) database = osuGame.Beatmaps;
                 trackManager = osuGame.Audio.Track;
+                config = osuGame.Config;
+                preferUnicode = osuGame.Config.GetBindable<bool>(OsuConfig.ShowUnicode);
+                preferUnicode.ValueChanged += preferUnicode_changed;
             }
 
             beatmapSource = osuGame?.Beatmap ?? new Bindable<WorkingBeatmap>();
@@ -208,6 +214,11 @@ namespace osu.Game.Overlays
             playButton.Icon = current.Track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
             if (current.Track.HasCompleted && !current.Track.Looping) next();
+        }
+
+        void preferUnicode_changed(object sender, EventArgs e)
+        {
+            updateDisplay(current, false);
         }
 
         private void workingChanged(object sender = null, EventArgs e = null)
@@ -281,9 +292,9 @@ namespace osu.Game.Overlays
 
         private void updateDisplay(WorkingBeatmap beatmap, bool? isNext)
         {
-            BeatmapMetadata metadata = beatmap.Beatmap.Metadata;
-            title.Text = metadata.TitleUnicode ?? metadata.Title;
-            artist.Text = metadata.ArtistUnicode ?? metadata.Artist;
+            BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
+            title.Text = config.GetUnicodeString(metadata.Title, metadata.TitleUnicode);
+            artist.Text = config.GetUnicodeString(metadata.Artist, metadata.ArtistUnicode);
 
             Sprite newBackground = getScaledSprite(beatmap.Background ?? fallbackTexture);
 
@@ -323,6 +334,13 @@ namespace osu.Game.Overlays
         {
             current?.Track?.Seek(current.Track.Length * position);
             current?.Track?.Start();
+        }
+        
+        protected override void Dispose(bool isDisposing)
+        {
+            if (preferUnicode != null)
+                preferUnicode.ValueChanged -= preferUnicode_changed;
+            base.Dispose(isDisposing);
         }
 
         protected override bool OnClick(InputState state) => true;
