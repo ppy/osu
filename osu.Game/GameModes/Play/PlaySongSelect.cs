@@ -133,7 +133,7 @@ namespace osu.Game.GameModes.Play
                 playMode = osuGame.PlayMode;
                 playMode.ValueChanged += playMode_ValueChanged;
                 // Temporary:
-                scrollContainer.Padding = new MarginPadding { Top = osuGame.Toolbar.Height };
+                scrollContainer.Padding = new MarginPadding { Top = ToolbarPadding };
             }
 
             if (database == null)
