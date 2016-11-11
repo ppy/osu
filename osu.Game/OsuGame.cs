@@ -29,6 +29,8 @@ namespace osu.Game
 
         private ChatConsole chat;
 
+        private MusicController musicController;
+
         private MainMenu mainMenu => modeStack?.ChildGameMode as MainMenu;
         private Intro intro => modeStack as Intro;
 
@@ -111,6 +113,7 @@ namespace osu.Game
 
             //overlay elements
             (chat = new ChatConsole(API) { Depth = 0 }).Preload(game, overlayContent.Add);
+            (musicController = new MusicController()).Preload(game, overlayContent.Add);
             (Options = new OptionsOverlay { Depth = 1 }).Preload(game, overlayContent.Add);
             (Toolbar = new Toolbar
             {
@@ -118,6 +121,7 @@ namespace osu.Game
                 OnHome = delegate { mainMenu?.MakeCurrent(); },
                 OnSettings = Options.ToggleVisibility,
                 OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
+                OnMusicController = musicController.ToggleVisibility
             }).Preload(game, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };

@@ -24,7 +24,8 @@ namespace osu.Game.Overlays.Options
                 }
             }
         }
-        private void bindableValueChanged(object sender, EventArgs e)
+
+        private void bindableValueChanged(object sender, EventArgs e)
         {
             State = bindable.Value ? CheckBoxState.Checked : CheckBoxState.Unchecked;
         }
@@ -47,7 +48,7 @@ namespace osu.Game.Overlays.Options
         {
             if (bindable != null)
                 bindable.Value = false;
-            base.OnChecked();
+            base.OnUnchecked();
         }
     }
 }

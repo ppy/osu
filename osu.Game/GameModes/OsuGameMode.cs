@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework;
 using osu.Framework.Configuration;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics.Containers;
@@ -72,6 +73,12 @@ namespace osu.Game.GameModes
         private void beatmap_ValueChanged(object sender, EventArgs e)
         {
             OnBeatmapChanged(beatmap.Value);
+        }
+
+        protected override void Load(BaseGame game)
+        {
+            base.Load(game);
+            beatmap = (game as OsuGameBase)?.Beatmap;
         }
 
         public override bool Push(GameMode mode)
