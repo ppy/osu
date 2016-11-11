@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Options
 {
     public class SkinSection : OptionsSection
     {
-        protected override string Header => "Skin";
+        public override string Header => "Skin";
         public override FontAwesome Icon => FontAwesome.fa_paint_brush;
 
         private CheckBoxOption ignoreSkins, useSkinSoundSamples, useTaikoSkin, useSkinCursor, autoCursorSize;

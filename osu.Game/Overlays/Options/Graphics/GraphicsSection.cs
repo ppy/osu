@@ -5,7 +5,7 @@ namespace osu.Game.Overlays.Options.Graphics
 {
     public class GraphicsSection : OptionsSection
     {
-        protected override string Header => "Graphics";
+        public override string Header => "Graphics";
         public override FontAwesome Icon => FontAwesome.fa_laptop;
 
         public GraphicsSection()
