@@ -178,6 +178,9 @@ namespace osu.Game.Configuration
             Set(OsuConfig.CompatibilityContext, false);
             Set(OsuConfig.CanForceOptimusCompatibility, true);
         }
+        
+        public string GetUnicodeString(string nonunicode, string unicode)
+            => Get<bool>(OsuConfig.ShowUnicode) ? unicode ?? nonunicode : nonunicode ?? unicode;
 
         public OsuConfigManager(BasicStorage storage) : base(storage)
         {
