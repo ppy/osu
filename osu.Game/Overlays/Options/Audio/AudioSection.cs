@@ -1,4 +1,5 @@
-﻿using osu.Framework.Graphics;
+﻿using osu.Framework;
+using osu.Framework.Graphics;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options.Audio
@@ -12,7 +13,7 @@ namespace osu.Game.Overlays.Options.Audio
         {
             Children = new Drawable[]
             {
-                new AudioDevicesOptions(),
+                new AudioDevicesOptions { Alpha = RuntimeInfo.IsWindows ? 1 : 0 },
                 new VolumeOptions(),
                 new OffsetAdjustmentOptions(),
             };
