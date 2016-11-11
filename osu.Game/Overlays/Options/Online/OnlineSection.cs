@@ -5,7 +5,7 @@ namespace osu.Game.Overlays.Options.Online
 {
     public class OnlineSection : OptionsSection
     {
-        protected override string Header => "Online";
+        public override string Header => "Online";
         public override FontAwesome Icon => FontAwesome.fa_globe;
 
         public OnlineSection()

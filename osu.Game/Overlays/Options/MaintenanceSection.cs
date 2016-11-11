@@ -8,7 +8,7 @@ namespace osu.Game.Overlays.Options
 {
     public class MaintenanceSection : OptionsSection
     {
-        protected override string Header => "Maintenance";
+        public override string Header => "Maintenance";
         public override FontAwesome Icon => FontAwesome.fa_wrench;
 
         public MaintenanceSection()

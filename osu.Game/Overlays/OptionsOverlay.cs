@@ -27,7 +27,8 @@ namespace osu.Game.Overlays
         internal const float CONTENT_MARGINS = 10;
 
         private const float width = 400;
-        private const float sidebar_width = 60;
+        private const float sidebar_width = OptionsSidebar.default_width;
+        private const float sidebar_padding = 10;
 
         private ScrollContainer scrollContainer;
         private OptionsSidebar sidebar;
@@ -105,7 +106,8 @@ namespace osu.Game.Overlays
                         new OptionsSidebar.SidebarButton
                         {
                             Icon = section.Icon,
-                            Action = () => scrollContainer.ScrollIntoView(section)
+                            Header = section.Header,
+                            Action = () => scrollContainer.ScrollIntoView(section),
                         }
                     )
                 }
