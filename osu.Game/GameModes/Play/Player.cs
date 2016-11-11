@@ -22,6 +22,8 @@ namespace osu.Game.GameModes.Play
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
+        internal override bool ShowToolbar => false;
+
         public BeatmapInfo BeatmapInfo;
 
         public PlayMode PreferredPlayMode;
