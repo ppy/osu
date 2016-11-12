@@ -1,4 +1,5 @@
 ﻿using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -10,31 +11,27 @@ namespace osu.Game.Overlays.Options.Graphics
     {
         protected override string Header => "Layout";
 
-        private CheckBoxOption fullscreen, letterboxing;
-
-        public LayoutOptions()
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {
                 new SpriteText { Text = "Resolution: TODO dropdown" },
-                fullscreen = new CheckBoxOption { LabelText = "Fullscreen mode" },
-                letterboxing = new CheckBoxOption { LabelText = "Letterboxing" },
+                new CheckBoxOption
+                {
+                    LabelText = "Fullscreen mode",
+                    Bindable = config.GetBindable<bool>(OsuConfig.Fullscreen),
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Letterboxing",
+                    Bindable = config.GetBindable<bool>(OsuConfig.Letterboxing),
+                },
                 new SpriteText { Text = "Horizontal position" },
                 new SpriteText { Text = "TODO: slider" },
                 new SpriteText { Text = "Vertical position" },
                 new SpriteText { Text = "TODO: slider" },
             };
-        }
-
-        protected override void Load(BaseGame game)
-        {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
-            if (osuGame != null)
-            {
-                fullscreen.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.Fullscreen);
-                letterboxing.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.Letterboxing);
-            }
         }
     }
 }

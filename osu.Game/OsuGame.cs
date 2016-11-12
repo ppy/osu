@@ -20,6 +20,8 @@ using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.GameModes;
 using osu.Game.Graphics.UserInterface.Volume;
+using osu.Game.Database;
+using osu.Framework.Allocation;
 
 namespace osu.Game
 {
@@ -56,7 +58,10 @@ namespace osu.Game
             host.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
         }
 
-        protected override void Load(BaseGame game)
+        public void ToggleOptions() => Options.ToggleVisibility();
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             if (!Host.IsPrimaryInstance)
             {
@@ -64,10 +69,10 @@ namespace osu.Game
                 Environment.Exit(0);
             }
 
-            base.Load(game);
-
             if (args?.Length > 0)
-                Schedule(delegate { Beatmaps.Import(args); });
+                Schedule(delegate { Dependencies.Get<BeatmapDatabase>().Import(args); });
+
+            Dependencies.Cache(this);
 
             //attach our bindables to the audio subsystem.
             Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeUniversal));
@@ -76,6 +81,7 @@ namespace osu.Game
 
             PlayMode = Config.GetBindable<PlayMode>(OsuConfig.PlayMode);
 
+            //todo: move to constructor or LoadComplete.
             Add(new Drawable[] {
                 new VolumeControlReceptor
                 {
@@ -102,7 +108,7 @@ namespace osu.Game
             (modeStack = new Intro
             {
                 Beatmap = Beatmap
-            }).Preload(game, d =>
+            }).Preload(this, d =>
             {
                 mainContent.Add(d);
 
@@ -112,9 +118,9 @@ namespace osu.Game
             });
 
             //overlay elements
-            (chat = new ChatConsole(API) { Depth = 0 }).Preload(game, overlayContent.Add);
-            (musicController = new MusicController()).Preload(game, overlayContent.Add);
-            (Options = new OptionsOverlay { Depth = 1 }).Preload(game, overlayContent.Add);
+            (chat = new ChatConsole(API) { Depth = 0 }).Preload(this, overlayContent.Add);
+            (musicController = new MusicController()).Preload(this, overlayContent.Add);
+            (Options = new OptionsOverlay { Depth = 1 }).Preload(this, overlayContent.Add);
             (Toolbar = new Toolbar
             {
                 Depth = 2,
@@ -122,7 +128,7 @@ namespace osu.Game
                 OnSettings = Options.ToggleVisibility,
                 OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
                 OnMusicController = musicController.ToggleVisibility
-            }).Preload(game, t =>
+            }).Preload(this, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
                 PlayMode.TriggerChange();

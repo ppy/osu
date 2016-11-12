@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Database;
 using OpenTK;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Beatmaps.Drawable
 {
@@ -99,10 +100,9 @@ namespace osu.Game.Beatmaps.Drawable
             };
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(BaseGame game)
         {
-            base.Load(game);
-
             BeatmapPanels = beatmapSet.Beatmaps.Select(b => new BeatmapPanel(b)
             {
                 GainedSelection = panelGainedSelection,

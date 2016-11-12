@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -39,15 +41,14 @@ namespace osu.Game.Overlays
         private int playHistoryIndex = -1;
 
         private TrackManager trackManager;
-        private BeatmapDatabase database;
         private Bindable<WorkingBeatmap> beatmapSource;
         private Bindable<bool> preferUnicode;
         private OsuConfigManager config;
         private WorkingBeatmap current;
+        private BeatmapDatabase beatmaps;
 
-        public MusicController(BeatmapDatabase db = null)
+        public MusicController()
         {
-            database = db;
             Width = 400;
             Height = 130;
             CornerRadius = 5;
@@ -192,24 +193,19 @@ namespace osu.Game.Overlays
             return base.OnDragEnd(state);
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase osuGame, BeatmapDatabase beatmaps, AudioManager audio, TextureStore textures)
         {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
+            this.beatmaps = beatmaps;
+            trackManager = osuGame.Audio.Track;
+            config = osuGame.Config;
+            preferUnicode = osuGame.Config.GetBindable<bool>(OsuConfig.ShowUnicode);
+            preferUnicode.ValueChanged += preferUnicode_changed;
 
-            if (osuGame != null)
-            {
-                if (database == null) database = osuGame.Beatmaps;
-                trackManager = osuGame.Audio.Track;
-                config = osuGame.Config;
-                preferUnicode = osuGame.Config.GetBindable<bool>(OsuConfig.ShowUnicode);
-                preferUnicode.ValueChanged += preferUnicode_changed;
-            }
+            beatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
+            playList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
 
-            beatmapSource = osuGame?.Beatmap ?? new Bindable<WorkingBeatmap>();
-            playList = database.GetAllWithChildren<BeatmapSetInfo>();
-
-            backgroundSprite = new MusicControllerBackground(fallbackTexture = game.Textures.Get(@"Backgrounds/bg4"));
+            backgroundSprite = new MusicControllerBackground(fallbackTexture = textures.Get(@"Backgrounds/bg4"));
             AddInternal(backgroundSprite);
         }
 
@@ -295,7 +291,7 @@ namespace osu.Game.Overlays
 
         private void play(BeatmapInfo info, bool isNext)
         {
-            current = database.GetWorkingBeatmap(info, current);
+            current = beatmaps.GetWorkingBeatmap(info, current);
             Task.Run(() =>
             {
                 trackManager.SetExclusive(current.Track);
@@ -307,6 +303,10 @@ namespace osu.Game.Overlays
 
         private void updateDisplay(WorkingBeatmap beatmap, bool? isNext)
         {
+            if (beatmap.Beatmap == null)
+                //todo: we may need to display some default text here (currently in the constructor).
+                return;
+
             BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
             title.Text = config.GetUnicodeString(metadata.Title, metadata.TitleUnicode);
             artist.Text = config.GetUnicodeString(metadata.Artist, metadata.ArtistUnicode);
