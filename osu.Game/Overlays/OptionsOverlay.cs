@@ -68,6 +68,7 @@ namespace osu.Game.Overlays
                 },
                 scrollContainer = new ScrollContainer
                 {
+                    ScrollDraggerVisible = false,
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
                     Margin = new MarginPadding { Left = sidebar_width },
