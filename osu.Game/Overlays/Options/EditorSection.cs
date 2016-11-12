@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
@@ -12,35 +13,43 @@ namespace osu.Game.Overlays.Options
         public override string Header => "Editor";
         public override FontAwesome Icon => FontAwesome.fa_pencil;
 
-        private CheckBoxOption backgroundVideo, defaultSkin, snakingSliders, hitAnimations, followPoints, stacking;
-
-        public EditorSection()
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             content.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
-                backgroundVideo = new CheckBoxOption { LabelText = "Background video" },
-                defaultSkin = new CheckBoxOption { LabelText = "Always use default skin" },
-                snakingSliders = new CheckBoxOption { LabelText = "Snaking sliders" },
-                hitAnimations = new CheckBoxOption { LabelText = "Hit animations" },
-                followPoints = new CheckBoxOption { LabelText = "Follow points" },
-                stacking = new CheckBoxOption { LabelText = "Stacking" },
+                new CheckBoxOption
+                {
+                    LabelText = "Background video",
+                    Bindable = config.GetBindable<bool>(OsuConfig.VideoEditor)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Always use default skin",
+                    Bindable = config.GetBindable<bool>(OsuConfig.EditorDefaultSkin)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Snaking sliders",
+                    Bindable = config.GetBindable<bool>(OsuConfig.EditorSnakingSliders)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Hit animations",
+                    Bindable = config.GetBindable<bool>(OsuConfig.EditorHitAnimations)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Follow points",
+                    Bindable = config.GetBindable<bool>(OsuConfig.EditorFollowPoints)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Stacking",
+                    Bindable = config.GetBindable<bool>(OsuConfig.EditorStacking)
+                },
             };
-        }
-
-        protected override void Load(BaseGame game)
-        {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
-            if (osuGame != null)
-            {
-                backgroundVideo.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.VideoEditor);
-                defaultSkin.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.EditorDefaultSkin);
-                snakingSliders.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.EditorSnakingSliders);
-                hitAnimations.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.EditorHitAnimations);
-                followPoints.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.EditorFollowPoints);
-                stacking.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.EditorStacking);
-            }
         }
     }
 }

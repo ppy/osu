@@ -13,14 +13,15 @@ using System.Collections.Generic;
 using osu.Game.GameModes.Play;
 using SQLiteNetExtensions.Extensions;
 using osu.Desktop.Platform;
+using osu.Framework.Allocation;
 
 namespace osu.Desktop.VisualTests
 {
     class VisualTestGame : OsuGameBase
     {
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.Load(game);
             Add(new TestBrowser());
         }
     }
