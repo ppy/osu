@@ -30,8 +30,8 @@ namespace osu.Game.Beatmaps.Objects.Catch.Drawable
             Position = new Vector2(h.Position, -0.1f);
         }
 
-        [Initializer]
-        private void Load(TextureStore textures)
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
             Texture = textures.Get(@"Menu/logo");
 

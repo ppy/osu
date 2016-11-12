@@ -110,8 +110,8 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             starContainer.Width = MaxStars * StarSize + Math.Max(MaxStars - 1, 0) * StarSpacing;
             starContainer.Height = StarSize;

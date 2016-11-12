@@ -28,8 +28,8 @@ namespace osu.Game.Online.Chat.Display
             const float padding = 200;
             const float text_size = 20;
 
-            [Initializer]
-            private void Load()
+            [BackgroundDependencyLoader]
+            private void load()
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;

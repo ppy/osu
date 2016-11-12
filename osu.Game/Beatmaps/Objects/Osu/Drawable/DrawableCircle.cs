@@ -64,8 +64,8 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
             Size = circle.DrawSize;
         }
 
-        [Initializer]
-        private void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(BaseGame game)
         {
             approachCircle.Texture = game.Textures.Get(@"Play/osu/approachcircle@2x");
         }
@@ -149,8 +149,8 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 };
             }
 
-            [Initializer]
-            private void Load(TextureStore textures)
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
             {
                 number.Texture = textures.Get(@"Play/osu/number@2x");
             }
@@ -177,8 +177,8 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 };
             }
 
-            [Initializer]
-            private void Load(TextureStore textures)
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
             {
                 layer.Texture = textures.Get(@"Play/osu/ring-glow@2x");
             }
@@ -203,8 +203,8 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 };
             }
 
-            [Initializer]
-            private void Load(TextureStore textures)
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
             {
                 ring.Texture = textures.Get(@"Play/osu/ring@2x");
             }
@@ -289,8 +289,8 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
                 };
             }
 
-            [Initializer]
-            private void Load(TextureStore textures)
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
             {
                 disc.Texture = textures.Get(@"Play/osu/disc@2x");
             }
@@ -306,8 +306,8 @@ namespace osu.Game.Beatmaps.Objects.Osu.Drawable
         {
             private Texture tex;
 
-            [Initializer]
-            private void Load(TextureStore textures)
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
             {
                 tex = textures.Get(@"Play/osu/triangle@2x");
 

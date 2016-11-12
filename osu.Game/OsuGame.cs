@@ -18,6 +18,7 @@ using osu.Framework.Input;
 using osu.Game.Input;
 using OpenTK.Input;
 using osu.Framework.Logging;
+using osu.Game.GameModes;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Game.Database;
 using osu.Framework.Allocation;
@@ -27,10 +28,15 @@ namespace osu.Game
     public class OsuGame : OsuGameBase
     {
         public Toolbar Toolbar;
-        public ChatConsole Chat;
-        public MusicController MusicController;
-        public MainMenu MainMenu => intro?.ChildGameMode as MainMenu;
-        private Intro intro;
+
+        private ChatConsole chat;
+
+        private MusicController musicController;
+
+        private MainMenu mainMenu => modeStack?.ChildGameMode as MainMenu;
+        private Intro intro => modeStack as Intro;
+
+        private OsuGameMode modeStack;
 
         private VolumeControl volume;
 
@@ -52,8 +58,10 @@ namespace osu.Game
             host.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
         }
 
-        [Initializer]
-        private void Load()
+        public void ToggleOptions() => Options.ToggleVisibility();
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             if (!Host.IsPrimaryInstance)
             {
@@ -73,6 +81,7 @@ namespace osu.Game
 
             PlayMode = Config.GetBindable<PlayMode>(OsuConfig.PlayMode);
 
+            //todo: move to constructor or LoadComplete.
             Add(new Drawable[] {
                 new VolumeControlReceptor
                 {
@@ -89,40 +98,41 @@ namespace osu.Game
                     VolumeSample = Audio.VolumeSample,
                     VolumeTrack = Audio.VolumeTrack
                 },
+                overlayContent = new Container{ RelativeSizeAxes = Axes.Both },
                 new GlobalHotkeys //exists because UserInputManager is at a level below us.
                 {
                     Handler = globalHotkeyPressed
                 }
             });
 
-            (Options = new OptionsOverlay { Depth = float.MaxValue / 2 }).Preload(this, Add);
-
-            (intro = new Intro
+            (modeStack = new Intro
             {
                 Beatmap = Beatmap
             }).Preload(this, d =>
             {
                 mainContent.Add(d);
 
-                intro.ModePushed += modeAdded;
-                intro.Exited += modeRemoved;
-                intro.DisplayAsRoot();
+                modeStack.ModePushed += modeAdded;
+                modeStack.Exited += modeRemoved;
+                modeStack.DisplayAsRoot();
             });
 
-            (Chat = new ChatConsole(API)).Preload(this, Add);
-            (MusicController = new MusicController()).Preload(this, Add);
-
+            //overlay elements
+            (chat = new ChatConsole(API) { Depth = 0 }).Preload(this, overlayContent.Add);
+            (musicController = new MusicController()).Preload(this, overlayContent.Add);
+            (Options = new OptionsOverlay { Depth = 1 }).Preload(this, overlayContent.Add);
             (Toolbar = new Toolbar
             {
-                OnHome = delegate { MainMenu?.MakeCurrent(); },
+                Depth = 2,
+                OnHome = delegate { mainMenu?.MakeCurrent(); },
                 OnSettings = Options.ToggleVisibility,
                 OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
-                OnMusicController = MusicController.ToggleVisibility
+                OnMusicController = musicController.ToggleVisibility
             }).Preload(this, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
                 PlayMode.TriggerChange();
-                Add(Toolbar);
+                overlayContent.Add(Toolbar);
             });
 
             Cursor.Alpha = 0;
@@ -133,7 +143,7 @@ namespace osu.Game
             switch (args.Key)
             {
                 case Key.F8:
-                    Chat.ToggleVisibility();
+                    chat.ToggleVisibility();
                     return true;
             }
 
@@ -154,6 +164,8 @@ namespace osu.Game
 
         private Container mainContent;
 
+        private Container overlayContent;
+
         private void modeChanged(GameMode newMode)
         {
             // - Ability to change window size
@@ -161,10 +173,10 @@ namespace osu.Game
             // - Frame limiter changes
 
             //central game mode change logic.
-            if (newMode is Player || newMode is Intro)
+            if ((newMode as OsuGameMode)?.ShowToolbar != true)
             {
                 Toolbar.State = Visibility.Hidden;
-                Chat.State = Visibility.Hidden;
+                chat.State = Visibility.Hidden;
             }
             else
             {

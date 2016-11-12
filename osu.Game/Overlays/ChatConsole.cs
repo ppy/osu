@@ -56,8 +56,8 @@ namespace osu.Game.Overlays
             });
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             initializeChannels();
         }

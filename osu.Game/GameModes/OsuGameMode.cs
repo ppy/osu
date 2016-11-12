@@ -28,6 +28,12 @@ namespace osu.Game.GameModes
         /// </summary>
         protected virtual BackgroundMode CreateBackground() => null;
 
+        internal virtual bool ShowToolbar => true;
+
+        protected new OsuGameBase Game => base.Game as OsuGameBase;
+
+        protected float ToolbarPadding => ShowToolbar ? (Game as OsuGame)?.Toolbar.DrawHeight ?? 0 : 0;
+
         private bool boundToBeatmap;
         private Bindable<WorkingBeatmap> beatmap;
 
@@ -70,10 +76,11 @@ namespace osu.Game.GameModes
             OnBeatmapChanged(beatmap.Value);
         }
 
-        [Initializer(permitNulls: true)]
-        private void Load(OsuGameBase game)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuGameBase game)
         {
-            beatmap = game?.Beatmap;
+            if (beatmap == null)
+                beatmap = game?.Beatmap;
         }
 
         public override bool Push(GameMode mode)

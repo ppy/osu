@@ -112,8 +112,8 @@ namespace osu.Game.Overlays
             Size = new Vector2(1, height);
         }
 
-        [Initializer]
-        private void Load(OsuConfigManager config)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             userButton.Text = config.Get<string>(OsuConfig.Username);
         }

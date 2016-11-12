@@ -15,6 +15,12 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Input;
+using osu.Framework.Platform;
+using OpenTK.Input;
+using MouseState = osu.Framework.Input.MouseState;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.GameModes.Play
 {
@@ -24,7 +30,41 @@ namespace osu.Game.GameModes.Play
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
+        internal override bool ShowToolbar => false;
+
         public BeatmapInfo BeatmapInfo;
+
+        PlayerInputManager inputManager;
+
+        class PlayerInputManager : UserInputManager
+        {
+            public PlayerInputManager(BasicGameHost host)
+                : base(host)
+            {
+            }
+
+            protected override void UpdateMouseState(InputState state)
+            {
+                base.UpdateMouseState(state);
+
+                MouseState mouse = (MouseState)state.Mouse;
+
+                foreach (Key k in state.Keyboard.Keys)
+                {
+                    switch (k)
+                    {
+                        case Key.Z:
+                            mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = true;
+                            break;
+                        case Key.X:
+                            mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = true;
+                            break;
+                    }
+                }
+                
+            }
+        }
+
 
         public PlayMode PreferredPlayMode;
 
@@ -32,9 +72,10 @@ namespace osu.Game.GameModes.Play
 
         private InterpolatingFramedClock playerClock;
         private IAdjustableClock sourceClock;
+        private Ruleset Ruleset;
 
-        [Initializer]
-        private void Load(AudioManager audio, BeatmapDatabase beatmaps)
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game)
         {
             try
             {
@@ -79,49 +120,11 @@ namespace osu.Game.GameModes.Play
 
             PlayMode usablePlayMode = beatmap.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode;
 
-            switch (usablePlayMode)
-            {
-                default:
-                    scoreOverlay = new ScoreOverlayOsu();
+            Ruleset = Ruleset.GetRuleset(usablePlayMode);
 
-                    hitRenderer = new OsuHitRenderer
-                    {
-                        Objects = beatmap.HitObjects,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    };
-                    break;
-                case PlayMode.Taiko:
-                    scoreOverlay = new ScoreOverlayOsu();
+            scoreOverlay = Ruleset.CreateScoreOverlay();
 
-                    hitRenderer = new TaikoHitRenderer
-                    {
-                        Objects = beatmap.HitObjects,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    };
-                    break;
-                case PlayMode.Catch:
-                    scoreOverlay = new ScoreOverlayOsu();
-
-                    hitRenderer = new CatchHitRenderer
-                    {
-                        Objects = beatmap.HitObjects,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    };
-                    break;
-                case PlayMode.Mania:
-                    scoreOverlay = new ScoreOverlayOsu();
-
-                    hitRenderer = new ManiaHitRenderer
-                    {
-                        Objects = beatmap.HitObjects,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    };
-                    break;
-            }
+            hitRenderer = Ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
             hitRenderer.OnHit += delegate (HitObject h) { scoreOverlay.OnHit(h); };
             hitRenderer.OnMiss += delegate (HitObject h) { scoreOverlay.OnMiss(h); };
@@ -131,7 +134,14 @@ namespace osu.Game.GameModes.Play
 
             Children = new Drawable[]
             {
-                hitRenderer,
+                inputManager = new PlayerInputManager(game.Host)
+                {
+                    PassThrough = false,
+                    Children = new Drawable[]
+                    {
+                        hitRenderer,
+                    }
+                },
                 scoreOverlay,
             };
         }

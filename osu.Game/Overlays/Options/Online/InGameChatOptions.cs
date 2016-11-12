@@ -9,10 +9,12 @@ namespace osu.Game.Overlays.Options.Online
 {
     public class InGameChatOptions : OptionsSubsection
     {
+        private TextBoxOption chatIgnoreList;
+        private TextBoxOption chatHighlightWords;
         protected override string Header => "In-game Chat";
 
-        [Initializer]
-        private void Load(OsuConfigManager config)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {
@@ -37,9 +39,17 @@ namespace osu.Game.Overlays.Options.Online
                     Bindable = config.GetBindable<bool>(OsuConfig.BlockNonFriendPM)
                 },
                 new SpriteText { Text = "Chat ignore list (space-seperated list)" },
-                new TextBox { Height = 20, RelativeSizeAxes = Axes.X },
+                chatIgnoreList = new TextBoxOption {
+                    Height = 20,
+                    RelativeSizeAxes = Axes.X,
+                    Bindable = config.GetBindable<string>(OsuConfig.IgnoreList)
+                },
                 new SpriteText { Text = "Chat highlight words (space-seperated list)" },
-                new TextBox { Height = 20, RelativeSizeAxes = Axes.X },
+                chatHighlightWords = new TextBoxOption {
+                    Height = 20,
+                    RelativeSizeAxes = Axes.X,
+                    Bindable = config.GetBindable<string>(OsuConfig.HighlightWords)
+                },
             };
         }
     }

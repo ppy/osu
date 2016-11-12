@@ -44,8 +44,8 @@ namespace osu.Game.Overlays
             }
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             DrawableIcon.TextSize *= 1.4f;
         }

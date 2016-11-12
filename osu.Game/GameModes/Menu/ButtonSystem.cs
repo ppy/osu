@@ -54,8 +54,8 @@ namespace osu.Game.GameModes.Menu
             RelativeSizeAxes = Axes.Both;
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Children = new Drawable[]
             {

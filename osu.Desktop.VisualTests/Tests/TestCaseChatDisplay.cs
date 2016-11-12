@@ -35,8 +35,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         private ChannelDisplay channelDisplay;
 
-        [Initializer]
-        private void Load(APIAccess api)
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api)
         {
             this.api = api;
         }

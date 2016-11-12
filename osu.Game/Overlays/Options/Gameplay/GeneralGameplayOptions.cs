@@ -11,8 +11,8 @@ namespace osu.Game.Overlays.Options.Gameplay
     {
         protected override string Header => "General";
 
-        [Initializer]
-        private void Load(OsuConfigManager config)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {

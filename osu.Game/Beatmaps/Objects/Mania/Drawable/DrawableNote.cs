@@ -22,8 +22,8 @@ namespace osu.Game.Beatmaps.Objects.Mania.Drawable
             Scale = new Vector2(0.1f);
         }
 
-        [Initializer]
-        private void Load(TextureStore textures)
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
             Texture = textures.Get(@"Menu/logo");
 

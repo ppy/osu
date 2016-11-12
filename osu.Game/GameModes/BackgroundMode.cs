@@ -35,8 +35,8 @@ namespace osu.Game.GameModes
 
         BaseGame game;
 
-        [Initializer]
-        private void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(BaseGame game)
         {
             this.game = game;
         }

@@ -33,8 +33,8 @@ namespace osu.Game.Graphics.UserInterface.Volume
             Origin = Anchor.BottomRight;
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             VolumeGlobal.ValueChanged += volumeChanged;
             VolumeSample.ValueChanged += volumeChanged;

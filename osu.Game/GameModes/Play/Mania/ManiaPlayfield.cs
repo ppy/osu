@@ -24,8 +24,8 @@ namespace osu.Game.GameModes.Play.Mania
             Origin = Anchor.BottomCentre;
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Add(new Box { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
 

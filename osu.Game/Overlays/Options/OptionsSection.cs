@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Options
         protected override Container<Drawable> Content => content;
 
         public abstract FontAwesome Icon { get; }
-        protected abstract string Header { get; }
+        public abstract string Header { get; }
 
         public OptionsSection()
         {

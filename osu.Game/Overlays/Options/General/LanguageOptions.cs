@@ -10,8 +10,8 @@ namespace osu.Game.Overlays.Options.General
     {
         protected override string Header => "Language";
         
-        [Initializer]
-        private void Load(OsuConfigManager config)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {

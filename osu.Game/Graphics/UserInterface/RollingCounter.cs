@@ -120,8 +120,8 @@ namespace osu.Game.Graphics.UserInterface
             AutoSizeAxes = Axes.Both;
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             DisplayedCount = Count;
 

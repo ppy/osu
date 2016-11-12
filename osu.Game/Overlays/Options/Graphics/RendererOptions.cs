@@ -11,8 +11,8 @@ namespace osu.Game.Overlays.Options.Graphics
     {
         protected override string Header => "Renderer";
 
-        [Initializer]
-        private void Load(OsuConfigManager config)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             // NOTE: Compatability mode omitted
             Children = new Drawable[]

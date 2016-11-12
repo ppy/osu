@@ -22,8 +22,8 @@ namespace osu.Game.GameModes.Play.Taiko
             Origin = Anchor.Centre;
         }
 
-        [Initializer]
-        private void Load(TextureStore textures)
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
             Add(new Box { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
 

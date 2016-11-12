@@ -28,6 +28,8 @@ namespace osu.Game.GameModes.Menu
         private AudioSample welcome;
         private AudioTrack bgm;
 
+        internal override bool ShowToolbar => (ParentGameMode as OsuGameMode)?.ShowToolbar ?? false;
+
         protected override BackgroundMode CreateBackground() => new BackgroundModeEmpty();
 
         public Intro()
@@ -45,8 +47,8 @@ namespace osu.Game.GameModes.Menu
             };
         }
 
-        [Initializer]
-        private void Load(AudioManager audio)
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
         {
             welcome = audio.Sample.Get(@"welcome");
 

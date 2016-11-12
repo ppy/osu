@@ -10,12 +10,20 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
+using osu.Game.Configuration;
 
 namespace osu.Game.Beatmaps.Drawable
 {
     class BeatmapSetHeader : Panel
     {
         public Action<BeatmapSetHeader> GainedSelection;
+        private BeatmapSetInfo beatmapSet;
+        private SpriteText title, artist;
+        private OsuConfigManager config;
+        private Bindable<bool> preferUnicode;
 
         protected override void Selected()
         {
@@ -31,8 +39,31 @@ namespace osu.Game.Beatmaps.Drawable
             Width = 0.8f;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            this.config = config;
+
+            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
+            preferUnicode.ValueChanged += preferUnicode_changed;
+            preferUnicode_changed(preferUnicode, null);
+        }
+        private void preferUnicode_changed(object sender, EventArgs e)
+        {
+            title.Text = config.GetUnicodeString(beatmapSet.Metadata.Title, beatmapSet.Metadata.TitleUnicode);
+            artist.Text = config.GetUnicodeString(beatmapSet.Metadata.Artist, beatmapSet.Metadata.ArtistUnicode);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (preferUnicode != null)
+                preferUnicode.ValueChanged -= preferUnicode_changed;
+            base.Dispose(isDisposing);
+        }
+
         public BeatmapSetHeader(BeatmapSetInfo beatmapSet, WorkingBeatmap working)
         {
+            this.beatmapSet = beatmapSet;
             Children = new Framework.Graphics.Drawable[]
             {
                 working.Background == null ? new Box{ RelativeSizeAxes = Axes.Both, Colour = new Color4(20, 20, 20, 255) } : new Sprite
@@ -51,16 +82,16 @@ namespace osu.Game.Beatmaps.Drawable
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        new SpriteText
+                        title = new SpriteText
                         {
                             Font = @"Exo2.0-SemiBoldItalic",
-                            Text = beatmapSet.Metadata.Title ?? beatmapSet.Metadata.TitleUnicode,
+                            Text = beatmapSet.Metadata.Title,
                             TextSize = 22
                         },
-                        new SpriteText
+                        artist = new SpriteText
                         {
                             Font = @"Exo2.0-MediumItalic",
-                            Text = beatmapSet.Metadata.Artist ?? beatmapSet.Metadata.ArtistUnicode,
+                            Text = beatmapSet.Metadata.Artist,
                             TextSize = 16
                         },
                         new FlowContainer

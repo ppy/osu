@@ -41,8 +41,8 @@ namespace osu.Game
         {
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Dependencies.Cache(this);
             Dependencies.Cache(new OsuConfigManager(Host.Storage));
@@ -68,13 +68,10 @@ namespace osu.Game
             
             AddInternal(ratioContainer = new RatioAdjust());
 
-            var options = new OptionsOverlay();
             Children = new Drawable[]
             {
-                options,
                 Cursor = new OsuCursorContainer { Depth = float.MaxValue }
             };
-            Dependencies.Cache(options);
 
             Beatmap.ValueChanged += Beatmap_ValueChanged;
 

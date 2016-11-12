@@ -61,8 +61,8 @@ namespace osu.Game.Graphics.UserInterface
             Name = name;
         }
 
-        [Initializer]
-        private void Load(TextureStore textures)
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
             Children = new Drawable[]
             {

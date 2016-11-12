@@ -21,8 +21,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         protected override IFrameBasedClock Clock => ourClock;
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             var swClock = new StopwatchClock(true) { Rate = 1 };
             ourClock = new FramedClock(swClock);

@@ -28,8 +28,8 @@ namespace osu.Game.Graphics.Background
             Depth = float.MinValue;
         }
 
-        [Initializer]
-        private void Load(TextureStore textures)
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
             Add(BackgroundSprite = new Sprite
             {
