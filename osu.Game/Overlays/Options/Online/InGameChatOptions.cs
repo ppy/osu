@@ -11,6 +11,7 @@ namespace osu.Game.Overlays.Options.Online
         protected override string Header => "In-game Chat";
 
         private CheckBoxOption filterWords, filterForeign, logPMs, blockPMs;
+        private TextBoxOption chatIgnoreList, chatHighlightWords;
 
         public InGameChatOptions()
         {
@@ -21,9 +22,9 @@ namespace osu.Game.Overlays.Options.Online
                 logPMs = new CheckBoxOption { LabelText = "Log private messages" },
                 blockPMs = new CheckBoxOption { LabelText = "Block private messages from non-friends" },
                 new SpriteText { Text = "Chat ignore list (space-seperated list)" },
-                new TextBox { Height = 20, RelativeSizeAxes = Axes.X },
+                chatIgnoreList = new TextBoxOption { Height = 20, RelativeSizeAxes = Axes.X },
                 new SpriteText { Text = "Chat highlight words (space-seperated list)" },
-                new TextBox { Height = 20, RelativeSizeAxes = Axes.X },
+                chatHighlightWords = new TextBoxOption { Height = 20, RelativeSizeAxes = Axes.X },
             };
         }
 
@@ -37,6 +38,8 @@ namespace osu.Game.Overlays.Options.Online
                 filterForeign.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.ChatRemoveForeign);
                 logPMs.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.LogPrivateMessages);
                 blockPMs.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.BlockNonFriendPM);
+                chatIgnoreList.Bindable = osuGame.Config.GetBindable<string>(OsuConfig.IgnoreList);
+                chatHighlightWords.Bindable = osuGame.Config.GetBindable<string>(OsuConfig.HighlightWords);
             }
         }
     }
