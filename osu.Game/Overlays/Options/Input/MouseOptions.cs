@@ -17,8 +17,16 @@ namespace osu.Game.Overlays.Options.Input
             Children = new Drawable[]
             {
                 new SpriteText { Text = "Sensitivity: TODO slider" },
-                rawInput = new CheckBoxOption { LabelText = "Raw input" },
-                mapRawInput = new CheckBoxOption { LabelText = "Map absolute raw input to the osu! window" },
+                rawInput = new CheckBoxOption
+                {
+                    LabelText = "Raw input",
+                    Alpha = RuntimeInfo.IsWindows ? 1 : 0
+                },
+                mapRawInput = new CheckBoxOption
+                {
+                    LabelText = "Map absolute raw input to the osu! window",
+                    Alpha = RuntimeInfo.IsWindows ? 1 : 0
+                },
                 new SpriteText { Text = "Confine mouse cursor: TODO dropdown" },
                 disableWheel = new CheckBoxOption { LabelText = "Disable mouse wheel in play mode" },
                 disableButtons = new CheckBoxOption { LabelText = "Disable mouse buttons in play mode" },
