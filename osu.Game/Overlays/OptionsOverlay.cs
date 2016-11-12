@@ -35,10 +35,13 @@ namespace osu.Game.Overlays
 
         private ScrollContainer scrollContainer;
         private OptionsSidebar sidebar;
+        private SidebarButton[] sidebarButtons;
+        private OptionsSection[] sections;
+        private float lastKnownScroll;
 
         public OptionsOverlay()
         {
-            var sections = new OptionsSection[]
+            sections = new OptionsSection[]
             {
                 new GeneralSection(),
                 new GraphicsSection(),
@@ -106,14 +109,15 @@ namespace osu.Game.Overlays
                 sidebar = new OptionsSidebar
                 {
                     Width = sidebar_width,
-                    Children = sections.Select(section =>
-                        new OptionsSidebar.SidebarButton
+                    Children = sidebarButtons = sections.Select(section =>
+                        new SidebarButton
                         {
-                            Icon = section.Icon,
-                            Header = section.Header,
-                            Action = () => scrollContainer.ScrollIntoView(section),
+                            Selected = sections[0] == section,
+                            Section = section,
+                            Action = () => scrollContainer.ScrollTo(
+                                scrollContainer.GetChildYInContent(section) - scrollContainer.DrawSize.Y / 2),
                         }
-                    )
+                    ).ToArray()
                 }
             };
         }
@@ -122,6 +126,30 @@ namespace osu.Game.Overlays
         private void load(OsuGame game)
         {
             scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            if (scrollContainer.Current != lastKnownScroll)
+            {
+                for (int i = sections.Length - 1; i >= 0; i--)
+                {
+                    var section = sections[i];
+                    float y = scrollContainer.GetChildYInContent(section) - scrollContainer.Current;
+                    if (y <= scrollContainer.DrawSize.Y / 2 + 25)
+                    {
+                        var previous = sidebarButtons.SingleOrDefault(sb => sb.Selected);
+                        var next = sidebarButtons.SingleOrDefault(sb => sb.Section == section);
+                        if (next != null)
+                        {
+                            previous.Selected = false;
+                            next.Selected = true;
+                        }
+                        break;
+                    }
+                }
+            }
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
