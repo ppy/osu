@@ -26,18 +26,19 @@ namespace osu.Game.Graphics.Background
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
             Depth = float.MinValue;
+
+            Add(BackgroundSprite = new Sprite
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Colour = Color4.DarkGray
+            });
         }
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            Add(BackgroundSprite = new Sprite
-            {
-                Texture = textures.Get(textureName),
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Colour = Color4.DarkGray
-            });
+            BackgroundSprite.Texture = textures.Get(textureName);
         }
 
         protected override void Update()

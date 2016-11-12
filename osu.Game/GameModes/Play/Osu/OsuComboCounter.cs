@@ -33,9 +33,8 @@ namespace osu.Game.GameModes.Play.Osu
                 DisplayedCountSpriteText.Position = value;
             }
         }
-
-        [BackgroundDependencyLoader]
-        private void load()
+        
+        public OsuComboCounter()
         {
             PopOutSpriteText.Origin = Origin;
             PopOutSpriteText.Anchor = Anchor;

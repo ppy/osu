@@ -18,6 +18,9 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         private VolumeMeter volumeMeterMaster;
 
+        private FlowContainer content;
+        protected override Container<Drawable> Content => content;
+
         public override bool Contains(Vector2 screenSpacePos) => true;
 
         private void volumeChanged(object sender, EventArgs e)
@@ -31,32 +34,31 @@ namespace osu.Game.Graphics.UserInterface.Volume
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomRight;
             Origin = Anchor.BottomRight;
+
+            AddInternal(content = new FlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Position = new Vector2(10, 30),
+                Spacing = new Vector2(15, 0),
+            });
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             VolumeGlobal.ValueChanged += volumeChanged;
             VolumeSample.ValueChanged += volumeChanged;
             VolumeTrack.ValueChanged += volumeChanged;
 
-            Children = new Drawable[]
+            Add(new[]
             {
-                new FlowContainer
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Position = new Vector2(10, 30),
-                    Spacing = new Vector2(15,0),
-                    Children = new Drawable[]
-                    {
-                        volumeMeterMaster = new VolumeMeter("Master", VolumeGlobal),
-                        new VolumeMeter("Effects", VolumeSample),
-                        new VolumeMeter("Music", VolumeTrack)
-                    }
-                }
-            };
+                volumeMeterMaster = new VolumeMeter("Master", VolumeGlobal),
+                new VolumeMeter("Effects", VolumeSample),
+                new VolumeMeter("Music", VolumeTrack)
+            });
         }
 
         protected override void Dispose(bool isDisposing)
