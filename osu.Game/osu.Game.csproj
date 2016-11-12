@@ -121,13 +121,18 @@
     <Compile Include="GameModes\Multiplayer\MatchCreate.cs" />
     <Compile Include="GameModes\Multiplayer\MatchSongSelect.cs" />
     <Compile Include="GameModes\OsuGameMode.cs" />
+    <Compile Include="GameModes\Play\Catch\CatchRuleset.cs" />
+    <Compile Include="GameModes\Play\Mania\ManiaRuleset.cs" />
     <Compile Include="GameModes\Play\ModSelect.cs" />
+    <Compile Include="GameModes\Play\Osu\OsuRuleset.cs" />
     <Compile Include="GameModes\Play\Osu\ScoreOverlayOsu.cs" />
     <Compile Include="Beatmaps\Drawable\BeatmapGroup.cs" />
     <Compile Include="Beatmaps\Drawable\BeatmapPanel.cs" />
     <Compile Include="GameModes\Play\Player.cs" />
     <Compile Include="GameModes\Charts\ChartListing.cs" />
     <Compile Include="GameModes\Play\PlayMode.cs" />
+    <Compile Include="GameModes\Play\Ruleset.cs" />
+    <Compile Include="GameModes\Play\Taiko\TaikoRuleset.cs" />
     <Compile Include="GameModes\Ranking\Results.cs" />
     <Compile Include="GameModes\Direct\OnlineListing.cs" />
     <Compile Include="GameModes\Play\PlaySongSelect.cs" />
@@ -235,6 +240,7 @@
     <Compile Include="Overlays\Options\Online\NotificationsOptions.cs" />
     <Compile Include="Overlays\Options\CheckBoxOption.cs" />
     <Compile Include="Overlays\Options\SidebarButton.cs" />
+    <Compile Include="Overlays\Options\TextBoxOption.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

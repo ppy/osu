@@ -1,4 +1,5 @@
 ﻿using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
@@ -8,10 +9,10 @@ namespace osu.Game.Overlays.Options.General
 {
     public class UpdateOptions : OptionsSubsection
     {
-        private BasicStorage storage;
         protected override string Header => "Updates";
 
-        public UpdateOptions()
+        [BackgroundDependencyLoader]
+        private void load(BasicStorage storage)
         {
             Children = new Drawable[]
             {
@@ -21,15 +22,9 @@ namespace osu.Game.Overlays.Options.General
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Open osu! folder",
-                    Action = () => storage?.OpenInNativeExplorer(),
+                    Action = () => storage.OpenInNativeExplorer(),
                 }
             };
-        }
-
-        protected override void Load(BaseGame game)
-        {
-            base.Load(game);
-            this.storage = game.Host.Storage;
         }
     }
 }

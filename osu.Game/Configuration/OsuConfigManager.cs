@@ -179,6 +179,10 @@ namespace osu.Game.Configuration
             Set(OsuConfig.CanForceOptimusCompatibility, true);
         }
 
+        //todo: make a UnicodeString class/struct rather than requiring this helper method.
+        public string GetUnicodeString(string nonunicode, string unicode)
+            => Get<bool>(OsuConfig.ShowUnicode) ? unicode ?? nonunicode : nonunicode ?? unicode;
+
         public OsuConfigManager(BasicStorage storage) : base(storage)
         {
         }

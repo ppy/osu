@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             HeadlessGameHost host = new HeadlessGameHost();
 
             var osu = loadOsu(host);
-            osu.Beatmaps.Import(osz_path);
+            osu.Dependencies.Get<BeatmapDatabase>().Import(osz_path);
             ensureLoaded(osu);
         }
 
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 Thread.Sleep(1);
 
             //reset beatmap database (sqlite and storage backing)
-            osu.Beatmaps.Reset();
+            osu.Dependencies.Get<BeatmapDatabase>().Reset();
 
             return osu;
         }
@@ -71,7 +71,8 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Action waitAction = () =>
             {
-                while ((resultSets = osu.Beatmaps.Query<BeatmapSetInfo>().Where(s => s.BeatmapSetID == 241526)).Count() != 1)
+                while ((resultSets = osu.Dependencies.Get<BeatmapDatabase>()
+                    .Query<BeatmapSetInfo>().Where(s => s.BeatmapSetID == 241526)).Count() != 1)
                     Thread.Sleep(1);
             };
 
@@ -87,7 +88,8 @@ namespace osu.Game.Tests.Beatmaps.IO
             //if we don't re-check here, the set will be inserted but the beatmaps won't be present yet.
             waitAction = () =>
             {
-                while ((resultBeatmaps = osu.Beatmaps.Query<BeatmapInfo>().Where(s => s.BeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() != 12)
+                while ((resultBeatmaps = osu.Dependencies.Get<BeatmapDatabase>()
+                    .Query<BeatmapInfo>().Where(s => s.BeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() != 12)
                     Thread.Sleep(1);
             };
 
@@ -95,7 +97,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 @"Beatmaps did not import to the database");
 
             //fetch children and check we can load from the post-storage path...
-            var set = osu.Beatmaps.GetChildren(resultSets.First());
+            var set = osu.Dependencies.Get<BeatmapDatabase>().GetChildren(resultSets.First());
 
             Assert.IsTrue(set.Beatmaps.Count == resultBeatmaps.Count());
 
@@ -104,7 +106,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Assert.IsTrue(set.Beatmaps.Count > 0);
 
-            var beatmap = osu.Beatmaps.GetBeatmap(set.Beatmaps.First(b => b.Mode == PlayMode.Osu));
+            var beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetBeatmap(set.Beatmaps.First(b => b.Mode == PlayMode.Osu));
 
             Assert.IsTrue(beatmap.HitObjects.Count > 0);
         }

@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -27,15 +28,14 @@ namespace osu.Game.Overlays.Options.General
             };
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(APIAccess api)
         {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
-            if (osuGame == null)
+            if (api == null)
                 return;
             loginForm.Children = new Drawable[]
             {
-                new LoginForm(osuGame.API)
+                new LoginForm(api)
             };
         }
 

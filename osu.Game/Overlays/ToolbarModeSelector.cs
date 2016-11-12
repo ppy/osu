@@ -12,6 +12,7 @@ using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Caching;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays
 {
@@ -30,10 +31,9 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.Y;
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.Load(game);
-
             Children = new Drawable[]
             {
                 new Box

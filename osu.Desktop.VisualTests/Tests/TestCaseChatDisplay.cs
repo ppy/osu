@@ -16,6 +16,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Chat.Display;
 using OpenTK;
+using osu.Framework.Allocation;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -34,11 +35,10 @@ namespace osu.Desktop.VisualTests.Tests
 
         private ChannelDisplay channelDisplay;
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api)
         {
-            base.Load(game);
-
-            api = ((OsuGameBase)game).API;
+            this.api = api;
         }
 
         public override void Reset()
