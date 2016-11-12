@@ -78,7 +78,8 @@ namespace osu.Game.GameModes
         protected override void Load(BaseGame game)
         {
             base.Load(game);
-            beatmap = (game as OsuGameBase)?.Beatmap;
+            if (beatmap == null)
+                beatmap = (game as OsuGameBase)?.Beatmap;
         }
 
         public override bool Push(GameMode mode)
