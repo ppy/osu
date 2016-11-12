@@ -67,8 +67,6 @@ namespace osu.Game.Overlays
                 },
                 scrollContainer = new ScrollContainer
                 {
-                    ScrollbarOverlapsContent = false,
-                    ScrollDraggerAnchor = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
                     Margin = new MarginPadding { Left = sidebar_width },
@@ -131,8 +129,11 @@ namespace osu.Game.Overlays
         protected override void Update()
         {
             base.Update();
+
             if (scrollContainer.Current != lastKnownScroll)
             {
+                lastKnownScroll = scrollContainer.Current;
+
                 for (int i = sections.Length - 1; i >= 0; i--)
                 {
                     var section = sections[i];
