@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Game.Configuration;
 
@@ -37,25 +38,22 @@ namespace osu.Game.Beatmaps.Drawable
             base.Deselected();
             Width = 0.8f;
         }
-        
-        protected override void Load(BaseGame game)
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
-            if (osuGame != null)
-            {
-                config = osuGame.Config;
-                preferUnicode = osuGame.Config.GetBindable<bool>(OsuConfig.ShowUnicode);
-                preferUnicode.ValueChanged += preferUnicode_changed;
-                preferUnicode_changed(preferUnicode, null);
-            }
+            this.config = config;
+
+            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
+            preferUnicode.ValueChanged += preferUnicode_changed;
+            preferUnicode_changed(preferUnicode, null);
         }
         private void preferUnicode_changed(object sender, EventArgs e)
         {
             title.Text = config.GetUnicodeString(beatmapSet.Metadata.Title, beatmapSet.Metadata.TitleUnicode);
             artist.Text = config.GetUnicodeString(beatmapSet.Metadata.Artist, beatmapSet.Metadata.ArtistUnicode);
         }
-        
+
         protected override void Dispose(bool isDisposing)
         {
             if (preferUnicode != null)

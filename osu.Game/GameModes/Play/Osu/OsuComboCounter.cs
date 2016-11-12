@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 
 namespace osu.Game.GameModes.Play.Osu
 {
@@ -33,12 +34,11 @@ namespace osu.Game.GameModes.Play.Osu
             }
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.Load(game);
-
-            PopOutSpriteText.Origin = this.Origin;
-            PopOutSpriteText.Anchor = this.Anchor;
+            PopOutSpriteText.Origin = Origin;
+            PopOutSpriteText.Anchor = Anchor;
 
             Add(PopOutSpriteText);
         }

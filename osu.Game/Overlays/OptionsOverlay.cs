@@ -7,12 +7,14 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using osu.Game.Configuration;
 using osu.Game.Overlays.Options;
 using osu.Game.Overlays.Options.Audio;
 using osu.Game.Overlays.Options.Gameplay;
@@ -116,11 +118,10 @@ namespace osu.Game.Overlays
             };
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuGame game)
         {
-            base.Load(game);
-
-            scrollContainer.Padding = new MarginPadding { Top = (game as OsuGame)?.Toolbar.DrawHeight ?? 0 };
+            scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;

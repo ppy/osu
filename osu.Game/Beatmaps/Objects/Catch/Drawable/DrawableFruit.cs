@@ -11,6 +11,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using OpenTK;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Beatmaps.Objects.Catch.Drawable
 {
@@ -28,11 +30,10 @@ namespace osu.Game.Beatmaps.Objects.Catch.Drawable
             Position = new Vector2(h.Position, -0.1f);
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
-            base.Load(game);
-
-            Texture = game.Textures.Get(@"Menu/logo");
+            Texture = textures.Get(@"Menu/logo");
 
             Transforms.Add(new TransformPosition { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = new Vector2(h.Position, -0.1f), EndValue = new Vector2(h.Position, 0.9f) });
             Transforms.Add(new TransformAlpha { StartTime = h.StartTime + h.Duration + 200, EndTime = h.StartTime + h.Duration + 400, StartValue = 1, EndValue = 0 });

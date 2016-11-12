@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics.Containers;
@@ -29,9 +30,9 @@ namespace osu.Game.GameModes
 
         internal virtual bool ShowToolbar => true;
 
-        protected new OsuGame Game => base.Game as OsuGame;
+        protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        protected float ToolbarPadding => ShowToolbar ? Game.Toolbar.DrawHeight : 0;
+        protected float ToolbarPadding => ShowToolbar ? (Game as OsuGame)?.Toolbar.DrawHeight ?? 0 : 0;
 
         private bool boundToBeatmap;
         private Bindable<WorkingBeatmap> beatmap;
@@ -75,11 +76,11 @@ namespace osu.Game.GameModes
             OnBeatmapChanged(beatmap.Value);
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuGameBase game)
         {
-            base.Load(game);
             if (beatmap == null)
-                beatmap = (game as OsuGameBase)?.Beatmap;
+                beatmap = game?.Beatmap;
         }
 
         public override bool Push(GameMode mode)
