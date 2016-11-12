@@ -37,10 +37,6 @@ namespace osu.Game
 
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        private void Beatmap_ValueChanged(object sender, EventArgs e)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -65,15 +61,6 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
-            
-            AddInternal(ratioContainer = new RatioAdjust());
-
-            Children = new Drawable[]
-            {
-                Cursor = new OsuCursorContainer { Depth = float.MaxValue }
-            };
-
-            Beatmap.ValueChanged += Beatmap_ValueChanged;
 
             OszArchiveReader.Register();
 
@@ -82,6 +69,19 @@ namespace osu.Game
                 Username = Config.Get<string>(OsuConfig.Username),
                 Password = Config.Get<string>(OsuConfig.Password),
                 Token = Config.Get<string>(OsuConfig.Token)
+            });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddInternal(ratioContainer = new RatioAdjust
+            {
+                Children = new[]
+                {
+                    Cursor = new OsuCursorContainer { Depth = float.MaxValue }
+                }
             });
         }
 

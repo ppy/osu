@@ -19,11 +19,7 @@ namespace osu.Game.GameModes.Play.Catch
             Size = new Vector2(512, 0.9f);
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             Add(new Box { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
         }
     }
