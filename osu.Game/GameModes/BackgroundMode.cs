@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework;
 using System.Threading;
+using osu.Framework.Allocation;
 
 namespace osu.Game.GameModes
 {
@@ -34,9 +35,9 @@ namespace osu.Game.GameModes
 
         BaseGame game;
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(BaseGame game)
         {
-            base.Load(game);
             this.game = game;
         }
 

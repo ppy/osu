@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 
 namespace osu.Game.GameModes.Play
 {
@@ -120,13 +121,12 @@ namespace osu.Game.GameModes.Play
             TextSize = 80;
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.Load(game);
-
             DisplayedCountSpriteText.Text = FormatCount(Count);
-            DisplayedCountSpriteText.Anchor = this.Anchor;
-            DisplayedCountSpriteText.Origin = this.Origin;
+            DisplayedCountSpriteText.Anchor = Anchor;
+            DisplayedCountSpriteText.Origin = Origin;
 
             StopRolling();
         }

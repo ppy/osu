@@ -6,6 +6,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using OpenTK;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Beatmaps.Objects.Taiko.Drawable
 {
@@ -23,11 +25,10 @@ namespace osu.Game.Beatmaps.Objects.Taiko.Drawable
             Position = new Vector2(1.1f, 0.5f);
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
-            base.Load(game);
-
-            Texture = game.Textures.Get(@"Menu/logo");
+            Texture = textures.Get(@"Menu/logo");
 
             Transforms.Add(new TransformPositionX { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = 1.1f, EndValue = 0.1f });
             Transforms.Add(new TransformAlpha { StartTime = h.StartTime + h.Duration + 200, EndTime = h.StartTime + h.Duration + 400, StartValue = 1, EndValue = 0 });

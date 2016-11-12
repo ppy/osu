@@ -21,6 +21,8 @@ using osu.Game.Beatmaps.Drawable;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Framework.GameModes;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
 
 namespace osu.Game.GameModes.Play
 {
@@ -113,35 +115,34 @@ namespace osu.Game.GameModes.Play
                             Width = 100,
                             Text = "Play",
                             Colour = new Color4(238, 51, 153, 255),
-                            Action = () => Push(new Player {
+                            Action = () => Push(new Player
+                            {
                                 BeatmapInfo = selectedBeatmapGroup.SelectedPanel.Beatmap,
                                 PreferredPlayMode = playMode.Value
-                            }),
+                            })
                         },
                     }
                 }
             };
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(BeatmapDatabase beatmaps, AudioManager audio, OsuGame game)
         {
-            base.Load(game);
-
-            OsuGame osuGame = game as OsuGame;
-            if (osuGame != null)
+            if (game != null)
             {
-                playMode = osuGame.PlayMode;
+                playMode = game.PlayMode;
                 playMode.ValueChanged += playMode_ValueChanged;
                 // Temporary:
                 scrollContainer.Padding = new MarginPadding { Top = ToolbarPadding };
             }
 
             if (database == null)
-                database = (game as OsuGameBase).Beatmaps;
+                database = beatmaps;
 
             database.BeatmapSetAdded += s => Schedule(() => addBeatmapSet(s));
 
-            trackManager = game.Audio.Track;
+            trackManager = audio.Track;
 
             Task.Factory.StartNew(addBeatmapSets);
         }
