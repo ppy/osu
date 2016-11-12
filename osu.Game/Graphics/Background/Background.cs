@@ -10,6 +10,8 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework;
 using System.Threading.Tasks;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.Background
 {
@@ -26,13 +28,12 @@ namespace osu.Game.Graphics.Background
             Depth = float.MinValue;
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
-            base.Load(game);
-
             Add(BackgroundSprite = new Sprite
             {
-                Texture = game.Textures.Get(textureName),
+                Texture = textures.Get(textureName),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Colour = Color4.DarkGray

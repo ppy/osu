@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Transformations;
 using osu.Game.Online.Chat.Display.osu.Online.Social;
 using OpenTK;
 using osu.Framework;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Online.Chat.Display
 {
@@ -59,9 +60,9 @@ namespace osu.Game.Online.Chat.Display
             channel.NewMessagesArrived -= newMessages;
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.Load(game);
             newMessages(channel.Messages);
         }
 

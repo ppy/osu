@@ -1,5 +1,6 @@
 ﻿using System;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics;
@@ -23,7 +24,6 @@ namespace osu.Game
     public class OsuGameBase : BaseGame
     {
         internal OsuConfigManager Config;
-        public BeatmapDatabase Beatmaps { get; private set; }
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -37,31 +37,19 @@ namespace osu.Game
 
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        public OsuGameBase()
-        {
-            AddInternal(ratioContainer = new RatioAdjust());
-
-            Children = new Drawable[]
-            {
-                Cursor = new OsuCursorContainer { Depth = float.MaxValue }
-            };
-
-            Beatmap.ValueChanged += Beatmap_ValueChanged;
-        }
-
         private void Beatmap_ValueChanged(object sender, EventArgs e)
         {
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.Load(game);
-
-            OszArchiveReader.Register();
-            Beatmaps = new BeatmapDatabase(Host.Storage, Host);
-
+            Dependencies.Cache(this);
+            Dependencies.Cache(new OsuConfigManager(Host.Storage));
+            Dependencies.Cache(new BeatmapDatabase(Host.Storage, Host));
+            
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            Fonts = new TextureStore() { ScaleAdjust = 0.01f };
+            Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 0.01f });
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
@@ -77,13 +65,24 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
+            
+            AddInternal(ratioContainer = new RatioAdjust());
 
-            API = new APIAccess()
+            Children = new Drawable[]
+            {
+                Cursor = new OsuCursorContainer { Depth = float.MaxValue }
+            };
+
+            Beatmap.ValueChanged += Beatmap_ValueChanged;
+
+            OszArchiveReader.Register();
+
+            Dependencies.Cache(API = new APIAccess
             {
                 Username = Config.Get<string>(OsuConfig.Username),
                 Password = Config.Get<string>(OsuConfig.Password),
                 Token = Config.Get<string>(OsuConfig.Token)
-            };
+            });
         }
 
         public override void SetHost(BasicGameHost host)

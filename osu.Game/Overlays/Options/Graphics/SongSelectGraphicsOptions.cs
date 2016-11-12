@@ -1,4 +1,5 @@
 ﻿using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 
@@ -7,25 +8,18 @@ namespace osu.Game.Overlays.Options.Graphics
     public class SongSelectGraphicsOptions : OptionsSubsection
     {
         protected override string Header => "Song Select";
-
-        private CheckBoxOption showThumbs;
-    
-        public SongSelectGraphicsOptions()
+        
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             Children = new[]
             {
-                showThumbs = new CheckBoxOption { LabelText = "Show thumbnails" }
+                new CheckBoxOption
+                {
+                    LabelText = "Show thumbnails",
+                    Bindable = config.GetBindable<bool>(OsuConfig.SongSelectThumbnails)
+                }
             };
-        }
-        
-        protected override void Load(BaseGame game)
-        {
-            base.Load(game);
-            var osuGame = game as OsuGameBase;
-            if (osuGame != null)
-            {
-                showThumbs.Bindable = osuGame.Config.GetBindable<bool>(OsuConfig.SongSelectThumbnails);
-            }
         }
     }
 }

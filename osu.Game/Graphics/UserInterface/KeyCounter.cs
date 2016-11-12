@@ -4,9 +4,11 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -59,20 +61,20 @@ namespace osu.Game.Graphics.UserInterface
             Name = name;
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
-            base.Load(game);
             Children = new Drawable[]
             {
                 buttonSprite = new Sprite
                 {
-                    Texture = game.Textures.Get(@"KeyCounter/key-up"),
+                    Texture = textures.Get(@"KeyCounter/key-up"),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
                 glowSprite = new Sprite
                 {
-                    Texture = game.Textures.Get(@"KeyCounter/key-glow"),
+                    Texture = textures.Get(@"KeyCounter/key-glow"),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Alpha = 0

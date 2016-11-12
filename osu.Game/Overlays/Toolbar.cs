@@ -12,6 +12,7 @@ using osu.Game.Configuration;
 using osu.Game.GameModes.Play;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays
 {
@@ -111,10 +112,10 @@ namespace osu.Game.Overlays
             Size = new Vector2(1, height);
         }
 
-        protected override void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
-            base.Load(game);
-            userButton.Text = ((OsuGame)game).Config.Get<string>(OsuConfig.Username);
+            userButton.Text = config.Get<string>(OsuConfig.Username);
         }
 
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
