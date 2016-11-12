@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
 
         private ScrollContainer scrollContainer;
         private OptionsSidebar sidebar;
-        private OptionsSidebar.SidebarButton[] sidebarButtons;
+        private SidebarButton[] sidebarButtons;
         private OptionsSection[] sections;
         private float lastKnownScroll;
 
@@ -108,7 +108,7 @@ namespace osu.Game.Overlays
                 {
                     Width = sidebar_width,
                     Children = sidebarButtons = sections.Select(section =>
-                        new OptionsSidebar.SidebarButton
+                        new SidebarButton
                         {
                             Selected = sections[0] == section,
                             Section = section,
