@@ -25,6 +25,8 @@ namespace osu.Game.Overlays
 {
     public class MusicController : OverlayContainer
     {
+        private static readonly Vector2 start_position = new Vector2(10, 60);
+
         private MusicControllerBackground backgroundSprite;
         private DragBar progress;
         private TextAwesome playButton, listButton;
@@ -49,10 +51,17 @@ namespace osu.Game.Overlays
             Width = 400;
             Height = 130;
             CornerRadius = 5;
+            EdgeEffect = new EdgeEffect
+            {
+                Type = EdgeEffectType.Shadow,
+                Colour = new Color4(0, 0, 0, 40),
+                Radius = 5,
+            };
+
             Masking = true;
             Anchor = Anchor.TopRight;//placeholder
             Origin = Anchor.TopRight;
-            Position = new Vector2(10, 60);
+            Position = start_position;
             Children = new Drawable[]
             {
                 title = new SpriteText
@@ -162,6 +171,25 @@ namespace osu.Game.Overlays
                     SeekRequested = seek
                 }
             };
+        }
+
+        protected override bool OnDragStart(InputState state) => true;
+
+        protected override bool OnDrag(InputState state)
+        {
+            Vector2 change = (state.Mouse.Position - state.Mouse.PositionMouseDown.Value);
+            change.X = -change.X;
+
+            change *= (float)Math.Pow(change.Length, 0.7f) / change.Length;
+
+            MoveTo(start_position + change);
+            return base.OnDrag(state);
+        }
+
+        protected override bool OnDragEnd(InputState state)
+        {
+            MoveTo(start_position, 800, EasingTypes.OutElastic);
+            return base.OnDragEnd(state);
         }
 
         protected override void Load(BaseGame game)
@@ -320,8 +348,6 @@ namespace osu.Game.Overlays
         protected override bool OnClick(InputState state) => true;
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
-
-        protected override bool OnDragStart(InputState state) => true;
 
         //placeholder for toggling
         protected override void PopIn() => FadeIn(100);
