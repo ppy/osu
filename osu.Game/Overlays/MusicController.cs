@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
 {
     public class MusicController : OverlayContainer
     {
-        private Sprite backgroundSprite;
+        private MusicControllerBackground backgroundSprite;
         private DragBar progress;
         private TextAwesome playButton, listButton;
         private SpriteText title, artist;
@@ -55,11 +55,6 @@ namespace osu.Game.Overlays
             Position = new Vector2(10, 60);
             Children = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0, 0, 0, 127)
-                },
                 title = new SpriteText
                 {
                     Origin = Anchor.BottomCentre,
@@ -79,14 +74,6 @@ namespace osu.Game.Overlays
                     Colour = Color4.White,
                     Text = @"Nothing to play",
                     Font = @"Exo2.0-BoldItalic"
-                },
-                new Box
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 50,
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
-                    Colour = new Color4(0, 0, 0, 127)
                 },
                 new ClickableContainer
                 {
@@ -194,7 +181,7 @@ namespace osu.Game.Overlays
             beatmapSource = osuGame?.Beatmap ?? new Bindable<WorkingBeatmap>();
             playList = database.GetAllWithChildren<BeatmapSetInfo>();
 
-            backgroundSprite = getScaledSprite(fallbackTexture = game.Textures.Get(@"Backgrounds/bg4"));
+            backgroundSprite = new MusicControllerBackground(fallbackTexture = game.Textures.Get(@"Backgrounds/bg4"));
             AddInternal(backgroundSprite);
         }
 
@@ -296,7 +283,7 @@ namespace osu.Game.Overlays
             title.Text = config.GetUnicodeString(metadata.Title, metadata.TitleUnicode);
             artist.Text = config.GetUnicodeString(metadata.Artist, metadata.ArtistUnicode);
 
-            Sprite newBackground = getScaledSprite(beatmap.Background ?? fallbackTexture);
+            MusicControllerBackground newBackground = new MusicControllerBackground(beatmap.Background ?? fallbackTexture);
 
             Add(newBackground);
 
@@ -317,25 +304,12 @@ namespace osu.Game.Overlays
             backgroundSprite = newBackground;
         }
 
-        private Sprite getScaledSprite(Texture background)
-        {
-            Sprite scaledSprite = new Sprite
-            {
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Texture = background,
-                Depth = float.MinValue
-            };
-            scaledSprite.Scale = new Vector2(Math.Max(DrawSize.X / scaledSprite.DrawSize.X, DrawSize.Y / scaledSprite.DrawSize.Y));
-            return scaledSprite;
-        }
-
         private void seek(float position)
         {
             current?.Track?.Seek(current.Track.Length * position);
             current?.Track?.Start();
         }
-        
+
         protected override void Dispose(bool isDisposing)
         {
             if (preferUnicode != null)
@@ -353,5 +327,40 @@ namespace osu.Game.Overlays
         protected override void PopIn() => FadeIn(100);
 
         protected override void PopOut() => FadeOut(100);
+
+        private class MusicControllerBackground : BufferedContainer
+        {
+            private Sprite sprite;
+
+            public MusicControllerBackground(Texture backgroundTexture)
+            {
+                CacheDrawnFrameBuffer = true;
+                RelativeSizeAxes = Axes.Both;
+                Depth = float.MinValue;
+
+                Children = new Drawable[]
+                {
+                    sprite = new Sprite
+                    {
+                        Texture = backgroundTexture,
+                        Colour = new Color4(150, 150, 150, 255)
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 50,
+                        Origin = Anchor.BottomCentre,
+                        Anchor = Anchor.BottomCentre,
+                        Colour = new Color4(0, 0, 0, 127)
+                    }
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                sprite.Scale = new Vector2(Math.Max(DrawSize.X / sprite.DrawSize.X, DrawSize.Y / sprite.DrawSize.Y));
+            }
+        }
     }
 }
