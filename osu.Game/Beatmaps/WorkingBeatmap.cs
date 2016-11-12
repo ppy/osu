@@ -18,7 +18,7 @@ namespace osu.Game.Beatmaps
         public readonly BeatmapSetInfo BeatmapSetInfo;
         private readonly BeatmapDatabase database;
 
-        private ArchiveReader reader => database.GetReader(BeatmapSetInfo);
+        private ArchiveReader reader => database?.GetReader(BeatmapSetInfo);
 
         private Texture background;
         private object backgroundLock = new object();
@@ -77,7 +77,7 @@ namespace osu.Game.Beatmaps
 
                     try
                     {
-                        var trackData = reader.GetStream(BeatmapInfo.Metadata.AudioFile);
+                        var trackData = reader?.GetStream(BeatmapInfo.Metadata.AudioFile);
                         if (trackData != null)
                             track = new AudioTrackBass(trackData);
                     }
