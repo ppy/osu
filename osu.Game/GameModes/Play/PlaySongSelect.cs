@@ -21,6 +21,7 @@ using osu.Game.Beatmaps.Drawable;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Framework.GameModes;
+using osu.Game.Graphics.Background;
 
 namespace osu.Game.GameModes.Play
 {
@@ -30,27 +31,31 @@ namespace osu.Game.GameModes.Play
         private BeatmapDatabase database;
         private BeatmapGroup selectedBeatmapGroup;
         private BeatmapInfo selectedBeatmapInfo;
-        // TODO: use currently selected track as bg
-        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
         private ScrollContainer scrollContainer;
+        private Button playButton;
         private FlowContainer beatmapSetFlow;
         private TrackManager trackManager;
         private Container wedgeContainer;
+
+        private BackgroundMode background;
+        protected override BackgroundMode CreateBackground() => background;
 
         /// <param name="database">Optionally provide a database to use instead of the OsuGame one.</param>
         public PlaySongSelect(BeatmapDatabase database = null)
         {
             this.database = database;
 
+            background = new BackgroundModeDefault();
+
             const float scrollWidth = 640;
             const float bottomToolHeight = 50;
+            const float topToolHeight = 50;
             Children = new Drawable[]
             {
                 wedgeContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Size = Vector2.One,
-                    Padding = new MarginPadding { Right = scrollWidth - 200 },
+                    Padding = new MarginPadding { Right = scrollWidth - 200, Bottom = bottomToolHeight, Top = topToolHeight },
                     Children = new[]
                     {
                         new Box
@@ -83,7 +88,7 @@ namespace osu.Game.GameModes.Play
                     {
                         beatmapSetFlow = new FlowContainer
                         {
-                            Padding = new MarginPadding { Left = 25, Top = 25, Bottom = 25 + bottomToolHeight },
+                            Padding = new MarginPadding { Left = 25, Top = topToolHeight, Bottom = 25 + bottomToolHeight },
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Direction = FlowDirection.VerticalOnly,
@@ -105,7 +110,7 @@ namespace osu.Game.GameModes.Play
                             Size = Vector2.One,
                             Colour = new Color4(0, 0, 0, 0.5f),
                         },
-                        new Button
+                        playButton = new Button
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
@@ -118,6 +123,18 @@ namespace osu.Game.GameModes.Play
                                 PreferredPlayMode = playMode.Value
                             }),
                         },
+                        new Button
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 100,
+                            Text = "Back",
+                            Colour = new Color4(238, 51, 153, 255),
+                            Action = delegate {
+                                Exit();
+                            }
+                        }
                     }
                 }
             };
@@ -278,8 +295,13 @@ namespace osu.Game.GameModes.Play
 
         private void addBeatmapSets()
         {
-            foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
-                addBeatmapSet(beatmapSet);
+            if (database.Query<BeatmapSetInfo>().Count() > 0)
+            {
+                if (playButton.IsVisible == false) playButton.Show();
+                foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
+                    addBeatmapSet(beatmapSet);
+            }
+            else playButton.Hide();
         }
     }
 }
