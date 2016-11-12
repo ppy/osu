@@ -10,8 +10,8 @@ namespace osu.Game.Overlays.Options.Online
     {
         protected override string Header => "Integration";
 
-        [Initializer]
-        private void Load(OsuConfigManager config)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {

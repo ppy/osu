@@ -31,8 +31,8 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.Y;
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Children = new Drawable[]
             {

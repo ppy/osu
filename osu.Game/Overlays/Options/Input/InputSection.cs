@@ -5,7 +5,7 @@ namespace osu.Game.Overlays.Options.Input
 {
     public class InputSection : OptionsSection
     {
-        protected override string Header => "Input";
+        public override string Header => "Input";
         public override FontAwesome Icon => FontAwesome.fa_keyboard_o;
 
         public InputSection()

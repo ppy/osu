@@ -103,8 +103,8 @@ namespace osu.Game.GameModes.Menu
             };
         }
 
-        [Initializer]
-        private void Load(TextureStore textures)
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");

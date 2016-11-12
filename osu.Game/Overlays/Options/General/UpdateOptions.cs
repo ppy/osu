@@ -11,8 +11,8 @@ namespace osu.Game.Overlays.Options.General
     {
         protected override string Header => "Updates";
 
-        [Initializer]
-        private void Load(BasicStorage storage)
+        [BackgroundDependencyLoader]
+        private void load(BasicStorage storage)
         {
             Children = new Drawable[]
             {

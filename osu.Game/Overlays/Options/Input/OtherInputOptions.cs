@@ -10,8 +10,8 @@ namespace osu.Game.Overlays.Options.Input
     {
         protected override string Header => "Other";
 
-        [Initializer]
-        private void Load(OsuConfigManager config)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {

@@ -43,8 +43,8 @@ namespace osu.Game.GameModes.Play
 
         protected virtual List<T> Convert(List<HitObject> objects) => Converter.Convert(objects);
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             RelativeSizeAxes = Axes.Both;
 

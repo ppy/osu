@@ -25,8 +25,8 @@ namespace osu.Desktop.Tests
 
         protected MusicController mc;
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             ourClock = new FramedClock();
         }

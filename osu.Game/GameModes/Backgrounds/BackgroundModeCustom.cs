@@ -16,8 +16,8 @@ namespace osu.Game.GameModes.Backgrounds
             this.textureName = textureName;
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Add(new Background(textureName));
         }

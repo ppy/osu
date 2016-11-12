@@ -100,8 +100,8 @@ namespace osu.Game.Beatmaps.Drawable
             };
         }
 
-        [Initializer]
-        private void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(BaseGame game)
         {
             BeatmapPanels = beatmapSet.Beatmaps.Select(b => new BeatmapPanel(b)
             {

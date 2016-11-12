@@ -9,8 +9,8 @@ namespace osu.Game.GameModes.Backgrounds
 {
     public class BackgroundModeDefault : BackgroundMode
     {
-        [Initializer]
-        private void Load(BaseGame game)
+        [BackgroundDependencyLoader]
+        private void load(BaseGame game)
         {
             Add(new Background());
         }

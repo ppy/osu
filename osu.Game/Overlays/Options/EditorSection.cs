@@ -10,11 +10,11 @@ namespace osu.Game.Overlays.Options
 {
     public class EditorSection : OptionsSection
     {
-        protected override string Header => "Editor";
+        public override string Header => "Editor";
         public override FontAwesome Icon => FontAwesome.fa_pencil;
 
-        [Initializer]
-        private void Load(OsuConfigManager config)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             content.Spacing = new Vector2(0, 5);
             Children = new Drawable[]

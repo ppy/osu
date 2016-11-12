@@ -6,12 +6,15 @@ using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using osu.Game.Configuration;
 using osu.Game.Overlays.Options;
 using osu.Game.Overlays.Options.Audio;
 using osu.Game.Overlays.Options.Gameplay;
@@ -27,7 +30,8 @@ namespace osu.Game.Overlays
         internal const float CONTENT_MARGINS = 10;
 
         private const float width = 400;
-        private const float sidebar_width = 60;
+        private const float sidebar_width = OptionsSidebar.default_width;
+        private const float sidebar_padding = 10;
 
         private ScrollContainer scrollContainer;
         private OptionsSidebar sidebar;
@@ -72,6 +76,7 @@ namespace osu.Game.Overlays
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                             Direction = FlowDirection.VerticalOnly,
+
                             Children = new Drawable[]
                             {
                                 new SpriteText
@@ -105,11 +110,18 @@ namespace osu.Game.Overlays
                         new OptionsSidebar.SidebarButton
                         {
                             Icon = section.Icon,
-                            Action = () => scrollContainer.ScrollIntoView(section)
+                            Header = section.Header,
+                            Action = () => scrollContainer.ScrollIntoView(section),
                         }
                     )
                 }
             };
+        }
+
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuGame game)
+        {
+            scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;

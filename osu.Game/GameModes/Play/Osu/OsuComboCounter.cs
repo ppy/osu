@@ -34,8 +34,8 @@ namespace osu.Game.GameModes.Play.Osu
             }
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             PopOutSpriteText.Origin = Origin;
             PopOutSpriteText.Anchor = Anchor;

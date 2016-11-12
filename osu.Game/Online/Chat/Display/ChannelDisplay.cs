@@ -60,8 +60,8 @@ namespace osu.Game.Online.Chat.Display
             channel.NewMessagesArrived -= newMessages;
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             newMessages(channel.Messages);
         }

@@ -25,8 +25,8 @@ namespace osu.Game.Beatmaps.Objects.Taiko.Drawable
             Position = new Vector2(1.1f, 0.5f);
         }
 
-        [Initializer]
-        private void Load(TextureStore textures)
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
             Texture = textures.Get(@"Menu/logo");
 

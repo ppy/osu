@@ -49,8 +49,8 @@ namespace osu.Game.GameModes.Menu
             AutoSizeAxes = Axes.Both;
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Alpha = 0;
 

@@ -12,11 +12,11 @@ namespace osu.Game.Overlays.Options
 {
     public class SkinSection : OptionsSection
     {
-        protected override string Header => "Skin";
+        public override string Header => "Skin";
         public override FontAwesome Icon => FontAwesome.fa_paint_brush;
         
-        [Initializer]
-        private void Load(OsuConfigManager config)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             content.Spacing = new Vector2(0, 5);
             Children = new Drawable[]

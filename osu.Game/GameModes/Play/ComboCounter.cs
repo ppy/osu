@@ -121,8 +121,8 @@ namespace osu.Game.GameModes.Play
             TextSize = 80;
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             DisplayedCountSpriteText.Text = FormatCount(Count);
             DisplayedCountSpriteText.Anchor = Anchor;

@@ -78,8 +78,8 @@ namespace osu.Game.GameModes
             Content.FadeIn(transition_time, EasingTypes.OutExpo);
         }
 
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Children = new Drawable[]
             {

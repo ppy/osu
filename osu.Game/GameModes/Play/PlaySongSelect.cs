@@ -126,17 +126,15 @@ namespace osu.Game.GameModes.Play
             };
         }
 
-        [Initializer]
-        private void Load(BeatmapDatabase beatmaps, AudioManager audio, BaseGame game)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(BeatmapDatabase beatmaps, AudioManager audio, OsuGame game)
         {
-            // TODO: Load(..., [PermitNull] OsuGame osuGame) or some such
-            var osuGame = game as OsuGame;
-            if (osuGame != null)
+            if (game != null)
             {
-                playMode = osuGame.PlayMode;
+                playMode = game.PlayMode;
                 playMode.ValueChanged += playMode_ValueChanged;
                 // Temporary:
-                scrollContainer.Padding = new MarginPadding { Top = osuGame.Toolbar.Height };
+                scrollContainer.Padding = new MarginPadding { Top = ToolbarPadding };
             }
 
             if (database == null)

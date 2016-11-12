@@ -28,8 +28,8 @@ namespace osu.Game.Overlays.Options.General
             };
         }
 
-        [Initializer(permitNulls: true)]
-        private void Load(APIAccess api)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(APIAccess api)
         {
             if (api == null)
                 return;

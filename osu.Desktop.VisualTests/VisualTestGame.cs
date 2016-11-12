@@ -19,8 +19,8 @@ namespace osu.Desktop.VisualTests
 {
     class VisualTestGame : OsuGameBase
     {
-        [Initializer]
-        private void Load()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Add(new TestBrowser());
         }
