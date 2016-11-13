@@ -2,7 +2,6 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Threading;
 using osu.Framework.Configuration;
 using osu.Framework.GameModes;
 using osu.Game.Configuration;
@@ -13,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game.GameModes.Play;
 using osu.Game.Overlays;
-using osu.Framework;
 using osu.Framework.Input;
 using osu.Game.Input;
 using OpenTK.Input;
