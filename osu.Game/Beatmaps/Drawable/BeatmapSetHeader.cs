@@ -10,7 +10,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Game.Configuration;

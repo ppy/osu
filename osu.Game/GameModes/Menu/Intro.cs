@@ -1,7 +1,6 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Threading;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.GameModes;
@@ -9,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.GameModes.Backgrounds;
 using OpenTK.Graphics;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 
