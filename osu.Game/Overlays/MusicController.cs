@@ -237,7 +237,7 @@ namespace osu.Game.Overlays
             if (beatmapSource.Value == current) return;
             bool audioEquals = current?.BeatmapInfo.AudioEquals(beatmapSource.Value.BeatmapInfo) ?? false;
             current = beatmapSource.Value;
-            updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Left);
+            updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Next);
             appendToHistory(current.BeatmapInfo);
         }
 
@@ -298,7 +298,7 @@ namespace osu.Game.Overlays
                 current.Track.Start();
                 beatmapSource.Value = current;
             });
-            updateDisplay(current, isNext ? TransformDirection.Left : TransformDirection.Right);
+            updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
         private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
@@ -315,13 +315,13 @@ namespace osu.Game.Overlays
 
             Add(newBackground);
 
-            if (direction == TransformDirection.Left)
+            if (direction == TransformDirection.Next)
             {
                 newBackground.Position = new Vector2(400, 0);
                 newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
                 backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
             }
-            else if (direction == TransformDirection.Right)
+            else if (direction == TransformDirection.Prev)
             {
                 newBackground.Position = new Vector2(-400, 0);
                 newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
@@ -354,7 +354,7 @@ namespace osu.Game.Overlays
 
         protected override void PopOut() => FadeOut(100);
 
-        private enum TransformDirection { None, Left, Right }
+        private enum TransformDirection { None, Next, Prev }
 
         private class MusicControllerBackground : BufferedContainer
         {
