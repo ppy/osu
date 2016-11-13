@@ -229,7 +229,7 @@ namespace osu.Game.Overlays
 
         void preferUnicode_changed(object sender, EventArgs e)
         {
-            updateDisplay(current, false);
+            updateDisplay(current, TransformDirection.None);
         }
 
         private void workingChanged(object sender = null, EventArgs e = null)
@@ -237,7 +237,7 @@ namespace osu.Game.Overlays
             if (beatmapSource.Value == current) return;
             bool audioEquals = current?.BeatmapInfo.AudioEquals(beatmapSource.Value.BeatmapInfo) ?? false;
             current = beatmapSource.Value;
-            updateDisplay(current, audioEquals ? null : (bool?)true);
+            updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Left);
             appendToHistory(current.BeatmapInfo);
         }
 
@@ -298,10 +298,10 @@ namespace osu.Game.Overlays
                 current.Track.Start();
                 beatmapSource.Value = current;
             });
-            updateDisplay(current, isNext);
+            updateDisplay(current, isNext ? TransformDirection.Left : TransformDirection.Right);
         }
 
-        private void updateDisplay(WorkingBeatmap beatmap, bool? isNext)
+        private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
         {
             if (beatmap.Beatmap == null)
                 //todo: we may need to display some default text here (currently in the constructor).
@@ -315,13 +315,13 @@ namespace osu.Game.Overlays
 
             Add(newBackground);
 
-            if (isNext == true)
+            if (direction == TransformDirection.Left)
             {
                 newBackground.Position = new Vector2(400, 0);
                 newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
                 backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
             }
-            else if (isNext == false)
+            else if (direction == TransformDirection.Right)
             {
                 newBackground.Position = new Vector2(-400, 0);
                 newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
@@ -353,6 +353,8 @@ namespace osu.Game.Overlays
         protected override void PopIn() => FadeIn(100);
 
         protected override void PopOut() => FadeOut(100);
+
+        private enum TransformDirection { None, Left, Right }
 
         private class MusicControllerBackground : BufferedContainer
         {
