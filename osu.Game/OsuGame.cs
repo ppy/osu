@@ -105,10 +105,7 @@ namespace osu.Game
                 }
             });
 
-            (modeStack = new Intro
-            {
-                Beatmap = Beatmap
-            }).Preload(this, d =>
+            (modeStack = new Intro()).Preload(this, d =>
             {
                 mainContent.Add(d);
 
