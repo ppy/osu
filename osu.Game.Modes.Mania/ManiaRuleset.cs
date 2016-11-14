@@ -12,7 +12,7 @@ namespace osu.Game.Modes.Mania
 {
     class ManiaRuleset : Ruleset
     {
-        public override ScoreOverlay CreateScoreOverlay() => new ScoreOverlayOsu();
+        public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
         public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new ManiaHitRenderer { Objects = objects };
     }
