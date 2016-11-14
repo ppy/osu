@@ -11,20 +11,6 @@ namespace osu.Game.Beatmaps.Objects.Osu
     {
         public Vector2 Position { get; set; }
 
-        [Flags]
-        private enum HitObjectType
-        {
-            Circle = 1,
-            Slider = 2,
-            NewCombo = 4,
-            CircleNewCombo = 5,
-            SliderNewCombo = 6,
-            Spinner = 8,
-            ColourHax = 122,
-            Hold = 128,
-            ManiaLong = 128,
-        }
-
         public static OsuBaseHit Parse(string val)
         {
             string[] split = val.Split(',');
@@ -53,6 +39,20 @@ namespace osu.Game.Beatmaps.Objects.Osu
             result.NewCombo = combo;
             // TODO: "addition" field
             return result;
+        }
+
+        [Flags]
+        private enum HitObjectType
+        {
+            Circle = 1,
+            Slider = 2,
+            NewCombo = 4,
+            CircleNewCombo = 5,
+            SliderNewCombo = 6,
+            Spinner = 8,
+            ColourHax = 122,
+            Hold = 128,
+            ManiaLong = 128,
         }
     }
 }
