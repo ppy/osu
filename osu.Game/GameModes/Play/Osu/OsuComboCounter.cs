@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.GameModes.Play.Osu
 {
@@ -22,15 +23,15 @@ namespace osu.Game.GameModes.Play.Osu
         protected virtual float PopOutSmallScale => 1.1f;
         protected virtual bool CanPopOutWhileRolling => false;
         
-        public Vector2 InnerCountPosition
+        public MarginPadding InnerCountMargin
         {
             get
             {
-                return DisplayedCountSpriteText.Position;
+                return DisplayedCountSpriteText.Margin;
             }
             set
             {
-                DisplayedCountSpriteText.Position = value;
+                DisplayedCountSpriteText.Margin = value;
             }
         }
         

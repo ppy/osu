@@ -11,6 +11,7 @@ using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Input;
 using osu.Game.Beatmaps.Objects;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.GameModes.Play.Osu
 {
@@ -42,7 +43,7 @@ namespace osu.Game.GameModes.Play.Osu
             FadeTime = 50,
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
-            Position = new Vector2(10),
+            Margin = new MarginPadding(10),
             Counters = new KeyCounter[]
                     {
                         new KeyCounterKeyboard(@"Z", Key.Z),
