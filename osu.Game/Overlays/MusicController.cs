@@ -229,7 +229,7 @@ namespace osu.Game.Overlays
 
         void preferUnicode_changed(object sender, EventArgs e)
         {
-            updateDisplay(current, false);
+            updateDisplay(current, TransformDirection.None);
         }
 
         private void workingChanged(object sender = null, EventArgs e = null)
@@ -237,7 +237,7 @@ namespace osu.Game.Overlays
             if (beatmapSource.Value == current) return;
             bool audioEquals = current?.BeatmapInfo.AudioEquals(beatmapSource.Value.BeatmapInfo) ?? false;
             current = beatmapSource.Value;
-            updateDisplay(current, audioEquals ? null : (bool?)true);
+            updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Next);
             appendToHistory(current.BeatmapInfo);
         }
 
@@ -298,10 +298,10 @@ namespace osu.Game.Overlays
                 current.Track.Start();
                 beatmapSource.Value = current;
             });
-            updateDisplay(current, isNext);
+            updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
-        private void updateDisplay(WorkingBeatmap beatmap, bool? isNext)
+        private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
         {
             if (beatmap.Beatmap == null)
                 //todo: we may need to display some default text here (currently in the constructor).
@@ -315,20 +315,21 @@ namespace osu.Game.Overlays
 
             Add(newBackground);
 
-            if (isNext == true)
+            switch (direction)
             {
-                newBackground.Position = new Vector2(400, 0);
-                newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
+                case TransformDirection.Next:
+                    newBackground.Position = new Vector2(400, 0);
+                    newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
+                    backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
+                    break;
+                case TransformDirection.Prev:
+                    newBackground.Position = new Vector2(-400, 0);
+                    newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
+                    backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
+                    break;
             }
-            else if (isNext == false)
-            {
-                newBackground.Position = new Vector2(-400, 0);
-                newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
-            }
-            backgroundSprite.Expire();
 
+            backgroundSprite.Expire();
             backgroundSprite = newBackground;
         }
 
@@ -353,6 +354,8 @@ namespace osu.Game.Overlays
         protected override void PopIn() => FadeIn(100);
 
         protected override void PopOut() => FadeOut(100);
+
+        private enum TransformDirection { None, Next, Prev }
 
         private class MusicControllerBackground : BufferedContainer
         {

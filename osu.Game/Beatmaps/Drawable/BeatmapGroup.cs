@@ -51,11 +51,15 @@ namespace osu.Game.Beatmaps.Drawable
                         difficulties.Show();
 
                         header.State = PanelSelectedState.Selected;
+                        if (SelectedPanel != null)
+                            SelectedPanel.State = PanelSelectedState.Selected;
                         break;
                     case BeatmapGroupState.Collapsed:
                         FadeTo(0.8f, 250);
 
                         header.State = PanelSelectedState.NotSelected;
+                        if (SelectedPanel != null)
+                            SelectedPanel.State = PanelSelectedState.NotSelected;
                         difficulties.Hide();
                         break;
                 }
