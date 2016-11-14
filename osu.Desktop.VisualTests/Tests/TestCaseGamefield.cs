@@ -8,11 +8,15 @@ using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Catch;
+using osu.Game.Modes.Catch.UI;
 using osu.Game.Modes.Mania;
+using osu.Game.Modes.Mania.UI;
 using osu.Game.Modes.Objects;
-using osu.Game.Modes.Objects.Osu;
 using osu.Game.Modes.Osu;
+using osu.Game.Modes.Osu.Objects;
+using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.Taiko;
+using osu.Game.Modes.Taiko.UI;
 using OpenTK;
 
 namespace osu.Desktop.VisualTests.Tests

@@ -2,7 +2,6 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps.Samples;
-using osu.Game.Modes.Objects.Osu;
 using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Objects
@@ -29,7 +28,7 @@ namespace osu.Game.Modes.Objects
             switch (mode)
             {
                 case PlayMode.Osu:
-                    return OsuBaseHit.Parse(val);
+                    return null; //return OsuBaseHit.Parse(val);
                 default:
                     return null;
             }

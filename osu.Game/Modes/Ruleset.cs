@@ -2,11 +2,8 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Game.Modes.Catch;
-using osu.Game.Modes.Mania;
 using osu.Game.Modes.Objects;
-using osu.Game.Modes.Osu;
-using osu.Game.Modes.Taiko;
+using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes
 {
@@ -21,13 +18,15 @@ namespace osu.Game.Modes
             switch (mode)
             {
                 default:
-                    return new OsuRuleset();
-                case PlayMode.Catch:
-                    return new CatchRuleset();
-                case PlayMode.Mania:
-                    return new ManiaRuleset();
-                case PlayMode.Taiko:
-                    return new TaikoRuleset();
+                    return null;
+
+                //    return new OsuRuleset();
+                //case PlayMode.Catch:
+                //    return new CatchRuleset();
+                //case PlayMode.Mania:
+                //    return new ManiaRuleset();
+                //case PlayMode.Taiko:
+                //    return new TaikoRuleset();
             }
         }
     }

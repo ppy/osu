@@ -11,7 +11,6 @@ using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
 using SQLiteNetExtensions.Extensions;
-using osu.Desktop.Platform;
 using osu.Framework.Allocation;
 
 namespace osu.Desktop.VisualTests

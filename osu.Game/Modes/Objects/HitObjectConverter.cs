@@ -11,6 +11,7 @@ namespace osu.Game.Modes.Objects
     {
         public abstract List<T> Convert(List<HitObject> input);
     }
+
     public class HitObjectConvertException : Exception
     {
         public HitObject Input { get; }

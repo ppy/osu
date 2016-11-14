@@ -11,7 +11,7 @@ using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Modes.Objects;
-using osu.Game.Modes.Objects.Osu;
+using osu.Game.Modes.Osu.Objects;
 using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
