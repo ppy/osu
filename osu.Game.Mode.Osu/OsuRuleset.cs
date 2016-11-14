@@ -8,9 +8,10 @@ using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Osu
 {
-    class OsuRuleset : Ruleset
+    public class OsuRuleset : Ruleset
     {
-        public override ScoreOverlay CreateScoreOverlay() => new ScoreOverlayOsu();
+        public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
         public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new UI.OsuHitRenderer { Objects = objects };
-    }}
+    }
+}

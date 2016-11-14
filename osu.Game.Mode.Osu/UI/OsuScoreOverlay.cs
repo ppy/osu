@@ -9,7 +9,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Modes.Osu.UI
 {
-    public class ScoreOverlayOsu : ScoreOverlay
+    public class OsuScoreOverlay : ScoreOverlay
     {
         protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter()
         {
