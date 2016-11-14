@@ -2,11 +2,11 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Extensions;
-using osu.Game.GameModes.Play;
 using osu.Game.Graphics;
 using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Overlays
 {

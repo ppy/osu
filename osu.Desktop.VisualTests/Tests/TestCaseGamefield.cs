@@ -9,10 +9,10 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
-using osu.Game.GameModes.Play.Catch;
-using osu.Game.GameModes.Play.Mania;
-using osu.Game.GameModes.Play.Osu;
-using osu.Game.GameModes.Play.Taiko;
+using osu.Game.Screens.Play.Catch;
+using osu.Game.Screens.Play.Mania;
+using osu.Game.Screens.Play.Osu;
+using osu.Game.Screens.Play.Taiko;
 using OpenTK;
 
 namespace osu.Desktop.VisualTests.Tests

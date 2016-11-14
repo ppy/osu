@@ -3,7 +3,7 @@
 
 using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Samples;
-using osu.Game.GameModes.Play;
+using osu.Game.Screens.Play;
 using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Objects
