@@ -47,53 +47,48 @@ namespace osu.Game.GameModes.Menu
             this.text = text;
 
             AutoSizeAxes = Axes.Both;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             Alpha = 0;
 
             Vector2 boxSize = new Vector2(ButtonSystem.button_width + Math.Abs(extraWidth), ButtonSystem.button_area_height);
 
             Children = new Drawable[]
             {
-                    box = new Box
+                box = new Box
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Colour = colour,
+                    Scale = new Vector2(0, 1),
+                    Size = boxSize,
+                    Shear = new Vector2(ButtonSystem.wedge_width / boxSize.Y, 0),
+                    EdgeSmoothness = new Vector2(2, 0),
+                },
+                iconText = new Container
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Position = new Vector2(extraWidth / 2, 0),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Colour = colour,
-                        Scale = new Vector2(0, 1),
-                        Size = boxSize,
-                        Shear = new Vector2(ButtonSystem.wedge_width / boxSize.Y, 0),
-                        EdgeSmoothness = new Vector2(2, 0),
-                    },
-                    iconText = new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Position = new Vector2(extraWidth / 2, 0),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Children = new Drawable[]
+                        icon = new TextAwesome
                         {
-                            icon = new TextAwesome
-                            {
-                                Anchor = Anchor.Centre,
-                                TextSize = 30,
-                                Position = new Vector2(0, 0),
-                                Icon = symbol
-                            },
-                            new SpriteText
-                            {
-                                Direction = FlowDirection.HorizontalOnly,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                TextSize = 16,
-                                Position = new Vector2(0, 35),
-                                Text = text
-                            }
+                            Anchor = Anchor.Centre,
+                            TextSize = 30,
+                            Position = new Vector2(0, 0),
+                            Icon = symbol
+                        },
+                        new SpriteText
+                        {
+                            Direction = FlowDirection.HorizontalOnly,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            TextSize = 16,
+                            Position = new Vector2(0, 35),
+                            Text = text
                         }
                     }
+                }
             };
         }
 

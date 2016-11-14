@@ -2,12 +2,9 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework;
-using osu.Framework.Allocation;
 
 namespace osu.Game.GameModes.Play.Mania
 {
@@ -22,11 +19,7 @@ namespace osu.Game.GameModes.Play.Mania
             Size = new Vector2(columns / 20f, 1f);
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             Add(new Box { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
 
             for (int i = 0; i < columns; i++)
