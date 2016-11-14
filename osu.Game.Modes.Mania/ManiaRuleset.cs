@@ -17,6 +17,8 @@ namespace osu.Game.Modes.Mania
 
         public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new ManiaHitRenderer { Objects = objects };
 
+        protected override PlayMode PlayMode => PlayMode.Mania;
+
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
     }
 }

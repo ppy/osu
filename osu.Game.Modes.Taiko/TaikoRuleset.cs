@@ -16,6 +16,8 @@ namespace osu.Game.Modes.Taiko
 
         public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new TaikoHitRenderer { Objects = objects };
 
+        protected override PlayMode PlayMode => PlayMode.Taiko;
+
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
     }
 }
