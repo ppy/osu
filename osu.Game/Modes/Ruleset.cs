@@ -7,13 +7,14 @@ using osu.Game.Modes.UI;
 using System.Reflection;
 using osu.Framework.Extensions;
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 
 namespace osu.Game.Modes
 {
     public abstract class Ruleset
     {
-        private static List<Type> availableRulesets = new List<Type>();
+        private static ConcurrentDictionary<PlayMode, Type> availableRulesets = new ConcurrentDictionary<PlayMode, Type>();
 
         public abstract ScoreOverlay CreateScoreOverlay();
 
@@ -21,13 +22,15 @@ namespace osu.Game.Modes
 
         public abstract HitObjectParser CreateHitObjectParser();
 
-        public static void Register(Ruleset ruleset) => availableRulesets.Add(ruleset.GetType());
+        public static void Register(Ruleset ruleset) => availableRulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
+
+        protected virtual PlayMode PlayMode => PlayMode.Osu;
 
         public static Ruleset GetRuleset(PlayMode mode)
         {
-            Type type = availableRulesets.FirstOrDefault(t => t.Name == $@"{mode}Ruleset");
+            Type type;
 
-            if (type == null)
+            if (!availableRulesets.TryGetValue(mode, out type))
                 return null;
 
             return Activator.CreateInstance(type) as Ruleset;
