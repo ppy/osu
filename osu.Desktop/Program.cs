@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using osu.Desktop.Beatmaps.IO;
 using osu.Framework;
 using osu.Framework.Desktop;
 using osu.Framework.Desktop.Platform;
@@ -18,6 +19,7 @@ namespace osu.Desktop
         [STAThread]
         public static int Main(string[] args)
         {
+            LegacyFilesystemReader.Register();
             using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
             {
                 if (!host.IsPrimaryInstance)
