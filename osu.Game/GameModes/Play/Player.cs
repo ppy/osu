@@ -26,7 +26,7 @@ namespace osu.Game.GameModes.Play
 {
     public class Player : OsuGameMode
     {
-        const bool autoplay = false;
+        public bool Autoplay;
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
@@ -61,7 +61,7 @@ namespace osu.Game.GameModes.Play
                             break;
                     }
                 }
-                
+
             }
         }
 
@@ -129,7 +129,7 @@ namespace osu.Game.GameModes.Play
             hitRenderer.OnHit += delegate (HitObject h) { scoreOverlay.OnHit(h); };
             hitRenderer.OnMiss += delegate (HitObject h) { scoreOverlay.OnMiss(h); };
 
-            if (autoplay)
+            if (Autoplay)
                 hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Armed));
 
             Children = new Drawable[]
