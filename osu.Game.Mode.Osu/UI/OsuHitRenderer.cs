@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.UI;
 using Circle = osu.Game.Modes.Osu.Objects.Circle;
 using DrawableCircle = osu.Game.Modes.Osu.Objects.Drawables.DrawableCircle;

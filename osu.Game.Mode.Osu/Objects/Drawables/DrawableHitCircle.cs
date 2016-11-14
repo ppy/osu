@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables

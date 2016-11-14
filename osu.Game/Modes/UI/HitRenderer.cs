@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Drawables;
 
 namespace osu.Game.Modes.UI
 {
