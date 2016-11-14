@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Options.Audio
         public VolumeOptions()
         {
         }
-        
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Options.Audio
                 new SpriteText { Text = "Master: TODO slider" },
                 new SpriteText { Text = "Music: TODO slider" },
                 new SpriteText { Text = "Effect: TODO slider" },
-                new CheckBoxOption
+                ignoreHitsounds = new CheckBoxOption
                 {
                     LabelText = "Ignore beatmap hitsounds",
                     Bindable = config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSamples)
