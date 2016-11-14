@@ -43,11 +43,14 @@ namespace osu.Game.GameModes.Play
 
         protected virtual List<T> Convert(List<HitObject> objects) => Converter.Convert(objects);
 
+        public HitRenderer()
+        {
+            RelativeSizeAxes = Axes.Both;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            RelativeSizeAxes = Axes.Both;
-
             Children = new Drawable[]
             {
                 Playfield = CreatePlayfield()

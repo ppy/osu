@@ -118,11 +118,7 @@ namespace osu.Game.Graphics.UserInterface
 
             TextSize = 40;
             AutoSizeAxes = Axes.Both;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             DisplayedCount = Count;
 
             DisplayedCountSpriteText.Text = FormatCount(count);

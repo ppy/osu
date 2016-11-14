@@ -20,17 +20,13 @@ namespace osu.Game.Online.Chat.Display
         {
             public readonly Message Message;
 
-            public ChatLine(Message message)
-            {
-                this.Message = message;
-            }
-
             const float padding = 200;
             const float text_size = 20;
 
-            [BackgroundDependencyLoader]
-            private void load()
+            public ChatLine(Message message)
             {
+                this.Message = message;
+
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 
