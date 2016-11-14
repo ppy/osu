@@ -315,20 +315,21 @@ namespace osu.Game.Overlays
 
             Add(newBackground);
 
-            if (direction == TransformDirection.Next)
+            switch (direction)
             {
-                newBackground.Position = new Vector2(400, 0);
-                newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
+                case TransformDirection.Next:
+                    newBackground.Position = new Vector2(400, 0);
+                    newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
+                    backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
+                    break;
+                case TransformDirection.Prev:
+                    newBackground.Position = new Vector2(-400, 0);
+                    newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
+                    backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
+                    break;
             }
-            else if (direction == TransformDirection.Prev)
-            {
-                newBackground.Position = new Vector2(-400, 0);
-                newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
-            }
-            backgroundSprite.Expire();
 
+            backgroundSprite.Expire();
             backgroundSprite = newBackground;
         }
 
