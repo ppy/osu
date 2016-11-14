@@ -119,11 +119,7 @@ namespace osu.Game.GameModes.Play
             };
 
             TextSize = 80;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             DisplayedCountSpriteText.Text = FormatCount(Count);
             DisplayedCountSpriteText.Anchor = Anchor;
             DisplayedCountSpriteText.Origin = Origin;

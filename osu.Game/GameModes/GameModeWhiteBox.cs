@@ -78,65 +78,64 @@ namespace osu.Game.GameModes
             Content.FadeIn(transition_time, EasingTypes.OutExpo);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public GameModeWhiteBox()
         {
             Children = new Drawable[]
             {
-                    box = new Box
+                box = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.3f),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Colour = getColourFor(GetType()),
+                    Alpha = 1,
+                    BlendingMode = BlendingMode.Additive,
+                },
+                textContainer = new Container
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.3f),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Colour = getColourFor(GetType()),
-                        Alpha = 1,
-                        BlendingMode = BlendingMode.Additive,
-                    },
-                    textContainer = new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Children = new[]
+                        new SpriteText
                         {
-                            new SpriteText
-                            {
-                                Text = GetType().Name,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                TextSize = 50,
-                            },
-                            new SpriteText
-                            {
-                                Text = GetType().Namespace,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Position = new Vector2(0, 30)
-                            },
-                        }
-                    },
-                    popButton = new Button
-                    {
-                        Text = @"Back",
-                        RelativeSizeAxes = Axes.X,
-                        Size = new Vector2(0.1f, 40),
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        Colour = new Color4(235, 51, 153, 255),
-                        Alpha = 0,
-                        Action = delegate {
-                            Exit();
-                        }
-                    },
-                    childModeButtons = new FlowContainer
-                    {
-                        Direction = FlowDirection.VerticalOnly,
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.1f, 1)
+                            Text = GetType().Name,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            TextSize = 50,
+                        },
+                        new SpriteText
+                        {
+                            Text = GetType().Namespace,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Position = new Vector2(0, 30)
+                        },
                     }
+                },
+                popButton = new Button
+                {
+                    Text = @"Back",
+                    RelativeSizeAxes = Axes.X,
+                    Size = new Vector2(0.1f, 40),
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Colour = new Color4(235, 51, 153, 255),
+                    Alpha = 0,
+                    Action = delegate {
+                        Exit();
+                    }
+                },
+                childModeButtons = new FlowContainer
+                {
+                    Direction = FlowDirection.VerticalOnly,
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.1f, 1)
+                }
             };
 
             if (PossibleChildren != null)

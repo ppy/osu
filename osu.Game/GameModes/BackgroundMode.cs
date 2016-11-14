@@ -43,12 +43,17 @@ namespace osu.Game.GameModes
 
         public override bool Push(GameMode mode)
         {
-            //don't actually push until we've finished loading.
-            if (!mode.IsLoaded)
+            // When trying to push a non-loaded GameMode, load it asynchronously and re-invoke Push
+            // once it's done.
+            if (mode.LoadState == LoadState.NotLoaded)
             {
                 mode.Preload(game, d => Push((BackgroundMode)d));
                 return true;
             }
+
+            // Make sure the in-progress loading is complete before pushing the GameMode.
+            while (mode.LoadState < LoadState.Loaded)
+                Thread.Sleep(1);
 
             base.Push(mode);
 

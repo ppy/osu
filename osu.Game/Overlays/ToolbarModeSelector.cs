@@ -29,11 +29,7 @@ namespace osu.Game.Overlays
         public ToolbarModeSelector()
         {
             RelativeSizeAxes = Axes.Y;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             Children = new Drawable[]
             {
                 new Box
@@ -59,8 +55,11 @@ namespace osu.Game.Overlays
                 }
             };
 
+            int amountButtons = 0;
             foreach (PlayMode m in Enum.GetValues(typeof(PlayMode)))
             {
+                ++amountButtons;
+
                 var localMode = m;
                 modeButtons.Add(new ToolbarModeButton
                 {
@@ -73,8 +72,8 @@ namespace osu.Game.Overlays
                 });
             }
 
-            RelativeSizeAxes = Axes.Y;
-            Size = new Vector2(modeButtons.Children.Count() * ToolbarButton.WIDTH + padding * 2, 1);
+            // We need to set the size within LoadComplete, because 
+            Size = new Vector2(amountButtons * ToolbarButton.WIDTH + padding * 2, 1);
         }
 
         public void SetGameMode(PlayMode mode)
