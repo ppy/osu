@@ -1,17 +1,14 @@
 //Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.GameModes.Testing;
 using System.Collections.Generic;
-using osu.Desktop.Platform;
+using osu.Desktop.VisualTests.Platform;
+using osu.Framework.GameModes.Testing;
 using osu.Game.Database;
-using SQLiteNetExtensions.Extensions;
-using osu.Framework;
-using osu.Game;
 using osu.Game.Modes;
 using osu.Game.Screens.Play;
 
-namespace osu.Desktop.Tests
+namespace osu.Desktop.VisualTests.Tests
 {
     class TestCasePlaySongSelect : TestCase
     {

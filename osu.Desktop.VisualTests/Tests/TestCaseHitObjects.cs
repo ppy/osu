@@ -8,8 +8,8 @@ using osu.Framework.Timing;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Game.Modes.Objects;
-using osu.Game.Modes.Objects.Osu;
-using osu.Game.Modes.Objects.Osu.Drawable;
+using osu.Game.Modes.Osu.Objects;
+using osu.Game.Modes.Osu.Objects.Drawables;
 
 namespace osu.Desktop.VisualTests.Tests
 {
