@@ -179,7 +179,9 @@ namespace osu.Game.Overlays
         protected override bool OnDrag(InputState state)
         {
             Vector2 change = (state.Mouse.Position - state.Mouse.PositionMouseDown.Value);
-            change.X = -change.X;
+
+            if ((Anchor & Anchor.x2) > 0)
+                change.X = -change.X;
 
             change *= (float)Math.Pow(change.Length, 0.7f) / change.Length;
 
