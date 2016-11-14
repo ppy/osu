@@ -5,11 +5,11 @@ using osu.Framework;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
-using osu.Game.Beatmaps.Objects;
-using osu.Game.Beatmaps.Objects.Osu;
-using osu.Game.Beatmaps.Objects.Osu.Drawable;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Osu;
+using osu.Game.Modes.Objects.Osu.Drawable;
 
 namespace osu.Desktop.VisualTests.Tests
 {

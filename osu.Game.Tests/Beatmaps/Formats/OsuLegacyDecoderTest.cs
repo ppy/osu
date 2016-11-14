@@ -5,8 +5,9 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Samples;
+using osu.Game.Modes;
+using osu.Game.Modes.Objects.Osu;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Resources;
 

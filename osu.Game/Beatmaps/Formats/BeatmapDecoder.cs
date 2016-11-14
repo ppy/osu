@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using osu.Game.Beatmaps.Objects;
+using osu.Game.Modes.Objects;
 using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats

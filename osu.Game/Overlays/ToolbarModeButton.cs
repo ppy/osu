@@ -6,6 +6,7 @@ using osu.Game.Graphics;
 using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Game.Modes;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Overlays

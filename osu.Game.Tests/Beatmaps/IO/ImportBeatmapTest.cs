@@ -8,6 +8,7 @@ using osu.Framework.Desktop.Platform;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.IPC;
+using osu.Game.Modes;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Beatmaps.IO
