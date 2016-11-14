@@ -13,8 +13,10 @@ namespace osu.Game.Modes.Osu
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new UI.OsuHitRenderer { Objects = objects };
+        public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new OsuHitRenderer { Objects = objects };
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
+
+        protected override PlayMode PlayMode => PlayMode.Osu;
     }
 }
