@@ -13,17 +13,19 @@ namespace osu.Game.Modes
 {
     public abstract class Ruleset
     {
+        private static List<Type> availableRulesets = new List<Type>();
+
         public abstract ScoreOverlay CreateScoreOverlay();
 
         public abstract HitRenderer CreateHitRendererWith(List<HitObject> objects);
 
+        public abstract HitObjectParser CreateHitObjectParser();
+
+        public static void Register(Ruleset ruleset) => availableRulesets.Add(ruleset.GetType());
+
         public static Ruleset GetRuleset(PlayMode mode)
         {
-            Type type = AppDomain.CurrentDomain
-                                .GetAssemblies()
-                                .Where(a => a.FullName.Contains($@"osu.Game.Modes.{mode}"))
-                                .SelectMany(a => a.GetTypes())
-                                .FirstOrDefault(t => t.Name == $@"{mode}Ruleset");
+            Type type = availableRulesets.FirstOrDefault(t => t.Name == $@"{mode}Ruleset");
 
             if (type == null)
                 return null;
