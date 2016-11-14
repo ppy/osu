@@ -48,6 +48,8 @@ namespace osu.Game.Beatmaps.Formats
                 new Color4(121,9,13, 255),
             };
 
+            if (colours.Count == 0) return;
+
             int i = -1;
 
             foreach (HitObject h in b.HitObjects)

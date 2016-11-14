@@ -4,15 +4,18 @@
 using System.Collections.Generic;
 using osu.Game.Modes.Catch.UI;
 using osu.Game.Modes.Objects;
+using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Catch
 {
-    class CatchRuleset : Ruleset
+    public class CatchRuleset : Ruleset
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
         public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new CatchHitRenderer { Objects = objects };
+
+        public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
     }
 }

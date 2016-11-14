@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Overlays\DragBar.cs" />
     <Compile Include="Overlays\MusicController.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />

@@ -5,15 +5,18 @@ using System.Collections.Generic;
 using osu.Game.Modes.Mania.UI;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu;
+using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Mania
 {
-    class ManiaRuleset : Ruleset
+    public class ManiaRuleset : Ruleset
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
         public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new ManiaHitRenderer { Objects = objects };
+
+        public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
     }
 }
