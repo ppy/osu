@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
-using osu.Game.Online.Chat.Display.osu.Online.Social;
 using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;

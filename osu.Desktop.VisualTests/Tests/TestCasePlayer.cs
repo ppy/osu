@@ -9,10 +9,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Objects.Osu;
-using osu.Game.GameModes.Play;
 using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {

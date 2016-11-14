@@ -2,7 +2,6 @@
 using System.IO;
 using NUnit.Framework;
 using osu.Game.Beatmaps.IO;
-using osu.Game.GameModes.Play;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Beatmaps.IO

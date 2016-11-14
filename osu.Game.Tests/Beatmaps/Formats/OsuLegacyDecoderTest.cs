@@ -7,7 +7,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Samples;
-using osu.Game.GameModes.Play;
+using osu.Game.Screens.Play;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Beatmaps.Formats

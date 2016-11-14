@@ -9,10 +9,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Configuration;
-using osu.Game.GameModes.Play;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Allocation;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Overlays
 {

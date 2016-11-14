@@ -2,7 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.GameModes.Testing;
-using osu.Game.GameModes.Menu;
+using osu.Game.Screens.Menu;
 
 namespace osu.Desktop.VisualTests.Tests
 {

@@ -8,7 +8,7 @@ using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.GameModes.Play;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Beatmaps.Formats
 {

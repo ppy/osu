@@ -5,10 +5,10 @@ using osu.Framework.GameModes.Testing;
 using System.Collections.Generic;
 using osu.Desktop.Platform;
 using osu.Game.Database;
-using osu.Game.GameModes.Play;
 using SQLiteNetExtensions.Extensions;
 using osu.Framework;
 using osu.Game;
+using osu.Game.Screens.Play;
 
 namespace osu.Desktop.Tests
 {
