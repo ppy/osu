@@ -8,6 +8,7 @@ using osu.Framework.Timing;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 

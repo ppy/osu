@@ -71,7 +71,7 @@
     <Compile Include="Beatmaps\Drawable\BeatmapSetHeader.cs" />
     <Compile Include="Beatmaps\Drawable\DifficultyIcon.cs" />
     <Compile Include="Beatmaps\Drawable\Panel.cs" />
-    <Compile Include="Modes\Objects\DrawableHitObject.cs" />
+    <Compile Include="Modes\Objects\Drawables\DrawableHitObject.cs" />
     <Compile Include="Modes\Objects\HitObject.cs" />
     <Compile Include="Modes\Objects\HitObjectConverter.cs" />
     <Compile Include="Beatmaps\Samples\HitSampleInfo.cs" />

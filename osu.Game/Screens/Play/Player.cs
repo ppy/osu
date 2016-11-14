@@ -12,6 +12,7 @@ using osu.Framework.Timing;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Backgrounds;
 using OpenTK.Input;

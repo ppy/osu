@@ -3,6 +3,7 @@
 
 using osu.Game.Modes.Mania.Objects;
 using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Mania.UI

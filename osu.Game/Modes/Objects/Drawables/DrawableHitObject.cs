@@ -5,7 +5,7 @@ using System;
 using osu.Framework;
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Modes.Objects
+namespace osu.Game.Modes.Objects.Drawables
 {
     public abstract class DrawableHitObject : Container, IStateful<ArmedState>
     {
