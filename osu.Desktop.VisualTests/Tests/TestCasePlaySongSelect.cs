@@ -8,6 +8,7 @@ using osu.Game.Database;
 using SQLiteNetExtensions.Extensions;
 using osu.Framework;
 using osu.Game;
+using osu.Game.Modes;
 using osu.Game.Screens.Play;
 
 namespace osu.Desktop.Tests

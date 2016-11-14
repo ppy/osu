@@ -17,6 +17,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawable;
 using osu.Game.Database;
+using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;

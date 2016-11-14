@@ -7,11 +7,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Modes;
+using osu.Game.Modes.Catch;
+using osu.Game.Modes.Mania;
+using osu.Game.Modes.Osu;
+using osu.Game.Modes.Taiko;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.Catch;
-using osu.Game.Screens.Play.Mania;
-using osu.Game.Screens.Play.Osu;
-using osu.Game.Screens.Play.Taiko;
 using OpenTK;
 using OpenTK.Graphics;
 

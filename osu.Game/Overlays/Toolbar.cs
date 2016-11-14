@@ -12,6 +12,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Allocation;
+using osu.Game.Modes;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Overlays

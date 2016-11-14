@@ -3,6 +3,7 @@
 
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
+using osu.Game.Modes;
 using osu.Game.Online.API;
 using osu.Game.Screens.Play;
 

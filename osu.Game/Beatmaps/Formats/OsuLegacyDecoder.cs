@@ -5,9 +5,10 @@ using System.IO;
 using OpenTK.Graphics;
 using osu.Game.Database;
 using osu.Game.Beatmaps.Events;
-using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Modes;
+using osu.Game.Modes.Objects;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Beatmaps.Formats
