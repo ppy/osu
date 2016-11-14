@@ -80,8 +80,12 @@ namespace osu.Game
             Audio.VolumeTrack.Weld(Config.GetBindable<double>(OsuConfig.VolumeMusic));
 
             PlayMode = Config.GetBindable<PlayMode>(OsuConfig.PlayMode);
+        }
 
-            //todo: move to constructor or LoadComplete.
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             Add(new Drawable[] {
                 new VolumeControlReceptor
                 {
