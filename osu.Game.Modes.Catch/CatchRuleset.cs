@@ -16,7 +16,7 @@ namespace osu.Game.Modes.Catch
 
         public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new CatchHitRenderer { Objects = objects };
 
-        protected override PlayMode PlayMode => PlayMode.Mania;
+        protected override PlayMode PlayMode => PlayMode.Catch;
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
     }

@@ -24,7 +24,7 @@ namespace osu.Game.Modes
 
         public static void Register(Ruleset ruleset) => availableRulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
 
-        protected virtual PlayMode PlayMode => PlayMode.Osu;
+        protected abstract PlayMode PlayMode { get; }
 
         public static Ruleset GetRuleset(PlayMode mode)
         {
