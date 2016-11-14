@@ -4,6 +4,10 @@
 using System.Collections.Generic;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
+using System.Reflection;
+using osu.Framework.Extensions;
+using System;
+using System.Linq;
 
 namespace osu.Game.Modes
 {
@@ -15,19 +19,16 @@ namespace osu.Game.Modes
 
         public static Ruleset GetRuleset(PlayMode mode)
         {
-            switch (mode)
-            {
-                default:
-                    return null;
+            Type type = AppDomain.CurrentDomain.GetAssemblies()
+                                .Where(a => a.FullName.Contains($@"osu.Game.Modes.{mode}"))
+                                .SelectMany(a => a.GetTypes())
+                                .Where(t => t.Name == $@"{mode}Ruleset")
+                                .FirstOrDefault();
 
-                //    return new OsuRuleset();
-                //case PlayMode.Catch:
-                //    return new CatchRuleset();
-                //case PlayMode.Mania:
-                //    return new ManiaRuleset();
-                //case PlayMode.Taiko:
-                //    return new TaikoRuleset();
-            }
+            if (type == null)
+                return null;
+
+            return Activator.CreateInstance(type) as Ruleset;
         }
     }
 }
