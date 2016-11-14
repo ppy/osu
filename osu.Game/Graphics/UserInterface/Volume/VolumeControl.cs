@@ -7,6 +7,7 @@ using osu.Framework.Input;
 using osu.Framework.Threading;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
@@ -40,7 +41,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
                 AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
-                Position = new Vector2(10, 30),
+                Margin = new MarginPadding { Left = 10, Right = 10, Top = 30, Bottom = 30 },
                 Spacing = new Vector2(15, 0),
             });
         }

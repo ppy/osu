@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
                     Direction = FlowDirection.VerticalOnly,
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomLeft,
-                    Position = new Vector2(5, -5),
+                    Position = new Vector2(5, 5),
                     Alpha = 0,
                     Children = new[]
                     {
