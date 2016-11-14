@@ -63,6 +63,7 @@ namespace osu.Game.Online.Chat.Display
                             {
                                 Text = Message.Content,
                                 TextSize = text_size,
+                                AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
                             }
                         }
