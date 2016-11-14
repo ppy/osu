@@ -14,11 +14,11 @@ namespace osu.Desktop.Beatmaps.IO
     /// </summary>
     public class LegacyFilesystemReader : ArchiveReader
     {
-        static LegacyFilesystemReader()
+        public static void Register()
         {
             AddReader<LegacyFilesystemReader>((storage, path) => Directory.Exists(path));
         }
-    
+
         private string basePath { get; set; }
         private string[] beatmaps { get; set; }
         private Beatmap firstMap { get; set; }
@@ -50,7 +50,7 @@ namespace osu.Desktop.Beatmaps.IO
         {
             return firstMap.BeatmapInfo.Metadata;
         }
-        
+
         public override void Dispose()
         {
             // no-op
