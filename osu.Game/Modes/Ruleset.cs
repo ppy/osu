@@ -19,11 +19,11 @@ namespace osu.Game.Modes
 
         public static Ruleset GetRuleset(PlayMode mode)
         {
-            Type type = AppDomain.CurrentDomain.GetAssemblies()
+            Type type = AppDomain.CurrentDomain
+                                .GetAssemblies()
                                 .Where(a => a.FullName.Contains($@"osu.Game.Modes.{mode}"))
                                 .SelectMany(a => a.GetTypes())
-                                .Where(t => t.Name == $@"{mode}Ruleset")
-                                .FirstOrDefault();
+                                .FirstOrDefault(t => t.Name == $@"{mode}Ruleset");
 
             if (type == null)
                 return null;
