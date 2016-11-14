@@ -22,6 +22,7 @@ using osu.Game.Overlays.Options.General;
 using osu.Game.Overlays.Options.Graphics;
 using osu.Game.Overlays.Options.Input;
 using osu.Game.Overlays.Options.Online;
+using System;
 
 namespace osu.Game.Overlays
 {
@@ -67,8 +68,7 @@ namespace osu.Game.Overlays
                 },
                 scrollContainer = new ScrollContainer
                 {
-                    ScrollbarOverlapsContent = false,
-                    ScrollDraggerAnchor = Anchor.TopLeft,
+                    ScrollDraggerVisible = false,
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
                     Margin = new MarginPadding { Left = sidebar_width },
@@ -114,8 +114,7 @@ namespace osu.Game.Overlays
                         {
                             Selected = sections[0] == section,
                             Section = section,
-                            Action = () => scrollContainer.ScrollTo(
-                                scrollContainer.GetChildYInContent(section) - scrollContainer.DrawSize.Y / 2),
+                            Action = () => scrollContainer.ScrollIntoView(section),
                         }
                     ).ToArray()
                 }
@@ -131,23 +130,31 @@ namespace osu.Game.Overlays
         protected override void Update()
         {
             base.Update();
-            if (scrollContainer.Current != lastKnownScroll)
+
+            float currentScroll = scrollContainer.Current;
+            if (currentScroll != lastKnownScroll)
             {
-                for (int i = sections.Length - 1; i >= 0; i--)
+                lastKnownScroll = currentScroll;
+
+                OptionsSection bestCandidate = null;
+                float bestDistance = float.MaxValue;
+
+                foreach (OptionsSection section in sections)
                 {
-                    var section = sections[i];
-                    float y = scrollContainer.GetChildYInContent(section) - scrollContainer.Current;
-                    if (y <= scrollContainer.DrawSize.Y / 2 + 25)
+                    float distance = Math.Abs(scrollContainer.GetChildYInContent(section) - currentScroll);
+                    if (distance < bestDistance)
                     {
-                        var previous = sidebarButtons.SingleOrDefault(sb => sb.Selected);
-                        var next = sidebarButtons.SingleOrDefault(sb => sb.Section == section);
-                        if (next != null)
-                        {
-                            previous.Selected = false;
-                            next.Selected = true;
-                        }
-                        break;
+                        bestDistance = distance;
+                        bestCandidate = section;
                     }
+                }
+
+                var previous = sidebarButtons.SingleOrDefault(sb => sb.Selected);
+                var next = sidebarButtons.SingleOrDefault(sb => sb.Section == bestCandidate);
+                if (next != null)
+                {
+                    previous.Selected = false;
+                    next.Selected = true;
                 }
             }
         }
