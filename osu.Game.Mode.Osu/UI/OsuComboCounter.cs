@@ -3,6 +3,7 @@
 
 using osu.Game.Modes.UI;
 using OpenTK;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Modes.Osu.UI
 {
@@ -16,15 +17,15 @@ namespace osu.Game.Modes.Osu.UI
         protected virtual float PopOutSmallScale => 1.1f;
         protected virtual bool CanPopOutWhileRolling => false;
         
-        public Vector2 InnerCountPosition
+        public MarginPadding InnerCountMargin
         {
             get
             {
-                return DisplayedCountSpriteText.Position;
+                return DisplayedCountSpriteText.Margin;
             }
             set
             {
-                DisplayedCountSpriteText.Position = value;
+                DisplayedCountSpriteText.Margin = value;
             }
         }
         
