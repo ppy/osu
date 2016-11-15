@@ -12,8 +12,10 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Colour;
 using osu.Game.Modes;
 using osu.Game.Screens.Play;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays
 {
@@ -28,6 +30,7 @@ namespace osu.Game.Overlays
 
         private ToolbarModeSelector modeSelector;
         private ToolbarButton userButton;
+        private Box gradientBackground;
 
         private const int transition_time = 200;
 
@@ -43,6 +46,18 @@ namespace osu.Game.Overlays
             FadeOut(transition_time, EasingTypes.InQuint);
         }
 
+        protected override bool OnHover(InputState state)
+        {
+            gradientBackground.FadeIn(200);
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            gradientBackground.FadeOut(200);
+            base.OnHoverLost(state);
+        }
+
         public Toolbar()
         {
             Children = new Drawable[]
@@ -50,7 +65,20 @@ namespace osu.Game.Overlays
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0.1f, 0.1f, 0.1f, 0.4f)
+                    Colour = new Color4(0.1f, 0.1f, 0.1f, 0.6f)
+                },
+                gradientBackground = new Box
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.BottomLeft,
+                    Alpha = 0,
+                    Height = 90,
+                    ColourInfo = new ColourInfo {
+                        TopLeft = new Color4(0.1f, 0.1f, 0.1f, 0.5f),
+                        TopRight = new Color4(0.1f, 0.1f, 0.1f, 0.5f),
+                        BottomLeft = new Color4(0.1f, 0.1f, 0.1f, 0f),
+                        BottomRight = new Color4(0.1f, 0.1f, 0.1f, 0f),
+                    },
                 },
                 new FlowContainer
                 {
