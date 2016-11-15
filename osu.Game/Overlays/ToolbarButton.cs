@@ -127,7 +127,7 @@ namespace osu.Game.Overlays
             Size = new Vector2(WIDTH + (DrawableText.IsVisible ? DrawableText.DrawSize.X : 0), 1);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs e)
+        protected override bool OnClick(InputState state)
         {
             Action?.Invoke();
             HoverBackground.FlashColour(Color4.White, 400);
