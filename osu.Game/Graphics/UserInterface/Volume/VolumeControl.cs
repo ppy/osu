@@ -22,8 +22,6 @@ namespace osu.Game.Graphics.UserInterface.Volume
         private FlowContainer content;
         protected override Container<Drawable> Content => content;
 
-        public override bool Contains(Vector2 screenSpacePos) => true;
-
         private void volumeChanged(object sender, EventArgs e)
         {
             Show();
@@ -70,13 +68,15 @@ namespace osu.Game.Graphics.UserInterface.Volume
             base.Dispose(isDisposing);
         }
 
-        protected override bool OnWheel(InputState state)
+        public void Adjust(InputState state)
         {
             if (!IsVisible)
-                return false;
+            {
+                Show();
+                return;
+            }
 
             volumeMeterMaster.TriggerWheel(state);
-            return true;
         }
 
         ScheduledDelegate popOutDelegate;
