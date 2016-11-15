@@ -171,7 +171,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
                     Height = 10,
-                    Colour = Color4.Orange,
+                    Colour = new Color4(255, 204, 34, 255),
                     SeekRequested = seek
                 }
             };
