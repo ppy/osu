@@ -91,7 +91,7 @@ namespace osu.Game
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ActivateRequested = delegate { volume.Show(); }
+                    ActionRequested = delegate(InputState state) { volume.Adjust(state); }
                 },
                 mainContent = new Container
                 {
@@ -121,8 +121,8 @@ namespace osu.Game
 
             //overlay elements
             (chat = new ChatConsole(API) { Depth = 0 }).Preload(this, overlayContent.Add);
-            (musicController = new MusicController()).Preload(this, overlayContent.Add);
             (Options = new OptionsOverlay { Depth = 1 }).Preload(this, overlayContent.Add);
+            (musicController = new MusicController() { Depth = 3 }).Preload(this, overlayContent.Add);
             (Toolbar = new Toolbar
             {
                 Depth = 2,
@@ -175,9 +175,10 @@ namespace osu.Game
             // - Frame limiter changes
 
             //central game mode change logic.
-            if ((newMode as OsuGameMode)?.ShowToolbar != true)
+            if ((newMode as OsuGameMode)?.ShowOverlays != true)
             {
                 Toolbar.State = Visibility.Hidden;
+                musicController.State = Visibility.Hidden;
                 chat.State = Visibility.Hidden;
             }
             else
