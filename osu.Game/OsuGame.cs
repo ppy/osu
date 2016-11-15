@@ -121,8 +121,8 @@ namespace osu.Game
 
             //overlay elements
             (chat = new ChatConsole(API) { Depth = 0 }).Preload(this, overlayContent.Add);
-            (musicController = new MusicController()).Preload(this, overlayContent.Add);
             (Options = new OptionsOverlay { Depth = 1 }).Preload(this, overlayContent.Add);
+            (musicController = new MusicController() { Depth = 3 }).Preload(this, overlayContent.Add);
             (Toolbar = new Toolbar
             {
                 Depth = 2,
