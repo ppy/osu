@@ -5,9 +5,11 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Beatmaps.Objects.Osu;
 using osu.Game.Beatmaps.Samples;
-using osu.Game.GameModes.Play;
+using osu.Game.Modes;
+using osu.Game.Modes.Osu;
+using osu.Game.Modes.Osu.Objects;
+using osu.Game.Screens.Play;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Beatmaps.Formats
@@ -19,6 +21,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void SetUp()
         {
             OsuLegacyDecoder.Register();
+            Ruleset.Register(new OsuRuleset());
         }
         [Test]
         public void TestDecodeMetadata()

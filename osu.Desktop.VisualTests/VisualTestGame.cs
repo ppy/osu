@@ -10,9 +10,7 @@ using osu.Framework.Desktop.Platform;
 using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
-using osu.Game.GameModes.Play;
 using SQLiteNetExtensions.Extensions;
-using osu.Desktop.Platform;
 using osu.Framework.Allocation;
 
 namespace osu.Desktop.VisualTests

@@ -8,7 +8,12 @@ using osu.Framework.Desktop.Platform;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.IPC;
-using osu.Game.GameModes.Play;
+using osu.Game.Modes;
+using osu.Game.Modes.Catch;
+using osu.Game.Modes.Mania;
+using osu.Game.Modes.Osu;
+using osu.Game.Modes.Taiko;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -20,6 +25,10 @@ namespace osu.Game.Tests.Beatmaps.IO
         [OneTimeSetUp]
         public void SetUp()
         {
+            Ruleset.Register(new OsuRuleset());
+            Ruleset.Register(new TaikoRuleset());
+            Ruleset.Register(new ManiaRuleset());
+            Ruleset.Register(new CatchRuleset());
         }
 
         [Test]

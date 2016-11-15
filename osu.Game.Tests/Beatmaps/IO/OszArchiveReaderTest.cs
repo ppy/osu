@@ -2,7 +2,8 @@
 using System.IO;
 using NUnit.Framework;
 using osu.Game.Beatmaps.IO;
-using osu.Game.GameModes.Play;
+using osu.Game.Modes;
+using osu.Game.Modes.Osu;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Beatmaps.IO
@@ -14,8 +15,9 @@ namespace osu.Game.Tests.Beatmaps.IO
         public void SetUp()
         {
             OszArchiveReader.Register();
+            Ruleset.Register(new OsuRuleset());
         }
-    
+
         [Test]
         public void TestReadBeatmaps()
         {
