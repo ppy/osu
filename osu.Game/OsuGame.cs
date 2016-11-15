@@ -91,7 +91,7 @@ namespace osu.Game
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ActivateRequested = delegate { volume.Show(); }
+                    ActionRequested = delegate(InputState state) { volume.Adjust(state); }
                 },
                 mainContent = new Container
                 {
