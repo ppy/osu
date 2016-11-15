@@ -98,8 +98,6 @@ namespace osu.Game.Screens.Menu
                 }
             };
 
-            buttonFlow.Position = new Vector2(wedge_width * 2 - (button_width + osuLogo.SizeForFlow / 4), 0);
-
             buttonsPlay.Add(new Button(@"solo", @"freeplay", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), wedge_width, Key.P));
             buttonsPlay.Add(new Button(@"multi", @"multiplayer", FontAwesome.fa_users, new Color4(94, 63, 186, 255), () => OnMulti?.Invoke(), 0, Key.M));
             buttonsPlay.Add(new Button(@"chart", @"charts", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
@@ -111,6 +109,14 @@ namespace osu.Game.Screens.Menu
 
             buttonFlow.Add(buttonsPlay);
             buttonFlow.Add(buttonsTopLevel);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // osuLogo.SizeForFlow relies on loading to be complete.
+            buttonFlow.Position = new Vector2(wedge_width * 2 - (button_width + osuLogo.SizeForFlow / 4), 0);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)

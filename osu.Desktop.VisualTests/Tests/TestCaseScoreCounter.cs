@@ -20,6 +20,7 @@ using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -43,7 +44,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Anchor = Anchor.TopRight,
                 TextSize = 40,
                 Count = 0,
-                Position = new Vector2(20, 20),
+                Margin = new MarginPadding(20),
             };
             Add(score);
 
@@ -51,8 +52,8 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
-                Position = new Vector2(10, 10),
-                InnerCountPosition = new Vector2(10, 10),
+                Margin = new MarginPadding(10),
+                InnerCountMargin = new MarginPadding(10),
                 Count = 0,
                 TextSize = 40,
             };
@@ -92,7 +93,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
-                Position = new Vector2(20, 60),
+                Position = new Vector2(-20, 60),
             };
             Add(accuracyCombo);
 
@@ -100,7 +101,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
-                Position = new Vector2(20, 160),
+                Position = new Vector2(20, -160),
                 Count = 5,
             };
             Add(stars);
@@ -109,7 +110,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
-                Position = new Vector2(20, 190),
+                Position = new Vector2(20, -190),
                 Text = stars.Count.ToString("0.00"),
             };
             Add(starsLabel);
