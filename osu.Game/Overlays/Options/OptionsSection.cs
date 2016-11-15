@@ -18,7 +18,9 @@ namespace osu.Game.Overlays.Options
 
         public OptionsSection()
         {
-            const int headerSize = 30, headerMargin = 25;
+            Margin = new MarginPadding { Top = 20 };
+
+            const int headerSize = 26, headerMargin = 25;
             const int borderSize = 2;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
@@ -26,7 +28,7 @@ namespace osu.Game.Overlays.Options
             {
                 new Box
                 {
-                    Colour = new Color4(30, 30, 30, 255),
+                    Colour = new Color4(0, 0, 0, 255),
                     RelativeSizeAxes = Axes.X,
                     Height = borderSize,
                 },
@@ -34,7 +36,7 @@ namespace osu.Game.Overlays.Options
                 {
                     Padding = new MarginPadding
                     {
-                        Top = 10 + borderSize,
+                        Top = 20 + borderSize,
                         Left = OptionsOverlay.CONTENT_MARGINS,
                         Right = OptionsOverlay.CONTENT_MARGINS,
                         Bottom = 10,
@@ -53,7 +55,7 @@ namespace osu.Game.Overlays.Options
                         {
                             Margin = new MarginPadding { Top = headerSize + headerMargin },
                             Direction = FlowDirection.VerticalOnly,
-                            Spacing = new Vector2(0, 25),
+                            Spacing = new Vector2(0, 50),
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                         },

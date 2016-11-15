@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Options
                         Width = 5,
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
-                        Colour = new Color4(233, 103, 161, 255)
+                        Colour = new Color4(247, 198, 35, 255)
                     }
             };
         }
