@@ -6,22 +6,23 @@ using System.Threading;
 using osu.Framework.Configuration;
 using osu.Framework.GameModes;
 using osu.Game.Configuration;
-using osu.Game.GameModes.Menu;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
-using osu.Game.GameModes.Play;
 using osu.Game.Overlays;
 using osu.Framework;
 using osu.Framework.Input;
 using osu.Game.Input;
 using OpenTK.Input;
 using osu.Framework.Logging;
-using osu.Game.GameModes;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Game.Database;
 using osu.Framework.Allocation;
+using osu.Game.Modes;
+using osu.Game.Screens;
+using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 
 namespace osu.Game
 {
