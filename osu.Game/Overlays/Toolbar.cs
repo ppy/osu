@@ -49,13 +49,12 @@ namespace osu.Game.Overlays
         protected override bool OnHover(InputState state)
         {
             gradientBackground.FadeIn(200);
-            return base.OnHover(state);
+            return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             gradientBackground.FadeOut(200);
-            base.OnHoverLost(state);
         }
 
         public Toolbar()
