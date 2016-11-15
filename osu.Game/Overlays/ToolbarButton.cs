@@ -138,7 +138,7 @@ namespace osu.Game.Overlays
         {
             HoverBackground.FadeTo(0.4f, 200);
             tooltipContainer.FadeIn(100);
-            return true;
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)
