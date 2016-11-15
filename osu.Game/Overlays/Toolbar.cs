@@ -72,12 +72,7 @@ namespace osu.Game.Overlays
                     Anchor = Anchor.BottomLeft,
                     Alpha = 0,
                     Height = 90,
-                    ColourInfo = new ColourInfo {
-                        TopLeft = new Color4(0.1f, 0.1f, 0.1f, 0.5f),
-                        TopRight = new Color4(0.1f, 0.1f, 0.1f, 0.5f),
-                        BottomLeft = new Color4(0.1f, 0.1f, 0.1f, 0f),
-                        BottomRight = new Color4(0.1f, 0.1f, 0.1f, 0f),
-                    },
+                    ColourInfo = ColourInfo.GradientVertical(new Color4(0.1f, 0.1f, 0.1f, 0.5f), new Color4(0.1f, 0.1f, 0.1f, 0f)),
                 },
                 new FlowContainer
                 {
