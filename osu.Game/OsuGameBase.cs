@@ -49,6 +49,9 @@ namespace osu.Game
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
+
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-RegularItalic"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBold"));
@@ -57,8 +60,6 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BoldItalic"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Light"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-LightItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
 
