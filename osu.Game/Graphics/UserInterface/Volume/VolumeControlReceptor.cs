@@ -12,11 +12,11 @@ namespace osu.Game.Graphics.UserInterface.Volume
 {
     class VolumeControlReceptor : Container
     {
-        public Action ActivateRequested;
+        public Action<InputState> ActionRequested;
 
         protected override bool OnWheel(InputState state)
         {
-            ActivateRequested?.Invoke();
+            ActionRequested?.Invoke(state);
             return true;
         }
 
@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
             {
                 case Key.Up:
                 case Key.Down:
-                    ActivateRequested?.Invoke();
+                    ActionRequested?.Invoke(state);
                     return true;
             }
 

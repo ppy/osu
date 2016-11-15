@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Menu
         private ButtonSystem buttons;
         public override string Name => @"Main Menu";
 
-        internal override bool ShowToolbar => true;
+        internal override bool ShowOverlays => true;
 
         private BackgroundMode background;
 

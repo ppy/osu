@@ -20,11 +20,11 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual BackgroundMode CreateBackground() => null;
 
-        internal virtual bool ShowToolbar => true;
+        internal virtual bool ShowOverlays => true;
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        protected float ToolbarPadding => ShowToolbar ? (Game as OsuGame)?.Toolbar.DrawHeight ?? 0 : 0;
+        protected float ToolbarPadding => ShowOverlays ? (Game as OsuGame)?.Toolbar.DrawHeight ?? 0 : 0;
 
         private bool boundToBeatmap;
         private Bindable<WorkingBeatmap> beatmap;
