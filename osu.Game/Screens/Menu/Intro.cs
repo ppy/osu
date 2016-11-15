@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Menu
         private AudioSample welcome;
         private AudioTrack bgm;
 
-        internal override bool ShowToolbar => (ParentGameMode as OsuGameMode)?.ShowToolbar ?? false;
+        internal override bool ShowOverlays => (ParentGameMode as OsuGameMode)?.ShowOverlays ?? false;
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeEmpty();
 

@@ -175,9 +175,10 @@ namespace osu.Game
             // - Frame limiter changes
 
             //central game mode change logic.
-            if ((newMode as OsuGameMode)?.ShowToolbar != true)
+            if ((newMode as OsuGameMode)?.ShowOverlays != true)
             {
                 Toolbar.State = Visibility.Hidden;
+                musicController.State = Visibility.Hidden;
                 chat.State = Visibility.Hidden;
             }
             else
