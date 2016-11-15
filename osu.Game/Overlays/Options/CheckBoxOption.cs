@@ -92,13 +92,13 @@ namespace osu.Game.Overlays.Options
 
         protected override bool OnHover(InputState state)
         {
-            light.TriggerHover(state);
+            light.Glowing = true;
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            light.TriggerHoverLost(state);
+            light.Glowing = false;
             base.OnHoverLost(state);
         }
 
@@ -159,19 +159,21 @@ namespace osu.Game.Overlays.Options
                 };
             }
 
-            protected override bool OnHover(InputState state)
+            public bool Glowing
             {
-                FadeColour(hoverColour, 500, EasingTypes.OutQuint);
-                FadeGlowTo(1, 500, EasingTypes.OutQuint);
-
-                return base.OnHover(state);
-            }
-
-            protected override void OnHoverLost(InputState state)
-            {
-                FadeGlowTo(0, 500);
-                FadeColour(defaultColour, 500);
-                base.OnHoverLost(state);
+                set
+                {
+                    if (value)
+                    {
+                        FadeColour(hoverColour, 500, EasingTypes.OutQuint);
+                        FadeGlowTo(1, 500, EasingTypes.OutQuint);
+                    }
+                    else
+                    {
+                        FadeGlowTo(0, 500);
+                        FadeColour(defaultColour, 500);
+                    }
+                }
             }
 
             private CheckBoxState state;
