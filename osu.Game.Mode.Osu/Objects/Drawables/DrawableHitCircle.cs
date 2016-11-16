@@ -2,17 +2,21 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.ComponentModel;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using osu.Framework.IO.Stores;
 using osu.Framework.MathUtils;
 using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -26,6 +30,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private NumberLayer number;
         private GlowLayer glow;
         private OsuBaseHit h;
+        private HitExplosion explosion;
 
         public DrawableHitCircle(HitCircle h) : base(h)
         {
@@ -107,6 +112,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 case ArmedState.Disarmed:
                     Delay(h.Duration + 200);
                     FadeOut(200);
+
+                    explosion?.Expire();
+                    explosion = null;
                     break;
                 case ArmedState.Armed:
                     const double flash_in = 30;
@@ -126,6 +134,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
                     FadeOut(800);
                     ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
+
+                    Schedule(() => Add(explosion = new HitExplosion(Judgement.Hit300)));
                     break;
             }
         }
@@ -337,6 +347,71 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
                 foreach (Drawable d in Children)
                     d.Position -= new Vector2(0, (float)(d.Scale.X * (Time.Elapsed / 2880)));
+            }
+        }
+
+        public enum Judgement
+        {
+            [Description(@"Miss")]
+            Miss,
+            [Description(@"50")]
+            Hit50,
+            [Description(@"100")]
+            Hit100,
+            [Description(@"300")]
+            Hit300,
+            [Description(@"500")]
+            Hit500
+        }
+
+        public enum ComboJudgement
+        {
+            [Description(@"")]
+            None,
+            [Description(@"Good")]
+            Good,
+            [Description(@"Amazing")]
+            Perfect
+        }
+
+        class HitExplosion : FlowContainer
+        {
+            private SpriteText line1;
+            private SpriteText line2;
+
+            public HitExplosion(Judgement judgement, ComboJudgement comboJudgement = ComboJudgement.None)
+            {
+                AutoSizeAxes = Axes.Both;
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+
+                Direction = FlowDirection.VerticalOnly;
+                Spacing = new Vector2(0, 2);
+
+                Children = new Drawable[]
+                {
+                    line1 = new SpriteText
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Text = judgement.GetDescription(),
+                        Font = @"Venera",
+                        TextSize = 20,
+                    },
+                    line2 = new SpriteText
+                    {
+                        Text = comboJudgement.GetDescription(),
+                        Font = @"Venera",
+                        TextSize = 14,
+                    }
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                line1.TransformSpacingTo(14, 1800, EasingTypes.OutQuint);
+                line2.TransformSpacingTo(14, 1800, EasingTypes.OutQuint);
             }
         }
     }
