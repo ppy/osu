@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play
 {
     public class Player : OsuGameMode
     {
-        const bool autoplay = false;
+        public bool Autoplay;
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
 
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play
                             break;
                     }
                 }
-                
+
             }
         }
 
@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Play
             hitRenderer.OnHit += delegate (HitObject h) { scoreOverlay.OnHit(h); };
             hitRenderer.OnMiss += delegate (HitObject h) { scoreOverlay.OnMiss(h); };
 
-            if (autoplay)
+            if (Autoplay)
                 hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Armed));
 
             Children = new Drawable[]
