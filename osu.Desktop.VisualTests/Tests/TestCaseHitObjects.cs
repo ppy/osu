@@ -38,7 +38,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             for (int i = 0; i < count; i++)
             {
-                var h = new Circle
+                var h = new HitCircle
                 {
                     StartTime = ourClock.CurrentTime + 1000 + i * 80,
                     Position = new Vector2((i - count / 2) * 14),

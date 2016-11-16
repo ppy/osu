@@ -38,7 +38,7 @@ namespace osu.Desktop.VisualTests.Tests
             int time = 1500;
             for (int i = 0; i < 50; i++)
             {
-                objects.Add(new Circle()
+                objects.Add(new HitCircle()
                 {
                     StartTime = time,
                     Position = new Vector2(RNG.Next(0, 512), RNG.Next(0, 384)),

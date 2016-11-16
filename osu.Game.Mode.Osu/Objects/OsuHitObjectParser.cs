@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Osu.Objects
             switch (type)
             {
                 case OsuBaseHit.HitObjectType.Circle:
-                    result = new Circle();
+                    result = new HitCircle();
                     break;
                 case OsuBaseHit.HitObjectType.Slider:
                     result = new Slider();

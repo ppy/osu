@@ -3,8 +3,8 @@
 
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.UI;
-using Circle = osu.Game.Modes.Osu.Objects.Circle;
 using DrawableCircle = osu.Game.Modes.Osu.Objects.Drawables.DrawableCircle;
 using OsuBaseHit = osu.Game.Modes.Osu.Objects.OsuBaseHit;
 using OsuConverter = osu.Game.Modes.Osu.Objects.OsuConverter;
@@ -18,6 +18,6 @@ namespace osu.Game.Modes.Osu.UI
         protected override Playfield CreatePlayfield() => new OsuPlayfield();
 
         protected override DrawableHitObject GetVisualRepresentation(OsuBaseHit h)
-            => h is Circle ? new DrawableCircle(h as Circle) : null;
+            => h is HitCircle ? new DrawableCircle(h as HitCircle) : null;
     }
 }
