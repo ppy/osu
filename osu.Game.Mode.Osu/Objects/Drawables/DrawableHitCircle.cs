@@ -28,7 +28,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private GlowLayer glow;
         private OsuBaseHit h;
 
-        public DrawableCircle(Circle h) : base(h)
+        public DrawableCircle(HitCircle h) : base(h)
         {
             this.h = h;
 
