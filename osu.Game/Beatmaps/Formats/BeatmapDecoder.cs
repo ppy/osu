@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using osu.Game.Beatmaps.Objects;
+using osu.Game.Modes.Objects;
 using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
@@ -47,6 +47,8 @@ namespace osu.Game.Beatmaps.Formats
                 new Color4(204,102,0, 255),
                 new Color4(121,9,13, 255),
             };
+
+            if (colours.Count == 0) return;
 
             int i = -1;
 

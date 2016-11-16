@@ -1,13 +1,11 @@
-﻿using System;
-using System.IO;
-using osu.Framework;
+﻿using osu.Framework;
 using osu.Framework.Desktop.Platform;
 using SQLite.Net;
-using SQLite.Net.Platform.Generic;
 using SQLite.Net.Interop;
+using SQLite.Net.Platform.Generic;
 using SQLite.Net.Platform.Win32;
 
-namespace osu.Desktop.Platform
+namespace osu.Desktop.VisualTests.Platform
 {
     public class TestStorage : DesktopStorage
     {

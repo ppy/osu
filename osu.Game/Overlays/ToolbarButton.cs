@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
                     Direction = FlowDirection.VerticalOnly,
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomLeft,
-                    Position = new Vector2(5, -5),
+                    Position = new Vector2(5, 5),
                     Alpha = 0,
                     Children = new[]
                     {
@@ -127,7 +127,9 @@ namespace osu.Game.Overlays
             Size = new Vector2(WIDTH + (DrawableText.IsVisible ? DrawableText.DrawSize.X : 0), 1);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs e)
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+
+        protected override bool OnClick(InputState state)
         {
             Action?.Invoke();
             HoverBackground.FlashColour(Color4.White, 400);
@@ -138,7 +140,7 @@ namespace osu.Game.Overlays
         {
             HoverBackground.FadeTo(0.4f, 200);
             tooltipContainer.FadeIn(100);
-            return true;
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)

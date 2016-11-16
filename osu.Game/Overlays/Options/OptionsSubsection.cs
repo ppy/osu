@@ -28,9 +28,9 @@ namespace osu.Game.Overlays.Options
                     {
                         new SpriteText
                         {
-                            TextSize = 25,
-                            Text = Header,
-                            // TODO: Bold
+                            TextSize = 17,
+                            Text = Header.ToUpper(),
+                            Font = @"Exo2.0-Black",
                         }
                     }
                 },

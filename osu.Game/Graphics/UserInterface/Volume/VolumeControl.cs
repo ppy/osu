@@ -7,6 +7,7 @@ using osu.Framework.Input;
 using osu.Framework.Threading;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
@@ -20,8 +21,6 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         private FlowContainer content;
         protected override Container<Drawable> Content => content;
-
-        public override bool Contains(Vector2 screenSpacePos) => true;
 
         private void volumeChanged(object sender, EventArgs e)
         {
@@ -40,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
                 AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
-                Position = new Vector2(10, 30),
+                Margin = new MarginPadding { Left = 10, Right = 10, Top = 30, Bottom = 30 },
                 Spacing = new Vector2(15, 0),
             });
         }
@@ -69,13 +68,15 @@ namespace osu.Game.Graphics.UserInterface.Volume
             base.Dispose(isDisposing);
         }
 
-        protected override bool OnWheel(InputState state)
+        public void Adjust(InputState state)
         {
             if (!IsVisible)
-                return false;
+            {
+                Show();
+                return;
+            }
 
             volumeMeterMaster.TriggerWheel(state);
-            return true;
         }
 
         ScheduledDelegate popOutDelegate;
