@@ -5,6 +5,11 @@ using System;
 using osu.Framework.Desktop;
 using osu.Framework.Desktop.Platform;
 using osu.Framework.Platform;
+using osu.Game.Modes;
+using osu.Game.Modes.Catch;
+using osu.Game.Modes.Mania;
+using osu.Game.Modes.Osu;
+using osu.Game.Modes.Taiko;
 
 namespace osu.Desktop.VisualTests
 {
@@ -15,6 +20,11 @@ namespace osu.Desktop.VisualTests
         {
             using (BasicGameHost host = Host.GetSuitableHost(@"osu-visual-tests"))
             {
+                Ruleset.Register(new OsuRuleset());
+                Ruleset.Register(new TaikoRuleset());
+                Ruleset.Register(new ManiaRuleset());
+                Ruleset.Register(new CatchRuleset());
+
                 host.Add(new VisualTestGame());
                 host.Run();
             }
