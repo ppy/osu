@@ -23,28 +23,28 @@ namespace osu.Game.Overlays.Options.Input
             Children = new Drawable[]
             {
                 new SpriteText { Text = "Sensitivity: TODO slider" },
-                new CheckBoxOption
+                rawInput = new CheckBoxOption
                 {
                     LabelText = "Raw input",
                     Bindable = config.GetBindable<bool>(OsuConfig.RawInput)
                 },
-                new CheckBoxOption
+                mapRawInput = new CheckBoxOption
                 {
                     LabelText = "Map absolute raw input to the osu! window",
                     Bindable = config.GetBindable<bool>(OsuConfig.AbsoluteToOsuWindow)
                 },
                 new SpriteText { Text = "Confine mouse cursor: TODO dropdown" },
-                new CheckBoxOption
+                disableWheel = new CheckBoxOption
                 {
                     LabelText = "Disable mouse wheel in play mode",
                     Bindable = config.GetBindable<bool>(OsuConfig.MouseDisableWheel)
                 },
-                new CheckBoxOption
+                disableButtons = new CheckBoxOption
                 {
                     LabelText = "Disable mouse buttons in play mode",
                     Bindable = config.GetBindable<bool>(OsuConfig.MouseDisableButtons)
                 },
-                new CheckBoxOption
+                enableRipples = new CheckBoxOption
                 {
                     LabelText = "Cursor ripples",
                     Bindable = config.GetBindable<bool>(OsuConfig.CursorRipple)
