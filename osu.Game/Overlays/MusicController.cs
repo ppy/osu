@@ -22,12 +22,13 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Overlays
 {
     public class MusicController : OverlayContainer
     {
-        private static readonly Vector2 start_position = new Vector2(10, 60);
+        private static readonly Vector2 start_position = new Vector2(0, 50);
 
         private MusicControllerBackground backgroundSprite;
         private DragBar progress;
@@ -63,6 +64,8 @@ namespace osu.Game.Overlays
             Anchor = Anchor.TopRight;//placeholder
             Origin = Anchor.TopRight;
             Position = start_position;
+            Margin = new MarginPadding(10);
+
             Children = new Drawable[]
             {
                 title = new SpriteText
@@ -90,7 +93,7 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.BottomCentre,
-                    Position = new Vector2(0, 30),
+                    Position = new Vector2(0, -30),
                     Action = () =>
                     {
                         if (current?.Track == null) return;
@@ -115,7 +118,7 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.BottomCentre,
-                    Position = new Vector2(-30, 30),
+                    Position = new Vector2(-30, -30),
                     Action = prev,
                     Children = new Drawable[]
                     {
@@ -133,7 +136,7 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.BottomCentre,
-                    Position = new Vector2(30, 30),
+                    Position = new Vector2(30, -30),
                     Action = next,
                     Children = new Drawable[]
                     {
@@ -151,7 +154,7 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.BottomRight,
-                    Position = new Vector2(20, 30),
+                    Position = new Vector2(20, -30),
                     Children = new Drawable[]
                     {
                         listButton = new TextAwesome
@@ -168,7 +171,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
                     Height = 10,
-                    Colour = Color4.Orange,
+                    Colour = new Color4(255, 204, 34, 255),
                     SeekRequested = seek
                 }
             };
@@ -179,8 +182,8 @@ namespace osu.Game.Overlays
         protected override bool OnDrag(InputState state)
         {
             Vector2 change = (state.Mouse.Position - state.Mouse.PositionMouseDown.Value);
-            change.X = -change.X;
 
+            // Diminish the drag distance as we go further to simulate "rubber band" feeling.
             change *= (float)Math.Pow(change.Length, 0.7f) / change.Length;
 
             MoveTo(start_position + change);

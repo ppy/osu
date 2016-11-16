@@ -5,10 +5,11 @@ using System.IO;
 using OpenTK.Graphics;
 using osu.Game.Database;
 using osu.Game.Beatmaps.Events;
-using osu.Game.Beatmaps.Objects;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.GameModes.Play;
+using osu.Game.Modes;
+using osu.Game.Modes.Objects;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -220,7 +221,9 @@ namespace osu.Game.Beatmaps.Formats
                     BaseDifficulty = new BaseDifficulty(),
                 },
             };
-            
+
+            HitObjectParser parser = null;
+
             var section = Section.None;
             string line;
             while (true)
@@ -232,14 +235,14 @@ namespace osu.Game.Beatmaps.Formats
                     continue;
                 if (line.StartsWith(@"osu file format v"))
                     continue;
-                    
+
                 if (line.StartsWith(@"[") && line.EndsWith(@"]"))
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
                         throw new InvalidDataException($@"Unknown osu section {line}");
                     continue;
                 }
-                
+
                 string val = line, key = null;
                 if (section != Section.Events && section != Section.TimingPoints && section != Section.HitObjects)
                 {
@@ -250,6 +253,7 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     case Section.General:
                         handleGeneral(beatmap, key, val);
+                        parser = Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).CreateHitObjectParser();
                         break;
                     case Section.Editor:
                         handleEditor(beatmap, key, val);
@@ -270,13 +274,13 @@ namespace osu.Game.Beatmaps.Formats
                         handleColours(beatmap, key, val);
                         break;
                     case Section.HitObjects:
-                        var h = HitObject.Parse(beatmap.BeatmapInfo.Mode, val);
-                        if (h != null)
-                            beatmap.HitObjects.Add(h);
+                        var obj = parser?.Parse(val);
+                        if (obj != null)
+                            beatmap.HitObjects.Add(obj);
                         break;
                 }
             }
-            
+
             return beatmap;
         }
     }
