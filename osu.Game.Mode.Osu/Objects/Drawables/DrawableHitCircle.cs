@@ -11,13 +11,12 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
-using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class DrawableCircle : DrawableHitObject
+    public class DrawableHitCircle : DrawableHitObject
     {
         private Sprite approachCircle;
         private CircleLayer circle;
@@ -28,7 +27,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private GlowLayer glow;
         private OsuBaseHit h;
 
-        public DrawableCircle(HitCircle h) : base(h)
+        public DrawableHitCircle(HitCircle h) : base(h)
         {
             this.h = h;
 
