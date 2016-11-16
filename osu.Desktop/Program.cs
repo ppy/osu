@@ -25,6 +25,7 @@ namespace osu.Desktop
         public static int Main(string[] args)
         {
             LegacyFilesystemReader.Register();
+
             using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
             {
                 if (!host.IsPrimaryInstance)
