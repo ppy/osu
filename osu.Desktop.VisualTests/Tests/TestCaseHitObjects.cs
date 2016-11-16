@@ -44,7 +44,7 @@ namespace osu.Desktop.VisualTests.Tests
                     Position = new Vector2((i - count / 2) * 14),
                 };
 
-                Add(new DrawableCircle(h)
+                Add(new DrawableHitCircle(h)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
