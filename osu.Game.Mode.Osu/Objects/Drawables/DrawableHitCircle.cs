@@ -252,6 +252,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 {
                     new Triangles
                     {
+                        BlendingMode = BlendingMode.Additive,
                         RelativeSizeAxes = Axes.Both
                     }
                 };
