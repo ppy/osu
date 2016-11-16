@@ -306,18 +306,22 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         private class Triangles : Container
         {
-            private Texture tex;
+            private Texture triangle;
 
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                tex = textures.Get(@"Play/osu/triangle@2x");
+                triangle = textures.Get(@"Play/osu/triangle@2x");
+            }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
                 for (int i = 0; i < 10; i++)
                 {
                     Add(new Sprite
                     {
-                        Texture = tex,
+                        Texture = triangle,
                         Origin = Anchor.Centre,
                         RelativePositionAxes = Axes.Both,
                         Position = new Vector2(RNG.NextSingle(), RNG.NextSingle()),
