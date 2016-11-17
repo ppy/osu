@@ -1,34 +1,27 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.ComponentModel;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
-using osu.Framework.Input;
 using osu.Framework.IO.Stores;
-using osu.Framework.MathUtils;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
-using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableHitObject
     {
         private Sprite approachCircle;
-        private CircleLayer circle;
-        private RingLayer ring;
-        private FlashLayer flash;
-        private ExplodeLayer explode;
-        private NumberLayer number;
-        private GlowLayer glow;
+        private CirclePiece circle;
+        private RingPiece ring;
+        private FlashPiece flash;
+        private ExplodePiece explode;
+        private NumberPiece number;
+        private GlowPiece glow;
         private OsuBaseHit h;
         private HitExplosion explosion;
 
@@ -42,19 +35,19 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             Children = new Drawable[]
             {
-                glow = new GlowLayer
+                glow = new GlowPiece
                 {
                     Colour = h.Colour
                 },
-                circle = new CircleLayer
+                circle = new CirclePiece
                 {
                     Colour = h.Colour,
                     Hit = Hit,
                 },
-                number = new NumberLayer(),
-                ring = new RingLayer(),
-                flash = new FlashLayer(),
-                explode = new ExplodeLayer
+                number = new NumberPiece(),
+                ring = new RingPiece(),
+                flash = new FlashPiece(),
+                explode = new ExplodePiece
                 {
                     Colour = h.Colour,
                 },
@@ -137,281 +130,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
                     Schedule(() => Add(explosion = new HitExplosion(Judgement.Hit300)));
                     break;
-            }
-        }
-
-        private class NumberLayer : Container
-        {
-            private Sprite number;
-
-            public NumberLayer()
-            {
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-
-                Children = new[]
-                {
-                    number = new Sprite
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Alpha = 1
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                number.Texture = textures.Get(@"Play/osu/number@2x");
-            }
-        }
-
-        private class GlowLayer : Container
-        {
-            private Sprite layer;
-
-            public GlowLayer()
-            {
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-
-                Children = new[]
-                {
-                    layer = new Sprite
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        BlendingMode = BlendingMode.Additive,
-                        Alpha = 0.5f
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                layer.Texture = textures.Get(@"Play/osu/ring-glow@2x");
-            }
-        }
-
-        private class RingLayer : Container
-        {
-            private Sprite ring;
-
-            public RingLayer()
-            {
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-
-                Children = new Drawable[]
-                {
-                    ring = new Sprite
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                ring.Texture = textures.Get(@"Play/osu/ring@2x");
-            }
-        }
-
-        private class FlashLayer : Container
-        {
-            public FlashLayer()
-            {
-                Size = new Vector2(144);
-
-                Masking = true;
-                CornerRadius = Size.X / 2;
-
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-
-                BlendingMode = BlendingMode.Additive;
-                Alpha = 0;
-
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    }
-                };
-            }
-        }
-
-        private class ExplodeLayer : Container
-        {
-            public ExplodeLayer()
-            {
-                Size = new Vector2(144);
-
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-
-                BlendingMode = BlendingMode.Additive;
-                Alpha = 0;
-
-                Children = new Drawable[]
-                {
-                    new Triangles
-                    {
-                        BlendingMode = BlendingMode.Additive,
-                        RelativeSizeAxes = Axes.Both
-                    }
-                };
-            }
-        }
-
-        private class CircleLayer : Container
-        {
-
-            private Sprite disc;
-            private Triangles triangles;
-
-            public Func<bool> Hit;
-
-            public CircleLayer()
-            {
-                Size = new Vector2(144);
-                Masking = true;
-                CornerRadius = DrawSize.X / 2;
-
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-
-                Children = new Drawable[]
-                {
-                    disc = new Sprite
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    },
-                    triangles = new Triangles
-                    {
-                        BlendingMode = BlendingMode.Additive,
-                        RelativeSizeAxes = Axes.Both
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                disc.Texture = textures.Get(@"Play/osu/disc@2x");
-            }
-
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-            {
-                Hit?.Invoke();
-                return true;
-            }
-        }
-
-        private class Triangles : Container
-        {
-            private Texture triangle;
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                triangle = textures.Get(@"Play/osu/triangle@2x");
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                for (int i = 0; i < 10; i++)
-                {
-                    Add(new Sprite
-                    {
-                        Texture = triangle,
-                        Origin = Anchor.Centre,
-                        RelativePositionAxes = Axes.Both,
-                        Position = new Vector2(RNG.NextSingle(), RNG.NextSingle()),
-                        Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
-                        Alpha = RNG.NextSingle() * 0.3f
-                    });
-                }
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                foreach (Drawable d in Children)
-                    d.Position -= new Vector2(0, (float)(d.Scale.X * (Time.Elapsed / 2880)));
-            }
-        }
-
-        public enum Judgement
-        {
-            [Description(@"Miss")]
-            Miss,
-            [Description(@"50")]
-            Hit50,
-            [Description(@"100")]
-            Hit100,
-            [Description(@"300")]
-            Hit300,
-            [Description(@"500")]
-            Hit500
-        }
-
-        public enum ComboJudgement
-        {
-            [Description(@"")]
-            None,
-            [Description(@"Good")]
-            Good,
-            [Description(@"Amazing")]
-            Perfect
-        }
-
-        class HitExplosion : FlowContainer
-        {
-            private SpriteText line1;
-            private SpriteText line2;
-
-            public HitExplosion(Judgement judgement, ComboJudgement comboJudgement = ComboJudgement.None)
-            {
-                AutoSizeAxes = Axes.Both;
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-
-                Direction = FlowDirection.VerticalOnly;
-                Spacing = new Vector2(0, 2);
-
-                Children = new Drawable[]
-                {
-                    line1 = new SpriteText
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Text = judgement.GetDescription(),
-                        Font = @"Venera",
-                        TextSize = 20,
-                    },
-                    line2 = new SpriteText
-                    {
-                        Text = comboJudgement.GetDescription(),
-                        Font = @"Venera",
-                        TextSize = 14,
-                    }
-                };
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                line1.TransformSpacingTo(14, 1800, EasingTypes.OutQuint);
-                line2.TransformSpacingTo(14, 1800, EasingTypes.OutQuint);
             }
         }
     }
