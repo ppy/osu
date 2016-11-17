@@ -30,8 +30,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             this.h = h;
 
             Origin = Anchor.Centre;
-            RelativePositionAxes = Axes.Both;
-            Position = new Vector2(h.Position.X / 512, h.Position.Y / 384);
+            Position = h.Position;
 
             Children = new Drawable[]
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +26,68 @@ namespace osu.Game.Modes.Osu.Objects
                     result = new HitCircle();
                     break;
                 case OsuBaseHit.HitObjectType.Slider:
-                    result = new Slider();
+                    Slider s = new Slider();
+
+                    CurveTypes curveType = CurveTypes.Catmull;
+                    int repeatCount = 0;
+                    double length = 0;
+                    List<Vector2> points = new List<Vector2>();
+
+                    points.Add(new Vector2(int.Parse(split[0]), int.Parse(split[1])));
+
+                    string[] pointsplit = split[5].Split('|');
+                    for (int i = 0; i < pointsplit.Length; i++)
+                    {
+                        if (pointsplit[i].Length == 1)
+                        {
+                            switch (pointsplit[i])
+                            {
+                                case @"C":
+                                    curveType = CurveTypes.Catmull;
+                                    break;
+                                case @"B":
+                                    curveType = CurveTypes.Bezier;
+                                    break;
+                                case @"L":
+                                    curveType = CurveTypes.Linear;
+                                    break;
+                                case @"P":
+                                    curveType = CurveTypes.PerfectCurve;
+                                    break;
+                            }
+                            continue;
+                        }
+
+                        string[] temp = pointsplit[i].Split(':');
+                        Vector2 v = new Vector2(
+                            (int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture),
+                            (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)
+                        );
+                        points.Add(v);
+                    }
+
+                    repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
+
+                    if (repeatCount > 9000)
+                    {
+                        throw new ArgumentOutOfRangeException("wacky man");
+                    }
+
+                    if (split.Length > 7)
+                        length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
+
+                    s.RepeatCount = repeatCount;
+
+                    s.Curve = new SliderCurve
+                    {
+                        Path = points,
+                        Length = length,
+                        CurveType = curveType
+                    };
+
+                    s.Curve.Calculate();
+
+                    result = s;
                     break;
                 case OsuBaseHit.HitObjectType.Spinner:
                     result = new Spinner();
