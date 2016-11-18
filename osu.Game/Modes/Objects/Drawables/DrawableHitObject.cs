@@ -53,12 +53,6 @@ namespace osu.Game.Modes.Objects.Drawables
             return true;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            UpdateState(state);
-        }
-
         private bool counted;
 
         protected override void Update()

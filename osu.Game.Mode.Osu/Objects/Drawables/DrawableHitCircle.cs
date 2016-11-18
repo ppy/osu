@@ -4,6 +4,7 @@
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.IO.Stores;
@@ -15,32 +16,38 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableHitObject
     {
-        private Sprite approachCircle;
+        private OsuBaseHit osuObject;
+
+        private ApproachCircle approachCircle;
         private CirclePiece circle;
         private RingPiece ring;
         private FlashPiece flash;
         private ExplodePiece explode;
         private NumberPiece number;
         private GlowPiece glow;
-        private OsuBaseHit h;
         private HitExplosion explosion;
 
         public DrawableHitCircle(HitCircle h) : base(h)
         {
-            this.h = h;
+            osuObject = h;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             Origin = Anchor.Centre;
-            Position = h.Position;
+            Position = osuObject.Position;
 
             Children = new Drawable[]
             {
                 glow = new GlowPiece
                 {
-                    Colour = h.Colour
+                    Colour = osuObject.Colour
                 },
                 circle = new CirclePiece
                 {
-                    Colour = h.Colour,
+                    Colour = osuObject.Colour,
                     Hit = Hit,
                 },
                 number = new NumberPiece(),
@@ -48,29 +55,16 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 flash = new FlashPiece(),
                 explode = new ExplodePiece
                 {
-                    Colour = h.Colour,
+                    Colour = osuObject.Colour,
                 },
-                approachCircle = new Sprite
+                approachCircle = new ApproachCircle()
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Colour = h.Colour
+                    Colour = osuObject.Colour,
                 }
             };
 
             //may not be so correct
             Size = circle.DrawSize;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(BaseGame game)
-        {
-            approachCircle.Texture = game.Textures.Get(@"Play/osu/approachcircle@2x");
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             //force application of the state that was set before we loaded.
             UpdateState(State);
@@ -81,8 +75,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             if (!IsLoaded) return;
 
             Flush(true); //move to DrawableHitObject
+            approachCircle.Flush(true);
 
-            double t = HitTime ?? h.StartTime;
+            double t = HitTime ?? osuObject.StartTime;
+
+            Alpha = 0;
 
             //sane defaults
             ring.Alpha = circle.Alpha = number.Alpha = approachCircle.Alpha = glow.Alpha = 1;
@@ -91,18 +88,20 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             //always-present transforms
             Transforms.Add(new TransformAlpha { StartTime = t - 1000, EndTime = t - 800, StartValue = 0, EndValue = 1 });
+
             approachCircle.Transforms.Add(new TransformScale { StartTime = t - 1000, EndTime = t, StartValue = new Vector2(2f), EndValue = new Vector2(0.6f) });
 
             //set transform delay to t==hitTime
             Delay(t - Time.Current, true);
 
             approachCircle.FadeOut();
+
             glow.FadeOut(400);
 
             switch (state)
             {
                 case ArmedState.Disarmed:
-                    Delay(h.Duration + 200);
+                    Delay(osuObject.Duration + 200);
                     FadeOut(200);
 
                     explosion?.Expire();
