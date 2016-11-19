@@ -79,7 +79,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             //sane defaults
             ring.Alpha = circle.Alpha = number.Alpha = approachCircle.Alpha = glow.Alpha = 1;
             explode.Alpha = 0;
-            Scale = Vector2.One;
+            Scale = new Vector2(0.5f); //this will probably need to be moved to DrawableHitObject at some point.
 
             //always-present transforms
             Transforms.Add(new TransformAlpha { StartTime = t - 1000, EndTime = t - 800, StartValue = 0, EndValue = 1 });
