@@ -5,6 +5,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Osu.Objects;
+using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Game.Modes.UI;
 using OpenTK;
 using OpenTK.Graphics;
@@ -13,9 +15,7 @@ namespace osu.Game.Modes.Osu.UI
 {
     public class OsuPlayfield : Playfield
     {
-        protected override Container<Drawable> Content => hitObjectContainer;
-
-        private Container hitObjectContainer;
+        private Container approachCircles;
 
         public override Vector2 Size
         {
@@ -35,24 +35,33 @@ namespace osu.Game.Modes.Osu.UI
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(0.75f);
 
-            AddInternal(new Box
+            AddInternal(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Colour = Color4.Black,
-                Alpha = 0.5f,
-            });
-
-            AddInternal(hitObjectContainer = new HitObjectContainer
-            {
-                RelativeSizeAxes = Axes.Both,
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Colour = Color4.Black,
+                    Depth = float.MinValue,
+                    Alpha = 0.5f,
+                },
+                approachCircles = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }
             });
         }
 
-        class HitObjectContainer : Container
+        public override void Add(DrawableHitObject h)
         {
-            protected override Vector2 DrawScale => new Vector2(DrawSize.X / 512);
+            DrawableHitCircle c = h as DrawableHitCircle;
+            if (c != null)
+            {
+                approachCircles.Add(c.ApproachCircle.CreateProxy());
+            }
+
+            base.Add(h);
         }
     }
 }

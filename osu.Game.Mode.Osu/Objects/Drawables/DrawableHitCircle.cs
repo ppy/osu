@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Modes.Objects.Drawables;
@@ -11,9 +12,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableHitObject
     {
-        private OsuBaseHit osuObject;
+        private OsuHitObject osuObject;
 
-        private ApproachCircle approachCircle;
+        public ApproachCircle ApproachCircle;
         private CirclePiece circle;
         private RingPiece ring;
         private FlashPiece flash;
@@ -25,11 +26,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         public DrawableHitCircle(HitCircle h) : base(h)
         {
             osuObject = h;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             Origin = Anchor.Centre;
             Position = osuObject.Position;
@@ -52,11 +48,16 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 {
                     Colour = osuObject.Colour,
                 },
-                approachCircle = new ApproachCircle()
+                ApproachCircle = new ApproachCircle()
                 {
                     Colour = osuObject.Colour,
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             //may not be so correct
             Size = circle.DrawSize;
@@ -70,26 +71,33 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             if (!IsLoaded) return;
 
             Flush(true); //move to DrawableHitObject
-            approachCircle.Flush(true);
+            ApproachCircle.Flush(true);
 
             double t = HitTime ?? osuObject.StartTime;
 
             Alpha = 0;
 
             //sane defaults
-            ring.Alpha = circle.Alpha = number.Alpha = approachCircle.Alpha = glow.Alpha = 1;
+            ring.Alpha = circle.Alpha = number.Alpha = glow.Alpha = 1;
+            ApproachCircle.Alpha = 0;
+            ApproachCircle.Scale = new Vector2(2);
             explode.Alpha = 0;
             Scale = new Vector2(0.5f); //this will probably need to be moved to DrawableHitObject at some point.
 
-            //always-present transforms
-            Transforms.Add(new TransformAlpha { StartTime = t - 1000, EndTime = t - 800, StartValue = 0, EndValue = 1 });
+            const float preempt = 600;
 
-            approachCircle.Transforms.Add(new TransformScale { StartTime = t - 1000, EndTime = t, StartValue = new Vector2(2f), EndValue = new Vector2(0.6f) });
+            const float fadein = 400;
 
-            //set transform delay to t==hitTime
-            Delay(t - Time.Current, true);
+            Delay(t - Time.Current - preempt, true);
 
-            approachCircle.FadeOut();
+            FadeIn(fadein);
+
+            ApproachCircle.FadeIn(Math.Min(fadein * 2, preempt));
+            ApproachCircle.ScaleTo(0.6f, preempt);
+
+            Delay(preempt, true);
+
+            ApproachCircle.FadeOut();
 
             glow.FadeOut(400);
 

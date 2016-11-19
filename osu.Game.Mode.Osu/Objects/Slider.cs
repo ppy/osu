@@ -6,7 +6,7 @@ using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects
 {
-    public class Slider : OsuBaseHit
+    public class Slider : OsuHitObject
     {
         public override double EndTime => StartTime + (RepeatCount + 1) * Curve.Length;
 

@@ -58,8 +58,8 @@
     <Compile Include="OsuRuleset.cs" />
     <Compile Include="Objects\HitCircle.cs" />
     <Compile Include="Objects\Drawables\DrawableHitCircle.cs" />
-    <Compile Include="Objects\OsuBaseHit.cs" />
-    <Compile Include="Objects\OsuConverter.cs" />
+    <Compile Include="Objects\OsuHitObject.cs" />
+    <Compile Include="Objects\OsuHitObjectConverter.cs" />
     <Compile Include="Objects\Slider.cs" />
     <Compile Include="Objects\Spinner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
