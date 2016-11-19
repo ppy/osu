@@ -1,9 +1,7 @@
 ﻿using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
