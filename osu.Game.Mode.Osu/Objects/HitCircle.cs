@@ -3,7 +3,7 @@
 
 namespace osu.Game.Modes.Osu.Objects
 {
-    public class HitCircle : OsuBaseHit
+    public class HitCircle : OsuHitObject
     {
     }
 }

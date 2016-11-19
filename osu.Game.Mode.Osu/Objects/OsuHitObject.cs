@@ -8,7 +8,7 @@ using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects
 {
-    public abstract class OsuBaseHit : HitObject
+    public abstract class OsuHitObject : HitObject
     {
         public Vector2 Position { get; set; }
 

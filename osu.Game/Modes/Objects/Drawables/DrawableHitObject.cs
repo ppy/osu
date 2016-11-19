@@ -15,6 +15,10 @@ namespace osu.Game.Modes.Objects.Drawables
 
         public Func<DrawableHitObject, bool> AllowHit;
 
+        public Container<DrawableHitObject> ChildObjects;
+
+        public JudgementResult Result;
+
         public HitObject HitObject;
 
         public DrawableHitObject(HitObject hitObject)

@@ -19,7 +19,7 @@ namespace osu.Game.Modes.Taiko.Objects
 
                 if (h == null)
                 {
-                    OsuBaseHit o = i as OsuBaseHit;
+                    OsuHitObject o = i as OsuHitObject;
 
                     if (o == null) throw new HitObjectConvertException(@"Taiko", i);
 

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using osu.Game.Modes.Objects;
+using OpenTK;
 
 namespace osu.Game.Modes
 {
@@ -20,6 +21,8 @@ namespace osu.Game.Modes
     {
         public ComboJudgement Combo;
         public Judgement Judgement;
+        public float TimeOffset;
+        public Vector2 PositionOffset;
     }
 
     public enum ComboJudgement
