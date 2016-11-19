@@ -40,7 +40,7 @@ namespace osu.Game.Modes.Catch.UI
         {
             if (!IsRolling)
             {
-                PopOutSpriteText.Colour = DisplayedCountSpriteText.Colour;
+                PopOutCount.Colour = DisplayedCountSpriteText.Colour;
                 FadeOut(FadeOutDuration);
             }
             base.OnCountRolling(currentValue, newValue);
@@ -58,7 +58,7 @@ namespace osu.Game.Modes.Catch.UI
         /// <param name="colour">Last grabbed fruit colour.</param>
         public void CatchFruit(Color4 colour)
         {
-            PopOutSpriteText.Colour = colour;
+            PopOutCount.Colour = colour;
             Count++;
         }
     }
