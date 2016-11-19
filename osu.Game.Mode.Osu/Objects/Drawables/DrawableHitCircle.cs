@@ -119,6 +119,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
                     explode.FadeIn(flash_in);
 
+                    Schedule(() => Add(explosion = new HitExplosion(Judgement.Hit300)));
+
                     Delay(flash_in, true);
 
                     //after the flash, we can hide some elements that were behind it
@@ -128,8 +130,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
                     FadeOut(800);
                     ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
-
-                    Schedule(() => Add(explosion = new HitExplosion(Judgement.Hit300)));
                     break;
             }
         }
