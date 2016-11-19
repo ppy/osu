@@ -3,7 +3,7 @@
 
 namespace osu.Game.Modes.Osu.Objects
 {
-    public class Spinner : OsuBaseHit
+    public class Spinner : OsuHitObject
     {
     }
 }

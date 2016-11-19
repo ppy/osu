@@ -22,6 +22,8 @@ namespace osu.Game.Modes
 
         public abstract HitObjectParser CreateHitObjectParser();
 
+        public virtual HitJudgementResolver CreateHitJudgement() => new HitJudgementResolver();
+
         public static void Register(Ruleset ruleset) => availableRulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
 
         protected abstract PlayMode PlayMode { get; }

@@ -10,9 +10,11 @@ using osu.Game.Beatmaps.Formats;
 using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Screens.Play;
+using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -38,10 +40,11 @@ namespace osu.Desktop.VisualTests.Tests
             int time = 1500;
             for (int i = 0; i < 50; i++)
             {
-                objects.Add(new Circle()
+                objects.Add(new HitCircle()
                 {
                     StartTime = time,
-                    Position = new Vector2(RNG.Next(0, 512), RNG.Next(0, 384)),
+                    Position = new Vector2(i % 4 == 0 || i % 4 == 2 ? 0 : 512, 
+                    i % 4 < 2 ? 0 : 384),
                     NewCombo = i % 4 == 0
                 });
 
@@ -56,6 +59,12 @@ namespace osu.Desktop.VisualTests.Tests
             };
 
             decoder.Process(b);
+
+            Add(new Box
+            {
+                RelativeSizeAxes = Framework.Graphics.Axes.Both,
+                Colour = Color4.Gray,
+            });
 
             Add(new Player
             {

@@ -16,25 +16,15 @@ namespace osu.Game.Modes.Osu.UI
 
         protected virtual float PopOutSmallScale => 1.1f;
         protected virtual bool CanPopOutWhileRolling => false;
-        
-        public MarginPadding InnerCountMargin
-        {
-            get
-            {
-                return DisplayedCountSpriteText.Margin;
-            }
-            set
-            {
-                DisplayedCountSpriteText.Margin = value;
-            }
-        }
-        
-        public OsuComboCounter()
-        {
-            PopOutSpriteText.Origin = Origin;
-            PopOutSpriteText.Anchor = Anchor;
 
-            Add(PopOutSpriteText);
+        public Vector2 PopOutScale = new Vector2(2.5f);
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            PopOutCount.Origin = Origin;
+            PopOutCount.Anchor = Anchor;
         }
 
         protected override string FormatCount(ulong count)
@@ -44,15 +34,15 @@ namespace osu.Game.Modes.Osu.UI
 
         protected virtual void TransformPopOut(ulong newValue)
         {
-            PopOutSpriteText.Text = FormatCount(newValue);
+            PopOutCount.Text = FormatCount(newValue);
 
-            PopOutSpriteText.ScaleTo(PopOutScale);
-            PopOutSpriteText.FadeTo(PopOutInitialAlpha);
-            PopOutSpriteText.MoveTo(Vector2.Zero);
+            PopOutCount.ScaleTo(PopOutScale);
+            PopOutCount.FadeTo(PopOutInitialAlpha);
+            PopOutCount.MoveTo(Vector2.Zero);
 
-            PopOutSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
-            PopOutSpriteText.FadeOut(PopOutDuration, PopOutEasing);
-            PopOutSpriteText.MoveTo(DisplayedCountSpriteText.Position, PopOutDuration, PopOutEasing);
+            PopOutCount.ScaleTo(1, PopOutDuration, PopOutEasing);
+            PopOutCount.FadeOut(PopOutDuration, PopOutEasing);
+            PopOutCount.MoveTo(DisplayedCountSpriteText.Position, PopOutDuration, PopOutEasing);
         }
 
         protected virtual void TransformPopOutRolling(ulong newValue)

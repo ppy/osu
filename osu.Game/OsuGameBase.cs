@@ -63,6 +63,8 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
 
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
+
             OszArchiveReader.Register();
 
             Dependencies.Cache(API = new APIAccess

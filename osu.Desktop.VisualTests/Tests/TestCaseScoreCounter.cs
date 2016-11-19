@@ -53,7 +53,6 @@ namespace osu.Desktop.VisualTests.Tests
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 Margin = new MarginPadding(10),
-                InnerCountMargin = new MarginPadding(10),
                 Count = 0,
                 TextSize = 40,
             };

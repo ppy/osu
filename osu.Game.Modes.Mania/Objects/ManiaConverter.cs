@@ -27,7 +27,7 @@ namespace osu.Game.Modes.Mania.Objects
 
                 if (h == null)
                 {
-                    OsuBaseHit o = i as OsuBaseHit;
+                    OsuHitObject o = i as OsuHitObject;
 
                     if (o == null) throw new HitObjectConvertException(@"Mania", i);
 
