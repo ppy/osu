@@ -86,6 +86,7 @@
     <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="Screens\BackgroundMode.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundModeBeatmap.cs" />
     <Compile Include="Screens\Backgrounds\BackgroundModeCustom.cs" />
     <Compile Include="Screens\Backgrounds\BackgroundModeDefault.cs" />
     <Compile Include="Screens\Backgrounds\BackgroundModeEmpty.cs" />

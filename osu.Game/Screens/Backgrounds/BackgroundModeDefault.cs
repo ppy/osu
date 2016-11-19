@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Backgrounds
         [BackgroundDependencyLoader]
         private void load(BaseGame game)
         {
-            Add(new Background());
+            Add(new Background(@"Backgrounds/bg1"));
         }
     }
 }
