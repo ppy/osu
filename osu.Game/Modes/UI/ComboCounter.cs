@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.MathUtils;
@@ -16,7 +17,7 @@ namespace osu.Game.Modes.UI
             get; protected set;
         }
 
-        protected SpriteText PopOutSpriteText;
+        protected SpriteText PopOutCount;
 
         protected virtual double PopOutDuration => 150;
         protected virtual float PopOutScale => 2.0f;
@@ -86,7 +87,7 @@ namespace osu.Game.Modes.UI
             {
                 textSize = value;
                 DisplayedCountSpriteText.TextSize = TextSize;
-                PopOutSpriteText.TextSize = TextSize;
+                PopOutCount.TextSize = TextSize;
             }
         }
 
@@ -103,13 +104,19 @@ namespace osu.Game.Modes.UI
                 {
                     Alpha = 0,
                 },
-                PopOutSpriteText = new SpriteText
+                PopOutCount = new SpriteText
                 {
                     Alpha = 0,
+                    Margin = new MarginPadding(0.05f),
                 }
             };
 
             TextSize = 80;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             DisplayedCountSpriteText.Text = FormatCount(Count);
             DisplayedCountSpriteText.Anchor = Anchor;
@@ -192,12 +199,11 @@ namespace osu.Game.Modes.UI
 
         private void updateCount(ulong value, bool rolling = false)
         {
+            ulong prevCount = count;
             count = value;
 
             if (!IsLoaded)
                 return;
-
-            ulong prevCount = count;
 
             if (!rolling)
             {

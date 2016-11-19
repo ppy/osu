@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(new Vector2(192, 168), slider.Position);
                 Assert.AreEqual(956, slider.StartTime);
                 Assert.AreEqual(SampleType.None, slider.Sample.Type);
-                var circle = beatmap.HitObjects[1] as Circle;
+                var circle = beatmap.HitObjects[1] as HitCircle;
                 Assert.IsNotNull(circle);
                 Assert.AreEqual(new Vector2(304, 56), circle.Position);
                 Assert.AreEqual(1285, circle.StartTime);

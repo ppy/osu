@@ -11,6 +11,7 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -34,23 +35,30 @@ namespace osu.Desktop.VisualTests.Tests
 
             ourClock.ProcessFrame();
 
+            Container approachContainer = new Container { Depth = float.MaxValue, };
+
+            Add(approachContainer);
+
             const int count = 10;
 
             for (int i = 0; i < count; i++)
             {
-                var h = new Circle
+                var h = new HitCircle
                 {
                     StartTime = ourClock.CurrentTime + 1000 + i * 80,
                     Position = new Vector2((i - count / 2) * 14),
                 };
 
-                Add(new DrawableCircle(h)
+                DrawableHitCircle d = new DrawableHitCircle(h)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Depth = -i,
                     State = ArmedState.Armed,
-                });
+                };
+
+                approachContainer.Add(d.ApproachCircle.CreateProxy());
+                Add(d);
             }
         }
 

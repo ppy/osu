@@ -6,14 +6,14 @@ using osu.Game.Modes.Objects;
 
 namespace osu.Game.Modes.Osu.Objects
 {
-    public class OsuConverter : HitObjectConverter<OsuBaseHit>
+    public class OsuHitObjectConverter : HitObjectConverter<OsuHitObject>
     {
-        public override List<OsuBaseHit> Convert(List<HitObject> input)
+        public override List<OsuHitObject> Convert(List<HitObject> input)
         {
-            List<OsuBaseHit> output = new List<OsuBaseHit>();
+            List<OsuHitObject> output = new List<OsuHitObject>();
 
             foreach (HitObject h in input)
-                output.Add(h as OsuBaseHit);
+                output.Add(h as OsuHitObject);
 
             return output;
         }

@@ -41,6 +41,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
+    <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
+    <Compile Include="Objects\Drawables\DrawableSlider.cs" />
+    <Compile Include="Objects\Drawables\Pieces\ExplodePiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\FlashPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
+    <Compile Include="Objects\Drawables\HitExplosion.cs" />
+    <Compile Include="Objects\Drawables\Pieces\NumberPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Triangles.cs" />
     <Compile Include="Objects\OsuHitObjectParser.cs" />
     <Compile Include="UI\OsuComboCounter.cs" />
     <Compile Include="UI\OsuHitRenderer.cs" />
@@ -48,8 +58,8 @@
     <Compile Include="OsuRuleset.cs" />
     <Compile Include="Objects\HitCircle.cs" />
     <Compile Include="Objects\Drawables\DrawableHitCircle.cs" />
-    <Compile Include="Objects\OsuBaseHit.cs" />
-    <Compile Include="Objects\OsuConverter.cs" />
+    <Compile Include="Objects\OsuHitObject.cs" />
+    <Compile Include="Objects\OsuHitObjectConverter.cs" />
     <Compile Include="Objects\Slider.cs" />
     <Compile Include="Objects\Spinner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -70,6 +80,7 @@
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

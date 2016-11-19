@@ -19,7 +19,7 @@ namespace osu.Game.Modes.UI
 
         protected Playfield Playfield;
 
-        public IEnumerable<DrawableHitObject> DrawableObjects => Playfield.Children.Cast<DrawableHitObject>();
+        public IEnumerable<DrawableHitObject> DrawableObjects => Playfield.HitObjects.Children;
     }
 
     public abstract class HitRenderer<T> : HitRenderer

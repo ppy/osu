@@ -29,9 +29,9 @@ namespace osu.Game.Modes.Mania.UI
         {
             base.LoadComplete();
 
-            PopOutSpriteText.Anchor = Anchor.BottomCentre;
-            PopOutSpriteText.Origin = Anchor.Centre;
-            PopOutSpriteText.FadeColour(PopOutColor, 0);
+            PopOutCount.Anchor = Anchor.BottomCentre;
+            PopOutCount.Origin = Anchor.Centre;
+            PopOutCount.FadeColour(PopOutColor, 0);
             OriginalColour = DisplayedCountSpriteText.Colour;
         }
 
@@ -39,13 +39,13 @@ namespace osu.Game.Modes.Mania.UI
         {
             if (!IsRolling && newValue < currentValue)
             {
-                PopOutSpriteText.Text = FormatCount(currentValue);
+                PopOutCount.Text = FormatCount(currentValue);
 
-                PopOutSpriteText.FadeTo(PopOutInitialAlpha);
-                PopOutSpriteText.ScaleTo(1.0f);
+                PopOutCount.FadeTo(PopOutInitialAlpha);
+                PopOutCount.ScaleTo(1.0f);
 
-                PopOutSpriteText.FadeOut(PopOutDuration, PopOutEasing);
-                PopOutSpriteText.ScaleTo(PopOutScale, PopOutDuration, PopOutEasing);
+                PopOutCount.FadeOut(PopOutDuration, PopOutEasing);
+                PopOutCount.ScaleTo(PopOutScale, PopOutDuration, PopOutEasing);
             }
 
             base.OnCountRolling(currentValue, newValue);
