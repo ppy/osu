@@ -15,19 +15,19 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.Background
 {
-    class Background : Container
+    public class Background : BufferedContainer
     {
-        protected Sprite BackgroundSprite;
+        public Sprite Sprite;
 
         string textureName;
 
-        public Background(string textureName = @"Backgrounds/bg1")
+        public Background(string textureName = @"")
         {
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
             Depth = float.MinValue;
 
-            Add(BackgroundSprite = new Sprite
+            Add(Sprite = new Sprite
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -38,13 +38,14 @@ namespace osu.Game.Graphics.Background
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            BackgroundSprite.Texture = textures.Get(textureName);
+            if (!string.IsNullOrEmpty(textureName))
+                Sprite.Texture = textures.Get(textureName);
         }
 
         protected override void Update()
         {
             base.Update();
-            BackgroundSprite.Scale = new Vector2(Math.Max(DrawSize.X / BackgroundSprite.DrawSize.X, DrawSize.Y / BackgroundSprite.DrawSize.Y));
+            Sprite.Scale = new Vector2(Math.Max(DrawSize.X / Sprite.DrawSize.X, DrawSize.Y / Sprite.DrawSize.Y));
         }
     }
 }

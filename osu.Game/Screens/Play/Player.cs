@@ -16,6 +16,8 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Backgrounds;
 using OpenTK.Input;
 using MouseState = osu.Framework.Input.MouseState;
+using OpenTK;
+using osu.Framework.GameModes;
 
 namespace osu.Game.Screens.Play
 {
@@ -23,7 +25,7 @@ namespace osu.Game.Screens.Play
     {
         public bool Autoplay;
 
-        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
+        protected override BackgroundMode CreateBackground() => null;
 
         internal override bool ShowOverlays => false;
 
@@ -104,6 +106,13 @@ namespace osu.Game.Screens.Play
                 },
                 scoreOverlay,
             };
+        }
+
+        protected override void OnEntering(GameMode last)
+        {
+            base.OnEntering(last);
+
+            (Background as BackgroundModeBeatmap)?.BlurTo(Vector2.Zero, 1000);
         }
 
         protected override void Update()

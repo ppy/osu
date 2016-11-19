@@ -30,12 +30,15 @@ namespace osu.Game.Screens.Play
         private BeatmapDatabase database;
         private BeatmapGroup selectedBeatmapGroup;
         private BeatmapInfo selectedBeatmapInfo;
-        // TODO: use currently selected track as bg
-        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
+
+        protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
+
         private ScrollContainer scrollContainer;
         private FlowContainer beatmapSetFlow;
         private TrackManager trackManager;
         private Container wedgeContainer;
+
+        private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
 
         /// <param name="database">Optionally provide a database to use instead of the OsuGame one.</param>
         public PlaySongSelect(BeatmapDatabase database = null)
@@ -150,10 +153,14 @@ namespace osu.Game.Screens.Play
             base.OnEntering(last);
             ensurePlayingSelected();
             wedgeContainer.FadeInFromZero(250);
+
+            (Background as BackgroundModeBeatmap)?.BlurTo(BACKGROUND_BLUR, 1000);
         }
 
         protected override void OnResuming(GameMode last)
         {
+            (Background as BackgroundModeBeatmap)?.BlurTo(BACKGROUND_BLUR, 1000);
+
             ensurePlayingSelected();
             base.OnResuming(last);
         }
@@ -175,6 +182,15 @@ namespace osu.Game.Screens.Play
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
             base.OnBeatmapChanged(beatmap);
+
+            var backgroundModeBeatmap = Background as BackgroundModeBeatmap;
+            if (backgroundModeBeatmap != null)
+            {
+                backgroundModeBeatmap.Beatmap = beatmap;
+                // TODO: Remove this once we have non-nullable Beatmap
+                (Background as BackgroundModeBeatmap)?.BlurTo(BACKGROUND_BLUR, 1000);
+            }
+
             selectBeatmap(beatmap.BeatmapInfo);
         }
 
