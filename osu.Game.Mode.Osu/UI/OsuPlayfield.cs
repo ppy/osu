@@ -47,14 +47,12 @@ namespace osu.Game.Modes.Osu.UI
             AddInternal(hitObjectContainer = new HitObjectContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
             });
         }
 
         class HitObjectContainer : Container
         {
-            public override Vector2 ChildScale => new Vector2(0.625f);
+            protected override Vector2 DrawScale => new Vector2(DrawSize.X / 512);
         }
     }
 }
