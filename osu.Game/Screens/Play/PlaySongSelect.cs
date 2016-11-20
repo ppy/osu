@@ -21,6 +21,7 @@ using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Screens.Play
 {
@@ -36,7 +37,13 @@ namespace osu.Game.Screens.Play
         private ScrollContainer scrollContainer;
         private FlowContainer beatmapSetFlow;
         private TrackManager trackManager;
-        private Container wedgeContainer;
+        private Container backgroundWedgesContainer;
+
+        private static readonly Vector2 wedged_container_size = new Vector2(600, 300);
+        private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
+        private static readonly Vector2 wedged_container_start_position = new Vector2(0, 50);
+        private Container wedgedContainer;
+        private Container wedgedBeatmapInfo;
 
         private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
 
@@ -49,11 +56,11 @@ namespace osu.Game.Screens.Play
             const float bottomToolHeight = 50;
             Children = new Drawable[]
             {
-                wedgeContainer = new Container
+                backgroundWedgesContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = Vector2.One,
-                    Padding = new MarginPadding { Right = scrollWidth - 200 },
+                    Padding = new MarginPadding { Right = scrollWidth },
                     Children = new[]
                     {
                         new Box
@@ -93,6 +100,26 @@ namespace osu.Game.Screens.Play
                             Spacing = new Vector2(0, 5),
                         }
                     }
+                },
+                wedgedContainer = new Container
+                {
+                    Position = wedged_container_start_position,
+                    Size = wedged_container_size,
+                    Margin = new MarginPadding { Top = 20, Right = 20, },
+                    Masking = true,
+                    BorderColour = new Color4(221, 255, 255, 255),
+                    BorderThickness = 2.5f,
+                    EdgeEffect = new EdgeEffect
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = new Color4(130, 204, 255, 150),
+                        Radius = 20,
+                        Roundness = 15,
+                    },
+                    Shear = wedged_container_shear,
+                    Children = new Drawable[]
+                    {
+                    },
                 },
                 new Container
                 {
@@ -152,14 +179,14 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
             ensurePlayingSelected();
-            wedgeContainer.FadeInFromZero(250);
+            backgroundWedgesContainer.FadeInFromZero(250);
 
-            (Background as BackgroundModeBeatmap)?.BlurTo(BACKGROUND_BLUR, 1000);
+            changeBackground(Beatmap);
         }
 
         protected override void OnResuming(GameMode last)
         {
-            (Background as BackgroundModeBeatmap)?.BlurTo(BACKGROUND_BLUR, 1000);
+            changeBackground(Beatmap);
 
             ensurePlayingSelected();
             base.OnResuming(last);
@@ -176,12 +203,10 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        /// <summary>
-        /// The global Beatmap was changed.
-        /// </summary>
-        protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
+        private void changeBackground(WorkingBeatmap beatmap)
         {
-            base.OnBeatmapChanged(beatmap);
+            if (beatmap == null)
+                return;
 
             var backgroundModeBeatmap = Background as BackgroundModeBeatmap;
             if (backgroundModeBeatmap != null)
@@ -190,6 +215,120 @@ namespace osu.Game.Screens.Play
                 // TODO: Remove this once we have non-nullable Beatmap
                 (Background as BackgroundModeBeatmap)?.BlurTo(BACKGROUND_BLUR, 1000);
             }
+
+            refreshWedgedBeatmapInfo(beatmap);
+        }
+
+        private void refreshWedgedBeatmapInfo(WorkingBeatmap beatmap)
+        {
+            if (beatmap == null)
+                return;
+
+            if (wedgedBeatmapInfo != null)
+            {
+                Drawable oldWedgedBeatmapInfo = wedgedBeatmapInfo;
+                oldWedgedBeatmapInfo.Depth = 1;
+                oldWedgedBeatmapInfo.FadeOut(250);
+                oldWedgedBeatmapInfo.Expire();
+            }
+
+            BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
+            BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
+            wedgedContainer.Add(wedgedBeatmapInfo = new BufferedContainer
+            {
+                PixelSnapping = true,
+                CacheDrawnFrameBuffer = true,
+                Shear = -wedged_container_shear,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    // We will create the white-to-black gradient by modulating transparency and having
+                    // a black backdrop. This results in an sRGB-space gradient and not linear space,
+                    // transitioning from white to black more perceptually uniformly.
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                    },
+                    // We use a container, such that we can set the colour gradient to go across the
+                    // vertices of the masked container instead of the vertices of the (larger) sprite.
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        ColourInfo = ColourInfo.GradientVertical(Color4.White, new Color4(1f, 1f, 1f, 0.3f)),
+                        Children = new []
+                        {
+                            // Zoomed-in and cropped beatmap background
+                            new Sprite
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Texture = beatmap.Background,
+                                Scale = new Vector2(1366 / beatmap.Background.Width * 0.6f),
+                            },
+                        },
+                    },
+                    // Text for beatmap info
+                    new FlowContainer
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Direction = FlowDirection.VerticalOnly,
+                        Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 40 },
+                        AutoSizeAxes = Axes.Both,
+                        Children = new[]
+                        {
+                            new SpriteText
+                            {
+                                Font = @"Exo2.0-MediumItalic",
+                                Text = beatmapSetInfo.Metadata.Artist + " -- " + beatmapSetInfo.Metadata.Title,
+                                TextSize = 28,
+                                Shadow = true,
+                            },
+                            new SpriteText
+                            {
+                                Font = @"Exo2.0-MediumItalic",
+                                Text = beatmapInfo.Version,
+                                TextSize = 17,
+                                Shadow = true,
+                            },
+                            new FlowContainer
+                            {
+                                Margin = new MarginPadding { Top = 10 },
+                                Direction = FlowDirection.HorizontalOnly,
+                                AutoSizeAxes = Axes.Both,
+                                Children = new []
+                                {
+                                    new SpriteText
+                                    {
+                                        Font = @"Exo2.0-Medium",
+                                        Text = "mapped by ",
+                                        TextSize = 15,
+                                        Shadow = true,
+                                    },
+                                    new SpriteText
+                                    {
+                                        Font = @"Exo2.0-Bold",
+                                        Text = beatmapSetInfo.Metadata.Author,
+                                        TextSize = 15,
+                                        Shadow = true,
+                                    },
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        /// <summary>
+        /// The global Beatmap was changed.
+        /// </summary>
+        protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
+        {
+            base.OnBeatmapChanged(beatmap);
+
+            changeBackground(beatmap);
 
             selectBeatmap(beatmap.BeatmapInfo);
         }
