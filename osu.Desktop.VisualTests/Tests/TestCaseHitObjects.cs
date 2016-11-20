@@ -19,21 +19,17 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Name => @"Hit Objects";
 
-        IFrameBasedClock ourClock;
-
-        protected override IFrameBasedClock Clock => ourClock;
-
         public TestCaseHitObjects()
         {
             var swClock = new StopwatchClock(true) { Rate = 1 };
-            ourClock = new FramedClock(swClock);
+            Clock = new FramedClock(swClock);
         }
 
         public override void Reset()
         {
             base.Reset();
 
-            ourClock.ProcessFrame();
+            Clock.ProcessFrame();
 
             Container approachContainer = new Container { Depth = float.MaxValue, };
 
@@ -45,7 +41,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 var h = new HitCircle
                 {
-                    StartTime = ourClock.CurrentTime + 1000 + i * 80,
+                    StartTime = Clock.CurrentTime + 1000 + i * 80,
                     Position = new Vector2((i - count / 2) * 14),
                 };
 
@@ -65,7 +61,7 @@ namespace osu.Desktop.VisualTests.Tests
         protected override void Update()
         {
             base.Update();
-            ourClock.ProcessFrame();
+            Clock.ProcessFrame();
         }
     }
 }
