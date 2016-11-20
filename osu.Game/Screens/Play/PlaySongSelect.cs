@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Play
         private TrackManager trackManager;
         private Container backgroundWedgesContainer;
 
-        private static readonly Vector2 wedged_container_size = new Vector2(600, 300);
+        private static readonly Vector2 wedged_container_size = new Vector2(700, 225);
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
         private static readonly Vector2 wedged_container_start_position = new Vector2(0, 50);
         private Container wedgedContainer;
