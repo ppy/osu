@@ -23,6 +23,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Screens.Play;
+using osu.Framework;
 
 namespace osu.Game.Screens.Select
 {
@@ -142,11 +143,11 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase beatmaps, AudioManager audio, OsuGame game)
+        private void load(BeatmapDatabase beatmaps, AudioManager audio, BaseGame game, OsuGame osuGame)
         {
-            if (game != null)
+            if (osuGame != null)
             {
-                playMode = game.PlayMode;
+                playMode = osuGame.PlayMode;
                 playMode.ValueChanged += playMode_ValueChanged;
                 // Temporary:
                 carousell.Padding = new MarginPadding { Top = ToolbarPadding };
@@ -368,7 +369,7 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        private void addBeatmapSet(BeatmapSetInfo beatmapSet, OsuGame game)
+        private void addBeatmapSet(BeatmapSetInfo beatmapSet, BaseGame game)
         {
             beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
             beatmapSet.Beatmaps.ForEach(b => database.GetChildren(b));
@@ -395,7 +396,7 @@ namespace osu.Game.Screens.Select
             }));
         }
 
-        private void addBeatmapSets(OsuGame game)
+        private void addBeatmapSets(BaseGame game)
         {
             foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
                 addBeatmapSet(beatmapSet, game);
