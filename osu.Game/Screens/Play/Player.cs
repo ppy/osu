@@ -32,10 +32,7 @@ namespace osu.Game.Screens.Play
         public BeatmapInfo BeatmapInfo;
 
         public PlayMode PreferredPlayMode;
-
-        protected override IFrameBasedClock Clock => playerClock;
-
-        private InterpolatingFramedClock playerClock;
+        
         private IAdjustableClock sourceClock;
 
         private Ruleset ruleset;
@@ -64,7 +61,7 @@ namespace osu.Game.Screens.Play
             }
 
             sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
-            playerClock = new InterpolatingFramedClock(sourceClock);
+            Clock = new InterpolatingFramedClock(sourceClock);
 
             Schedule(() =>
             {
@@ -118,7 +115,7 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             base.Update();
-            playerClock.ProcessFrame();
+            Clock.ProcessFrame();
         }
 
         class PlayerInputManager : UserInputManager

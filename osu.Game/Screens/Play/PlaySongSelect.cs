@@ -103,6 +103,7 @@ namespace osu.Game.Screens.Play
                 },
                 wedgedContainer = new Container
                 {
+                    Alpha = 0,
                     Position = wedged_container_start_position,
                     Size = wedged_container_size,
                     Margin = new MarginPadding { Top = 20, Right = 20, },
@@ -179,17 +180,31 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
             ensurePlayingSelected();
-            backgroundWedgesContainer.FadeInFromZero(250);
 
             changeBackground(Beatmap);
+
+            Content.FadeInFromZero(250);
         }
 
         protected override void OnResuming(GameMode last)
         {
             changeBackground(Beatmap);
-
             ensurePlayingSelected();
             base.OnResuming(last);
+
+            Content.FadeIn(250);
+        }
+
+        protected override void OnSuspending(GameMode next)
+        {
+            Content.FadeOut(250);
+            base.OnSuspending(next);
+        }
+
+        protected override bool OnExiting(GameMode next)
+        {
+            Content.FadeOut(100);
+            return base.OnExiting(next);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -232,6 +247,8 @@ namespace osu.Game.Screens.Play
                 oldWedgedBeatmapInfo.Expire();
             }
 
+            wedgedContainer.FadeIn(250);
+
             BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
             wedgedContainer.Add(wedgedBeatmapInfo = new BufferedContainer
@@ -252,7 +269,7 @@ namespace osu.Game.Screens.Play
                     },
                     // We use a container, such that we can set the colour gradient to go across the
                     // vertices of the masked container instead of the vertices of the (larger) sprite.
-                    new Container
+                    beatmap.Background == null ? new Container() : new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         ColourInfo = ColourInfo.GradientVertical(Color4.White, new Color4(1f, 1f, 1f, 0.3f)),
