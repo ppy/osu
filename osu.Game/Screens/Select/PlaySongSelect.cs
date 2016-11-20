@@ -22,20 +22,17 @@ using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Game.Screens.Play;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Select
 {
     public class PlaySongSelect : OsuGameMode
     {
         private Bindable<PlayMode> playMode;
         private BeatmapDatabase database;
-        private BeatmapGroup selectedBeatmapGroup;
-        private BeatmapInfo selectedBeatmapInfo;
-
         protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
 
-        private ScrollContainer scrollContainer;
-        private FlowContainer beatmapSetFlow;
+        private CarousellContainer carousell;
         private TrackManager trackManager;
         private Container backgroundWedgesContainer;
 
@@ -83,23 +80,12 @@ namespace osu.Game.Screens.Play
                         },
                     }
                 },
-                scrollContainer = new ScrollContainer
+                carousell = new CarousellContainer
                 {
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(scrollWidth, 1),
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Children = new Drawable[]
-                    {
-                        beatmapSetFlow = new FlowContainer
-                        {
-                            Padding = new MarginPadding { Left = 25, Top = 25, Bottom = 25 + bottomToolHeight },
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FlowDirection.VerticalOnly,
-                            Spacing = new Vector2(0, 5),
-                        }
-                    }
                 },
                 wedgedContainer = new Container
                 {
@@ -146,7 +132,7 @@ namespace osu.Game.Screens.Play
                             Colour = new Color4(238, 51, 153, 255),
                             Action = () => Push(new Player
                             {
-                                BeatmapInfo = selectedBeatmapGroup.SelectedPanel.Beatmap,
+                                BeatmapInfo = carousell.SelectedGroup.SelectedPanel.Beatmap,
                                 PreferredPlayMode = playMode.Value
                             })
                         },
@@ -163,17 +149,17 @@ namespace osu.Game.Screens.Play
                 playMode = game.PlayMode;
                 playMode.ValueChanged += playMode_ValueChanged;
                 // Temporary:
-                scrollContainer.Padding = new MarginPadding { Top = ToolbarPadding };
+                carousell.Padding = new MarginPadding { Top = ToolbarPadding };
             }
 
             if (database == null)
                 database = beatmaps;
 
-            database.BeatmapSetAdded += s => Schedule(() => addBeatmapSet(s));
+            database.BeatmapSetAdded += s => Schedule(() => addBeatmapSet(s, game));
 
             trackManager = audio.Track;
 
-            Task.Factory.StartNew(addBeatmapSets);
+            Task.Factory.StartNew(() => addBeatmapSets(game));
         }
 
         protected override void OnEntering(GameMode last)
@@ -352,21 +338,7 @@ namespace osu.Game.Screens.Play
 
         private void selectBeatmap(BeatmapInfo beatmap)
         {
-            if (beatmap.Equals(selectedBeatmapInfo))
-                return;
-
-            //this is VERY temporary logic.
-            beatmapSetFlow.Children.Cast<BeatmapGroup>().Any(b =>
-            {
-                var panel = b.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
-                if (panel != null)
-                {
-                    panel.State = PanelSelectedState.Selected;
-                    return true;
-                }
-
-                return false;
-            });
+            carousell.SelectBeatmap(beatmap);
         }
 
         /// <summary>
@@ -374,22 +346,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void selectionChanged(BeatmapGroup group, BeatmapInfo beatmap)
         {
-            selectedBeatmapInfo = beatmap;
-
             if (!beatmap.Equals(Beatmap?.BeatmapInfo))
-            {
                 Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
-            }
 
             ensurePlayingSelected();
-
-            if (selectedBeatmapGroup == group)
-                return;
-
-            if (selectedBeatmapGroup != null)
-                selectedBeatmapGroup.State = BeatmapGroupState.Collapsed;
-
-            selectedBeatmapGroup = group;
         }
 
         private async Task ensurePlayingSelected()
@@ -408,7 +368,7 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private void addBeatmapSet(BeatmapSetInfo beatmapSet)
+        private void addBeatmapSet(BeatmapSetInfo beatmapSet, OsuGame game)
         {
             beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
             beatmapSet.Beatmaps.ForEach(b => database.GetChildren(b));
@@ -418,39 +378,27 @@ namespace osu.Game.Screens.Play
 
             var group = new BeatmapGroup(beatmapSet, working) { SelectionChanged = selectionChanged };
 
-            group.Preload(Game, g =>
+            //for the time being, let's completely load the difficulty panels in the background.
+            //this likely won't scale so well, but allows us to completely async the loading flow.
+            Task.WhenAll(group.BeatmapPanels.Select(panel => panel.Preload(game))).ContinueWith(task => Schedule(delegate
             {
-                beatmapSetFlow.Add(group);
+                carousell.AddGroup(group);
 
                 if (Beatmap == null)
-                {
-                    if (beatmapSetFlow.Children.Count() == 1)
-                    {
-                        group.State = BeatmapGroupState.Expanded;
-                        return;
-                    }
-                }
+                    carousell.SelectBeatmap(beatmapSet.Beatmaps.First());
                 else
                 {
-                    if (selectedBeatmapInfo?.Equals(Beatmap.BeatmapInfo) != true)
-                    {
-                        var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(Beatmap.BeatmapInfo));
-                        if (panel != null)
-                        {
-                            panel.State = PanelSelectedState.Selected;
-                            return;
-                        }
-                    }
+                    var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(Beatmap.BeatmapInfo));
+                    if (panel != null)
+                        carousell.SelectGroup(group, panel);
                 }
-
-                group.State = BeatmapGroupState.Collapsed;
-            });
+            }));
         }
 
-        private void addBeatmapSets()
+        private void addBeatmapSets(OsuGame game)
         {
             foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
-                addBeatmapSet(beatmapSet);
+                addBeatmapSet(beatmapSet, game);
         }
     }
 }

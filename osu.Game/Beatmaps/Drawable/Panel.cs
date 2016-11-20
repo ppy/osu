@@ -26,8 +26,26 @@ namespace osu.Game.Beatmaps.Drawable
             BorderColour = new Color4(221, 255, 255, 255);
 
             RelativeSizeAxes = Axes.X;
+        }
 
-            Deselected();
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            applyState();
+            FadeInFromZero(250);
+        }
+
+        private void applyState()
+        {
+            switch (state)
+            {
+                case PanelSelectedState.NotSelected:
+                    Deselected();
+                    break;
+                case PanelSelectedState.Selected:
+                    Selected();
+                    break;
+            }
         }
 
         private PanelSelectedState state = PanelSelectedState.NotSelected;
@@ -41,15 +59,7 @@ namespace osu.Game.Beatmaps.Drawable
                 if (state == value) return;
                 state = value;
 
-                switch (state)
-                {
-                    case PanelSelectedState.NotSelected:
-                        Deselected();
-                        break;
-                    case PanelSelectedState.Selected:
-                        Selected();
-                        break;
-                }
+                applyState();
             }
         }
 

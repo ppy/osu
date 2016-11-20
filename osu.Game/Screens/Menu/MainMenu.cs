@@ -15,6 +15,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multiplayer;
 using osu.Game.Screens.Play;
 using OpenTK;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.Menu
 {

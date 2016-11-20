@@ -17,7 +17,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Beatmaps.Drawable
 {
-    class BeatmapGroup : Container, IStateful<BeatmapGroupState>
+    class BeatmapGroup : IStateful<BeatmapGroupState>
     {
         public BeatmapPanel SelectedPanel;
 
@@ -27,8 +27,7 @@ namespace osu.Game.Beatmaps.Drawable
         public Action<BeatmapGroup, BeatmapInfo> SelectionChanged;
 
         private BeatmapSetInfo beatmapSet;
-        private BeatmapSetHeader header;
-        private FlowContainer difficulties;
+        public BeatmapSetHeader Header;
 
         private BeatmapGroupState state;
 
@@ -43,24 +42,24 @@ namespace osu.Game.Beatmaps.Drawable
                 switch (state)
                 {
                     case BeatmapGroupState.Expanded:
-                        FadeTo(1, 250);
-
                         //if (!difficulties.Children.All(d => IsLoaded))
                         //    Task.WhenAll(difficulties.Children.Select(d => d.Preload(Game))).ContinueWith(t => difficulties.Show());
                         //else
-                        difficulties.Show();
+                        foreach (BeatmapPanel panel in BeatmapPanels)
+                            panel.Show();
 
-                        header.State = PanelSelectedState.Selected;
+                        Header.State = PanelSelectedState.Selected;
                         if (SelectedPanel != null)
                             SelectedPanel.State = PanelSelectedState.Selected;
                         break;
                     case BeatmapGroupState.Collapsed:
-                        FadeTo(0.8f, 250);
-
-                        header.State = PanelSelectedState.NotSelected;
+                        Header.State = PanelSelectedState.NotSelected;
                         if (SelectedPanel != null)
                             SelectedPanel.State = PanelSelectedState.NotSelected;
-                        difficulties.Hide();
+
+                        foreach (BeatmapPanel panel in BeatmapPanels)
+                            panel.Hide();
+
                         break;
                 }
             }
@@ -70,43 +69,14 @@ namespace osu.Game.Beatmaps.Drawable
         {
             this.beatmapSet = beatmapSet;
 
-            Alpha = 0;
-            AutoSizeAxes = Axes.Y;
-            RelativeSizeAxes = Axes.X;
-
-            Children = new[]
+            Header = new BeatmapSetHeader(beatmapSet, working)
             {
-                new FlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FlowDirection.VerticalOnly,
-                    Children = new Framework.Graphics.Drawable[]
-                    {
-                        header = new BeatmapSetHeader(beatmapSet, working)
-                        {
-                            GainedSelection = headerGainedSelection,
-                            RelativeSizeAxes = Axes.X,
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                        },
-                        difficulties = new FlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Top = 5 },
-                            Padding = new MarginPadding { Left = 75 },
-                            Spacing = new Vector2(0, 5),
-                            Direction = FlowDirection.VerticalOnly,
-                        }
-                    }
-                }
+                GainedSelection = headerGainedSelection,
+                RelativeSizeAxes = Axes.X,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(BaseGame game)
-        {
             BeatmapPanels = beatmapSet.Beatmaps.Select(b => new BeatmapPanel(b)
             {
                 GainedSelection = panelGainedSelection,
@@ -114,10 +84,6 @@ namespace osu.Game.Beatmaps.Drawable
                 Origin = Anchor.TopRight,
                 RelativeSizeAxes = Axes.X,
             }).ToList();
-
-            //for the time being, let's completely load the difficulty panels in the background.
-            //this likely won't scale so well, but allows us to completely async the loading flow.
-            Task.WhenAll(BeatmapPanels.Select(panel => panel.Preload(game, p => difficulties.Add(panel)))).Wait();
         }
 
         private void headerGainedSelection(BeatmapSetHeader panel)
