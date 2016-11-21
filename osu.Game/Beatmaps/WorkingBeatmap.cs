@@ -89,6 +89,12 @@ namespace osu.Game.Beatmaps
             set { lock (trackLock) track = value; }
         }
 
+
+        ~WorkingBeatmap()
+        {
+            Dispose(false);
+        }
+
         public WorkingBeatmap(Beatmap beatmap)
         {
             this.beatmap = beatmap;
@@ -116,6 +122,7 @@ namespace osu.Game.Beatmaps
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public void TransferTo(WorkingBeatmap working)
