@@ -35,29 +35,31 @@ namespace osu.Game.Tests.Beatmaps.IO
         public void TestImportWhenClosed()
         {
             //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            HeadlessGameHost host = new HeadlessGameHost();
-
-            var osu = loadOsu(host);
-            osu.Dependencies.Get<BeatmapDatabase>().Import(osz_path);
-            ensureLoaded(osu);
+            using (HeadlessGameHost host = new HeadlessGameHost())
+            {
+                var osu = loadOsu(host);
+                osu.Dependencies.Get<BeatmapDatabase>().Import(osz_path);
+                ensureLoaded(osu);
+            }
         }
 
         [Test]
         public void TestImportOverIPC()
         {
-            HeadlessGameHost host = new HeadlessGameHost("host", true);
-            HeadlessGameHost client = new HeadlessGameHost("client", true);
+            using (HeadlessGameHost host = new HeadlessGameHost("host", true))
+            using (HeadlessGameHost client = new HeadlessGameHost("client", true))
+            {
+                Assert.IsTrue(host.IsPrimaryInstance);
+                Assert.IsTrue(!client.IsPrimaryInstance);
 
-            Assert.IsTrue(host.IsPrimaryInstance);
-            Assert.IsTrue(!client.IsPrimaryInstance);
+                var osu = loadOsu(host);
 
-            var osu = loadOsu(host);
+                var importer = new BeatmapImporter(client);
+                if (!importer.Import(osz_path).Wait(1000))
+                    Assert.Fail(@"IPC took too long to send");
 
-            var importer = new BeatmapImporter(client);
-            if (!importer.Import(osz_path).Wait(1000))
-                Assert.Fail(@"IPC took too long to send");
-
-            ensureLoaded(osu, 10000);
+                ensureLoaded(osu, 10000);
+            }
         }
 
         private OsuGameBase loadOsu(BasicGameHost host)
