@@ -8,8 +8,6 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using OpenTK;
-using osu.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
@@ -24,16 +22,12 @@ namespace osu.Desktop.VisualTests.Tests
 
         public override string Description => @"Showing everything to play the game.";
 
-        FramedClock localClock;
-
-        protected override IFrameBasedClock Clock => localClock;
-
         public override void Reset()
         {
             base.Reset();
 
             //ensure we are at offset 0
-            localClock = new FramedClock();
+            Clock = new FramedClock();
 
             var objects = new List<HitObject>();
 
@@ -75,7 +69,7 @@ namespace osu.Desktop.VisualTests.Tests
         protected override void Update()
         {
             base.Update();
-            localClock.ProcessFrame();
+            Clock.ProcessFrame();
         }
     }
 }

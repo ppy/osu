@@ -10,10 +10,10 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Game.Configuration;
+using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Beatmaps.Drawable
 {
@@ -28,15 +28,13 @@ namespace osu.Game.Beatmaps.Drawable
         protected override void Selected()
         {
             base.Selected();
-
-            Width = 1;
+            
             GainedSelection?.Invoke(this);
         }
 
         protected override void Deselected()
         {
             base.Deselected();
-            Width = 0.8f;
         }
 
         [BackgroundDependencyLoader]
@@ -66,36 +64,83 @@ namespace osu.Game.Beatmaps.Drawable
             this.beatmapSet = beatmapSet;
             Children = new Framework.Graphics.Drawable[]
             {
-                working.Background == null ? new Box{ RelativeSizeAxes = Axes.Both, Colour = new Color4(20, 20, 20, 255) } : new Sprite
+                new BufferedContainer
                 {
-                    Texture = working.Background,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(1366 / working.Background.Width * 0.6f),
-                    Colour = new Color4(200, 200, 200, 255),
+                    CacheDrawnFrameBuffer = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Framework.Graphics.Drawable[]
+                    {
+                        working.Background == null ? new Box{ RelativeSizeAxes = Axes.Both, Colour = new Color4(200, 200, 200, 255) } : new Sprite
+                        {
+                            Texture = working.Background,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Scale = new Vector2(1366 / working.Background.Width * 0.6f),
+                        },
+                        new FlowContainer
+                        {
+                            Direction = FlowDirection.HorizontalOnly,
+                            RelativeSizeAxes = Axes.Both,
+                            // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
+                            Shear = new Vector2(0.8f, 0),
+                            Alpha = 0.5f,
+                            Children = new[]
+                            {
+                                // The left half with no gradient applied
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.Black,
+                                    Width = 0.4f,
+                                },
+                                // Piecewise-linear gradient with 3 segments to make it appear smoother
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ColourInfo = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
+                                    Width = 0.05f,
+                                },
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ColourInfo = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
+                                    Width = 0.2f,
+                                },
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ColourInfo = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
+                                    Width = 0.05f,
+                                },
+                            }
+                        },
+                    }
                 },
                 new FlowContainer
                 {
                     Direction = FlowDirection.VerticalOnly,
-                    Spacing = new Vector2(0, 2),
-                    Padding = new MarginPadding { Top = 10, Left = 15, Right = 10, Bottom = 10 },
+                    Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
                     {
                         title = new SpriteText
                         {
-                            Font = @"Exo2.0-SemiBoldItalic",
+                            Font = @"Exo2.0-BoldItalic",
                             Text = beatmapSet.Metadata.Title,
-                            TextSize = 22
+                            TextSize = 22,
+                            Shadow = true,
                         },
                         artist = new SpriteText
                         {
-                            Font = @"Exo2.0-MediumItalic",
+                            Margin = new MarginPadding { Top = -1 },
+                            Font = @"Exo2.0-SemiBoldItalic",
                             Text = beatmapSet.Metadata.Artist,
-                            TextSize = 16
+                            TextSize = 17,
+                            Shadow = true,
                         },
                         new FlowContainer
                         {
+                            Margin = new MarginPadding { Top = 5 },
                             AutoSizeAxes = Axes.Both,
                             Children = new[]
                             {
@@ -106,8 +151,6 @@ namespace osu.Game.Beatmaps.Drawable
                     }
                 }
             };
-
-            Deselected();
         }
     }
 }

@@ -7,6 +7,7 @@ using osu.Framework.GameModes;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using OpenTK.Graphics;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.Multiplayer
 {

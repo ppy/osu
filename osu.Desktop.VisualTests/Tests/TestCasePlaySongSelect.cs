@@ -6,7 +6,7 @@ using osu.Desktop.VisualTests.Platform;
 using osu.Framework.GameModes.Testing;
 using osu.Game.Database;
 using osu.Game.Modes;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
 
 namespace osu.Desktop.VisualTests.Tests
 {
