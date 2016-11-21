@@ -125,9 +125,9 @@ namespace osu.Game.Screens.Play
             {
             }
 
-            protected override void UpdateMouseState(InputState state)
+            protected override void TransformState(InputState state)
             {
-                base.UpdateMouseState(state);
+                base.TransformState(state);
 
                 MouseState mouse = (MouseState)state.Mouse;
 
