@@ -105,9 +105,6 @@ namespace osu.Game.Screens.Select
                         Roundness = 15,
                     },
                     Shear = wedged_container_shear,
-                    Children = new Drawable[]
-                    {
-                    },
                 },
                 new Container
                 {

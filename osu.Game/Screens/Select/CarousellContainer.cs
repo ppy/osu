@@ -6,6 +6,7 @@ using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Drawable;
 using osu.Game.Database;
 using System;
@@ -18,7 +19,9 @@ namespace osu.Game.Screens.Select
     {
         private Container<Panel> scrollableContent;
         private List<BeatmapGroup> groups = new List<BeatmapGroup>();
+
         public BeatmapGroup SelectedGroup { get; private set; }
+        public BeatmapPanel SelectedPanel { get; private set; }
 
         private Cached yPositions = new Cached();
 
@@ -26,9 +29,7 @@ namespace osu.Game.Screens.Select
         {
             Add(scrollableContent = new Container<Panel>
             {
-                Padding = new MarginPadding { Left = 25, Top = 25, Bottom = 25 },
                 RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
             });
         }
 
@@ -43,21 +44,38 @@ namespace osu.Game.Screens.Select
 
         private void computeYPositions()
         {
-            float currentY = 0;
+            float currentY = DrawHeight / 2;
+            float selectedY = currentY;
+
             foreach (BeatmapGroup group in groups)
             {
-                group.Header.Position = new Vector2(group.Header.Position.X, currentY);
+                group.Header.MoveToY(currentY, 500, EasingTypes.OutExpo);
                 currentY += group.Header.DrawSize.Y + 5;
 
                 if (group.State == BeatmapGroupState.Expanded)
                 {
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
                     {
-                        panel.Position = new Vector2(panel.Position.X, currentY);
-                        currentY += panel.DrawSize.Y + 5;
+                        if (panel == SelectedPanel)
+                            selectedY = currentY + panel.DrawHeight - DrawHeight / 2;
+
+                        panel.MoveToY(currentY, 500, EasingTypes.OutExpo);
+                        currentY += panel.DrawHeight + 5;
                     }
                 }
             }
+
+            currentY += DrawHeight / 2;
+            scrollableContent.Height = currentY;
+
+            ScrollTo(selectedY);
+        }
+
+        private void scrollToSelected()
+        {
+            if (SelectedPanel == null)
+                return;
+            ScrollTo(getScrollPos(SelectedPanel).Y - DrawHeight / 2);
         }
 
         public void SelectBeatmap(BeatmapInfo beatmap)
@@ -77,6 +95,7 @@ namespace osu.Game.Screens.Select
 
             SelectedGroup = group;
             panel.State = PanelSelectedState.Selected;
+            SelectedPanel = panel;
 
             yPositions.Invalidate();
         }
@@ -87,6 +106,25 @@ namespace osu.Game.Screens.Select
 
             if (!yPositions.EnsureValid())
                 yPositions.Refresh(computeYPositions);
+        }
+
+        private static float offsetX(Vector2 pos, Panel panel, float dist)
+        {
+            float result = 25 + dist * 0.1f;
+            if (!(panel is BeatmapSetHeader) || panel.State != PanelSelectedState.Selected)
+                result += 100;
+
+            return result;
+        }
+
+        private Vector2 getScrollPos(Panel panel)
+        {
+            return panel.Position + panel.DrawSize;;
+        }
+
+        private Vector2 getDrawPos(Panel panel)
+        {
+            return panel.ToSpaceOfOtherDrawable(panel.DrawSize / 2.0f, this);
         }
 
         protected override void Update()
@@ -110,12 +148,11 @@ namespace osu.Game.Screens.Select
                     continue;
 
                 Vector2 panelPosLocal = panel.Position;
-                Vector2 panelPos = panel.ToSpaceOfOtherDrawable(panel.DrawSize / 2.0f, this);
+                Vector2 panelPos = getDrawPos(panel);
 
                 float halfHeight = DrawSize.Y / 2;
                 float dist = Math.Abs(panelPos.Y - halfHeight);
-                panel.Position = new Vector2(
-                    (panel is BeatmapSetHeader && panel.State == PanelSelectedState.Selected ? 0 : 100) + dist * 0.1f, panelPosLocal.Y);
+                panel.Position = new Vector2(offsetX(panelPos, panel, dist), panelPosLocal.Y);
 
                 panel.Alpha = MathHelper.Clamp(1.75f - 1.5f * dist / halfHeight, 0, 1);
             }
