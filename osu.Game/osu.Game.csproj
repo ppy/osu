@@ -103,7 +103,8 @@
     <Compile Include="Screens\Multiplayer\Lobby.cs" />
     <Compile Include="Screens\Multiplayer\Match.cs" />
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
-    <Compile Include="Screens\Multiplayer\MatchSongSelect.cs" />
+    <Compile Include="Screens\Select\CarousellContainer.cs" />
+    <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameMode.cs" />
     <Compile Include="Screens\Play\ModSelect.cs" />
     <Compile Include="Beatmaps\Drawable\BeatmapGroup.cs" />
@@ -114,11 +115,11 @@
     <Compile Include="Modes\Ruleset.cs" />
     <Compile Include="Screens\Ranking\Results.cs" />
     <Compile Include="Screens\Direct\OnlineListing.cs" />
-    <Compile Include="Screens\Play\PlaySongSelect.cs" />
+    <Compile Include="Screens\Select\PlaySongSelect.cs" />
     <Compile Include="Modes\UI\HitRenderer.cs" />
     <Compile Include="Modes\UI\Playfield.cs" />
     <Compile Include="Modes\UI\ScoreOverlay.cs" />
-    <Compile Include="Screens\Edit\EditSongSelect.cs" />
+    <Compile Include="Screens\Select\EditSongSelect.cs" />
     <Compile Include="Modes\UI\ComboCounter.cs" />
     <Compile Include="Modes\UI\ComboResultCounter.cs" />
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />

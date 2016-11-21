@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Backgrounds
                 {
                     oldBackground.Depth = 1;
                     oldBackground.Flush();
-                    oldBackground.FadeOut(500);
+                    oldBackground.FadeOut(250);
                     oldBackground.Expire();
 
                     background.BlurSigma = oldBackground.BlurSigma;
@@ -61,11 +61,6 @@ namespace osu.Game.Screens.Backgrounds
         public void BlurTo(Vector2 sigma, double duration)
         {
             background?.BlurTo(sigma, duration, EasingTypes.OutExpo);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
         }
 
         public override bool Equals(BackgroundMode other)

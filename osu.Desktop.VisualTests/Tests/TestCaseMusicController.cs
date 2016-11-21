@@ -13,20 +13,17 @@ namespace osu.Desktop.VisualTests.Tests
         public override string Name => @"Music Controller";
         public override string Description => @"Tests music controller ui.";
 
-        IFrameBasedClock ourClock;
-        protected override IFrameBasedClock Clock => ourClock;
-
         protected MusicController mc;
 
         public TestCaseMusicController()
         {
-            ourClock = new FramedClock();
+            Clock = new FramedClock();
         }
 
         public override void Reset()
         {
             base.Reset();
-            ourClock.ProcessFrame();
+            Clock.ProcessFrame();
             mc = new MusicController
             {
                 Origin = Anchor.Centre,
@@ -39,7 +36,7 @@ namespace osu.Desktop.VisualTests.Tests
         protected override void Update()
         {
             base.Update();
-            ourClock.ProcessFrame();
+            Clock.ProcessFrame();
         }
     }
 }

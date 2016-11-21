@@ -11,12 +11,14 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Beatmaps.Drawable
 {
     class BeatmapPanel : Panel
     {
         public BeatmapInfo Beatmap;
+        private Sprite background;
 
         public Action<BeatmapPanel> GainedSelection;
 
@@ -24,6 +26,17 @@ namespace osu.Game.Beatmaps.Drawable
         {
             base.Selected();
             GainedSelection?.Invoke(this);
+
+            background.ColourInfo = ColourInfo.GradientVertical(
+                new Color4(20, 43, 51, 255),
+                new Color4(40, 86, 102, 255));
+        }
+
+        protected override void Deselected()
+        {
+            base.Deselected();
+
+            background.Colour = new Color4(20, 43, 51, 255);
         }
 
         public BeatmapPanel(BeatmapInfo beatmap)
@@ -33,11 +46,9 @@ namespace osu.Game.Beatmaps.Drawable
 
             Children = new Framework.Graphics.Drawable[]
             {
-                new Box
+                background = new Box
                 {
-                    Colour = new Color4(40, 86, 102, 255), // TODO: gradient
                     RelativeSizeAxes = Axes.Both,
-                    Size = Vector2.One,
                 },
                 new FlowContainer
                 {
