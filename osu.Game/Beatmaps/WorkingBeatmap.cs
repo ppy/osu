@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps
                     try
                     {
                         using (var reader = GetReader())
-                            background = new TextureStore(new RawTextureLoaderStore(reader)).Get(BeatmapInfo.Metadata.BackgroundFile);
+                            background = new TextureStore(new RawTextureLoaderStore(reader), false).Get(BeatmapInfo.Metadata.BackgroundFile);
                     }
                     catch { }
 
