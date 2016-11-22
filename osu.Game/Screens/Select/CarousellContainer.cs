@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Drawable;
 using osu.Game.Database;
@@ -27,6 +26,8 @@ namespace osu.Game.Screens.Select
 
         public CarousellContainer()
         {
+            DistanceDecayJump = 0.01;
+
             Add(scrollableContent = new Container<Panel>
             {
                 RelativeSizeAxes = Axes.X,
@@ -42,6 +43,13 @@ namespace osu.Game.Screens.Select
             yPositions.Invalidate();
         }
 
+        private static void addPanel(Panel panel, ref float currentY)
+        {
+            panel.Depth = -currentY;
+            panel.MoveToY(currentY, 750, EasingTypes.OutExpo);
+            currentY += panel.DrawHeight + 5;
+        }
+
         private void computeYPositions()
         {
             float currentY = DrawHeight / 2;
@@ -49,19 +57,23 @@ namespace osu.Game.Screens.Select
 
             foreach (BeatmapGroup group in groups)
             {
-                group.Header.MoveToY(currentY, 500, EasingTypes.OutExpo);
-                currentY += group.Header.DrawSize.Y + 5;
+                addPanel(group.Header, ref currentY);
 
                 if (group.State == BeatmapGroupState.Expanded)
                 {
+                    group.Header.MoveToX(-100, 500, EasingTypes.OutExpo);
+
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
                     {
                         if (panel == SelectedPanel)
-                            selectedY = currentY + panel.DrawHeight - DrawHeight / 2;
+                            selectedY = currentY + 1.5f * panel.DrawHeight - DrawHeight / 2;
 
-                        panel.MoveToY(currentY, 500, EasingTypes.OutExpo);
-                        currentY += panel.DrawHeight + 5;
+                        addPanel(panel, ref currentY);
                     }
+                }
+                else
+                {
+                    group.Header.MoveToX(0, 500, EasingTypes.OutExpo);
                 }
             }
 
@@ -94,7 +106,11 @@ namespace osu.Game.Screens.Select
         public void SelectGroup(BeatmapGroup group, BeatmapPanel panel)
         {
             if (SelectedGroup != null && SelectedGroup != group)
+            {
                 SelectedGroup.State = BeatmapGroupState.Collapsed;
+                foreach (BeatmapPanel p in group.BeatmapPanels)
+                    p.MoveToY(group.Header.Position.Y);
+            }
 
             SelectedGroup = group;
             panel.State = PanelSelectedState.Selected;
@@ -111,13 +127,14 @@ namespace osu.Game.Screens.Select
                 yPositions.Refresh(computeYPositions);
         }
 
-        private static float offsetX(Vector2 pos, Panel panel, float dist)
+        private static float offsetX(Vector2 pos, Panel panel, float dist, float halfHeight)
         {
-            float result = 25 + dist * 0.1f;
-            if (!(panel is BeatmapSetHeader) || panel.State != PanelSelectedState.Selected)
-                result += 100;
+            // The radius of the circle the carousel moves on.
+            const float CIRCLE_RADIUS = 4;
+            double discriminant = Math.Max(0, CIRCLE_RADIUS * CIRCLE_RADIUS - dist * dist);
+            float x = (CIRCLE_RADIUS - (float)Math.Sqrt(discriminant)) * halfHeight;
 
-            return result;
+            return 125 + x;
         }
 
         private Vector2 getScrollPos(Panel panel)
@@ -154,10 +171,10 @@ namespace osu.Game.Screens.Select
                 Vector2 panelPos = getDrawPos(panel);
 
                 float halfHeight = DrawSize.Y / 2;
-                float dist = Math.Abs(panelPos.Y - halfHeight);
-                panel.Position = new Vector2(offsetX(panelPos, panel, dist), panelPosLocal.Y);
+                float dist = Math.Abs(1f - panelPos.Y / halfHeight);
+                panel.OriginPosition = new Vector2(-offsetX(panelPos, panel, dist, halfHeight), 0);
 
-                panel.Alpha = MathHelper.Clamp(1.75f - 1.5f * dist / halfHeight, 0, 1);
+                panel.Alpha = MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1);
             }
         }
     }
