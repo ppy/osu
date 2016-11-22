@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -44,6 +45,7 @@ namespace osu.Game.Screens.Select
         private Container wedgedBeatmapInfo;
 
         private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
+        private CancellationTokenSource initialAddSetsTask;
 
         /// <param name="database">Optionally provide a database to use instead of the OsuGame one.</param>
         public PlaySongSelect(BeatmapDatabase database = null)
@@ -156,11 +158,18 @@ namespace osu.Game.Screens.Select
             if (database == null)
                 database = beatmaps;
 
-            database.BeatmapSetAdded += s => Schedule(() => addBeatmapSet(s, game));
+            database.BeatmapSetAdded += onDatabaseOnBeatmapSetAdded;
 
             trackManager = audio.Track;
 
-            Task.Factory.StartNew(() => addBeatmapSets(game));
+            initialAddSetsTask = new CancellationTokenSource();
+
+            Task.Factory.StartNew(() => addBeatmapSets(game, initialAddSetsTask.Token), initialAddSetsTask.Token);
+        }
+
+        private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)
+        {
+            Schedule(() => addBeatmapSet(s, Game));
         }
 
         protected override void OnEntering(GameMode last)
@@ -199,6 +208,10 @@ namespace osu.Game.Screens.Select
             base.Dispose(isDisposing);
             if (playMode != null)
                 playMode.ValueChanged -= playMode_ValueChanged;
+
+            database.BeatmapSetAdded -= onDatabaseOnBeatmapSetAdded;
+
+            initialAddSetsTask.Cancel();
         }
 
         private void playMode_ValueChanged(object sender, EventArgs e)
@@ -396,10 +409,13 @@ namespace osu.Game.Screens.Select
             }));
         }
 
-        private void addBeatmapSets(BaseGame game)
+        private void addBeatmapSets(BaseGame game, CancellationToken token)
         {
             foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
+            {
+                if (token.IsCancellationRequested) return;
                 addBeatmapSet(beatmapSet, game);
+            }
         }
     }
 }
