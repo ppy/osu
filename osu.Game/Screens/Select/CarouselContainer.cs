@@ -18,12 +18,14 @@ namespace osu.Game.Screens.Select
     {
         private Container<Panel> scrollableContent;
         private List<BeatmapGroup> groups = new List<BeatmapGroup>();
+        private List<Panel> panels = new List<Panel>();
 
         public BeatmapGroup SelectedGroup { get; private set; }
         public BeatmapPanel SelectedPanel { get; private set; }
 
-        private Cached yPositions = new Cached();
-
+        private Cached yPositionsCached = new Cached();
+        private List<float> yPositions = new List<float>();
+        
         public CarouselContainer()
         {
             DistanceDecayJump = 0.01;
@@ -39,25 +41,32 @@ namespace osu.Game.Screens.Select
             group.State = BeatmapGroupState.Collapsed;
 
             groups.Add(group);
+            panels.Add(group.Header);
+            foreach (BeatmapPanel panel in group.BeatmapPanels)
+                panels.Add(panel);
 
-            yPositions.Invalidate();
+            yPositionsCached.Invalidate();
         }
 
-        private static void addPanel(Panel panel, ref float currentY)
+        private void movePanel(Panel panel, bool advance, ref float currentY)
         {
-            panel.Depth = -currentY;
+            yPositions.Add(currentY);
             panel.MoveToY(currentY, 750, EasingTypes.OutExpo);
-            currentY += panel.DrawHeight + 5;
+
+            if (advance)
+                currentY += panel.DrawHeight + 5;
         }
 
         private void computeYPositions()
         {
+            yPositions.Clear();
+
             float currentY = DrawHeight / 2;
             float selectedY = currentY;
 
             foreach (BeatmapGroup group in groups)
             {
-                addPanel(group.Header, ref currentY);
+                movePanel(group.Header, true, ref currentY);
 
                 if (group.State == BeatmapGroupState.Expanded)
                 {
@@ -66,14 +75,17 @@ namespace osu.Game.Screens.Select
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
                     {
                         if (panel == SelectedPanel)
-                            selectedY = currentY + 1.5f * panel.DrawHeight - DrawHeight / 2;
+                            selectedY = currentY + panel.DrawHeight / 2 - DrawHeight / 2;
 
-                        addPanel(panel, ref currentY);
+                        movePanel(panel, true, ref currentY);
                     }
                 }
                 else
                 {
                     group.Header.MoveToX(0, 500, EasingTypes.OutExpo);
+
+                    foreach (BeatmapPanel panel in group.BeatmapPanels)
+                        movePanel(panel, false, ref currentY);
                 }
             }
 
@@ -81,13 +93,6 @@ namespace osu.Game.Screens.Select
             scrollableContent.Height = currentY;
 
             ScrollTo(selectedY);
-        }
-
-        private void scrollToSelected()
-        {
-            if (SelectedPanel == null)
-                return;
-            ScrollTo(getScrollPos(SelectedPanel).Y - DrawHeight / 2);
         }
 
         public void SelectBeatmap(BeatmapInfo beatmap)
@@ -116,18 +121,18 @@ namespace osu.Game.Screens.Select
             panel.State = PanelSelectedState.Selected;
             SelectedPanel = panel;
 
-            yPositions.Invalidate();
+            yPositionsCached.Invalidate();
         }
 
         protected override void UpdateLayout()
         {
             base.UpdateLayout();
 
-            if (!yPositions.EnsureValid())
-                yPositions.Refresh(computeYPositions);
+            if (!yPositionsCached.EnsureValid())
+                yPositionsCached.Refresh(computeYPositions);
         }
 
-        private static float offsetX(Vector2 pos, Panel panel, float dist, float halfHeight)
+        private static float offsetX(Panel panel, float dist, float halfHeight)
         {
             // The radius of the circle the carousel moves on.
             const float CIRCLE_RADIUS = 4;
@@ -137,44 +142,52 @@ namespace osu.Game.Screens.Select
             return 125 + x;
         }
 
-        private Vector2 getScrollPos(Panel panel)
+        private void addPanel(int index)
         {
-            return panel.Position + panel.DrawSize;;
-        }
+            Panel panel = panels[index];
+            if (panel.Hidden)
+                return;
 
-        private Vector2 getDrawPos(Panel panel)
-        {
-            return panel.ToSpaceOfOtherDrawable(panel.DrawSize / 2.0f, this);
+            panel.Depth = index + (panel is BeatmapSetHeader ? panels.Count : 0);
+
+            if (!scrollableContent.Contains(panel))
+                scrollableContent.Add(panel);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            scrollableContent.Clear(false);
-
-            foreach (BeatmapGroup group in groups)
+            float drawHeight = DrawHeight;
+            scrollableContent.RemoveAll(delegate (Panel p)
             {
-                scrollableContent.Add(group.Header);
+                float panelPosY = p.Position.Y;
+                return panelPosY < Current - p.DrawHeight || panelPosY > Current + drawHeight || !IsVisible;
+            });
 
-                if (group.State == BeatmapGroupState.Expanded)
-                    foreach (BeatmapPanel panel in group.BeatmapPanels)
-                        scrollableContent.Add(panel);
-            }
+            int firstIndex = yPositions.BinarySearch(Current - Panel.MAX_HEIGHT);
+            if (firstIndex < 0) firstIndex = ~firstIndex;
+            int lastIndex = yPositions.BinarySearch(Current + drawHeight);
+            if (lastIndex < 0) lastIndex = ~lastIndex;
 
+            for (int i = firstIndex; i < lastIndex; ++i)
+                addPanel(i);
+
+            float halfHeight = drawHeight / 2;
             foreach (Panel panel in scrollableContent.Children)
             {
-                if (panel.Position.Y < 0)
-                    continue;
+                float panelDrawY = panel.Position.Y - Current;
+                float dist = Math.Abs(1f - panelDrawY / halfHeight);
 
-                Vector2 panelPosLocal = panel.Position;
-                Vector2 panelPos = getDrawPos(panel);
+                // Setting the origin position serves as an additive position on top of potential
+                // local transformation we may want to apply (e.g. when a panel gets selected, we
+                // may want to smoothly transform it leftwards.)
+                panel.OriginPosition = new Vector2(-offsetX(panel, dist, halfHeight), 0);
 
-                float halfHeight = DrawSize.Y / 2;
-                float dist = Math.Abs(1f - panelPos.Y / halfHeight);
-                panel.OriginPosition = new Vector2(-offsetX(panelPos, panel, dist, halfHeight), 0);
-
-                panel.Alpha = MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1);
+                // We are applying a multiplicative alpha (which is internally done by nesting an
+                // additional container and setting that container's alpha) such that we can
+                // layer transformations on top, with a similar reasoning to the previous comment.
+                panel.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
             }
         }
     }

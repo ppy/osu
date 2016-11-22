@@ -103,7 +103,7 @@
     <Compile Include="Screens\Multiplayer\Lobby.cs" />
     <Compile Include="Screens\Multiplayer\Match.cs" />
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
-    <Compile Include="Screens\Select\CarousellContainer.cs" />
+    <Compile Include="Screens\Select\CarouselContainer.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameMode.cs" />
     <Compile Include="Screens\Play\ModSelect.cs" />

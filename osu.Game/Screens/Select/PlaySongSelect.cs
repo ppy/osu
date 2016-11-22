@@ -148,8 +148,6 @@ namespace osu.Game.Screens.Select
             {
                 playMode = osuGame.PlayMode;
                 playMode.ValueChanged += playMode_ValueChanged;
-                // Temporary:
-                carousell.Padding = new MarginPadding { Top = ToolbarPadding };
             }
 
             if (database == null)
