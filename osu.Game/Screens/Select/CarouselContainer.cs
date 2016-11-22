@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Select
             float halfHeight = drawHeight / 2;
             foreach (Panel panel in scrollableContent.Children)
             {
-                float panelDrawY = panel.Position.Y - Current;
+                float panelDrawY = panel.Position.Y - Current + panel.DrawHeight / 2;
                 float dist = Math.Abs(1f - panelDrawY / halfHeight);
 
                 // Setting the origin position serves as an additive position on top of potential
