@@ -1,11 +1,6 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,15 +12,32 @@ namespace osu.Game.Beatmaps.Drawable
 {
     class Panel : Container, IStateful<PanelSelectedState>
     {
+        public const float MAX_HEIGHT = 80;
+
+        public bool Hidden = true;
+        private Container nestedContainer;
+
+        protected override Container<Framework.Graphics.Drawable> Content => nestedContainer;
+
         public Panel()
         {
-            Height = 80;
+            Height = MAX_HEIGHT;
 
             Masking = true;
             CornerRadius = 10;
             BorderColour = new Color4(221, 255, 255, 255);
 
             RelativeSizeAxes = Axes.X;
+
+            AddInternal(nestedContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
+        }
+
+        public void SetMultiplicativeAlpha(float alpha)
+        {
+            nestedContainer.Alpha = alpha;
         }
 
         protected override void LoadComplete()
