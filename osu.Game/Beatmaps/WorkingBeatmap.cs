@@ -94,6 +94,8 @@ namespace osu.Game.Beatmaps
             set { lock (trackLock) track = value; }
         }
 
+        public bool TrackLoaded => track != null;
+
         public WorkingBeatmap(Beatmap beatmap)
         {
             this.beatmap = beatmap;
