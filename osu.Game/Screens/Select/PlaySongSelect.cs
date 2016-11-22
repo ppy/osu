@@ -231,6 +231,7 @@ namespace osu.Game.Screens.Select
                 (Background as BackgroundModeBeatmap)?.BlurTo(BACKGROUND_BLUR, 1000);
             }
 
+            //todo: move to own class and fix async logic (move every call on WorkingBeatmap.* to load() and use Preload to create it.
             refreshWedgedBeatmapInfo(beatmap);
         }
 
