@@ -73,15 +73,11 @@ namespace osu.Game.Beatmaps.Drawable
             {
                 GainedSelection = headerGainedSelection,
                 RelativeSizeAxes = Axes.X,
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
             };
 
             BeatmapPanels = beatmap.BeatmapSetInfo.Beatmaps.Select(b => new BeatmapPanel(b)
             {
                 GainedSelection = panelGainedSelection,
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
                 RelativeSizeAxes = Axes.X,
             }).ToList();
         }
