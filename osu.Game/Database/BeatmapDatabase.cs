@@ -136,7 +136,7 @@ namespace osu.Game.Database
 
         public BeatmapSetInfo GetBeatmapSet(int id)
         {
-            return Query<BeatmapSetInfo>().Where(s => s.BeatmapSetID == id).FirstOrDefault();
+            return Query<BeatmapSetInfo>().FirstOrDefault(s => s.BeatmapSetID == id);
         }
 
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
@@ -175,10 +175,10 @@ namespace osu.Game.Database
             return connection.GetWithChildren<T>(id);
         }
 
-        public List<T> GetAllWithChildren<T>(Expression<Func<T, bool>> filter = null,
-            bool recursive = true) where T : class
+        public List<T> GetAllWithChildren<T>(Expression<Func<T, bool>> filter = null, bool recursive = true)
+            where T : class
         {
-            return connection.GetAllWithChildren<T>(filter, recursive);
+            return connection.GetAllWithChildren(filter, recursive);
         }
 
         public T GetChildren<T>(T item, bool recursive = true)
@@ -199,7 +199,7 @@ namespace osu.Game.Database
 
         public void Update<T>(T record, bool cascade = true) where T : class
         {
-            if (!validTypes.Any(t => t == typeof(T)))
+            if (validTypes.All(t => t != typeof(T)))
                 throw new ArgumentException(nameof(T), "Must be a type managed by BeatmapDatabase");
             if (cascade)
                 connection.UpdateWithChildren(record);
