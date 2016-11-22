@@ -14,107 +14,27 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Game.Configuration;
 using osu.Framework.Graphics.Colour;
+using osu.Framework;
 
 namespace osu.Game.Beatmaps.Drawable
 {
     class BeatmapSetHeader : Panel
     {
         public Action<BeatmapSetHeader> GainedSelection;
-        private BeatmapSetInfo beatmapSet;
         private SpriteText title, artist;
         private OsuConfigManager config;
         private Bindable<bool> preferUnicode;
+        private WorkingBeatmap beatmap;
 
-        protected override void Selected()
+        public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
-            base.Selected();
-            
-            GainedSelection?.Invoke(this);
-        }
+            this.beatmap = beatmap;
 
-        protected override void Deselected()
-        {
-            base.Deselected();
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            this.config = config;
-
-            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
-            preferUnicode.ValueChanged += preferUnicode_changed;
-            preferUnicode_changed(preferUnicode, null);
-        }
-        private void preferUnicode_changed(object sender, EventArgs e)
-        {
-            title.Text = config.GetUnicodeString(beatmapSet.Metadata.Title, beatmapSet.Metadata.TitleUnicode);
-            artist.Text = config.GetUnicodeString(beatmapSet.Metadata.Artist, beatmapSet.Metadata.ArtistUnicode);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            if (preferUnicode != null)
-                preferUnicode.ValueChanged -= preferUnicode_changed;
-            base.Dispose(isDisposing);
-        }
-
-        public BeatmapSetHeader(BeatmapSetInfo beatmapSet, WorkingBeatmap working)
-        {
-            this.beatmapSet = beatmapSet;
             Children = new Framework.Graphics.Drawable[]
             {
-                new BufferedContainer
+                new PanelBackground(beatmap)
                 {
-                    CacheDrawnFrameBuffer = true,
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Framework.Graphics.Drawable[]
-                    {
-                        working.Background == null ? new Box{ RelativeSizeAxes = Axes.Both, Colour = new Color4(200, 200, 200, 255) } : new Sprite
-                        {
-                            Texture = working.Background,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Scale = new Vector2(1366 / working.Background.Width * 0.6f),
-                        },
-                        new FlowContainer
-                        {
-                            Direction = FlowDirection.HorizontalOnly,
-                            RelativeSizeAxes = Axes.Both,
-                            // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
-                            Shear = new Vector2(0.8f, 0),
-                            Alpha = 0.5f,
-                            Children = new[]
-                            {
-                                // The left half with no gradient applied
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
-                                    Width = 0.4f,
-                                },
-                                // Piecewise-linear gradient with 3 segments to make it appear smoother
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ColourInfo = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
-                                    Width = 0.05f,
-                                },
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ColourInfo = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
-                                    Width = 0.2f,
-                                },
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ColourInfo = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
-                                    Width = 0.05f,
-                                },
-                            }
-                        },
-                    }
                 },
                 new FlowContainer
                 {
@@ -126,7 +46,7 @@ namespace osu.Game.Beatmaps.Drawable
                         title = new SpriteText
                         {
                             Font = @"Exo2.0-BoldItalic",
-                            Text = beatmapSet.Metadata.Title,
+                            Text = beatmap.BeatmapSetInfo.Metadata.Title,
                             TextSize = 22,
                             Shadow = true,
                         },
@@ -134,7 +54,7 @@ namespace osu.Game.Beatmaps.Drawable
                         {
                             Margin = new MarginPadding { Top = -1 },
                             Font = @"Exo2.0-SemiBoldItalic",
-                            Text = beatmapSet.Metadata.Artist,
+                            Text = beatmap.BeatmapSetInfo.Metadata.Artist,
                             TextSize = 17,
                             Shadow = true,
                         },
@@ -151,6 +71,125 @@ namespace osu.Game.Beatmaps.Drawable
                     }
                 }
             };
+        }
+
+        protected override void Selected()
+        {
+            base.Selected();
+            GainedSelection?.Invoke(this);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            this.config = config;
+
+            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
+            preferUnicode.ValueChanged += preferUnicode_changed;
+            preferUnicode_changed(preferUnicode, null);
+        }
+        private void preferUnicode_changed(object sender, EventArgs e)
+        {
+            title.Text = config.GetUnicodeString(beatmap.BeatmapSetInfo.Metadata.Title, beatmap.BeatmapSetInfo.Metadata.TitleUnicode);
+            artist.Text = config.GetUnicodeString(beatmap.BeatmapSetInfo.Metadata.Artist, beatmap.BeatmapSetInfo.Metadata.ArtistUnicode);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (preferUnicode != null)
+                preferUnicode.ValueChanged -= preferUnicode_changed;
+            base.Dispose(isDisposing);
+        }
+
+        class PanelBackground : BufferedContainer
+        {
+            private readonly WorkingBeatmap working;
+
+            public PanelBackground(WorkingBeatmap working)
+            {
+                this.working = working;
+
+                CacheDrawnFrameBuffer = true;
+
+                Children = new[]
+                {
+                    new FlowContainer
+                    {
+                        Depth = 1,
+                        Direction = FlowDirection.HorizontalOnly,
+                        RelativeSizeAxes = Axes.Both,
+                        // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
+                        Shear = new Vector2(0.8f, 0),
+                        Alpha = 0.5f,
+                        Children = new[]
+                        {
+                            // The left half with no gradient applied
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.Black,
+                                Width = 0.4f,
+                            },
+                            // Piecewise-linear gradient with 3 segments to make it appear smoother
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColourInfo = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
+                                Width = 0.05f,
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColourInfo = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
+                                Width = 0.2f,
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColourInfo = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
+                                Width = 0.05f,
+                            },
+                        }
+                    },
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuGameBase game)
+            {
+                //todo: masking check
+                new BeatmapBackground(working)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                }.Preload(game, (bg) =>
+                {
+                    Add(bg);
+                    ForceRedraw();
+                });
+            }
+
+            class BeatmapBackground : Sprite
+            {
+                private readonly WorkingBeatmap working;
+
+                public BeatmapBackground(WorkingBeatmap working)
+                {
+                    this.working = working;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuGameBase game)
+                {
+                    Texture = working.Background;
+                }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+                    Scale = new Vector2(1366 / (Texture?.Width ?? 1) * 0.6f);
+                }
+            }
         }
     }
 }
