@@ -22,16 +22,14 @@ namespace osu.Game.Beatmaps.Drawable
         public Panel()
         {
             Height = MAX_HEIGHT;
-
-            Masking = true;
-            CornerRadius = 10;
-            BorderColour = new Color4(221, 255, 255, 255);
-
             RelativeSizeAxes = Axes.X;
 
             AddInternal(nestedContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                CornerRadius = 10,
+                BorderColour = new Color4(221, 255, 255, 255),
             });
         }
 
@@ -77,9 +75,8 @@ namespace osu.Game.Beatmaps.Drawable
 
         protected virtual void Selected()
         {
-            BorderThickness = 2.5f;
-
-            EdgeEffect = new EdgeEffect
+            nestedContainer.BorderThickness = 2.5f;
+            nestedContainer.EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Glow,
                 Colour = new Color4(130, 204, 255, 150),
@@ -90,9 +87,8 @@ namespace osu.Game.Beatmaps.Drawable
 
         protected virtual void Deselected()
         {
-            BorderThickness = 0;
-
-            EdgeEffect = new EdgeEffect
+            nestedContainer.BorderThickness = 0;
+            nestedContainer.EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(1),
