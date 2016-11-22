@@ -18,7 +18,7 @@ namespace osu.Game.Beatmaps
         public readonly BeatmapSetInfo BeatmapSetInfo;
         private readonly BeatmapDatabase database;
 
-        private ArchiveReader reader => database?.GetReader(BeatmapSetInfo);
+        private ArchiveReader GetReader() => database?.GetReader(BeatmapSetInfo);
 
         private Texture background;
         private object backgroundLock = new object();
@@ -32,7 +32,8 @@ namespace osu.Game.Beatmaps
 
                     try
                     {
-                        background = new TextureStore(new RawTextureLoaderStore(reader)).Get(BeatmapInfo.Metadata.BackgroundFile);
+                        using (var reader = GetReader())
+                            background = new TextureStore(new RawTextureLoaderStore(reader)).Get(BeatmapInfo.Metadata.BackgroundFile);
                     }
                     catch { }
 
@@ -54,6 +55,7 @@ namespace osu.Game.Beatmaps
 
                     try
                     {
+                        using (var reader = GetReader())
                         using (var stream = new StreamReader(reader.GetStream(BeatmapInfo.Path)))
                             beatmap = BeatmapDecoder.GetDecoder(stream)?.Decode(stream);
                     }
@@ -77,9 +79,12 @@ namespace osu.Game.Beatmaps
 
                     try
                     {
-                        var trackData = reader?.GetStream(BeatmapInfo.Metadata.AudioFile);
-                        if (trackData != null)
-                            track = new AudioTrackBass(trackData);
+                        using (var reader = GetReader())
+                        {
+                            var trackData = reader?.GetStream(BeatmapInfo.Metadata.AudioFile);
+                            if (trackData != null)
+                                track = new AudioTrackBass(trackData);
+                        }
                     }
                     catch { }
 
@@ -87,12 +92,6 @@ namespace osu.Game.Beatmaps
                 }
             }
             set { lock (trackLock) track = value; }
-        }
-
-
-        ~WorkingBeatmap()
-        {
-            Dispose(false);
         }
 
         public WorkingBeatmap(Beatmap beatmap)
@@ -114,7 +113,7 @@ namespace osu.Game.Beatmaps
             if (!isDisposed)
             {
                 track?.Dispose();
-                reader?.Dispose();
+                background?.Dispose();
                 isDisposed = true;
             }
         }
