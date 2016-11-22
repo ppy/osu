@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps.IO
             public Func<BasicStorage, string, bool> Test { get; set; }
             public Type Type { get; set; }
         }
-    
+
         private static List<Reader> readers { get; } = new List<Reader>();
     
         public static ArchiveReader GetReader(BasicStorage storage, string path)

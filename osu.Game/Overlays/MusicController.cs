@@ -34,7 +34,6 @@ namespace osu.Game.Overlays
         private DragBar progress;
         private TextAwesome playButton, listButton;
         private SpriteText title, artist;
-        private Texture fallbackTexture;
 
         private List<BeatmapSetInfo> playList;
         private List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
@@ -47,6 +46,7 @@ namespace osu.Game.Overlays
         private OsuConfigManager config;
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
+        private BaseGame game;
 
         public MusicController()
         {
@@ -208,7 +208,7 @@ namespace osu.Game.Overlays
             beatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
             playList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
 
-            backgroundSprite = new MusicControllerBackground(fallbackTexture = textures.Get(@"Backgrounds/bg4"));
+            backgroundSprite = new MusicControllerBackground();
             AddInternal(backgroundSprite);
         }
 
@@ -222,12 +222,15 @@ namespace osu.Game.Overlays
         protected override void Update()
         {
             base.Update();
-            if (current?.Track == null) return;
 
-            progress.UpdatePosition((float)(current.Track.CurrentTime / current.Track.Length));
-            playButton.Icon = current.Track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
+            if (current?.TrackLoaded ?? false)
+            {
 
-            if (current.Track.HasCompleted && !current.Track.Looping) next();
+                progress.UpdatePosition((float)(current.Track.CurrentTime / current.Track.Length));
+                playButton.Icon = current.Track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
+
+                if (current.Track.HasCompleted && !current.Track.Looping) next();
+            }
         }
 
         void preferUnicode_changed(object sender, EventArgs e)
@@ -304,36 +307,49 @@ namespace osu.Game.Overlays
             updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
+        protected override void PerformLoad(BaseGame game)
+        {
+            this.game = game;
+            base.PerformLoad(game);
+        }
+
         private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
         {
-            if (beatmap.Beatmap == null)
-                //todo: we may need to display some default text here (currently in the constructor).
-                return;
-
-            BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
-            title.Text = config.GetUnicodeString(metadata.Title, metadata.TitleUnicode);
-            artist.Text = config.GetUnicodeString(metadata.Artist, metadata.ArtistUnicode);
-
-            MusicControllerBackground newBackground = new MusicControllerBackground(beatmap.Background ?? fallbackTexture);
-
-            Add(newBackground);
-
-            switch (direction)
+            Task.Run(() =>
             {
-                case TransformDirection.Next:
-                    newBackground.Position = new Vector2(400, 0);
-                    newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                    backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
-                    break;
-                case TransformDirection.Prev:
-                    newBackground.Position = new Vector2(-400, 0);
-                    newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                    backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
-                    break;
-            }
+                if (beatmap.Beatmap == null)
+                    //todo: we may need to display some default text here (currently in the constructor).
+                    return;
 
-            backgroundSprite.Expire();
-            backgroundSprite = newBackground;
+                BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
+                title.Text = config.GetUnicodeString(metadata.Title, metadata.TitleUnicode);
+                artist.Text = config.GetUnicodeString(metadata.Artist, metadata.ArtistUnicode);
+            });
+
+            MusicControllerBackground newBackground;
+
+            (newBackground = new MusicControllerBackground(beatmap)).Preload(game, delegate
+            {
+
+                Add(newBackground);
+
+                switch (direction)
+                {
+                    case TransformDirection.Next:
+                        newBackground.Position = new Vector2(400, 0);
+                        newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
+                        backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
+                        break;
+                    case TransformDirection.Prev:
+                        newBackground.Position = new Vector2(-400, 0);
+                        newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
+                        backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
+                        break;
+                }
+
+                backgroundSprite.Expire();
+                backgroundSprite = newBackground;
+            });
         }
 
         private void seek(float position)
@@ -363,9 +379,11 @@ namespace osu.Game.Overlays
         private class MusicControllerBackground : BufferedContainer
         {
             private Sprite sprite;
+            private WorkingBeatmap beatmap;
 
-            public MusicControllerBackground(Texture backgroundTexture)
+            public MusicControllerBackground(WorkingBeatmap beatmap = null)
             {
+                this.beatmap = beatmap;
                 CacheDrawnFrameBuffer = true;
                 RelativeSizeAxes = Axes.Both;
                 Depth = float.MinValue;
@@ -374,7 +392,6 @@ namespace osu.Game.Overlays
                 {
                     sprite = new Sprite
                     {
-                        Texture = backgroundTexture,
                         Colour = new Color4(150, 150, 150, 255)
                     },
                     new Box
@@ -386,6 +403,12 @@ namespace osu.Game.Overlays
                         Colour = new Color4(0, 0, 0, 127)
                     }
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
             }
 
             protected override void LoadComplete()
