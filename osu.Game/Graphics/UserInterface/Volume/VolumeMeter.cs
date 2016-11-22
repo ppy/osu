@@ -75,7 +75,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         protected override bool OnWheel(InputState state)
         {
-            Volume += 0.05f * state.Mouse.WheelDiff;
+            Volume += 0.05f * state.Mouse.WheelDelta;
             return true;
         }
 

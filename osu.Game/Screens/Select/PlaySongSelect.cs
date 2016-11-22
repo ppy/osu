@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -44,6 +45,7 @@ namespace osu.Game.Screens.Select
         private Container wedgedBeatmapInfo;
 
         private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
+        private CancellationTokenSource initialAddSetsTask;
 
         /// <param name="database">Optionally provide a database to use instead of the OsuGame one.</param>
         public PlaySongSelect(BeatmapDatabase database = null)
@@ -153,11 +155,18 @@ namespace osu.Game.Screens.Select
             if (database == null)
                 database = beatmaps;
 
-            database.BeatmapSetAdded += s => Schedule(() => addBeatmapSet(s, game));
+            database.BeatmapSetAdded += onDatabaseOnBeatmapSetAdded;
 
             trackManager = audio.Track;
 
-            Task.Factory.StartNew(() => addBeatmapSets(game));
+            initialAddSetsTask = new CancellationTokenSource();
+
+            Task.Factory.StartNew(() => addBeatmapSets(game, initialAddSetsTask.Token), initialAddSetsTask.Token);
+        }
+
+        private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)
+        {
+            Schedule(() => addBeatmapSet(s, Game));
         }
 
         protected override void OnEntering(GameMode last)
@@ -196,6 +205,10 @@ namespace osu.Game.Screens.Select
             base.Dispose(isDisposing);
             if (playMode != null)
                 playMode.ValueChanged -= playMode_ValueChanged;
+
+            database.BeatmapSetAdded -= onDatabaseOnBeatmapSetAdded;
+
+            initialAddSetsTask.Cancel();
         }
 
         private void playMode_ValueChanged(object sender, EventArgs e)
@@ -215,6 +228,7 @@ namespace osu.Game.Screens.Select
                 (Background as BackgroundModeBeatmap)?.BlurTo(BACKGROUND_BLUR, 1000);
             }
 
+            //todo: move to own class and fix async logic (move every call on WorkingBeatmap.* to load() and use Preload to create it.
             refreshWedgedBeatmapInfo(beatmap);
         }
 
@@ -329,6 +343,7 @@ namespace osu.Game.Screens.Select
         {
             base.OnBeatmapChanged(beatmap);
 
+            //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
 
             selectBeatmap(beatmap.BeatmapInfo);
@@ -372,9 +387,9 @@ namespace osu.Game.Screens.Select
             beatmapSet.Beatmaps.ForEach(b => database.GetChildren(b));
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty).ToList();
 
-            var working = database.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault());
+            var beatmap = database.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault());
 
-            var group = new BeatmapGroup(beatmapSet, working) { SelectionChanged = selectionChanged };
+            var group = new BeatmapGroup(beatmap) { SelectionChanged = selectionChanged };
 
             //for the time being, let's completely load the difficulty panels in the background.
             //this likely won't scale so well, but allows us to completely async the loading flow.
@@ -393,10 +408,13 @@ namespace osu.Game.Screens.Select
             }));
         }
 
-        private void addBeatmapSets(BaseGame game)
+        private void addBeatmapSets(BaseGame game, CancellationToken token)
         {
             foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
+            {
+                if (token.IsCancellationRequested) return;
                 addBeatmapSet(beatmapSet, game);
+            }
         }
     }
 }
