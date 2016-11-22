@@ -14,6 +14,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Game.Configuration;
 using osu.Framework.Graphics.Colour;
+using osu.Framework;
 
 namespace osu.Game.Beatmaps.Drawable
 {
@@ -24,40 +25,6 @@ namespace osu.Game.Beatmaps.Drawable
         private SpriteText title, artist;
         private OsuConfigManager config;
         private Bindable<bool> preferUnicode;
-
-        protected override void Selected()
-        {
-            base.Selected();
-            
-            GainedSelection?.Invoke(this);
-        }
-
-        protected override void Deselected()
-        {
-            base.Deselected();
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            this.config = config;
-
-            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
-            preferUnicode.ValueChanged += preferUnicode_changed;
-            preferUnicode_changed(preferUnicode, null);
-        }
-        private void preferUnicode_changed(object sender, EventArgs e)
-        {
-            title.Text = config.GetUnicodeString(beatmapSet.Metadata.Title, beatmapSet.Metadata.TitleUnicode);
-            artist.Text = config.GetUnicodeString(beatmapSet.Metadata.Artist, beatmapSet.Metadata.ArtistUnicode);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            if (preferUnicode != null)
-                preferUnicode.ValueChanged -= preferUnicode_changed;
-            base.Dispose(isDisposing);
-        }
 
         public BeatmapSetHeader(BeatmapSetInfo beatmapSet, WorkingBeatmap working)
         {
@@ -70,12 +37,9 @@ namespace osu.Game.Beatmaps.Drawable
                     RelativeSizeAxes = Axes.Both,
                     Children = new Framework.Graphics.Drawable[]
                     {
-                        working.Background == null ? new Box{ RelativeSizeAxes = Axes.Both, Colour = new Color4(200, 200, 200, 255) } : new Sprite
+                        new PanelBackground(working)
                         {
-                            Texture = working.Background,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Scale = new Vector2(1366 / working.Background.Width * 0.6f),
+                            RelativeSizeAxes = Axes.Both
                         },
                         new FlowContainer
                         {
@@ -151,6 +115,86 @@ namespace osu.Game.Beatmaps.Drawable
                     }
                 }
             };
+        }
+
+        protected override void Selected()
+        {
+            base.Selected();
+            GainedSelection?.Invoke(this);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            this.config = config;
+
+            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
+            preferUnicode.ValueChanged += preferUnicode_changed;
+            preferUnicode_changed(preferUnicode, null);
+        }
+        private void preferUnicode_changed(object sender, EventArgs e)
+        {
+            title.Text = config.GetUnicodeString(beatmapSet.Metadata.Title, beatmapSet.Metadata.TitleUnicode);
+            artist.Text = config.GetUnicodeString(beatmapSet.Metadata.Artist, beatmapSet.Metadata.ArtistUnicode);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (preferUnicode != null)
+                preferUnicode.ValueChanged -= preferUnicode_changed;
+            base.Dispose(isDisposing);
+        }
+
+        class PanelBackground : Container
+        {
+            private readonly WorkingBeatmap working;
+
+            private AsyncBackground backgroundSprite;
+
+            public PanelBackground(WorkingBeatmap working)
+            {
+                this.working = working;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuGameBase game)
+            {
+                OnUpdate += () =>
+                {
+                    //todo: masking check
+                    if (backgroundSprite == null)
+                    {
+                        //moving this to ctor fixes the issue.
+                        (backgroundSprite = new AsyncBackground(working)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }).Preload(game, Add);
+                    }
+                };
+            }
+
+            class AsyncBackground : Sprite
+            {
+                private readonly WorkingBeatmap working;
+
+                public AsyncBackground(WorkingBeatmap working)
+                {
+                    this.working = working;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuGameBase game)
+                {
+                    Texture = working.Background;
+                }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+                    Scale = new Vector2(1366 / (Texture?.Width ?? 1) * 0.6f);
+                }
+            }
         }
     }
 }
