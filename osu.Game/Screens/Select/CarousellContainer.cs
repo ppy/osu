@@ -84,7 +84,10 @@ namespace osu.Game.Screens.Select
             {
                 var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
                 if (panel != null)
+                {
                     SelectGroup(group, panel);
+                    return;
+                }
             }
         }
 
