@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Select
         private BeatmapDatabase database;
         protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
 
-        private CarousellContainer carousell;
+        private CarouselContainer carousell;
         private TrackManager trackManager;
         private Container backgroundWedgesContainer;
 
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Select
                         },
                     }
                 },
-                carousell = new CarousellContainer
+                carousell = new CarouselContainer
                 {
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(scrollWidth, 1),

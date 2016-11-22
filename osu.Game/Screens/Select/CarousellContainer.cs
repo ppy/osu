@@ -14,7 +14,7 @@ using System.Linq;
 
 namespace osu.Game.Screens.Select
 {
-    class CarousellContainer : ScrollContainer
+    class CarouselContainer : ScrollContainer
     {
         private Container<Panel> scrollableContent;
         private List<BeatmapGroup> groups = new List<BeatmapGroup>();
@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Select
 
         private Cached yPositions = new Cached();
 
-        public CarousellContainer()
+        public CarouselContainer()
         {
             DistanceDecayJump = 0.01;
 
