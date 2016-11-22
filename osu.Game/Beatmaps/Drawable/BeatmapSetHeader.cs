@@ -21,17 +21,18 @@ namespace osu.Game.Beatmaps.Drawable
     class BeatmapSetHeader : Panel
     {
         public Action<BeatmapSetHeader> GainedSelection;
-        private BeatmapSetInfo beatmapSet;
         private SpriteText title, artist;
         private OsuConfigManager config;
         private Bindable<bool> preferUnicode;
+        private WorkingBeatmap beatmap;
 
-        public BeatmapSetHeader(BeatmapSetInfo beatmapSet, WorkingBeatmap working)
+        public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
-            this.beatmapSet = beatmapSet;
+            this.beatmap = beatmap;
+
             Children = new Framework.Graphics.Drawable[]
             {
-                new PanelBackground(working)
+                new PanelBackground(beatmap)
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -45,7 +46,7 @@ namespace osu.Game.Beatmaps.Drawable
                         title = new SpriteText
                         {
                             Font = @"Exo2.0-BoldItalic",
-                            Text = beatmapSet.Metadata.Title,
+                            Text = beatmap.BeatmapSetInfo.Metadata.Title,
                             TextSize = 22,
                             Shadow = true,
                         },
@@ -53,7 +54,7 @@ namespace osu.Game.Beatmaps.Drawable
                         {
                             Margin = new MarginPadding { Top = -1 },
                             Font = @"Exo2.0-SemiBoldItalic",
-                            Text = beatmapSet.Metadata.Artist,
+                            Text = beatmap.BeatmapSetInfo.Metadata.Artist,
                             TextSize = 17,
                             Shadow = true,
                         },
@@ -89,8 +90,8 @@ namespace osu.Game.Beatmaps.Drawable
         }
         private void preferUnicode_changed(object sender, EventArgs e)
         {
-            title.Text = config.GetUnicodeString(beatmapSet.Metadata.Title, beatmapSet.Metadata.TitleUnicode);
-            artist.Text = config.GetUnicodeString(beatmapSet.Metadata.Artist, beatmapSet.Metadata.ArtistUnicode);
+            title.Text = config.GetUnicodeString(beatmap.BeatmapSetInfo.Metadata.Title, beatmap.BeatmapSetInfo.Metadata.TitleUnicode);
+            artist.Text = config.GetUnicodeString(beatmap.BeatmapSetInfo.Metadata.Artist, beatmap.BeatmapSetInfo.Metadata.ArtistUnicode);
         }
 
         protected override void Dispose(bool isDisposing)

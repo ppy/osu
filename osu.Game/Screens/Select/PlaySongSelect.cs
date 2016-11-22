@@ -346,6 +346,7 @@ namespace osu.Game.Screens.Select
         {
             base.OnBeatmapChanged(beatmap);
 
+            //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
 
             selectBeatmap(beatmap.BeatmapInfo);
@@ -389,9 +390,9 @@ namespace osu.Game.Screens.Select
             beatmapSet.Beatmaps.ForEach(b => database.GetChildren(b));
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty).ToList();
 
-            var working = database.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault());
+            var beatmap = database.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault());
 
-            var group = new BeatmapGroup(beatmapSet, working) { SelectionChanged = selectionChanged };
+            var group = new BeatmapGroup(beatmap) { SelectionChanged = selectionChanged };
 
             //for the time being, let's completely load the difficulty panels in the background.
             //this likely won't scale so well, but allows us to completely async the loading flow.

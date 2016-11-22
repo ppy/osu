@@ -26,12 +26,12 @@ namespace osu.Game.Beatmaps.Drawable
         /// </summary>
         public Action<BeatmapGroup, BeatmapInfo> SelectionChanged;
 
-        private BeatmapSetInfo beatmapSet;
         public BeatmapSetHeader Header;
 
         private BeatmapGroupState state;
 
         public List<BeatmapPanel> BeatmapPanels;
+        private WorkingBeatmap beatmap;
 
         public BeatmapGroupState State
         {
@@ -65,11 +65,11 @@ namespace osu.Game.Beatmaps.Drawable
             }
         }
 
-        public BeatmapGroup(BeatmapSetInfo beatmapSet, WorkingBeatmap working)
+        public BeatmapGroup(WorkingBeatmap beatmap)
         {
-            this.beatmapSet = beatmapSet;
+            this.beatmap = beatmap;
 
-            Header = new BeatmapSetHeader(beatmapSet, working)
+            Header = new BeatmapSetHeader(beatmap)
             {
                 GainedSelection = headerGainedSelection,
                 RelativeSizeAxes = Axes.X,
@@ -77,7 +77,7 @@ namespace osu.Game.Beatmaps.Drawable
                 Origin = Anchor.TopRight,
             };
 
-            BeatmapPanels = beatmapSet.Beatmaps.Select(b => new BeatmapPanel(b)
+            BeatmapPanels = beatmap.BeatmapSetInfo.Beatmaps.Select(b => new BeatmapPanel(b)
             {
                 GainedSelection = panelGainedSelection,
                 Anchor = Anchor.TopRight,
