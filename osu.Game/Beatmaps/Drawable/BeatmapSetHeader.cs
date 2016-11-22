@@ -31,54 +31,9 @@ namespace osu.Game.Beatmaps.Drawable
             this.beatmapSet = beatmapSet;
             Children = new Framework.Graphics.Drawable[]
             {
-                new BufferedContainer
+                new PanelBackground(working)
                 {
-                    CacheDrawnFrameBuffer = true,
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Framework.Graphics.Drawable[]
-                    {
-                        new PanelBackground(working)
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        },
-                        new FlowContainer
-                        {
-                            Direction = FlowDirection.HorizontalOnly,
-                            RelativeSizeAxes = Axes.Both,
-                            // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
-                            Shear = new Vector2(0.8f, 0),
-                            Alpha = 0.5f,
-                            Children = new[]
-                            {
-                                // The left half with no gradient applied
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
-                                    Width = 0.4f,
-                                },
-                                // Piecewise-linear gradient with 3 segments to make it appear smoother
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ColourInfo = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
-                                    Width = 0.05f,
-                                },
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ColourInfo = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
-                                    Width = 0.2f,
-                                },
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ColourInfo = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
-                                    Width = 0.05f,
-                                },
-                            }
-                        },
-                    }
                 },
                 new FlowContainer
                 {
@@ -145,40 +100,79 @@ namespace osu.Game.Beatmaps.Drawable
             base.Dispose(isDisposing);
         }
 
-        class PanelBackground : Container
+        class PanelBackground : BufferedContainer
         {
             private readonly WorkingBeatmap working;
-
-            private AsyncBackground backgroundSprite;
 
             public PanelBackground(WorkingBeatmap working)
             {
                 this.working = working;
+
+                CacheDrawnFrameBuffer = true;
+
+                Children = new[]
+                {
+                    new FlowContainer
+                    {
+                        Depth = 1,
+                        Direction = FlowDirection.HorizontalOnly,
+                        RelativeSizeAxes = Axes.Both,
+                        // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
+                        Shear = new Vector2(0.8f, 0),
+                        Alpha = 0.5f,
+                        Children = new[]
+                        {
+                            // The left half with no gradient applied
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.Black,
+                                Width = 0.4f,
+                            },
+                            // Piecewise-linear gradient with 3 segments to make it appear smoother
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColourInfo = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
+                                Width = 0.05f,
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColourInfo = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
+                                Width = 0.2f,
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColourInfo = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
+                                Width = 0.05f,
+                            },
+                        }
+                    },
+                };
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuGameBase game)
             {
-                OnUpdate += () =>
+                //todo: masking check
+                new BeatmapBackground(working)
                 {
-                    //todo: masking check
-                    if (backgroundSprite == null)
-                    {
-                        //moving this to ctor fixes the issue.
-                        (backgroundSprite = new AsyncBackground(working)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        }).Preload(game, Add);
-                    }
-                };
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                }.Preload(game, (bg) =>
+                {
+                    Add(bg);
+                    ForceRedraw();
+                });
             }
 
-            class AsyncBackground : Sprite
+            class BeatmapBackground : Sprite
             {
                 private readonly WorkingBeatmap working;
 
-                public AsyncBackground(WorkingBeatmap working)
+                public BeatmapBackground(WorkingBeatmap working)
                 {
                     this.working = working;
                 }
