@@ -28,7 +28,8 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Colour = Color4.DarkGray
+                Colour = Color4.DarkGray,
+                FillMode = FillMode.Fill,
             });
         }
 
@@ -37,12 +38,6 @@ namespace osu.Game.Graphics.Backgrounds
         {
             if (!string.IsNullOrEmpty(textureName))
                 Sprite.Texture = textures.Get(textureName);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            Sprite.Scale = new Vector2(Math.Max(DrawSize.X / Sprite.DrawSize.X, DrawSize.Y / Sprite.DrawSize.Y));
         }
     }
 }
