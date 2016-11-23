@@ -13,11 +13,10 @@ namespace osu.Game.Graphics.UserInterface.Volume
     internal class VolumeMeter : Container
     {
         private Box meterFill;
-        private BindableDouble volume;
+        public BindableDouble Bindable;
 
-        public VolumeMeter(string meterName, BindableDouble volume)
+        public VolumeMeter(string meterName)
         {
-            this.volume = volume;
             Size = new Vector2(40, 180);
             Children = new Drawable[]
             {
@@ -65,10 +64,10 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         public double Volume
         {
-            get { return volume.Value; }
+            get { return Bindable.Value; }
             private set
             {
-                volume.Value = value;
+                Bindable.Value = value;
                 updateFill();
             }
         }
