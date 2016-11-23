@@ -64,6 +64,7 @@ namespace osu.Game.Screens.Backgrounds
         [BackgroundDependencyLoader]
         private void load()
         {
+            //this should be "background?.IsLoaded != true" but this will cause the schedule above to never be run.
             while (beatmap == null && !HasExited)
                 Thread.Sleep(1);
         }
