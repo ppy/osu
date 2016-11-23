@@ -104,11 +104,13 @@ namespace osu.Game.Overlays
                     {
                         tooltip1 = new SpriteText
                         {
+                            Shadow = true,
                             TextSize = 22,
                             Font = @"Exo2.0-Bold",
                         },
                         tooltip2 = new SpriteText
                         {
+                            Shadow = true,
                             TextSize = 16
                         }
                     }
