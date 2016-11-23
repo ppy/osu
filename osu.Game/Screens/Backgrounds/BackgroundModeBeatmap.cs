@@ -36,18 +36,18 @@ namespace osu.Game.Screens.Backgrounds
 
                     newBackground.Preload(Game, delegate
                     {
-                        Background oldBackground = background;
+                        float newDepth = 0;
+                        if (background != null)
+                        {
+                            newDepth = background.Depth - 1;
+                            background.Flush();
+                            background.FadeOut(250);
+                            background.Expire();
+                        }
 
+                        newBackground.Depth = newDepth;
                         Add(background = newBackground);
                         background.BlurSigma = blurTarget;
-
-                        if (oldBackground != null)
-                        {
-                            oldBackground.Depth = 1;
-                            oldBackground.Flush();
-                            oldBackground.FadeOut(250);
-                            oldBackground.Expire();
-                        }
                     });
                 });
             }
