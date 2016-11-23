@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Select
         private TrackManager trackManager;
         private Container backgroundWedgesContainer;
 
-        private static readonly Vector2 wedged_container_size = new Vector2(700, 225);
+        private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
         private static readonly Vector2 wedged_container_start_position = new Vector2(0, 50);
         private BeatmapInfoOverlay wedgedBeatmapInfoOverlay;
@@ -93,6 +93,7 @@ namespace osu.Game.Screens.Select
                     Alpha = 0,
                     Position = wedged_container_start_position,
                     Size = wedged_container_size,
+                    RelativeSizeAxes = Axes.X,
                     Shear = wedged_container_shear,
                     Margin = new MarginPadding { Top = 20, Right = 20, },
                     Masking = true,
