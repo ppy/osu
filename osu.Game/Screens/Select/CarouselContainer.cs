@@ -6,11 +6,11 @@ using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
-using osu.Game.Beatmaps.Drawable;
 using osu.Game.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Beatmaps.Drawables;
 
 namespace osu.Game.Screens.Select
 {

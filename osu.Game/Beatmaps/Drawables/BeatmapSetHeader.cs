@@ -2,21 +2,19 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Database;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Game.Configuration;
-using osu.Framework.Graphics.Colour;
-using osu.Framework;
 
-namespace osu.Game.Beatmaps.Drawable
+namespace osu.Game.Beatmaps.Drawables
 {
     class BeatmapSetHeader : Panel
     {
@@ -31,7 +29,7 @@ namespace osu.Game.Beatmaps.Drawable
             this.beatmap = beatmap;
             Hidden = false;
 
-            Children = new Framework.Graphics.Drawable[]
+            Children = new Drawable[]
             {
                 new PanelBackground(beatmap)
                 {
@@ -158,7 +156,6 @@ namespace osu.Game.Beatmaps.Drawable
             [BackgroundDependencyLoader]
             private void load(OsuGameBase game)
             {
-                //todo: masking check
                 new BeatmapBackground(working)
                 {
                     Anchor = Anchor.Centre,

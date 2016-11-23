@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using OpenTK;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Background;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens.Backgrounds
 {

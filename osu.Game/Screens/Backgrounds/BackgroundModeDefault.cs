@@ -3,7 +3,7 @@
 
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Game.Graphics.Background;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens.Backgrounds
 {
