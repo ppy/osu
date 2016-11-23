@@ -2,9 +2,8 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Diagnostics;
 using System.Threading;
-using osu.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
@@ -29,30 +28,30 @@ namespace osu.Game.Screens
             return false;
         }
 
-        BaseGame game;
-
-        [BackgroundDependencyLoader]
-        private void load(BaseGame game)
-        {
-            this.game = game;
-        }
+        private GameMode pendingLoad;
 
         public override bool Push(GameMode mode)
         {
+            Debug.Assert(pendingLoad == null);
+
             // When trying to push a non-loaded GameMode, load it asynchronously and re-invoke Push
             // once it's done.
             if (mode.LoadState == LoadState.NotLoaded)
             {
-                mode.Preload(game, d => Push((BackgroundMode)d));
+                pendingLoad = mode;
+                mode.Preload(Game, d => Push((BackgroundMode)d));
                 return true;
             }
 
             // Make sure the in-progress loading is complete before pushing the GameMode.
-            while (mode.LoadState < LoadState.Loaded)
+            while (mode.LoadState < LoadState.Loaded && !mode.HasExited)
                 Thread.Sleep(1);
 
-            base.Push(mode);
+            if (mode.HasExited)
+                return false;
 
+            pendingLoad = null;
+            base.Push(mode);
             return true;
         }
 
@@ -81,10 +80,25 @@ namespace osu.Game.Screens
 
         protected override bool OnExiting(GameMode next)
         {
+            if (base.OnExiting(next)) return true;
+
             Content.FadeOut(transition_length, EasingTypes.OutExpo);
             Content.MoveToX(x_movement_amount, transition_length, EasingTypes.OutExpo);
 
-            return base.OnExiting(next);
+            stopPendingLoad();
+            return false;
+        }
+
+        public override void MakeCurrent()
+        {
+            base.MakeCurrent();
+            stopPendingLoad();
+        }
+
+        private void stopPendingLoad()
+        {
+            pendingLoad?.Exit();
+            pendingLoad = null;
         }
 
         protected override void OnResuming(GameMode last)
