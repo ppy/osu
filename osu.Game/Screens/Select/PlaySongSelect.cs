@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawable;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
@@ -24,6 +23,8 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Screens.Play;
 using osu.Framework;
+using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
@@ -33,11 +34,10 @@ namespace osu.Game.Screens.Select
         private BeatmapDatabase database;
         protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
 
-        private CarouselContainer carousell;
+        private CarouselContainer carousel;
         private TrackManager trackManager;
-        private Container backgroundWedgesContainer;
 
-        private static readonly Vector2 wedged_container_size = new Vector2(700, 225);
+        private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
         private static readonly Vector2 wedged_container_start_position = new Vector2(0, 50);
         private BeatmapInfoOverlay wedgedBeatmapInfoOverlay;
@@ -45,46 +45,60 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
 
+        class WedgeBackground : Container
+        {
+            public WedgeBackground()
+            {
+                Children = new[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(1, 0.5f),
+                        Colour = new Color4(0, 0, 0, 0.5f),
+                        Shear = new Vector2(0.15f, 0),
+                        EdgeSmoothness = new Vector2(2, 0),
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        RelativePositionAxes = Axes.Y,
+                        Size = new Vector2(1, -0.5f),
+                        Position = new Vector2(0, 1),
+                        Colour = new Color4(0, 0, 0, 0.5f),
+                        Shear = new Vector2(-0.15f, 0),
+                        EdgeSmoothness = new Vector2(2, 0),
+                    },
+                };
+            }
+        }
+
         /// <param name="database">Optionally provide a database to use instead of the OsuGame one.</param>
         public PlaySongSelect(BeatmapDatabase database = null)
         {
             this.database = database;
 
-            const float scrollWidth = 640;
+            const float carouselWidth = 640;
             const float bottomToolHeight = 50;
             Children = new Drawable[]
             {
-                backgroundWedgesContainer = new Container
+                new ParallaxContainer
                 {
+                    ParallaxAmount = 0.005f,
                     RelativeSizeAxes = Axes.Both,
-                    Size = Vector2.One,
-                    Padding = new MarginPadding { Right = scrollWidth },
-                    Children = new[]
+                    Children = new []
                     {
-                        new Box
+                        new WedgeBackground
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(1, 0.5f),
-                            Colour = new Color4(0, 0, 0, 0.5f),
-                            Shear = new Vector2(0.15f, 0),
-                            EdgeSmoothness = new Vector2(2, 0),
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            RelativePositionAxes = Axes.Y,
-                            Size = new Vector2(1, -0.5f),
-                            Position = new Vector2(0, 1),
-                            Colour = new Color4(0, 0, 0, 0.5f),
-                            Shear = new Vector2(-0.15f, 0),
-                            EdgeSmoothness = new Vector2(2, 0),
+                            Padding = new MarginPadding { Right = carouselWidth * 0.76f },
                         },
                     }
                 },
-                carousell = new CarouselContainer
+                carousel = new CarouselContainer
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(scrollWidth, 1),
+                    Size = new Vector2(carouselWidth, 1),
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                 },
@@ -93,6 +107,7 @@ namespace osu.Game.Screens.Select
                     Alpha = 0,
                     Position = wedged_container_start_position,
                     Size = wedged_container_size,
+                    RelativeSizeAxes = Axes.X,
                     Shear = wedged_container_shear,
                     Margin = new MarginPadding { Top = 20, Right = 20, },
                     Masking = true,
@@ -130,7 +145,7 @@ namespace osu.Game.Screens.Select
                             Colour = new Color4(238, 51, 153, 255),
                             Action = () => Push(new Player
                             {
-                                BeatmapInfo = carousell.SelectedGroup.SelectedPanel.Beatmap,
+                                BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
                                 PreferredPlayMode = playMode.Value
                             })
                         },
@@ -242,7 +257,7 @@ namespace osu.Game.Screens.Select
 
         private void selectBeatmap(BeatmapInfo beatmap)
         {
-            carousell.SelectBeatmap(beatmap);
+            carousel.SelectBeatmap(beatmap);
         }
 
         /// <summary>
@@ -286,15 +301,15 @@ namespace osu.Game.Screens.Select
             //this likely won't scale so well, but allows us to completely async the loading flow.
             Task.WhenAll(group.BeatmapPanels.Select(panel => panel.Preload(game))).ContinueWith(task => Schedule(delegate
             {
-                carousell.AddGroup(group);
+                carousel.AddGroup(group);
 
                 if (Beatmap == null)
-                    carousell.SelectBeatmap(beatmapSet.Beatmaps.First());
+                    carousel.SelectBeatmap(beatmapSet.Beatmaps.First());
                 else
                 {
                     var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(Beatmap.BeatmapInfo));
                     if (panel != null)
-                        carousell.SelectGroup(group, panel);
+                        carousel.SelectGroup(group, panel);
                 }
             }));
         }

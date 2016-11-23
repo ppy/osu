@@ -8,7 +8,7 @@ using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Beatmaps.Drawable
+namespace osu.Game.Beatmaps.Drawables
 {
     class Panel : Container, IStateful<PanelSelectedState>
     {
@@ -17,9 +17,9 @@ namespace osu.Game.Beatmaps.Drawable
         public bool Hidden = true;
         private Container nestedContainer;
 
-        protected override Container<Framework.Graphics.Drawable> Content => nestedContainer;
+        protected override Container<Drawable> Content => nestedContainer;
 
-        public Panel()
+        protected Panel()
         {
             Height = MAX_HEIGHT;
             RelativeSizeAxes = Axes.X;

@@ -19,9 +19,6 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         private VolumeMeter volumeMeterMaster;
 
-        private FlowContainer content;
-        protected override Container<Drawable> Content => content;
-
         private void volumeChanged(object sender, EventArgs e)
         {
             Show();
@@ -34,14 +31,23 @@ namespace osu.Game.Graphics.UserInterface.Volume
             Anchor = Anchor.BottomRight;
             Origin = Anchor.BottomRight;
 
-            AddInternal(content = new FlowContainer
+            Children = new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight,
-                Margin = new MarginPadding { Left = 10, Right = 10, Top = 30, Bottom = 30 },
-                Spacing = new Vector2(15, 0),
-            });
+                new FlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Margin = new MarginPadding { Left = 10, Right = 10, Top = 30, Bottom = 30 },
+                    Spacing = new Vector2(15, 0),
+                    Children = new Drawable[]
+                    {
+                        volumeMeterMaster = new VolumeMeter("Master"),
+                        volumeMeterEffect = new VolumeMeter("Effects"),
+                        volumeMeterMusic = new VolumeMeter("Music")
+                    }
+                }
+            };
         }
 
         protected override void LoadComplete()
@@ -52,12 +58,9 @@ namespace osu.Game.Graphics.UserInterface.Volume
             VolumeSample.ValueChanged += volumeChanged;
             VolumeTrack.ValueChanged += volumeChanged;
 
-            Add(new[]
-            {
-                volumeMeterMaster = new VolumeMeter("Master", VolumeGlobal),
-                new VolumeMeter("Effects", VolumeSample),
-                new VolumeMeter("Music", VolumeTrack)
-            });
+            volumeMeterMaster.Bindable = VolumeGlobal;
+            volumeMeterEffect.Bindable = VolumeSample;
+            volumeMeterMusic.Bindable = VolumeTrack;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -80,6 +83,9 @@ namespace osu.Game.Graphics.UserInterface.Volume
         }
 
         ScheduledDelegate popOutDelegate;
+
+        private VolumeMeter volumeMeterEffect;
+        private VolumeMeter volumeMeterMusic;
 
         protected override void PopIn()
         {
