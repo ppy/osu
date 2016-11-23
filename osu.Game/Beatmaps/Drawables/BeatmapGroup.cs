@@ -4,18 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Database;
-using OpenTK;
-using osu.Framework.Allocation;
 
-namespace osu.Game.Beatmaps.Drawable
+namespace osu.Game.Beatmaps.Drawables
 {
     class BeatmapGroup : IStateful<BeatmapGroupState>
     {

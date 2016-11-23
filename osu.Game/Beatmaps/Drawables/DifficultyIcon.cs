@@ -7,7 +7,7 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Beatmaps.Drawable
+namespace osu.Game.Beatmaps.Drawables
 {
     class DifficultyIcon : Container
     {

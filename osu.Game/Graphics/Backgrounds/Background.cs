@@ -2,18 +2,15 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.Containers;
+using osu.Framework.Graphics.Textures;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework;
-using System.Threading.Tasks;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Allocation;
 
-namespace osu.Game.Graphics.Background
+namespace osu.Game.Graphics.Backgrounds
 {
     public class Background : BufferedContainer
     {
