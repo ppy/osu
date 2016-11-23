@@ -144,7 +144,7 @@ namespace osu.Game.Database
             var beatmapSetInfo = Query<BeatmapSetInfo>().FirstOrDefault(s => s.BeatmapSetID == beatmapInfo.BeatmapSetID);
 
             //we need metadata
-            GetChildren(beatmapSetInfo, false);
+            GetChildren(beatmapSetInfo);
 
             if (beatmapSetInfo == null)
                 throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetID} is not in the local database.");
@@ -181,7 +181,7 @@ namespace osu.Game.Database
             return connection.GetAllWithChildren(filter, recursive);
         }
 
-        public T GetChildren<T>(T item, bool recursive = true)
+        public T GetChildren<T>(T item, bool recursive = false)
         {
             if (item == null) return default(T);
 
