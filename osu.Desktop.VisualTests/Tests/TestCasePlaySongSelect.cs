@@ -26,6 +26,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 storage = new TestStorage(@"TestCasePlaySongSelect");
                 db = new BeatmapDatabase(storage);
+                Dependencies.Cache(db, true);
 
                 var sets = new List<BeatmapSetInfo>();
 
@@ -35,7 +36,7 @@ namespace osu.Desktop.VisualTests.Tests
                 db.Import(sets);
             }
 
-            Add(new PlaySongSelect(db));
+            Add(new PlaySongSelect());
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)

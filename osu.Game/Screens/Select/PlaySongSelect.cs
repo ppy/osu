@@ -73,11 +73,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        /// <param name="database">Optionally provide a database to use instead of the OsuGame one.</param>
-        public PlaySongSelect(BeatmapDatabase database = null)
+        public PlaySongSelect()
         {
-            this.database = database;
-
             const float carouselWidth = 640;
             const float bottomToolHeight = 50;
             Children = new Drawable[]
