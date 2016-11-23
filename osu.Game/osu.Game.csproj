@@ -103,7 +103,7 @@
     <Compile Include="Screens\Multiplayer\Lobby.cs" />
     <Compile Include="Screens\Multiplayer\Match.cs" />
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
-    <Compile Include="Screens\Select\CarousellContainer.cs" />
+    <Compile Include="Screens\Select\CarouselContainer.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameMode.cs" />
     <Compile Include="Screens\Play\ModSelect.cs" />
@@ -159,6 +159,7 @@
     <Compile Include="Overlays\ToolbarModeButton.cs" />
     <Compile Include="Overlays\ToolbarModeSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Screens\Select\BeatmapInfoOverlay.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
