@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Select
         private BeatmapDatabase database;
         protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
 
-        private CarouselContainer carousell;
+        private CarouselContainer carousel;
         private TrackManager trackManager;
         private Container backgroundWedgesContainer;
 
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Select
                         },
                     }
                 },
-                carousell = new CarouselContainer
+                carousel = new CarouselContainer
                 {
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(scrollWidth, 1),
@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Select
                             Colour = new Color4(238, 51, 153, 255),
                             Action = () => Push(new Player
                             {
-                                BeatmapInfo = carousell.SelectedGroup.SelectedPanel.Beatmap,
+                                BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
                                 PreferredPlayMode = playMode.Value
                             })
                         },
@@ -243,7 +243,7 @@ namespace osu.Game.Screens.Select
 
         private void selectBeatmap(BeatmapInfo beatmap)
         {
-            carousell.SelectBeatmap(beatmap);
+            carousel.SelectBeatmap(beatmap);
         }
 
         /// <summary>
@@ -287,15 +287,15 @@ namespace osu.Game.Screens.Select
             //this likely won't scale so well, but allows us to completely async the loading flow.
             Task.WhenAll(group.BeatmapPanels.Select(panel => panel.Preload(game))).ContinueWith(task => Schedule(delegate
             {
-                carousell.AddGroup(group);
+                carousel.AddGroup(group);
 
                 if (Beatmap == null)
-                    carousell.SelectBeatmap(beatmapSet.Beatmaps.First());
+                    carousel.SelectBeatmap(beatmapSet.Beatmaps.First());
                 else
                 {
                     var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(Beatmap.BeatmapInfo));
                     if (panel != null)
-                        carousell.SelectGroup(group, panel);
+                        carousel.SelectGroup(group, panel);
                 }
             }));
         }
