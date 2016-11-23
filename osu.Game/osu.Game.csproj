@@ -70,9 +70,9 @@
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\Formats\ConstructableBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\WorkingBeatmap.cs" />
-    <Compile Include="Beatmaps\Drawable\BeatmapSetHeader.cs" />
-    <Compile Include="Beatmaps\Drawable\DifficultyIcon.cs" />
-    <Compile Include="Beatmaps\Drawable\Panel.cs" />
+    <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
+    <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
+    <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Modes\Objects\Drawables\DrawableHitObject.cs" />
     <Compile Include="Modes\Objects\HitObject.cs" />
     <Compile Include="Modes\Objects\HitObjectConverter.cs" />
@@ -107,8 +107,8 @@
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameMode.cs" />
     <Compile Include="Screens\Play\ModSelect.cs" />
-    <Compile Include="Beatmaps\Drawable\BeatmapGroup.cs" />
-    <Compile Include="Beatmaps\Drawable\BeatmapPanel.cs" />
+    <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
+    <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Screens\Play\Player.cs" />
     <Compile Include="Screens\Charts\ChartListing.cs" />
     <Compile Include="Modes\PlayMode.cs" />
@@ -125,7 +125,7 @@
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
     <Compile Include="Input\GlobalHotkeys.cs" />
-    <Compile Include="Graphics\Background\Background.cs" />
+    <Compile Include="Graphics\Backgrounds\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />

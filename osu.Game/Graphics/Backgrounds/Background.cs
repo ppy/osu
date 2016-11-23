@@ -2,18 +2,15 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.Containers;
+using osu.Framework.Graphics.Textures;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework;
-using System.Threading.Tasks;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Allocation;
 
-namespace osu.Game.Graphics.Background
+namespace osu.Game.Graphics.Backgrounds
 {
     public class Background : BufferedContainer
     {
@@ -31,7 +28,8 @@ namespace osu.Game.Graphics.Background
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Colour = Color4.DarkGray
+                Colour = Color4.DarkGray,
+                FillMode = FillMode.Fill,
             });
         }
 
@@ -40,12 +38,6 @@ namespace osu.Game.Graphics.Background
         {
             if (!string.IsNullOrEmpty(textureName))
                 Sprite.Texture = textures.Get(textureName);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            Sprite.Scale = new Vector2(Math.Max(DrawSize.X / Sprite.DrawSize.X, DrawSize.Y / Sprite.DrawSize.Y));
         }
     }
 }

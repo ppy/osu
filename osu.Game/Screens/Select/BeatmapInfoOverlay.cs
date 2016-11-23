@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using System;
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -61,7 +62,7 @@ namespace osu.Game.Screens.Select
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Texture = beatmap.Background,
-                                Scale = new Vector2(1366 / beatmap.Background.Width * 0.6f),
+                                FillMode = FillMode.Fill,
                             },
                         },
                     },

@@ -392,7 +392,8 @@ namespace osu.Game.Overlays
                 {
                     sprite = new Sprite
                     {
-                        Colour = new Color4(150, 150, 150, 255)
+                        Colour = new Color4(150, 150, 150, 255),
+                        FillMode = FillMode.Fill,
                     },
                     new Box
                     {
@@ -409,12 +410,6 @@ namespace osu.Game.Overlays
             private void load(TextureStore textures)
             {
                 sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                sprite.Scale = new Vector2(Math.Max(DrawSize.X / sprite.DrawSize.X, DrawSize.Y / sprite.DrawSize.Y));
             }
         }
     }
