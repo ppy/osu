@@ -144,10 +144,11 @@ namespace osu.Game.Screens.Select
             if (panel.Hidden)
                 return;
 
-            panel.Depth = index + (panel is BeatmapSetHeader ? panels.Count : 0);
-
             if (!scrollableContent.Contains(panel))
+            {
+                panel.Depth = index + (panel is BeatmapSetHeader ? panels.Count : 0);
                 scrollableContent.Add(panel);
+            }
         }
 
         protected override void Update()
