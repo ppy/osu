@@ -14,6 +14,8 @@ namespace osu.Game.Modes.UI
 
         public virtual void Add(DrawableHitObject h) => HitObjects.Add(h);
 
+        public override bool Contains(Vector2 screenSpacePos) => true;
+
         public Playfield()
         {
             AddInternal(HitObjects = new HitObjectContainer
@@ -25,6 +27,8 @@ namespace osu.Game.Modes.UI
         public class HitObjectContainer : Container<DrawableHitObject>
         {
             protected override Vector2 DrawScale => new Vector2(DrawSize.X / 512);
+
+            public override bool Contains(Vector2 screenSpacePos) => true;
         }
     }
 }

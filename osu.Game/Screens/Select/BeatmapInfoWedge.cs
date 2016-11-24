@@ -1,4 +1,6 @@
 ﻿using System;
+using osu.Framework;
+using osu.Framework.Allocation;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
@@ -8,31 +10,37 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Framework.Graphics.Colour;
+using osu.Game.Beatmaps.Drawables;
 
 namespace osu.Game.Screens.Select
 {
-    class BeatmapInfoOverlay : Container
+    class BeatmapInfoWedge : Container
     {
         private Container beatmapInfoContainer;
+
+        private BaseGame game;
+
+        [BackgroundDependencyLoader]
+        private void load(BaseGame game)
+        {
+            this.game = game;
+        }
 
         public void UpdateBeatmap(WorkingBeatmap beatmap)
         {
             if (beatmap == null)
                 return;
 
-            float newDepth = 0;
-            if (beatmapInfoContainer != null)
-            {
-                newDepth = beatmapInfoContainer.Depth - 1;
-                beatmapInfoContainer.FadeOut(250);
-                beatmapInfoContainer.Expire();
-            }
+            var lastContainer = beatmapInfoContainer;
+
+            float newDepth = lastContainer?.Depth - 1 ?? 0;
 
             FadeIn(250);
 
             BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
-            Add(beatmapInfoContainer = new BufferedContainer
+
+            (beatmapInfoContainer = new BufferedContainer
             {
                 Depth = newDepth,
                 PixelSnapping = true,
@@ -51,18 +59,17 @@ namespace osu.Game.Screens.Select
                     },
                     // We use a container, such that we can set the colour gradient to go across the
                     // vertices of the masked container instead of the vertices of the (larger) sprite.
-                    beatmap.Background == null ? new Container() : new Container
+                    new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         ColourInfo = ColourInfo.GradientVertical(Color4.White, new Color4(1f, 1f, 1f, 0.3f)),
                         Children = new []
                         {
                             // Zoomed-in and cropped beatmap background
-                            new Sprite
+                            new BeatmapBackgroundSprite(beatmap)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Texture = beatmap.Background,
                                 FillMode = FillMode.Fill,
                             },
                         },
@@ -117,6 +124,12 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 }
+            }).Preload(game, delegate(Drawable d)
+            {
+                lastContainer?.FadeOut(250);
+                lastContainer?.Expire();
+
+                Add(d);
             });
         }
     }
