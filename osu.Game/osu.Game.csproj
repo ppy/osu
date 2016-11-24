@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Modes\HitJudgementResolver.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Overlays\DragBar.cs" />
@@ -159,7 +160,7 @@
     <Compile Include="Overlays\ToolbarModeButton.cs" />
     <Compile Include="Overlays\ToolbarModeSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Screens\Select\BeatmapInfoOverlay.cs" />
+    <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
