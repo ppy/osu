@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
         private static readonly Vector2 wedged_container_start_position = new Vector2(0, 50);
-        private BeatmapInfoOverlay wedgedBeatmapInfoOverlay;
+        private BeatmapInfoWedge wedgedBeatmapInfoWedge;
 
         private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                 },
-                wedgedBeatmapInfoOverlay = new BeatmapInfoOverlay
+                wedgedBeatmapInfoWedge = new BeatmapInfoWedge
                 {
                     Alpha = 0,
                     Position = wedged_container_start_position,
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Select
                 (Background as BackgroundModeBeatmap)?.BlurTo(BACKGROUND_BLUR, 1000);
             }
 
-            wedgedBeatmapInfoOverlay.UpdateBeatmap(beatmap);
+            wedgedBeatmapInfoWedge.UpdateBeatmap(beatmap);
         }
 
         /// <summary>
