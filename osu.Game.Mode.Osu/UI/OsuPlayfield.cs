@@ -37,15 +37,6 @@ namespace osu.Game.Modes.Osu.UI
 
             AddInternal(new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Colour = Color4.Black,
-                    Depth = float.MinValue,
-                    Alpha = 0.5f,
-                },
                 approachCircles = new Container
                 {
                     RelativeSizeAxes = Axes.Both,

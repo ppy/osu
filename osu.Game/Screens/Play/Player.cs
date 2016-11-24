@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -125,23 +126,25 @@ namespace osu.Game.Screens.Play
             {
             }
 
+            bool leftViaKeyboard;
+            bool rightViaKeyboard;
+
             protected override void TransformState(InputState state)
             {
                 base.TransformState(state);
 
                 MouseState mouse = (MouseState)state.Mouse;
 
-                foreach (Key k in state.Keyboard.Keys)
+                if (state.Keyboard != null)
                 {
-                    switch (k)
-                    {
-                        case Key.Z:
-                            mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = true;
-                            break;
-                        case Key.X:
-                            mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = true;
-                            break;
-                    }
+                    leftViaKeyboard = state.Keyboard.Keys.Contains(Key.Z);
+                    rightViaKeyboard = state.Keyboard.Keys.Contains(Key.X);
+                }
+
+                if (state.Mouse != null)
+                {
+                    if (leftViaKeyboard) mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = true;
+                    if (rightViaKeyboard) mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = true;
                 }
 
             }
