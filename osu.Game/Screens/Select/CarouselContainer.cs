@@ -77,10 +77,10 @@ namespace osu.Game.Screens.Select
 
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
                     {
-                        panel.MoveToX(-50, 500, EasingTypes.OutExpo);
-
                         if (panel == SelectedPanel)
                             selectedY = currentY + panel.DrawHeight / 2 - DrawHeight / 2;
+
+                        panel.MoveToX(-50, 500, EasingTypes.OutExpo);
 
                         movePanel(panel, true, ref currentY);
                     }
@@ -90,7 +90,10 @@ namespace osu.Game.Screens.Select
                     group.Header.MoveToX(0, 500, EasingTypes.OutExpo);
 
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
+                    {
+                        panel.MoveToX(0, 500, EasingTypes.OutExpo);
                         movePanel(panel, false, ref currentY);
+                    }
                 }
             }
 
