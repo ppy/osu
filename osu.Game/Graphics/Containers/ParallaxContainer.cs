@@ -38,7 +38,7 @@ namespace osu.Game.Graphics.Containers
         protected override void Update()
         {
             base.Update();
-            content.Position = (input.CurrentState.Mouse.Position - DrawSize / 2) * ParallaxAmount;
+            content.Position = (ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2) * ParallaxAmount;
             content.Scale = new Vector2(1 + ParallaxAmount);
         }
     }
