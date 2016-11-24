@@ -20,12 +20,12 @@ namespace osu.Game.Screens.Select
             if (beatmap == null)
                 return;
 
+            float newDepth = 0;
             if (beatmapInfoContainer != null)
             {
-                Drawable oldWedgedBeatmapInfo = beatmapInfoContainer;
-                oldWedgedBeatmapInfo.Depth = 1;
-                oldWedgedBeatmapInfo.FadeOut(250);
-                oldWedgedBeatmapInfo.Expire();
+                newDepth = beatmapInfoContainer.Depth - 1;
+                beatmapInfoContainer.FadeOut(250);
+                beatmapInfoContainer.Expire();
             }
 
             FadeIn(250);
@@ -34,6 +34,7 @@ namespace osu.Game.Screens.Select
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
             Add(beatmapInfoContainer = new BufferedContainer
             {
+                Depth = newDepth,
                 PixelSnapping = true,
                 CacheDrawnFrameBuffer = true,
                 Shear = -Shear,

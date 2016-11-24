@@ -22,8 +22,7 @@ namespace osu.Game.Screens.Select
 
         public BeatmapGroup SelectedGroup { get; private set; }
         public BeatmapPanel SelectedPanel { get; private set; }
-
-        private Cached yPositionsCached = new Cached();
+        
         private List<float> yPositions = new List<float>();
         
         public CarouselContainer()
@@ -45,7 +44,7 @@ namespace osu.Game.Screens.Select
             foreach (BeatmapPanel panel in group.BeatmapPanels)
                 panels.Add(panel);
 
-            yPositionsCached.Invalidate();
+            computeYPositions();
         }
 
         private void movePanel(Panel panel, bool advance, ref float currentY)
@@ -57,7 +56,11 @@ namespace osu.Game.Screens.Select
                 currentY += panel.DrawHeight + 5;
         }
 
-        private void computeYPositions()
+        /// <summary>
+        /// Computes the target Y positions for every panel in the carousel.
+        /// </summary>
+        /// <returns>The Y position of the currently selected panel.</returns>
+        private float computeYPositions()
         {
             yPositions.Clear();
 
@@ -92,7 +95,7 @@ namespace osu.Game.Screens.Select
             currentY += DrawHeight / 2;
             scrollableContent.Height = currentY;
 
-            ScrollTo(selectedY);
+            return selectedY;
         }
 
         public void SelectBeatmap(BeatmapInfo beatmap)
@@ -121,15 +124,8 @@ namespace osu.Game.Screens.Select
             panel.State = PanelSelectedState.Selected;
             SelectedPanel = panel;
 
-            yPositionsCached.Invalidate();
-        }
-
-        protected override void UpdateLayout()
-        {
-            base.UpdateLayout();
-
-            if (!yPositionsCached.EnsureValid())
-                yPositionsCached.Refresh(computeYPositions);
+            float selectedY = computeYPositions();
+            ScrollTo(selectedY);
         }
 
         private static float offsetX(Panel panel, float dist, float halfHeight)
@@ -148,10 +144,11 @@ namespace osu.Game.Screens.Select
             if (panel.Hidden)
                 return;
 
-            panel.Depth = index + (panel is BeatmapSetHeader ? panels.Count : 0);
-
             if (!scrollableContent.Contains(panel))
+            {
+                panel.Depth = index + (panel is BeatmapSetHeader ? panels.Count : 0);
                 scrollableContent.Add(panel);
+            }
         }
 
         protected override void Update()
