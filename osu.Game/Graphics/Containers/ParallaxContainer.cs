@@ -25,18 +25,20 @@ namespace osu.Game.Graphics.Containers
         }
 
         private Container content;
+        private InputManager input;
 
         protected override Container<Drawable> Content => content;
 
-        protected override bool OnMouseMove(InputState state)
+        [BackgroundDependencyLoader]
+        private void load(UserInputManager input)
         {
-            content.Position = (state.Mouse.Position - DrawSize / 2) * ParallaxAmount;
-            return base.OnMouseMove(state);
+            this.input = input;
         }
 
         protected override void Update()
         {
             base.Update();
+            content.Position = (input.CurrentState.Mouse.Position - DrawSize / 2) * ParallaxAmount;
             content.Scale = new Vector2(1 + ParallaxAmount);
         }
     }
