@@ -156,37 +156,16 @@ namespace osu.Game.Beatmaps.Drawables
             [BackgroundDependencyLoader]
             private void load(OsuGameBase game)
             {
-                new BeatmapBackground(working)
+                new BeatmapBackgroundSprite(working)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    FillMode = FillMode.Fill,
                 }.Preload(game, (bg) =>
                 {
                     Add(bg);
                     ForceRedraw();
                 });
-            }
-
-            class BeatmapBackground : Sprite
-            {
-                private readonly WorkingBeatmap working;
-
-                public BeatmapBackground(WorkingBeatmap working)
-                {
-                    this.working = working;
-                }
-
-                [BackgroundDependencyLoader]
-                private void load(OsuGameBase game)
-                {
-                    Texture = working.Background;
-                }
-
-                protected override void LoadComplete()
-                {
-                    base.LoadComplete();
-                    Scale = new Vector2(1366 / (Texture?.Width ?? 1) * 0.6f);
-                }
             }
         }
     }
