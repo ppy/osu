@@ -27,7 +27,6 @@ namespace osu.Game.Beatmaps.Drawables
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
             this.beatmap = beatmap;
-            Hidden = false;
 
             Children = new Drawable[]
             {
