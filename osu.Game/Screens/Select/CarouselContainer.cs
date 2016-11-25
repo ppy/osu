@@ -10,7 +10,10 @@ using osu.Game.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps.Drawables;
+using osu.Framework.Timing;
 
 namespace osu.Game.Screens.Select
 {
@@ -18,31 +21,74 @@ namespace osu.Game.Screens.Select
     {
         private Container<Panel> scrollableContent;
         private List<BeatmapGroup> groups = new List<BeatmapGroup>();
-        private List<Panel> panels = new List<Panel>();
 
         public BeatmapGroup SelectedGroup { get; private set; }
         public BeatmapPanel SelectedPanel { get; private set; }
-        
+
         private List<float> yPositions = new List<float>();
-        
+        private CarouselLifetimeList<Panel> Lifetime;
+
         public CarouselContainer()
         {
             DistanceDecayJump = 0.01;
 
-            Add(scrollableContent = new Container<Panel>
+            Add(scrollableContent = new Container<Panel>(Lifetime = new CarouselLifetimeList<Panel>(DepthComparer))
             {
                 RelativeSizeAxes = Axes.X,
             });
         }
 
+        internal class CarouselLifetimeList<T> : LifetimeList<Panel>
+        {
+            public CarouselLifetimeList(IComparer<Panel> comparer)
+                : base(comparer)
+            {
+            }
+
+            public int StartIndex;
+            public int EndIndex;
+
+            public override bool Update(FrameTimeInfo time)
+            {
+                bool anyAliveChanged = false;
+
+                //check existing items to make sure they haven't died.
+                foreach (var item in AliveItems.ToArray())
+                {
+                    item.UpdateTime(time);
+                    if (!item.IsAlive)
+                    {
+                        //todo: make this more efficient
+                        int i = IndexOf(item);
+                        anyAliveChanged |= CheckItem(item, ref i);
+                    }
+                }
+
+                //handle custom range
+                for (int i = StartIndex; i < EndIndex; i++)
+                {
+                    var item = this[i];
+                    item.UpdateTime(time);
+                    anyAliveChanged |= CheckItem(item, ref i);
+                }
+
+                return anyAliveChanged;
+            }
+        }
+
         public void AddGroup(BeatmapGroup group)
         {
             group.State = BeatmapGroupState.Collapsed;
-
             groups.Add(group);
-            panels.Add(group.Header);
+
+            group.Header.Depth = scrollableContent.Children.Count();
+            scrollableContent.Add(group.Header);
+
             foreach (BeatmapPanel panel in group.BeatmapPanels)
-                panels.Add(panel);
+            {
+                panel.Depth = scrollableContent.Children.Count();
+                scrollableContent.Add(panel);
+            }
 
             computeYPositions();
         }
@@ -134,7 +180,7 @@ namespace osu.Game.Screens.Select
             ScrollTo(selectedY);
         }
 
-        private static float offsetX(Panel panel, float dist, float halfHeight)
+        private static float offsetX(float dist, float halfHeight)
         {
             // The radius of the circle the carousel moves on.
             const float CIRCLE_RADIUS = 4;
@@ -144,28 +190,16 @@ namespace osu.Game.Screens.Select
             return 125 + x;
         }
 
-        private void addPanel(int index)
-        {
-            Panel panel = panels[index];
-            if (panel.Hidden)
-                return;
-
-            if (!scrollableContent.Contains(panel))
-            {
-                panel.Depth = index + (panel is BeatmapSetHeader ? panels.Count : 0);
-                scrollableContent.Add(panel);
-            }
-        }
-
         protected override void Update()
         {
             base.Update();
 
             float drawHeight = DrawHeight;
-            scrollableContent.RemoveAll(delegate (Panel p)
+
+            Lifetime.AliveItems.ForEach(delegate (Panel p)
             {
                 float panelPosY = p.Position.Y;
-                return panelPosY < Current - p.DrawHeight || panelPosY > Current + drawHeight || !IsVisible;
+                p.OnScreen = panelPosY >= Current - p.DrawHeight && panelPosY <= Current + drawHeight;
             });
 
             int firstIndex = yPositions.BinarySearch(Current - Panel.MAX_HEIGHT);
@@ -173,19 +207,24 @@ namespace osu.Game.Screens.Select
             int lastIndex = yPositions.BinarySearch(Current + drawHeight);
             if (lastIndex < 0) lastIndex = ~lastIndex;
 
-            for (int i = firstIndex; i < lastIndex; ++i)
-                addPanel(i);
+            Lifetime.StartIndex = firstIndex;
+            Lifetime.EndIndex = lastIndex;
 
             float halfHeight = drawHeight / 2;
-            foreach (Panel panel in scrollableContent.Children)
+
+            for (int i = firstIndex; i < lastIndex; ++i)
             {
+                var panel = Lifetime[i];
+
+                panel.OnScreen = true;
+
                 float panelDrawY = panel.Position.Y - Current + panel.DrawHeight / 2;
                 float dist = Math.Abs(1f - panelDrawY / halfHeight);
 
                 // Setting the origin position serves as an additive position on top of potential
                 // local transformation we may want to apply (e.g. when a panel gets selected, we
                 // may want to smoothly transform it leftwards.)
-                panel.OriginPosition = new Vector2(-offsetX(panel, dist, halfHeight), 0);
+                panel.OriginPosition = new Vector2(-offsetX(dist, halfHeight), 0);
 
                 // We are applying a multiplicative alpha (which is internally done by nesting an
                 // additional container and setting that container's alpha) such that we can

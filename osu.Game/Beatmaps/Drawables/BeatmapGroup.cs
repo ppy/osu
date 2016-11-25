@@ -60,7 +60,6 @@ namespace osu.Game.Beatmaps.Drawables
 
             Header = new BeatmapSetHeader(beatmap)
             {
-                Depth = 1,
                 GainedSelection = headerGainedSelection,
                 RelativeSizeAxes = Axes.X,
             };
