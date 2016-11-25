@@ -15,7 +15,11 @@ namespace osu.Game.Beatmaps.Drawables
     {
         public const float MAX_HEIGHT = 80;
 
-        public bool Hidden => Alpha == 0 && Transforms.Count == 0;
+        public override bool RemoveWhenNotAlive => false;
+
+        public bool OnScreen;
+
+        public override bool IsAlive => OnScreen;
 
         private Container nestedContainer;
 
