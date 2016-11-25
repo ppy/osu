@@ -35,14 +35,8 @@ namespace osu.Game.Beatmaps.Drawables
                 switch (state)
                 {
                     case BeatmapGroupState.Expanded:
-                        //if (!difficulties.Children.All(d => IsLoaded))
-                        //    Task.WhenAll(difficulties.Children.Select(d => d.Preload(Game))).ContinueWith(t => difficulties.Show());
-                        //else
                         foreach (BeatmapPanel panel in BeatmapPanels)
-                        {
-                            panel.Hidden = false;
                             panel.FadeIn(250);
-                        }
 
                         Header.State = PanelSelectedState.Selected;
                         if (SelectedPanel != null)
@@ -54,11 +48,7 @@ namespace osu.Game.Beatmaps.Drawables
                             SelectedPanel.State = PanelSelectedState.NotSelected;
 
                         foreach (BeatmapPanel panel in BeatmapPanels)
-                        {
-                            panel.Hidden = true;
                             panel.FadeOut(250);
-                        }
-
                         break;
                 }
             }
@@ -76,6 +66,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             BeatmapPanels = beatmap.BeatmapSetInfo.Beatmaps.Select(b => new BeatmapPanel(b)
             {
+                Alpha = 0,
                 GainedSelection = panelGainedSelection,
                 RelativeSizeAxes = Axes.X,
             }).ToList();
