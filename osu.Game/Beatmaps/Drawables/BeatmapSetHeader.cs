@@ -71,6 +71,12 @@ namespace osu.Game.Beatmaps.Drawables
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            FadeInFromZero(250);
+        }
+
         protected override void Selected()
         {
             base.Selected();

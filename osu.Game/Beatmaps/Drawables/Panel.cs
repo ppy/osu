@@ -44,7 +44,6 @@ namespace osu.Game.Beatmaps.Drawables
         {
             base.LoadComplete();
             applyState();
-            FadeInFromZero(250);
         }
 
         private void applyState()
