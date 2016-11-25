@@ -116,6 +116,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     ring.FadeOut();
                     circle.FadeOut();
                     number.FadeOut();
+                    glow.FadeOut();
 
                     explosion?.Expire();
                     explosion = null;
