@@ -39,7 +39,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 circle = new CirclePiece
                 {
                     Colour = osuObject.Colour,
-                    Hit = Hit,
+                    Hit = () => Hit(new JudgementInfo {
+                        UserTriggered = true,
+                    }),
                 },
                 number = new NumberPiece(),
                 ring = new RingPiece(),
@@ -73,7 +75,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             Flush(true); //move to DrawableHitObject
             ApproachCircle.Flush(true);
 
-            double t = HitTime ?? osuObject.StartTime;
+            double t = osuObject.EndTime + (Judgement?.TimeOffset ?? 0);
 
             Alpha = 0;
 
@@ -103,14 +105,26 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             switch (state)
             {
-                case ArmedState.Disarmed:
-                    Delay(osuObject.Duration + 200);
-                    FadeOut(200);
+                case ArmedState.Idle:
+                    Delay(osuObject.Duration + 500);
+                    FadeOut(500);
 
                     explosion?.Expire();
                     explosion = null;
                     break;
-                case ArmedState.Armed:
+                case ArmedState.Miss:
+                    ring.FadeOut();
+                    circle.FadeOut();
+                    number.FadeOut();
+
+                    explosion?.Expire();
+                    explosion = null;
+
+                    Schedule(() => Add(explosion = new HitExplosion(HitResult.Miss)));
+
+                    FadeOut(800);
+                    break;
+                case ArmedState.Hit:
                     const double flash_in = 30;
 
                     flash.FadeTo(0.8f, flash_in);
@@ -119,7 +133,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
                     explode.FadeIn(flash_in);
 
-                    Schedule(() => Add(explosion = new HitExplosion(Judgement.Hit300)));
+                    Schedule(() => Add(explosion = new HitExplosion(Judgement.Result)));
 
                     Delay(flash_in, true);
 

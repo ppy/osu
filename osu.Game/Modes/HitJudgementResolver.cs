@@ -4,28 +4,34 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
 
 namespace osu.Game.Modes
 {
     public class HitJudgementResolver
     {
-        public JudgementResult CheckJudgement(HitObject h) => new JudgementResult { Combo = ComboJudgement.None, Judgement = Judgement.Hit300 };
+        public virtual void CheckJudgement(DrawableHitObject h, JudgementInfo info)
+        {
+            info.Result = HitResult.Hit300;
+        }
     }
 
-    public struct JudgementResult
+    public class JudgementInfo
     {
-        public ComboJudgement Combo;
-        public Judgement Judgement;
-        public float TimeOffset;
+        public bool UserTriggered;
+        public ComboResult Combo;
+        public HitResult Result;
+        public double TimeOffset;
         public Vector2 PositionOffset;
     }
 
-    public enum ComboJudgement
+    public enum ComboResult
     {
         [Description(@"")]
         None,
@@ -35,8 +41,9 @@ namespace osu.Game.Modes
         Perfect
     }
 
-    public enum Judgement
+    public enum HitResult
     {
+        Ignore,
         [Description(@"Miss")]
         Miss,
         [Description(@"50")]
