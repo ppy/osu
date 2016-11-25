@@ -74,6 +74,7 @@ namespace osu.Game.Screens.Select
                 if (group.State == BeatmapGroupState.Expanded)
                 {
                     group.Header.MoveToX(-100, 500, EasingTypes.OutExpo);
+                    var headerY = group.Header.Position.Y;
 
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
                     {
@@ -81,6 +82,10 @@ namespace osu.Game.Screens.Select
                             selectedY = currentY + panel.DrawHeight / 2 - DrawHeight / 2;
 
                         panel.MoveToX(-50, 500, EasingTypes.OutExpo);
+
+                        //on first display we want to begin hidden under our group's header.
+                        if (panel.Alpha == 0)
+                            panel.MoveToY(headerY);
 
                         movePanel(panel, true, ref currentY);
                     }
@@ -119,11 +124,7 @@ namespace osu.Game.Screens.Select
         public void SelectGroup(BeatmapGroup group, BeatmapPanel panel)
         {
             if (SelectedGroup != null && SelectedGroup != group)
-            {
                 SelectedGroup.State = BeatmapGroupState.Collapsed;
-                foreach (BeatmapPanel p in group.BeatmapPanels)
-                    p.MoveToY(group.Header.Position.Y);
-            }
 
             SelectedGroup = group;
             panel.State = PanelSelectedState.Selected;
