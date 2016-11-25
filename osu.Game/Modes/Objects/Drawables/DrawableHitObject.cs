@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Diagnostics;
 using osu.Framework;
 using osu.Framework.Graphics.Containers;
 
@@ -13,11 +14,11 @@ namespace osu.Game.Modes.Objects.Drawables
         public Action<DrawableHitObject> OnHit;
         public Action<DrawableHitObject> OnMiss;
 
-        public Func<DrawableHitObject, bool> AllowHit;
+        public Action<DrawableHitObject, JudgementInfo> CheckJudgement;
 
         public Container<DrawableHitObject> ChildObjects;
 
-        public JudgementResult Result;
+        public JudgementInfo Judgement;
 
         public HitObject HitObject;
 
@@ -41,36 +42,47 @@ namespace osu.Game.Modes.Objects.Drawables
             }
         }
 
-        protected double? HitTime;
-
-        protected virtual bool Hit()
+        /// <summary>
+        /// Process a hit of this hitobject. Carries out judgement.
+        /// </summary>
+        /// <param name="judgement">Preliminary judgement information provided by the hit source.</param>
+        /// <returns>Whether a hit was processed.</returns>
+        protected bool Hit(JudgementInfo judgement)
         {
-            if (State != ArmedState.Disarmed)
+            if (State != ArmedState.Idle)
                 return false;
 
-            if (AllowHit?.Invoke(this) == false)
+            judgement.TimeOffset = Time.Current - HitObject.EndTime;
+
+            CheckJudgement?.Invoke(this, judgement);
+
+            if (judgement.Result == HitResult.Ignore)
                 return false;
 
-            HitTime = Time.Current;
+            Judgement = judgement;
 
-            State = ArmedState.Armed;
+            switch (judgement.Result)
+            {
+                default:
+                    State = ArmedState.Hit;
+                    OnHit?.Invoke(this);
+                    break;
+                case HitResult.Miss:
+                    State = ArmedState.Miss;
+                    OnMiss?.Invoke(this);
+                    break;
+            }
+
+            
             return true;
         }
-
-        private bool counted;
 
         protected override void Update()
         {
             base.Update();
 
-            if (Time.Current >= HitObject.EndTime && !counted)
-            {
-                counted = true;
-                if (state == ArmedState.Armed)
-                    OnHit?.Invoke(this);
-                else
-                    OnMiss?.Invoke(this);
-            }
+            if (Time.Current >= HitObject.EndTime && Judgement == null)
+                Hit(new JudgementInfo());
         }
 
         protected abstract void UpdateState(ArmedState state);
@@ -78,7 +90,8 @@ namespace osu.Game.Modes.Objects.Drawables
 
     public enum ArmedState
     {
-        Disarmed,
-        Armed
+        Idle,
+        Hit,
+        Miss
     }
 }

@@ -18,7 +18,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 Add(new CirclePiece
                 {
                     Colour = h.Colour,
-                    Hit = Hit,
+                    Hit = () => Hit(new JudgementInfo()),
                     Position = h.Curve.PositionAt(i) - h.Position //non-relative?
                 });
             }

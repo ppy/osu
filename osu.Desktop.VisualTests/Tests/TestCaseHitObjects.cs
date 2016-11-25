@@ -50,7 +50,7 @@ namespace osu.Desktop.VisualTests.Tests
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Depth = -i,
-                    State = ArmedState.Armed,
+                    State = ArmedState.Hit,
                 };
 
                 approachContainer.Add(d.ApproachCircle.CreateProxy());

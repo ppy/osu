@@ -12,7 +12,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private SpriteText line1;
         private SpriteText line2;
 
-        public HitExplosion(Judgement judgement, ComboJudgement comboJudgement = ComboJudgement.None)
+        public HitExplosion(HitResult hitResult, ComboResult comboResult = ComboResult.None)
         {
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
@@ -27,13 +27,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = judgement.GetDescription(),
+                    Text = hitResult.GetDescription(),
                     Font = @"Venera",
                     TextSize = 20,
                 },
                 line2 = new SpriteText
                 {
-                    Text = comboJudgement.GetDescription(),
+                    Text = comboResult.GetDescription(),
                     Font = @"Venera",
                     TextSize = 14,
                 }
