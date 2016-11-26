@@ -12,6 +12,13 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using OpenTK;
+using System;
+using osu.Framework.Graphics.OpenGL;
+using osu.Framework.Graphics.OpenGL.Buffers;
+using System.Collections.Concurrent;
+using OpenTK.Graphics.ES30;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -24,13 +31,18 @@ namespace osu.Game.Graphics.Cursor
             Origin = Anchor.Centre;
         }
 
+        protected override DrawNode CreateDrawNode() => new TrailSpriteDrawNode();
+
         protected override void ApplyDrawNode(DrawNode node)
         {
             base.ApplyDrawNode(node);
 
-            SpriteDrawNode sNode = node as SpriteDrawNode;
+            TrailSpriteDrawNode sNode = node as TrailSpriteDrawNode;
             sNode.RoundedTextureShader = sNode.TextureShader = shader;
+            sNode.NeedsUpdate = true;
         }
+
+        public override bool IsVisible => true;
 
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)
@@ -38,6 +50,11 @@ namespace osu.Game.Graphics.Cursor
             shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.Texture);
             Texture = textures.Get(@"Cursor/cursortrail");
         }
+    }
+
+    class TrailSpriteDrawNode : SpriteDrawNode
+    {
+        public bool NeedsUpdate;
     }
 
     class CursorTrail : Container<TrailSprite>
@@ -53,7 +70,8 @@ namespace osu.Game.Graphics.Cursor
         private double timeOffset;
 
         private float time;
-
+        
+        TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
         const int MAX_SPRITES = 2048;
 
         Vector2? lastPosition;
@@ -67,6 +85,7 @@ namespace osu.Game.Graphics.Cursor
             TrailDrawNode tNode = node as TrailDrawNode;
             tNode.Shader = shader;
             tNode.Time = time;
+            tNode.Shared = trailDrawNodeSharedData;
         }
 
         public CursorTrail()
@@ -87,7 +106,7 @@ namespace osu.Game.Graphics.Cursor
         {
             base.Update();
 
-            Invalidate(Invalidation.DrawNode);
+            Invalidate(Invalidation.DrawNode, shallPropagate: false);
 
             int fadeClockResetThreshold = 1000000;
 
@@ -140,15 +159,62 @@ namespace osu.Game.Graphics.Cursor
             currentIndex = (currentIndex + 1) % MAX_SPRITES;
         }
 
+        public class TrailDrawNodeSharedData
+        {
+            public VertexBuffer<TexturedVertex2D> VertexBuffer;
+        }
+
         class TrailDrawNode : ContainerDrawNode
         {
             public new Shader Shader;
             public float Time;
+            public TrailDrawNodeSharedData Shared;
 
-            public override void Draw(IVertexBatch vertexBatch)
+            public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
+                if (Shared.VertexBuffer == null)
+                    Shared.VertexBuffer = new QuadVertexBuffer<TexturedVertex2D>(MAX_SPRITES, BufferUsageHint.DynamicDraw);
+
                 Shader.GetUniform<float>("g_FadeClock").Value = Time;
-                base.Draw(vertexBatch);
+
+                int updateStart = -1, updateEnd = 0;
+                int test = 0;
+                for (int i = 0; i < Children.Count; ++i)
+                {
+                    TrailSpriteDrawNode tNode = Children[i] as TrailSpriteDrawNode;
+                    if (tNode.NeedsUpdate)
+                    {
+                        if (updateStart == -1)
+                            updateStart = i;
+                        updateEnd = i + 1;
+
+                        int start = i * 4;
+                        int end = start;
+                        tNode.Draw(delegate (TexturedVertex2D v)
+                        {
+                            Shared.VertexBuffer.Vertices[end++] = v;
+                        });
+
+                        tNode.NeedsUpdate = false;
+                    }
+                    else if (updateStart != -1)
+                    {
+                        Shared.VertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
+                        updateStart = -1;
+                    }
+                }
+
+                // Update all remaining vertices that have been changed.
+                if (updateStart != -1)
+                    Shared.VertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
+
+                SpriteDrawNode sNode = Children[0] as SpriteDrawNode;
+                sNode.Texture.TextureGL.Bind();
+                sNode.TextureShader.Bind();
+
+                Shared.VertexBuffer.Draw();
+
+                sNode.TextureShader.Unbind();
             }
         }
     }
