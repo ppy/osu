@@ -27,7 +27,6 @@ namespace osu.Game.Beatmaps.Drawables
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
             this.beatmap = beatmap;
-            Hidden = false;
 
             Children = new Drawable[]
             {
@@ -70,6 +69,12 @@ namespace osu.Game.Beatmaps.Drawables
                     }
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            FadeInFromZero(250);
         }
 
         protected override void Selected()

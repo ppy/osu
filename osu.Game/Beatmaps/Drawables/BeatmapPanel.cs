@@ -2,11 +2,14 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.MathUtils;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -22,6 +25,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         public Action<BeatmapPanel> GainedSelection;
 
+        Color4 deselectedColour = new Color4(20, 43, 51, 255);
+
         protected override void Selected()
         {
             base.Selected();
@@ -36,7 +41,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             base.Deselected();
 
-            background.Colour = new Color4(20, 43, 51, 255);
+            background.Colour = deselectedColour;
         }
 
         public BeatmapPanel(BeatmapInfo beatmap)
@@ -44,11 +49,17 @@ namespace osu.Game.Beatmaps.Drawables
             Beatmap = beatmap;
             Height *= 0.60f;
 
-            Children = new Framework.Graphics.Drawable[]
+            Children = new Drawable[]
             {
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                },
+                new Triangles
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    BlendingMode = BlendingMode.Additive,
+                    Colour = deselectedColour,
                 },
                 new FlowContainer
                 {
@@ -57,7 +68,7 @@ namespace osu.Game.Beatmaps.Drawables
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Children = new Framework.Graphics.Drawable[]
+                    Children = new Drawable[]
                     {
                         new DifficultyIcon(FontAwesome.fa_dot_circle_o, new Color4(159, 198, 0, 255))
                         {
@@ -71,7 +82,7 @@ namespace osu.Game.Beatmaps.Drawables
                             Spacing = new Vector2(0, 5),
                             Direction = FlowDirection.VerticalOnly,
                             AutoSizeAxes = Axes.Both,
-                            Children = new Framework.Graphics.Drawable[]
+                            Children = new Drawable[]
                             {
                                 new FlowContainer
                                 {
@@ -112,6 +123,46 @@ namespace osu.Game.Beatmaps.Drawables
                     }
                 }
             };
+        }
+
+        public class Triangles : Container
+        {
+            private Texture triangle;
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                triangle = textures.Get(@"Play/osu/triangle@2x");
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                for (int i = 0; i < 10; i++)
+                {
+                    Add(new Sprite
+                    {
+                        Texture = triangle,
+                        Origin = Anchor.TopCentre,
+                        RelativePositionAxes = Axes.Both,
+                        Position = new Vector2(RNG.NextSingle(), RNG.NextSingle()),
+                        Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
+                        Alpha = RNG.NextSingle() * 0.3f
+                    });
+                }
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                foreach (Drawable d in Children)
+                {
+                    d.Position -= new Vector2(0, (float)(d.Scale.X * (Time.Elapsed / 880)));
+                    if (d.DrawPosition.Y + d.DrawSize.Y * d.Scale.Y < 0)
+                        d.MoveToY(1);
+                }
+            }
         }
     }
 }

@@ -4,6 +4,7 @@
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
@@ -14,7 +15,12 @@ namespace osu.Game.Beatmaps.Drawables
     {
         public const float MAX_HEIGHT = 80;
 
-        public bool Hidden = true;
+        public override bool RemoveWhenNotAlive => false;
+
+        public bool IsOnScreen;
+
+        public override bool IsAlive => IsOnScreen && base.IsAlive;
+
         private Container nestedContainer;
 
         protected override Container<Drawable> Content => nestedContainer;
@@ -42,7 +48,6 @@ namespace osu.Game.Beatmaps.Drawables
         {
             base.LoadComplete();
             applyState();
-            FadeInFromZero(250);
         }
 
         private void applyState()
