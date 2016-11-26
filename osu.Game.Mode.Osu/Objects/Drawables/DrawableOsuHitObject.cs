@@ -1,34 +1,33 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
-using OpenTK;
 
-namespace osu.Game.Modes
+namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class HitJudgementResolver
+    public class DrawableOsuHitObject : DrawableHitObject
     {
-        public virtual void CheckJudgement(DrawableHitObject h, JudgementInfo info)
+        public DrawableOsuHitObject(OsuHitObject hitObject)
+            : base(hitObject)
         {
-            info.Result = HitResult.Hit300;
+        }
+
+        public override JudgementInfo CreateJudgementInfo() => new OsuJudgementInfo();
+
+        protected override void UpdateState(ArmedState state)
+        {
+            throw new NotImplementedException();
         }
     }
 
-    public class JudgementInfo
+    public class OsuJudgementInfo : PositionalJudgementInfo
     {
-        public bool UserTriggered;
+        public OsuScoreResult Score;
         public ComboResult Combo;
-        public HitResult Result;
-        public double TimeOffset;
-        public Vector2 PositionOffset;
     }
 
     public enum ComboResult
@@ -41,9 +40,8 @@ namespace osu.Game.Modes
         Perfect
     }
 
-    public enum HitResult
+    public enum OsuScoreResult
     {
-        Ignore,
         [Description(@"Miss")]
         Miss,
         [Description(@"50")]

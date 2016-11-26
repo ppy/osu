@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.ComponentModel;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Modes.Objects.Drawables;
@@ -10,7 +11,7 @@ using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class DrawableHitCircle : DrawableHitObject
+    public class DrawableHitCircle : DrawableOsuHitObject
     {
         private OsuHitObject osuObject;
 
@@ -39,9 +40,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 circle = new CirclePiece
                 {
                     Colour = osuObject.Colour,
-                    Hit = () => Hit(new JudgementInfo {
-                        UserTriggered = true,
-                    }),
+                    Hit = () =>
+                    {
+                        ((PositionalJudgementInfo)Judgement).PositionOffset = Vector2.Zero; //todo: set to correct value
+                        UpdateJudgement(true);
+                        return true;
+                    },
                 },
                 number = new NumberPiece(),
                 ring = new RingPiece(),
@@ -68,6 +72,38 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             UpdateState(State);
         }
 
+        double hit50 = 150;
+        double hit100 = 80;
+        double hit300 = 30;
+
+        protected override void CheckJudgement(bool userTriggered)
+        {
+            if (!userTriggered)
+            {
+                if (Judgement.TimeOffset > hit50)
+                    Judgement.Result = HitResult.Miss;
+                return;
+            }
+
+            double hitOffset = Math.Abs(Judgement.TimeOffset);
+
+            if (hitOffset < hit50)
+            {
+                Judgement.Result = HitResult.Hit;
+
+                OsuJudgementInfo osuInfo = Judgement as OsuJudgementInfo;
+
+                if (hitOffset < hit300)
+                    osuInfo.Score = OsuScoreResult.Hit300;
+                else if (hitOffset < hit100)
+                    osuInfo.Score = OsuScoreResult.Hit100;
+                else if (hitOffset < hit50)
+                    osuInfo.Score = OsuScoreResult.Hit50;
+            }
+            else
+                Judgement.Result = HitResult.Miss;
+        }
+
         protected override void UpdateState(ArmedState state)
         {
             if (!IsLoaded) return;
@@ -75,7 +111,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             Flush(true); //move to DrawableHitObject
             ApproachCircle.Flush(true);
 
-            double t = osuObject.EndTime + (Judgement?.TimeOffset ?? 0);
+            double t = osuObject.EndTime + Judgement.TimeOffset;
 
             Alpha = 0;
 
@@ -121,7 +157,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     explosion?.Expire();
                     explosion = null;
 
-                    Schedule(() => Add(explosion = new HitExplosion(HitResult.Miss)));
+                    Schedule(() => Add(explosion = new HitExplosion((OsuJudgementInfo)Judgement)));
 
                     FadeOut(800);
                     break;
@@ -134,7 +170,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
                     explode.FadeIn(flash_in);
 
-                    Schedule(() => Add(explosion = new HitExplosion(Judgement.Result)));
+                    Schedule(() => Add(explosion = new HitExplosion((OsuJudgementInfo)Judgement)));
 
                     Delay(flash_in, true);
 

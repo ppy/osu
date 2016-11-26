@@ -49,8 +49,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            Hit?.Invoke();
-            return true;
+            return Hit?.Invoke() ?? false;
         }
     }
 }

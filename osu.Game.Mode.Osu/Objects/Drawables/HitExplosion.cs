@@ -3,6 +3,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
@@ -12,7 +13,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private SpriteText line1;
         private SpriteText line2;
 
-        public HitExplosion(HitResult hitResult, ComboResult comboResult = ComboResult.None)
+        public HitExplosion(OsuJudgementInfo judgement)
         {
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
@@ -27,13 +28,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = hitResult.GetDescription(),
+                    Text = judgement.Score.GetDescription(),
                     Font = @"Venera",
                     TextSize = 20,
                 },
                 line2 = new SpriteText
                 {
-                    Text = comboResult.GetDescription(),
+                    Text = judgement.Combo.GetDescription(),
                     Font = @"Venera",
                     TextSize = 14,
                 }

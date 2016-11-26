@@ -75,12 +75,12 @@ namespace osu.Game.Modes.UI
             }
         }
 
-        private void onMiss(DrawableHitObject obj)
+        private void onMiss(DrawableHitObject obj, JudgementInfo judgement)
         {
             OnMiss?.Invoke(obj.HitObject);
         }
 
-        private void onHit(DrawableHitObject obj)
+        private void onHit(DrawableHitObject obj, JudgementInfo judgement)
         {
             OnHit?.Invoke(obj.HitObject);
         }
