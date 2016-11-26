@@ -52,7 +52,6 @@ namespace osu.Desktop.VisualTests.Tests
                     Origin = Anchor.Centre,
                     Depth = -i,
                     State = ArmedState.Hit,
-                    Judgement = new JudgementInfo { Result = HitResult.Hit300 }
                 };
 
                 approachContainer.Add(d.ApproachCircle.CreateProxy());

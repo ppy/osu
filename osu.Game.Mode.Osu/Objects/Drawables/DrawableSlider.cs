@@ -5,7 +5,7 @@ using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    class DrawableSlider : DrawableHitObject
+    class DrawableSlider : DrawableOsuHitObject
     {
         public DrawableSlider(Slider h) : base(h)
         {
@@ -18,7 +18,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 Add(new CirclePiece
                 {
                     Colour = h.Colour,
-                    Hit = () => Hit(new JudgementInfo()),
                     Position = h.Curve.PositionAt(i) - h.Position //non-relative?
                 });
             }

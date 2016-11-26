@@ -86,16 +86,11 @@ namespace osu.Game.Screens.Play
             var scoreOverlay = ruleset.CreateScoreOverlay();
             var hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
-            var hitJudgement = ruleset.CreateHitJudgement();
-
             hitRenderer.OnHit += delegate (HitObject h) { scoreOverlay.OnHit(h); };
             hitRenderer.OnMiss += delegate (HitObject h) { scoreOverlay.OnMiss(h); };
 
             if (Autoplay)
                 hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Hit));
-
-            //bind DrawableHitObjects to HitJudgement
-            hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.CheckJudgement = hitJudgement.CheckJudgement));
 
             Children = new Drawable[]
             {
