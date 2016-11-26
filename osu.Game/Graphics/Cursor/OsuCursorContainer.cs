@@ -1,15 +1,22 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
+using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.OpenGL;
+using osu.Framework.Graphics.OpenGL.Buffers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using OpenTK.Graphics;
+using OpenTK.Graphics.ES30;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -17,9 +24,14 @@ namespace osu.Game.Graphics.Cursor
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 
+        public OsuCursorContainer()
+        {
+            Add(new CursorTrail { Depth = -1 });
+        }
+
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            ActiveCursor.Scale = new OpenTK.Vector2(1);
+            ActiveCursor.Scale = new Vector2(1);
             ActiveCursor.ScaleTo(1.2f, 100, EasingTypes.OutQuad);
             return base.OnMouseDown(state, args);
         }
@@ -52,5 +64,4 @@ namespace osu.Game.Graphics.Cursor
             }
         }
     }
-
 }
