@@ -1,71 +1,33 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Batches;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shaders;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
-using osu.Framework.MathUtils;
 using OpenTK;
 using System;
 using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.OpenGL.Buffers;
-using System.Collections.Concurrent;
 using OpenTK.Graphics.ES30;
-using System.Collections.Generic;
-using System.Diagnostics;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Graphics.Cursor
 {
-    class TrailSprite : Sprite
-    {
-        private Shader shader;
 
-        public TrailSprite()
-        {
-            Origin = Anchor.Centre;
-        }
-
-        protected override DrawNode CreateDrawNode() => new TrailSpriteDrawNode();
-
-        protected override void ApplyDrawNode(DrawNode node)
-        {
-            base.ApplyDrawNode(node);
-
-            TrailSpriteDrawNode sNode = node as TrailSpriteDrawNode;
-            sNode.RoundedTextureShader = sNode.TextureShader = shader;
-            sNode.NeedsUpdate = true;
-        }
-
-        public override bool IsVisible => true;
-
-        [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, TextureStore textures)
-        {
-            shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.Texture);
-            Texture = textures.Get(@"Cursor/cursortrail");
-        }
-    }
-
-    class TrailSpriteDrawNode : SpriteDrawNode
-    {
-        public bool NeedsUpdate;
-    }
-
-    class CursorTrail : Container<TrailSprite>
+    class CursorTrail : Drawable
     {
         public override bool Contains(Vector2 screenSpacePos) => true;
+        public override bool HandleInput => true;
 
         int currentIndex;
 
-        protected override bool CanBeFlattened => false;
-
         Shader shader;
+        Texture texture;
+
+        Vector2 size => texture.Size * Scale;
 
         private double timeOffset;
 
@@ -73,6 +35,8 @@ namespace osu.Game.Graphics.Cursor
         
         TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
         const int MAX_SPRITES = 2048;
+
+        private TrailPart[] parts = new TrailPart[MAX_SPRITES];
 
         Vector2? lastPosition;
 
@@ -84,8 +48,14 @@ namespace osu.Game.Graphics.Cursor
 
             TrailDrawNode tNode = node as TrailDrawNode;
             tNode.Shader = shader;
+            tNode.Texture = texture;
+            tNode.Size = size;
             tNode.Time = time;
             tNode.Shared = trailDrawNodeSharedData;
+
+            for (int i = 0; i < parts.Length; ++i)
+                if (parts[i].InvalidationID > tNode.Parts[i].InvalidationID)
+                    tNode.Parts[i] = parts[i];
         }
 
         public CursorTrail()
@@ -93,13 +63,17 @@ namespace osu.Game.Graphics.Cursor
             RelativeSizeAxes = Axes.Both;
 
             for (int i = 0; i < MAX_SPRITES; i++)
-                AddInternal(new TrailSprite());
+            {
+                parts[i].InvalidationID = 0;
+                parts[i].WasUpdated = true;
+            }
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders)
+        private void load(ShaderManager shaders, TextureStore textures)
         {
             shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.Texture);
+            texture = textures.Get(@"Cursor/cursortrail");
         }
 
         protected override void Update()
@@ -117,8 +91,11 @@ namespace osu.Game.Graphics.Cursor
 
         private void ResetTime()
         {
-            foreach (var c in Children)
-                c.Alpha -= time;
+            for (int i = 0; i < parts.Length; ++i)
+            {
+                parts[i].Time -= time;
+                ++parts[i].InvalidationID;
+            }
 
             time = 0;
             timeOffset = Time.Current;
@@ -128,18 +105,18 @@ namespace osu.Game.Graphics.Cursor
         {
             if (lastPosition == null)
             {
-                lastPosition = state.Mouse.Position;
+                lastPosition = state.Mouse.NativeState.Position;
                 return base.OnMouseMove(state);
             }
 
             Vector2 pos1 = lastPosition.Value;
-            Vector2 pos2 = state.Mouse.Position;
+            Vector2 pos2 = state.Mouse.NativeState.Position;
 
             Vector2 diff = pos2 - pos1;
             float distance = diff.Length;
             Vector2 direction = diff / distance;
 
-            float interval = this[0].DrawSize.X / 2;
+            float interval = size.X / 2;
 
             for (float d = interval; d < distance; d += interval)
             {
@@ -152,23 +129,45 @@ namespace osu.Game.Graphics.Cursor
 
         private void addPosition(Vector2 pos)
         {
-            var s = this[currentIndex];
-            s.Position = pos;
-            s.Alpha = time + 1f;
+            parts[currentIndex].Position = pos;
+            parts[currentIndex].Time = time;
+            ++parts[currentIndex].InvalidationID;
 
             currentIndex = (currentIndex + 1) % MAX_SPRITES;
         }
 
-        public class TrailDrawNodeSharedData
+        struct TrailPart
+        {
+            public Vector2 Position;
+            public float Time;
+            public long InvalidationID;
+            public bool WasUpdated;
+        }
+
+        class TrailDrawNodeSharedData
         {
             public VertexBuffer<TexturedVertex2D> VertexBuffer;
         }
 
-        class TrailDrawNode : ContainerDrawNode
+        class TrailDrawNode : DrawNode
         {
-            public new Shader Shader;
+            public Shader Shader;
+            public Texture Texture;
+
             public float Time;
             public TrailDrawNodeSharedData Shared;
+
+            public TrailPart[] Parts = new TrailPart[MAX_SPRITES];
+            public Vector2 Size;
+
+            public TrailDrawNode()
+            {
+                for (int i = 0; i < MAX_SPRITES; i++)
+                {
+                    Parts[i].InvalidationID = 0;
+                    Parts[i].WasUpdated = false;
+                }
+            }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
@@ -178,11 +177,9 @@ namespace osu.Game.Graphics.Cursor
                 Shader.GetUniform<float>("g_FadeClock").Value = Time;
 
                 int updateStart = -1, updateEnd = 0;
-                int test = 0;
-                for (int i = 0; i < Children.Count; ++i)
+                for (int i = 0; i < Parts.Length; ++i)
                 {
-                    TrailSpriteDrawNode tNode = Children[i] as TrailSpriteDrawNode;
-                    if (tNode.NeedsUpdate)
+                    if (Parts[i].WasUpdated)
                     {
                         if (updateStart == -1)
                             updateStart = i;
@@ -190,12 +187,21 @@ namespace osu.Game.Graphics.Cursor
 
                         int start = i * 4;
                         int end = start;
-                        tNode.Draw(delegate (TexturedVertex2D v)
-                        {
-                            Shared.VertexBuffer.Vertices[end++] = v;
-                        });
 
-                        tNode.NeedsUpdate = false;
+                        Vector2 pos = Parts[i].Position;
+                        ColourInfo colour = DrawInfo.Colour;
+                        colour.TopLeft.Linear.A = Parts[i].Time + colour.TopLeft.Linear.A;
+                        colour.TopRight.Linear.A = Parts[i].Time + colour.TopRight.Linear.A;
+                        colour.BottomLeft.Linear.A = Parts[i].Time + colour.BottomLeft.Linear.A;
+                        colour.BottomRight.Linear.A = Parts[i].Time + colour.BottomRight.Linear.A;
+
+                        Texture.Draw(
+                            new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
+                            colour,
+                            null,
+                            v => Shared.VertexBuffer.Vertices[end++] = v);
+
+                        Parts[i].WasUpdated = false;
                     }
                     else if (updateStart != -1)
                     {
@@ -208,13 +214,14 @@ namespace osu.Game.Graphics.Cursor
                 if (updateStart != -1)
                     Shared.VertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
 
-                SpriteDrawNode sNode = Children[0] as SpriteDrawNode;
-                sNode.Texture.TextureGL.Bind();
-                sNode.TextureShader.Bind();
+                base.Draw(vertexAction);
 
+                Shader.Bind();
+
+                Texture.TextureGL.Bind();
                 Shared.VertexBuffer.Draw();
 
-                sNode.TextureShader.Unbind();
+                Shader.Unbind();
             }
         }
     }
