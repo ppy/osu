@@ -2,22 +2,26 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using osu.Framework;
 using osu.Framework.Graphics.Containers;
+using OpenTK;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Modes.Objects.Drawables
 {
     public abstract class DrawableHitObject : Container, IStateful<ArmedState>
     {
         //todo: move to a more central implementation. this logic should not be at a drawable level.
-        public Action<DrawableHitObject> OnHit;
-        public Action<DrawableHitObject> OnMiss;
-
-        public Func<DrawableHitObject, bool> AllowHit;
+        public Action<DrawableHitObject, JudgementInfo> OnHit;
+        public Action<DrawableHitObject, JudgementInfo> OnMiss;
 
         public Container<DrawableHitObject> ChildObjects;
 
-        public JudgementResult Result;
+        protected JudgementInfo Judgement;
+
+        public abstract JudgementInfo CreateJudgementInfo();
 
         public HitObject HitObject;
 
@@ -41,36 +45,55 @@ namespace osu.Game.Modes.Objects.Drawables
             }
         }
 
-        protected double? HitTime;
-
-        protected virtual bool Hit()
+        protected override void LoadComplete()
         {
-            if (State != ArmedState.Disarmed)
+            base.LoadComplete();
+
+            Judgement = CreateJudgementInfo();
+        }
+
+        /// <summary>
+        /// Process a hit of this hitobject. Carries out judgement.
+        /// </summary>
+        /// <param name="judgement">Preliminary judgement information provided by the hit source.</param>
+        /// <returns>Whether a hit was processed.</returns>
+        protected bool UpdateJudgement(bool userTriggered)
+        {
+            if (Judgement.Result != null)
                 return false;
 
-            if (AllowHit?.Invoke(this) == false)
+            Judgement.TimeOffset = Time.Current - HitObject.EndTime;
+
+            CheckJudgement(userTriggered);
+
+            if (Judgement.Result == null)
                 return false;
 
-            HitTime = Time.Current;
+            switch (Judgement.Result)
+            {
+                default:
+                    State = ArmedState.Hit;
+                    OnHit?.Invoke(this, Judgement);
+                    break;
+                case HitResult.Miss:
+                    State = ArmedState.Miss;
+                    OnMiss?.Invoke(this, Judgement);
+                    break;
+            }
 
-            State = ArmedState.Armed;
             return true;
         }
 
-        private bool counted;
+        protected virtual void CheckJudgement(bool userTriggered)
+        {
+
+        }
 
         protected override void Update()
         {
             base.Update();
 
-            if (Time.Current >= HitObject.EndTime && !counted)
-            {
-                counted = true;
-                if (state == ArmedState.Armed)
-                    OnHit?.Invoke(this);
-                else
-                    OnMiss?.Invoke(this);
-            }
+            UpdateJudgement(false);
         }
 
         protected abstract void UpdateState(ArmedState state);
@@ -78,7 +101,27 @@ namespace osu.Game.Modes.Objects.Drawables
 
     public enum ArmedState
     {
-        Disarmed,
-        Armed
+        Idle,
+        Hit,
+        Miss
+    }
+
+    public class PositionalJudgementInfo : JudgementInfo
+    {
+        public Vector2 PositionOffset;
+    }
+
+    public class JudgementInfo
+    {
+        public HitResult? Result;
+        public double TimeOffset;
+    }
+
+    public enum HitResult
+    {
+        [Description(@"Miss")]
+        Miss,
+        [Description(@"Hit")]
+        Hit,
     }
 }

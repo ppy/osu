@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Play
             hitRenderer.OnMiss += delegate (HitObject h) { scoreOverlay.OnMiss(h); };
 
             if (Autoplay)
-                hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Armed));
+                hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Hit));
 
             Children = new Drawable[]
             {
