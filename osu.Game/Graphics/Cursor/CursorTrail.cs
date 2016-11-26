@@ -56,6 +56,8 @@ namespace osu.Game.Graphics.Cursor
 
         const int MAX_SPRITES = 2048;
 
+        Vector2? lastPosition;
+
         protected override DrawNode CreateDrawNode() => new TrailDrawNode();
 
         protected override void ApplyDrawNode(DrawNode node)
@@ -65,43 +67,6 @@ namespace osu.Game.Graphics.Cursor
             TrailDrawNode tNode = node as TrailDrawNode;
             tNode.Shader = shader;
             tNode.Time = time;
-        }
-
-        Vector2? last;
-
-        protected override bool OnMouseMove(InputState state)
-        {
-            if (last == null)
-            {
-                last = state.Mouse.Position;
-                return base.OnMouseMove(state);
-            }
-
-            Vector2 pos1 = last.Value;
-            Vector2 pos2 = state.Mouse.Position;
-
-            Vector2 diff = (pos2 - pos1);
-            float distance = diff.Length;
-            Vector2 direction = diff / distance;
-
-            float interval = this[0].DrawSize.X / 2;
-
-            for (float d = interval; d < distance; d += interval)
-            {
-                last = pos1 + direction * d;
-                addPosition(last.Value);
-            }
-
-            return base.OnMouseMove(state);
-        }
-
-        private void addPosition(Vector2 pos)
-        {
-            var s = this[currentIndex];
-            s.Position = pos;
-            s.Alpha = time + 1f;
-
-            currentIndex = (currentIndex + 1) % MAX_SPRITES;
         }
 
         public CursorTrail()
@@ -140,9 +105,44 @@ namespace osu.Game.Graphics.Cursor
             timeOffset = Time.Current;
         }
 
+        protected override bool OnMouseMove(InputState state)
+        {
+            if (lastPosition == null)
+            {
+                lastPosition = state.Mouse.Position;
+                return base.OnMouseMove(state);
+            }
+
+            Vector2 pos1 = lastPosition.Value;
+            Vector2 pos2 = state.Mouse.Position;
+
+            Vector2 diff = pos2 - pos1;
+            float distance = diff.Length;
+            Vector2 direction = diff / distance;
+
+            float interval = this[0].DrawSize.X / 2;
+
+            for (float d = interval; d < distance; d += interval)
+            {
+                lastPosition = pos1 + direction * d;
+                addPosition(lastPosition.Value);
+            }
+
+            return base.OnMouseMove(state);
+        }
+
+        private void addPosition(Vector2 pos)
+        {
+            var s = this[currentIndex];
+            s.Position = pos;
+            s.Alpha = time + 1f;
+
+            currentIndex = (currentIndex + 1) % MAX_SPRITES;
+        }
+
         class TrailDrawNode : ContainerDrawNode
         {
-            public Shader Shader;
+            public new Shader Shader;
             public float Time;
 
             public override void Draw(IVertexBatch vertexBatch)
