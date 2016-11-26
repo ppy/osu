@@ -1,7 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework;
+using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,9 +17,14 @@ namespace osu.Game.Graphics.Cursor
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 
+        public OsuCursorContainer()
+        {
+            Add(new CursorTrail { Depth = -1 });
+        }
+
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            ActiveCursor.Scale = new OpenTK.Vector2(1);
+            ActiveCursor.Scale = new Vector2(1);
             ActiveCursor.ScaleTo(1.2f, 100, EasingTypes.OutQuad);
             return base.OnMouseDown(state, args);
         }
@@ -52,5 +57,4 @@ namespace osu.Game.Graphics.Cursor
             }
         }
     }
-
 }
