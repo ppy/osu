@@ -199,7 +199,7 @@ namespace osu.Game.Screens.Select
             Lifetime.AliveItems.ForEach(delegate (Panel p)
             {
                 float panelPosY = p.Position.Y;
-                p.OnScreen = panelPosY >= Current - p.DrawHeight && panelPosY <= Current + drawHeight;
+                p.IsOnScreen = panelPosY >= Current - p.DrawHeight && panelPosY <= Current + drawHeight;
             });
 
             int firstIndex = yPositions.BinarySearch(Current - Panel.MAX_HEIGHT);
@@ -216,7 +216,7 @@ namespace osu.Game.Screens.Select
             {
                 var panel = Lifetime[i];
 
-                panel.OnScreen = true;
+                panel.IsOnScreen = true;
 
                 float panelDrawY = panel.Position.Y - Current + panel.DrawHeight / 2;
                 float dist = Math.Abs(1f - panelDrawY / halfHeight);
