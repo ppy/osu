@@ -12,6 +12,7 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Modes;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -50,7 +51,7 @@ namespace osu.Desktop.VisualTests.Tests
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Depth = -i,
-                    State = ArmedState.Armed,
+                    State = ArmedState.Hit,
                 };
 
                 approachContainer.Add(d.ApproachCircle.CreateProxy());

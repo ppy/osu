@@ -6,16 +6,17 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using OpenTK;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Audio;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
     internal class VolumeControl : OverlayContainer
     {
-        public BindableDouble VolumeGlobal { get; set; }
-        public BindableDouble VolumeSample { get; set; }
-        public BindableDouble VolumeTrack { get; set; }
+        private BindableDouble volumeGlobal = new BindableDouble();
+        private BindableDouble volumeSample = new BindableDouble();
+        private BindableDouble volumeTrack = new BindableDouble();
 
         private VolumeMeter volumeMeterMaster;
 
@@ -54,20 +55,20 @@ namespace osu.Game.Graphics.UserInterface.Volume
         {
             base.LoadComplete();
 
-            VolumeGlobal.ValueChanged += volumeChanged;
-            VolumeSample.ValueChanged += volumeChanged;
-            VolumeTrack.ValueChanged += volumeChanged;
+            volumeGlobal.ValueChanged += volumeChanged;
+            volumeSample.ValueChanged += volumeChanged;
+            volumeTrack.ValueChanged += volumeChanged;
 
-            volumeMeterMaster.Bindable = VolumeGlobal;
-            volumeMeterEffect.Bindable = VolumeSample;
-            volumeMeterMusic.Bindable = VolumeTrack;
+            volumeMeterMaster.Bindable.Weld(volumeGlobal);
+            volumeMeterEffect.Bindable.Weld(volumeSample);
+            volumeMeterMusic.Bindable.Weld(volumeTrack);
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            VolumeGlobal.ValueChanged -= volumeChanged;
-            VolumeSample.ValueChanged -= volumeChanged;
-            VolumeTrack.ValueChanged -= volumeChanged;
+            volumeGlobal.ValueChanged -= volumeChanged;
+            volumeSample.ValueChanged -= volumeChanged;
+            volumeTrack.ValueChanged -= volumeChanged;
             base.Dispose(isDisposing);
         }
 
@@ -80,6 +81,14 @@ namespace osu.Game.Graphics.UserInterface.Volume
             }
 
             volumeMeterMaster.TriggerWheel(state);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            volumeGlobal.Weld(audio.Volume);
+            volumeSample.Weld(audio.VolumeSample);
+            volumeTrack.Weld(audio.VolumeTrack);
         }
 
         ScheduledDelegate popOutDelegate;
