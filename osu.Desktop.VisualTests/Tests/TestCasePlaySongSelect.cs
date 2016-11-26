@@ -12,7 +12,7 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCasePlaySongSelect : TestCase
     {
-        private BeatmapDatabase db;
+        private BeatmapDatabase db, oldDb;
         private TestStorage storage;
 
         public override string Name => @"Song Select";
@@ -21,11 +21,12 @@ namespace osu.Desktop.VisualTests.Tests
         public override void Reset()
         {
             base.Reset();
-
+            oldDb = Dependencies.Get<BeatmapDatabase>();
             if (db == null)
             {
                 storage = new TestStorage(@"TestCasePlaySongSelect");
                 db = new BeatmapDatabase(storage);
+                Dependencies.Cache(db, true);
 
                 var sets = new List<BeatmapSetInfo>();
 
@@ -34,8 +35,13 @@ namespace osu.Desktop.VisualTests.Tests
 
                 db.Import(sets);
             }
-
-            Add(new PlaySongSelect(db));
+            Add(new PlaySongSelect());
+        }
+        
+        protected override void Dispose(bool isDisposing)
+        {
+            Dependencies.Cache(oldDb, true);
+            base.Dispose(isDisposing);
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)

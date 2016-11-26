@@ -97,12 +97,7 @@ namespace osu.Game
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                volume = new VolumeControl
-                {
-                    VolumeGlobal = Audio.Volume,
-                    VolumeSample = Audio.VolumeSample,
-                    VolumeTrack = Audio.VolumeTrack
-                },
+                volume = new VolumeControl(),
                 overlayContent = new Container{ RelativeSizeAxes = Axes.Both },
                 new GlobalHotkeys //exists because UserInputManager is at a level below us.
                 {
