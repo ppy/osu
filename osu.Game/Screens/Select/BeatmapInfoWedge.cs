@@ -16,9 +16,26 @@ namespace osu.Game.Screens.Select
 {
     class BeatmapInfoWedge : Container
     {
+        private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
+
         private Container beatmapInfoContainer;
 
         private BaseGame game;
+
+        public BeatmapInfoWedge()
+        {
+            Shear = wedged_container_shear;
+            Masking = true;
+            BorderColour = new Color4(221, 255, 255, 255);
+            BorderThickness = 2.5f;
+            EdgeEffect = new EdgeEffect
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = new Color4(130, 204, 255, 150),
+                Radius = 20,
+                Roundness = 15,
+            };
+        }
 
         [BackgroundDependencyLoader]
         private void load(BaseGame game)
@@ -34,8 +51,6 @@ namespace osu.Game.Screens.Select
             var lastContainer = beatmapInfoContainer;
 
             float newDepth = lastContainer?.Depth - 1 ?? 0;
-
-            FadeIn(250);
 
             BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
@@ -126,6 +141,8 @@ namespace osu.Game.Screens.Select
                 }
             }).Preload(game, delegate(Drawable d)
             {
+                FadeIn(250);
+
                 lastContainer?.FadeOut(250);
                 lastContainer?.Expire();
 
