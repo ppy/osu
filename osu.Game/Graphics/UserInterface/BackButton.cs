@@ -18,12 +18,14 @@ namespace osu.Game.Graphics.UserInterface
 
         private Container leftContainer;
         private Container rightContainer;
-        private Box textBox;
 
         public Vector2 ExtendLength;
         public Vector2 InitialExtendLength;
 
+        private Color4 colorBright = new Color4(238, 51, 153, 255);
+        private Color4 colorDark = new Color4(195, 40, 140, 255);
         private const double transformTime = 300.0;
+        private const int pulseLength = 250; // FIXME: remove when bpm-based pulsing will be possible
 
         public BackButton()
         {
@@ -46,7 +48,7 @@ namespace osu.Game.Graphics.UserInterface
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = new Color4(195, 40, 140, 255),
+                            Colour = colorDark,
                             Shear = new Vector2(0.1f, 0),
                         },
                         icon = new TextAwesome
@@ -65,9 +67,9 @@ namespace osu.Game.Graphics.UserInterface
                     Position = Position + InitialExtendLength,
                     Children = new Drawable[]
                     {
-                        textBox = new Box
+                        new Box
                         {
-                            Colour = new Color4(238, 51, 153, 255),
+                            Colour = colorBright,
                             Origin = Anchor.TopLeft,
                             Anchor = Anchor.TopLeft,
                             RelativeSizeAxes = Axes.Both,
@@ -87,14 +89,12 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(InputState state)
         {
             icon.ClearTransformations();
-            rightContainer.ClearTransformations();
-            leftContainer.ClearTransformations();
 
             rightContainer.MoveTo(Position + ExtendLength, transformTime, EasingTypes.OutElastic);
             leftContainer.ResizeTo(new Vector2(ExtendLength.X, 1.0f), transformTime, EasingTypes.OutElastic);
 
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
-            if (duration == 0) duration = 250;
+            if (duration == 0) duration = pulseLength;
 
             double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
             double startTime = Time.Current + offset;
@@ -102,7 +102,7 @@ namespace osu.Game.Graphics.UserInterface
             // basic pulse
             icon.Transforms.Add(new TransformScale
             {
-                StartValue = new Vector2(1.1f, 1.1f),
+                StartValue = new Vector2(1.1f),
                 EndValue = Vector2.One,
                 StartTime = startTime,
                 EndTime = startTime + duration,
@@ -117,25 +117,40 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnHoverLost(InputState state)
         {
             icon.ClearTransformations();
-            rightContainer.ClearTransformations();
-            leftContainer.ClearTransformations();
 
             rightContainer.MoveTo(Position + InitialExtendLength, transformTime, EasingTypes.OutElastic);
             leftContainer.ResizeTo(new Vector2(InitialExtendLength.X, 1.0f), transformTime, EasingTypes.OutElastic);
+
+            int duration = 0; //(int)(Game.Audio.BeatLength / 2);
+            if (duration == 0) duration = pulseLength * 2;
+
+            double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
+            double startTime = Time.Current + offset;
+
+            // slow pulse
+            icon.Transforms.Add(new TransformScale
+            {
+                StartValue = new Vector2(1.1f),
+                EndValue = Vector2.One,
+                StartTime = startTime,
+                EndTime = startTime + duration,
+                Easing = EasingTypes.Out,
+                LoopCount = -1,
+                LoopDelay = duration
+            });
         }
 
         protected override bool OnClick(InputState state)
         {
             var flash = new Box
             {
-                RelativeSizeAxes = RelativeSizeAxes
+                RelativeSizeAxes = RelativeSizeAxes,
+                Colour = colorBright,
+                BlendingMode = BlendingMode.Additive,
+                Alpha = 0.3f
             };
-
             Add(flash);
 
-            flash.Colour = textBox.Colour;
-            flash.BlendingMode = BlendingMode.Additive;
-            flash.Alpha = 0.3f;
             flash.FadeOutFromOne(200);
             flash.Expire();
 
