@@ -72,6 +72,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
                     Margin = new MarginPadding { Left = sidebar_width },
+                    KeyScroll = true,
                     Children = new[]
                     {
                         new FlowContainer
@@ -169,18 +170,10 @@ namespace osu.Game.Overlays
                     if (State == Visibility.Hidden) return false;
                     Hide();
                     return true;
-                case Key.PageUp:
-                    if (State == Visibility.Hidden) return false;
-                    ScrollToPrevSection(); // Go to start of previous section
-                    return true;
 
-                case Key.PageDown:
+                case Key.Tab:
                     if (State == Visibility.Hidden) return false;
-                    ScrollToNextSection(); // Go to start of next section
-                    return true;
-
-                    if (State == Visibility.Hidden) return false;
-                    ScrollToPrevSection(); // Go to start of previous section
+                    GotoNextItem(); // Go to next item
                     return true;
             }
             return base.OnKeyDown(state, args);
@@ -200,46 +193,9 @@ namespace osu.Game.Overlays
             FadeTo(0, 300);
         }
 
-        private int GetCurrentSection()
+        private void GotoNextItem()
         {
-            int currSection = int.MaxValue;
-            float minDistance = float.MaxValue;
 
-            for (int i = 0; i < sections.Length; i++)
-            {
-                float distance = Math.Abs(scrollContainer.GetChildYInContent(sections[i]) - scrollContainer.Current);
-                if (distance < minDistance)
-                {
-                    currSection = i;
-                    minDistance = distance;
-                }
-            }
-
-            return currSection;
-        }
-
-        private void ScrollToNextSection()
-        {
-            int currSection = GetCurrentSection();
-
-            if (currSection == sections.Length - 1)
-                currSection = 0;
-            else
-                currSection++;
-
-            scrollContainer.ScrollIntoView(sections[currSection]);
-        }
-
-        private void ScrollToPrevSection()
-        {
-            int currSection = GetCurrentSection();
-
-            if (currSection == 0)
-                currSection = sections.Length - 1;
-            else
-                currSection--;
-
-            scrollContainer.ScrollIntoView(sections[currSection]);
         }
     }
 }
