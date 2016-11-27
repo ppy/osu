@@ -19,24 +19,17 @@ namespace osu.Game.Graphics.UserInterface
         private Container leftContainer;
         private Container rightContainer;
 
-        public Vector2 ExtendLength;
-        public Vector2 InitialExtendLength;
+        public Vector2 ExtendLength = new Vector2(60, 0);
+        public Vector2 InitialExtendLength = new Vector2(40, 0);
 
         private Color4 colorBright = new Color4(238, 51, 153, 255);
         private Color4 colorDark = new Color4(195, 40, 140, 255);
-        private const double transformTime = 300.0;
-        private const int pulseLength = 250; // FIXME: remove when bpm-based pulsing will be possible
+        private const double transform_time = 300.0;
+        private const int pulse_length = 250;
 
         public BackButton()
         {
-            // [ should be set or should be relative?
-            InitialExtendLength = new Vector2(40, 0);
-            ExtendLength = new Vector2(60, 0);
-
             Width = 80;
-            //Height = 40;
-            // ] should be set or should be relative?
-
             Children = new Drawable[]
             {
                 leftContainer = new Container
@@ -90,11 +83,11 @@ namespace osu.Game.Graphics.UserInterface
         {
             icon.ClearTransformations();
 
-            rightContainer.MoveTo(Position + ExtendLength, transformTime, EasingTypes.OutElastic);
-            leftContainer.ResizeTo(new Vector2(ExtendLength.X, 1.0f), transformTime, EasingTypes.OutElastic);
+            rightContainer.MoveTo(Position + ExtendLength, transform_time, EasingTypes.OutElastic);
+            leftContainer.ResizeTo(new Vector2(ExtendLength.X, 1.0f), transform_time, EasingTypes.OutElastic);
 
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
-            if (duration == 0) duration = pulseLength;
+            if (duration == 0) duration = pulse_length;
 
             double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
             double startTime = Time.Current + offset;
@@ -118,11 +111,11 @@ namespace osu.Game.Graphics.UserInterface
         {
             icon.ClearTransformations();
 
-            rightContainer.MoveTo(Position + InitialExtendLength, transformTime, EasingTypes.OutElastic);
-            leftContainer.ResizeTo(new Vector2(InitialExtendLength.X, 1.0f), transformTime, EasingTypes.OutElastic);
+            rightContainer.MoveTo(Position + InitialExtendLength, transform_time, EasingTypes.OutElastic);
+            leftContainer.ResizeTo(new Vector2(InitialExtendLength.X, 1.0f), transform_time, EasingTypes.OutElastic);
 
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
-            if (duration == 0) duration = pulseLength * 2;
+            if (duration == 0) duration = pulse_length * 2;
 
             double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
             double startTime = Time.Current + offset;
