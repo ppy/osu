@@ -19,6 +19,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Screens.Play;
@@ -119,6 +120,12 @@ namespace osu.Game.Screens.Select
                             RelativeSizeAxes = Axes.Both,
                             Size = Vector2.One,
                             Colour = new Color4(0, 0, 0, 0.5f),
+                        },
+                        new BackButton
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Action = () => Exit()
                         },
                         new Button
                         {

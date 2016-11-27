@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
+    <Compile Include="Graphics\UserInterface\BackButton.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Overlays\DragBar.cs" />
     <Compile Include="Overlays\MusicController.cs" />

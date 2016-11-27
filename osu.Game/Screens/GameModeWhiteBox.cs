@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -17,7 +18,7 @@ namespace osu.Game.Screens
 {
     public class GameModeWhiteBox : OsuGameMode
     {
-        private Button popButton;
+        private BackButton popButton;
 
         const int transition_time = 1000;
 
@@ -113,14 +114,12 @@ namespace osu.Game.Screens
                         },
                     }
                 },
-                popButton = new Button
+                popButton = new BackButton
                 {
-                    Text = @"Back",
-                    RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(0.1f, 40),
+                    RelativeSizeAxes = Axes.None,
+                    Height = 40,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Colour = new Color4(235, 51, 153, 255),
                     Alpha = 0,
                     Action = delegate {
                         Exit();
