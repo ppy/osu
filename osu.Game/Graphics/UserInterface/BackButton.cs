@@ -15,12 +15,10 @@ namespace osu.Game.Graphics.UserInterface
     class BackButton : ClickableContainer
     {
         private TextAwesome icon;
-        private Vector2 iconPos;
 
-        private Box bgBox;
+        private Container leftContainer;
+        private Container rightContainer;
         private Box textBox;
-        private Container textContainer;
-        private SpriteText spriteText;
 
         public Vector2 ExtendLength;
         public Vector2 InitialExtendLength;
@@ -32,7 +30,6 @@ namespace osu.Game.Graphics.UserInterface
             // [ should be set or should be relative?
             InitialExtendLength = new Vector2(40, 0);
             ExtendLength = new Vector2(60, 0);
-            iconPos = new Vector2(20, 0);
 
             Width = 80;
             //Height = 40;
@@ -40,19 +37,27 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                bgBox = new Box
+                leftContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(195, 40, 140, 255),
+                    RelativeSizeAxes = Axes.Y,
+                    Width = InitialExtendLength.X,
+                    Children = new Drawable[] 
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = new Color4(195, 40, 140, 255),
+                            Shear = new Vector2(0.1f, 0),
+                        },
+                        icon = new TextAwesome
+                        {
+                            Anchor = Anchor.Centre,
+                            TextSize = 25,
+                            Icon = FontAwesome.fa_osu_left_o
+                        },
+                    }
                 },
-                icon = new TextAwesome
-                {
-                    Anchor = Anchor.CentreLeft,
-                    TextSize = 25,
-                    Position = iconPos,
-                    Icon = FontAwesome.fa_osu_left_o
-                },
-                textContainer = new Container
+                rightContainer = new Container
                 {
                     Origin = Anchor.TopLeft,
                     Anchor = Anchor.TopLeft,
@@ -69,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface
                             Shear = new Vector2(0.1f, 0), 
                             EdgeSmoothness = new Vector2(1.5f, 0), 
                         },
-                        spriteText = new SpriteText
+                        new SpriteText
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
@@ -78,17 +83,15 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 }
             };
-
-            // HACK: because it never uses InitialExtendLength that we give to it on creation
-            textContainer.Position = Position + InitialExtendLength; 
         }
         protected override bool OnHover(InputState state)
         {
             icon.ClearTransformations();
-            textContainer.ClearTransformations();
+            rightContainer.ClearTransformations();
+            leftContainer.ClearTransformations();
 
-            textContainer.MoveTo(Position + ExtendLength, transformTime, EasingTypes.OutElastic);
-            icon.MoveToX(iconPos.X + 10, transformTime, EasingTypes.OutElastic);
+            rightContainer.MoveTo(Position + ExtendLength, transformTime, EasingTypes.OutElastic);
+            leftContainer.ResizeTo(new Vector2(ExtendLength.X, 1.0f), transformTime, EasingTypes.OutElastic);
 
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
             if (duration == 0) duration = 250;
@@ -114,10 +117,11 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnHoverLost(InputState state)
         {
             icon.ClearTransformations();
-            textContainer.ClearTransformations();
+            rightContainer.ClearTransformations();
+            leftContainer.ClearTransformations();
 
-            textContainer.MoveTo(Position + InitialExtendLength, transformTime, EasingTypes.OutElastic);
-            icon.MoveToX(iconPos.X, transformTime, EasingTypes.OutElastic);
+            rightContainer.MoveTo(Position + InitialExtendLength, transformTime, EasingTypes.OutElastic);
+            leftContainer.ResizeTo(new Vector2(InitialExtendLength.X, 1.0f), transformTime, EasingTypes.OutElastic);
         }
 
         protected override bool OnClick(InputState state)
