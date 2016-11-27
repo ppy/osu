@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Select
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.Y,
+                            //RelativeSizeAxes = Axes.Y,
                             Action = () => Exit()
                         },
                         new Button
