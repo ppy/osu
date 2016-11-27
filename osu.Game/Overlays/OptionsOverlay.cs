@@ -170,11 +170,6 @@ namespace osu.Game.Overlays
                     if (State == Visibility.Hidden) return false;
                     Hide();
                     return true;
-
-                case Key.Tab:
-                    if (State == Visibility.Hidden) return false;
-                    GotoNextItem(); // Go to next item
-                    return true;
             }
             return base.OnKeyDown(state, args);
         }
@@ -191,11 +186,6 @@ namespace osu.Game.Overlays
             scrollContainer.MoveToX(-width, 600, EasingTypes.OutQuint);
             sidebar.MoveToX(-sidebar_width, 600, EasingTypes.OutQuint);
             FadeTo(0, 300);
-        }
-
-        private void GotoNextItem()
-        {
-
         }
     }
 }
