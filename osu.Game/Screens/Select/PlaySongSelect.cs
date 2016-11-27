@@ -123,8 +123,9 @@ namespace osu.Game.Screens.Select
                         },
                         new BackButton
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.Y,
                             Action = () => Exit()
                         },
                         new Button

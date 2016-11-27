@@ -4,52 +4,91 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
     // Basic back button as it was on stable (kinda). No skinning possible for now
-    class BackButton : ExtendableButton
+    class BackButton : ClickableContainer
     {
         private TextAwesome icon;
-        private Vector2 iconPos = new Vector2(20, 0);
+        private Vector2 iconPos;
+
+        private Box bgBox;
+        private Box textBox;
+        private Container textContainer;
+        private SpriteText spriteText;
+
+        public Vector2 ExtendLength;
+        public Vector2 InitialExtendLength;
+
+        private const double transformTime = 300.0;
 
         public BackButton()
         {
-            InitialExtendLenght = new Vector2(40, 0);
-            ExtendLenght = new Vector2(60, 0);
+            // [ should be set or should be relative?
+            InitialExtendLength = new Vector2(40, 0);
+            ExtendLength = new Vector2(60, 0);
+            iconPos = new Vector2(20, 0);
 
-            RelativeSizeAxes = Axes.Y;
             Width = 80;
-            //Height = 40; // should be set or should be relative?
-
-            Text = @"Back";
-
-            BGColour = new Color4(195, 40, 140, 255);
-            Colour = new Color4(238, 51, 153, 255);
+            //Height = 40;
+            // ] should be set or should be relative?
 
             Children = new Drawable[]
             {
+                bgBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = new Color4(195, 40, 140, 255),
+                },
                 icon = new TextAwesome
                 {
                     Anchor = Anchor.CentreLeft,
                     TextSize = 25,
                     Position = iconPos,
                     Icon = FontAwesome.fa_osu_left_o
+                },
+                textContainer = new Container
+                {
+                    Origin = Anchor.TopLeft,
+                    Anchor = Anchor.TopLeft,
+                    RelativeSizeAxes = Axes.Both,
+                    Position = Position + InitialExtendLength,
+                    Children = new Drawable[]
+                    {
+                        textBox = new Box
+                        {
+                            Colour = new Color4(238, 51, 153, 255),
+                            Origin = Anchor.TopLeft,
+                            Anchor = Anchor.TopLeft,
+                            RelativeSizeAxes = Axes.Both,
+                            Shear = new Vector2(0.1f, 0), 
+                            EdgeSmoothness = new Vector2(1.5f, 0), 
+                        },
+                        spriteText = new SpriteText
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Text = @"Back",
+                        }
+                    }
                 }
             };
 
-            // HACK: because it never uses InitialExtendLenght that we give to it on creation
-            textContainer.Position = Position + InitialExtendLenght; 
+            // HACK: because it never uses InitialExtendLength that we give to it on creation
+            textContainer.Position = Position + InitialExtendLength; 
         }
         protected override bool OnHover(InputState state)
         {
-            bool result = base.OnHover(state);
-
             icon.ClearTransformations();
+            textContainer.ClearTransformations();
 
-            icon.MoveToX(iconPos.X + 10, 150, EasingTypes.OutElastic);
+            textContainer.MoveTo(Position + ExtendLength, transformTime, EasingTypes.OutElastic);
+            icon.MoveToX(iconPos.X + 10, transformTime, EasingTypes.OutElastic);
 
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
             if (duration == 0) duration = 250;
@@ -69,15 +108,34 @@ namespace osu.Game.Graphics.UserInterface
                 LoopDelay = duration
             });
 
-            return result;
+            return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             icon.ClearTransformations();
-            icon.MoveToX(iconPos.X, 150, EasingTypes.OutElastic);
+            textContainer.ClearTransformations();
 
-            base.OnHoverLost(state);
+            textContainer.MoveTo(Position + InitialExtendLength, transformTime, EasingTypes.OutElastic);
+            icon.MoveToX(iconPos.X, transformTime, EasingTypes.OutElastic);
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            var flash = new Box
+            {
+                RelativeSizeAxes = RelativeSizeAxes
+            };
+
+            Add(flash);
+
+            flash.Colour = textBox.Colour;
+            flash.BlendingMode = BlendingMode.Additive;
+            flash.Alpha = 0.3f;
+            flash.FadeOutFromOne(200);
+            flash.Expire();
+
+            return base.OnClick(state);
         }
     }
 }
