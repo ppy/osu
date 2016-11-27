@@ -169,6 +169,19 @@ namespace osu.Game.Overlays
                     if (State == Visibility.Hidden) return false;
                     Hide();
                     return true;
+                case Key.PageUp:
+                    if (State == Visibility.Hidden) return false;
+                    ScrollToPrevSection(); // Go to start of previous section
+                    return true;
+
+                case Key.PageDown:
+                    if (State == Visibility.Hidden) return false;
+                    ScrollToNextSection(); // Go to start of next section
+                    return true;
+
+                    if (State == Visibility.Hidden) return false;
+                    ScrollToPrevSection(); // Go to start of previous section
+                    return true;
             }
             return base.OnKeyDown(state, args);
         }
@@ -185,6 +198,48 @@ namespace osu.Game.Overlays
             scrollContainer.MoveToX(-width, 600, EasingTypes.OutQuint);
             sidebar.MoveToX(-sidebar_width, 600, EasingTypes.OutQuint);
             FadeTo(0, 300);
+        }
+
+        private int GetCurrentSection()
+        {
+            int currSection = int.MaxValue;
+            float minDistance = float.MaxValue;
+
+            for (int i = 0; i < sections.Length; i++)
+            {
+                float distance = Math.Abs(scrollContainer.GetChildYInContent(sections[i]) - scrollContainer.Current);
+                if (distance < minDistance)
+                {
+                    currSection = i;
+                    minDistance = distance;
+                }
+            }
+
+            return currSection;
+        }
+
+        private void ScrollToNextSection()
+        {
+            int currSection = GetCurrentSection();
+
+            if (currSection == sections.Length - 1)
+                currSection = 0;
+            else
+                currSection++;
+
+            scrollContainer.ScrollIntoView(sections[currSection]);
+        }
+
+        private void ScrollToPrevSection()
+        {
+            int currSection = GetCurrentSection();
+
+            if (currSection == 0)
+                currSection = sections.Length - 1;
+            else
+                currSection--;
+
+            scrollContainer.ScrollIntoView(sections[currSection]);
         }
     }
 }
