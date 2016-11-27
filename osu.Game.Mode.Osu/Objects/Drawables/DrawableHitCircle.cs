@@ -24,7 +24,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private GlowPiece glow;
         private HitExplosion explosion;
 
-        public DrawableHitCircle(HitCircle h) : base(h)
+        public DrawableHitCircle(OsuHitObject h) : base(h)
         {
             osuObject = h;
 
