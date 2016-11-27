@@ -116,8 +116,6 @@ namespace osu.Game.Screens
                 },
                 popButton = new BackButton
                 {
-                    RelativeSizeAxes = Axes.None,
-                    Height = 40,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Alpha = 0,

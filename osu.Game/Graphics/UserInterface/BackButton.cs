@@ -29,7 +29,10 @@ namespace osu.Game.Graphics.UserInterface
 
         public BackButton()
         {
-            Width = 80;
+            RelativeSizeAxes = Axes.None;
+            Width = 120;
+            Height = 50; // same as bottomToolHeight in PlaySongSelect
+
             Children = new Drawable[]
             {
                 leftContainer = new Container
@@ -56,7 +59,8 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Origin = Anchor.TopLeft,
                     Anchor = Anchor.TopLeft,
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 80,
                     Position = Position + InitialExtendLength,
                     Children = new Drawable[]
                     {
@@ -86,6 +90,8 @@ namespace osu.Game.Graphics.UserInterface
             rightContainer.MoveTo(Position + ExtendLength, transform_time, EasingTypes.OutElastic);
             leftContainer.ResizeTo(new Vector2(ExtendLength.X, 1.0f), transform_time, EasingTypes.OutElastic);
 
+            Width = 140; // right container + ExtendLength
+
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
             if (duration == 0) duration = pulse_length;
 
@@ -114,6 +120,8 @@ namespace osu.Game.Graphics.UserInterface
             rightContainer.MoveTo(Position + InitialExtendLength, transform_time, EasingTypes.OutElastic);
             leftContainer.ResizeTo(new Vector2(InitialExtendLength.X, 1.0f), transform_time, EasingTypes.OutElastic);
 
+            Width = 120; // right container + InitialExtendLength
+
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
             if (duration == 0) duration = pulse_length * 2;
 
@@ -137,13 +145,17 @@ namespace osu.Game.Graphics.UserInterface
         {
             var flash = new Box
             {
-                RelativeSizeAxes = RelativeSizeAxes,
-                Colour = colorBright,
+                RelativeSizeAxes = Axes.None,
+                Width = 140,
+                Height = 50,
+                Shear = new Vector2(0.1f, 0),
+                Colour = new Color4(255,255,255,255),
                 BlendingMode = BlendingMode.Additive,
                 Alpha = 0.3f
             };
             Add(flash);
 
+            flash.ResizeTo(new Vector2(120, 50), transform_time, EasingTypes.OutElastic);
             flash.FadeOutFromOne(200);
             flash.Expire();
 
