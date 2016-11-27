@@ -169,13 +169,16 @@ namespace osu.Game.Overlays
                     if (State == Visibility.Hidden) return false;
                     Hide();
                     return true;
-                
-                case Key.Down:
+                case Key.PageUp:
+                    if (State == Visibility.Hidden) return false;
+                    ScrollToPrevSection(); // Go to start of previous section
+                    return true;
+
+                case Key.PageDown:
                     if (State == Visibility.Hidden) return false;
                     ScrollToNextSection(); // Go to start of next section
                     return true;
 
-                case Key.Up:
                     if (State == Visibility.Hidden) return false;
                     ScrollToPrevSection(); // Go to start of previous section
                     return true;
