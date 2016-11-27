@@ -14,6 +14,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps.Drawables;
 using osu.Framework.Timing;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Screens.Select
 {
@@ -231,6 +232,19 @@ namespace osu.Game.Screens.Select
                 // layer transformations on top, with a similar reasoning to the previous comment.
                 panel.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
             }
+        }
+
+        public void SelectRandom()
+        {
+            if (groups.Count < 1)
+                return;
+            BeatmapGroup BG = groups[RNG.Next(groups.Count)];
+            if (BG == null)
+                return;
+            BeatmapPanel BP = BG.BeatmapPanels.First(); //TODO: implement stable's "recommended difficulty" here, instead of .First()
+            if (BP == null)
+                return;
+            SelectGroup(BG, BP);
         }
     }
 }

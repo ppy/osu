@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
 
+        private Button beatmapOptionsButton;
+
         class WedgeBackground : Container
         {
             public WedgeBackground()
@@ -134,6 +136,47 @@ namespace osu.Game.Screens.Select
                                 PreferredPlayMode = playMode.Value
                             })
                         },
+                        new FlowContainer
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+                            Direction = FlowDirection.HorizontalOnly,
+                            Children = new Drawable[]
+                            {
+                                new Button
+                                {
+                                    Width = 100,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Text = "back",
+                                    Colour = new Color4(238, 51, 153, 255),
+                                    Action = () => Exit(),
+                                },
+                                new Button
+                                {
+                                    Width = 100,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Text = "mods",
+                                    Colour = new Color4(238, 51, 153, 255),
+                                },
+                                new Button
+                                {
+                                    Width = 100,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Text = "random",
+                                    Colour = new Color4(238, 51, 153, 255),
+                                    Action = () => carousel.SelectRandom(),
+                                },
+                                beatmapOptionsButton = new Button
+                                {
+                                    Width = 100,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Text = "options",
+                                    Colour = new Color4(238, 51, 153, 255),
+                                }
+                            }
+                        }
                     }
                 }
             };
@@ -154,6 +197,8 @@ namespace osu.Game.Screens.Select
             database.BeatmapSetAdded += onDatabaseOnBeatmapSetAdded;
 
             trackManager = audio.Track;
+
+            beatmapOptionsButton.Action = () =>  osuGame.BeatmapOptions.ToggleVisibility();
 
             initialAddSetsTask = new CancellationTokenSource();
 
