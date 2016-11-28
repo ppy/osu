@@ -1,5 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
@@ -12,13 +13,10 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Database;
-using osu.Game.Screens.Select;
 using osu.Game.Graphics;
-using System.Collections.Generic;
 using osu.Framework.MathUtils;
 
-namespace osu.Game
+namespace osu.Game.Overlays
 {
     public class BeatmapOptions : OverlayContainer, IStateful<BeatmapOptionsState>
     {
@@ -28,6 +26,11 @@ namespace osu.Game
         private FlowContainer buttonFlow;
         private FlowContainer header;
         private OsuGameBase osuGameBase;
+
+        //State Appearance Properties
+        private Vector2 initialStateButtonFlowSpacing = new Vector2(0, 20);
+        private Vector2 deleteStateButtonFlowSpacing = new Vector2(0, 0);
+
 
         private BeatmapOptionsState state;
         public new BeatmapOptionsState State
@@ -56,7 +59,7 @@ namespace osu.Game
             RelativeSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
-                new BeatmapOptionsTriangles
+                new BackingTriangles
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -65,7 +68,7 @@ namespace osu.Game
                 {
                     Colour = new Color4(0, 0, 0, 255),
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.90f,
+                    Alpha = 0.80f,
                 },
                 new FlowContainer
                 {
@@ -92,7 +95,6 @@ namespace osu.Game
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Direction = FlowDirection.VerticalOnly,
-                            Spacing = new Vector2(0, 20),
                         },
                     }
                 }
@@ -117,6 +119,8 @@ namespace osu.Game
         private void applyInitialState()
         {
             resetStateAppearance();
+
+            buttonFlow.Spacing = initialStateButtonFlowSpacing;
             buttonFlow.Add(new Drawable[]
             {
                 new Button
@@ -169,6 +173,7 @@ namespace osu.Game
         private void applyDeleteState()
         {
             resetStateAppearance();
+
             header.Add(new Drawable[]
             {
                 new Container
@@ -177,21 +182,21 @@ namespace osu.Game
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding
                     {
-                        Bottom = 20,
+                        Bottom = 10,
                     },
                     Children = new TextAwesome[]
                     {
                         new TextAwesome
                         {
                             Icon = FontAwesome.fa_circle_thin,
-                            TextSize = 120,
+                            TextSize = 90,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
                         new TextAwesome
                         {
                             Icon = FontAwesome.fa_trash_o,
-                            TextSize = 50,
+                            TextSize = 40,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
@@ -199,7 +204,9 @@ namespace osu.Game
                 },
                 new SpriteText
                 {
-                    Text = "Delete Beatmap",
+                    Text = "DELETE BEATMAP",
+                    TextSize = 17,
+                    Font = @"Exo2.0-Bold",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Padding = new MarginPadding
@@ -210,43 +217,50 @@ namespace osu.Game
                 new SpriteText
                 {
                     Text = "Confirm deletion of",
+                    Font = @"Exo2.0-Bold",
+                    TextSize = 19,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = new Color4(0, 229, 229, 255),
+                    Colour = new Color4(153, 238, 255, 255),
+                    Padding = new MarginPadding
+                    {
+                        Bottom = 5,
+                    },
                 },
                 new SpriteText
                 {
                     Text = $"{osuGameBase.Beatmap.Value.BeatmapInfo.Metadata.Artist}" + " - " + $"{osuGameBase.Beatmap.Value.BeatmapInfo.Metadata.Title}",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = @"Exo2.0-SemiBoldItalic",
+                    Font = @"Exo2.0-BoldItalic",
                 },
             });
 
+            buttonFlow.Spacing = deleteStateButtonFlowSpacing;
             buttonFlow.Add(new Drawable[]
             {
-                new Button
+                new BeatmapOptionsButton
                 {
-                    Width = 350,
-                    Height = 50,
                     Text = "Yes. Totally. Delete it.",
                     Colour = new Color4(238, 51, 153, 255),
-                },
-                new Button
-                {
-                    Width = 350,
+                    BackgroundColour = new Color4(159, 14, 102, 255),
+                    Width = 400,
                     Height = 50,
+                    BackgroundWidth = 500,
+                    BackgroundHeight = 50,
+                },
+                new BeatmapOptionsButton
+                {
                     Text = "Firetruck, I didn't mean to!",
-                    Colour = new Color4(0, 229, 229, 255),
+                    Colour = new Color4(68, 170, 221, 225),
+                    BackgroundColour = new Color4(14, 116, 145, 255),
+                    Width = 400,
+                    Height = 50,
+                    BackgroundWidth = 500,
+                    BackgroundHeight = 50,
                     Action = () => State = BeatmapOptionsState.Initial,
                 }
             });
-        }
-
-        private void reset()
-        {
-            State = BeatmapOptionsState.Initial;
-            Hide();
         }
 
         private const int transition_length = 200;
@@ -259,20 +273,15 @@ namespace osu.Game
         protected override void PopOut()
         {
             MoveToY(ScreenSpaceDrawQuad.Height, transition_length, EasingTypes.Out);
-        }
-
-        public override void Hide()
-        {
-            base.Hide();
             State = BeatmapOptionsState.Initial;
         }
 
-        class BeatmapOptionsTriangles : Container
+        class BackingTriangles : Container
         {
             private Texture triangle;
             private const int num_triangles = 300;
 
-            public BeatmapOptionsTriangles()
+            public BackingTriangles()
             {
                 RelativeSizeAxes = Axes.Both;
             }
@@ -293,7 +302,7 @@ namespace osu.Game
                         Texture = triangle,
                         Origin = Anchor.Centre,
                         RelativePositionAxes = Axes.Both,
-                        Position = new Vector2(RNG.NextSingle(), RNG.NextSingle()),
+                        Position = new Vector2(RNG.NextSingle() + RNG.NextSingle(-0.1f, 0.1f), RNG.NextSingle() + RNG.NextSingle(-0.1f, 0.1f)),
                         Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
                         Alpha = RNG.NextSingle() * 0.3f,
                         Colour = new Color4(RNG.NextSingle(),RNG.NextSingle(),RNG.NextSingle(), 255),
