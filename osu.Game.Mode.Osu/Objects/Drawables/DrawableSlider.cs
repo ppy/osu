@@ -43,8 +43,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             base.LoadComplete();
 
-            for (int i = 0; i < slider.Curve.Path.Count; ++i)
-                path.Positions.Add(slider.Curve.Path[i]);
+            for (int i = 0; i < slider.Curve.Length; i += 10)
+                path.Positions.Add(slider.Curve.PositionAt(i / slider.Curve.Length));
 
             path.PathWidth = startCircle.DrawWidth / 4;
 
