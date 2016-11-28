@@ -104,16 +104,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 Judgement.Result = HitResult.Miss;
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateInitialState()
         {
-            if (!IsLoaded) return;
-
-            Flush(true); //move to DrawableHitObject
-            ApproachCircle.Flush(true);
-
-            double t = osuObject.EndTime + Judgement.TimeOffset;
-
-            Alpha = 0;
+            base.UpdateInitialState();
 
             //sane defaults
             ring.Alpha = circle.Alpha = number.Alpha = glow.Alpha = 1;
@@ -121,29 +114,30 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             ApproachCircle.Scale = new Vector2(2);
             explode.Alpha = 0;
             Scale = new Vector2(0.5f); //this will probably need to be moved to DrawableHitObject at some point.
+        }
 
-            const float preempt = 600;
+        protected override void UpdatePreemptState()
+        {
+            base.UpdatePreemptState();
 
-            const float fadein = 400;
+            ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT));
+            ApproachCircle.ScaleTo(0.6f, TIME_PREEMPT);
+        }
 
-            Delay(t - Time.Current - preempt, true);
+        protected override void UpdateState(ArmedState state)
+        {
+            if (!IsLoaded) return;
 
-            FadeIn(fadein);
-
-            ApproachCircle.FadeIn(Math.Min(fadein * 2, preempt));
-            ApproachCircle.ScaleTo(0.6f, preempt);
-
-            Delay(preempt, true);
+            base.UpdateState(state);
 
             ApproachCircle.FadeOut();
-
             glow.FadeOut(400);
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    Delay(osuObject.Duration + 500);
-                    FadeOut(500);
+                    Delay(osuObject.Duration + TIME_PREEMPT);
+                    FadeOut(TIME_FADEOUT);
 
                     explosion?.Expire();
                     explosion = null;
