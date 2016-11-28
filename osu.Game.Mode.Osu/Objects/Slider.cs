@@ -4,14 +4,21 @@
 using System.Collections.Generic;
 using osu.Game.Database;
 using OpenTK;
+using osu.Game.Beatmaps;
+using System;
 
 namespace osu.Game.Modes.Osu.Objects
 {
     public class Slider : OsuHitObject
     {
-        public override double EndTime => StartTime + RepeatCount * Curve.Length / VelocityAt(StartTime);
+        public override double EndTime => StartTime + RepeatCount * Curve.Length / Velocity;
 
-        public double VelocityAt(double time) => 100 / Beatmap.BeatLengthAt(time, true) * Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
+        public double Velocity;
+
+        public override void SetDefaultsFromBeatmap(Beatmap beatmap)
+        {
+            Velocity = 100 / beatmap.BeatLengthAt(StartTime, true) * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
+        }
 
         public int RepeatCount;
 

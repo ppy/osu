@@ -21,8 +21,8 @@ namespace osu.Game.Modes.Objects
 
         public double Duration => EndTime - StartTime;
 
-        public Beatmap Beatmap;
-
         public HitSampleInfo Sample;
+
+        public virtual void SetDefaultsFromBeatmap(Beatmap beatmap) { }
     }
 }

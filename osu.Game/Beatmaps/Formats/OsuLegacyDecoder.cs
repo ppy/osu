@@ -297,7 +297,7 @@ namespace osu.Game.Beatmaps.Formats
 
                         if (obj != null)
                         {
-                            obj.Beatmap = beatmap;
+                            obj.SetDefaultsFromBeatmap(beatmap);
                             beatmap.HitObjects.Add(obj);
                         }
                         break;
