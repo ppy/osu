@@ -2,18 +2,20 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Game.Database;
 using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects
 {
     public class Slider : OsuHitObject
     {
-        public override double EndTime => StartTime + (RepeatCount + 1) * Curve.Length;
+        public override double EndTime => StartTime + (RepeatCount + 1) * Curve.Length / VelocityAt(StartTime);
+
+        public double VelocityAt(double time) => 10000 / Beatmap.BeatLengthAt(time, true) * Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
 
         public int RepeatCount;
 
         public SliderCurve Curve;
-        
     }
 
     public class SliderCurve

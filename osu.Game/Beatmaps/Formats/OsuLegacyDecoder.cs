@@ -294,8 +294,12 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                     case Section.HitObjects:
                         var obj = parser?.Parse(val);
+
                         if (obj != null)
+                        {
+                            obj.Beatmap = beatmap;
                             beatmap.HitObjects.Add(obj);
+                        }
                         break;
                 }
             }
