@@ -9,7 +9,7 @@ namespace osu.Game.Modes.Osu.Objects
 {
     public class Slider : OsuHitObject
     {
-        public override double EndTime => StartTime + (RepeatCount + 1) * Curve.Length / VelocityAt(StartTime);
+        public override double EndTime => StartTime + RepeatCount * Curve.Length / VelocityAt(StartTime);
 
         public double VelocityAt(double time) => 100 / Beatmap.BeatLengthAt(time, true) * Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
 
