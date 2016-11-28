@@ -100,7 +100,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             private Path path;
 
-            double snakeDrawn = 0;
+            double? drawnProgress;
 
             Slider slider;
 
@@ -134,26 +134,37 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             {
                 base.Update();
 
-                double snake = MathHelper.Clamp((Time.Current - slider.StartTime + 450) / 200, 0, 1);
-                if (snake != snakeDrawn)
+                double segmentSize = 1 / (slider.Curve.Length / 5);
+                double progress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT) / TIME_FADEIN, 0, 1);
+
+                if (progress != drawnProgress)
                 {
-                    if (snake < snakeDrawn)
+                    if (progress == 0)
                     {
                         //if we have gone backwards, just clear the path for now.
-                        snakeDrawn = 0;
+                        drawnProgress = 0;
                         path.Positions.Clear();
                     }
 
-                    const double segment_size = 10;
-
-                    while (snakeDrawn < snake)
+                    if (drawnProgress == null)
                     {
-                        snakeDrawn += segment_size;
-                        path.Positions.Add(slider.Curve.PositionAt(snake));
+                        drawnProgress = 0;
+                        path.Positions.Add(slider.Curve.PositionAt(drawnProgress.Value));
                     }
 
-                    snakeDrawn = snake;
-                    path.Positions.Add(slider.Curve.PositionAt(snake));
+                    while (drawnProgress + segmentSize < progress)
+                    {
+                        drawnProgress += segmentSize;
+                        path.Positions.Add(slider.Curve.PositionAt(drawnProgress.Value));
+                    }
+
+                    if (progress == 1 && drawnProgress != progress)
+                    {
+                        drawnProgress = progress;
+                        path.Positions.Add(slider.Curve.PositionAt(drawnProgress.Value));
+                    }
+
+                    path.Invalidate(Invalidation.DrawNode);
                 }
             }
         }
