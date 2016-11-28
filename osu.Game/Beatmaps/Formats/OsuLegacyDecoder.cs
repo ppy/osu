@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
 using osu.Game.Screens.Play;
+using static System.Double;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -85,7 +86,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.StoredBookmarks = val;
                     break;
                 case @"DistanceSpacing":
-                    beatmap.BeatmapInfo.DistanceSpacing = double.Parse(val, NumberFormatInfo.InvariantInfo);
+                    beatmap.BeatmapInfo.DistanceSpacing = Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"BeatDivisor":
                     beatmap.BeatmapInfo.BeatDivisor = int.Parse(val);
@@ -94,7 +95,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.GridSize = int.Parse(val);
                     break;
                 case @"TimelineZoom":
-                    beatmap.BeatmapInfo.TimelineZoom = double.Parse(val, NumberFormatInfo.InvariantInfo);
+                    beatmap.BeatmapInfo.TimelineZoom = Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
             }
         }
@@ -187,7 +188,25 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleTimingPoints(Beatmap beatmap, string val)
         {
-            // TODO
+            ControlPoint cp = null;
+
+            string[] split = val.Split(',');
+
+            if (split.Length > 2)
+            {
+                int kiai_flags = split.Length > 7 ? Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : 0;
+                double beatLength = Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
+                cp = new ControlPoint
+                {
+                    Time = Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo),
+                    BeatLength = beatLength > 0 ? beatLength : 0,
+                    VelocityAdjustment = beatLength < 0 ? -beatLength / 100.0 : 1,
+                    TimingChange = split.Length <= 6 || split[6][0] == '1',
+                };
+            }
+
+            if (cp != null)
+                beatmap.ControlPoints.Add(cp);
         }
 
         private void handleColours(Beatmap beatmap, string key, string val)
