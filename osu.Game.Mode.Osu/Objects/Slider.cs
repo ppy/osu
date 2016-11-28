@@ -11,7 +11,7 @@ namespace osu.Game.Modes.Osu.Objects
     {
         public override double EndTime => StartTime + (RepeatCount + 1) * Curve.Length / VelocityAt(StartTime);
 
-        public double VelocityAt(double time) => 10000 / Beatmap.BeatLengthAt(time, true) * Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
+        public double VelocityAt(double time) => 100 / Beatmap.BeatLengthAt(time, true) * Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
 
         public int RepeatCount;
 
