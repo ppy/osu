@@ -44,11 +44,13 @@ namespace osu.Game.Modes.Osu.Objects
 
         public Vector2 PositionAt(double progress)
         {
-            int index = (int)(progress * (calculatedPath.Count - 1));
+            progress = MathHelper.Clamp(progress, 0, 1);
 
-            Vector2 pos = calculatedPath[index];
-            if (index != progress)
-                pos += (calculatedPath[index + 1] - pos) * (float)(progress - index);
+            double index = progress * (calculatedPath.Count - 1);
+
+            Vector2 pos = calculatedPath[(int)index];
+            if (index != (int)index)
+                pos += (calculatedPath[(int)index + 1] - pos) * (float)(index - (int)index);
 
             return pos;
         }
