@@ -15,6 +15,8 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Database;
 using osu.Game.Screens.Select;
 using osu.Game.Graphics;
+using System.Collections.Generic;
+using osu.Framework.MathUtils;
 
 namespace osu.Game
 {
@@ -54,6 +56,11 @@ namespace osu.Game
             RelativeSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
+                new BeatmapOptionsTriangles
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
                 backgroundBox = new Box
                 {
                     Colour = new Color4(0, 0, 0, 255),
@@ -231,7 +238,7 @@ namespace osu.Game
                     Height = 50,
                     Text = "Firetruck, I didn't mean to!",
                     Colour = new Color4(0, 229, 229, 255),
-                    Action = reset,
+                    Action = () => State = BeatmapOptionsState.Initial,
                 }
             });
         }
@@ -258,6 +265,53 @@ namespace osu.Game
         {
             base.Hide();
             State = BeatmapOptionsState.Initial;
+        }
+
+        class BeatmapOptionsTriangles : Container
+        {
+            private Texture triangle;
+            private const int num_triangles = 300;
+
+            public BeatmapOptionsTriangles()
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                triangle = textures.Get(@"Play/osu/triangle@2x");
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                for (int i = 0; i < num_triangles; i++)
+                {
+                    Add(new Sprite
+                    {
+                        Texture = triangle,
+                        Origin = Anchor.Centre,
+                        RelativePositionAxes = Axes.Both,
+                        Position = new Vector2(RNG.NextSingle(), RNG.NextSingle()),
+                        Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
+                        Alpha = RNG.NextSingle() * 0.3f,
+                        Colour = new Color4(RNG.NextSingle(),RNG.NextSingle(),RNG.NextSingle(), 255),
+                    });
+                }
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                foreach (Drawable d in Children)
+                {
+                    d.Position -= new Vector2(0, (float)(d.Scale.X * (Time.Elapsed / 2880)));
+                    if (d.DrawPosition.Y + d.DrawSize.Y * d.Scale.Y < 0)
+                        d.MoveToY(1);
+                }
+            }
         }
     }
 
