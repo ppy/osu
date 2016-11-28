@@ -28,11 +28,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             Flush(true);
 
-            double t = HitObject.EndTime + Judgement.TimeOffset;
-
             UpdateInitialState();
 
-            Delay(t - Time.Current - TIME_PREEMPT, true);
+            Delay(HitObject.StartTime - Time.Current - TIME_PREEMPT + Judgement.TimeOffset, true);
 
             UpdatePreemptState();
 

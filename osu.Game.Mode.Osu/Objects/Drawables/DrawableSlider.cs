@@ -5,7 +5,9 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transformations;
 using OpenTK.Graphics;
+using osu.Framework.Input;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -15,7 +17,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         private DrawableHitCircle startCircle;
         private Container ball;
-        private SliderBody body;
+        private Body body;
 
         public DrawableSlider(Slider s) : base(s)
         {
@@ -23,26 +25,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             Origin = Anchor.TopLeft;
             Position = Vector2.Zero;
+            RelativeSizeAxes = Axes.Both;
 
             Children = new Drawable[]
             {
-                body = new SliderBody(s),
-                ball = new Container
-                {
-                    Masking = true,
-                    CornerRadius = 20,
-                    AutoSizeAxes = Axes.Both,
-                    Colour = Color4.Red,
-                    Origin = Anchor.Centre,
-                    Children = new []
-                    {
-                        new Box
-                        {
-                            Width = 40,
-                            Height = 40,
-                        }
-                    }
-                },
+                body = new Body(s),
+                ball = new Ball(),
                 startCircle = new DrawableHitCircle(new HitCircle
                 {
                     StartTime = s.StartTime,
@@ -89,15 +77,102 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             FadeOut(100);
         }
 
-        class SliderBody : Container
+        private class Ball : Container
+        {
+            private Box follow;
+
+            public Ball()
+            {
+                Masking = true;
+                AutoSizeAxes = Axes.Both;
+                BlendingMode = BlendingMode.Additive;
+                Origin = Anchor.Centre;
+
+                Children = new Drawable[]
+                {
+                    follow = new Box
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Colour = Color4.Orange,
+                        Width = 64,
+                        Height = 64,
+                    },
+                    new Container
+                    {
+                        Masking = true,
+                        AutoSizeAxes = Axes.Both,
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Colour = Color4.Cyan,
+                        CornerRadius = 32,
+                        Children = new[]
+                        {
+                            new Box
+                            {
+                                
+                                Width = 64,
+                                Height = 64,
+                            },
+                        }
+                    }
+                    
+                };
+            }
+
+            private InputState lastState;
+
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            {
+                lastState = state;
+                return base.OnMouseDown(state, args);
+            }
+
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            {
+                lastState = state;
+                return base.OnMouseUp(state, args);
+            }
+
+            protected override bool OnMouseMove(InputState state)
+            {
+                lastState = state;
+                return base.OnMouseMove(state);
+            }
+
+            bool tracking;
+            protected bool Tracking
+            {
+                get { return tracking; }
+                set
+                {
+                    if (value == tracking) return;
+
+                    tracking = value;
+
+                    follow.ScaleTo(tracking ? 2 : 1, 140, EasingTypes.Out);
+                    follow.FadeTo(tracking ? 0.8f : 0, 140, EasingTypes.Out);
+                }
+            }
+            
+            protected override void Update()
+            {
+                base.Update();
+
+                CornerRadius = DrawWidth / 2;
+                Tracking = lastState != null && Contains(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
+            }
+        }
+
+        private class Body : Container
         {
             private Path path;
 
-            double? drawnProgress;
+            private double? drawnProgress;
 
-            Slider slider;
+            private Slider slider;
 
-            public SliderBody(Slider s)
+            public Body(Slider s)
             {
                 slider = s;
 
@@ -127,38 +202,43 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             {
                 base.Update();
 
-                double segmentSize = 1 / (slider.Curve.Length / 5);
+                updateSnaking();
+            }
+
+            private void updateSnaking()
+            {
                 double progress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT / 2) / TIME_FADEIN, 0, 1);
 
-                if (progress != drawnProgress)
+                if (progress == drawnProgress) return;
+
+                if (progress == 0)
                 {
-                    if (progress == 0)
-                    {
-                        //if we have gone backwards, just clear the path for now.
-                        drawnProgress = 0;
-                        path.Positions.Clear();
-                    }
-
-                    if (drawnProgress == null)
-                    {
-                        drawnProgress = 0;
-                        path.Positions.Add(slider.Curve.PositionAt(drawnProgress.Value));
-                    }
-
-                    while (drawnProgress + segmentSize < progress)
-                    {
-                        drawnProgress += segmentSize;
-                        path.Positions.Add(slider.Curve.PositionAt(drawnProgress.Value));
-                    }
-
-                    if (progress == 1 && drawnProgress != progress)
-                    {
-                        drawnProgress = progress;
-                        path.Positions.Add(slider.Curve.PositionAt(drawnProgress.Value));
-                    }
-
-                    path.Invalidate(Invalidation.DrawNode);
+                    //if we have gone backwards, just clear the path for now.
+                    drawnProgress = 0;
+                    path.Positions.Clear();
                 }
+
+                if (drawnProgress == null)
+                {
+                    drawnProgress = 0;
+                    path.Positions.Add(slider.Curve.PositionAt(drawnProgress.Value));
+                }
+
+                double segmentSize = 1 / (slider.Curve.Length / 5);
+
+                while (drawnProgress + segmentSize < progress)
+                {
+                    drawnProgress += segmentSize;
+                    path.Positions.Add(slider.Curve.PositionAt(drawnProgress.Value));
+                }
+
+                if (progress == 1 && drawnProgress != progress)
+                {
+                    drawnProgress = progress;
+                    path.Positions.Add(slider.Curve.PositionAt(drawnProgress.Value));
+                }
+
+                path.Invalidate(Invalidation.DrawNode);
             }
         }
     }
