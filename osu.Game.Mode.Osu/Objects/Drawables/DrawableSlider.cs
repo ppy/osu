@@ -195,7 +195,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                path.PathWidth = 50;
+                path.PathWidth = 32;
             }
 
             protected override void Update()
@@ -215,13 +215,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 {
                     //if we have gone backwards, just clear the path for now.
                     drawnProgress = 0;
-                    path.Positions.Clear();
+                    path.ClearVertices();
                 }
 
                 if (drawnProgress == null)
                 {
                     drawnProgress = 0;
-                    path.Positions.Add(slider.Curve.PositionAt(drawnProgress.Value));
+                    path.AddVertex(slider.Curve.PositionAt(drawnProgress.Value));
                 }
 
                 double segmentSize = 1 / (slider.Curve.Length / 5);
@@ -229,13 +229,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 while (drawnProgress + segmentSize < progress)
                 {
                     drawnProgress += segmentSize;
-                    path.Positions.Add(slider.Curve.PositionAt(drawnProgress.Value));
+                    path.AddVertex(slider.Curve.PositionAt(drawnProgress.Value));
                 }
 
                 if (progress == 1 && drawnProgress != progress)
                 {
                     drawnProgress = progress;
-                    path.Positions.Add(slider.Curve.PositionAt(drawnProgress.Value));
+                    path.AddVertex(slider.Curve.PositionAt(drawnProgress.Value));
                 }
 
                 path.Invalidate(Invalidation.DrawNode);
