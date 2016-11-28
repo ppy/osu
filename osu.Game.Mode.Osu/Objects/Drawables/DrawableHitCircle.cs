@@ -59,14 +59,14 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Colour = osuObject.Colour,
                 }
             };
+
+            //may not be so correct
+            Size = circle.DrawSize;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            //may not be so correct
-            Size = circle.DrawSize;
 
             //force application of the state that was set before we loaded.
             UpdateState(State);
