@@ -13,6 +13,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private Path path;
         private DrawableHitCircle startCircle;
         private Slider slider;
+        private Container ball;
 
         public DrawableSlider(Slider s) : base(s)
         {
@@ -23,6 +24,26 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             Children = new Drawable[]
             {
+                path = new Path
+                {
+                    Colour = s.Colour,
+                },
+                ball = new Container
+                {
+                    Masking = true,
+                    CornerRadius = 20,
+                    AutoSizeAxes = Axes.Both,
+                    Colour = Color4.Red,
+                    Origin = Anchor.Centre,
+                    Children = new []
+                    {
+                        new Box
+                        {
+                            Width = 40,
+                            Height = 40,
+                        }
+                    }
+                },
                 startCircle = new DrawableHitCircle(new HitCircle
                 {
                     StartTime = s.StartTime,
@@ -32,10 +53,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 {
                     Depth = 1 //override time-based depth.
                 },
-                path = new Path
-                {
-                    Colour = s.Colour,
-                }
             };
         }
 
@@ -52,6 +69,25 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             UpdateState(State);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            ball.Alpha = Time.Current >= slider.StartTime && Time.Current <= slider.EndTime ? 1 : 0;
+
+            double t = (Time.Current - slider.StartTime) / slider.Duration;
+            if (slider.RepeatCount > 1)
+            {
+                double currentRepeat = (int)(t * slider.RepeatCount);
+                t = (t * slider.RepeatCount) % 1;
+                if (currentRepeat % 2 == 1)
+                    t = 1 - t;
+            }
+                
+            ball.Position = slider.Curve.PositionAt(t);
+
+        }
+
         protected override void UpdateState(ArmedState state)
         {
             if (!IsLoaded) return;
@@ -64,7 +100,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             FadeIn(200);
             Delay(450 + HitObject.Duration);
-            FadeOut(200);
+            FadeOut(100);
         }
     }
 }
