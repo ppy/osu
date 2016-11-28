@@ -60,7 +60,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             double t = (Time.Current - slider.StartTime) / slider.Duration;
             if (slider.RepeatCount > 1)
             {
-                double currentRepeat = (int)(t * slider.RepeatCount);
+                int currentRepeat = (int)(t * slider.RepeatCount);
                 t = (t * slider.RepeatCount) % 1;
                 if (currentRepeat % 2 == 1)
                     t = 1 - t;
