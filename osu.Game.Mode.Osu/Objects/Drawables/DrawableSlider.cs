@@ -8,6 +8,9 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using OpenTK.Graphics;
 using osu.Framework.Input;
+using OpenTK.Graphics.ES30;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -29,7 +32,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             Children = new Drawable[]
             {
-                body = new Body(s),
+                body = new Body(s)
+                {
+                    Position = s.Position,
+                },
                 ball = new Ball(),
                 startCircle = new DrawableHitCircle(new HitCircle
                 {
@@ -167,29 +173,40 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private class Body : Container
         {
             private Path path;
+            private BufferedContainer container;
 
             private double? drawnProgress;
 
             private Slider slider;
-
             public Body(Slider s)
             {
                 slider = s;
 
                 Children = new Drawable[]
                 {
-                    //new BufferedContainer
-                    //{
-                    //    RelativeSizeAxes = Axes.Both,
-                    //    Children = new Drawable[]
-                    //    {
+                    container = new BufferedContainer
+                    {
+                        CacheDrawnFrameBuffer = true,
+                        Children = new Drawable[]
+                        {
                             path = new Path
                             {
                                 Colour = s.Colour,
+                                BlendingMode = BlendingMode.None,
                             },
-                    //    }
-                    //}
+                        }
+                    }
                 };
+
+                container.Attach(RenderbufferInternalFormat.DepthComponent16);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                // Surprisingly, this looks somewhat okay and works well as a test for self-overlaps.
+                // TODO: Don't do this.
+                path.Texture = textures.Get(@"Menu/logo");
             }
 
             protected override void LoadComplete()
@@ -202,26 +219,40 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             {
                 base.Update();
 
-                updateSnaking();
+                if (updateSnaking())
+                {
+                    // Autosizing does not give us the desired behaviour here.
+                    // We want the container to have the same size as the slider,
+                    // and to be positioned such that the slider head is at (0,0).
+                    container.Size = path.Size;
+                    container.Position = -path.HeadPosition;
+
+                    container.ForceRedraw();
+                }
             }
 
-            private void updateSnaking()
+            private bool updateSnaking()
             {
-                double progress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT / 2) / TIME_FADEIN, 0, 1);
+                double progress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT) / TIME_FADEIN, 0, 1);
 
-                if (progress == drawnProgress) return;
+                if (progress == drawnProgress) return false;
 
+                bool madeChanges = false;
                 if (progress == 0)
                 {
                     //if we have gone backwards, just clear the path for now.
                     drawnProgress = 0;
                     path.ClearVertices();
+                    madeChanges = true;
                 }
+
+                Vector2 startPosition = slider.Curve.PositionAt(0);
 
                 if (drawnProgress == null)
                 {
                     drawnProgress = 0;
-                    path.AddVertex(slider.Curve.PositionAt(drawnProgress.Value));
+                    path.AddVertex(slider.Curve.PositionAt(drawnProgress.Value) - startPosition);
+                    madeChanges = true;
                 }
 
                 double segmentSize = 1 / (slider.Curve.Length / 5);
@@ -229,16 +260,18 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 while (drawnProgress + segmentSize < progress)
                 {
                     drawnProgress += segmentSize;
-                    path.AddVertex(slider.Curve.PositionAt(drawnProgress.Value));
+                    path.AddVertex(slider.Curve.PositionAt(drawnProgress.Value) - startPosition);
+                    madeChanges = true;
                 }
 
                 if (progress == 1 && drawnProgress != progress)
                 {
                     drawnProgress = progress;
-                    path.AddVertex(slider.Curve.PositionAt(drawnProgress.Value));
+                    path.AddVertex(slider.Curve.PositionAt(drawnProgress.Value) - startPosition);
+                    madeChanges = true;
                 }
 
-                path.Invalidate(Invalidation.DrawNode);
+                return madeChanges;
             }
         }
     }
