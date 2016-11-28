@@ -21,15 +21,20 @@ namespace osu.Game.Overlays
     public class BeatmapOptions : OverlayContainer, IStateful<BeatmapOptionsState>
     {
 
-        private Box backgroundBox;
         private const float width = 500;
+        private const float button_width = 400;
+        private const float button_background_width = 500;
+        private const float button_height = 50;
+        private const int state_transition_length = 200;
+
+        private Box backgroundBox;
         private FlowContainer buttonFlow;
         private FlowContainer header;
         private OsuGameBase osuGameBase;
 
         //State Appearance Properties
-        private Vector2 initialStateButtonFlowSpacing = new Vector2(0, 20);
-        private Vector2 deleteStateButtonFlowSpacing = new Vector2(0, 0);
+        private static readonly Vector2 initialStateButtonFlowSpacing = new Vector2(0, 20);
+        private static readonly Vector2 deleteStateButtonFlowSpacing = new Vector2(0, 0);
 
 
         private BeatmapOptionsState state;
@@ -125,44 +130,44 @@ namespace osu.Game.Overlays
             {
                 new Button
                 {
-                    Width = 350,
-                    Height = 50,
+                    Width = button_width,
+                    Height = button_height,
                     Text = "Manage Collections",
                     Colour = new Color4(238, 51, 153, 255),
                 },
                 new Button
                 {
-                    Width = 350,
-                    Height = 50,
+                    Width = button_width,
+                    Height = button_height,
                     Text = "Delete",
                     Colour = new Color4(238, 51, 153, 255),
                     Action = () => State = BeatmapOptionsState.Delete,
                 },
                 new Button
                 {
-                    Width = 350,
-                    Height = 50,
+                    Width = button_width,
+                    Height = button_height,
                     Text = "Remove from Unplayed",
                     Colour = new Color4(238, 51, 153, 255),
                 },
                 new Button
                 {
-                    Width = 350,
-                    Height = 50,
+                    Width = button_width,
+                    Height = button_height,
                     Text = "Clear local Scores",
                     Colour = new Color4(238, 51, 153, 255),
                 },
                 new Button
                 {
-                    Width = 350,
-                    Height = 50,
+                    Width = button_width,
+                    Height = button_height,
                     Text = "Edit",
                     Colour = new Color4(238, 51, 153, 255),
                 },
                 new Button
                 {
-                    Width = 350,
-                    Height = 50,
+                    Width = button_width,
+                    Height = button_height,
                     Text = "Cancel",
                     Colour = new Color4(238, 51, 153, 255),
                     Action = ToggleVisibility,
@@ -244,35 +249,33 @@ namespace osu.Game.Overlays
                     Text = "Yes. Totally. Delete it.",
                     Colour = new Color4(238, 51, 153, 255),
                     BackgroundColour = new Color4(159, 14, 102, 255),
-                    Width = 400,
-                    Height = 50,
-                    BackgroundWidth = 500,
-                    BackgroundHeight = 50,
+                    Width = button_width,
+                    Height = button_height,
+                    BackgroundWidth = button_background_width,
+                    BackgroundHeight = button_height,
                 },
                 new BeatmapOptionsButton
                 {
                     Text = "Firetruck, I didn't mean to!",
                     Colour = new Color4(68, 170, 221, 225),
                     BackgroundColour = new Color4(14, 116, 145, 255),
-                    Width = 400,
-                    Height = 50,
-                    BackgroundWidth = 500,
-                    BackgroundHeight = 50,
+                    Width = button_width,
+                    Height = button_height,
+                    BackgroundWidth = button_background_width,
+                    BackgroundHeight = button_height,
                     Action = () => State = BeatmapOptionsState.Initial,
                 }
             });
         }
 
-        private const int transition_length = 200;
-
         protected override void PopIn()
         {
-            MoveToY(0, transition_length, EasingTypes.In);
+            MoveToY(0, state_transition_length, EasingTypes.In);
         }
 
         protected override void PopOut()
         {
-            MoveToY(ScreenSpaceDrawQuad.Height, transition_length, EasingTypes.Out);
+            MoveToY(ScreenSpaceDrawQuad.Height, state_transition_length, EasingTypes.Out);
             State = BeatmapOptionsState.Initial;
         }
 

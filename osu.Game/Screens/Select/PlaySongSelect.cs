@@ -44,7 +44,15 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
 
-        private Button beatmapOptionsButton;
+        private Box modeLight;
+
+        private PlaySongSelectButtonContainer playSongSelectButtonContainer;
+        private PlaySongSelectButton beatmapModsButton;
+        private PlaySongSelectButton beatmapRandomButton;
+        private PlaySongSelectButton beatmapOptionsButton;
+        private const float play_song_select_button_width = 100;
+        private const float play_song_select_button_height = 50;
+        private const int mode_light_transition_time = 200;
 
         class WedgeBackground : Container
         {
@@ -122,6 +130,13 @@ namespace osu.Game.Screens.Select
                             Size = Vector2.One,
                             Colour = new Color4(0, 0, 0, 0.5f),
                         },
+                        modeLight = new Box
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 3,
+                            Alpha = 0f,
+                            Position = new Vector2(0, -3),
+                        },
                         new Button
                         {
                             Anchor = Anchor.CentreRight,
@@ -143,6 +158,7 @@ namespace osu.Game.Screens.Select
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
                             Direction = FlowDirection.HorizontalOnly,
+                            Spacing = new Vector2(20, 0),
                             Children = new Drawable[]
                             {
                                 new Button
@@ -153,27 +169,35 @@ namespace osu.Game.Screens.Select
                                     Colour = new Color4(238, 51, 153, 255),
                                     Action = () => Exit(),
                                 },
-                                new Button
+                                playSongSelectButtonContainer = new PlaySongSelectButtonContainer
                                 {
-                                    Width = 100,
-                                    RelativeSizeAxes = Axes.Y,
-                                    Text = "mods",
-                                    Colour = new Color4(238, 51, 153, 255),
-                                },
-                                new Button
-                                {
-                                    Width = 100,
-                                    RelativeSizeAxes = Axes.Y,
-                                    Text = "random",
-                                    Colour = new Color4(238, 51, 153, 255),
-                                    Action = () => carousel.SelectRandom(),
-                                },
-                                beatmapOptionsButton = new Button
-                                {
-                                    Width = 100,
-                                    RelativeSizeAxes = Axes.Y,
-                                    Text = "options",
-                                    Colour = new Color4(238, 51, 153, 255),
+                                    Children = new Drawable[]
+                                    {
+                                        beatmapModsButton = new PlaySongSelectButton
+                                        {
+                                            Text = "mods",
+                                            Height = play_song_select_button_height,
+                                            Width = play_song_select_button_width,
+                                            SelectedColour = new Color4(238, 51, 153, 255),
+                                            DeselectedColour = new Color4(125, 54, 82, 255),
+                                        },
+                                        beatmapRandomButton = new PlaySongSelectButton
+                                        {
+                                            Text = "random",
+                                            Height = play_song_select_button_height,
+                                            Width = play_song_select_button_width,
+                                            SelectedColour = new Color4(165, 204, 0, 225),
+                                            DeselectedColour = new Color4(79, 99, 8, 255),
+                                        },
+                                        beatmapOptionsButton = new PlaySongSelectButton
+                                        {
+                                            Text = "options",
+                                            Height = play_song_select_button_height,
+                                            Width = play_song_select_button_width,
+                                            SelectedColour = new Color4(68, 170, 221, 225),
+                                            DeselectedColour = new Color4(14, 116, 145, 255),
+                                        },
+                                    }
                                 }
                             }
                         }
@@ -198,11 +222,19 @@ namespace osu.Game.Screens.Select
 
             trackManager = audio.Track;
 
-            beatmapOptionsButton.Action = () =>  osuGame.BeatmapOptions.ToggleVisibility();
+            playSongSelectButtonContainer.On_SelectionChanged += updateModeLight;
+            beatmapRandomButton.Action = () => carousel.SelectRandom();
+            beatmapOptionsButton.Action = () => osuGame.BeatmapOptions.ToggleVisibility();
 
             initialAddSetsTask = new CancellationTokenSource();
 
             Task.Factory.StartNew(() => addBeatmapSets(game, initialAddSetsTask.Token), initialAddSetsTask.Token);
+        }
+
+        private void updateModeLight()
+        {
+            modeLight.FadeIn(mode_light_transition_time);
+            modeLight.FadeColour(playSongSelectButtonContainer.SelectedButton.SelectedColour, mode_light_transition_time);
         }
 
         private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)

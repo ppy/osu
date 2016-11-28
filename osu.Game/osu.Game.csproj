@@ -213,6 +213,8 @@
     <Compile Include="Overlays\Options\TextBoxOption.cs" />
     <Compile Include="Overlays\BeatmapOptions\BeatmapOptions.cs" />
     <Compile Include="Overlays\BeatmapOptions\BeatmapOptionsButton.cs" />
+    <Compile Include="Screens\Select\PlaySongSelectButton.cs" />
+    <Compile Include="Screens\Select\PlaySongSelectButtonContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
