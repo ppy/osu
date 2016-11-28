@@ -2,6 +2,7 @@
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -10,17 +11,16 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         public DrawableSlider(Slider h) : base(h)
         {
             Origin = Anchor.Centre;
-            RelativePositionAxes = Axes.Both;
-            Position = new Vector2(h.Position.X / 512, h.Position.Y / 384);
+            Position = new Vector2(h.Position.X, h.Position.Y);
 
-            for (float i = 0; i <= 1; i += 0.1f)
-            {
-                Add(new CirclePiece
-                {
-                    Colour = h.Colour,
-                    Position = h.Curve.PositionAt(i) - h.Position //non-relative?
-                });
-            }
+            Path sliderPath;
+            Add(sliderPath = new Path());
+
+            for (int i = 0; i < h.Curve.Path.Count; ++i)
+                sliderPath.Positions.Add(h.Curve.Path[i] - h.Position);
+
+            h.Position = Vector2.Zero;
+            Add(new DrawableHitCircle(h));
         }
 
         protected override void LoadComplete()
@@ -39,10 +39,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             Alpha = 0;
 
-            Delay(HitObject.StartTime - 200 - Time.Current, true);
+            Delay(HitObject.StartTime - 450 - Time.Current, true);
 
             FadeIn(200);
-            Delay(200 + HitObject.Duration);
+            Delay(450 + HitObject.Duration);
             FadeOut(200);
         }
     }
