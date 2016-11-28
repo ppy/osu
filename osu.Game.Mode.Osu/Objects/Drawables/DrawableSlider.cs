@@ -1,37 +1,52 @@
 ﻿using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 using osu.Framework.Graphics.Sprites;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     class DrawableSlider : DrawableOsuHitObject
     {
+        private Path path;
+        private DrawableHitCircle startCircle;
+        private Slider slider;
+
         public DrawableSlider(Slider s) : base(s)
         {
-            Origin = Anchor.Centre;
-            Position = new Vector2(s.Position.X, s.Position.Y);
+            slider = s;
 
-            Path sliderPath;
-            Add(sliderPath = new Path());
+            Origin = Anchor.TopLeft;
+            Position = Vector2.Zero;
 
-            for (int i = 0; i < s.Curve.Path.Count; ++i)
-                sliderPath.Positions.Add(s.Curve.Path[i] - s.Position);
-
-            Add(new DrawableHitCircle(new HitCircle
+            Children = new Drawable[]
             {
-                StartTime = s.StartTime,
-                Position = sliderPath.Positions[0] - s.Position,
-            })
-            {
-                Depth = 1
-            });
+                startCircle = new DrawableHitCircle(new HitCircle
+                {
+                    StartTime = s.StartTime,
+                    Position = s.Position,
+                    Colour = s.Colour,
+                })
+                {
+                    Depth = 1 //override time-based depth.
+                },
+                path = new Path
+                {
+                    Colour = s.Colour,
+                }
+            };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            for (int i = 0; i < slider.Curve.Path.Count; ++i)
+                path.Positions.Add(slider.Curve.Path[i]);
+
+            path.PathWidth = startCircle.DrawWidth / 4;
 
             //force application of the state that was set before we loaded.
             UpdateState(State);
