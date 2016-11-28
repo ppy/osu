@@ -57,6 +57,10 @@ namespace osu.Game.Beatmaps.Drawables
                 },
                 new Triangles
                 {
+                    // The border is drawn in the shader of the children. Being additive, triangles would over-emphasize
+                    // the border wherever they cross it, and thus they get their own masking container without a border.
+                    Masking = true,
+                    CornerRadius = Content.CornerRadius,
                     RelativeSizeAxes = Axes.Both,
                     BlendingMode = BlendingMode.Additive,
                     Colour = deselectedColour,
