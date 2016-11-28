@@ -54,10 +54,11 @@ namespace osu.Game.Modes.Osu.Objects
             progress = MathHelper.Clamp(progress, 0, 1);
 
             double index = progress * (calculatedPath.Count - 1);
+            int flooredIndex = (int)index;
 
-            Vector2 pos = calculatedPath[(int)index];
-            if (index != (int)index)
-                pos += (calculatedPath[(int)index + 1] - pos) * (float)(index - (int)index);
+            Vector2 pos = calculatedPath[flooredIndex];
+            if (index != flooredIndex)
+                pos += (calculatedPath[flooredIndex + 1] - pos) * (float)(index - flooredIndex);
 
             return pos;
         }
