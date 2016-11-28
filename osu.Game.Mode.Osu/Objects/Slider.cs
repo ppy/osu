@@ -201,5 +201,5 @@ namespace osu.Game.Modes.Osu.Objects
         Bezier,
         Linear,
         PerfectCurve
-    };
+    }
 }
