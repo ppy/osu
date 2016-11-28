@@ -10,7 +10,6 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
 using osu.Game.Screens.Play;
-using static System.Double;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -86,7 +85,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.StoredBookmarks = val;
                     break;
                 case @"DistanceSpacing":
-                    beatmap.BeatmapInfo.DistanceSpacing = Parse(val, NumberFormatInfo.InvariantInfo);
+                    beatmap.BeatmapInfo.DistanceSpacing = double.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"BeatDivisor":
                     beatmap.BeatmapInfo.BeatDivisor = int.Parse(val);
@@ -95,7 +94,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.GridSize = int.Parse(val);
                     break;
                 case @"TimelineZoom":
-                    beatmap.BeatmapInfo.TimelineZoom = Parse(val, NumberFormatInfo.InvariantInfo);
+                    beatmap.BeatmapInfo.TimelineZoom = double.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
             }
         }
