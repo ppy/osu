@@ -83,16 +83,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
-            if (!IsLoaded) return;
+            base.UpdateState(state);
 
-            Flush(true); //move to DrawableHitObject
-
-            Alpha = 0;
-
-            Delay(HitObject.StartTime - 450 - Time.Current, true);
-
-            FadeIn(300);
-            Delay(450 + HitObject.Duration);
+            Delay(HitObject.Duration);
             FadeOut(100);
         }
 

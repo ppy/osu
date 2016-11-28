@@ -11,6 +11,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableOsuHitObject : DrawableHitObject
     {
+        protected const float TIME_PREEMPT = 600;
+        protected const float TIME_FADEIN = 400;
+        protected const float TIME_FADEOUT = 500;
+
         public DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
@@ -20,7 +24,29 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
-            throw new NotImplementedException();
+            if (!IsLoaded) return;
+
+            Flush(true);
+
+            double t = HitObject.EndTime + Judgement.TimeOffset;
+
+            UpdateInitialState();
+
+            Delay(t - Time.Current - TIME_PREEMPT, true);
+
+            UpdatePreemptState();
+
+            Delay(TIME_PREEMPT, true);
+        }
+
+        protected virtual void UpdatePreemptState()
+        {
+            FadeIn(TIME_FADEIN);
+        }
+
+        protected virtual void UpdateInitialState()
+        {
+            Alpha = 0;
         }
     }
 
