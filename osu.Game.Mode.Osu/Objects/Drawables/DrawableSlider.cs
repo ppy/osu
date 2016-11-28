@@ -128,7 +128,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 base.Update();
 
                 double segmentSize = 1 / (slider.Curve.Length / 5);
-                double progress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT) / TIME_FADEIN, 0, 1);
+                double progress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT / 2) / TIME_FADEIN, 0, 1);
 
                 if (progress != drawnProgress)
                 {
