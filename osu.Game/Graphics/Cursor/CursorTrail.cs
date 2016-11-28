@@ -22,23 +22,23 @@ namespace osu.Game.Graphics.Cursor
         public override bool Contains(Vector2 screenSpacePos) => true;
         public override bool HandleInput => true;
 
-        int currentIndex;
+        private int currentIndex;
 
-        Shader shader;
-        Texture texture;
+        private Shader shader;
+        private Texture texture;
 
-        Vector2 size => texture.Size * Scale;
+        private Vector2 size => texture.Size * Scale;
 
         private double timeOffset;
 
         private float time;
         
-        TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
-        const int MAX_SPRITES = 2048;
+        private TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
+        private const int MAX_SPRITES = 2048;
 
         private TrailPart[] parts = new TrailPart[MAX_SPRITES];
 
-        Vector2? lastPosition;
+        private Vector2? lastPosition;
 
         protected override DrawNode CreateDrawNode() => new TrailDrawNode();
 
