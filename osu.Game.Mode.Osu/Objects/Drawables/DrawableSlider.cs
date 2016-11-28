@@ -1,4 +1,5 @@
-﻿using osu.Framework.Graphics;
+﻿using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
@@ -60,14 +61,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             base.LoadComplete();
 
-            for (int i = 0; i < slider.Curve.Length; i += 10)
-                path.Positions.Add(slider.Curve.PositionAt(i / slider.Curve.Length));
-
             path.PathWidth = startCircle.DrawWidth / 4;
 
             //force application of the state that was set before we loaded.
             UpdateState(State);
         }
+
+        double snakeDrawn = 0;
 
         protected override void Update()
         {
@@ -83,9 +83,30 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 if (currentRepeat % 2 == 1)
                     t = 1 - t;
             }
-                
-            ball.Position = slider.Curve.PositionAt(t);
 
+            double snake = MathHelper.Clamp((Time.Current - slider.StartTime + 450) / 200, 0, 1);
+            if (snake != snakeDrawn)
+            {
+                if (snake < snakeDrawn)
+                {
+                    //if we have gone backwards, just clear the path for now.
+                    snakeDrawn = 0;
+                    path.Positions.Clear();
+                }
+
+                const double segment_size = 10;
+
+                while (snakeDrawn < snake)
+                {
+                    snakeDrawn += segment_size;
+                    path.Positions.Add(slider.Curve.PositionAt(snake));
+                }
+
+                snakeDrawn = snake;
+                path.Positions.Add(slider.Curve.PositionAt(snake));
+            }
+
+            ball.Position = slider.Curve.PositionAt(t);
         }
 
         protected override void UpdateState(ArmedState state)
