@@ -40,7 +40,8 @@ namespace osu.Desktop.VisualTests.Tests
         
         protected override void Dispose(bool isDisposing)
         {
-            Dependencies.Cache(oldDb, true);
+            if (oldDb != null)
+                Dependencies.Cache(oldDb, true);
             base.Dispose(isDisposing);
         }
 
