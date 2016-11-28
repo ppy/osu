@@ -11,10 +11,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     class DrawableSlider : DrawableOsuHitObject
     {
-        private Path path;
-        private DrawableHitCircle startCircle;
         private Slider slider;
+
+        private DrawableHitCircle startCircle;
         private Container ball;
+        private SliderBody body;
 
         public DrawableSlider(Slider s) : base(s)
         {
@@ -25,10 +26,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             Children = new Drawable[]
             {
-                path = new Path
-                {
-                    Colour = s.Colour,
-                },
+                body = new SliderBody(s),
                 ball = new Container
                 {
                     Masking = true,
@@ -61,13 +59,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             base.LoadComplete();
 
-            path.PathWidth = startCircle.DrawWidth / 4;
-
             //force application of the state that was set before we loaded.
             UpdateState(State);
         }
-
-        double snakeDrawn = 0;
 
         protected override void Update()
         {
@@ -84,28 +78,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     t = 1 - t;
             }
 
-            double snake = MathHelper.Clamp((Time.Current - slider.StartTime + 450) / 200, 0, 1);
-            if (snake != snakeDrawn)
-            {
-                if (snake < snakeDrawn)
-                {
-                    //if we have gone backwards, just clear the path for now.
-                    snakeDrawn = 0;
-                    path.Positions.Clear();
-                }
-
-                const double segment_size = 10;
-
-                while (snakeDrawn < snake)
-                {
-                    snakeDrawn += segment_size;
-                    path.Positions.Add(slider.Curve.PositionAt(snake));
-                }
-
-                snakeDrawn = snake;
-                path.Positions.Add(slider.Curve.PositionAt(snake));
-            }
-
             ball.Position = slider.Curve.PositionAt(t);
         }
 
@@ -119,9 +91,71 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             Delay(HitObject.StartTime - 450 - Time.Current, true);
 
-            FadeIn(200);
+            FadeIn(300);
             Delay(450 + HitObject.Duration);
             FadeOut(100);
+        }
+
+        class SliderBody : Container
+        {
+            private Path path;
+
+            double snakeDrawn = 0;
+
+            Slider slider;
+
+            public SliderBody(Slider s)
+            {
+                slider = s;
+
+                Children = new Drawable[]
+                {
+                    //new BufferedContainer
+                    //{
+                    //    RelativeSizeAxes = Axes.Both,
+                    //    Children = new Drawable[]
+                    //    {
+                            path = new Path
+                            {
+                                Colour = s.Colour,
+                            },
+                    //    }
+                    //}
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                path.PathWidth = 50;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                double snake = MathHelper.Clamp((Time.Current - slider.StartTime + 450) / 200, 0, 1);
+                if (snake != snakeDrawn)
+                {
+                    if (snake < snakeDrawn)
+                    {
+                        //if we have gone backwards, just clear the path for now.
+                        snakeDrawn = 0;
+                        path.Positions.Clear();
+                    }
+
+                    const double segment_size = 10;
+
+                    while (snakeDrawn < snake)
+                    {
+                        snakeDrawn += segment_size;
+                        path.Positions.Add(slider.Curve.PositionAt(snake));
+                    }
+
+                    snakeDrawn = snake;
+                    path.Positions.Add(slider.Curve.PositionAt(snake));
+                }
+            }
         }
     }
 }
