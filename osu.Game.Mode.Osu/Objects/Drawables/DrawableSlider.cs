@@ -150,7 +150,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
                     tracking = value;
 
-                    follow.ScaleTo(tracking ? 2 : 1, 140, EasingTypes.Out);
+                    follow.ScaleTo(tracking ? 2.4f : 1, 140, EasingTypes.Out);
                     follow.FadeTo(tracking ? 0.8f : 0, 140, EasingTypes.Out);
                 }
             }
