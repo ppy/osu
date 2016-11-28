@@ -8,19 +8,25 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     class DrawableSlider : DrawableOsuHitObject
     {
-        public DrawableSlider(Slider h) : base(h)
+        public DrawableSlider(Slider s) : base(s)
         {
             Origin = Anchor.Centre;
-            Position = new Vector2(h.Position.X, h.Position.Y);
+            Position = new Vector2(s.Position.X, s.Position.Y);
 
             Path sliderPath;
             Add(sliderPath = new Path());
 
-            for (int i = 0; i < h.Curve.Path.Count; ++i)
-                sliderPath.Positions.Add(h.Curve.Path[i] - h.Position);
+            for (int i = 0; i < s.Curve.Path.Count; ++i)
+                sliderPath.Positions.Add(s.Curve.Path[i] - s.Position);
 
-            h.Position = Vector2.Zero;
-            Add(new DrawableHitCircle(h));
+            Add(new DrawableHitCircle(new HitCircle
+            {
+                StartTime = s.StartTime,
+                Position = sliderPath.Positions[0] - s.Position,
+            })
+            {
+                Depth = 1
+            });
         }
 
         protected override void LoadComplete()
