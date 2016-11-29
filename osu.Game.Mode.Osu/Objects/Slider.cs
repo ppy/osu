@@ -35,17 +35,40 @@ namespace osu.Game.Modes.Osu.Objects
 
         private List<Vector2> calculatedPath;
 
-        public void Calculate()
+        private void calculateSubpath(List<Vector2> subpath)
         {
+            // If we already constructed a subpath previously, then the new subpath
+            // will have as starting position the end position of the previous subpath.
+            // Hence we can and should remove the previous endpoint to avoid a segment
+            // with 0 length.
+            if (calculatedPath.Count > 0)
+                calculatedPath.RemoveAt(calculatedPath.Count - 1);
+
             switch (CurveType)
             {
                 case CurveTypes.Linear:
-                    calculatedPath = Path;
+                    calculatedPath.AddRange(subpath);
                     break;
                 default:
-                    var bezier = new BezierApproximator(Path);
-                    calculatedPath = bezier.CreateBezier();
+                    var bezier = new BezierApproximator(subpath);
+                    calculatedPath.AddRange(bezier.CreateBezier());
                     break;
+            }
+        }
+
+        public void Calculate()
+        {
+            calculatedPath = new List<Vector2>();
+            List<Vector2> subpath = new List<Vector2>();
+            
+            for (int i = 0; i < Path.Count; ++i)
+            {
+                subpath.Add(Path[i]);
+                if (i == Path.Count-1 || Path[i] == Path[i+1])
+                {
+                    calculateSubpath(subpath);
+                    subpath.Clear();
+                }
             }
         }
 
