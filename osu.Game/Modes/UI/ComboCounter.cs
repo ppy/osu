@@ -262,5 +262,13 @@ namespace osu.Game.Modes.UI
                 (d as ComboCounter).DisplayedCount = CurrentValue;
             }
         }
+
+        public void Set(ulong value)
+        {
+            if (value == 0)
+                Roll();
+            else
+                Count = value;
+        }
     }
 }
