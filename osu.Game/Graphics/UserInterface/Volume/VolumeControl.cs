@@ -14,10 +14,6 @@ namespace osu.Game.Graphics.UserInterface.Volume
 {
     internal class VolumeControl : OverlayContainer
     {
-        private BindableDouble volumeGlobal = new BindableDouble();
-        private BindableDouble volumeSample = new BindableDouble();
-        private BindableDouble volumeTrack = new BindableDouble();
-
         private VolumeMeter volumeMeterMaster;
 
         private void volumeChanged(object sender, EventArgs e)
@@ -55,21 +51,18 @@ namespace osu.Game.Graphics.UserInterface.Volume
         {
             base.LoadComplete();
 
-            volumeGlobal.ValueChanged += volumeChanged;
-            volumeSample.ValueChanged += volumeChanged;
-            volumeTrack.ValueChanged += volumeChanged;
-
-            volumeMeterMaster.Bindable.Weld(volumeGlobal);
-            volumeMeterEffect.Bindable.Weld(volumeSample);
-            volumeMeterMusic.Bindable.Weld(volumeTrack);
+            volumeMeterMaster.Bindable.ValueChanged += volumeChanged;
+            volumeMeterEffect.Bindable.ValueChanged += volumeChanged;
+            volumeMeterMusic.Bindable.ValueChanged += volumeChanged;
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            volumeGlobal.ValueChanged -= volumeChanged;
-            volumeSample.ValueChanged -= volumeChanged;
-            volumeTrack.ValueChanged -= volumeChanged;
             base.Dispose(isDisposing);
+
+            volumeMeterMaster.Bindable.ValueChanged -= volumeChanged;
+            volumeMeterEffect.Bindable.ValueChanged -= volumeChanged;
+            volumeMeterMusic.Bindable.ValueChanged -= volumeChanged;
         }
 
         public void Adjust(InputState state)
@@ -86,9 +79,9 @@ namespace osu.Game.Graphics.UserInterface.Volume
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            volumeGlobal.Weld(audio.Volume);
-            volumeSample.Weld(audio.VolumeSample);
-            volumeTrack.Weld(audio.VolumeTrack);
+            volumeMeterMaster.Bindable.Weld(audio.Volume);
+            volumeMeterEffect.Bindable.Weld(audio.VolumeSample);
+            volumeMeterMusic.Bindable.Weld(audio.VolumeTrack);
         }
 
         ScheduledDelegate popOutDelegate;
