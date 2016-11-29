@@ -10,23 +10,20 @@ namespace osu.Game.Modes.Osu
 {
     class OsuScoreProcessor : ScoreProcessor
     {
-        public override void AddJudgement(JudgementInfo judgement)
+        protected override void UpdateCalculations(JudgementInfo judgement)
         {
-            base.AddJudgement(judgement);
-
-            switch (judgement.Result)
+            if (judgement != null)
             {
-                case HitResult.Hit:
-                    Combo.Value++;
-                    break;
-                case HitResult.Miss:
-                    Combo.Value = 0;
-                    break;
+                switch (judgement.Result)
+                {
+                    case HitResult.Hit:
+                        Combo.Value++;
+                        break;
+                    case HitResult.Miss:
+                        Combo.Value = 0;
+                        break;
+                }
             }
-        }
-        protected override void UpdateCalculations()
-        {
-            base.UpdateCalculations();
 
             int score = 0;
             int maxScore = 0;
@@ -51,8 +48,6 @@ namespace osu.Game.Modes.Osu
                         maxScore += 300;
                         break;
                 }
-
-                
             }
 
             TotalScore.Value = score;
