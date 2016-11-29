@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.Cursor
 
         public OsuCursorContainer()
         {
-            Add(new CursorTrail { Depth = -1 });
+            Add(new CursorTrail { Depth = 1 });
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)

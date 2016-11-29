@@ -386,7 +386,7 @@ namespace osu.Game.Overlays
                 this.beatmap = beatmap;
                 CacheDrawnFrameBuffer = true;
                 RelativeSizeAxes = Axes.Both;
-                Depth = float.MinValue;
+                Depth = float.MaxValue;
 
                 Children = new Drawable[]
                 {

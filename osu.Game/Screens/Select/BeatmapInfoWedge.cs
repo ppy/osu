@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Select
 
             var lastContainer = beatmapInfoContainer;
 
-            float newDepth = lastContainer?.Depth - 1 ?? 0;
+            float newDepth = lastContainer?.Depth + 1 ?? 0;
 
             BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;

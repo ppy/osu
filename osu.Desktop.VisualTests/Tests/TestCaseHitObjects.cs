@@ -32,7 +32,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             Clock.ProcessFrame();
 
-            Container approachContainer = new Container { Depth = float.MaxValue, };
+            Container approachContainer = new Container { Depth = float.MinValue, };
 
             Add(approachContainer);
 
@@ -50,7 +50,7 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Depth = -i,
+                    Depth = i,
                     State = ArmedState.Hit,
                 };
 
