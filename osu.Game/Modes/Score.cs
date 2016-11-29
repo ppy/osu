@@ -11,7 +11,9 @@ namespace osu.Game.Modes
 {
     public class Score
     {
-        public double TotalScore { get; }
-        public double Accuracy { get; }
+        public double TotalScore { get; set; }
+        public double Accuracy { get; set; }
+        public double Combo { get; set; }
+        public double MaxCombo { get; set; }
     }
 }

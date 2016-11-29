@@ -13,7 +13,13 @@ namespace osu.Game.Modes
 {
     public abstract class ScoreProcessor
     {
-        public virtual Score GetScore() => new Score();
+        public virtual Score GetScore() => new Score()
+        {
+            TotalScore = TotalScore,
+            Combo = Combo,
+            MaxCombo = HighestCombo,
+            Accuracy = Accuracy
+        };
 
         public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
 
