@@ -27,6 +27,8 @@ namespace osu.Game.Modes
         {
             Judgements.Add(judgement);
             UpdateCalculations();
+
+            judgement.ComboAtHit = (ulong)Combo.Value;
         }
 
         /// <summary>

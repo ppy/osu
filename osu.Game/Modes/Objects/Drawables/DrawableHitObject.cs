@@ -111,6 +111,7 @@ namespace osu.Game.Modes.Objects.Drawables
 
     public class JudgementInfo
     {
+        public ulong? ComboAtHit;
         public HitResult? Result;
         public double TimeOffset;
     }
