@@ -17,7 +17,7 @@ namespace osu.Game.Modes.Objects.Drawables
 
         public Container<DrawableHitObject> ChildObjects;
 
-        protected JudgementInfo Judgement;
+        public JudgementInfo Judgement;
 
         public abstract JudgementInfo CreateJudgementInfo();
 
@@ -84,7 +84,7 @@ namespace osu.Game.Modes.Objects.Drawables
 
         protected virtual void CheckJudgement(bool userTriggered)
         {
-
+            //todo: consider making abstract.
         }
 
         protected override void Update()
