@@ -18,6 +18,8 @@ namespace osu.Game.Modes.Catch
 
         protected override PlayMode PlayMode => PlayMode.Catch;
 
+        public override Score CreateScore() => new Score();
+
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
     }
 }

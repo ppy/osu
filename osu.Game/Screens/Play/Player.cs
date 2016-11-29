@@ -19,6 +19,7 @@ using OpenTK.Input;
 using MouseState = osu.Framework.Input.MouseState;
 using OpenTK;
 using osu.Framework.GameModes;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
@@ -35,6 +36,8 @@ namespace osu.Game.Screens.Play
         public PlayMode PreferredPlayMode;
         
         private IAdjustableClock sourceClock;
+
+        private Score score;
 
         private Ruleset ruleset;
 
@@ -84,6 +87,8 @@ namespace osu.Game.Screens.Play
             ruleset = Ruleset.GetRuleset(usablePlayMode);
 
             var scoreOverlay = ruleset.CreateScoreOverlay();
+            scoreOverlay.Score = (score = ruleset.CreateScore());
+
             var hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
             hitRenderer.OnHit += delegate (HitObject h) { scoreOverlay.OnHit(h); };
@@ -117,6 +122,12 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
             Clock.ProcessFrame();
+
+            if (Beatmap.Track.HasCompleted)
+                Push(new Results
+                {
+                    Score = score
+                });
         }
 
         class PlayerInputManager : UserInputManager

@@ -19,6 +19,8 @@ namespace osu.Game.Modes.Mania
 
         protected override PlayMode PlayMode => PlayMode.Mania;
 
+        public override Score CreateScore() => new Score();
+
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
     }
 }
