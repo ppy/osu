@@ -37,9 +37,9 @@ namespace osu.Game.Screens.Play
         
         private IAdjustableClock sourceClock;
 
-        private Score score;
-
         private Ruleset ruleset;
+
+        private ScoreProcessor scoreProcessor;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game)
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Play
             ruleset = Ruleset.GetRuleset(usablePlayMode);
 
             var scoreOverlay = ruleset.CreateScoreOverlay();
-            scoreOverlay.Score = (score = ruleset.CreateScore());
+            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor());
 
             var hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Play
             if (Beatmap.Track.HasCompleted)
                 Push(new Results
                 {
-                    Score = score
+                    Score = scoreProcessor.GetScore()
                 });
         }
 

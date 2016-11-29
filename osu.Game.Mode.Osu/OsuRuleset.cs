@@ -17,7 +17,7 @@ namespace osu.Game.Modes.Osu
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
 
-        public override Score CreateScore() => new OsuScore();
+        public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
 
         protected override PlayMode PlayMode => PlayMode.Osu;
     }

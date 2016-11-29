@@ -46,5 +46,10 @@ namespace osu.Game.Modes.UI
                 AccuracyCounter = CreateAccuracyCounter(),
             };
         }
+
+        public void BindProcessor(ScoreProcessor processor)
+        {
+            
+        }
     }
 }
