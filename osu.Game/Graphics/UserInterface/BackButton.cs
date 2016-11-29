@@ -24,23 +24,19 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float shear = 0.1f;
 
-        private const int extend_length = 60;
-        private const int initial_extend_length = 40;
-
-        private const int width_extended = 140;
-        private const int width_retracted = 120;
+        private static readonly Vector2 size_extended = new Vector2(140, 50);
+        private static readonly Vector2 size_retracted = new Vector2(100, 50);
 
         public BackButton()
         {
-            Width = width_retracted;
-            Height = 50; // same as bottomToolHeight in PlaySongSelect
+            Size = size_retracted;
 
             Children = new Drawable[]
             {
                 leftContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = initial_extend_length,
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.4f,
                     Children = new Drawable[]
                     {
                         new Box
@@ -59,11 +55,10 @@ namespace osu.Game.Graphics.UserInterface
                 },
                 rightContainer = new Container
                 {
-                    Origin = Anchor.TopLeft,
-                    Anchor = Anchor.TopLeft,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 80,
-                    Position = Position + new Vector2(initial_extend_length, 0),
+                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.6f,
                     Children = new Drawable[]
                     {
                         new Box
@@ -89,10 +84,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             icon.ClearTransformations();
 
-            rightContainer.MoveToX(Position.X + extend_length, transform_time, EasingTypes.OutElastic);
-            leftContainer.ResizeTo(new Vector2(extend_length, 1.0f), transform_time, EasingTypes.OutElastic);
-
-            Width = width_extended; // right container + ExtendLength
+            ResizeTo(size_extended, transform_time, EasingTypes.OutElastic);
 
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
             if (duration == 0) duration = pulse_length;
@@ -119,12 +111,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             icon.ClearTransformations();
 
-            rightContainer.MoveToX(Position.X + initial_extend_length, transform_time, EasingTypes.OutElastic);
-            leftContainer.ResizeTo(new Vector2(initial_extend_length, 1.0f), transform_time, EasingTypes.OutElastic);
+            ResizeTo(size_retracted, transform_time, EasingTypes.OutElastic);
 
-            Width = width_retracted; // right container + InitialExtendLength
-
-            int duration = 0; //(int)(Game.Audio.BeatLength / 2);
+            int duration = 0; //(int)(Game.Audio.BeatLength);
             if (duration == 0) duration = pulse_length * 2;
 
             double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
