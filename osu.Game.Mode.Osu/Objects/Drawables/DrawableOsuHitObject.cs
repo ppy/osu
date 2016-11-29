@@ -74,7 +74,5 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         Hit100,
         [Description(@"300")]
         Hit300,
-        [Description(@"500")]
-        Hit500
     }
 }

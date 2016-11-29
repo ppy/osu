@@ -19,6 +19,8 @@ using OpenTK.Input;
 using MouseState = osu.Framework.Input.MouseState;
 using OpenTK;
 using osu.Framework.GameModes;
+using osu.Game.Modes.UI;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
@@ -37,6 +39,9 @@ namespace osu.Game.Screens.Play
         private IAdjustableClock sourceClock;
 
         private Ruleset ruleset;
+
+        private ScoreProcessor scoreProcessor;
+        private HitRenderer hitRenderer;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game)
@@ -84,10 +89,12 @@ namespace osu.Game.Screens.Play
             ruleset = Ruleset.GetRuleset(usablePlayMode);
 
             var scoreOverlay = ruleset.CreateScoreOverlay();
-            var hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
+            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor());
 
-            hitRenderer.OnHit += delegate (HitObject h) { scoreOverlay.OnHit(h); };
-            hitRenderer.OnMiss += delegate (HitObject h) { scoreOverlay.OnMiss(h); };
+            hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
+
+            hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
+            hitRenderer.OnAllJudged += hitRenderer_OnAllJudged;
 
             if (Autoplay)
                 hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Hit));
@@ -104,6 +111,18 @@ namespace osu.Game.Screens.Play
                 },
                 scoreOverlay,
             };
+        }
+
+        private void hitRenderer_OnAllJudged()
+        {
+            Delay(1000);
+            Schedule(delegate
+            {
+                Push(new Results
+                {
+                    Score = scoreProcessor.GetScore()
+                });
+            });
         }
 
         protected override void OnEntering(GameMode last)

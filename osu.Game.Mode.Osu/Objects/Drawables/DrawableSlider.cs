@@ -75,12 +75,24 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             ball.Position = slider.Curve.PositionAt(t);
         }
 
+        protected override void CheckJudgement(bool userTriggered)
+        {
+            var j = Judgement as OsuJudgementInfo;
+            var sc = startCircle.Judgement as OsuJudgementInfo;
+
+            if (!userTriggered && Time.Current >= HitObject.EndTime)
+            {
+                j.Score = sc.Score;
+                j.Result = sc.Result;
+            }
+        }
+
         protected override void UpdateState(ArmedState state)
         {
             base.UpdateState(state);
 
             Delay(HitObject.Duration);
-            FadeOut(100);
+            FadeOut(300);
         }
 
         private class Ball : Container
