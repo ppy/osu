@@ -14,8 +14,9 @@ namespace osu.Game.Modes.UI
 {
     public abstract class HitRenderer : Container
     {
-        public Action<HitObject> OnHit;
-        public Action<HitObject> OnMiss;
+        public event Action<JudgementInfo> OnJudgement;
+
+        protected void TriggerOnJudgement(JudgementInfo j) => OnJudgement?.Invoke(j);
 
         protected Playfield Playfield;
 
@@ -68,22 +69,13 @@ namespace osu.Game.Modes.UI
 
                 if (drawableObject == null) continue;
 
-                drawableObject.OnHit = onHit;
-                drawableObject.OnMiss = onMiss;
+                drawableObject.OnJudgement += onJudgement;
 
                 Playfield.Add(drawableObject);
             }
         }
 
-        private void onMiss(DrawableHitObject obj, JudgementInfo judgement)
-        {
-            OnMiss?.Invoke(obj.HitObject);
-        }
-
-        private void onHit(DrawableHitObject obj, JudgementInfo judgement)
-        {
-            OnHit?.Invoke(obj.HitObject);
-        }
+        private void onJudgement(DrawableHitObject o, JudgementInfo j) => TriggerOnJudgement(j);
 
         protected abstract DrawableHitObject GetVisualRepresentation(T h);
     }

@@ -13,9 +13,7 @@ namespace osu.Game.Modes.Objects.Drawables
 {
     public abstract class DrawableHitObject : Container, IStateful<ArmedState>
     {
-        //todo: move to a more central implementation. this logic should not be at a drawable level.
-        public Action<DrawableHitObject, JudgementInfo> OnHit;
-        public Action<DrawableHitObject, JudgementInfo> OnMiss;
+        public event Action<DrawableHitObject, JudgementInfo> OnJudgement;
 
         public Container<DrawableHitObject> ChildObjects;
 
@@ -73,13 +71,13 @@ namespace osu.Game.Modes.Objects.Drawables
             {
                 default:
                     State = ArmedState.Hit;
-                    OnHit?.Invoke(this, Judgement);
                     break;
                 case HitResult.Miss:
                     State = ArmedState.Miss;
-                    OnMiss?.Invoke(this, Judgement);
                     break;
             }
+
+            OnJudgement?.Invoke(this, Judgement);
 
             return true;
         }
