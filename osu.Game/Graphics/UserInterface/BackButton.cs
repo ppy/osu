@@ -19,6 +19,9 @@ namespace osu.Game.Graphics.UserInterface
         private Container leftContainer;
         private Container rightContainer;
 
+        private Box leftBox;
+        private Box rightBox;
+
         private const double transform_time = 300.0;
         private const int pulse_length = 250;
 
@@ -39,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
                     Width = 0.4f,
                     Children = new Drawable[]
                     {
-                        new Box
+                        leftBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = new Color4(195, 40, 140, 255),
@@ -61,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
                     Width = 0.6f,
                     Children = new Drawable[]
                     {
-                        new Box
+                        rightBox = new Box
                         {
                             Colour = new Color4(238, 51, 153, 255),
                             Origin = Anchor.TopLeft,
@@ -80,6 +83,12 @@ namespace osu.Game.Graphics.UserInterface
                 }
             };
         }
+
+        public override bool Contains(Vector2 screenSpacePos)
+        {
+            return leftBox.Contains(screenSpacePos) || rightBox.Contains(screenSpacePos);
+        }
+
         protected override bool OnHover(InputState state)
         {
             icon.ClearTransformations();
