@@ -91,8 +91,7 @@ namespace osu.Game.Screens.Play
 
             var hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
-            hitRenderer.OnHit += delegate (HitObject h) { scoreOverlay.OnHit(h); };
-            hitRenderer.OnMiss += delegate (HitObject h) { scoreOverlay.OnMiss(h); };
+            hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
 
             if (Autoplay)
                 hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Hit));
