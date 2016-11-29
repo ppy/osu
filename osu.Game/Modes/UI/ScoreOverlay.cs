@@ -15,6 +15,7 @@ namespace osu.Game.Modes.UI
         public ComboCounter ComboCounter;
         public ScoreCounter ScoreCounter;
         public PercentageCounter AccuracyCounter;
+        public Score Score { get; set; }
 
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract ComboCounter CreateComboCounter();

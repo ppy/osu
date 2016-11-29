@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.GameModes;
+using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK.Graphics;
 
@@ -22,5 +23,7 @@ namespace osu.Game.Screens.Ranking
             Background.Schedule(() => Background.FadeColour(Color4.White, 500));
             return base.OnExiting(next);
         }
+
+        public Score Score { get; set; }
     }
 }
