@@ -16,5 +16,27 @@ namespace osu.Game.Beatmaps
         public List<HitObject> HitObjects { get; set; }
         public List<ControlPoint> ControlPoints { get; set; }
         public List<Color4> ComboColors { get; set; }
+
+        public double BeatLengthAt(double time, bool applyMultipliers = false)
+        {
+            int point = 0;
+            int samplePoint = 0;
+
+            for (int i = 0; i < ControlPoints.Count; i++)
+                if (ControlPoints[i].Time <= time)
+                {
+                    if (ControlPoints[i].TimingChange)
+                        point = i;
+                    else
+                        samplePoint = i;
+                }
+
+            double mult = 1;
+
+            if (applyMultipliers && samplePoint > point && ControlPoints[samplePoint].BeatLength < 0)
+                mult = ControlPoints[samplePoint].VelocityAdjustment;
+
+            return ControlPoints[point].BeatLength * mult;
+        }
     }
 }
