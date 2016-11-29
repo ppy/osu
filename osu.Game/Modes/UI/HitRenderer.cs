@@ -16,9 +16,18 @@ namespace osu.Game.Modes.UI
     {
         public event Action<JudgementInfo> OnJudgement;
 
-        protected void TriggerOnJudgement(JudgementInfo j) => OnJudgement?.Invoke(j);
+        public event Action OnAllJudged;
+
+        protected void TriggerOnJudgement(JudgementInfo j)
+        {
+            OnJudgement?.Invoke(j);
+            if (AllObjectsJudged)
+                OnAllJudged?.Invoke();
+        }
 
         protected Playfield Playfield;
+
+        public bool AllObjectsJudged => Playfield.HitObjects.Children.First()?.Judgement.Result != null; //reverse depth sort means First() instead of Last().
 
         public IEnumerable<DrawableHitObject> DrawableObjects => Playfield.HitObjects.Children;
     }
