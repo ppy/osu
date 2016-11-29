@@ -11,37 +11,38 @@ using osu.Game.Modes.Objects.Drawables;
 
 namespace osu.Game.Modes
 {
-    public class ScoreProcessor
+    public abstract class ScoreProcessor
     {
         public virtual Score GetScore() => new Score();
 
-        public BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
+        public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
 
-        public BindableDouble Accuracy = new BindableDouble { MinValue = 0, MaxValue = 1 };
+        public readonly BindableDouble Accuracy = new BindableDouble { MinValue = 0, MaxValue = 1 };
 
-        public BindableInt Combo = new BindableInt();
+        public readonly BindableInt Combo = new BindableInt();
 
-        public BindableInt MaximumCombo = new BindableInt();
+        public readonly BindableInt MaximumCombo = new BindableInt();
 
-        public List<JudgementInfo> Judgements = new List<JudgementInfo>();
+        public readonly List<JudgementInfo> Judgements = new List<JudgementInfo>();
 
-        public virtual void AddJudgement(JudgementInfo judgement)
+        public ScoreProcessor()
+        {
+            Combo.ValueChanged += delegate { MaximumCombo.Value = Math.Max(MaximumCombo.Value, Combo.Value); };
+        }
+
+        public void AddJudgement(JudgementInfo judgement)
         {
             Judgements.Add(judgement);
-            UpdateCalculations();
+
+            UpdateCalculations(judgement);
 
             judgement.ComboAtHit = (ulong)Combo.Value;
-
-            if (Combo.Value > MaximumCombo.Value)
-                MaximumCombo.Value = Combo.Value;
         }
 
         /// <summary>
         /// Update any values that potentially need post-processing on a judgement change.
         /// </summary>
-        protected virtual void UpdateCalculations()
-        {
-            
-        }
+        /// <param name="newJudgement">A new JudgementInfo that triggered this calculation. May be null.</param>
+        protected abstract void UpdateCalculations(JudgementInfo newJudgement);
     }
 }
