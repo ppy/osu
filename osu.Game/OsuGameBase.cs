@@ -41,7 +41,7 @@ namespace osu.Game
         private void load()
         {
             Dependencies.Cache(this);
-            Dependencies.Cache(new OsuConfigManager(Host.Storage));
+            Dependencies.Cache(Config);
             Dependencies.Cache(new BeatmapDatabase(Host.Storage, Host));
             
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
