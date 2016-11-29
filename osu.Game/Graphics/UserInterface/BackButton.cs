@@ -16,19 +16,19 @@ namespace osu.Game.Graphics.UserInterface
     {
         private TextAwesome icon;
 
-        private Container   leftContainer;
-        private Container   rightContainer;
+        private Container leftContainer;
+        private Container rightContainer;
 
         private const double transform_time = 300.0;
-        private const int   pulse_length = 250;
+        private const int pulse_length = 250;
 
         private const float shear = 0.1f;
 
-        private const int   extend_length = 60;
-        private const int   initial_extend_length = 40;
+        private const int extend_length = 60;
+        private const int initial_extend_length = 40;
 
-        private const int   width_extended = 140;
-        private const int   width_retracted = 120;
+        private const int width_extended = 140;
+        private const int width_retracted = 120;
 
         public BackButton()
         {
@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.Y,
                     Width = initial_extend_length,
-                    Children = new Drawable[] 
+                    Children = new Drawable[]
                     {
                         new Box
                         {
@@ -75,8 +75,8 @@ namespace osu.Game.Graphics.UserInterface
                             Origin = Anchor.TopLeft,
                             Anchor = Anchor.TopLeft,
                             RelativeSizeAxes = Axes.Both,
-                            Shear = new Vector2(shear, 0), 
-                            EdgeSmoothness = new Vector2(1.5f, 0), 
+                            Shear = new Vector2(shear, 0),
+                            EdgeSmoothness = new Vector2(1.5f, 0),
                         },
                         new SpriteText
                         {
@@ -152,7 +152,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 RelativeSizeAxes = Axes.Both,
                 Shear = new Vector2(shear, 0),
-                Colour = new Color4(255,255,255,128),
+                Colour = new Color4(255, 255, 255, 128),
             };
             Add(flash);
 
