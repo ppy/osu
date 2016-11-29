@@ -2,18 +2,27 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Game.Database;
 using OpenTK;
+using osu.Game.Beatmaps;
+using System;
 
 namespace osu.Game.Modes.Osu.Objects
 {
     public class Slider : OsuHitObject
     {
-        public override double EndTime => StartTime + (RepeatCount + 1) * Curve.Length;
+        public override double EndTime => StartTime + RepeatCount * Curve.Length / Velocity;
+
+        public double Velocity;
+
+        public override void SetDefaultsFromBeatmap(Beatmap beatmap)
+        {
+            Velocity = 100 / beatmap.BeatLengthAt(StartTime, true) * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
+        }
 
         public int RepeatCount;
 
         public SliderCurve Curve;
-        
     }
 
     public class SliderCurve
@@ -42,11 +51,14 @@ namespace osu.Game.Modes.Osu.Objects
 
         public Vector2 PositionAt(double progress)
         {
-            int index = (int)(progress * (calculatedPath.Count - 1));
+            progress = MathHelper.Clamp(progress, 0, 1);
 
-            Vector2 pos = calculatedPath[index];
-            if (index != progress)
-                pos += (calculatedPath[index + 1] - pos) * (float)(progress - index);
+            double index = progress * (calculatedPath.Count - 1);
+            int flooredIndex = (int)index;
+
+            Vector2 pos = calculatedPath[flooredIndex];
+            if (index != flooredIndex)
+                pos += (calculatedPath[flooredIndex + 1] - pos) * (float)(index - flooredIndex);
 
             return pos;
         }
@@ -201,5 +213,5 @@ namespace osu.Game.Modes.Osu.Objects
         Bezier,
         Linear,
         PerfectCurve
-    };
+    }
 }
