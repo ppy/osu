@@ -92,7 +92,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             base.UpdateState(state);
 
             Delay(HitObject.Duration);
-            FadeOut(100);
+            FadeOut(300);
         }
 
         private class Ball : Container
