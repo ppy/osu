@@ -54,6 +54,7 @@
     <Compile Include="Objects\Drawables\Pieces\Triangles.cs" />
     <Compile Include="Objects\OsuHitObjectParser.cs" />
     <Compile Include="OsuScore.cs" />
+    <Compile Include="OsuScoreProcessor.cs" />
     <Compile Include="UI\OsuComboCounter.cs" />
     <Compile Include="UI\OsuHitRenderer.cs" />
     <Compile Include="UI\OsuPlayfield.cs" />

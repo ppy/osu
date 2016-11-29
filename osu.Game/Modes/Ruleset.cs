@@ -18,7 +18,7 @@ namespace osu.Game.Modes
 
         public abstract ScoreOverlay CreateScoreOverlay();
 
-        public abstract Score CreateScore();
+        public abstract ScoreProcessor CreateScoreProcessor();
 
         public abstract HitRenderer CreateHitRendererWith(List<HitObject> objects);
 
