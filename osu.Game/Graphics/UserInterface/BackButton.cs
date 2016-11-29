@@ -32,7 +32,6 @@ namespace osu.Game.Graphics.UserInterface
 
         public BackButton()
         {
-            RelativeSizeAxes = Axes.None;
             Width = width_retracted;
             Height = 50; // same as bottomToolHeight in PlaySongSelect
 
@@ -40,8 +39,6 @@ namespace osu.Game.Graphics.UserInterface
             {
                 leftContainer = new Container
                 {
-                    Origin = Anchor.TopLeft,
-                    Anchor = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.Y,
                     Width = initial_extend_length,
                     Children = new Drawable[]
