@@ -28,7 +28,7 @@ namespace osu.Game.Modes.Objects.Drawables
         public DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
-            Depth = -(float)hitObject.StartTime;
+            Depth = (float)hitObject.StartTime;
         }
 
         private ArmedState state;

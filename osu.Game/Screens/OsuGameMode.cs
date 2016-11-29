@@ -111,7 +111,7 @@ namespace osu.Game.Screens
             {
                 AddInternal(new ParallaxContainer
                 {
-                    Depth = float.MinValue,
+                    Depth = float.MaxValue,
                     Children = new[]
                     {
                         Background = bg
