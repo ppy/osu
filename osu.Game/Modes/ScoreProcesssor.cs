@@ -21,6 +21,8 @@ namespace osu.Game.Modes
 
         public BindableInt Combo = new BindableInt();
 
+        public BindableInt MaximumCombo = new BindableInt();
+
         public List<JudgementInfo> Judgements = new List<JudgementInfo>();
 
         public virtual void AddJudgement(JudgementInfo judgement)
@@ -29,6 +31,9 @@ namespace osu.Game.Modes
             UpdateCalculations();
 
             judgement.ComboAtHit = (ulong)Combo.Value;
+
+            if (Combo.Value > MaximumCombo.Value)
+                MaximumCombo.Value = Combo.Value;
         }
 
         /// <summary>
