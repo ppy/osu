@@ -1,5 +1,6 @@
 ﻿using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -16,10 +17,21 @@ namespace osu.Game.Overlays.Options.Gameplay
         {
             Children = new Drawable[]
             {
-                new SpriteText { Text = "Background dim: TODO slider" },
+                // TODO: bindable int stuff
+                /*
+                new OptionsSlider
+                {
+                    Label = "Background dim",
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.DimLevel)
+                },
+                */
                 new SpriteText { Text = "Progress display: TODO dropdown" },
                 new SpriteText { Text = "Score meter type: TODO dropdown" },
-                new SpriteText { Text = "Score meter size: TODO slider" },
+                new OptionsSlider
+                {
+                    Label = "Score meter size",
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.ScoreMeterScale)
+                },
                 new CheckBoxOption
                 {
                     LabelText = "Always show key overlay",

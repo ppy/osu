@@ -98,6 +98,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.MouseDisableWheel, false);
             Set(OsuConfig.MouseSpeed, 1, 0.4, 6);
             Set(OsuConfig.Offset, 0, -300, 300);
+            Set(OsuConfig.ScoreMeterScale, 1, 0.5, 2);
             //Set(OsuConfig.ScoreMeterScale, 1, 0.5, OsuGame.Tournament ? 10 : 2);
             Set(OsuConfig.DistanceSpacing, 0.8, 0.1, 6);
             Set(OsuConfig.EditorBeatDivisor, 1, 1, 16);
