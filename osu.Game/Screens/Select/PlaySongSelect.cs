@@ -25,6 +25,7 @@ using osu.Game.Screens.Play;
 using osu.Framework;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays.PopUpDialogs;
 
 namespace osu.Game.Screens.Select
 {
@@ -53,6 +54,8 @@ namespace osu.Game.Screens.Select
         private const float play_song_select_button_width = 100;
         private const float play_song_select_button_height = 50;
         private const int mode_light_transition_time = 200;
+
+        private DeleteBeatmapDialog deleteBeatmapDialog;
 
         class WedgeBackground : Container
         {
@@ -101,6 +104,7 @@ namespace osu.Game.Screens.Select
                         },
                     }
                 },
+                deleteBeatmapDialog = new DeleteBeatmapDialog(),
                 carousel = new CarouselContainer
                 {
                     RelativeSizeAxes = Axes.Y,
@@ -188,6 +192,7 @@ namespace osu.Game.Screens.Select
                                             Width = play_song_select_button_width,
                                             SelectedColour = new Color4(165, 204, 0, 225),
                                             DeselectedColour = new Color4(79, 99, 8, 255),
+                                            Action = carousel.SelectRandom,
                                         },
                                         beatmapOptionsButton = new PlaySongSelectButton
                                         {
@@ -196,6 +201,7 @@ namespace osu.Game.Screens.Select
                                             Width = play_song_select_button_width,
                                             SelectedColour = new Color4(68, 170, 221, 225),
                                             DeselectedColour = new Color4(14, 116, 145, 255),
+                                            Action = deleteBeatmapDialog.ToggleVisibility, //TODO: replace with submenu
                                         },
                                     }
                                 }
@@ -222,9 +228,7 @@ namespace osu.Game.Screens.Select
 
             trackManager = audio.Track;
 
-            playSongSelectButtonContainer.On_SelectionChanged += updateModeLight;
-            beatmapRandomButton.Action = () => carousel.SelectRandom();
-            beatmapOptionsButton.Action = () => osuGame.BeatmapOptions.ToggleVisibility();
+            playSongSelectButtonContainer.On_HoveredChanged += updateModeLight;
 
             initialAddSetsTask = new CancellationTokenSource();
 
@@ -234,7 +238,7 @@ namespace osu.Game.Screens.Select
         private void updateModeLight()
         {
             modeLight.FadeIn(mode_light_transition_time);
-            modeLight.FadeColour(playSongSelectButtonContainer.SelectedButton.SelectedColour, mode_light_transition_time);
+            modeLight.FadeColour(playSongSelectButtonContainer.HoveredButton.SelectedColour, mode_light_transition_time);
         }
 
         private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)
@@ -313,7 +317,7 @@ namespace osu.Game.Screens.Select
 
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
-
+            deleteBeatmapDialog.UpdateSelectedBeatmap(beatmap);
             selectBeatmap(beatmap.BeatmapInfo);
         }
 

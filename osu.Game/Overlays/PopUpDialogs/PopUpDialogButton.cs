@@ -8,9 +8,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.PopUpDialogs
 {
-    public class BeatmapOptionsButton : ClickableContainer
+    public class PopUpDialogButton : ClickableContainer
     {
         public string Text
         {
@@ -78,12 +78,14 @@ namespace osu.Game.Overlays
             }
         }
 
+        const float transition_time = 400;
+
         //Component Drawables
         private SpriteText spriteText;
         private Box mainBox;
         private Box backgroundBox;
 
-        public BeatmapOptionsButton()
+        public PopUpDialogButton()
         {
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
@@ -127,20 +129,13 @@ namespace osu.Game.Overlays
 
         protected override bool OnClick(InputState state)
         {
-            var flash = new Box
-            {
-                RelativeSizeAxes = Axes.Both
-            };
+            Flush();
+            FadeOutFromOne(transition_time);
+            Delay(transition_time);
+            FadeInFromZero(transition_time);
+            base.OnClick(state);
 
-            Add(flash);
-
-            flash.Colour = mainBox.Colour;
-            flash.BlendingMode = BlendingMode.Additive;
-            flash.Alpha = 0.3f;
-            flash.FadeOutFromOne(200);
-            flash.Expire();
-
-            return base.OnClick(state);
+            return true;
         }
     }
 }

@@ -34,8 +34,6 @@ namespace osu.Game
 
         private MusicController musicController;
 
-        public BeatmapOptions BeatmapOptions;
-
         private MainMenu mainMenu => modeStack?.ChildGameMode as MainMenu;
         private Intro intro => modeStack as Intro;
 
@@ -120,7 +118,6 @@ namespace osu.Game
             (chat = new ChatConsole(API) { Depth = 0 }).Preload(this, overlayContent.Add);
             (Options = new OptionsOverlay { Depth = 1 }).Preload(this, overlayContent.Add);
             (musicController = new MusicController() { Depth = 3 }).Preload(this, overlayContent.Add);
-            (BeatmapOptions = new BeatmapOptions() { Depth = 3 }).Preload(this, overlayContent.Add);
             (Toolbar = new Toolbar
             {
                 Depth = 2,
@@ -183,7 +180,6 @@ namespace osu.Game
             {
                 Toolbar.State = Visibility.Visible;
             }
-            BeatmapOptions.Hide();
 
             Cursor.FadeIn(100);
 

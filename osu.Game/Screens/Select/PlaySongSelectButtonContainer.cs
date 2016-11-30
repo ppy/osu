@@ -13,7 +13,15 @@ namespace osu.Game.Screens.Select
 {
     public class PlaySongSelectButtonContainer : FlowContainer
     {
-        public PlaySongSelectButton SelectedButton;
+        private PlaySongSelectButton hoveredButton;
+        public PlaySongSelectButton HoveredButton
+        {
+            get { return hoveredButton; }
+            set
+            {
+                HoveredOver(value);
+            }
+        }
 
         public override IEnumerable<Drawable> Children
         {
@@ -25,11 +33,14 @@ namespace osu.Game.Screens.Select
             {
                 base.Children = value;
                 foreach (PlaySongSelectButton p in value)
+                {
                     p.ButtonContainer = this;
+                    p.On_Hovered = () => HoveredButton = p;
+                }
             }
         }
 
-        public Action On_SelectionChanged;
+        public Action On_HoveredChanged;
 
         public PlaySongSelectButtonContainer()
         {
@@ -38,17 +49,12 @@ namespace osu.Game.Screens.Select
             Spacing = new Vector2(0.2f, 0);
         }
 
-        public void Select(PlaySongSelectButton P)
+        public void HoveredOver(PlaySongSelectButton P)
         {
-            if (SelectedButton == P)
+            if (HoveredButton == P)
                 return;
-            if (SelectedButton != null)
-            {
-                SelectedButton.OnDeselected();
-            }
-            SelectedButton = P;
-            SelectedButton.OnSelected();
-            On_SelectionChanged?.Invoke();
+            hoveredButton = P;
+            On_HoveredChanged?.Invoke();
         }
     }
 }

@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Transformations;
+using System;
 
 namespace osu.Game.Screens.Select
 {
@@ -82,13 +83,17 @@ namespace osu.Game.Screens.Select
             Colour = Color4.Black;
         }
 
-        public void OnSelected()
+        public Action On_Hovered;
+
+        protected override bool OnHover(InputState state)
         {
+            On_Hovered.Invoke();
             light.ScaleTo(new Vector2(1, 2), selection_transition_length);
             light.FadeColour(SelectedColour, selection_transition_length);
+            return true;
         }
 
-        public void OnDeselected()
+        protected override void OnHoverLost(InputState state)
         {
             light.ScaleTo(new Vector2(1, 1), selection_transition_length);
             light.FadeColour(DeselectedColour, selection_transition_length);
@@ -97,7 +102,6 @@ namespace osu.Game.Screens.Select
         protected override bool OnClick(InputState state)
         {
 
-            ButtonContainer.Select(this);
             box.FlashColour(Color4.White, click_flash_length);
             return base.OnClick(state);
         }
