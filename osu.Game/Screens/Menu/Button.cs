@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Menu
     public class Button : Container, IStateful<ButtonState>
     {
         private Container iconText;
-        private Box box;
+        private Container box;
         private Color4 colour;
         private TextAwesome icon;
         private string internalName;
@@ -51,15 +51,31 @@ namespace osu.Game.Screens.Menu
 
             Children = new Drawable[]
             {
-                box = new Box
+                box = new Container
                 {
+                    Masking = true,
+                    EdgeEffect = new EdgeEffect
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = new Color4(0, 0, 0, 0.2f),
+                        Roundness = 5,
+                        Radius = 8,
+                    },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Colour = colour,
                     Scale = new Vector2(0, 1),
                     Size = boxSize,
                     Shear = new Vector2(ButtonSystem.wedge_width / boxSize.Y, 0),
-                    EdgeSmoothness = new Vector2(2, 0),
+
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            EdgeSmoothness = new Vector2(2, 0),
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    }
                 },
                 iconText = new Container
                 {
@@ -71,6 +87,7 @@ namespace osu.Game.Screens.Menu
                     {
                         icon = new TextAwesome
                         {
+                            Shadow = true,
                             Anchor = Anchor.Centre,
                             TextSize = 30,
                             Position = new Vector2(0, 0),
@@ -78,6 +95,7 @@ namespace osu.Game.Screens.Menu
                         },
                         new SpriteText
                         {
+                            Shadow = true,
                             Direction = FlowDirection.HorizontalOnly,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,

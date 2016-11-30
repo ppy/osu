@@ -19,6 +19,7 @@ using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Game.Database;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Transformations;
 using osu.Game.Modes;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
@@ -131,6 +132,19 @@ namespace osu.Game
                 PlayMode.TriggerChange();
                 overlayContent.Add(Toolbar);
             });
+
+            Options.StateChanged += delegate
+            {
+                switch (Options.State)
+                {
+                    case Visibility.Hidden:
+                        intro.MoveToX(0, OptionsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
+                        break;
+                    case Visibility.Visible:
+                        intro.MoveToX(OptionsOverlay.SIDEBAR_WIDTH / 2, OptionsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
+                        break;
+                }
+            };
 
             Cursor.Alpha = 0;
         }
