@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using System;
+using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,7 +11,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Options.General
 {
-    public class LoginOptions : OptionsSubsection
+    public class LoginOptions : OptionsSubsection, IOnlineComponent
     {
         private Container loginForm;
         protected override string Header => "Sign In";
@@ -31,16 +32,56 @@ namespace osu.Game.Overlays.Options.General
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(APIAccess api)
         {
-            if (api == null)
-                return;
-            loginForm.Children = new Drawable[]
+            api?.Register(this);
+        }
+
+        public void APIStateChanged(APIAccess api, APIState state)
+        {
+            switch (state)
             {
-                new LoginForm(api)
-            };
+                case APIState.Offline:
+                    loginForm.Children = new Drawable[]
+                    {
+                        new LoginForm(api)
+                    };
+                    break;
+                case APIState.Failing:
+                    loginForm.Children = new Drawable[]
+                    {
+                        new SpriteText
+                        {
+                            Text = @"Connection failing :(",
+                        },
+                    };
+                    break;
+                case APIState.Connecting:
+                    loginForm.Children = new Drawable[]
+                    {
+                        new SpriteText
+                        {
+                            Text = @"Connecting...",
+                        },
+                    };
+                    break;
+                case APIState.Online:
+                    loginForm.Children = new Drawable[]
+                    {
+                        new SpriteText
+                        {
+                            Text = $@"Connected as {api.Username}!",
+                        },
+                    };
+                    break;
+            }
         }
 
         class LoginForm : FlowContainer
         {
+            private APIAccess api;
+
+            private TextBox username;
+            private TextBox password;
+
             public LoginForm(APIAccess api)
             {
                 Direction = FlowDirection.VerticalOnly;
@@ -51,15 +92,27 @@ namespace osu.Game.Overlays.Options.General
                 Children = new Drawable[]
                 {
                     new SpriteText { Text = "Username" },
-                    new TextBox { Height = 20, RelativeSizeAxes = Axes.X, Text = api?.Username ?? string.Empty },
+                    username = new TextBox { Height = 20, RelativeSizeAxes = Axes.X, Text = api?.Username ?? string.Empty },
                     new SpriteText { Text = "Password" },
-                    new TextBox { Height = 20, RelativeSizeAxes = Axes.X },
+                    password = new PasswordTextBox { Height = 20, RelativeSizeAxes = Axes.X },
                     new OsuButton
                     {
                         RelativeSizeAxes = Axes.X,
                         Text = "Log in",
+                        Action = performLogin
                     }
                 };
+            }
+
+            private void performLogin()
+            {
+                api.Login(username.Text, password.Text);
+            }
+
+            [BackgroundDependencyLoader(permitNulls: true)]
+            private void load(APIAccess api)
+            {
+                this.api = api;
             }
         }
     }
