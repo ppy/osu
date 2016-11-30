@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,11 +15,11 @@ using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
-using osu.Game.Online.Chat.Display;
+using osu.Game.Online.Chat.Drawables;
 
 namespace osu.Game.Overlays
 {
-    public class ChatConsole : OverlayContainer
+    public class ChatOverlay : OverlayContainer, IOnlineComponent
     {
         private ChannelDisplay channelDisplay;
 
@@ -32,7 +31,7 @@ namespace osu.Game.Overlays
 
         private APIAccess api;
 
-        public ChatConsole()
+        public ChatOverlay()
         {
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, 300);
@@ -147,6 +146,11 @@ namespace osu.Game.Overlays
         {
             MoveToY(DrawSize.Y, transition_length, EasingTypes.InSine);
             FadeOut(transition_length, EasingTypes.InSine);
+        }
+
+        public void APIStateChanged(APIAccess api, APIState state)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

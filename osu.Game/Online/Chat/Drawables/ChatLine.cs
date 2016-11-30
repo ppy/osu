@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Online.Chat.Display
+namespace osu.Game.Online.Chat.Drawables
 {
     public class ChatLine : Container
     {
