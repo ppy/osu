@@ -3,6 +3,7 @@
 
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -14,21 +15,15 @@ namespace osu.Game.Overlays.Options.Audio
     {
         protected override string Header => "Volume";
 
-        private CheckBoxOption ignoreHitsounds;
-
-        public VolumeOptions()
-        {
-        }
-
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, AudioManager audio)
         {
             Children = new Drawable[]
             {
-                new SpriteText { Text = "Master: TODO slider" },
-                new SpriteText { Text = "Music: TODO slider" },
-                new SpriteText { Text = "Effect: TODO slider" },
-                ignoreHitsounds = new CheckBoxOption
+                new OptionsSlider { Label = "Master", Bindable = audio.Volume },
+                new OptionsSlider { Label = "Effect", Bindable = audio.VolumeSample },
+                new OptionsSlider { Label = "Music", Bindable = audio.VolumeTrack },
+                new CheckBoxOption
                 {
                     LabelText = "Ignore beatmap hitsounds",
                     Bindable = config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSamples)
