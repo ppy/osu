@@ -44,7 +44,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Colour = s.Colour,
                 })
                 {
-                    Depth = 1 //override time-based depth.
+                    Depth = -1 //override time-based depth.
                 },
             };
         }
