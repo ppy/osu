@@ -19,8 +19,8 @@ namespace osu.Game.Online.API
         private OAuth authentication;
 
         public string Endpoint = @"https://new.ppy.sh";
-        const string ClientId = @"daNBnfdv7SppRVc61z0XuOI13y6Hroiz";
-        const string ClientSecret = @"d6fgZuZeQ0eSXkEj5igdqQX6ztdtS6Ow";
+        const string ClientId = @"5";
+        const string ClientSecret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
 
         ConcurrentQueue<APIRequest> queue = new ConcurrentQueue<APIRequest>();
 
