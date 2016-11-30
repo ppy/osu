@@ -38,6 +38,7 @@ namespace osu.Game.Overlays
         
         private const float sidebar_padding = 10;
 
+        private Container scrollableSection;
         private ScrollContainer scrollContainer;
         private OptionsSidebar sidebar;
         private SidebarButton[] sidebarButtons;
@@ -64,50 +65,59 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                new Box
+                scrollableSection = new Container()
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.6f,
-                },
-                scrollContainer = new ScrollContainer
-                {
-                    ScrollDraggerVisible = false,
                     RelativeSizeAxes = Axes.Y,
-                    Width = width,
-                    Margin = new MarginPadding { Left = SIDEBAR_WIDTH },
-                    Children = new[]
-                    {
-                        new FlowContainer
-                        {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                            Direction = FlowDirection.VerticalOnly,
+                    AutoSizeAxes = Axes.X,
 
-                            Children = new Drawable[]
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                            Alpha = 0.6f,
+                        },
+                        scrollContainer = new ScrollContainer
+                        {
+                            ScrollDraggerVisible = false,
+                            RelativeSizeAxes = Axes.Y,
+                            Width = width,
+                            Margin = new MarginPadding { Left = SIDEBAR_WIDTH },
+                            Children = new[]
                             {
-                                new SpriteText
-                                {
-                                    Text = "settings",
-                                    TextSize = 40,
-                                    Margin = new MarginPadding { Left = CONTENT_MARGINS, Top = 30 },
-                                },
-                                new SpriteText
-                                {
-                                    Colour = new Color4(255, 102, 170, 255),
-                                    Text = "Change the way osu! behaves",
-                                    TextSize = 18,
-                                    Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
-                                },
                                 new FlowContainer
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
                                     Direction = FlowDirection.VerticalOnly,
-                                    Children = sections,
+
+                                    Children = new Drawable[]
+                                    {
+                                        new SpriteText
+                                        {
+                                            Text = "settings",
+                                            TextSize = 40,
+                                            Margin = new MarginPadding { Left = CONTENT_MARGINS, Top = 30 },
+                                        },
+                                        new SpriteText
+                                        {
+                                            Colour = new Color4(255, 102, 170, 255),
+                                            Text = "Change the way osu! behaves",
+                                            TextSize = 18,
+                                            Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
+                                        },
+                                        new FlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                            Direction = FlowDirection.VerticalOnly,
+                                            Children = sections,
+                                        }
+                                    }
                                 }
                             }
-                        }
+                        },
                     }
                 },
                 sidebar = new OptionsSidebar
@@ -181,14 +191,16 @@ namespace osu.Game.Overlays
         {
             scrollContainer.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
-            FadeTo(1, TRANSITION_LENGTH / 2);
+
+            scrollableSection.FadeTo(1, TRANSITION_LENGTH / 2);
         }
 
         protected override void PopOut()
         {
             scrollContainer.MoveToX(-width, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, EasingTypes.OutQuint);
-            FadeTo(0, TRANSITION_LENGTH / 2);
+
+            scrollableSection.FadeTo(0, TRANSITION_LENGTH / 2);
         }
     }
 }
