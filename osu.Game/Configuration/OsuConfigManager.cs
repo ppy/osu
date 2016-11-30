@@ -156,7 +156,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.AudioDevice, string.Empty);
             //Set(OsuConfig.ReleaseStream, ReleaseStream.Lazer, true);
             Set(OsuConfig.UpdateFailCount, 0);
-            //Set(OsuConfig.SavePassword, Password != null);
+            Set(OsuConfig.SavePassword, false);
             Set(OsuConfig.SaveUsername, true);
             //Set(OsuConfig.TreeSortMode, TreeGroupMode.Show_All);
             //Set(OsuConfig.TreeSortMode2, TreeSortMode.Title);
