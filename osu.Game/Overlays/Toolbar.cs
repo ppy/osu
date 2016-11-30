@@ -139,6 +139,10 @@ namespace osu.Game.Overlays
         private void load(OsuConfigManager config)
         {
             userButton.Text = config.Get<string>(OsuConfig.Username);
+            config.GetBindable<string>(OsuConfig.Username).ValueChanged += delegate
+            {
+                userButton.Text = config.Get<string>(OsuConfig.Username);
+            };
         }
 
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);

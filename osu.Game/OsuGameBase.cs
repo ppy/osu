@@ -73,6 +73,19 @@ namespace osu.Game
                 Password = Config.Get<string>(OsuConfig.Password),
                 Token = Config.Get<string>(OsuConfig.Token)
             });
+
+            API.OnStateChange += apiStateChanged;
+        }
+
+        private void apiStateChanged(APIState oldState, APIState newState)
+        {
+            switch (newState)
+            {
+                case APIState.Online:
+                    Config.Set(OsuConfig.Username, Config.Get<bool>(OsuConfig.SaveUsername) ? API.Username : string.Empty);
+                    Config.Set(OsuConfig.Password, Config.Get<bool>(OsuConfig.SavePassword) ? API.Password : string.Empty);
+                    break;
+            }
         }
 
         protected override void LoadComplete()

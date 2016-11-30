@@ -28,15 +28,9 @@ namespace osu.Game.Online.API
 
         public string Username;
 
-        private SecurePassword password;
+        //private SecurePassword password;
 
-        public string Password
-        {
-            set
-            {
-                password = string.IsNullOrEmpty(value) ? null : new SecurePassword(value);
-            }
-        }
+        public string Password;
 
         public string Token
         {
@@ -52,7 +46,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        protected bool HasLogin => Token != null || (!string.IsNullOrEmpty(Username) && password != null);
+        protected bool HasLogin => Token != null || (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password));
 
         private Thread thread;
 
@@ -71,13 +65,19 @@ namespace osu.Game.Online.API
 
         public void Register(IOnlineComponent component)
         {
-            components.Add(component);
-            component.APIStateChanged(this, state);
+            Scheduler.Add(delegate
+            {
+                components.Add(component);
+                component.APIStateChanged(this, state);
+            });
         }
 
         public void Unregister(IOnlineComponent component)
         {
-            components.Remove(component);
+            Scheduler.Add(delegate
+            {
+                components.Remove(component);
+            });
         }
 
         public string AccessToken => authentication.RequestAccessToken();
@@ -117,7 +117,7 @@ namespace osu.Game.Online.API
                         if (State < APIState.Connecting)
                             State = APIState.Connecting;
 
-                        if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(Username, password.Get(Representation.Raw)))
+                        if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(Username, Password))
                         {
                             //todo: this fails even on network-related issues. we should probably handle those differently.
                             //NotificationManager.ShowMessage("Login failed!");
@@ -157,7 +157,7 @@ namespace osu.Game.Online.API
         private void ClearCredentials()
         {
             Username = null;
-            password = null;
+            Password = null;
         }
 
         public void Login(string username, string password)
