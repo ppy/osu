@@ -57,6 +57,7 @@ namespace osu.Game.Overlays
         private void load(APIAccess api)
         {
             this.api = api;
+            api.Register(this);
 
             initializeChannels();
         }
