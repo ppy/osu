@@ -32,10 +32,8 @@ namespace osu.Game.Overlays
 
         private APIAccess api;
 
-        public ChatConsole(APIAccess api)
+        public ChatConsole()
         {
-            this.api = api;
-
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, 300);
             Anchor = Anchor.BottomLeft;
@@ -57,8 +55,10 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(APIAccess api)
         {
+            this.api = api;
+
             initializeChannels();
         }
 
@@ -145,8 +145,8 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            MoveToY(DrawSize.Y, transition_length, EasingTypes.InQuint);
-            FadeOut(transition_length, EasingTypes.InQuint);
+            MoveToY(DrawSize.Y, transition_length, EasingTypes.InSine);
+            FadeOut(transition_length, EasingTypes.InSine);
         }
     }
 }
