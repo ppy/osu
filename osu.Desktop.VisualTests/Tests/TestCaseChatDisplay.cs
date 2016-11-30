@@ -45,7 +45,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            if (api.State != APIAccess.APIState.Online)
+            if (api.State != APIState.Online)
                 api.OnStateChange += delegate { initializeChannels(); };
             else
                 initializeChannels();
@@ -65,7 +65,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             careChannels = new List<Channel>();
 
-            if (api.State != APIAccess.APIState.Online)
+            if (api.State != APIState.Online)
                 return;
 
             Add(flow = new FlowContainer

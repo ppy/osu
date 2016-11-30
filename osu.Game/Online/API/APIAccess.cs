@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using osu.Framework;
@@ -63,6 +64,18 @@ namespace osu.Game.Online.API
 
             thread = new Thread(run) { IsBackground = true };
             thread.Start();
+        }
+
+        private List<IOnlineComponent> components = new List<IOnlineComponent>();
+
+        public void Register(IOnlineComponent component)
+        {
+            components.Add(component);
+        }
+
+        public void Unregister(IOnlineComponent component)
+        {
+            components.Remove(component);
         }
 
         public string AccessToken => authentication.RequestAccessToken();
@@ -221,6 +234,7 @@ namespace osu.Game.Online.API
                         log.Add($@"We just went {newState}!");
                         Scheduler.Add(delegate
                         {
+                            components.ForEach(c => c.APIStateChanged(this, newState));
                             OnStateChange?.Invoke(oldState, newState);
                         });
                     }
@@ -236,29 +250,6 @@ namespace osu.Game.Online.API
         public event StateChangeDelegate OnStateChange;
 
         public delegate void StateChangeDelegate(APIState oldState, APIState newState);
-
-        public enum APIState
-        {
-            /// <summary>
-            /// We cannot login (not enough credentials).
-            /// </summary>
-            Offline,
-
-            /// <summary>
-            /// We are having connectivity issues.
-            /// </summary>
-            Failing,
-
-            /// <summary>
-            /// We are in the process of (re-)connecting.
-            /// </summary>
-            Connecting,
-
-            /// <summary>
-            /// We are online.
-            /// </summary>
-            Online
-        }
 
         private void flushQueue(bool failOldRequests = true)
         {
@@ -285,5 +276,28 @@ namespace osu.Game.Online.API
         {
             Scheduler.Update();
         }
+    }
+
+    public enum APIState
+    {
+        /// <summary>
+        /// We cannot login (not enough credentials).
+        /// </summary>
+        Offline,
+
+        /// <summary>
+        /// We are having connectivity issues.
+        /// </summary>
+        Failing,
+
+        /// <summary>
+        /// We are in the process of (re-)connecting.
+        /// </summary>
+        Connecting,
+
+        /// <summary>
+        /// We are online.
+        /// </summary>
+        Online
     }
 }
