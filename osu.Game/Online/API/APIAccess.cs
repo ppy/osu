@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using osu.Framework;
@@ -71,6 +72,7 @@ namespace osu.Game.Online.API
         public void Register(IOnlineComponent component)
         {
             components.Add(component);
+            component.APIStateChanged(this, state);
         }
 
         public void Unregister(IOnlineComponent component)
@@ -158,6 +160,16 @@ namespace osu.Game.Online.API
             password = null;
         }
 
+        public void Login(string username, string password)
+        {
+            Debug.Assert(State == APIState.Offline);
+
+            Username = username;
+            Password = password;
+
+            State = APIState.Connecting;
+        }
+
         /// <summary>
         /// Handle a single API request.
         /// </summary>
@@ -167,6 +179,7 @@ namespace osu.Game.Online.API
         {
             try
             {
+                Logger.Log($@"Performing request {req}", LoggingTarget.Network);
                 req.Perform(this);
 
                 State = APIState.Online;
