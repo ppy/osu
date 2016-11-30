@@ -119,7 +119,7 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     new FlowContainer
                     {
-                        Depth = 1,
+                        Depth = -1,
                         Direction = FlowDirection.HorizontalOnly,
                         RelativeSizeAxes = Axes.Both,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle

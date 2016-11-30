@@ -45,7 +45,7 @@ namespace osu.Game.Overlays
             {
                 new Box
                 {
-                    Depth = float.MinValue,
+                    Depth = float.MaxValue,
                     RelativeSizeAxes = Axes.Both,
                     Colour = new Color4(0.1f, 0.1f, 0.1f, 0.4f),
                 },

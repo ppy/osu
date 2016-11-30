@@ -83,7 +83,7 @@ namespace osu.Game
             {
                 Children = new[]
                 {
-                    Cursor = new OsuCursorContainer { Depth = float.MaxValue }
+                    Cursor = new OsuCursorContainer { Depth = float.MinValue }
                 }
             });
         }
