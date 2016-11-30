@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -58,48 +59,11 @@ namespace osu.Game.Overlays
         {
             this.api = api;
             api.Register(this);
-
-            initializeChannels();
         }
 
         private long? lastMessageId;
 
         private List<Channel> careChannels;
-
-        private void initializeChannels()
-        {
-            careChannels = new List<Channel>();
-
-            //if (api.State != APIAccess.APIState.Online)
-            //  return;
-
-            SpriteText loading;
-            Add(loading = new SpriteText
-            {
-                Text = @"Loading available channels...",
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                TextSize = 40,
-            });
-
-            messageRequest?.Cancel();
-
-            ListChannelsRequest req = new ListChannelsRequest();
-            req.Success += delegate (List<Channel> channels)
-            {
-                Scheduler.Add(delegate
-                {
-                    loading.FadeOut(100);
-                    addChannel(channels.Find(c => c.Name == @"#osu"));
-                });
-
-                //addChannel(channels.Find(c => c.Name == @"#lobby"));
-                //addChannel(channels.Find(c => c.Name == @"#english"));
-
-                messageRequest = Scheduler.AddDelayed(() => FetchNewMessages(api), 1000, true);
-            };
-            api.Queue(req);
-        }
 
         private void addChannel(Channel channel)
         {
@@ -151,7 +115,52 @@ namespace osu.Game.Overlays
 
         public void APIStateChanged(APIAccess api, APIState state)
         {
-            throw new System.NotImplementedException();
+            switch (state)
+            {
+                case APIState.Online:
+                    initializeChannels();
+                    break;
+                default:
+                    messageRequest?.Cancel();
+                    break;
+            }
+        }
+
+        private void initializeChannels()
+        {
+            Clear();
+
+            careChannels = new List<Channel>();
+
+            //if (api.State != APIAccess.APIState.Online)
+            //  return;
+
+            SpriteText loading;
+            Add(loading = new SpriteText
+            {
+                Text = @"Loading available channels...",
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                TextSize = 40,
+            });
+
+            messageRequest?.Cancel();
+
+            ListChannelsRequest req = new ListChannelsRequest();
+            req.Success += delegate (List<Channel> channels)
+            {
+                Scheduler.Add(delegate
+                {
+                    loading.FadeOut(100);
+                    addChannel(channels.Find(c => c.Name == @"#osu"));
+                });
+
+                //addChannel(channels.Find(c => c.Name == @"#lobby"));
+                //addChannel(channels.Find(c => c.Name == @"#english"));
+
+                messageRequest = Scheduler.AddDelayed(() => FetchNewMessages(api), 1000, true);
+            };
+            api.Queue(req);
         }
     }
 }
