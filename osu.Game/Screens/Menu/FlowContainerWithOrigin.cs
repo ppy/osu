@@ -1,6 +1,8 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Screens.Menu
 {
@@ -14,6 +16,10 @@ namespace osu.Game.Screens.Menu
         /// This target should be a direct child of this FlowContainer.
         /// </summary>
         public Drawable CentreTarget;
+
+        protected override IComparer<Drawable> DepthComparer => new ReverseDepthComparer();
+
+        protected override IEnumerable<Drawable> SortedChildren => base.SortedChildren.Reverse();
 
         public override Anchor Origin => Anchor.Custom;
 
