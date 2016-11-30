@@ -281,6 +281,7 @@ namespace osu.Game.Online.API
 
         public void Logout()
         {
+            ClearCredentials();
             authentication.Clear();
             State = APIState.Offline;
         }

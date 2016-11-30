@@ -14,6 +14,7 @@ namespace osu.Game.Overlays.Options.General
     public class LoginOptions : OptionsSubsection, IOnlineComponent
     {
         private Container loginForm;
+        private APIAccess api;
         protected override string Header => "Sign In";
 
         public LoginOptions()
@@ -32,6 +33,7 @@ namespace osu.Game.Overlays.Options.General
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(APIAccess api)
         {
+            this.api = api;
             api?.Register(this);
         }
 
@@ -70,9 +72,20 @@ namespace osu.Game.Overlays.Options.General
                         {
                             Text = $@"Connected as {api.Username}!",
                         },
+                        new OsuButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Sign out",
+                            Action = performLogout
+                        }
                     };
                     break;
             }
+        }
+
+        private void performLogout()
+        {
+            api.Logout();
         }
 
         class LoginForm : FlowContainer
@@ -106,7 +119,8 @@ namespace osu.Game.Overlays.Options.General
 
             private void performLogin()
             {
-                api.Login(username.Text, password.Text);
+                if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
+                    api.Login(username.Text, password.Text);
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
