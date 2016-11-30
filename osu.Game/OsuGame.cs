@@ -30,7 +30,7 @@ namespace osu.Game
     {
         public Toolbar Toolbar;
 
-        private ChatConsole chat;
+        private ChatOverlay chat;
 
         private MusicController musicController;
 
@@ -115,7 +115,7 @@ namespace osu.Game
             });
 
             //overlay elements
-            (chat = new ChatConsole(API) { Depth = 0 }).Preload(this, overlayContent.Add);
+            (chat = new ChatOverlay { Depth = 0 }).Preload(this, overlayContent.Add);
             (Options = new OptionsOverlay { Depth = -1 }).Preload(this, overlayContent.Add);
             (musicController = new MusicController() { Depth = -3 }).Preload(this, overlayContent.Add);
             (Toolbar = new Toolbar

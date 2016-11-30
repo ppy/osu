@@ -14,9 +14,9 @@ using osu.Game;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
-using osu.Game.Online.Chat.Display;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Game.Online.Chat.Drawables;
 
 namespace osu.Desktop.VisualTests.Tests
 {
