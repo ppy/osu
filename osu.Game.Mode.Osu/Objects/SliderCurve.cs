@@ -13,17 +13,40 @@ namespace osu.Game.Modes.Osu.Objects
 
         private List<Vector2> calculatedPath;
 
-        public void Calculate()
+        private List<Vector2> calculateSubpath(List<Vector2> subpath)
         {
             switch (CurveType)
             {
                 case CurveTypes.Linear:
-                    calculatedPath = Path;
-                    break;
+                    return subpath;
                 default:
-                    var bezier = new BezierApproximator(Path);
-                    calculatedPath = bezier.CreateBezier();
-                    break;
+                    return new BezierApproximator(subpath).CreateBezier();
+            }
+        }
+
+        public void Calculate()
+        {
+            calculatedPath = new List<Vector2>();
+
+            // Sliders may consist of various subpaths separated by two consecutive vertices
+            // with the same position. The following loop parses these subpaths and computes
+            // their shape independently, consecutively appending them to calculatedPath.
+            List<Vector2> subpath = new List<Vector2>();
+            for (int i = 0; i < Path.Count; ++i)
+            {
+                subpath.Add(Path[i]);
+                if (i == Path.Count - 1 || Path[i] == Path[i + 1])
+                {
+                    // If we already constructed a subpath previously, then the new subpath
+                    // will have as starting position the end position of the previous subpath.
+                    // Hence we can and should remove the previous endpoint to avoid a segment
+                    // with 0 length.
+                    if (calculatedPath.Count > 0)
+                        calculatedPath.RemoveAt(calculatedPath.Count - 1);
+
+                    calculatedPath.AddRange(calculateSubpath(subpath));
+                    subpath.Clear();
+                }
             }
         }
 
