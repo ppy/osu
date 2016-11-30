@@ -17,7 +17,11 @@ namespace osu.Game.Overlays.Options
         public string Label
         {
             get { return text.Text; }
-            set { text.Text = value; }
+            set
+            {
+                text.Text = value;
+                text.Alpha = string.IsNullOrEmpty(value) ? 0 : 1;
+            }
         }
         
         public BindableDouble Bindable
@@ -33,7 +37,7 @@ namespace osu.Game.Overlays.Options
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
-                text = new SpriteText(),
+                text = new SpriteText { Alpha = 0 },
                 slider = new SliderBar
                 {
                     Margin = new MarginPadding { Top = 5 },
