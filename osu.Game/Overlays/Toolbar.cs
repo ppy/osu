@@ -30,9 +30,14 @@ namespace osu.Game.Overlays
 
         private ToolbarModeSelector modeSelector;
         private ToolbarButton userButton;
+        private Box solidBackground;
         private Box gradientBackground;
 
-        private const int transition_time = 200;
+        private const int transition_time = 250;
+
+        private const float alpha_hovering = 0.8f;
+        private const float alpha_normal = 0.6f;
+
 
         protected override void PopIn()
         {
@@ -48,23 +53,26 @@ namespace osu.Game.Overlays
 
         protected override bool OnHover(InputState state)
         {
-            gradientBackground.FadeIn(200);
+            solidBackground.FadeTo(alpha_hovering, transition_time, EasingTypes.OutQuint);
+            gradientBackground.FadeIn(transition_time, EasingTypes.OutQuint);
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            gradientBackground.FadeOut(200);
+            solidBackground.FadeTo(alpha_normal, transition_time, EasingTypes.OutQuint);
+            gradientBackground.FadeOut(transition_time, EasingTypes.OutQuint);
         }
 
         public Toolbar()
         {
             Children = new Drawable[]
             {
-                new Box
+                solidBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0.1f, 0.1f, 0.1f, 0.6f)
+                    Colour = new Color4(0.1f, 0.1f, 0.1f, 1),
+                    Alpha = alpha_normal,
                 },
                 gradientBackground = new Box
                 {
