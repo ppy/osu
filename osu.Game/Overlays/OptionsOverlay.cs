@@ -30,8 +30,12 @@ namespace osu.Game.Overlays
     {
         internal const float CONTENT_MARGINS = 10;
 
+        public const float TRANSITION_LENGTH = 600;
+
+        public const float SIDEBAR_WIDTH = OptionsSidebar.default_width;
+
         private const float width = 400;
-        private const float sidebar_width = OptionsSidebar.default_width;
+        
         private const float sidebar_padding = 10;
 
         private ScrollContainer scrollContainer;
@@ -71,7 +75,7 @@ namespace osu.Game.Overlays
                     ScrollDraggerVisible = false,
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
-                    Margin = new MarginPadding { Left = sidebar_width },
+                    Margin = new MarginPadding { Left = SIDEBAR_WIDTH },
                     Children = new[]
                     {
                         new FlowContainer
@@ -108,7 +112,7 @@ namespace osu.Game.Overlays
                 },
                 sidebar = new OptionsSidebar
                 {
-                    Width = sidebar_width,
+                    Width = SIDEBAR_WIDTH,
                     Children = sidebarButtons = sections.Select(section =>
                         new SidebarButton
                         {
@@ -175,16 +179,16 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            scrollContainer.MoveToX(0, 600, EasingTypes.OutQuint);
-            sidebar.MoveToX(0, 800, EasingTypes.OutQuint);
-            FadeTo(1, 300);
+            scrollContainer.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
+            sidebar.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
+            FadeTo(1, TRANSITION_LENGTH / 2);
         }
 
         protected override void PopOut()
         {
-            scrollContainer.MoveToX(-width, 600, EasingTypes.OutQuint);
-            sidebar.MoveToX(-sidebar_width, 600, EasingTypes.OutQuint);
-            FadeTo(0, 300);
+            scrollContainer.MoveToX(-width, TRANSITION_LENGTH, EasingTypes.OutQuint);
+            sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, EasingTypes.OutQuint);
+            FadeTo(0, TRANSITION_LENGTH / 2);
         }
     }
 }
