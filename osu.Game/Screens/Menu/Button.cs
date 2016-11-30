@@ -71,6 +71,7 @@ namespace osu.Game.Screens.Menu
                     {
                         icon = new TextAwesome
                         {
+                            Shadow = true,
                             Anchor = Anchor.Centre,
                             TextSize = 30,
                             Position = new Vector2(0, 0),
@@ -78,6 +79,7 @@ namespace osu.Game.Screens.Menu
                         },
                         new SpriteText
                         {
+                            Shadow = true,
                             Direction = FlowDirection.HorizontalOnly,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
