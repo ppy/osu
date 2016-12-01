@@ -16,10 +16,11 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Modes;
 using osu.Game.Screens.Play;
 using osu.Framework.Input;
+using osu.Game.Online.API;
 
 namespace osu.Game.Overlays
 {
-    public class Toolbar : OverlayContainer
+    public class Toolbar : OverlayContainer, IOnlineComponent
     {
         private const float height = 50;
 
@@ -144,15 +145,24 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(APIAccess api, OsuConfigManager config)
         {
-            userButton.Text = config.Get<string>(OsuConfig.Username);
-            config.GetBindable<string>(OsuConfig.Username).ValueChanged += delegate
-            {
-                userButton.Text = config.Get<string>(OsuConfig.Username);
-            };
+            api.Register(this);
         }
 
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
+
+        public void APIStateChanged(APIAccess api, APIState state)
+        {
+            switch (state)
+            {
+                default:
+                    userButton.Text = @"Guest";
+                    break;
+                case APIState.Online:
+                    userButton.Text = api.Username;
+                    break;
+            }
+        }
     }
 }
