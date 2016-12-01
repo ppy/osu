@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Type = EdgeEffectType.Shadow,
                     Radius = 4,
-                    Colour = new Color4(0, 0, 0, 25),
+                    Colour = new Color4(0, 0, 0, 0.1f),
                 };
 
                 Masking = true;
