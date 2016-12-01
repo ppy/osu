@@ -3,26 +3,25 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Graphics.Backgrounds;
+using osu.Game.Modes;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework;
-using osu.Framework.Caching;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Allocation;
-using osu.Game.Modes;
-using osu.Game.Screens.Play;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.Toolbar
 {
     class ToolbarModeSelector : Container
     {
         const float padding = 10;
 
         private FlowContainer modeButtons;
-        private Box modeButtonLine;
+        private Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
         public Action<PlayMode> OnPlayModeChange;
@@ -33,11 +32,7 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(20, 20, 20, 255)
-                },
+                new OpaqueBackground(),
                 modeButtons = new FlowContainer
                 {
                     RelativeSizeAxes = Axes.Y,
@@ -45,14 +40,29 @@ namespace osu.Game.Overlays
                     Direction = FlowDirection.HorizontalOnly,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
+                    Padding = new MarginPadding { Left = 10, Right = 10 },
                 },
-                modeButtonLine = new Box
+                modeButtonLine = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     Size = new Vector2(0.3f, 3),
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopCentre,
-                    Colour = Color4.White
+                    Origin = Anchor.TopLeft,
+                    Masking = true,
+                    EdgeEffect = new EdgeEffect
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = new Color4(255, 194, 224, 100),
+                        Radius = 15,
+                        Roundness = 15,
+                    },
+                    Children = new []
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        }
+                    }
                 }
             };
 
@@ -72,9 +82,13 @@ namespace osu.Game.Overlays
                     }
                 });
             }
+        }
 
-            // We need to set the size within LoadComplete, because 
-            Size = new Vector2(amountButtons * ToolbarButton.WIDTH + padding * 2, 1);
+        protected override void Update()
+        {
+            base.Update();
+
+            Size = new Vector2(modeButtons.DrawSize.X, 1);
         }
 
         public void SetGameMode(PlayMode mode)
@@ -97,7 +111,7 @@ namespace osu.Game.Overlays
             base.UpdateLayout();
 
             if (!activeMode.EnsureValid())
-                activeMode.Refresh(() => modeButtonLine.MoveToX(activeButton.DrawPosition.X + activeButton.DrawSize.X / 2 + padding, 200, EasingTypes.OutQuint));
+                activeMode.Refresh(() => modeButtonLine.MoveToX(activeButton.DrawPosition.X, 200, EasingTypes.OutQuint));
         }
     }
 }

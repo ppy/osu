@@ -4,6 +4,7 @@ using osu.Framework.Input;
 using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Transformations;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -35,11 +36,16 @@ namespace osu.Game.Graphics.Containers
             this.input = input;
         }
 
+        bool firstUpdate = true;
+
         protected override void Update()
         {
             base.Update();
-            content.Position = (ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2) * ParallaxAmount;
+
+            content.MoveTo((ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2) * ParallaxAmount, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
             content.Scale = new Vector2(1 + ParallaxAmount);
+
+            firstUpdate = false;
         }
     }
 }

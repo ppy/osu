@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using System;
+using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,38 +11,72 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Options.General
 {
-    public class LoginOptions : OptionsSubsection
+    public class LoginOptions : OptionsSubsection, IOnlineComponent
     {
         private Container loginForm;
-        protected override string Header => "Sign In";
 
-        public LoginOptions()
-        {
-            Children = new[]
-            {
-                loginForm = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new[] { new LoadingAnimation() }
-                }
-            };
-        }
+        private Action performLogout;
+        protected override string Header => "Sign In";
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(APIAccess api)
         {
-            if (api == null)
-                return;
-            loginForm.Children = new Drawable[]
+            api?.Register(this);
+        }
+
+        public void APIStateChanged(APIAccess api, APIState state)
+        {
+            switch (state)
             {
-                new LoginForm(api)
-            };
+                case APIState.Offline:
+                    Children = new Drawable[]
+                    {
+                        new LoginForm()
+                    };
+                    break;
+                case APIState.Failing:
+                    Children = new Drawable[]
+                    {
+                        new SpriteText
+                        {
+                            Text = "Connection failing :(",
+                        },
+                    };
+                    break;
+                case APIState.Connecting:
+                    Children = new Drawable[]
+                    {
+                        new SpriteText
+                        {
+                            Text = "Connecting...",
+                        },
+                    };
+                    break;
+                case APIState.Online:
+                    Children = new Drawable[]
+                    {
+                        new SpriteText
+                        {
+                            Text = $"Connected as {api.Username}!",
+                        },
+                        new OsuButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Sign out",
+                            Action = api.Logout
+                        }
+                    };
+                    break;
+            }
         }
 
         class LoginForm : FlowContainer
         {
-            public LoginForm(APIAccess api)
+            private TextBox username;
+            private TextBox password;
+            private APIAccess api;
+
+            public LoginForm()
             {
                 Direction = FlowDirection.VerticalOnly;
                 AutoSizeAxes = Axes.Y;
@@ -51,15 +86,28 @@ namespace osu.Game.Overlays.Options.General
                 Children = new Drawable[]
                 {
                     new SpriteText { Text = "Username" },
-                    new TextBox { Height = 20, RelativeSizeAxes = Axes.X, Text = api?.Username ?? string.Empty },
+                    username = new TextBox { Height = 20, RelativeSizeAxes = Axes.X, Text = api?.Username ?? string.Empty },
                     new SpriteText { Text = "Password" },
-                    new TextBox { Height = 20, RelativeSizeAxes = Axes.X },
+                    password = new PasswordTextBox { Height = 20, RelativeSizeAxes = Axes.X },
                     new OsuButton
                     {
                         RelativeSizeAxes = Axes.X,
                         Text = "Log in",
+                        Action = performLogin
                     }
                 };
+            }
+
+            private void performLogin()
+            {
+                if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
+                    api.Login(username.Text, password.Text);
+            }
+
+            [BackgroundDependencyLoader(permitNulls: true)]
+            private void load(APIAccess api)
+            {
+                this.api = api;
             }
         }
     }

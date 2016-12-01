@@ -3,9 +3,12 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using osu.Framework;
+using osu.Framework.Configuration;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Online.API.Requests;
@@ -17,8 +20,8 @@ namespace osu.Game.Online.API
         private OAuth authentication;
 
         public string Endpoint = @"https://new.ppy.sh";
-        const string ClientId = @"daNBnfdv7SppRVc61z0XuOI13y6Hroiz";
-        const string ClientSecret = @"d6fgZuZeQ0eSXkEj5igdqQX6ztdtS6Ow";
+        const string ClientId = @"5";
+        const string ClientSecret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
 
         ConcurrentQueue<APIRequest> queue = new ConcurrentQueue<APIRequest>();
 
@@ -26,15 +29,11 @@ namespace osu.Game.Online.API
 
         public string Username;
 
-        private SecurePassword password;
+        //private SecurePassword password;
 
-        public string Password
-        {
-            set
-            {
-                password = string.IsNullOrEmpty(value) ? null : new SecurePassword(value);
-            }
-        }
+        public string Password;
+
+        public Bindable<User> LocalUser = new Bindable<User>();
 
         public string Token
         {
@@ -50,7 +49,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        protected bool HasLogin => Token != null || (!string.IsNullOrEmpty(Username) && password != null);
+        protected bool HasLogin => Token != null || (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password));
 
         private Thread thread;
 
@@ -63,6 +62,25 @@ namespace osu.Game.Online.API
 
             thread = new Thread(run) { IsBackground = true };
             thread.Start();
+        }
+
+        private List<IOnlineComponent> components = new List<IOnlineComponent>();
+
+        public void Register(IOnlineComponent component)
+        {
+            Scheduler.Add(delegate
+            {
+                components.Add(component);
+                component.APIStateChanged(this, state);
+            });
+        }
+
+        public void Unregister(IOnlineComponent component)
+        {
+            Scheduler.Add(delegate
+            {
+                components.Remove(component);
+            });
         }
 
         public string AccessToken => authentication.RequestAccessToken();
@@ -102,12 +120,23 @@ namespace osu.Game.Online.API
                         if (State < APIState.Connecting)
                             State = APIState.Connecting;
 
-                        if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(Username, password.Get(Representation.Raw)))
+                        if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(Username, Password))
                         {
                             //todo: this fails even on network-related issues. we should probably handle those differently.
                             //NotificationManager.ShowMessage("Login failed!");
                             log.Add(@"Login failed!");
                             ClearCredentials();
+                            continue;
+                        }
+
+
+                        var userReq = new GetUserRequest();
+                        userReq.Success += (u) => {
+                            LocalUser.Value = u;
+                        };
+                        if (!handleRequest(userReq))
+                        {
+                            State = APIState.Failing;
                             continue;
                         }
 
@@ -142,7 +171,17 @@ namespace osu.Game.Online.API
         private void ClearCredentials()
         {
             Username = null;
-            password = null;
+            Password = null;
+        }
+
+        public void Login(string username, string password)
+        {
+            Debug.Assert(State == APIState.Offline);
+
+            Username = username;
+            Password = password;
+
+            State = APIState.Connecting;
         }
 
         /// <summary>
@@ -154,6 +193,7 @@ namespace osu.Game.Online.API
         {
             try
             {
+                Logger.Log($@"Performing request {req}", LoggingTarget.Network);
                 req.Perform(this);
 
                 State = APIState.Online;
@@ -221,6 +261,7 @@ namespace osu.Game.Online.API
                         log.Add($@"We just went {newState}!");
                         Scheduler.Add(delegate
                         {
+                            components.ForEach(c => c.APIStateChanged(this, newState));
                             OnStateChange?.Invoke(oldState, newState);
                         });
                     }
@@ -236,29 +277,6 @@ namespace osu.Game.Online.API
         public event StateChangeDelegate OnStateChange;
 
         public delegate void StateChangeDelegate(APIState oldState, APIState newState);
-
-        public enum APIState
-        {
-            /// <summary>
-            /// We cannot login (not enough credentials).
-            /// </summary>
-            Offline,
-
-            /// <summary>
-            /// We are having connectivity issues.
-            /// </summary>
-            Failing,
-
-            /// <summary>
-            /// We are in the process of (re-)connecting.
-            /// </summary>
-            Connecting,
-
-            /// <summary>
-            /// We are online.
-            /// </summary>
-            Online
-        }
 
         private void flushQueue(bool failOldRequests = true)
         {
@@ -277,6 +295,7 @@ namespace osu.Game.Online.API
 
         public void Logout()
         {
+            ClearCredentials();
             authentication.Clear();
             State = APIState.Offline;
         }
@@ -285,5 +304,28 @@ namespace osu.Game.Online.API
         {
             Scheduler.Update();
         }
+    }
+
+    public enum APIState
+    {
+        /// <summary>
+        /// We cannot login (not enough credentials).
+        /// </summary>
+        Offline,
+
+        /// <summary>
+        /// We are having connectivity issues.
+        /// </summary>
+        Failing,
+
+        /// <summary>
+        /// We are in the process of (re-)connecting.
+        /// </summary>
+        Connecting,
+
+        /// <summary>
+        /// We are online.
+        /// </summary>
+        Online
     }
 }
