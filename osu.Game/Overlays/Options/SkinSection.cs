@@ -4,6 +4,7 @@
 using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -62,6 +63,11 @@ namespace osu.Game.Overlays.Options
                     Bindable = config.GetBindable<bool>(OsuConfig.UseSkinCursor)
                 },
                 new SpriteText { Text = "Cursor size: TODO slider" },
+                new OptionsSlider<double>
+                {
+                    Label = "Cursor size",
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.CursorSize)
+                },
                 new CheckBoxOption
                 {
                     LabelText = "Automatic cursor size",
