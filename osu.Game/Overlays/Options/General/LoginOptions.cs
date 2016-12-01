@@ -14,26 +14,13 @@ namespace osu.Game.Overlays.Options.General
     public class LoginOptions : OptionsSubsection, IOnlineComponent
     {
         private Container loginForm;
-        private APIAccess api;
-        protected override string Header => "Sign In";
 
-        public LoginOptions()
-        {
-            Children = new[]
-            {
-                loginForm = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new[] { new LoadingAnimation() }
-                }
-            };
-        }
+        private Action performLogout;
+        protected override string Header => "Sign In";
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(APIAccess api)
         {
-            this.api = api;
             api?.Register(this);
         }
 
@@ -42,13 +29,13 @@ namespace osu.Game.Overlays.Options.General
             switch (state)
             {
                 case APIState.Offline:
-                    loginForm.Children = new Drawable[]
+                    Children = new Drawable[]
                     {
-                        new LoginForm(api)
+                        new LoginForm()
                     };
                     break;
                 case APIState.Failing:
-                    loginForm.Children = new Drawable[]
+                    Children = new Drawable[]
                     {
                         new SpriteText
                         {
@@ -57,7 +44,7 @@ namespace osu.Game.Overlays.Options.General
                     };
                     break;
                 case APIState.Connecting:
-                    loginForm.Children = new Drawable[]
+                    Children = new Drawable[]
                     {
                         new SpriteText
                         {
@@ -66,7 +53,7 @@ namespace osu.Game.Overlays.Options.General
                     };
                     break;
                 case APIState.Online:
-                    loginForm.Children = new Drawable[]
+                    Children = new Drawable[]
                     {
                         new SpriteText
                         {
@@ -76,26 +63,20 @@ namespace osu.Game.Overlays.Options.General
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Sign out",
-                            Action = performLogout
+                            Action = api.Logout
                         }
                     };
                     break;
             }
         }
 
-        private void performLogout()
-        {
-            api.Logout();
-        }
-
         class LoginForm : FlowContainer
         {
-            private APIAccess api;
-
             private TextBox username;
             private TextBox password;
+            private APIAccess api;
 
-            public LoginForm(APIAccess api)
+            public LoginForm()
             {
                 Direction = FlowDirection.VerticalOnly;
                 AutoSizeAxes = Axes.Y;
