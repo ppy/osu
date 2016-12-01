@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using osu.Framework;
+using osu.Framework.Configuration;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Online.API.Requests;
@@ -31,6 +32,8 @@ namespace osu.Game.Online.API
         //private SecurePassword password;
 
         public string Password;
+
+        public Bindable<User> LocalUser = new Bindable<User>();
 
         public string Token
         {
@@ -123,6 +126,17 @@ namespace osu.Game.Online.API
                             //NotificationManager.ShowMessage("Login failed!");
                             log.Add(@"Login failed!");
                             ClearCredentials();
+                            continue;
+                        }
+
+
+                        var userReq = new GetUserRequest();
+                        userReq.Success += (u) => {
+                            LocalUser.Value = u;
+                        };
+                        if (!handleRequest(userReq))
+                        {
+                            State = APIState.Failing;
                             continue;
                         }
 

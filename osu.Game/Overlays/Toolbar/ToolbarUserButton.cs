@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Toolbar
                     break;
                 case APIState.Online:
                     Text = api.Username;
-                    avatar.UserId = 2;
+                    avatar.UserId = api.LocalUser.Value.Id;
                     break;
             }
         }
