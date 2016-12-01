@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Options.General
                     {
                         new SpriteText
                         {
-                            Text = @"Connection failing :(",
+                            Text = "Connection failing :(",
                         },
                     };
                     break;
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Options.General
                     {
                         new SpriteText
                         {
-                            Text = @"Connecting...",
+                            Text = "Connecting...",
                         },
                     };
                     break;
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Options.General
                     {
                         new SpriteText
                         {
-                            Text = $@"Connected as {api.Username}!",
+                            Text = $"Connected as {api.Username}!",
                         },
                         new OsuButton
                         {
