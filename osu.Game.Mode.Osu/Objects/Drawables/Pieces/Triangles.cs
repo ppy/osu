@@ -8,29 +8,24 @@ using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
-    public class Triangles : Container
+    public class Triangles : Container<Triangle>
     {
-        private Texture triangle;
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            triangle = textures.Get(@"Play/osu/triangle@2x");
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            const float size = 100;
             for (int i = 0; i < 10; i++)
             {
-                Add(new Sprite
+                Add(new Triangle
                 {
-                    Texture = triangle,
                     Origin = Anchor.Centre,
                     RelativePositionAxes = Axes.Both,
                     Position = new Vector2(RNG.NextSingle(), RNG.NextSingle()),
                     Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
-                    Alpha = RNG.NextSingle() * 0.3f
+                    // Scaling height by 0.866 results in equiangular triangles (== 60° and equal side length)
+                    Size = new Vector2(size, 0.866f * size),
+                    Alpha = RNG.NextSingle() * 0.3f,
                 });
             }
         }
