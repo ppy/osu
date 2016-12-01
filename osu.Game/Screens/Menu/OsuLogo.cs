@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Menu
         private Container logoHoverContainer;
         private MenuVisualisation vis;
 
-        private CircularContainer colourAndTriangles;
+        private Container colourAndTriangles;
 
         public Action Action;
 
@@ -84,14 +84,14 @@ namespace osu.Game.Screens.Menu
                             {
                                 logoContainer = new CircularContainer
                                 {
-                                    AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Scale = new Vector2(0.8f),
                                     Children = new Drawable[]
                                     {
-                                        colourAndTriangles = new CircularContainer
+                                        colourAndTriangles = new Container
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Scale = new Vector2(0.78f),
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Children = new Drawable[]
@@ -107,13 +107,14 @@ namespace osu.Game.Screens.Menu
                                                 },
                                             }
                                         },
-                                        logo = new Sprite
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Scale = new Vector2(0.5f),
-                                        },
+
                                     },
+                                },
+                                logo = new Sprite
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Scale = new Vector2(0.5f),
                                 },
                                 rippleContainer = new Container
                                 {
@@ -203,19 +204,6 @@ namespace osu.Game.Screens.Menu
             {
                 TriangleScale = 4;
                 Alpha = 1;
-            }
-
-            public override float CornerRadius
-            {
-                get
-                {
-                    return DrawSize.X / 2f;
-                }
-
-                set
-                {
-                    Debug.Assert(false, "Cannot manually set CornerRadius of CircularContainer.");
-                }
             }
 
             protected override Sprite CreateTriangle()

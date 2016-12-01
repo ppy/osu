@@ -19,7 +19,6 @@ namespace osu.Game.Graphics.Backgrounds
 
         public Triangles()
         {
-            Masking = true;
             Alpha = 0.3f;
         }
 
