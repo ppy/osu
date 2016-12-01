@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Toolbar
                     RelativeSizeAxes = Axes.X,
                     Size = new Vector2(0.3f, 3),
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopCentre,
+                    Origin = Anchor.TopLeft,
                     Colour = Color4.White
                 }
             };
@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Toolbar
             base.UpdateLayout();
 
             if (!activeMode.EnsureValid())
-                activeMode.Refresh(() => modeButtonLine.MoveToX(activeButton.DrawPosition.X + activeButton.DrawSize.X / 2 + padding, 200, EasingTypes.OutQuint));
+                activeMode.Refresh(() => modeButtonLine.MoveToX(activeButton.DrawPosition.X, 200, EasingTypes.OutQuint));
         }
     }
 }
