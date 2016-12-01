@@ -1,5 +1,6 @@
 ﻿using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -23,6 +24,11 @@ namespace osu.Game.Overlays.Options.Input
             Children = new Drawable[]
             {
                 new SpriteText { Text = "Sensitivity: TODO slider" },
+                new OptionsSlider<double>
+                {
+                    Label = "Sensitivity",
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.MouseSpeed),
+                },
                 rawInput = new CheckBoxOption
                 {
                     LabelText = "Raw input",
