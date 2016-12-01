@@ -36,9 +36,9 @@ namespace osu.Game.Overlays.Options.Input
                     LabelText = "Map absolute raw input to the osu! window",
                     Bindable = config.GetBindable<bool>(OsuConfig.AbsoluteToOsuWindow)
                 },
-                new OptionsDropdown<ConfineMouseMode>
+                new DropdownOption<ConfineMouseMode>
                 {
-                    Label = "Confine mouse cursor",
+                    LabelText = "Confine mouse cursor",
                     Bindable = config.GetBindable<ConfineMouseMode>(OsuConfig.ConfineMouse),
                 },
                 new CheckBoxOption
