@@ -16,6 +16,18 @@ namespace osu.Game.Overlays
         public Action<float> SeekRequested;
         private bool isDragging;
 
+        private bool enabled;
+        public bool IsEnabled
+        {
+            get { return enabled; }
+            set
+            {
+                enabled = value;
+                if (!enabled)
+                    fill.Width = 0;
+            }
+        }
+
         public DragBar()
         {
             RelativeSizeAxes = Axes.X;
@@ -34,13 +46,14 @@ namespace osu.Game.Overlays
 
         public void UpdatePosition(float position)
         {
-            if (isDragging) return;
+            if (isDragging || !IsEnabled) return;
 
             fill.Width = position;
         }
 
         private void seek(InputState state)
         {
+            if (!IsEnabled) return;
             float seekLocation = state.Mouse.Position.X / DrawWidth;
             SeekRequested?.Invoke(seekLocation);
             fill.Width = seekLocation;
