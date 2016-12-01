@@ -26,13 +26,14 @@ namespace osu.Game.Screens.Menu
         private Sprite logo;
         private CircularContainer logoContainer;
         private Container logoBounceContainer;
+        private Container logoHoverContainer;
         private MenuVisualisation vis;
 
         private CircularContainer colourAndTriangles;
 
         public Action Action;
 
-        public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.78f;
+        public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X * 0.78f;
 
         private Sprite ripple;
 
@@ -76,62 +77,69 @@ namespace osu.Game.Screens.Menu
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        logoContainer = new CircularContainer
+                        logoHoverContainer = new Container
                         {
                             AutoSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
                             Children = new Drawable[]
                             {
-                                colourAndTriangles = new CircularContainer
+                                logoContainer = new CircularContainer
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Scale = new Vector2(0.78f),
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.Centre,
+                                    Children = new Drawable[]
+                                    {
+                                        colourAndTriangles = new CircularContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Scale = new Vector2(0.78f),
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Children = new Drawable[]
+                                            {
+                                                new Box
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Colour = new Color4(233, 103, 161, 255),
+                                                },
+                                                new OsuLogoTriangles
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                },
+                                            }
+                                        },
+                                        logo = new Sprite
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Scale = new Vector2(0.5f),
+                                        },
+                                    },
+                                },
+                                rippleContainer = new Container
+                                {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Children = new Drawable[]
                                     {
-                                        new Box
+                                        ripple = new Sprite()
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = new Color4(233, 103, 161, 255),
-                                        },
-                                        new OsuLogoTriangles
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            BlendingMode = BlendingMode.Additive,
+                                            Scale = new Vector2(0.5f),
+                                            Alpha = 0.05f
+                                        }
                                     }
                                 },
-                                logo = new Sprite
+                                vis = new MenuVisualisation
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Scale = new Vector2(0.5f),
-                                },
-                            },
-                        },
-                        rippleContainer = new Container
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Children = new Drawable[]
-                            {
-                                ripple = new Sprite()
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
+                                    Size = logo.Size,
                                     BlendingMode = BlendingMode.Additive,
-                                    Scale = new Vector2(0.5f),
-                                    Alpha = 0.05f
+                                    Alpha = 0.2f,
                                 }
                             }
-                        },
-                        vis = new MenuVisualisation
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Size = logo.Size,
-                            BlendingMode = BlendingMode.Additive,
-                            Alpha = 0.2f,
                         }
                     }
                 }
@@ -158,14 +166,14 @@ namespace osu.Game.Screens.Menu
         {
             if (!Interactive) return false;
 
-            logoBounceContainer.ScaleTo(1.1f, 1000, EasingTypes.Out);
+            logoBounceContainer.ScaleTo(0.9f, 1000, EasingTypes.Out);
             return true;
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
 
-            logoBounceContainer.ScaleTo(1.2f, 500, EasingTypes.OutElastic);
+            logoBounceContainer.ScaleTo(1f, 500, EasingTypes.OutElastic);
             return true;
         }
 
@@ -180,13 +188,13 @@ namespace osu.Game.Screens.Menu
         protected override bool OnHover(InputState state)
         {
             if (!Interactive) return false;
-            logoBounceContainer.ScaleTo(1.2f, 500, EasingTypes.OutElastic);
+            logoHoverContainer.ScaleTo(1.2f, 500, EasingTypes.OutElastic);
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            logoBounceContainer.ScaleTo(1, 500, EasingTypes.OutElastic);
+            logoHoverContainer.ScaleTo(1, 500, EasingTypes.OutElastic);
         }
 
         class OsuLogoTriangles : Triangles
