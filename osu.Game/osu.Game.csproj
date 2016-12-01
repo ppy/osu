@@ -159,10 +159,10 @@
     <Compile Include="OsuGameBase.cs" />
     <Compile Include="Overlays\ChatOverlay.cs" />
     <Compile Include="Overlays\OptionsOverlay.cs" />
-    <Compile Include="Overlays\Toolbar.cs" />
-    <Compile Include="Overlays\ToolbarButton.cs" />
-    <Compile Include="Overlays\ToolbarModeButton.cs" />
-    <Compile Include="Overlays\ToolbarModeSelector.cs" />
+    <Compile Include="Overlays\Toolbar\Toolbar.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarModeButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarModeSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
     <Compile Include="Users\User.cs" />

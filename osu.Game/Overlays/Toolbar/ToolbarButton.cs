@@ -4,15 +4,14 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework;
-using osu.Framework.Graphics.Primitives;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarButton : Container
     {
