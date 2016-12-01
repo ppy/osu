@@ -67,6 +67,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = new Color4(80, 80, 80, 180),
+                    BlendingMode = BlendingMode.Additive,
                     Alpha = 0,
                 },
                 Flow = new FlowContainer
