@@ -2,7 +2,10 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.GameModes.Testing;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Menu;
+using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -15,6 +18,11 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
+            Add(new Box
+            {
+                ColourInfo = ColourInfo.GradientVertical(Color4.Gray, Color4.WhiteSmoke),
+                RelativeSizeAxes = Framework.Graphics.Axes.Both,
+            });
             Add(new ButtonSystem());
         }
     }
