@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Toolbar
         const float padding = 10;
 
         private FlowContainer modeButtons;
-        private Box modeButtonLine;
+        private Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
         public Action<PlayMode> OnPlayModeChange;
@@ -42,13 +42,27 @@ namespace osu.Game.Overlays.Toolbar
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding { Left = 10, Right = 10 },
                 },
-                modeButtonLine = new Box
+                modeButtonLine = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     Size = new Vector2(0.3f, 3),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
-                    Colour = Color4.White
+                    Masking = true,
+                    EdgeEffect = new EdgeEffect
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = new Color4(255, 194, 224, 100),
+                        Radius = 15,
+                        Roundness = 15,
+                    },
+                    Children = new []
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        }
+                    }
                 }
             };
 
