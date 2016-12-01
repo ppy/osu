@@ -18,7 +18,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class Toolbar : OverlayContainer, IOnlineComponent
+    public class Toolbar : OverlayContainer
     {
         private const float height = 50;
 
@@ -28,7 +28,6 @@ namespace osu.Game.Overlays.Toolbar
         public Action OnMusicController;
 
         private ToolbarModeSelector modeSelector;
-        private ToolbarButton userButton;
         private Box solidBackground;
         private Box gradientBackground;
 
@@ -126,10 +125,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Icon = FontAwesome.fa_search
                         },
-                        userButton = new ToolbarButton
-                        {
-                            Icon = FontAwesome.fa_user,
-                        },
+                        new ToolbarUserButton(),
                         new ToolbarButton
                         {
                             Icon = FontAwesome.fa_bars
@@ -142,25 +138,6 @@ namespace osu.Game.Overlays.Toolbar
             Size = new Vector2(1, height);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api, OsuConfigManager config)
-        {
-            api.Register(this);
-        }
-
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
-
-        public void APIStateChanged(APIAccess api, APIState state)
-        {
-            switch (state)
-            {
-                default:
-                    userButton.Text = @"Guest";
-                    break;
-                case APIState.Online:
-                    userButton.Text = api.Username;
-                    break;
-            }
-        }
     }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Modes;
@@ -42,6 +43,7 @@ namespace osu.Game.Overlays.Toolbar
                     Direction = FlowDirection.HorizontalOnly,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
+                    Padding = new MarginPadding { Left = 10, Right = 10 },
                 },
                 modeButtonLine = new Box
                 {
@@ -69,9 +71,13 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 });
             }
+        }
 
-            // We need to set the size within LoadComplete, because 
-            Size = new Vector2(amountButtons * ToolbarButton.WIDTH + padding * 2, 1);
+        protected override void Update()
+        {
+            base.Update();
+
+            Size = new Vector2(modeButtons.DrawSize.X, 1);
         }
 
         public void SetGameMode(PlayMode mode)

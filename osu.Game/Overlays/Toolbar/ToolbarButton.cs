@@ -15,8 +15,6 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarButton : Container
     {
-        public const float WIDTH = 60;
-
         public FontAwesome Icon
         {
             get { return DrawableIcon.Icon; }
@@ -57,6 +55,7 @@ namespace osu.Game.Overlays.Toolbar
         private FlowContainer tooltipContainer;
         private SpriteText tooltip1;
         private SpriteText tooltip2;
+        protected FlowContainer Flow;
 
         public ToolbarButton()
         {
@@ -69,12 +68,13 @@ namespace osu.Game.Overlays.Toolbar
                     Colour = new Color4(60, 60, 60, 255),
                     Alpha = 0,
                 },
-                new FlowContainer
+                Flow = new FlowContainer
                 {
                     Direction = FlowDirection.HorizontalOnly,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding { Left = 5, Right = 5 },
+                    Padding = new MarginPadding { Left = 15, Right = 15 },
+                    Spacing = new Vector2(5),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
@@ -86,7 +86,6 @@ namespace osu.Game.Overlays.Toolbar
                         },
                         DrawableText = new SpriteText
                         {
-                            Margin = new MarginPadding { Left = 5 },
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
@@ -117,7 +116,6 @@ namespace osu.Game.Overlays.Toolbar
             };
 
             RelativeSizeAxes = Axes.Y;
-            Size = new Vector2(WIDTH, 1);
         }
 
         protected override void Update()
@@ -125,7 +123,7 @@ namespace osu.Game.Overlays.Toolbar
             base.Update();
 
             //todo: find a way to avoid using this (autosize needs to be able to ignore certain drawables.. in this case the tooltip)
-            Size = new Vector2(WIDTH + (DrawableText.IsVisible ? DrawableText.DrawSize.X : 0), 1);
+            Size = new Vector2(Flow.DrawSize.X, 1);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
