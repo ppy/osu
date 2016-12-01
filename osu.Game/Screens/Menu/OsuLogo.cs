@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// osu! logo and its attachments (pulsing, visualiser etc.)
     /// </summary>
-    public partial class OsuLogo : BufferedContainer
+    public partial class OsuLogo : Container
     {
         private Sprite logo;
         private CircularContainer logoContainer;
@@ -82,39 +82,46 @@ namespace osu.Game.Screens.Menu
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                logoContainer = new CircularContainer
+                                new BufferedContainer
                                 {
-                                    Anchor = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Scale = new Vector2(0.8f),
+                                    AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        colourAndTriangles = new Container
+                                        logoContainer = new CircularContainer
                                         {
-                                            RelativeSizeAxes = Axes.Both,
                                             Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
+                                            RelativeSizeAxes = Axes.Both,
+                                            Scale = new Vector2(0.8f),
                                             Children = new Drawable[]
                                             {
-                                                new Box
+                                                colourAndTriangles = new Container
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
-                                                    Colour = new Color4(233, 103, 161, 255),
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new Box
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Colour = new Color4(233, 103, 161, 255),
+                                                        },
+                                                        new OsuLogoTriangles
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                        },
+                                                    }
                                                 },
-                                                new OsuLogoTriangles
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                },
-                                            }
-                                        },
 
-                                    },
-                                },
-                                logo = new Sprite
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Scale = new Vector2(0.5f),
+                                            },
+                                        },
+                                        logo = new Sprite
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Scale = new Vector2(0.5f),
+                                        },
+                                    }
                                 },
                                 rippleContainer = new Container
                                 {
@@ -128,7 +135,7 @@ namespace osu.Game.Screens.Menu
                                             Origin = Anchor.Centre,
                                             BlendingMode = BlendingMode.Additive,
                                             Scale = new Vector2(0.5f),
-                                            Alpha = 0.05f
+                                            Alpha = 0.15f
                                         }
                                     }
                                 },
