@@ -116,7 +116,7 @@ namespace osu.Game.Graphics.Cursor
             float distance = diff.Length;
             Vector2 direction = diff / distance;
 
-            float interval = size.X / 2;
+            float interval = (size.X / 2) * 0.9f;
 
             for (float d = interval; d < distance; d += interval)
             {
