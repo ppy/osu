@@ -110,7 +110,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.NotifyFriends, true);
             Set(OsuConfig.NotifySubmittedThread, true);
             Set(OsuConfig.PopupDuringGameplay, true);
-            //Set(OsuConfig.ProgressBarType, ProgressBarTypes.Pie);
+            Set(OsuConfig.ProgressBarType, ProgressBarType.Pie);
             //Set(OsuConfig.RankType, RankingType.Top);
             Set(OsuConfig.RefreshRate, 60);
             Set(OsuConfig.OverrideRefreshRate, Get<int>(OsuConfig.RefreshRate) != 60);

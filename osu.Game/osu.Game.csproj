@@ -223,6 +223,8 @@
     <Compile Include="Overlays\Options\SidebarButton.cs" />
     <Compile Include="Overlays\Options\TextBoxOption.cs" />
     <Compile Include="Overlays\Options\SliderOption.cs" />
+    <Compile Include="Configuration\ProgressBarType.cs" />
+    <Compile Include="Overlays\Options\OptionsDropdown.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

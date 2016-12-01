@@ -25,7 +25,11 @@ namespace osu.Game.Overlays.Options.Gameplay
                     LabelText = "Background dim",
                     Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.DimLevel)
                 },
-                new SpriteText { Text = "Progress display: TODO dropdown" },
+                new OptionsDropdown<ProgressBarType>
+                {
+                    Label = "Progress display",
+                    Bindable = config.GetBindable<ProgressBarType>(OsuConfig.ProgressBarType)
+                },
                 new SpriteText { Text = "Score meter type: TODO dropdown" },
                 new SliderOption<double>
                 {
