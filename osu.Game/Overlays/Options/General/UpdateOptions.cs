@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Options.General
             {
                 new DropdownOption<ReleaseStream>
                 {
-                    Label = "Release stream",
+                    LabelText = "Release stream",
                     Bindable = config.GetBindable<ReleaseStream>(OsuConfig.ReleaseStream),
                 },
                 new SpriteText { Text = "Your osu! is up to date" }, // TODO: map this to reality

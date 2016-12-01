@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using OpenTK.Graphics;
@@ -56,7 +57,7 @@ namespace osu.Game.Overlays.Options
             AutoSizeAxes = Axes.Y;
             var items = typeof(T).GetFields().Where(f => !f.IsSpecialName).Zip(
                 (T[])Enum.GetValues(typeof(T)), (a, b) => new Tuple<string, T>(
-                    a.GetCustomAttribute<DisplayNameAttribute>()?.Name ?? a.Name, b));
+                    a.GetCustomAttribute<DescriptionAttribute>()?.Description ?? a.Name, b));
             Children = new Drawable[]
             {
                 text = new SpriteText { Alpha = 0 },
