@@ -12,12 +12,12 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionsDropdown<T> : FlowContainer
+    public class DropdownOption<T> : FlowContainer
     {
         private DropDownMenu<T> dropdown;
         private SpriteText text;
     
-        public string Label
+        public string LabelText
         {
             get { return text.Text; }
             set
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Options
             dropdown.SelectedValue = bindable.Value;
         }
 
-        public OptionsDropdown()
+        public DropdownOption()
         {
             if (!typeof(T).IsEnum)
                 throw new InvalidOperationException("OptionsDropdown only supports enums as the generic type argument");

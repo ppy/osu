@@ -57,9 +57,9 @@ namespace osu.Game.Overlays.Options.Graphics
                     LabelText = "Softening filter",
                     Bindable = config.GetBindable<bool>(OsuConfig.BloomSoftening)
                 },
-                new OptionsDropdown<ScreenshotFormat>
+                new DropdownOption<ScreenshotFormat>
                 {
-                    Label = "Screenshot",
+                    LabelText = "Screenshot",
                     Bindable = config.GetBindable<ScreenshotFormat>(OsuConfig.ScreenshotFormat)
                 }
             };

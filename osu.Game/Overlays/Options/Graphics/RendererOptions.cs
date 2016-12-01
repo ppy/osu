@@ -21,9 +21,9 @@ namespace osu.Game.Overlays.Options.Graphics
             Children = new Drawable[]
             {
                 // TODO: this needs to be a custom dropdown at some point
-                new OptionsDropdown<FrameSync>
+                new DropdownOption<FrameSync>
                 {
-                    Label = "Frame limiter",
+                    LabelText = "Frame limiter",
                     Bindable = config.GetBindable<FrameSync>(OsuConfig.FrameSync)
                 },
                 new CheckBoxOption

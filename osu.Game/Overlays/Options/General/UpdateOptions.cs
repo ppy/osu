@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Options.General
         {
             Children = new Drawable[]
             {
-                new OptionsDropdown<ReleaseStream>
+                new DropdownOption<ReleaseStream>
                 {
                     Label = "Release stream",
                     Bindable = config.GetBindable<ReleaseStream>(OsuConfig.ReleaseStream),
