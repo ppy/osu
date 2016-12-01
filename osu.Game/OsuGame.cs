@@ -21,6 +21,7 @@ using osu.Game.Database;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Modes;
+using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;

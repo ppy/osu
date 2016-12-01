@@ -2,23 +2,21 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
+using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics.Colour;
 using osu.Game.Modes;
-using osu.Game.Screens.Play;
-using osu.Framework.Input;
 using osu.Game.Online.API;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.Toolbar
 {
     public class Toolbar : OverlayContainer, IOnlineComponent
     {
