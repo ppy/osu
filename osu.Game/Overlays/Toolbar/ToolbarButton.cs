@@ -156,6 +156,7 @@ namespace osu.Game.Overlays.Toolbar
         public OpaqueBackground()
         {
             RelativeSizeAxes = Axes.Both;
+            Masking = true;
 
             Children = new Drawable[]
             {
