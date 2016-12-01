@@ -20,9 +20,9 @@ namespace osu.Game.Overlays.Options.Audio
         {
             Children = new Drawable[]
             {
-                new OptionsSlider<double> { Label = "Master", Bindable = audio.Volume },
-                new OptionsSlider<double> { Label = "Effect", Bindable = audio.VolumeSample },
-                new OptionsSlider<double> { Label = "Music", Bindable = audio.VolumeTrack },
+                new SliderOption<double> { LabelText = "Master", Bindable = audio.Volume },
+                new SliderOption<double> { LabelText = "Effect", Bindable = audio.VolumeSample },
+                new SliderOption<double> { LabelText = "Music", Bindable = audio.VolumeTrack },
                 new CheckBoxOption
                 {
                     LabelText = "Ignore beatmap hitsounds",
