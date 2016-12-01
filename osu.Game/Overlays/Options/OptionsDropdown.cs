@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -7,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Options
 {
@@ -52,8 +54,9 @@ namespace osu.Game.Overlays.Options
             Direction = FlowDirection.VerticalOnly;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            var items = Enum.GetNames(typeof(T)).Zip(
-                (T[])Enum.GetValues(typeof(T)), (a, b) => new Tuple<string, T>(a, b));
+            var items = typeof(T).GetFields().Where(f => !f.IsSpecialName).Zip(
+                (T[])Enum.GetValues(typeof(T)), (a, b) => new Tuple<string, T>(
+                    a.GetCustomAttribute<DisplayNameAttribute>()?.Name ?? a.Name, b));
             Children = new Drawable[]
             {
                 text = new SpriteText { Alpha = 0 },
