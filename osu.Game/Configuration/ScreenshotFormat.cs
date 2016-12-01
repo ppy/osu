@@ -1,12 +1,14 @@
 ﻿using System;
+using System.ComponentModel;
+
 namespace osu.Game.Configuration
 {
     public enum ScreenshotFormat
     {
         Bmp = 0, // TODO: Figure out the best way to hide this from the dropdown
-        [DisplayName("JPG (web-friendly)")]
+        [Description("JPG (web-friendly)")]
         Jpg = 1,
-        [DisplayName("PNG (lossless)")]
+        [Description("PNG (lossless)")]
         Png = 2
     }
 }

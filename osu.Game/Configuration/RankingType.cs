@@ -1,12 +1,14 @@
 ﻿using System;
+using System.ComponentModel;
+
 namespace osu.Game.Configuration
 {   
     public enum RankingType
     {
         Local,
-        [DisplayName("Global")]
+        [Description("Global")]
         Top,
-        [DisplayName("Selected Mods")]
+        [Description("Selected Mods")]
         SelectedMod,
         Friends,
         Country

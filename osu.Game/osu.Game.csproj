@@ -225,7 +225,6 @@
     <Compile Include="Overlays\Options\SliderOption.cs" />
     <Compile Include="Configuration\ProgressBarType.cs" />
     <Compile Include="Overlays\Options\DropdownOption.cs" />
-    <Compile Include="Configuration\DisplayNameAttribute.cs" />
     <Compile Include="Configuration\RankingType.cs" />
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ReleaseStream.cs" />

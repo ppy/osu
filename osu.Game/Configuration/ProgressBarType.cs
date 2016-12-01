@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace osu.Game.Configuration
 {
@@ -6,9 +7,9 @@ namespace osu.Game.Configuration
     {
         Off,
         Pie,
-        [DisplayName("Top Right")]
+        [Description("Top Right")]
         TopRight,
-        [DisplayName("Bottom Right")]
+        [Description("Bottom Right")]
         BottomRight,
         Bottom
     }
