@@ -15,37 +15,35 @@ namespace osu.Game.Overlays.Options.Gameplay
     {
         protected override string Header => "Song Select";
 
-        //private BindableInt starMinimum, starMaximum;
-        //private StarCounter counterMin, counterMax;
+        private BindableInt starMinimum, starMaximum;
+        private StarCounter counterMin, counterMax;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            // TODO: Deal with bindable ints
-            /*
-            starMinimum = config.GetBindable<int>(OsuConfig.DisplayStarsMinimum);
-            starMaximum = config.GetBindable<int>(OsuConfig.DisplayStarsMaximum);
+            starMinimum = (BindableInt)config.GetBindable<int>(OsuConfig.DisplayStarsMinimum);
+            starMaximum = (BindableInt)config.GetBindable<int>(OsuConfig.DisplayStarsMaximum);
             Children = new Drawable[]
             {
-                new OptionsSlider { Label = "Display beatmaps from", Bindable = starMinimum },
+                new OptionsSlider<int> { Label = "Display beatmaps from", Bindable = starMinimum },
                 counterMin = new StarCounter { Count = starMinimum.Value },
-                new OptionsSlider { Label = "up to", Bindable = starMaximum },
+                new OptionsSlider<int> { Label = "up to", Bindable = starMaximum },
                 counterMax = new StarCounter { Count = starMaximum.Value },
             };
             starMinimum.ValueChanged += starValueChanged;
-            starMaximum.ValueChanged += starValueChanged;*/
+            starMaximum.ValueChanged += starValueChanged;
         }
 
         private void starValueChanged(object sender, EventArgs e)
         {
-            //counterMin.Count = starMinimum.Value;
-            //counterMax.Count = starMaximum.Value;
+            counterMin.Count = starMinimum.Value;
+            counterMax.Count = starMaximum.Value;
         }
         
         protected override void Dispose(bool isDisposing)
         {
-            //starMinimum.ValueChanged -= starValueChanged;
-            //starMaximum.ValueChanged -= starValueChanged;
+            starMinimum.ValueChanged -= starValueChanged;
+            starMaximum.ValueChanged -= starValueChanged;
             base.Dispose(isDisposing);
         }
     }

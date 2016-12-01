@@ -31,19 +31,16 @@ namespace osu.Game.Overlays.Options.Graphics
                     LabelText = "Letterboxing",
                     Bindable = config.GetBindable<bool>(OsuConfig.Letterboxing),
                 },
-                // TODO: deal with bindable ints
-                /*
-                new OptionsSlider
+                new OptionsSlider<int>
                 {
                     Label = "Horizontal position",
-                    Bindable = config.GetBindable<int>(OsuConfig.LetterboxPositionX)
+                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.LetterboxPositionX)
                 },
-                new OptionsSlider
+                new OptionsSlider<int>
                 {
                     Label = "Vertical position",
-                    Bindable = config.GetBindable<int>(OsuConfig.LetterboxPositionY)
+                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.LetterboxPositionY)
                 },
-                */
             };
         }
     }

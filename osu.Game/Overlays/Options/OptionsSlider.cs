@@ -9,9 +9,10 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionsSlider : FlowContainer
+    public class OptionsSlider<T> : FlowContainer where T : struct,
+        IComparable, IFormattable, IConvertible, IComparable<T>, IEquatable<T>
     {
-        private SliderBar slider;
+        private SliderBar<T> slider;
         private SpriteText text;
     
         public string Label
@@ -24,7 +25,7 @@ namespace osu.Game.Overlays.Options
             }
         }
         
-        public BindableDouble Bindable
+        public BindableNumber<T> Bindable
         {
             get { return slider.Bindable; }
             set { slider.Bindable = value; }
@@ -38,7 +39,7 @@ namespace osu.Game.Overlays.Options
             Children = new Drawable[]
             {
                 text = new SpriteText { Alpha = 0 },
-                slider = new SliderBar
+                slider = new SliderBar<T>
                 {
                     Margin = new MarginPadding { Top = 5 },
                     Height = 10,
