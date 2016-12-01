@@ -2,34 +2,49 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
+using osu.Game.Graphics.Backgrounds;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
     /// <summary>
     /// osu! logo and its attachments (pulsing, visualiser etc.)
     /// </summary>
-    public partial class OsuLogo : Container
+    public partial class OsuLogo : BufferedContainer
     {
         private Sprite logo;
         private CircularContainer logoContainer;
         private Container logoBounceContainer;
         private MenuVisualisation vis;
 
+        private CircularContainer colourAndTriangles;
+
         public Action Action;
 
-        public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.8f;
+        public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * 0.78f;
 
         private Sprite ripple;
 
         private Container rippleContainer;
+
+        public bool Triangles
+        {
+            set
+            {
+                colourAndTriangles.Alpha = value ? 1 : 0;
+            }
+        }
 
         public override bool Contains(Vector2 screenSpacePos)
         {
@@ -65,12 +80,32 @@ namespace osu.Game.Screens.Menu
                         {
                             AutoSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
-                            Children = new[]
+                            Children = new Drawable[]
                             {
+                                colourAndTriangles = new CircularContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Scale = new Vector2(0.78f),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = new Color4(233, 103, 161, 255),
+                                        },
+                                        new OsuLogoTriangles
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                    }
+                                },
                                 logo = new Sprite
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
+                                    Scale = new Vector2(0.5f),
                                 },
                             },
                         },
@@ -85,6 +120,7 @@ namespace osu.Game.Screens.Menu
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     BlendingMode = BlendingMode.Additive,
+                                    Scale = new Vector2(0.5f),
                                     Alpha = 0.05f
                                 }
                             }
@@ -105,15 +141,15 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            logo.Texture = textures.Get(@"Menu/logo");
-            ripple.Texture = textures.Get(@"Menu/logo");
+            logo.Texture = textures.Get(@"Menu/logo@2x");
+            ripple.Texture = textures.Get(@"Menu/logo@2x");
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            ripple.ScaleTo(1.1f, 500);
+            ripple.ScaleTo(ripple.Scale * 1.1f, 500);
             ripple.FadeOut(500);
             ripple.Loop(300);
         }
@@ -151,6 +187,45 @@ namespace osu.Game.Screens.Menu
         protected override void OnHoverLost(InputState state)
         {
             logoBounceContainer.ScaleTo(1, 500, EasingTypes.OutElastic);
+        }
+
+        class OsuLogoTriangles : Triangles
+        {
+            public OsuLogoTriangles()
+            {
+                TriangleScale = 4;
+                Alpha = 1;
+            }
+
+            public override float CornerRadius
+            {
+                get
+                {
+                    return DrawSize.X / 2f;
+                }
+
+                set
+                {
+                    Debug.Assert(false, "Cannot manually set CornerRadius of CircularContainer.");
+                }
+            }
+
+            protected override Sprite CreateTriangle()
+            {
+                var triangle = base.CreateTriangle();
+                triangle.Alpha = 1;
+                triangle.Colour = getTriangleShade();
+                return triangle;
+            }
+
+            private Color4 getTriangleShade()
+            {
+                float val = RNG.NextSingle();
+                return Interpolation.ValueAt(val,
+                    new Color4(222, 91, 149, 255),
+                    new Color4(255, 125, 183, 255),
+                    0, 1);
+            }
         }
     }
 }
