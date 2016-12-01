@@ -30,7 +30,11 @@ namespace osu.Game.Overlays.Options.Gameplay
                     Label = "Progress display",
                     Bindable = config.GetBindable<ProgressBarType>(OsuConfig.ProgressBarType)
                 },
-                new SpriteText { Text = "Score meter type: TODO dropdown" },
+                new OptionsDropdown<ScoreMeterType>
+                {
+                    Label = "Score meter type",
+                    Bindable = config.GetBindable<ScoreMeterType>(OsuConfig.ScoreMeter)
+                },
                 new SliderOption<double>
                 {
                     LabelText = "Score meter size",
