@@ -34,9 +34,10 @@ namespace osu.Game.Screens.Menu
         {
             Children = new Drawable[]
             {
-                logo = new OsuLogo()
+                logo = new OsuLogo
                 {
                     Alpha = 0,
+                    Triangles = false,
                     BlendingMode = BlendingMode.Additive,
                     Interactive = false,
                     Colour = Color4.DarkGray,
