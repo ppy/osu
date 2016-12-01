@@ -27,6 +27,8 @@ namespace osu.Game.Overlays.Toolbar
         {
             DrawableText.Font = @"Exo2.0-MediumItalic";
 
+            Add(new OpaqueBackground { Depth = 1 });
+
             Flow.Add(avatar = new Avatar());
         }
 

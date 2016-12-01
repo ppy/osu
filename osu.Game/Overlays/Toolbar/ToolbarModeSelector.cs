@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Modes;
 using OpenTK;
 using OpenTK.Graphics;
@@ -31,11 +32,7 @@ namespace osu.Game.Overlays.Toolbar
 
             Children = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(20, 20, 20, 255)
-                },
+                new OpaqueBackground(),
                 modeButtons = new FlowContainer
                 {
                     RelativeSizeAxes = Axes.Y,
