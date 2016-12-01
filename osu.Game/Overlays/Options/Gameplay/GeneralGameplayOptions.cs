@@ -20,16 +20,16 @@ namespace osu.Game.Overlays.Options.Gameplay
         {
             Children = new Drawable[]
             {
-                new OptionsSlider<int>
+                new SliderOption<int>
                 {
-                    Label = "Background dim",
+                    LabelText = "Background dim",
                     Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.DimLevel)
                 },
                 new SpriteText { Text = "Progress display: TODO dropdown" },
                 new SpriteText { Text = "Score meter type: TODO dropdown" },
-                new OptionsSlider<double>
+                new SliderOption<double>
                 {
-                    Label = "Score meter size",
+                    LabelText = "Score meter size",
                     Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.ScoreMeterScale)
                 },
                 new CheckBoxOption

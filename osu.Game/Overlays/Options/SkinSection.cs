@@ -63,9 +63,9 @@ namespace osu.Game.Overlays.Options
                     Bindable = config.GetBindable<bool>(OsuConfig.UseSkinCursor)
                 },
                 new SpriteText { Text = "Cursor size: TODO slider" },
-                new OptionsSlider<double>
+                new SliderOption<double>
                 {
-                    Label = "Cursor size",
+                    LabelText = "Cursor size",
                     Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.CursorSize)
                 },
                 new CheckBoxOption

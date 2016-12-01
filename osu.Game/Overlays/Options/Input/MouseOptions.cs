@@ -27,9 +27,9 @@ namespace osu.Game.Overlays.Options.Input
             Children = new Drawable[]
             {
                 new SpriteText { Text = "Sensitivity: TODO slider" },
-                new OptionsSlider<double>
+                new SliderOption<double>
                 {
-                    Label = "Sensitivity",
+                    LabelText = "Sensitivity",
                     Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.MouseSpeed),
                 },
                 rawInput = new CheckBoxOption

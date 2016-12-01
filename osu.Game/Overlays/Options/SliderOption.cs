@@ -9,13 +9,13 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionsSlider<T> : FlowContainer where T : struct,
+    public class SliderOption<T> : FlowContainer where T : struct,
         IComparable, IFormattable, IConvertible, IComparable<T>, IEquatable<T>
     {
         private SliderBar<T> slider;
         private SpriteText text;
     
-        public string Label
+        public string LabelText
         {
             get { return text.Text; }
             set
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Options
             set { slider.Bindable = value; }
         }
 
-        public OptionsSlider()
+        public SliderOption()
         {
             Direction = FlowDirection.VerticalOnly;
             RelativeSizeAxes = Axes.X;
