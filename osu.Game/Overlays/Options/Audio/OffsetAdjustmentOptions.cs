@@ -16,14 +16,11 @@ namespace osu.Game.Overlays.Options.Audio
         {
             Children = new Drawable[]
             {
-                // TODO: bindable int crap
-                /*
-                new OptionsSlider
+                new OptionsSlider<int>
                 {
                     Label = "Universal Offset",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.Offset)
+                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.Offset)
                 },
-                */
                 new OsuButton
                 {
                     RelativeSizeAxes = Axes.X,
