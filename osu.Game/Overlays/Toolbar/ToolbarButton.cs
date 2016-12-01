@@ -6,8 +6,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -64,8 +66,7 @@ namespace osu.Game.Overlays.Toolbar
                 HoverBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    BlendingMode = BlendingMode.Additive,
-                    Colour = new Color4(60, 60, 60, 255),
+                    Colour = new Color4(80, 80, 80, 180),
                     Alpha = 0,
                 },
                 Flow = new FlowContainer
@@ -131,21 +132,43 @@ namespace osu.Game.Overlays.Toolbar
         protected override bool OnClick(InputState state)
         {
             Action?.Invoke();
-            HoverBackground.FlashColour(Color4.White, 400);
+            HoverBackground.FlashColour(new Color4(255, 255, 255, 180), 800, EasingTypes.OutQuint);
             return true;
         }
 
         protected override bool OnHover(InputState state)
         {
-            HoverBackground.FadeTo(0.4f, 200);
+            HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
             return false;
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            HoverBackground.FadeTo(0, 200);
+            HoverBackground.FadeOut(200);
             tooltipContainer.FadeOut(100);
+        }
+    }
+
+    public class OpaqueBackground : Container
+    {
+        public OpaqueBackground()
+        {
+            RelativeSizeAxes = Axes.Both;
+
+            Children = new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = new Color4(30, 30, 30, 255)
+                },
+                new Triangles
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.05f,
+                },
+            };
         }
     }
 }
