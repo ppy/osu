@@ -4,15 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
 using OpenTK;
-using osu.Framework;
-using osu.Framework.Allocation;
 
-namespace osu.Game.Online.Chat.Display
+namespace osu.Game.Online.Chat.Drawables
 {
     public class ChannelDisplay : Container
     {

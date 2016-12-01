@@ -30,7 +30,7 @@ namespace osu.Game.Online.API
         {
             var req = new AccessTokenRequestPassword(username, password)
             {
-                Url = $@"{endpoint}/oauth/access_token",
+                Url = $@"{endpoint}/oauth/token",
                 Method = HttpMethod.POST,
                 ClientId = clientId,
                 ClientSecret = clientSecret
@@ -55,7 +55,7 @@ namespace osu.Game.Online.API
             {
                 var req = new AccessTokenRequestRefresh(refresh)
                 {
-                    Url = $@"{endpoint}/oauth/access_token",
+                    Url = $@"{endpoint}/oauth/token",
                     Method = HttpMethod.POST,
                     ClientId = clientId,
                     ClientSecret = clientSecret
