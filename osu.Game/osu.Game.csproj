@@ -214,7 +214,7 @@
     <Compile Include="Overlays\Options\CheckBoxOption.cs" />
     <Compile Include="Overlays\Options\SidebarButton.cs" />
     <Compile Include="Overlays\Options\TextBoxOption.cs" />
-    <Compile Include="Overlays\Options\OptionsSlider.cs" />
+    <Compile Include="Overlays\Options\SliderOption.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

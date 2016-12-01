@@ -22,9 +22,9 @@ namespace osu.Game.Overlays.Options.Gameplay
             starMaximum = (BindableInt)config.GetBindable<int>(OsuConfig.DisplayStarsMaximum);
             Children = new Drawable[]
             {
-                new OptionsSlider<int> { Label = "Display beatmaps from", Bindable = starMinimum },
+                new SliderOption<int> { LabelText = "Display beatmaps from", Bindable = starMinimum },
                 counterMin = new StarCounter { Count = starMinimum.Value },
-                new OptionsSlider<int> { Label = "up to", Bindable = starMaximum },
+                new SliderOption<int> { LabelText = "up to", Bindable = starMaximum },
                 counterMax = new StarCounter { Count = starMaximum.Value },
             };
             starMinimum.ValueChanged += starValueChanged;
