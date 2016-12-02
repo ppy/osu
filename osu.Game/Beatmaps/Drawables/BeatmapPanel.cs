@@ -2,13 +2,17 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.MathUtils;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
@@ -21,6 +25,8 @@ namespace osu.Game.Beatmaps.Drawables
         private Sprite background;
 
         public Action<BeatmapPanel> GainedSelection;
+
+        Color4 deselectedColour = new Color4(20, 43, 51, 255);
 
         protected override void Selected()
         {
@@ -36,7 +42,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             base.Deselected();
 
-            background.Colour = new Color4(20, 43, 51, 255);
+            background.Colour = deselectedColour;
         }
 
         public BeatmapPanel(BeatmapInfo beatmap)
@@ -44,11 +50,21 @@ namespace osu.Game.Beatmaps.Drawables
             Beatmap = beatmap;
             Height *= 0.60f;
 
-            Children = new Framework.Graphics.Drawable[]
+            Children = new Drawable[]
             {
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                },
+                new Triangles
+                {
+                    // The border is drawn in the shader of the children. Being additive, triangles would over-emphasize
+                    // the border wherever they cross it, and thus they get their own masking container without a border.
+                    Masking = true,
+                    CornerRadius = Content.CornerRadius,
+                    RelativeSizeAxes = Axes.Both,
+                    BlendingMode = BlendingMode.Additive,
+                    Colour = deselectedColour,
                 },
                 new FlowContainer
                 {
@@ -57,7 +73,7 @@ namespace osu.Game.Beatmaps.Drawables
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Children = new Framework.Graphics.Drawable[]
+                    Children = new Drawable[]
                     {
                         new DifficultyIcon(FontAwesome.fa_dot_circle_o, new Color4(159, 198, 0, 255))
                         {
@@ -71,7 +87,7 @@ namespace osu.Game.Beatmaps.Drawables
                             Spacing = new Vector2(0, 5),
                             Direction = FlowDirection.VerticalOnly,
                             AutoSizeAxes = Axes.Both,
-                            Children = new Framework.Graphics.Drawable[]
+                            Children = new Drawable[]
                             {
                                 new FlowContainer
                                 {

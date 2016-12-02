@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.ComponentModel;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Modes.Objects.Drawables;
@@ -10,7 +11,7 @@ using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class DrawableHitCircle : DrawableHitObject
+    public class DrawableHitCircle : DrawableOsuHitObject
     {
         private OsuHitObject osuObject;
 
@@ -23,7 +24,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private GlowPiece glow;
         private HitExplosion explosion;
 
-        public DrawableHitCircle(HitCircle h) : base(h)
+        public DrawableHitCircle(OsuHitObject h) : base(h)
         {
             osuObject = h;
 
@@ -39,7 +40,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 circle = new CirclePiece
                 {
                     Colour = osuObject.Colour,
-                    Hit = Hit,
+                    Hit = () =>
+                    {
+                        ((PositionalJudgementInfo)Judgement).PositionOffset = Vector2.Zero; //todo: set to correct value
+                        UpdateJudgement(true);
+                        return true;
+                    },
                 },
                 number = new NumberPiece(),
                 ring = new RingPiece(),
@@ -53,29 +59,54 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Colour = osuObject.Colour,
                 }
             };
+
+            //may not be so correct
+            Size = circle.DrawSize;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            //may not be so correct
-            Size = circle.DrawSize;
-
             //force application of the state that was set before we loaded.
             UpdateState(State);
         }
 
-        protected override void UpdateState(ArmedState state)
+        double hit50 = 150;
+        double hit100 = 80;
+        double hit300 = 30;
+
+        protected override void CheckJudgement(bool userTriggered)
         {
-            if (!IsLoaded) return;
+            if (!userTriggered)
+            {
+                if (Judgement.TimeOffset > hit50)
+                    Judgement.Result = HitResult.Miss;
+                return;
+            }
 
-            Flush(true); //move to DrawableHitObject
-            ApproachCircle.Flush(true);
+            double hitOffset = Math.Abs(Judgement.TimeOffset);
 
-            double t = HitTime ?? osuObject.StartTime;
+            if (hitOffset < hit50)
+            {
+                Judgement.Result = HitResult.Hit;
 
-            Alpha = 0;
+                OsuJudgementInfo osuInfo = Judgement as OsuJudgementInfo;
+
+                if (hitOffset < hit300)
+                    osuInfo.Score = OsuScoreResult.Hit300;
+                else if (hitOffset < hit100)
+                    osuInfo.Score = OsuScoreResult.Hit100;
+                else if (hitOffset < hit50)
+                    osuInfo.Score = OsuScoreResult.Hit50;
+            }
+            else
+                Judgement.Result = HitResult.Miss;
+        }
+
+        protected override void UpdateInitialState()
+        {
+            base.UpdateInitialState();
 
             //sane defaults
             ring.Alpha = circle.Alpha = number.Alpha = glow.Alpha = 1;
@@ -83,34 +114,48 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             ApproachCircle.Scale = new Vector2(2);
             explode.Alpha = 0;
             Scale = new Vector2(0.5f); //this will probably need to be moved to DrawableHitObject at some point.
+        }
 
-            const float preempt = 600;
+        protected override void UpdatePreemptState()
+        {
+            base.UpdatePreemptState();
 
-            const float fadein = 400;
+            ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT));
+            ApproachCircle.ScaleTo(0.6f, TIME_PREEMPT);
+        }
 
-            Delay(t - Time.Current - preempt, true);
+        protected override void UpdateState(ArmedState state)
+        {
+            if (!IsLoaded) return;
 
-            FadeIn(fadein);
-
-            ApproachCircle.FadeIn(Math.Min(fadein * 2, preempt));
-            ApproachCircle.ScaleTo(0.6f, preempt);
-
-            Delay(preempt, true);
+            base.UpdateState(state);
 
             ApproachCircle.FadeOut();
-
             glow.FadeOut(400);
 
             switch (state)
             {
-                case ArmedState.Disarmed:
-                    Delay(osuObject.Duration + 200);
-                    FadeOut(200);
+                case ArmedState.Idle:
+                    Delay(osuObject.Duration + TIME_PREEMPT);
+                    FadeOut(TIME_FADEOUT);
 
                     explosion?.Expire();
                     explosion = null;
                     break;
-                case ArmedState.Armed:
+                case ArmedState.Miss:
+                    ring.FadeOut();
+                    circle.FadeOut();
+                    number.FadeOut();
+                    glow.FadeOut();
+
+                    explosion?.Expire();
+                    explosion = null;
+
+                    Schedule(() => Add(explosion = new HitExplosion((OsuJudgementInfo)Judgement)));
+
+                    FadeOut(800);
+                    break;
+                case ArmedState.Hit:
                     const double flash_in = 30;
 
                     flash.FadeTo(0.8f, flash_in);
@@ -119,7 +164,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
                     explode.FadeIn(flash_in);
 
-                    Schedule(() => Add(explosion = new HitExplosion(Judgement.Hit300)));
+                    Schedule(() => Add(explosion = new HitExplosion((OsuJudgementInfo)Judgement)));
 
                     Delay(flash_in, true);
 

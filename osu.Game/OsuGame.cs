@@ -19,7 +19,9 @@ using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Game.Database;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Transformations;
 using osu.Game.Modes;
+using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
@@ -30,7 +32,7 @@ namespace osu.Game
     {
         public Toolbar Toolbar;
 
-        private ChatConsole chat;
+        private ChatOverlay chat;
 
         private MusicController musicController;
 
@@ -45,7 +47,7 @@ namespace osu.Game
 
         string[] args;
 
-        public OptionsOverlay Options;
+        private OptionsOverlay options;
 
         public OsuGame(string[] args = null)
         {
@@ -59,7 +61,7 @@ namespace osu.Game
             host.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
         }
 
-        public void ToggleOptions() => Options.ToggleVisibility();
+        public void ToggleOptions() => options.ToggleVisibility();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -97,12 +99,7 @@ namespace osu.Game
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                volume = new VolumeControl
-                {
-                    VolumeGlobal = Audio.Volume,
-                    VolumeSample = Audio.VolumeSample,
-                    VolumeTrack = Audio.VolumeTrack
-                },
+                volume = new VolumeControl(),
                 overlayContent = new Container{ RelativeSizeAxes = Axes.Both },
                 new GlobalHotkeys //exists because UserInputManager is at a level below us.
                 {
@@ -120,22 +117,37 @@ namespace osu.Game
             });
 
             //overlay elements
-            (chat = new ChatConsole(API) { Depth = 0 }).Preload(this, overlayContent.Add);
-            (Options = new OptionsOverlay { Depth = 1 }).Preload(this, overlayContent.Add);
-            (musicController = new MusicController() { Depth = 3 }).Preload(this, overlayContent.Add);
+            (chat = new ChatOverlay { Depth = 0 }).Preload(this, overlayContent.Add);
+            (options = new OptionsOverlay { Depth = -1 }).Preload(this, overlayContent.Add);
+            (musicController = new MusicController() { Depth = -3 }).Preload(this, overlayContent.Add);
+
+            Dependencies.Cache(options);
+            Dependencies.Cache(musicController);
+
             (Toolbar = new Toolbar
             {
-                Depth = 2,
+                Depth = -2,
                 OnHome = delegate { mainMenu?.MakeCurrent(); },
-                OnSettings = Options.ToggleVisibility,
                 OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
-                OnMusicController = musicController.ToggleVisibility
             }).Preload(this, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
                 PlayMode.TriggerChange();
                 overlayContent.Add(Toolbar);
             });
+
+            options.StateChanged += delegate
+            {
+                switch (options.State)
+                {
+                    case Visibility.Hidden:
+                        intro.MoveToX(0, OptionsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
+                        break;
+                    case Visibility.Visible:
+                        intro.MoveToX(OptionsOverlay.SIDEBAR_WIDTH / 2, OptionsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
+                        break;
+                }
+            };
 
             Cursor.Alpha = 0;
         }
@@ -154,7 +166,7 @@ namespace osu.Game
                 switch (args.Key)
                 {
                     case Key.O:
-                        Options.ToggleVisibility();
+                        options.ToggleVisibility();
                         return true;
                 }
             }

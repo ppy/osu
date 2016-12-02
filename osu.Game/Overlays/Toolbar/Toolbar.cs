@@ -2,37 +2,37 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
+using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics.Colour;
 using osu.Game.Modes;
-using osu.Game.Screens.Play;
-using osu.Framework.Input;
+using osu.Game.Online.API;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.Toolbar
 {
     public class Toolbar : OverlayContainer
     {
         private const float height = 50;
 
-        public Action OnSettings;
         public Action OnHome;
         public Action<PlayMode> OnPlayModeChange;
-        public Action OnMusicController;
 
         private ToolbarModeSelector modeSelector;
-        private ToolbarButton userButton;
+        private Box solidBackground;
         private Box gradientBackground;
 
-        private const int transition_time = 200;
+        private const int transition_time = 250;
+
+        private const float alpha_hovering = 0.8f;
+        private const float alpha_normal = 0.6f;
+
 
         protected override void PopIn()
         {
@@ -48,23 +48,26 @@ namespace osu.Game.Overlays
 
         protected override bool OnHover(InputState state)
         {
-            gradientBackground.FadeIn(200);
+            solidBackground.FadeTo(alpha_hovering, transition_time, EasingTypes.OutQuint);
+            gradientBackground.FadeIn(transition_time, EasingTypes.OutQuint);
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            gradientBackground.FadeOut(200);
+            solidBackground.FadeTo(alpha_normal, transition_time, EasingTypes.OutQuint);
+            gradientBackground.FadeOut(transition_time, EasingTypes.OutQuint);
         }
 
         public Toolbar()
         {
             Children = new Drawable[]
             {
-                new Box
+                solidBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0.1f, 0.1f, 0.1f, 0.6f)
+                    Colour = new Color4(0.1f, 0.1f, 0.1f, 1),
+                    Alpha = alpha_normal,
                 },
                 gradientBackground = new Box
                 {
@@ -81,18 +84,9 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new ToolbarButton
+                        new ToolbarSettingsButton(),
+                        new ToolbarHomeButton()
                         {
-                            Icon = FontAwesome.fa_gear,
-                            TooltipMain = "Settings",
-                            TooltipSub = "Change your settings",
-                            Action = () => OnSettings?.Invoke()
-                        },
-                        new ToolbarButton
-                        {
-                            Icon = FontAwesome.fa_home,
-                            TooltipMain = "Home",
-                            TooltipSub = "Return to the main menu",
                             Action = () => OnHome?.Invoke()
                         },
                         modeSelector = new ToolbarModeSelector
@@ -110,19 +104,12 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.X,
                     Children = new []
                     {
-                        new ToolbarButton
-                        {
-                            Icon = FontAwesome.fa_music,
-                            Action = () => OnMusicController?.Invoke()
-                        },
+                        new ToolbarMusicButton(),
                         new ToolbarButton
                         {
                             Icon = FontAwesome.fa_search
                         },
-                        userButton = new ToolbarButton
-                        {
-                            Icon = FontAwesome.fa_user,
-                        },
+                        new ToolbarUserButton(),
                         new ToolbarButton
                         {
                             Icon = FontAwesome.fa_bars
@@ -133,12 +120,6 @@ namespace osu.Game.Overlays
 
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, height);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            userButton.Text = config.Get<string>(OsuConfig.Username);
         }
 
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);

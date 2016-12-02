@@ -16,12 +16,14 @@ using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.IPC;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game
 {
-    public class OsuGameBase : BaseGame
+    public class OsuGameBase : BaseGame, IOnlineComponent
     {
         internal OsuConfigManager Config;
 
@@ -41,11 +43,11 @@ namespace osu.Game
         private void load()
         {
             Dependencies.Cache(this);
-            Dependencies.Cache(new OsuConfigManager(Host.Storage));
+            Dependencies.Cache(Config);
             Dependencies.Cache(new BeatmapDatabase(Host.Storage, Host));
-            
+
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 0.01f });
+            Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 0.01f }, true);
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
@@ -73,6 +75,19 @@ namespace osu.Game
                 Password = Config.Get<string>(OsuConfig.Password),
                 Token = Config.Get<string>(OsuConfig.Token)
             });
+
+            API.Register(this);
+        }
+
+        public void APIStateChanged(APIAccess api, APIState state)
+        {
+            switch (state)
+            {
+                case APIState.Online:
+                    Config.Set(OsuConfig.Username, Config.Get<bool>(OsuConfig.SaveUsername) ? API.Username : string.Empty);
+                    Config.Set(OsuConfig.Password, Config.Get<bool>(OsuConfig.SavePassword) ? API.Password : string.Empty);
+                    break;
+            }
         }
 
         protected override void LoadComplete()
@@ -83,7 +98,7 @@ namespace osu.Game
             {
                 Children = new[]
                 {
-                    Cursor = new OsuCursorContainer { Depth = float.MaxValue }
+                    Cursor = new OsuCursorContainer { Depth = float.MinValue }
                 }
             });
         }

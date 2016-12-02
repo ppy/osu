@@ -27,7 +27,6 @@ namespace osu.Game.Beatmaps.Drawables
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
             this.beatmap = beatmap;
-            Hidden = false;
 
             Children = new Drawable[]
             {
@@ -72,6 +71,12 @@ namespace osu.Game.Beatmaps.Drawables
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            FadeInFromZero(250);
+        }
+
         protected override void Selected()
         {
             base.Selected();
@@ -114,7 +119,7 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     new FlowContainer
                     {
-                        Depth = 1,
+                        Depth = -1,
                         Direction = FlowDirection.HorizontalOnly,
                         RelativeSizeAxes = Axes.Both,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
@@ -156,37 +161,16 @@ namespace osu.Game.Beatmaps.Drawables
             [BackgroundDependencyLoader]
             private void load(OsuGameBase game)
             {
-                new BeatmapBackground(working)
+                new BeatmapBackgroundSprite(working)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    FillMode = FillMode.Fill,
                 }.Preload(game, (bg) =>
                 {
                     Add(bg);
                     ForceRedraw();
                 });
-            }
-
-            class BeatmapBackground : Sprite
-            {
-                private readonly WorkingBeatmap working;
-
-                public BeatmapBackground(WorkingBeatmap working)
-                {
-                    this.working = working;
-                }
-
-                [BackgroundDependencyLoader]
-                private void load(OsuGameBase game)
-                {
-                    Texture = working.Background;
-                }
-
-                protected override void LoadComplete()
-                {
-                    base.LoadComplete();
-                    Scale = new Vector2(1366 / (Texture?.Width ?? 1) * 0.6f);
-                }
             }
         }
     }

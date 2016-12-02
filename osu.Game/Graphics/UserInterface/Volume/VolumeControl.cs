@@ -6,17 +6,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using OpenTK;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Audio;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
     internal class VolumeControl : OverlayContainer
     {
-        public BindableDouble VolumeGlobal { get; set; }
-        public BindableDouble VolumeSample { get; set; }
-        public BindableDouble VolumeTrack { get; set; }
-
         private VolumeMeter volumeMeterMaster;
 
         private void volumeChanged(object sender, EventArgs e)
@@ -54,21 +51,18 @@ namespace osu.Game.Graphics.UserInterface.Volume
         {
             base.LoadComplete();
 
-            VolumeGlobal.ValueChanged += volumeChanged;
-            VolumeSample.ValueChanged += volumeChanged;
-            VolumeTrack.ValueChanged += volumeChanged;
-
-            volumeMeterMaster.Bindable = VolumeGlobal;
-            volumeMeterEffect.Bindable = VolumeSample;
-            volumeMeterMusic.Bindable = VolumeTrack;
+            volumeMeterMaster.Bindable.ValueChanged += volumeChanged;
+            volumeMeterEffect.Bindable.ValueChanged += volumeChanged;
+            volumeMeterMusic.Bindable.ValueChanged += volumeChanged;
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            VolumeGlobal.ValueChanged -= volumeChanged;
-            VolumeSample.ValueChanged -= volumeChanged;
-            VolumeTrack.ValueChanged -= volumeChanged;
             base.Dispose(isDisposing);
+
+            volumeMeterMaster.Bindable.ValueChanged -= volumeChanged;
+            volumeMeterEffect.Bindable.ValueChanged -= volumeChanged;
+            volumeMeterMusic.Bindable.ValueChanged -= volumeChanged;
         }
 
         public void Adjust(InputState state)
@@ -80,6 +74,14 @@ namespace osu.Game.Graphics.UserInterface.Volume
             }
 
             volumeMeterMaster.TriggerWheel(state);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            volumeMeterMaster.Bindable.Weld(audio.Volume);
+            volumeMeterEffect.Bindable.Weld(audio.VolumeSample);
+            volumeMeterMusic.Bindable.Weld(audio.VolumeTrack);
         }
 
         ScheduledDelegate popOutDelegate;

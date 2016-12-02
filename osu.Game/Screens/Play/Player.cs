@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -18,6 +19,8 @@ using OpenTK.Input;
 using MouseState = osu.Framework.Input.MouseState;
 using OpenTK;
 using osu.Framework.GameModes;
+using osu.Game.Modes.UI;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
@@ -36,6 +39,9 @@ namespace osu.Game.Screens.Play
         private IAdjustableClock sourceClock;
 
         private Ruleset ruleset;
+
+        private ScoreProcessor scoreProcessor;
+        private HitRenderer hitRenderer;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game)
@@ -83,13 +89,15 @@ namespace osu.Game.Screens.Play
             ruleset = Ruleset.GetRuleset(usablePlayMode);
 
             var scoreOverlay = ruleset.CreateScoreOverlay();
-            var hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
+            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor());
 
-            hitRenderer.OnHit += delegate (HitObject h) { scoreOverlay.OnHit(h); };
-            hitRenderer.OnMiss += delegate (HitObject h) { scoreOverlay.OnMiss(h); };
+            hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
+
+            hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
+            hitRenderer.OnAllJudged += hitRenderer_OnAllJudged;
 
             if (Autoplay)
-                hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Armed));
+                hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Hit));
 
             Children = new Drawable[]
             {
@@ -103,6 +111,18 @@ namespace osu.Game.Screens.Play
                 },
                 scoreOverlay,
             };
+        }
+
+        private void hitRenderer_OnAllJudged()
+        {
+            Delay(1000);
+            Schedule(delegate
+            {
+                Push(new Results
+                {
+                    Score = scoreProcessor.GetScore()
+                });
+            });
         }
 
         protected override void OnEntering(GameMode last)
@@ -125,23 +145,25 @@ namespace osu.Game.Screens.Play
             {
             }
 
+            bool leftViaKeyboard;
+            bool rightViaKeyboard;
+
             protected override void TransformState(InputState state)
             {
                 base.TransformState(state);
 
                 MouseState mouse = (MouseState)state.Mouse;
 
-                foreach (Key k in state.Keyboard.Keys)
+                if (state.Keyboard != null)
                 {
-                    switch (k)
-                    {
-                        case Key.Z:
-                            mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = true;
-                            break;
-                        case Key.X:
-                            mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = true;
-                            break;
-                    }
+                    leftViaKeyboard = state.Keyboard.Keys.Contains(Key.Z);
+                    rightViaKeyboard = state.Keyboard.Keys.Contains(Key.X);
+                }
+
+                if (state.Mouse != null)
+                {
+                    if (leftViaKeyboard) mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = true;
+                    if (rightViaKeyboard) mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = true;
                 }
 
             }

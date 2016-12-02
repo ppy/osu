@@ -2,14 +2,12 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using OpenTK.Graphics;
-using osu.Framework;
-using osu.Framework.Allocation;
 using osu.Game.Modes;
-using osu.Game.Screens.Play;
+using OpenTK.Graphics;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarModeButton : ToolbarButton
     {
@@ -30,7 +28,23 @@ namespace osu.Game.Overlays
         {
             set
             {
-                //Background.Colour = value ? new Color4(100, 100, 100, 255) : new Color4(20, 20, 20, 255);
+                if (value)
+                {
+                    DrawableIcon.Colour = Color4.White;
+                    DrawableIcon.Masking = true;
+                    DrawableIcon.EdgeEffect = new EdgeEffect
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = new Color4(255, 194, 224, 100),
+                        Radius = 15,
+                        Roundness = 15,
+                    };
+                }
+                else
+                {
+                    DrawableIcon.Masking = false;
+                    DrawableIcon.Colour = new Color4(255, 194, 224, 255);
+                }
             }
         }
 

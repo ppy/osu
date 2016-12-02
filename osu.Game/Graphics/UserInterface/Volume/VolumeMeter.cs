@@ -13,7 +13,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
     internal class VolumeMeter : Container
     {
         private Box meterFill;
-        public BindableDouble Bindable;
+        public BindableDouble Bindable { get; private set; } = new BindableDouble();
 
         public VolumeMeter(string meterName)
         {
@@ -41,6 +41,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
                         meterFill = new Box
                         {
                             Colour = Color4.White,
+                            Scale = new Vector2(1, 0),
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.BottomCentre
@@ -54,6 +55,8 @@ namespace osu.Game.Graphics.UserInterface.Volume
                     Origin = Anchor.TopCentre
                 }
             };
+
+            Bindable.ValueChanged += delegate { updateFill(); };
         }
 
         protected override void LoadComplete()
@@ -68,7 +71,6 @@ namespace osu.Game.Graphics.UserInterface.Volume
             private set
             {
                 Bindable.Value = value;
-                updateFill();
             }
         }
 

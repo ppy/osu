@@ -18,11 +18,11 @@ namespace osu.Game.Modes
 
         public abstract ScoreOverlay CreateScoreOverlay();
 
+        public abstract ScoreProcessor CreateScoreProcessor();
+
         public abstract HitRenderer CreateHitRendererWith(List<HitObject> objects);
 
         public abstract HitObjectParser CreateHitObjectParser();
-
-        public virtual HitJudgementResolver CreateHitJudgement() => new HitJudgementResolver();
 
         public static void Register(Ruleset ruleset) => availableRulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
 

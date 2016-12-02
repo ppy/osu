@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Objects\BezierApproximator.cs" />
+    <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
     <Compile Include="Objects\Drawables\DrawableSlider.cs" />
@@ -52,6 +54,9 @@
     <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\Triangles.cs" />
     <Compile Include="Objects\OsuHitObjectParser.cs" />
+    <Compile Include="Objects\SliderCurve.cs" />
+    <Compile Include="OsuScore.cs" />
+    <Compile Include="OsuScoreProcessor.cs" />
     <Compile Include="UI\OsuComboCounter.cs" />
     <Compile Include="UI\OsuHitRenderer.cs" />
     <Compile Include="UI\OsuPlayfield.cs" />

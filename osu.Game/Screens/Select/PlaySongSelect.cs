@@ -19,6 +19,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Screens.Play;
@@ -38,9 +39,8 @@ namespace osu.Game.Screens.Select
         private TrackManager trackManager;
 
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
-        private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
         private static readonly Vector2 wedged_container_start_position = new Vector2(0, 50);
-        private BeatmapInfoOverlay wedgedBeatmapInfoOverlay;
+        private BeatmapInfoWedge beatmapInfoWedge;
 
         private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
@@ -73,11 +73,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        /// <param name="database">Optionally provide a database to use instead of the OsuGame one.</param>
-        public PlaySongSelect(BeatmapDatabase database = null)
+        public PlaySongSelect()
         {
-            this.database = database;
-
             const float carouselWidth = 640;
             const float bottomToolHeight = 50;
             Children = new Drawable[]
@@ -102,24 +99,13 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                 },
-                wedgedBeatmapInfoOverlay = new BeatmapInfoOverlay
+                beatmapInfoWedge = new BeatmapInfoWedge
                 {
                     Alpha = 0,
                     Position = wedged_container_start_position,
                     Size = wedged_container_size,
                     RelativeSizeAxes = Axes.X,
-                    Shear = wedged_container_shear,
                     Margin = new MarginPadding { Top = 20, Right = 20, },
-                    Masking = true,
-                    BorderColour = new Color4(221, 255, 255, 255),
-                    BorderThickness = 2.5f,
-                    EdgeEffect = new EdgeEffect
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Colour = new Color4(130, 204, 255, 150),
-                        Radius = 20,
-                        Roundness = 15,
-                    },
                 },
                 new Container
                 {
@@ -134,6 +120,13 @@ namespace osu.Game.Screens.Select
                             RelativeSizeAxes = Axes.Both,
                             Size = Vector2.One,
                             Colour = new Color4(0, 0, 0, 0.5f),
+                        },
+                        new BackButton
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            //RelativeSizeAxes = Axes.Y,
+                            Action = () => Exit()
                         },
                         new Button
                         {
@@ -239,7 +232,7 @@ namespace osu.Game.Screens.Select
                 (Background as BackgroundModeBeatmap)?.BlurTo(BACKGROUND_BLUR, 1000);
             }
 
-            wedgedBeatmapInfoOverlay.UpdateBeatmap(beatmap);
+            beatmapInfoWedge.UpdateBeatmap(beatmap);
         }
 
         /// <summary>

@@ -8,6 +8,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using OpenTK.Graphics;
 
@@ -34,13 +35,21 @@ namespace osu.Game.Screens.Menu
         {
             Children = new Drawable[]
             {
-                logo = new OsuLogo()
+                new ParallaxContainer
                 {
-                    Alpha = 0,
-                    BlendingMode = BlendingMode.Additive,
-                    Interactive = false,
-                    Colour = Color4.DarkGray,
-                    Ripple = false
+                    ParallaxAmount = 0.01f,
+                    Children = new Drawable[]
+                    {
+                        logo = new OsuLogo
+                        {
+                            Alpha = 0,
+                            Triangles = false,
+                            BlendingMode = BlendingMode.Additive,
+                            Interactive = false,
+                            Colour = Color4.DarkGray,
+                            Ripple = false
+                        }
+                    }
                 }
             };
         }
