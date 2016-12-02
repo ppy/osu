@@ -13,10 +13,8 @@ using OpenTK;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    public class Triangles : Container
+    public class Triangles : Container<Triangle>
     {
-        private Texture triangle;
-
         public Triangles()
         {
             Alpha = 0.3f;
@@ -33,12 +31,6 @@ namespace osu.Game.Graphics.Backgrounds
 
                 Children.ForEach(t => t.ScaleTo(triangleScale));
             }
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            triangle = textures.Get(@"Play/osu/triangle@2x");
         }
 
         private int aimTriangleCount => (int)((DrawWidth * DrawHeight) / 800 / triangleScale);
@@ -60,16 +52,18 @@ namespace osu.Game.Graphics.Backgrounds
 
         }
 
-        protected virtual Sprite CreateTriangle()
+        protected virtual Triangle CreateTriangle()
         {
             var scale = triangleScale * RNG.NextSingle() * 0.4f + 0.2f;
+            const float size = 100;
 
-            return new Sprite
+            return new Triangle
             {
-                Texture = triangle,
                 Origin = Anchor.TopCentre,
                 RelativePositionAxes = Axes.Both,
                 Scale = new Vector2(scale),
+                // Scaling height by 0.866 results in equiangular triangles (== 60° and equal side length)
+                Size = new Vector2(size, 0.866f * size),
                 Alpha = RNG.NextSingle(),
                 Depth = scale,
             };

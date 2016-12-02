@@ -195,7 +195,7 @@ namespace osu.Game.Graphics.Cursor
                         colour.BottomLeft.Linear.A = Parts[i].Time + colour.BottomLeft.Linear.A;
                         colour.BottomRight.Linear.A = Parts[i].Time + colour.BottomRight.Linear.A;
 
-                        Texture.Draw(
+                        Texture.DrawQuad(
                             new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
                             colour,
                             null,
