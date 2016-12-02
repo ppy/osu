@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.Backgrounds
         {
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
-            Depth = float.MinValue;
+            Depth = float.MaxValue;
 
             Add(Sprite = new Sprite
             {

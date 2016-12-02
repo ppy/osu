@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.MathUtils;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
@@ -57,6 +58,10 @@ namespace osu.Game.Beatmaps.Drawables
                 },
                 new Triangles
                 {
+                    // The border is drawn in the shader of the children. Being additive, triangles would over-emphasize
+                    // the border wherever they cross it, and thus they get their own masking container without a border.
+                    Masking = true,
+                    CornerRadius = Content.CornerRadius,
                     RelativeSizeAxes = Axes.Both,
                     BlendingMode = BlendingMode.Additive,
                     Colour = deselectedColour,
@@ -123,46 +128,6 @@ namespace osu.Game.Beatmaps.Drawables
                     }
                 }
             };
-        }
-
-        public class Triangles : Container
-        {
-            private Texture triangle;
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                triangle = textures.Get(@"Play/osu/triangle@2x");
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                for (int i = 0; i < 10; i++)
-                {
-                    Add(new Sprite
-                    {
-                        Texture = triangle,
-                        Origin = Anchor.TopCentre,
-                        RelativePositionAxes = Axes.Both,
-                        Position = new Vector2(RNG.NextSingle(), RNG.NextSingle()),
-                        Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
-                        Alpha = RNG.NextSingle() * 0.3f
-                    });
-                }
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                foreach (Drawable d in Children)
-                {
-                    d.Position -= new Vector2(0, (float)(d.Scale.X * (Time.Elapsed / 880)));
-                    if (d.DrawPosition.Y + d.DrawSize.Y * d.Scale.Y < 0)
-                        d.MoveToY(1);
-                }
-            }
         }
     }
 }

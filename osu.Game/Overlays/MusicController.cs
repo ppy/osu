@@ -240,6 +240,7 @@ namespace osu.Game.Overlays
 
         private void workingChanged(object sender = null, EventArgs e = null)
         {
+            progress.IsEnabled = (beatmapSource.Value != null);
             if (beatmapSource.Value == current) return;
             bool audioEquals = current?.BeatmapInfo.AudioEquals(beatmapSource.Value.BeatmapInfo) ?? false;
             current = beatmapSource.Value;
@@ -386,7 +387,7 @@ namespace osu.Game.Overlays
                 this.beatmap = beatmap;
                 CacheDrawnFrameBuffer = true;
                 RelativeSizeAxes = Axes.Both;
-                Depth = float.MinValue;
+                Depth = float.MaxValue;
 
                 Children = new Drawable[]
                 {

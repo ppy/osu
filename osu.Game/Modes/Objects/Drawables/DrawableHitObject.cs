@@ -13,13 +13,11 @@ namespace osu.Game.Modes.Objects.Drawables
 {
     public abstract class DrawableHitObject : Container, IStateful<ArmedState>
     {
-        //todo: move to a more central implementation. this logic should not be at a drawable level.
-        public Action<DrawableHitObject, JudgementInfo> OnHit;
-        public Action<DrawableHitObject, JudgementInfo> OnMiss;
+        public event Action<DrawableHitObject, JudgementInfo> OnJudgement;
 
         public Container<DrawableHitObject> ChildObjects;
 
-        protected JudgementInfo Judgement;
+        public JudgementInfo Judgement;
 
         public abstract JudgementInfo CreateJudgementInfo();
 
@@ -28,7 +26,7 @@ namespace osu.Game.Modes.Objects.Drawables
         public DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
-            Depth = -(float)hitObject.StartTime;
+            Depth = (float)hitObject.StartTime;
         }
 
         private ArmedState state;
@@ -73,20 +71,20 @@ namespace osu.Game.Modes.Objects.Drawables
             {
                 default:
                     State = ArmedState.Hit;
-                    OnHit?.Invoke(this, Judgement);
                     break;
                 case HitResult.Miss:
                     State = ArmedState.Miss;
-                    OnMiss?.Invoke(this, Judgement);
                     break;
             }
+
+            OnJudgement?.Invoke(this, Judgement);
 
             return true;
         }
 
         protected virtual void CheckJudgement(bool userTriggered)
         {
-
+            //todo: consider making abstract.
         }
 
         protected override void Update()
@@ -113,6 +111,7 @@ namespace osu.Game.Modes.Objects.Drawables
 
     public class JudgementInfo
     {
+        public ulong? ComboAtHit;
         public HitResult? Result;
         public double TimeOffset;
     }

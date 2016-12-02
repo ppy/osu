@@ -19,6 +19,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Screens.Play;
@@ -141,6 +142,13 @@ namespace osu.Game.Screens.Select
                             Alpha = 0f,
                             Position = new Vector2(0, -3),
                         },
+                        new BackButton
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            //RelativeSizeAxes = Axes.Y,
+                            Action = () => Exit()
+                        },
                         new Button
                         {
                             Anchor = Anchor.CentreRight,
@@ -165,14 +173,6 @@ namespace osu.Game.Screens.Select
                             Spacing = new Vector2(20, 0),
                             Children = new Drawable[]
                             {
-                                new Button
-                                {
-                                    Width = 100,
-                                    RelativeSizeAxes = Axes.Y,
-                                    Text = "back",
-                                    Colour = new Color4(238, 51, 153, 255),
-                                    Action = () => Exit(),
-                                },
                                 playSongSelectButtonContainer = new PlaySongSelectButtonContainer
                                 {
                                     Children = new Drawable[]

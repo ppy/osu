@@ -22,23 +22,23 @@ namespace osu.Game.Graphics.Cursor
         public override bool Contains(Vector2 screenSpacePos) => true;
         public override bool HandleInput => true;
 
-        int currentIndex;
+        private int currentIndex;
 
-        Shader shader;
-        Texture texture;
+        private Shader shader;
+        private Texture texture;
 
-        Vector2 size => texture.Size * Scale;
+        private Vector2 size => texture.Size * Scale;
 
         private double timeOffset;
 
         private float time;
         
-        TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
-        const int MAX_SPRITES = 2048;
+        private TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
+        private const int MAX_SPRITES = 2048;
 
         private TrailPart[] parts = new TrailPart[MAX_SPRITES];
 
-        Vector2? lastPosition;
+        private Vector2? lastPosition;
 
         protected override DrawNode CreateDrawNode() => new TrailDrawNode();
 
@@ -116,7 +116,7 @@ namespace osu.Game.Graphics.Cursor
             float distance = diff.Length;
             Vector2 direction = diff / distance;
 
-            float interval = size.X / 2;
+            float interval = (size.X / 2) * 0.9f;
 
             for (float d = interval; d < distance; d += interval)
             {
@@ -195,7 +195,7 @@ namespace osu.Game.Graphics.Cursor
                         colour.BottomLeft.Linear.A = Parts[i].Time + colour.BottomLeft.Linear.A;
                         colour.BottomRight.Linear.A = Parts[i].Time + colour.BottomRight.Linear.A;
 
-                        Texture.Draw(
+                        Texture.DrawQuad(
                             new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
                             colour,
                             null,

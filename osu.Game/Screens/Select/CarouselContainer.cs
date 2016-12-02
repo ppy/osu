@@ -82,12 +82,12 @@ namespace osu.Game.Screens.Select
             group.State = BeatmapGroupState.Collapsed;
             groups.Add(group);
 
-            group.Header.Depth = scrollableContent.Children.Count();
+            group.Header.Depth = -scrollableContent.Children.Count();
             scrollableContent.Add(group.Header);
 
             foreach (BeatmapPanel panel in group.BeatmapPanels)
             {
-                panel.Depth = scrollableContent.Children.Count();
+                panel.Depth = -scrollableContent.Children.Count();
                 scrollableContent.Add(panel);
             }
 

@@ -12,5 +12,14 @@ namespace osu.Game.Beatmaps.Timing
     public class ControlPoint
     {
         public double Time;
+        public double BeatLength;
+        public double VelocityAdjustment;
+        public bool TimingChange;
+    }
+
+    internal enum TimeSignatures
+    {
+        SimpleQuadruple = 4,
+        SimpleTriple = 3
     }
 }

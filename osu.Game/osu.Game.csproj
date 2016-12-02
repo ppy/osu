@@ -64,8 +64,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
+    <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
+    <Compile Include="Graphics\UserInterface\BackButton.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
+    <Compile Include="Modes\Score.cs" />
+    <Compile Include="Modes\ScoreProcesssor.cs" />
+    <Compile Include="Online\API\IOnlineComponent.cs" />
+    <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
     <Compile Include="Overlays\MusicController.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
@@ -86,6 +92,7 @@
     <Compile Include="Beatmaps\Timing\SampleChange.cs" />
     <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarUserButton.cs" />
     <Compile Include="Screens\BackgroundMode.cs" />
     <Compile Include="Screens\Backgrounds\BackgroundModeBeatmap.cs" />
     <Compile Include="Screens\Backgrounds\BackgroundModeCustom.cs" />
@@ -147,18 +154,18 @@
     <Compile Include="Online\API\SecurePassword.cs" />
     <Compile Include="Online\API\Requests\ListChannels.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
-    <Compile Include="Online\Chat\Display\ChannelDisplay.cs" />
-    <Compile Include="Online\Chat\Display\ChatLine.cs" />
+    <Compile Include="Online\Chat\Drawables\ChannelDisplay.cs" />
+    <Compile Include="Online\Chat\Drawables\ChatLine.cs" />
     <Compile Include="Online\Chat\Message.cs" />
     <Compile Include="Online\User.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="OsuGameBase.cs" />
-    <Compile Include="Overlays\ChatConsole.cs" />
+    <Compile Include="Overlays\ChatOverlay.cs" />
     <Compile Include="Overlays\OptionsOverlay.cs" />
-    <Compile Include="Overlays\Toolbar.cs" />
-    <Compile Include="Overlays\ToolbarButton.cs" />
-    <Compile Include="Overlays\ToolbarModeButton.cs" />
-    <Compile Include="Overlays\ToolbarModeSelector.cs" />
+    <Compile Include="Overlays\Toolbar\Toolbar.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarModeButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarModeSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
     <Compile Include="Users\User.cs" />

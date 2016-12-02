@@ -14,9 +14,9 @@ using osu.Game;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
-using osu.Game.Online.Chat.Display;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Game.Online.Chat.Drawables;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -45,7 +45,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            if (api.State != APIAccess.APIState.Online)
+            if (api.State != APIState.Online)
                 api.OnStateChange += delegate { initializeChannels(); };
             else
                 initializeChannels();
@@ -65,7 +65,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             careChannels = new List<Channel>();
 
-            if (api.State != APIAccess.APIState.Online)
+            if (api.State != APIState.Online)
                 return;
 
             Add(flow = new FlowContainer
