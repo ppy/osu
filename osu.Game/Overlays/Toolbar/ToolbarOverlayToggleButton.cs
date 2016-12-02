@@ -20,7 +20,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    class ToolbarToggleButton : ToolbarButton
+    class ToolbarOverlayToggleButton : ToolbarButton
     {
         private Box StateBackground;
 
@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
-        public ToolbarToggleButton()
+        public ToolbarOverlayToggleButton()
         {
             Add(StateBackground = new Box
             {

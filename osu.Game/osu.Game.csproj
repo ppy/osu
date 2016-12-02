@@ -95,7 +95,7 @@
     <Compile Include="Overlays\Toolbar\ToolbarHomeButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarMusicButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarSettingsButton.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarToggleButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarOverlayToggleButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarUserButton.cs" />
     <Compile Include="Screens\BackgroundMode.cs" />
     <Compile Include="Screens\Backgrounds\BackgroundModeBeatmap.cs" />
