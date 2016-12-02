@@ -2,7 +2,6 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -22,10 +21,8 @@ namespace osu.Game.Overlays.Toolbar
     {
         private const float height = 50;
 
-        public Action OnSettings;
         public Action OnHome;
         public Action<PlayMode> OnPlayModeChange;
-        public Action OnMusicController;
 
         private ToolbarModeSelector modeSelector;
         private Box solidBackground;
@@ -87,18 +84,9 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new ToolbarButton
+                        new ToolbarSettingsButton(),
+                        new ToolbarHomeButton()
                         {
-                            Icon = FontAwesome.fa_gear,
-                            TooltipMain = "Settings",
-                            TooltipSub = "Change your settings",
-                            Action = () => OnSettings?.Invoke()
-                        },
-                        new ToolbarButton
-                        {
-                            Icon = FontAwesome.fa_home,
-                            TooltipMain = "Home",
-                            TooltipSub = "Return to the main menu",
                             Action = () => OnHome?.Invoke()
                         },
                         modeSelector = new ToolbarModeSelector
@@ -116,11 +104,7 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new []
                     {
-                        new ToolbarButton
-                        {
-                            Icon = FontAwesome.fa_music,
-                            Action = () => OnMusicController?.Invoke()
-                        },
+                        new ToolbarMusicButton(),
                         new ToolbarButton
                         {
                             Icon = FontAwesome.fa_search

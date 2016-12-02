@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Toolbar
         protected override bool OnClick(InputState state)
         {
             Action?.Invoke();
-            HoverBackground.FlashColour(new Color4(255, 255, 255, 180), 800, EasingTypes.OutQuint);
+            HoverBackground.FlashColour(new Color4(255, 255, 255, 100), 500, EasingTypes.OutQuint);
             return true;
         }
 
