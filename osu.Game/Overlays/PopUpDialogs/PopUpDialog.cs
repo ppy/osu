@@ -38,8 +38,8 @@ namespace osu.Game.Overlays.PopUpDialogs
         private SpriteText titleText;
         protected virtual string title => string.Empty;
 
-        private Container<Drawable> header;
-        private Container<Drawable> body;
+        private FlowContainer header;
+        private FlowContainer body;
         private FlowContainer content;
 
         protected OsuGameBase osuGameBase;
@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.PopUpDialogs
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, Database.BeatmapDatabase beatmaps, AudioManager audio, TextureStore textures)
+        private void load(OsuGameBase osuGame)
         {
             osuGameBase = osuGame;
             content.Add(new Drawable[]
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.PopUpDialogs
             titleText.Text = title;
         }
 
-        protected virtual Container<Drawable> CreateHeader()
+        protected virtual FlowContainer CreateHeader()
         {
             FlowContainer headCont = new FlowContainer
             {
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.PopUpDialogs
             return headCont;
         }
 
-        protected virtual Container<Drawable> CreateBody()
+        protected virtual FlowContainer CreateBody()
         {
             FlowContainer bodyCont = new FlowContainer
             {
@@ -171,6 +171,9 @@ namespace osu.Game.Overlays.PopUpDialogs
             iconCircle.Flush();
             iconCircle.Scale = new Vector2(0, 0);
             iconCircle.ScaleTo(1, transition_length * 1.5, EasingTypes.In);
+
+            body.TransformSpacingTo(Vector2.Zero, transition_length, EasingTypes.In);
+
             Flush();
             Position = new Vector2(0, ScreenSpaceDrawQuad.Height);
             backingTriangles.SlideIn(transition_length * 1.5);
@@ -182,16 +185,18 @@ namespace osu.Game.Overlays.PopUpDialogs
         {
             backingTriangles.SlideOut(transition_length * 1.5);
             Delay(transition_length);
+
+            body.Spacing = new Vector2(0, 40);
             MoveToY(-ScreenSpaceDrawQuad.Height, transition_length, EasingTypes.Out);
             FadeOut(transition_length, EasingTypes.Out);
         }
 
-        class BackingTriangles : Container
+        class BackingTriangles : Container<Framework.Graphics.Sprites.Triangle>
         {
-            private Texture triangle;
             private const int num_triangles = 300;
-            private const float triangleMovingSpeed = 720;
-            private const float triangleNormalSpeed = 2880;
+            private const float triangle_moving_speed = 720;
+            private const float triangle_normal_speed = 2880;
+            private const float triangle_size = 100;
             private float triangleMoveSpeed;
 
             public BackingTriangles()
@@ -199,24 +204,19 @@ namespace osu.Game.Overlays.PopUpDialogs
                 RelativeSizeAxes = Axes.Both;
             }
 
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                triangle = textures.Get(@"Play/osu/triangle@2x");
-            }
-
             protected override void LoadComplete()
             {
                 base.LoadComplete();
                 for (int i = 0; i < num_triangles; i++)
                 {
-                    Add(new Sprite
+                    Add(new Framework.Graphics.Sprites.Triangle
                     {
-                        Texture = triangle,
                         Origin = Anchor.Centre,
                         RelativePositionAxes = Axes.Both,
                         Position = new Vector2(RNG.NextSingle() + RNG.NextSingle(-0.1f, 0.1f), RNG.NextSingle() + RNG.NextSingle(-0.1f, 0.1f)),
                         Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
+                        // Scaling height by 0.866 results in equiangular triangles(== 60° and equal side length)
+                        Size = new Vector2(triangle_size, triangle_size * 0.866f),
                         Alpha = RNG.NextSingle() * 0.3f,
                         Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 255),
                     });
@@ -237,14 +237,14 @@ namespace osu.Game.Overlays.PopUpDialogs
 
             public void SlideIn(double duration)
             {
-                triangleMoveSpeed = triangleMovingSpeed;
-                TransformFloatTo(triangleMoveSpeed, triangleNormalSpeed, duration, EasingTypes.In, new TransformFloatSpeed());
+                triangleMoveSpeed = triangle_moving_speed;
+                TransformFloatTo(triangleMoveSpeed, triangle_normal_speed, duration, EasingTypes.In, new TransformFloatSpeed());
             }
 
             public void SlideOut(double duration)
             {
-                triangleMoveSpeed = triangleMovingSpeed;
-                TransformFloatTo(triangleMoveSpeed, triangleNormalSpeed, duration, EasingTypes.In, new TransformFloatSpeed());
+                triangleMoveSpeed = triangle_moving_speed;
+                TransformFloatTo(triangleMoveSpeed, triangle_normal_speed, duration, EasingTypes.In, new TransformFloatSpeed());
             }
 
 

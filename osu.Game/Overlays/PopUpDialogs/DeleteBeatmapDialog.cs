@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.PopUpDialogs
         private WorkingBeatmap beatmap;
         private SpriteText trackMetadata;
 
-        protected override Container<Drawable> CreateHeader()
+        protected override FlowContainer CreateHeader()
         {
             FlowContainer headCont = new FlowContainer
             {
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.PopUpDialogs
             trackMetadata.Text = $"{beatmap.BeatmapInfo.Metadata.Artist}" + " - " + $"{beatmap.BeatmapInfo.Metadata.Title}";
         }
 
-        protected override Container<Drawable> CreateBody()
+        protected override FlowContainer CreateBody()
         {
             FlowContainer bodyCont = new FlowContainer
             {

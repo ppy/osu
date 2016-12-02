@@ -59,7 +59,7 @@ namespace osu.Desktop.VisualTests.Tests
             protected override FontAwesome icon => FontAwesome.fa_thumbs_up;
             protected override string title => "TEST";
 
-            protected override Container<Drawable> CreateBody()
+            protected override FlowContainer CreateBody()
             {
                 FlowContainer bodyCont = new FlowContainer
                 {

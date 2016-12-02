@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Select
                 foreach (PlaySongSelectButton p in value)
                 {
                     p.ButtonContainer = this;
-                    p.On_Hovered = () => HoveredButton = p;
+                    p.On_Hovered += () => HoveredButton = p;
                 }
             }
         }
