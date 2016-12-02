@@ -213,7 +213,7 @@ namespace osu.Game.Screens.Menu
                 Alpha = 1;
             }
 
-            protected override Sprite CreateTriangle()
+            protected override Triangle CreateTriangle()
             {
                 var triangle = base.CreateTriangle();
                 triangle.Alpha = 1;
