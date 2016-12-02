@@ -64,7 +64,6 @@ namespace osu.Game.Overlays.Options
                 dropdown = new DropDownMenu<T>
                 {
                     Margin = new MarginPadding { Top = 5 },
-                    Height = 10,
                     RelativeSizeAxes = Axes.X,
                     Items = items.Select(item => new DropDownMenuItem<T>(item.Item1, item.Item2))
                 }
