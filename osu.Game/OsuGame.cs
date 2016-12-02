@@ -47,7 +47,7 @@ namespace osu.Game
 
         string[] args;
 
-        public OptionsOverlay Options;
+        private OptionsOverlay options;
 
         public OsuGame(string[] args = null)
         {
@@ -61,7 +61,7 @@ namespace osu.Game
             host.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
         }
 
-        public void ToggleOptions() => Options.ToggleVisibility();
+        public void ToggleOptions() => options.ToggleVisibility();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -118,15 +118,17 @@ namespace osu.Game
 
             //overlay elements
             (chat = new ChatOverlay { Depth = 0 }).Preload(this, overlayContent.Add);
-            (Options = new OptionsOverlay { Depth = -1 }).Preload(this, overlayContent.Add);
+            (options = new OptionsOverlay { Depth = -1 }).Preload(this, overlayContent.Add);
             (musicController = new MusicController() { Depth = -3 }).Preload(this, overlayContent.Add);
+
+            Dependencies.Cache(options);
+            Dependencies.Cache(musicController);
+
             (Toolbar = new Toolbar
             {
                 Depth = -2,
                 OnHome = delegate { mainMenu?.MakeCurrent(); },
-                OnSettings = Options.ToggleVisibility,
                 OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
-                OnMusicController = musicController.ToggleVisibility
             }).Preload(this, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
@@ -134,9 +136,9 @@ namespace osu.Game
                 overlayContent.Add(Toolbar);
             });
 
-            Options.StateChanged += delegate
+            options.StateChanged += delegate
             {
-                switch (Options.State)
+                switch (options.State)
                 {
                     case Visibility.Hidden:
                         intro.MoveToX(0, OptionsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
@@ -164,7 +166,7 @@ namespace osu.Game
                 switch (args.Key)
                 {
                     case Key.O:
-                        Options.ToggleVisibility();
+                        options.ToggleVisibility();
                         return true;
                 }
             }
