@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -61,13 +62,92 @@ namespace osu.Game.Overlays.Options
             Children = new Drawable[]
             {
                 text = new SpriteText { Alpha = 0 },
-                dropdown = new DropDownMenu<T>
+                dropdown = new StyledDropDownMenu<T>
                 {
                     Margin = new MarginPadding { Top = 5 },
                     RelativeSizeAxes = Axes.X,
-                    Items = items.Select(item => new DropDownMenuItem<T>(item.Item1, item.Item2))
+                    Items = items.Select(item => new StyledDropDownMenuItem<T>(item.Item1, item.Item2))
                 }
             };
+        }
+        
+        private class StyledDropDownMenu<U> : DropDownMenu<U>
+        {
+            protected override float DropDownListSpacing => 4;
+
+            protected override DropDownComboBox CreateComboBox()
+            {
+                return new StyledDropDownComboBox();
+            }
+
+            public StyledDropDownMenu()
+            {
+                ComboBox.CornerRadius = 4;
+                DropDown.CornerRadius = 4;
+            }
+
+            protected override void AnimateOpen()
+            {
+                foreach (StyledDropDownMenuItem<U> child in DropDownList.Children)
+                {
+                    child.FadeIn(200);
+                    child.ResizeTo(new Vector2(1, 24), 200);
+                }
+                DropDown.Show();
+            }
+
+            protected override void AnimateClose()
+            {
+                foreach (StyledDropDownMenuItem<U> child in DropDownList.Children)
+                {
+                    child.ResizeTo(new Vector2(1, 0), 200);
+                    child.FadeOut(200);
+                }
+            }
+        }
+
+        private class StyledDropDownComboBox : DropDownComboBox
+        {
+            protected override Color4 BackgroundColour => new Color4(255, 255, 255, 100);
+            protected override Color4 BackgroundColourHover => Color4.HotPink;
+
+            public StyledDropDownComboBox()
+            {
+                Foreground.Padding = new MarginPadding(4);
+            }
+        }
+
+        private class StyledDropDownMenuItem<U> : DropDownMenuItem<U>
+        {
+            public StyledDropDownMenuItem(string text, U value) : base(text, value)
+            {
+                AutoSizeAxes = Axes.None;
+                Height = 0;
+                Foreground.Padding = new MarginPadding(2);
+            }
+
+            protected override void OnSelectChange()
+            {
+                if (!IsLoaded)
+                    return;
+
+                FormatBackground();
+                FormatCaret();
+                FormatLabel();
+            }
+
+            protected override void FormatCaret()
+            {
+                (Caret as SpriteText).Text = IsSelected ? @"+" : @"-";
+            }
+
+            protected override void FormatLabel()
+            {
+                if (IsSelected)
+                    (Label as SpriteText).Text = @"*" + Value + @"*";
+                else
+                    (Label as SpriteText).Text = Value.ToString();
+            }
         }
     }
 }
