@@ -11,6 +11,8 @@ using osu.Framework.Input;
 using OpenTK.Graphics.ES30;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Configuration;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -49,12 +51,24 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             };
         }
 
+        private Bindable<bool> snakingIn;
+        private Bindable<bool> snakingOut;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            snakingIn = config.GetBindable<bool>(OsuConfig.SnakingInSliders);
+            snakingOut = config.GetBindable<bool>(OsuConfig.SnakingOutSliders);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             //force application of the state that was set before we loaded.
             UpdateState(State);
+
+            body.PathWidth = 32;
         }
 
         protected override void Update()
@@ -77,7 +91,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             ball.Position = slider.Curve.PositionAt(currentProgress);
 
             double drawEndProgress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT) / TIME_FADEIN, 0, 1);
-            body.SetRange(drawStartProgress, drawEndProgress);
+            body.SetRange(
+                snakingOut ? drawStartProgress : 0,
+                snakingIn ? drawEndProgress : 1);
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -192,8 +208,14 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             private Path path;
             private BufferedContainer container;
 
-            private double drawnProgressStart;
-            private double drawnProgressEnd;
+            public float PathWidth
+            {
+                get { return path.PathWidth; }
+                set { path.PathWidth = value; }
+            }
+
+            private double? drawnProgressStart;
+            private double? drawnProgressEnd;
 
             private Slider slider;
             public Body(Slider s)
@@ -225,12 +247,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 // Surprisingly, this looks somewhat okay and works well as a test for self-overlaps.
                 // TODO: Don't do this.
                 path.Texture = textures.Get(@"Menu/logo");
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                path.PathWidth = 32;
             }
 
             public void SetRange(double p0, double p1)

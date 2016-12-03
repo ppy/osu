@@ -18,8 +18,13 @@ namespace osu.Game.Overlays.Options.Graphics
             {
                 new CheckBoxOption
                 {
-                    LabelText = "Snaking sliders",
-                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingSliders)
+                    LabelText = "Snaking in sliders",
+                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingInSliders)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Snaking out sliders",
+                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingOutSliders)
                 },
                 new CheckBoxOption
                 {
