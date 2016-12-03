@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps
 
             double mult = 1;
 
-            if (applyMultipliers && samplePoint > point && ControlPoints[samplePoint].BeatLength < 0)
+            if (applyMultipliers && samplePoint > point)
                 mult = ControlPoints[samplePoint].VelocityAdjustment;
 
             return ControlPoints[point].BeatLength * mult;
