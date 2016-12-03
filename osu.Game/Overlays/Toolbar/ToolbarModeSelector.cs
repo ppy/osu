@@ -106,9 +106,9 @@ namespace osu.Game.Overlays.Toolbar
 
         private Cached activeMode = new Cached();
 
-        protected override void UpdateLayout()
+        protected override void UpdateAfterChildren()
         {
-            base.UpdateLayout();
+            base.UpdateAfterChildren();
 
             if (!activeMode.EnsureValid())
                 activeMode.Refresh(() => modeButtonLine.MoveToX(activeButton.DrawPosition.X, 200, EasingTypes.OutQuint));
