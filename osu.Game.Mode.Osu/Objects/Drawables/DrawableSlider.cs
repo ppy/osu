@@ -15,6 +15,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Configuration;
 using osu.Framework.Configuration;
+using System;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -73,29 +74,57 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             body.PathWidth = 32;
         }
 
+        private void computeProgress(out int repeat, out double progress)
+        {
+            progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
+
+            repeat = (int)(progress * slider.RepeatCount);
+            progress = (progress * slider.RepeatCount) % 1;
+
+            if (repeat % 2 == 1)
+                progress = 1 - progress;
+        }
+
+        private void updateBall(double progress)
+        {
+            ball.Alpha = Time.Current >= slider.StartTime && Time.Current <= slider.EndTime ? 1 : 0;
+            ball.Position = slider.Curve.PositionAt(progress);
+        }
+
+        private void updateBody(int repeat, double progress)
+        {
+            double drawStartProgress = 0;
+            double drawEndProgress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT) / TIME_FADEIN, 0, 1);
+
+            if (repeat >= slider.RepeatCount - 1)
+            {
+                if (Math.Min(repeat, slider.RepeatCount - 1) % 2 == 1)
+                {
+                    drawStartProgress = 0;
+                    drawEndProgress = progress;
+                }
+                else
+                {
+                    drawStartProgress = progress;
+                    drawEndProgress = 1;
+                }
+            }
+
+            body.SetRange(
+                snakingOut ? drawStartProgress : 0,
+                snakingIn ? drawEndProgress : 1);
+        }
+
         protected override void Update()
         {
             base.Update();
 
-            ball.Alpha = Time.Current >= slider.StartTime && Time.Current <= slider.EndTime ? 1 : 0;
+            double progress;
+            int repeat;
+            computeProgress(out repeat, out progress);
 
-            double currentProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
-            double drawStartProgress = 0;
-
-            int currentRepeat = (int)(currentProgress * slider.RepeatCount);
-            currentProgress = (currentProgress * slider.RepeatCount) % 1;
-            if (currentRepeat % 2 == 1)
-                currentProgress = 1 - currentProgress;
-
-            if (currentRepeat >= slider.RepeatCount - 1)
-                drawStartProgress = currentProgress;
-
-            ball.Position = slider.Curve.PositionAt(currentProgress);
-
-            double drawEndProgress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT) / TIME_FADEIN, 0, 1);
-            body.SetRange(
-                snakingOut ? drawStartProgress : 0,
-                snakingIn ? drawEndProgress : 1);
+            updateBall(progress);
+            updateBody(repeat, progress);
         }
 
         protected override void CheckJudgement(bool userTriggered)
