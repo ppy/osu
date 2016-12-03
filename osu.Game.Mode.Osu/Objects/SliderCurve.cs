@@ -3,6 +3,7 @@ using OpenTK;
 using System.Linq;
 using System.Diagnostics;
 using osu.Framework.MathUtils;
+using System;
 
 namespace osu.Game.Modes.Osu.Objects
 {
@@ -64,19 +65,28 @@ namespace osu.Game.Modes.Osu.Objects
             }
         }
 
-        public Vector2 PositionAt(double progress)
+        private int indexOfDistance(double d)
         {
-            progress = MathHelper.Clamp(progress, 0, 1);
-
-            double d = progress * Length;
             int i = cumulativeLength.BinarySearch(d);
             if (i < 0) i = ~i;
 
-            if (i >= calculatedPath.Count)
-                return calculatedPath.Last();
+            return i;
+        }
+
+        private double progressToDistance(double progress)
+        {
+            return MathHelper.Clamp(progress, 0, 1) * Length;
+        }
+
+        private Vector2 interpolateVertices(int i, double d)
+        {
+            if (calculatedPath.Count == 0)
+                return Vector2.Zero;
 
             if (i <= 0)
                 return calculatedPath.First();
+            else if (i >= calculatedPath.Count)
+                return calculatedPath.Last();
 
             Vector2 p0 = calculatedPath[i - 1];
             Vector2 p1 = calculatedPath[i];
@@ -90,6 +100,23 @@ namespace osu.Game.Modes.Osu.Objects
 
             double w = (d - d0) / (d1 - d0);
             return p0 + (p1 - p0) * (float)w;
+        }
+
+        public void FillCurveUntilProgress(Action<Vector2> action, double progress)
+        {
+            double d = progressToDistance(progress);
+
+            int i = 0;
+            for (; i < calculatedPath.Count && cumulativeLength[i] <= d; ++i)
+                action.Invoke(calculatedPath[i]);
+
+            action.Invoke(interpolateVertices(i, d));
+        }
+
+        public Vector2 PositionAt(double progress)
+        {
+            double d = progressToDistance(progress);
+            return interpolateVertices(indexOfDistance(d), d);
         }
     }
 }
