@@ -39,7 +39,7 @@ namespace osu.Game.Modes.Osu.UI
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
-            Counters = new KeyCounter[]
+            Children = new KeyCounter[]
             {
                 new KeyCounterKeyboard(@"Z", Key.Z),
                 new KeyCounterKeyboard(@"X", Key.X),
