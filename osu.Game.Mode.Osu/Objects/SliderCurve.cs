@@ -6,6 +6,7 @@ using OpenTK;
 using System.Linq;
 using System.Diagnostics;
 using osu.Framework.MathUtils;
+using System;
 
 namespace osu.Game.Modes.Osu.Objects
 {
@@ -31,7 +32,7 @@ namespace osu.Game.Modes.Osu.Objects
             }
         }
 
-        public void Calculate()
+        private void calculatePath()
         {
             calculatedPath.Clear();
 
@@ -55,16 +56,55 @@ namespace osu.Game.Modes.Osu.Objects
                     subpath.Clear();
                 }
             }
-            
+        }
+
+        private void calculateCumulativeLengthAndTrimPath()
+        {
+            double l = 0;
+
             cumulativeLength.Clear();
-            cumulativeLength.Add(Length = 0);
+            cumulativeLength.Add(l);
+
             for (int i = 0; i < calculatedPath.Count - 1; ++i)
             {
-                double d = (calculatedPath[i + 1] - calculatedPath[i]).Length;
+                Vector2 diff = calculatedPath[i + 1] - calculatedPath[i];
+                double d = diff.Length;
 
-                Debug.Assert(d >= 0, "Cumulative lengths have to be strictly increasing.");
-                cumulativeLength.Add(Length += d);
+                // Shorten slider curves that are too long compared to what's
+                // in the .osu file.
+                if (Length - l < d)
+                {
+                    calculatedPath[i + 1] = calculatedPath[i] + diff * (float)((Length - l) / d);
+                    calculatedPath.RemoveRange(i + 2, calculatedPath.Count - 2 - i);
+
+                    l = Length;
+                    cumulativeLength.Add(l);
+                    break;
+                }
+
+                l += d;
+                cumulativeLength.Add(l);
             }
+
+            // Lengthen slider curves that are too short compared to what's
+            // in the .osu file.
+            if (l < Length && calculatedPath.Count > 1)
+            {
+                Vector2 diff = calculatedPath[calculatedPath.Count - 1] - calculatedPath[calculatedPath.Count - 2];
+                double d = diff.Length;
+
+                if (d <= 0)
+                    return;
+
+                calculatedPath[calculatedPath.Count - 1] += diff * (float)((Length - l) / d);
+                cumulativeLength[calculatedPath.Count - 1] = Length;
+            }
+        }
+
+        public void Calculate()
+        {
+            calculatePath();
+            calculateCumulativeLengthAndTrimPath();
         }
 
         private int indexOfDistance(double d)
