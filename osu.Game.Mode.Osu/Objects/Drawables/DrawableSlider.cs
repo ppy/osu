@@ -248,42 +248,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 double progress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT) / TIME_FADEIN, 0, 1);
 
                 if (progress == drawnProgress) return false;
-
-                bool madeChanges = false;
-                if (progress == 0)
-                {
-                    //if we have gone backwards, just clear the path for now.
-                    drawnProgress = 0;
-                    path.ClearVertices();
-                    madeChanges = true;
-                }
+                drawnProgress = progress;
 
                 Vector2 startPosition = slider.Curve.PositionAt(0);
 
-                if (drawnProgress == null)
-                {
-                    drawnProgress = 0;
-                    path.AddVertex(slider.Curve.PositionAt(drawnProgress.Value) - startPosition);
-                    madeChanges = true;
-                }
-
-                double segmentSize = 1 / (slider.Curve.Length / 5);
-
-                while (drawnProgress + segmentSize < progress)
-                {
-                    drawnProgress += segmentSize;
-                    path.AddVertex(slider.Curve.PositionAt(drawnProgress.Value) - startPosition);
-                    madeChanges = true;
-                }
-
-                if (progress == 1 && drawnProgress != progress)
-                {
-                    drawnProgress = progress;
-                    path.AddVertex(slider.Curve.PositionAt(drawnProgress.Value) - startPosition);
-                    madeChanges = true;
-                }
-
-                return madeChanges;
+                path.ClearVertices();
+                slider.Curve.FillCurveUntilProgress(p => path.AddVertex(p - startPosition), progress);
+                return true;
             }
         }
     }
