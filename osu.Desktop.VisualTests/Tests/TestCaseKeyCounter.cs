@@ -25,7 +25,7 @@ namespace osu.Desktop.VisualTests.Tests
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     IsCounting = true,
-                    Counters = new KeyCounter[]
+                    Children = new KeyCounter[]
                     {
                         new KeyCounterKeyboard(@"Z", Key.Z),
                         new KeyCounterKeyboard(@"X", Key.X),
