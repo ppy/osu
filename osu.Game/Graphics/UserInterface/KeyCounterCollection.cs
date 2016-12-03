@@ -1,7 +1,6 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
@@ -9,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class KeyCounterCollection : FlowContainer
+    public class KeyCounterCollection : FlowContainer<KeyCounter>
     {
         public KeyCounterCollection()
         {
@@ -17,22 +16,9 @@ namespace osu.Game.Graphics.UserInterface
             AutoSizeAxes = Axes.Both;
         }
 
-        private List<KeyCounter> counters = new List<KeyCounter>();
-        public IEnumerable<KeyCounter> Counters
+        public override void Add(KeyCounter key)
         {
-            get { return counters; }
-            set
-            {
-                foreach (var k in value)
-                    addKey(k);
-
-                Children = value;
-            }
-        }
-
-        private void addKey(KeyCounter key)
-        {
-            counters.Add(key);
+            base.Add(key);
             key.IsCounting = IsCounting;
             key.FadeTime = FadeTime;
             key.KeyDownTextColor = KeyDownTextColor;
@@ -41,7 +27,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public void ResetCount()
         {
-            foreach (var counter in counters)
+            foreach (var counter in Children)
                 counter.ResetCount();
         }
 
@@ -57,7 +43,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (value != isCounting)
                 {
                     isCounting = value;
-                    foreach (var child in counters)
+                    foreach (var child in Children)
                         child.IsCounting = value;
                 }
             }
@@ -72,7 +58,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (value != fadeTime)
                 {
                     fadeTime = value;
-                    foreach (var child in counters)
+                    foreach (var child in Children)
                         child.FadeTime = value;
                 }
             }
@@ -87,7 +73,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (value != keyDownTextColor)
                 {
                     keyDownTextColor = value;
-                    foreach (var child in counters)
+                    foreach (var child in Children)
                         child.KeyDownTextColor = value;
                 }
             }
@@ -102,7 +88,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (value != keyUpTextColor)
                 {
                     keyUpTextColor = value;
-                    foreach (var child in counters)
+                    foreach (var child in Children)
                         child.KeyUpTextColor = value;
                 }
             }
