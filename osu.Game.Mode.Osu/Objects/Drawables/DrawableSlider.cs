@@ -63,16 +63,21 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             ball.Alpha = Time.Current >= slider.StartTime && Time.Current <= slider.EndTime ? 1 : 0;
 
-            double t = (Time.Current - slider.StartTime) / slider.Duration;
-            if (slider.RepeatCount > 1)
-            {
-                int currentRepeat = (int)(t * slider.RepeatCount);
-                t = (t * slider.RepeatCount) % 1;
-                if (currentRepeat % 2 == 1)
-                    t = 1 - t;
-            }
+            double currentProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
+            double drawStartProgress = 0;
 
-            ball.Position = slider.Curve.PositionAt(t);
+            int currentRepeat = (int)(currentProgress * slider.RepeatCount);
+            currentProgress = (currentProgress * slider.RepeatCount) % 1;
+            if (currentRepeat % 2 == 1)
+                currentProgress = 1 - currentProgress;
+
+            if (currentRepeat >= slider.RepeatCount - 1)
+                drawStartProgress = currentProgress;
+
+            ball.Position = slider.Curve.PositionAt(currentProgress);
+
+            double drawEndProgress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT) / TIME_FADEIN, 0, 1);
+            body.SetRange(drawStartProgress, drawEndProgress);
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -187,7 +192,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             private Path path;
             private BufferedContainer container;
 
-            private double? drawnProgress;
+            private double drawnProgressStart;
+            private double drawnProgressEnd;
 
             private Slider slider;
             public Body(Slider s)
@@ -227,33 +233,37 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 path.PathWidth = 32;
             }
 
-            protected override void Update()
+            public void SetRange(double p0, double p1)
             {
-                base.Update();
+                if (p0 > p1)
+                    MathHelper.Swap(ref p0, ref p1);
 
-                if (updateSnaking())
+                if (updateSnaking(p0, p1))
                 {
                     // Autosizing does not give us the desired behaviour here.
                     // We want the container to have the same size as the slider,
                     // and to be positioned such that the slider head is at (0,0).
                     container.Size = path.Size;
-                    container.Position = -path.HeadPosition;
+                    container.Position = -path.PositionInBoundingBox(slider.Curve.PositionAt(0) - currentCurve[0]);
 
                     container.ForceRedraw();
                 }
             }
 
-            private bool updateSnaking()
+            private List<Vector2> currentCurve = new List<Vector2>();
+            private bool updateSnaking(double p0, double p1)
             {
-                double progress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT) / TIME_FADEIN, 0, 1);
+                if (drawnProgressStart == p0 && drawnProgressEnd == p1) return false;
 
-                if (progress == drawnProgress) return false;
-                drawnProgress = progress;
+                drawnProgressStart = p0;
+                drawnProgressEnd = p1;
 
-                Vector2 startPosition = slider.Curve.PositionAt(0);
+                slider.Curve.GetPathToProgress(currentCurve, p0, p1);
 
                 path.ClearVertices();
-                slider.Curve.FillCurveUntilProgress(p => path.AddVertex(p - startPosition), progress);
+                foreach (Vector2 p in currentCurve)
+                    path.AddVertex(p - currentCurve[0]);
+
                 return true;
             }
         }

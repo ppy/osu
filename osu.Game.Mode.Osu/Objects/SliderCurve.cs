@@ -102,17 +102,36 @@ namespace osu.Game.Modes.Osu.Objects
             return p0 + (p1 - p0) * (float)w;
         }
 
-        public void FillCurveUntilProgress(Action<Vector2> action, double progress)
+        /// <summary>
+        /// Computes the slider curve until a given progress that ranges from 0 (beginning of the slider)
+        /// to 1 (end of the slider) and stores the generated path in the given list.
+        /// </summary>
+        /// <param name="path">The list to be filled with the computed curve.</param>
+        /// <param name="progress">Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        public void GetPathToProgress(List<Vector2> path, double p0, double p1)
         {
-            double d = progressToDistance(progress);
+            double d0 = progressToDistance(p0);
+            double d1 = progressToDistance(p1);
+
+            path.Clear();
 
             int i = 0;
-            for (; i < calculatedPath.Count && cumulativeLength[i] <= d; ++i)
-                action.Invoke(calculatedPath[i]);
+            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i);
 
-            action.Invoke(interpolateVertices(i, d));
+            path.Add(interpolateVertices(i, d0));
+
+            for (; i < calculatedPath.Count && cumulativeLength[i] <= d1; ++i)
+                path.Add(calculatedPath[i]);
+
+            path.Add(interpolateVertices(i, d1));
         }
 
+        /// <summary>
+        /// Computes the position on the slider at a given progress that ranges from 0 (beginning of the slider)
+        /// to 1 (end of the slider).
+        /// </summary>
+        /// <param name="progress">Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <returns></returns>
         public Vector2 PositionAt(double progress)
         {
             double d = progressToDistance(progress);
