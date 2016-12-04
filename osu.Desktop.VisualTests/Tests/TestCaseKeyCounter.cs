@@ -5,6 +5,11 @@ using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK.Input;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Configuration;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -18,22 +23,32 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            Children = new[]
+            KeyCounterCollection kc;
+            BindableInt bindable = new BindableInt { MinValue = 0, MaxValue = 1000, Default = 50 };
+            AddButton("Add Random", null);
+            Add(new SliderBar<int>
             {
-                new KeyCounterCollection
+                Origin = Anchor.TopLeft,
+                Anchor = Anchor.TopLeft,
+                Width = 150,
+                Height = 10,
+                SelectionColor = Color4.Orange,
+                Position = new Vector2(0, 50),
+                Bindable = bindable
+            });
+            Add(kc = new KeyCounterCollection
+            {
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                IsCounting = true,
+                Children = new KeyCounter[]
                 {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    IsCounting = true,
-                    Children = new KeyCounter[]
-                    {
-                        new KeyCounterKeyboard(@"Z", Key.Z),
-                        new KeyCounterKeyboard(@"X", Key.X),
-                        new KeyCounterMouse(@"M1", MouseButton.Left),
-                        new KeyCounterMouse(@"M2", MouseButton.Right),
-                    },
+                    new KeyCounterKeyboard(@"Z", Key.Z),
+                    new KeyCounterKeyboard(@"X", Key.X),
+                    new KeyCounterMouse(@"M1", MouseButton.Left),
+                    new KeyCounterMouse(@"M2", MouseButton.Right),
                 },
-            };
+            });
         }
     }
 }
