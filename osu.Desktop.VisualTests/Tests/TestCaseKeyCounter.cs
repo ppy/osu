@@ -37,7 +37,8 @@ namespace osu.Desktop.VisualTests.Tests
                     new KeyCounterMouse(@"M2", MouseButton.Right),
                 },
             };
-            BindableInt bindable = new BindableInt { MinValue = 0, MaxValue = 1000, Default = 50 };
+            BindableInt bindable = new BindableInt { MinValue = 0, MaxValue = 200, Default = 50 };
+            bindable.ValueChanged += delegate { kc.FadeTime = bindable.Value; };
             AddButton("Add Random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
