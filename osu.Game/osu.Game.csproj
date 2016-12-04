@@ -223,6 +223,8 @@
     <Compile Include="Overlays\PopUpDialogs\PopUpDialog.cs" />
     <Compile Include="Overlays\PopUpDialogs\PopUpDialogButton.cs" />
     <Compile Include="Overlays\PopUpDialogs\DeleteBeatmapDialog.cs" />
+    <Compile Include="Screens\Select\SongSelectOptions\SongSelectOptionsContainer.cs" />
+    <Compile Include="Screens\Select\SongSelectOptions\SongSelectOptionsButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -245,6 +247,7 @@
   <ItemGroup />
   <ItemGroup>
     <Folder Include="Overlays\PopUpDialogs\" />
+    <Folder Include="Screens\Select\SongSelectOptions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

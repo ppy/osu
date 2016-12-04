@@ -54,7 +54,6 @@ namespace osu.Game.Screens.Select
         private SpriteText spriteText;
         private Box box;
         private Box light;
-        public PlaySongSelectButtonContainer ButtonContainer;
 
         public PlaySongSelectButton()
         {

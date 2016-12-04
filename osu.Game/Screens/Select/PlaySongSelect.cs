@@ -27,6 +27,7 @@ using osu.Framework;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.PopUpDialogs;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -55,6 +56,10 @@ namespace osu.Game.Screens.Select
         private const float play_song_select_button_width = 100;
         private const float play_song_select_button_height = 50;
         private const int mode_light_transition_time = 200;
+
+        private SongSelectOptionsContainer songSelectOptionsContainer;
+        private const float options_button_width = 140;
+        private const float options_button_height = 125;
 
         private DeleteBeatmapDialog deleteBeatmapDialog;
 
@@ -106,6 +111,49 @@ namespace osu.Game.Screens.Select
                     }
                 },
                 deleteBeatmapDialog = new DeleteBeatmapDialog(),
+                songSelectOptionsContainer = new SongSelectOptionsContainer
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Position = new Vector2(0, -53),
+                    Depth = -10,
+                    Children = new SongSelectOptionsButton[]
+                    {
+                        new SongSelectOptionsButton
+                        {
+                            Icon = FontAwesome.fa_osu_cross_o,
+                            TextLineA = "Remove",
+                            TextLineB = "from Unplayed",
+                            Size = new Vector2(options_button_width, options_button_height),
+                            Colour = new Color4(103, 83, 196, 255),
+                        },
+                        new SongSelectOptionsButton
+                        {
+                            Icon = FontAwesome.fa_eraser,
+                            TextLineA = "Clear",
+                            TextLineB = "local scores",
+                            Size = new Vector2(options_button_width, options_button_height),
+                            Colour = new Color4(103, 83, 196, 255),
+                        },
+                        new SongSelectOptionsButton
+                        {
+                            Icon = FontAwesome.fa_pencil,
+                            TextLineA = "Edit",
+                            TextLineB = "Beatmap",
+                            Size = new Vector2(options_button_width, options_button_height),
+                            Colour = new Color4(227, 159, 12, 255),
+                        },
+                        new SongSelectOptionsButton
+                        {
+                            Icon = FontAwesome.fa_trash,
+                            TextLineA = "Delete",
+                            TextLineB = "Beatmap",
+                            Size = new Vector2(options_button_width, options_button_height),
+                            Colour = new Color4(238, 51, 153, 255),
+                            Action = deleteBeatmapDialog.ToggleVisibility,
+                        },
+                    }
+                },
                 carousel = new CarouselContainer
                 {
                     RelativeSizeAxes = Axes.Y,
@@ -142,13 +190,6 @@ namespace osu.Game.Screens.Select
                             Alpha = 0f,
                             Position = new Vector2(0, -3),
                         },
-                        new BackButton
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            //RelativeSizeAxes = Axes.Y,
-                            Action = () => Exit()
-                        },
                         new Button
                         {
                             Anchor = Anchor.CentreRight,
@@ -165,14 +206,20 @@ namespace osu.Game.Screens.Select
                         },
                         new FlowContainer
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
                             Direction = FlowDirection.HorizontalOnly,
-                            Spacing = new Vector2(20, 0),
+                            Spacing = new Vector2(80, 0),
                             Children = new Drawable[]
                             {
+                                new BackButton
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Action = Exit,
+                                },
                                 playSongSelectButtonContainer = new PlaySongSelectButtonContainer
                                 {
                                     Children = new Drawable[]
@@ -201,7 +248,7 @@ namespace osu.Game.Screens.Select
                                             Width = play_song_select_button_width,
                                             SelectedColour = new Color4(68, 170, 221, 225),
                                             DeselectedColour = new Color4(14, 116, 145, 255),
-                                            Action = deleteBeatmapDialog.ToggleVisibility, //TODO: replace with submenu
+                                            Action = songSelectOptionsContainer.ToggleState,
                                         },
                                     }
                                 }

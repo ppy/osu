@@ -34,10 +34,17 @@ namespace osu.Game.Screens.Select
                 base.Children = value;
                 foreach (PlaySongSelectButton p in value)
                 {
-                    p.ButtonContainer = this;
                     p.On_Hovered += () => HoveredButton = p;
                 }
             }
+        }
+
+        public override void Add(Drawable drawable)
+        {
+            base.Add(drawable);
+            PlaySongSelectButton p = drawable as PlaySongSelectButton;
+            if (p != null)
+                p.On_Hovered += () => HoveredButton = p;
         }
 
         public Action On_HoveredChanged;

@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Framework.MathUtils;
 using System;
 using System.Linq;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Overlays.PopUpDialogs
 {
@@ -33,7 +34,7 @@ namespace osu.Game.Overlays.PopUpDialogs
         protected const float icon_circle_height = 90;
 
         private Box backgroundBox;
-        private BackingTriangles backingTriangles;
+        private PopUpDialogTriangles backingTriangles;
         private TextAwesome iconCircle;
         private SpriteText titleText;
         protected virtual string title => string.Empty;
@@ -45,6 +46,8 @@ namespace osu.Game.Overlays.PopUpDialogs
         protected OsuGameBase osuGameBase;
         protected virtual FontAwesome icon => FontAwesome.fa_warning;
 
+        public override bool HandleInput => (Transforms.Count == 0);
+
         public PopUpDialog()
         {
             Anchor = Anchor.Centre;
@@ -52,13 +55,14 @@ namespace osu.Game.Overlays.PopUpDialogs
             Width = width;
             RelativeSizeAxes = Axes.Y;
             State = Visibility.Hidden;
-            Depth = float.MaxValue;
+            Depth = float.MinValue;
             Children = new Drawable[]
             {
-                backingTriangles = new BackingTriangles
+                backingTriangles = new PopUpDialogTriangles
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
                 },
                 backgroundBox = new Box
                 {
@@ -156,14 +160,16 @@ namespace osu.Game.Overlays.PopUpDialogs
             return bodyCont;
         }
 
-        public void Nest(PopUpDialog nestee)
+        public void Nest(PopUpDialog nestee, bool removeThis = true)
         {
             Container parent = Parent as Container;
             parent.Add(nestee);
             Hide();
-            nestee.Position = new Vector2(0, ScreenSpaceDrawQuad.Height);
             nestee.Delay(transition_length);
             nestee.Show();
+            if (removeThis)
+                Delay(transition_length);
+                Expire();
         }
 
         protected override void PopIn()
@@ -172,7 +178,8 @@ namespace osu.Game.Overlays.PopUpDialogs
             iconCircle.Scale = new Vector2(0, 0);
             iconCircle.ScaleTo(1, transition_length * 1.5, EasingTypes.In);
 
-            body.TransformSpacingTo(Vector2.Zero, transition_length, EasingTypes.In);
+            body.TransformSpacingTo(Vector2.Zero, transition_length * 1.5, EasingTypes.In);
+            body.MoveTo(Vector2.Zero, transition_length, EasingTypes.In);
 
             Flush();
             Position = new Vector2(0, ScreenSpaceDrawQuad.Height);
@@ -186,41 +193,25 @@ namespace osu.Game.Overlays.PopUpDialogs
             backingTriangles.SlideOut(transition_length * 1.5);
             Delay(transition_length);
 
-            body.Spacing = new Vector2(0, 40);
             MoveToY(-ScreenSpaceDrawQuad.Height, transition_length, EasingTypes.Out);
             FadeOut(transition_length, EasingTypes.Out);
+
+            body.Delay(transition_length);
+            body.TransformSpacingTo(new Vector2(0, 40), transition_length, EasingTypes.Out);
+            body.MoveTo(new Vector2(0, 60), transition_length, EasingTypes.Out);
         }
 
-        class BackingTriangles : Container<Framework.Graphics.Sprites.Triangle>
+        class PopUpDialogTriangles : Triangles
         {
-            private const int num_triangles = 300;
             private const float triangle_moving_speed = 720;
             private const float triangle_normal_speed = 2880;
             private const float triangle_size = 100;
             private float triangleMoveSpeed;
+            private Vector2 size = new Vector2(triangle_size, triangle_size * 0.866f);
 
-            public BackingTriangles()
+            public PopUpDialogTriangles()
             {
-                RelativeSizeAxes = Axes.Both;
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                for (int i = 0; i < num_triangles; i++)
-                {
-                    Add(new Framework.Graphics.Sprites.Triangle
-                    {
-                        Origin = Anchor.Centre,
-                        RelativePositionAxes = Axes.Both,
-                        Position = new Vector2(RNG.NextSingle() + RNG.NextSingle(-0.1f, 0.1f), RNG.NextSingle() + RNG.NextSingle(-0.1f, 0.1f)),
-                        Scale = new Vector2(RNG.NextSingle() * 0.4f + 0.2f),
-                        // Scaling height by 0.866 results in equiangular triangles(== 60° and equal side length)
-                        Size = new Vector2(triangle_size, triangle_size * 0.866f),
-                        Alpha = RNG.NextSingle() * 0.3f,
-                        Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 255),
-                    });
-                }
+                Alpha = 1;
             }
 
             protected override void Update()
@@ -235,6 +226,16 @@ namespace osu.Game.Overlays.PopUpDialogs
                 }
             }
 
+            protected override Framework.Graphics.Sprites.Triangle CreateTriangle()
+            {
+                var triangle = base.CreateTriangle();
+                triangle.Alpha = RNG.NextSingle() * 0.3f;
+                triangle.Size = size;
+                triangle.Scale = new Vector2(RNG.NextSingle() * 0.6f + 0.2f);
+                triangle.Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 255);
+                return triangle;
+            }
+
             public void SlideIn(double duration)
             {
                 triangleMoveSpeed = triangle_moving_speed;
@@ -247,13 +248,12 @@ namespace osu.Game.Overlays.PopUpDialogs
                 TransformFloatTo(triangleMoveSpeed, triangle_normal_speed, duration, EasingTypes.In, new TransformFloatSpeed());
             }
 
-
             public class TransformFloatSpeed : TransformFloat
             {
                 public override void Apply(Drawable d)
                 {
                     base.Apply(d);
-                    BackingTriangles bt = d as BackingTriangles;
+                    PopUpDialogTriangles bt = d as PopUpDialogTriangles;
                     bt.triangleMoveSpeed = CurrentValue;
                 }
             }

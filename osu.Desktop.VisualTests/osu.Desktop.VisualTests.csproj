@@ -187,6 +187,7 @@
     <Compile Include="Platform\TestStorage.cs" />
     <Compile Include="Tests\TestCaseOptions.cs" />
     <Compile Include="Tests\TestCasePopUpDialog.cs" />
+    <Compile Include="Tests\TestCaseSongSelectOptions.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
