@@ -1,5 +1,12 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
+
+using System.Collections.Generic;
 using OpenTK;
+using System.Linq;
+using System.Diagnostics;
+using osu.Framework.MathUtils;
+using System;
 
 namespace osu.Game.Modes.Osu.Objects
 {
@@ -11,7 +18,8 @@ namespace osu.Game.Modes.Osu.Objects
 
         public CurveTypes CurveType;
 
-        private List<Vector2> calculatedPath;
+        private List<Vector2> calculatedPath = new List<Vector2>();
+        private List<double> cumulativeLength = new List<double>();
 
         private List<Vector2> calculateSubpath(List<Vector2> subpath)
         {
@@ -24,9 +32,9 @@ namespace osu.Game.Modes.Osu.Objects
             }
         }
 
-        public void Calculate()
+        private void calculatePath()
         {
-            calculatedPath = new List<Vector2>();
+            calculatedPath.Clear();
 
             // Sliders may consist of various subpaths separated by two consecutive vertices
             // with the same position. The following loop parses these subpaths and computes
@@ -50,18 +58,126 @@ namespace osu.Game.Modes.Osu.Objects
             }
         }
 
+        private void calculateCumulativeLengthAndTrimPath()
+        {
+            double l = 0;
+
+            cumulativeLength.Clear();
+            cumulativeLength.Add(l);
+
+            for (int i = 0; i < calculatedPath.Count - 1; ++i)
+            {
+                Vector2 diff = calculatedPath[i + 1] - calculatedPath[i];
+                double d = diff.Length;
+
+                // Shorten slider curves that are too long compared to what's
+                // in the .osu file.
+                if (Length - l < d)
+                {
+                    calculatedPath[i + 1] = calculatedPath[i] + diff * (float)((Length - l) / d);
+                    calculatedPath.RemoveRange(i + 2, calculatedPath.Count - 2 - i);
+
+                    l = Length;
+                    cumulativeLength.Add(l);
+                    break;
+                }
+
+                l += d;
+                cumulativeLength.Add(l);
+            }
+
+            // Lengthen slider curves that are too short compared to what's
+            // in the .osu file.
+            if (l < Length && calculatedPath.Count > 1)
+            {
+                Vector2 diff = calculatedPath[calculatedPath.Count - 1] - calculatedPath[calculatedPath.Count - 2];
+                double d = diff.Length;
+
+                if (d <= 0)
+                    return;
+
+                calculatedPath[calculatedPath.Count - 1] += diff * (float)((Length - l) / d);
+                cumulativeLength[calculatedPath.Count - 1] = Length;
+            }
+        }
+
+        public void Calculate()
+        {
+            calculatePath();
+            calculateCumulativeLengthAndTrimPath();
+        }
+
+        private int indexOfDistance(double d)
+        {
+            int i = cumulativeLength.BinarySearch(d);
+            if (i < 0) i = ~i;
+
+            return i;
+        }
+
+        private double progressToDistance(double progress)
+        {
+            return MathHelper.Clamp(progress, 0, 1) * Length;
+        }
+
+        private Vector2 interpolateVertices(int i, double d)
+        {
+            if (calculatedPath.Count == 0)
+                return Vector2.Zero;
+
+            if (i <= 0)
+                return calculatedPath.First();
+            else if (i >= calculatedPath.Count)
+                return calculatedPath.Last();
+
+            Vector2 p0 = calculatedPath[i - 1];
+            Vector2 p1 = calculatedPath[i];
+
+            double d0 = cumulativeLength[i - 1];
+            double d1 = cumulativeLength[i];
+
+            // Avoid division by and almost-zero number in case two points are extremely close to each other.
+            if (Precision.AlmostEquals(d0, d1))
+                return p0;
+
+            double w = (d - d0) / (d1 - d0);
+            return p0 + (p1 - p0) * (float)w;
+        }
+
+        /// <summary>
+        /// Computes the slider curve until a given progress that ranges from 0 (beginning of the slider)
+        /// to 1 (end of the slider) and stores the generated path in the given list.
+        /// </summary>
+        /// <param name="path">The list to be filled with the computed curve.</param>
+        /// <param name="progress">Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        public void GetPathToProgress(List<Vector2> path, double p0, double p1)
+        {
+            double d0 = progressToDistance(p0);
+            double d1 = progressToDistance(p1);
+
+            path.Clear();
+
+            int i = 0;
+            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i);
+
+            path.Add(interpolateVertices(i, d0));
+
+            for (; i < calculatedPath.Count && cumulativeLength[i] <= d1; ++i)
+                path.Add(calculatedPath[i]);
+
+            path.Add(interpolateVertices(i, d1));
+        }
+
+        /// <summary>
+        /// Computes the position on the slider at a given progress that ranges from 0 (beginning of the slider)
+        /// to 1 (end of the slider).
+        /// </summary>
+        /// <param name="progress">Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <returns></returns>
         public Vector2 PositionAt(double progress)
         {
-            progress = MathHelper.Clamp(progress, 0, 1);
-
-            double index = progress * (calculatedPath.Count - 1);
-            int flooredIndex = (int)index;
-
-            Vector2 pos = calculatedPath[flooredIndex];
-            if (index != flooredIndex)
-                pos += (calculatedPath[flooredIndex + 1] - pos) * (float)(index - flooredIndex);
-
-            return pos;
+            double d = progressToDistance(progress);
+            return interpolateVertices(indexOfDistance(d), d);
         }
     }
 }
