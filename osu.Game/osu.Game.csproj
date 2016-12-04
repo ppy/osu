@@ -67,12 +67,15 @@
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
+    <Compile Include="Modes\Mod.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Modes\Score.cs" />
     <Compile Include="Modes\ScoreProcesssor.cs" />
     <Compile Include="Online\API\IOnlineComponent.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
+    <Compile Include="Overlays\ModButton.cs" />
+    <Compile Include="Overlays\ModSelection.cs" />
     <Compile Include="Overlays\MusicController.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\Formats\ConstructableBeatmapDecoder.cs" />
