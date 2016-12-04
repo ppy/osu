@@ -4,12 +4,10 @@
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
 using osu.Game.Modes;
-using osu.Game.Online.API;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Configuration
 {
-    class OsuConfigManager : ConfigManager<OsuConfig>
+    public class OsuConfigManager : ConfigManager<OsuConfig>
     {
         protected override void InitialiseDefaults()
         {
@@ -129,7 +127,8 @@ namespace osu.Game.Configuration
             //Set(OsuConfig.Skin, SkinManager.DEFAULT_SKIN);
             Set(OsuConfig.SkinSamples, true);
             Set(OsuConfig.SkipTablet, false);
-            Set(OsuConfig.SnakingSliders, true);
+            Set(OsuConfig.SnakingInSliders, true);
+            Set(OsuConfig.SnakingOutSliders, false);
             Set(OsuConfig.Tablet, false);
             Set(OsuConfig.UpdatePending, false);
             Set(OsuConfig.UseSkinCursor, false);
@@ -189,7 +188,7 @@ namespace osu.Game.Configuration
         }
     }
 
-    enum OsuConfig
+    public enum OsuConfig
     {
         // New osu:
         PlayMode,
@@ -303,7 +302,8 @@ namespace osu.Game.Configuration
         Skin,
         SkinSamples,
         SkipTablet,
-        SnakingSliders,
+        SnakingInSliders,
+        SnakingOutSliders,
         Tablet,
         UpdatePending,
         UserFilter,
@@ -345,5 +345,6 @@ namespace osu.Game.Configuration
         Ticker,
         CompatibilityContext,
         CanForceOptimusCompatibility,
+
     }
 }

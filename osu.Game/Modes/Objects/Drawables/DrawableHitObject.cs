@@ -87,9 +87,9 @@ namespace osu.Game.Modes.Objects.Drawables
             //todo: consider making abstract.
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             UpdateJudgement(false);
         }
