@@ -44,8 +44,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            line1.TransformSpacingTo(14, 1800, EasingTypes.OutQuint);
-            line2.TransformSpacingTo(14, 1800, EasingTypes.OutQuint);
+            line1.TransformSpacingTo(new Vector2(14, 0), 1800, EasingTypes.OutQuint);
+            line2.TransformSpacingTo(new Vector2(14, 0), 1800, EasingTypes.OutQuint);
         }
     }
 }
