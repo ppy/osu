@@ -113,7 +113,9 @@ namespace osu.Game.Overlays.Toolbar
 
                         Add(s);
 
-                        s.FadeInFromZero(200);
+                        //todo: fix this... clock dependencies are a pain
+                        if (s.Clock != null)
+                            s.FadeInFromZero(200);
                     });
                 }
             }
