@@ -5,6 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -27,6 +30,8 @@ namespace osu.Game.Screens.Menu
         public Action OnMulti;
         public Action OnChart;
         public Action OnTest;
+
+        private AudioSample sampleOsuClick;
 
         private FlowContainerWithOrigin buttonFlow;
 
@@ -111,6 +116,12 @@ namespace osu.Game.Screens.Menu
             buttonFlow.Add(buttonsTopLevel);
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleOsuClick = audio.Sample.Get(@"Menu/menuhit");
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -158,7 +169,7 @@ namespace osu.Game.Screens.Menu
             switch (state)
             {
                 case MenuState.Initial:
-                    //Game.Audio.PlaySamplePositional(@"menuhit");
+                    sampleOsuClick.Play();
                     State = MenuState.TopLevel;
                     return;
                 case MenuState.TopLevel:
