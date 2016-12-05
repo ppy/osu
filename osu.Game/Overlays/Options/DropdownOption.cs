@@ -49,6 +49,18 @@ namespace osu.Game.Overlays.Options
             dropdown.SelectedValue = bindable.Value;
         }
 
+        void Dropdown_ValueChanged(object sender, EventArgs e)
+        {
+            bindable.Value = dropdown.SelectedValue;
+        }
+        
+        protected override void Dispose(bool isDisposing)
+        {
+            bindable.ValueChanged -= Bindable_ValueChanged;
+            dropdown.ValueChanged -= Dropdown_ValueChanged;
+            base.Dispose(isDisposing);
+        }
+
         public DropdownOption()
         {
             if (!typeof(T).IsEnum)
@@ -69,6 +81,7 @@ namespace osu.Game.Overlays.Options
                     Items = items.Select(item => new StyledDropDownMenuItem<T>(item.Item1, item.Item2))
                 }
             };
+            dropdown.ValueChanged += Dropdown_ValueChanged;
         }
         
         private class StyledDropDownMenu<U> : DropDownMenu<U>
