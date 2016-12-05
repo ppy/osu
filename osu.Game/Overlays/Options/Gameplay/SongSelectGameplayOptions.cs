@@ -15,36 +15,22 @@ namespace osu.Game.Overlays.Options.Gameplay
     {
         protected override string Header => "Song Select";
 
-        private BindableInt starMinimum, starMaximum;
-        private StarCounter counterMin, counterMax;
-
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            starMinimum = (BindableInt)config.GetBindable<int>(OsuConfig.DisplayStarsMinimum);
-            starMaximum = (BindableInt)config.GetBindable<int>(OsuConfig.DisplayStarsMaximum);
             Children = new Drawable[]
             {
-                new SliderOption<int> { LabelText = "Display beatmaps from", Bindable = starMinimum },
-                counterMin = new StarCounter { Count = starMinimum.Value },
-                new SliderOption<int> { LabelText = "up to", Bindable = starMaximum },
-                counterMax = new StarCounter { Count = starMaximum.Value },
+                new SliderOption<double>
+                {
+                    LabelText = "Display beatmaps from",
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.DisplayStarsMinimum)
+                },
+                new SliderOption<double>
+                {
+                    LabelText = "up to",
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.DisplayStarsMaximum)
+                },
             };
-            starMinimum.ValueChanged += starValueChanged;
-            starMaximum.ValueChanged += starValueChanged;
-        }
-
-        private void starValueChanged(object sender, EventArgs e)
-        {
-            counterMin.Count = starMinimum.Value;
-            counterMax.Count = starMaximum.Value;
-        }
-        
-        protected override void Dispose(bool isDisposing)
-        {
-            starMinimum.ValueChanged -= starValueChanged;
-            starMaximum.ValueChanged -= starValueChanged;
-            base.Dispose(isDisposing);
         }
     }
 }
