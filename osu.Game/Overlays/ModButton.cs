@@ -6,21 +6,17 @@ using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
-using osu.Game.Graphics;
 using osu.Game.Modes;
-using osu.Framework.Extensions;
 
 namespace osu.Game.Overlays
 {
     class ModButton : ClickableContainer, IStateful<ModButtonState>
     {
-        private TextAwesome icon, bg;
+        private Mod Mod;
         private Color4 bgColor;
 
         public ModButtonState State{get; set;}
-        private Mod Mod;
 
         private const int transform_time = 150;
 
@@ -40,30 +36,13 @@ namespace osu.Game.Overlays
             Margin = new MarginPadding { Left = 40, Top = -15 };
             Children = new Drawable[]
             {
-                bg = new TextAwesome
+                new DrawableMod
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    TextSize = 80,
-                    Icon = FontAwesome.fa_osu_mod_bg,
-                    Colour = bgColor,
-                    Shadow = true,
-                },
-                icon = new TextAwesome
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    TextSize = 50,
-                    Icon = Mod.Icon,
-                    Colour = new Color4(84,84,84,255)
-                },
-                new SpriteText
-                {
-                    Margin = new MarginPadding { Top = 15 },
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
-                    TextSize = 18,
-                    Text = Mod.Name.GetDescription(),
+                    Mod = Mod,
+                    Colour = bgColor
                 }
             };
 

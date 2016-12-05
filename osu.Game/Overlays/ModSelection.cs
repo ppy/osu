@@ -14,6 +14,7 @@ using osu.Framework.MathUtils;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Modes;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -210,17 +211,18 @@ namespace osu.Game.Overlays
                                         {
                                             Origin = Anchor.CentreLeft,
                                             Anchor = Anchor.CentreLeft,
-                                            Text = @"1.00",
+                                            Text = @"1.00 ",
                                             TextSize = textsize_multiplier_info,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        new SpriteText
+                                        new TextAwesome
                                         {
                                             Origin = Anchor.CentreLeft,
                                             Anchor = Anchor.CentreLeft,
-                                            Text = @" X",
+                                            Icon = FontAwesome.fa_close,
+                                            //Text = @" X",
                                             TextSize = textsize_multiplier_info,
-                                            Font = @"Exo2.0-Bold",
+                                            //Font = @"Exo2.0-Bold",
                                         }
                                     }
                                 },
@@ -290,7 +292,7 @@ namespace osu.Game.Overlays
 
                 totalmultiplier *= m.ScoreMultiplier;
             }
-            multiplier.Text = totalmultiplier.ToString();
+            multiplier.Text = totalmultiplier.ToString() + " ";
 
             if (isRanked)
                 ranked.Text = "Ranked";
@@ -311,7 +313,7 @@ namespace osu.Game.Overlays
             foreach (ModButton button in assistmods.Children)
                 button.Disarm();
 
-            multiplier.Text = "1.0";
+            multiplier.Text = "1.0 ";
             ranked.Text = "Ranked";
         }
         private void RecreateButtons(PlayMode playmode)
@@ -351,92 +353,92 @@ namespace osu.Game.Overlays
             TempMods.Add(new Mod
             {
                 Type = ModType.DiffReducing,
-                Name = ModName.EZ,
-                Icon = Graphics.FontAwesome.fa_osu_mod_easy,
+                Name = Mods.Easy,
+                Icon = FontAwesome.fa_osu_mod_easy,
                 ScoreMultiplier = 0.5
             });
             TempMods.Add(new Mod
             {
                 Type = ModType.DiffReducing,
-                Name = ModName.NF,
-                Icon = Graphics.FontAwesome.fa_osu_mod_nofail,
+                Name = Mods.NoFail,
+                Icon = FontAwesome.fa_osu_mod_nofail,
                 ScoreMultiplier = 0.5
             });
             TempMods.Add(new Mod
             {
                 Type = ModType.DiffReducing,
-                Name = ModName.HT,
-                Icon = Graphics.FontAwesome.fa_osu_mod_halftime,
-                ScoreMultiplier = 0.5
+                Name = Mods.HalfTime,
+                Icon = FontAwesome.fa_osu_mod_halftime,
+                ScoreMultiplier = 0.3
             });
             TempMods.Add(new Mod
             {
                 Type = ModType.DiffIncreasing,
-                Name = ModName.HR,
-                Icon = Graphics.FontAwesome.fa_osu_mod_hardrock,
+                Name = Mods.HardRock,
+                Icon = FontAwesome.fa_osu_mod_hardrock,
                 ScoreMultiplier = 1.06 // FIXME
             });
             TempMods.Add(new Mod
             {
                 Type = ModType.DiffIncreasing,
-                Name = ModName.SD,
-                Icon = Graphics.FontAwesome.fa_osu_mod_suddendeath,
+                Name = Mods.SuddenDeath,
+                Icon = FontAwesome.fa_osu_mod_suddendeath,
                 ScoreMultiplier = 1.0
             });
             TempMods.Add(new Mod
             {
                 Type = ModType.DiffIncreasing,
-                Name = ModName.DT,
-                Icon = Graphics.FontAwesome.fa_osu_mod_doubletime,
+                Name = Mods.DoubleTime,
+                Icon = FontAwesome.fa_osu_mod_doubletime,
+                ScoreMultiplier = 1.12 // FIXME
+            });
+            TempMods.Add(new Mod
+            {
+                Type = ModType.DiffIncreasing,
+                Name = Mods.Hidden,
+                Icon = FontAwesome.fa_osu_mod_hidden,
                 ScoreMultiplier = 1.06 // FIXME
             });
             TempMods.Add(new Mod
             {
                 Type = ModType.DiffIncreasing,
-                Name = ModName.HD,
-                Icon = Graphics.FontAwesome.fa_osu_mod_hidden,
-                ScoreMultiplier = 1.06 // FIXME
-            });
-            TempMods.Add(new Mod
-            {
-                Type = ModType.DiffIncreasing,
-                Name = ModName.FL,
-                Icon = Graphics.FontAwesome.fa_osu_mod_flashlight,
-                ScoreMultiplier = 1.06 // FIXME
+                Name = Mods.Flashlight,
+                Icon = FontAwesome.fa_osu_mod_flashlight,
+                ScoreMultiplier = 1.12 // FIXME
             });
             TempMods.Add(new Mod
             {
                 Type = ModType.Assistance,
-                Name = ModName.RX,
-                Icon = Graphics.FontAwesome.fa_osu_mod_relax,
+                Name = Mods.Relax,
+                Icon = FontAwesome.fa_osu_mod_relax,
                 ScoreMultiplier = 0
             });
             TempMods.Add(new Mod
             {
                 Type = ModType.Assistance,
-                Name = ModName.AP,
-                Icon = Graphics.FontAwesome.fa_osu_mod_autopilot,
+                Name = Mods.Relax2,
+                Icon = FontAwesome.fa_osu_mod_autopilot,
                 ScoreMultiplier = 0
             });
             TempMods.Add(new Mod
             {
                 Type = ModType.Assistance,
-                Name = ModName.TP,
-                Icon = Graphics.FontAwesome.fa_osu_mod_target,
+                Name = Mods.Target,
+                Icon = FontAwesome.fa_osu_mod_target,
                 ScoreMultiplier = 0
             });
             TempMods.Add(new Mod
             {
                 Type = ModType.Assistance,
-                Name = ModName.SO,
-                Icon = Graphics.FontAwesome.fa_osu_mod_spunout,
+                Name = Mods.SpunOut,
+                Icon = FontAwesome.fa_osu_mod_spunout,
                 ScoreMultiplier = 0
             });
             TempMods.Add(new Mod
             {
                 Type = ModType.Assistance,
-                Name = ModName.AU,
-                Icon = Graphics.FontAwesome.fa_osu_mod_auto,
+                Name = Mods.Autoplay,
+                Icon = FontAwesome.fa_osu_mod_auto,
                 ScoreMultiplier = 0
             });
         }
@@ -461,18 +463,12 @@ namespace osu.Game.Overlays
         protected override Framework.Graphics.Sprites.Triangle CreateTriangle()
         {
             var scale = TriangleScale * 4 * RNG.NextSingle() * 0.4f + 0.2f;
-            const float size = 100;
 
-            return new Framework.Graphics.Sprites.Triangle
-            {
-                Origin = Anchor.TopCentre,
-                RelativePositionAxes = Axes.Both,
-                Scale = new Vector2(scale),
-                Depth = scale,
-                Size = new Vector2(size, 0.866f * size),
-                Colour = colors[RNG.Next(0,colors.Count)]
+            Framework.Graphics.Sprites.Triangle result = base.CreateTriangle();
+            result.Colour = colors[RNG.Next(0, colors.Count)];
+            result.Scale = new Vector2(scale);
 
-            };
+            return result;
         }
     }
 }
