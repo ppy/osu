@@ -20,6 +20,7 @@ using osu.Game.Graphics.UserInterface.Volume;
 using osu.Game.Database;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Transformations;
+using osu.Framework.Timing;
 using osu.Game.Modes;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
@@ -154,10 +155,18 @@ namespace osu.Game
 
         private bool globalHotkeyPressed(InputState state, KeyDownEventArgs args)
         {
+            if (args.Repeat) return false;
+
             switch (args.Key)
             {
                 case Key.F8:
                     chat.ToggleVisibility();
+                    return true;
+                case Key.PageUp:
+                case Key.PageDown:
+                    var rate = ((Clock as ThrottledFrameClock).Source as StopwatchClock).Rate * (args.Key == Key.PageUp ? 1.1f : 0.9f);
+                    ((Clock as ThrottledFrameClock).Source as StopwatchClock).Rate = rate;
+                    Logger.Log($@"Adjusting game clock to {rate}", LoggingTarget.Debug);
                     return true;
             }
 
