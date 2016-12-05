@@ -155,7 +155,6 @@ namespace osu.Game.Screens.Menu
 
         private void onExit()
         {
-            State = MenuState.Exit;
             OnExit?.Invoke();
         }
 
