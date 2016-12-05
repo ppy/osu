@@ -24,6 +24,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Screens.Play;
 using osu.Framework;
+using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 
@@ -44,6 +45,9 @@ namespace osu.Game.Screens.Select
 
         private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
+
+        private AudioSample sampleChangeDifficulty;
+        private AudioSample sampleChangeBeatmap;
 
         class WedgeBackground : Container
         {
@@ -163,6 +167,9 @@ namespace osu.Game.Screens.Select
 
             trackManager = audio.Track;
 
+            sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
+            sampleChangeBeatmap = audio.Sample.Get(@"SongSelect/select-expand");
+
             initialAddSetsTask = new CancellationTokenSource();
 
             Task.Factory.StartNew(() => addBeatmapSets(game, initialAddSetsTask.Token), initialAddSetsTask.Token);
@@ -259,7 +266,14 @@ namespace osu.Game.Screens.Select
         private void selectionChanged(BeatmapGroup group, BeatmapInfo beatmap)
         {
             if (!beatmap.Equals(Beatmap?.BeatmapInfo))
+            {
+                if (beatmap.BeatmapSetID == Beatmap?.BeatmapInfo.BeatmapSetID)
+                    sampleChangeDifficulty.Play();
+                else
+                    sampleChangeBeatmap.Play();
+
                 Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
+            }
 
             ensurePlayingSelected();
         }
