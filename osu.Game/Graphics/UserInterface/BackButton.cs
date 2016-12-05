@@ -1,6 +1,9 @@
 ﻿// Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
 
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
@@ -26,6 +29,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private static readonly Vector2 size_extended = new Vector2(140, 50);
         private static readonly Vector2 size_retracted = new Vector2(100, 50);
+        private AudioSample sampleClick;
 
         public BackButton()
         {
@@ -135,6 +139,12 @@ namespace osu.Game.Graphics.UserInterface
             });
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleClick = audio.Sample.Get(@"Menu/menuback");
+        }
+
         protected override bool OnClick(InputState state)
         {
             var flash = new Box
@@ -147,6 +157,8 @@ namespace osu.Game.Graphics.UserInterface
 
             flash.FadeOutFromOne(200);
             flash.Expire();
+
+            sampleClick.Play();
 
             return base.OnClick(state);
         }
