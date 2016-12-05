@@ -19,13 +19,10 @@ namespace osu.Game.Graphics.UserInterface
     {
         private TextAwesome icon;
 
-        private Container leftContainer;
-        private Container rightContainer;
-
         private Box leftBox;
         private Box rightBox;
 
-        private const double transform_time = 300.0;
+        private const double transform_time = 600;
         private const int pulse_length = 250;
 
         private const float shear = 0.1f;
@@ -40,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                leftContainer = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.4f,
@@ -60,7 +57,7 @@ namespace osu.Game.Graphics.UserInterface
                         },
                     }
                 },
-                rightContainer = new Container
+                new Container
                 {
                     Origin = Anchor.TopRight,
                     Anchor = Anchor.TopRight,
@@ -88,10 +85,7 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        public override bool Contains(Vector2 screenSpacePos)
-        {
-            return leftBox.Contains(screenSpacePos) || rightBox.Contains(screenSpacePos);
-        }
+        public override bool Contains(Vector2 screenSpacePos) => leftBox.Contains(screenSpacePos) || rightBox.Contains(screenSpacePos);
 
         protected override bool OnHover(InputState state)
         {
