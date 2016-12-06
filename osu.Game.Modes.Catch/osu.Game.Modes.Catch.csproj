@@ -57,6 +57,9 @@
     <Compile Include="CatchRuleset.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\osu.licenseheader">
+      <Link>osu.licenseheader</Link>
+    </None>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>
