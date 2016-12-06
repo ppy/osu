@@ -44,14 +44,11 @@ namespace osu.Desktop.VisualTests.Tests
                 Key key = (Key)((int)Key.A + RNG.Next(26));
                 kc.Add(new KeyCounterKeyboard(key.ToString(), key));
             });
-            Add(new SliderBar<int>
+            ButtonsContainer.Add(new SliderBar<int>
             {
-                Origin = Anchor.TopLeft,
-                Anchor = Anchor.TopLeft,
                 Width = 150,
                 Height = 10,
                 SelectionColor = Color4.Orange,
-                Position = new Vector2(0, 50),
                 Bindable = bindable
             });
             Add(kc);
