@@ -48,6 +48,9 @@ namespace osu.Game.Modes.Objects.Drawables
             base.LoadComplete();
 
             Judgement = CreateJudgementInfo();
+
+            //force application of the state that was set before we loaded.
+            UpdateState(State);
         }
 
         /// <summary>
