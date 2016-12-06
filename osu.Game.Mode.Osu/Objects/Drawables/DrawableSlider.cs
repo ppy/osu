@@ -68,8 +68,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             base.LoadComplete();
 
-            //force application of the state that was set before we loaded.
-            UpdateState(State);
 
             body.PathWidth = 32;
         }

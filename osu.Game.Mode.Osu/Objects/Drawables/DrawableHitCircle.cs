@@ -64,14 +64,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             Size = circle.DrawSize;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            //force application of the state that was set before we loaded.
-            UpdateState(State);
-        }
-
         double hit50 = 150;
         double hit100 = 80;
         double hit300 = 30;
