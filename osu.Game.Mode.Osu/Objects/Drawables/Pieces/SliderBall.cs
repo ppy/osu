@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
@@ -30,8 +31,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Colour = Color4.Orange,
-                    Width = 64,
-                    Height = 64,
+                    Width = 80,
+                    Height = 80,
                 },
                 new Container
                 {
@@ -51,8 +52,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                         },
                     }
                 }
-
             };
+
+            Scale = new Vector2(0.94f);
+
         }
 
         private InputState lastState;

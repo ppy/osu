@@ -29,7 +29,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             if (!IsLoaded) return;
 
-            Flush(true);
+            Flush();
 
             UpdateInitialState();
 
