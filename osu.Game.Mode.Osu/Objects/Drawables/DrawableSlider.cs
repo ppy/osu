@@ -83,7 +83,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             base.UpdateState(state);
 
             Delay(HitObject.Duration);
-            FadeOut(300);
+            FadeOut(100);
         }
     }
 
