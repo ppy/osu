@@ -3,9 +3,12 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -13,13 +16,16 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
     {
         private Slider slider;
 
-        private DrawableHitCircle startCircle;
+        private DrawableHitCircle initialCircle;
 
         private List<ISliderProgress> components = new List<ISliderProgress>();
 
+        SliderBody body;
+
+        SliderBouncer bouncer1, bouncer2;
+
         public DrawableSlider(Slider s) : base(s)
         {
-            SliderBody body;
             SliderBall ball;
 
             slider = s;
@@ -35,8 +41,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Position = s.Position,
                     PathWidth = 36,
                 },
+                bouncer1 = new SliderBouncer(slider, false) { Position = slider.Curve.PositionAt(1) },
+                bouncer2 = new SliderBouncer(slider, true) { Position = slider.Position },
                 ball = new SliderBall(slider),
-                startCircle = new DrawableHitCircle(new HitCircle
+                initialCircle = new DrawableHitCircle(new HitCircle
                 {
                     StartTime = s.StartTime,
                     Position = s.Position,
@@ -49,6 +57,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             components.Add(body);
             components.Add(ball);
+            components.Add(bouncer1);
+            components.Add(bouncer2);
         }
 
         protected override void Update()
@@ -63,13 +73,15 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             if (repeat % 2 == 1)
                 progress = 1 - progress;
 
+            bouncer2.Position = slider.Curve.PositionAt(body.SnakedAmount);
+
             components.ForEach(c => c.UpdateProgress(progress, repeat));
         }
 
         protected override void CheckJudgement(bool userTriggered)
         {
             var j = Judgement as OsuJudgementInfo;
-            var sc = startCircle.Judgement as OsuJudgementInfo;
+            var sc = initialCircle.Judgement as OsuJudgementInfo;
 
             if (!userTriggered && Time.Current >= HitObject.EndTime)
             {
@@ -78,12 +90,19 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             }
         }
 
+        protected override void UpdateInitialState()
+        {
+            base.UpdateInitialState();
+            body.Alpha = 1;
+        }
+
         protected override void UpdateState(ArmedState state)
         {
             base.UpdateState(state);
 
-            Delay(HitObject.Duration);
-            FadeOut(100);
+            Delay(HitObject.Duration, true);
+            body.FadeOut(160);
+            FadeOut(800);
         }
     }
 

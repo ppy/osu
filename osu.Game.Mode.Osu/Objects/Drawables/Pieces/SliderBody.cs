@@ -58,7 +58,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                         },
                     }
                 },
-
             };
 
             container.Attach(RenderbufferInternalFormat.DepthComponent16);
@@ -90,6 +89,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             snakingIn = config.GetBindable<bool>(OsuConfig.SnakingInSliders);
             snakingOut = config.GetBindable<bool>(OsuConfig.SnakingOutSliders);
         }
+
+        public double SnakedAmount { get; private set; }
 
         private List<Vector2> currentCurve = new List<Vector2>();
         private bool updateSnaking(double p0, double p1)
@@ -123,7 +124,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         public void UpdateProgress(double progress, int repeat)
         {
             double start = 0;
-            double end = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - DrawableOsuHitObject.TIME_PREEMPT)) / DrawableOsuHitObject.TIME_FADEIN, 0, 1) : 1;
+            double end = SnakedAmount = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - DrawableOsuHitObject.TIME_PREEMPT)) / DrawableOsuHitObject.TIME_FADEIN, 0, 1) : 1;
 
             if (repeat >= slider.RepeatCount - 1)
             {
@@ -188,12 +189,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = Color4.White,
-                                Size = new Vector2(0.13f, 1),
+                                Size = new Vector2(0.16f, 1),
                             },
                             gradientPortion = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(0.85f, 1),
+                                Size = new Vector2(0.82f, 1),
                             },
                         },
                     }
