@@ -142,6 +142,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             SetRange(start, end);
         }
 
+        // --------------------------------------------- DO NOT MERGE THIS -----------------------------------------------------------------------
         public class BodyTexture : BufferedContainer
         {
             private Box gradientPortion;
@@ -201,5 +202,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                 };
             }
         }
+        // --------------------------------------------- DO NOT MERGE THIS -----------------------------------------------------------------------
     }
 }
