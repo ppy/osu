@@ -1,4 +1,7 @@
-﻿using System;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -11,9 +14,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableOsuHitObject : DrawableHitObject
     {
-        protected const float TIME_PREEMPT = 600;
-        protected const float TIME_FADEIN = 400;
-        protected const float TIME_FADEOUT = 500;
+        public const float TIME_PREEMPT = 600;
+        public const float TIME_FADEIN = 400;
+        public const float TIME_FADEOUT = 500;
 
         public DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
