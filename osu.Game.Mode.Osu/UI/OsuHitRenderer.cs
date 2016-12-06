@@ -6,7 +6,6 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Game.Modes.UI;
-using OsuConverter = osu.Game.Modes.Osu.Objects.OsuHitObjectConverter;
 
 namespace osu.Game.Modes.Osu.UI
 {

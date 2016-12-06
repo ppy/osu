@@ -22,7 +22,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private ExplodePiece explode;
         private NumberPiece number;
         private GlowPiece glow;
-        private HitExplosion explosion;
 
         public DrawableHitCircle(OsuHitObject h) : base(h)
         {
@@ -130,20 +129,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 case ArmedState.Idle:
                     Delay(osuObject.Duration + TIME_PREEMPT);
                     FadeOut(TIME_FADEOUT);
-
-                    explosion?.Expire();
-                    explosion = null;
                     break;
                 case ArmedState.Miss:
                     ring.FadeOut();
                     circle.FadeOut();
                     number.FadeOut();
                     glow.FadeOut();
-
-                    explosion?.Expire();
-                    explosion = null;
-
-                    Schedule(() => Add(explosion = new HitExplosion((OsuJudgementInfo)Judgement)));
 
                     FadeOut(800);
                     break;
@@ -155,8 +146,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     flash.FadeOut(100);
 
                     explode.FadeIn(flash_in);
-
-                    Schedule(() => Add(explosion = new HitExplosion((OsuJudgementInfo)Judgement)));
 
                     Delay(flash_in, true);
 

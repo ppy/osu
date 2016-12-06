@@ -4,12 +4,15 @@
 using osu.Game.Database;
 using osu.Game.Beatmaps;
 using System;
+using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects
 {
     public class Slider : OsuHitObject
     {
         public override double EndTime => StartTime + RepeatCount * Curve.Length / Velocity;
+
+        public override Vector2 EndPosition => RepeatCount % 2 == 0 ? Position : Curve.PositionAt(1);
 
         public double Velocity;
 

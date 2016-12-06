@@ -3,19 +3,18 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Game.Modes.UI;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.UI
 {
     public class OsuPlayfield : Playfield
     {
         private Container approachCircles;
+        private Container judgementLayer;
 
         public override Vector2 Size
         {
@@ -35,11 +34,17 @@ namespace osu.Game.Modes.Osu.UI
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(0.75f);
 
-            AddInternal(new Drawable[]
+            Add(new Drawable[]
             {
+                judgementLayer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = 1,
+                },
                 approachCircles = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Depth = -1,
                 }
             });
         }
@@ -52,7 +57,16 @@ namespace osu.Game.Modes.Osu.UI
                 approachCircles.Add(c.ApproachCircle.CreateProxy());
             }
 
+            h.OnJudgement += judgement;
+
             base.Add(h);
+        }
+
+        private void judgement(DrawableHitObject h, JudgementInfo j)
+        {
+            HitExplosion explosion = new HitExplosion((OsuJudgementInfo)j, (OsuHitObject)h.HitObject);
+
+            judgementLayer.Add(explosion);
         }
     }
 }
