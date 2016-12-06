@@ -93,26 +93,24 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         private void updateBody(int repeat, double progress)
         {
-            double drawStartProgress = 0;
-            double drawEndProgress = MathHelper.Clamp((Time.Current - slider.StartTime + TIME_PREEMPT) / TIME_FADEIN, 0, 1);
+            double start = 0;
+            double end = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - TIME_PREEMPT)) / TIME_FADEIN, 0, 1) : 1;
 
             if (repeat >= slider.RepeatCount - 1)
             {
                 if (Math.Min(repeat, slider.RepeatCount - 1) % 2 == 1)
                 {
-                    drawStartProgress = 0;
-                    drawEndProgress = progress;
+                    start = 0;
+                    end = snakingOut ? progress : 1;
                 }
                 else
                 {
-                    drawStartProgress = progress;
-                    drawEndProgress = 1;
+                    start = snakingOut ? progress : 0;
+                    end = 1;
                 }
             }
 
-            body.SetRange(
-                snakingOut ? drawStartProgress : 0,
-                snakingIn ? drawEndProgress : 1);
+            body.SetRange(start, end);
         }
 
         protected override void Update()
