@@ -6,13 +6,12 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Configuration;
 using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Graphics.ES30;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
@@ -20,7 +19,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
     public class SliderBody : Container, ISliderProgress
     {
         private Path path;
-        private BodyTexture pathTexture;
         private BufferedContainer container;
 
         public float PathWidth
@@ -29,7 +27,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             set
             {
                 path.PathWidth = value;
-                pathTexture.Size = new Vector2(value, 1);
             }
         }
 
@@ -43,10 +40,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                pathTexture = new BodyTexture
-                {
-                    MainColour = s.Colour
-                },
                 container = new BufferedContainer
                 {
                     CacheDrawnFrameBuffer = true,
@@ -88,6 +81,45 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         {
             snakingIn = config.GetBindable<bool>(OsuConfig.SnakingInSliders);
             snakingOut = config.GetBindable<bool>(OsuConfig.SnakingOutSliders);
+
+            int textureWidth = (int)PathWidth * 2;
+
+            //initialise background
+            var upload = new TextureUpload(textureWidth * 4);
+            var bytes = upload.Data;
+
+            const float aa_portion = 0.02f;
+            const float border_portion = 0.18f;
+            const float gradient_portion = 1 - border_portion;
+
+            const float opacity_at_centre = 0.3f;
+            const float opacity_at_edge = 0.8f;
+
+            for (int i = 0; i < textureWidth; i++)
+            {
+                float progress = (float)i / (textureWidth - 1);
+
+                if (progress <= border_portion)
+                {
+                    bytes[i * 4] = 255;
+                    bytes[i * 4 + 1] = 255;
+                    bytes[i * 4 + 2] = 255;
+                    bytes[i * 4 + 3] = (byte)(Math.Min(progress / aa_portion, 1) * 255);
+                }
+                else
+                {
+                    progress -= border_portion;
+
+                    bytes[i * 4] = (byte)(slider.Colour.R * 255);
+                    bytes[i * 4 + 1] = (byte)(slider.Colour.G * 255);
+                    bytes[i * 4 + 2] = (byte)(slider.Colour.B * 255);
+                    bytes[i * 4 + 3] = (byte)((opacity_at_edge - (opacity_at_edge - opacity_at_centre) * progress / gradient_portion) * (slider.Colour.A * 255));
+                }
+            }
+
+            var texture = new Texture(textureWidth, 1);
+            texture.SetData(upload);
+            path.Texture = texture;
         }
 
         public double SnakedEnd { get; private set; }
@@ -110,18 +142,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             return true;
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            var texture = pathTexture.Texture;
-            if (texture != null)
-            {
-                path.Texture = texture;
-                pathTexture.Alpha = 0;
-            }
-        }
-
         public void UpdateProgress(double progress, int repeat)
         {
             SnakedStart = 0;
@@ -142,67 +162,5 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 
             SetRange(SnakedStart, SnakedEnd);
         }
-
-        // --------------------------------------------- DO NOT MERGE THIS -----------------------------------------------------------------------
-        public class BodyTexture : BufferedContainer
-        {
-            private Box gradientPortion;
-            private BufferedContainerDrawNode lastNode;
-            public Texture Texture => lastNode?.FrameBuffers[0].Texture != null ? new Texture(lastNode.FrameBuffers[0].Texture) : null;
-
-            protected override void ApplyDrawNode(DrawNode node)
-            {
-                base.ApplyDrawNode(node);
-                lastNode = node as BufferedContainerDrawNode;
-            }
-
-            public Color4 MainColour
-            {
-                set
-                {
-                    gradientPortion.ColourInfo = ColourInfo.GradientHorizontal(
-                        value,
-                        new Color4(value.R, value.G, value.B, value.A * 0.4f)
-                    );
-                }
-            }
-
-            public BodyTexture()
-            {
-                Children = new[]
-                {
-                    new FlowContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Direction = FlowDirection.HorizontalOnly,
-                        Masking = true,
-                        Children = new[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                ColourInfo = ColourInfo.GradientHorizontal(
-                                    new Color4(255, 255, 255, 0),
-                                    Color4.White
-                                ),
-                                Size = new Vector2(0.02f, 1),
-                            },
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White,
-                                Size = new Vector2(0.16f, 1),
-                            },
-                            gradientPortion = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(0.82f, 1),
-                            },
-                        },
-                    }
-                };
-            }
-        }
-        // --------------------------------------------- DO NOT MERGE THIS -----------------------------------------------------------------------
     }
 }
