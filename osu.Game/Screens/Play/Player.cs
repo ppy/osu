@@ -67,12 +67,10 @@ namespace osu.Game.Screens.Play
             }
 
             sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
-            Clock = new InterpolatingFramedClock(sourceClock);
 
             Schedule(() =>
             {
                 sourceClock.Reset();
-                sourceClock.Start();
             });
 
             var beatmap = Beatmap.Beatmap;
@@ -103,6 +101,7 @@ namespace osu.Game.Screens.Play
             {
                 new PlayerInputManager(game.Host)
                 {
+                    Clock = new InterpolatingFramedClock(sourceClock),
                     PassThrough = false,
                     Children = new Drawable[]
                     {
@@ -111,6 +110,21 @@ namespace osu.Game.Screens.Play
                 },
                 scoreOverlay,
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Delay(250, true);
+            Content.FadeIn(250);
+
+            Delay(500, true);
+
+            Schedule(() =>
+            {
+                sourceClock.Start();
+            });
         }
 
         private void hitRenderer_OnAllJudged()
@@ -130,12 +144,8 @@ namespace osu.Game.Screens.Play
             base.OnEntering(last);
 
             (Background as BackgroundModeBeatmap)?.BlurTo(Vector2.Zero, 1000);
-        }
 
-        protected override void Update()
-        {
-            base.Update();
-            Clock.ProcessFrame();
+            Content.Alpha = 0;
         }
 
         class PlayerInputManager : UserInputManager
