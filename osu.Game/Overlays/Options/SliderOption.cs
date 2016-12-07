@@ -1,6 +1,9 @@
 ﻿using System;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -53,6 +56,8 @@ namespace osu.Game.Overlays.Options
             IComparable, IFormattable, IConvertible, IComparable<U>, IEquatable<U>
         {
             private Container nub;
+            private AudioSample sample;
+            private float prevAmount = -1;
         
             public OsuSliderBar()
             {
@@ -83,8 +88,17 @@ namespace osu.Game.Overlays.Options
                 Box.Colour = new Color4(255, 102, 170, 100);
             }
 
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                sample = audio.Sample.Get(@"Sliderbar/sliderbar");
+            }
+
             protected override void UpdateAmount(float amt)
             {
+                if (prevAmount != -1 && (int)(prevAmount * 10) != (int)(amt * 10))
+                    sample?.Play();
+                prevAmount = amt;
                 nub.MoveToX(amt, 300, EasingTypes.OutQuint);
                 SelectionBox.ScaleTo(
                     new Vector2(DrawWidth * amt - Height / 2 + 1, 1),
