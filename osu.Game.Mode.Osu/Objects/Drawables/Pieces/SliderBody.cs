@@ -90,7 +90,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             snakingOut = config.GetBindable<bool>(OsuConfig.SnakingOutSliders);
         }
 
-        public double SnakedAmount { get; private set; }
+        public double SnakedEnd { get; private set; }
+        public double SnakedStart { get; private set; }
 
         private List<Vector2> currentCurve = new List<Vector2>();
         private bool updateSnaking(double p0, double p1)
@@ -123,23 +124,23 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 
         public void UpdateProgress(double progress, int repeat)
         {
-            double start = 0;
-            double end = SnakedAmount = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - DrawableOsuHitObject.TIME_PREEMPT)) / DrawableOsuHitObject.TIME_FADEIN, 0, 1) : 1;
+            SnakedStart = 0;
+            SnakedEnd = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - DrawableOsuHitObject.TIME_PREEMPT)) / DrawableOsuHitObject.TIME_FADEIN, 0, 1) : 1;
 
             if (repeat >= slider.RepeatCount - 1)
             {
                 if (Math.Min(repeat, slider.RepeatCount - 1) % 2 == 1)
                 {
-                    start = 0;
-                    end = snakingOut ? progress : 1;
+                    SnakedStart = 0;
+                    SnakedEnd = snakingOut ? progress : 1;
                 }
                 else
                 {
-                    start = snakingOut ? progress : 0;
+                    SnakedStart = snakingOut ? progress : 0;
                 }
             }
 
-            SetRange(start, end);
+            SetRange(SnakedStart, SnakedEnd);
         }
 
         // --------------------------------------------- DO NOT MERGE THIS -----------------------------------------------------------------------
