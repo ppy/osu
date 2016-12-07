@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
@@ -16,35 +17,34 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
     {
         private readonly Slider slider;
         private readonly bool isEnd;
+        private TextAwesome icon;
 
         public SliderBouncer(Slider slider, bool isEnd)
         {
             this.slider = slider;
             this.isEnd = isEnd;
 
-            Masking = true;
             AutoSizeAxes = Axes.Both;
             BlendingMode = BlendingMode.Additive;
             Origin = Anchor.Centre;
 
             Children = new Drawable[]
             {
-                    new Container
-                    {
-                        Masking = true,
-                        AutoSizeAxes = Axes.Both,
-
-                        CornerRadius = 16,
-                        Children = new[]
-                        {
-                            new Box
-                            {
-                                Width = 32,
-                                Height = 32,
-                            },
-                        }
-                    }
+                icon = new TextAwesome
+                {
+                    Icon = FontAwesome.fa_eercast,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    TextSize = 24,
+                }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            icon.RotateTo(360, 1000);
+            icon.Loop();
         }
 
         public void UpdateProgress(double progress, int repeat)
