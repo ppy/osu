@@ -17,7 +17,7 @@ namespace osu.Game.Modes.Osu.UI
         protected virtual float PopOutSmallScale => 1.1f;
         protected virtual bool CanPopOutWhileRolling => false;
 
-        public Vector2 PopOutScale = new Vector2(2.5f);
+        public Vector2 PopOutScale = new Vector2(1.6f);
 
         protected override void LoadComplete()
         {
