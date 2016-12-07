@@ -131,12 +131,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     FadeOut(TIME_FADEOUT);
                     break;
                 case ArmedState.Miss:
-                    ring.FadeOut();
-                    circle.FadeOut();
-                    number.FadeOut();
-                    glow.FadeOut();
-
-                    FadeOut(800);
+                    FadeOut(TIME_FADEOUT / 5);
                     break;
                 case ArmedState.Hit:
                     const double flash_in = 30;
