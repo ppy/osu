@@ -74,7 +74,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (initialCircle.Judgement?.Result != HitResult.Hit)
-                initialCircle.Position = slider.Curve.PositionAt(body.SnakedStart ?? 0);
+                initialCircle.Position = slider.Curve.PositionAt(progress);
 
             components.ForEach(c => c.UpdateProgress(progress, repeat));
         }
