@@ -30,8 +30,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             }
         }
 
-        private double? drawnProgressStart;
-        private double? drawnProgressEnd;
+        public double? SnakedStart { get; private set; }
+        public double? SnakedEnd { get; private set; }
 
         private Slider slider;
         public SliderBody(Slider s)
@@ -122,16 +122,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             path.Texture = texture;
         }
 
-        public double SnakedEnd { get; private set; }
-        public double SnakedStart { get; private set; }
-
         private List<Vector2> currentCurve = new List<Vector2>();
         private bool updateSnaking(double p0, double p1)
         {
-            if (drawnProgressStart == p0 && drawnProgressEnd == p1) return false;
+            if (SnakedStart == p0 && SnakedEnd == p1) return false;
 
-            drawnProgressStart = p0;
-            drawnProgressEnd = p1;
+            SnakedStart = p0;
+            SnakedEnd = p1;
 
             slider.Curve.GetPathToProgress(currentCurve, p0, p1);
 
@@ -144,23 +141,23 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 
         public void UpdateProgress(double progress, int repeat)
         {
-            SnakedStart = 0;
-            SnakedEnd = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - DrawableOsuHitObject.TIME_PREEMPT)) / DrawableOsuHitObject.TIME_FADEIN, 0, 1) : 1;
+            double start = 0;
+            double end = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - DrawableOsuHitObject.TIME_PREEMPT)) / DrawableOsuHitObject.TIME_FADEIN, 0, 1) : 1;
 
             if (repeat >= slider.RepeatCount - 1)
             {
                 if (Math.Min(repeat, slider.RepeatCount - 1) % 2 == 1)
                 {
-                    SnakedStart = 0;
-                    SnakedEnd = snakingOut ? progress : 1;
+                    start = 0;
+                    end = snakingOut ? progress : 1;
                 }
                 else
                 {
-                    SnakedStart = snakingOut ? progress : 0;
+                    start = snakingOut ? progress : 0;
                 }
             }
 
-            SetRange(SnakedStart, SnakedEnd);
+            SetRange(start, end);
         }
     }
 }

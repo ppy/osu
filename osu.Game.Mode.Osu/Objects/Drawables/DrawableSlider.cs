@@ -73,11 +73,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             if (repeat % 2 == 1)
                 progress = 1 - progress;
 
-            bouncer2.Position = slider.Curve.PositionAt(body.SnakedEnd);
+            bouncer2.Position = slider.Curve.PositionAt(body.SnakedEnd ?? 0);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (initialCircle.Judgement?.Result != HitResult.Hit)
-                initialCircle.Position = slider.Curve.PositionAt(body.SnakedStart);
+                initialCircle.Position = slider.Curve.PositionAt(body.SnakedStart ?? 0);
 
             components.ForEach(c => c.UpdateProgress(progress, repeat));
         }
