@@ -16,6 +16,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         private readonly Slider slider;
         private Box follow;
 
+        const float width = 70;
+
         public SliderBall(Slider slider)
         {
             this.slider = slider;
@@ -23,6 +25,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             AutoSizeAxes = Axes.Both;
             BlendingMode = BlendingMode.Additive;
             Origin = Anchor.Centre;
+            BorderThickness = 5;
+            BorderColour = Color4.Orange;
 
             Children = new Drawable[]
             {
@@ -31,8 +35,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Colour = Color4.Orange,
-                    Width = 80,
-                    Height = 80,
+                    Width = width,
+                    Height = width,
+                    Alpha = 0,
                 },
                 new Container
                 {
@@ -40,22 +45,22 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Colour = Color4.Cyan,
-                    CornerRadius = 32,
+                    BorderThickness = 7,
+                    BorderColour = Color4.White,
+                    Alpha = 1,
+                    CornerRadius = width / 2,
                     Children = new[]
                     {
                         new Box
                         {
-
-                            Width = 64,
-                            Height = 64,
+                            Colour = slider.Colour,
+                            Alpha = 0.4f,
+                            Width = width,
+                            Height = width,
                         },
                     }
                 }
             };
-
-            Scale = new Vector2(0.94f);
-
         }
 
         private InputState lastState;
@@ -88,8 +93,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 
                 tracking = value;
 
-                follow.ScaleTo(tracking ? 2.4f : 1, 140, EasingTypes.Out);
-                follow.FadeTo(tracking ? 0.8f : 0, 140, EasingTypes.Out);
+                follow.ScaleTo(tracking ? 2.8f : 1, 300, EasingTypes.OutQuint);
+                follow.FadeTo(tracking ? 0.2f : 0, 300, EasingTypes.OutQuint);
             }
         }
 
