@@ -12,18 +12,20 @@ namespace osu.Game.Modes.Osu.UI
 {
     public class OsuScoreOverlay : ScoreOverlay
     {
-        protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter()
-        {
-            Anchor = Anchor.TopRight,
-            Origin = Anchor.TopRight,
-            Position = new Vector2(0, 45)
-        };
-
         protected override ScoreCounter CreateScoreCounter() => new ScoreCounter()
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
-            TextSize = 60
+            TextSize = 60,
+            Margin = new MarginPadding { Right = 5 },
+        };
+
+        protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter()
+        {
+            Anchor = Anchor.TopRight,
+            Origin = Anchor.TopRight,
+            Position = new Vector2(0, 55),
+            Margin = new MarginPadding { Right = 5 },
         };
 
         protected override ComboCounter CreateComboCounter() => new OsuComboCounter()
