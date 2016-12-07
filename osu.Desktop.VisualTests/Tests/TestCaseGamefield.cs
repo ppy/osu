@@ -85,11 +85,5 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
         }
-
-        protected override void Update()
-        {
-            base.Update();
-            Clock.ProcessFrame();
-        }
     }
 }
