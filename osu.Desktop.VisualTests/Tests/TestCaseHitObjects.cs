@@ -22,7 +22,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         public TestCaseHitObjects()
         {
-            var swClock = new StopwatchClock(true) { Rate = 1 };
+            var swClock = new StopwatchClock(true) { Rate = 0.2f };
             Clock = new FramedClock(swClock);
         }
 
@@ -52,7 +52,9 @@ namespace osu.Desktop.VisualTests.Tests
                     Origin = Anchor.Centre,
                     Depth = i,
                     State = ArmedState.Hit,
+                    Judgement = new OsuJudgementInfo { Result = HitResult.Hit }
                 };
+
 
                 approachContainer.Add(d.ApproachCircle.CreateProxy());
                 Add(d);
