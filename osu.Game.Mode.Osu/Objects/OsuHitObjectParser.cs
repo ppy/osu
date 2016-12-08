@@ -101,7 +101,10 @@ namespace osu.Game.Modes.Osu.Objects
             }
             result.Position = new Vector2(int.Parse(split[0]), int.Parse(split[1]));
             result.StartTime = double.Parse(split[2]);
-            result.Sample = new HitSampleInfo { Type = (SampleType)int.Parse(split[4]) };
+            result.Sample = new HitSampleInfo {
+                Type = (SampleType)Math.Max(1, int.Parse(split[4])),
+                Set = SampleSet.Soft,
+            };
             result.NewCombo = combo;
             // TODO: "addition" field
             return result;

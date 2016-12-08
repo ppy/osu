@@ -18,13 +18,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private List<ISliderProgress> components = new List<ISliderProgress>();
 
         SliderBody body;
+        SliderBall ball;
 
         SliderBouncer bouncer1, bouncer2;
 
         public DrawableSlider(Slider s) : base(s)
         {
-            SliderBall ball;
-
             slider = s;
 
             Origin = Anchor.TopLeft;
@@ -46,6 +45,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     StartTime = s.StartTime,
                     Position = s.Position,
                     Colour = s.Colour,
+                    Sample = s.Sample,
                 })
                 {
                     Depth = -1 //override time-based depth.
@@ -58,6 +58,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             components.Add(bouncer2);
         }
 
+        int currentRepeat;
+
         protected override void Update()
         {
             base.Update();
@@ -66,6 +68,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             int repeat = (int)(progress * slider.RepeatCount);
             progress = (progress * slider.RepeatCount) % 1;
+
+            if (repeat > currentRepeat)
+            {
+                if (ball.Tracking)
+                    PlaySample();
+                currentRepeat = repeat;
+            }
 
             if (repeat % 2 == 1)
                 progress = 1 - progress;
