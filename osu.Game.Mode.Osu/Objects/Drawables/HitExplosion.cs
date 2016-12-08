@@ -8,22 +8,25 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class HitExplosion : FlowContainer
     {
+        private readonly OsuJudgementInfo judgement;
         private SpriteText line1;
         private SpriteText line2;
 
-        public HitExplosion(OsuJudgementInfo judgement)
+        public HitExplosion(OsuJudgementInfo judgement, OsuHitObject h = null)
         {
+            this.judgement = judgement;
             AutoSizeAxes = Axes.Both;
-            Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             Direction = FlowDirection.VerticalOnly;
             Spacing = new Vector2(0, 2);
+            Position = (h?.EndPosition ?? Vector2.Zero) + judgement.PositionOffset;
 
             Children = new Drawable[]
             {
@@ -33,13 +36,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Origin = Anchor.TopCentre,
                     Text = judgement.Score.GetDescription(),
                     Font = @"Venera",
-                    TextSize = 20,
+                    TextSize = 16,
                 },
                 line2 = new SpriteText
                 {
                     Text = judgement.Combo.GetDescription(),
                     Font = @"Venera",
-                    TextSize = 14,
+                    TextSize = 11,
                 }
             };
         }
@@ -47,8 +50,35 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            line1.TransformSpacingTo(new Vector2(14, 0), 1800, EasingTypes.OutQuint);
-            line2.TransformSpacingTo(new Vector2(14, 0), 1800, EasingTypes.OutQuint);
+
+            if (judgement.Result == HitResult.Miss)
+            {
+                FadeInFromZero(60);
+
+                ScaleTo(1.6f);
+                ScaleTo(1, 100, EasingTypes.In);
+
+                MoveToRelative(new Vector2(0, 100), 800, EasingTypes.InQuint);
+                RotateTo(40, 800, EasingTypes.InQuint);
+
+                Delay(600);
+                FadeOut(200);
+            }
+            else
+            {
+                line1.TransformSpacingTo(new Vector2(14, 0), 1800, EasingTypes.OutQuint);
+                line2.TransformSpacingTo(new Vector2(14, 0), 1800, EasingTypes.OutQuint);
+                FadeOut(500);
+            }
+
+            switch (judgement.Result)
+            {
+                case HitResult.Miss:
+                    Colour = Color4.Red;
+                    break;
+            }
+
+            Expire();
         }
     }
 }
