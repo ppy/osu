@@ -1,5 +1,6 @@
 ﻿using System;
 using OpenTK;
+using OpenTK.Input;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -11,6 +12,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Options
 {
@@ -55,37 +57,50 @@ namespace osu.Game.Overlays.Options
         private class OsuSliderBar<U> : SliderBar<U> where U : struct,
             IComparable, IFormattable, IConvertible, IComparable<U>, IEquatable<U>
         {
-            private Container nub;
             private AudioSample sample;
-            private float prevAmount = -1;
-        
+            private double lastSample;
+            
+            private Container nub;
+            private Box leftBox, rightBox;
             public OsuSliderBar()
             {
                 Height = 22;
-                Color = Color4.White;
-                SelectionColor = new Color4(255, 102, 170, 255);
-                Add(nub = new Container
+                Children = new Drawable[]
                 {
-                    Width = Height,
-                    Height = Height,
-                    CornerRadius = Height / 2,
-                    Origin = Anchor.TopCentre,
-                    AutoSizeAxes = Axes.None,
-                    RelativeSizeAxes = Axes.None,
-                    RelativePositionAxes = Axes.X,
-                    Masking = true,
-                    BorderColour = new Color4(255, 102, 170, 255),
-                    BorderThickness = 2,
-                    Children = new[]
+                    leftBox = new Box
                     {
-                        new Box { Colour = Color4.Transparent, RelativeSizeAxes = Axes.Both }
-                    }
-                });
-                Box.Height = SelectionBox.Height = 2;
-                Box.RelativePositionAxes = Axes.None;
-                Box.RelativeSizeAxes = SelectionBox.RelativeSizeAxes = Axes.None;
-                Box.Position = SelectionBox.Position = new Vector2(0, Height / 2 - 1);
-                Box.Colour = new Color4(255, 102, 170, 100);
+                        Height = 2,
+                        RelativeSizeAxes = Axes.None,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Colour = new Color4(255, 102, 170, 255),
+                    },
+                    rightBox = new Box
+                    {
+                        Height = 2,
+                        RelativeSizeAxes = Axes.None,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Colour = new Color4(255, 102, 170, 255),
+                        Alpha = 0.5f,
+                    },
+                    nub = new Container
+                    {
+                        Width = Height,
+                        Height = Height,
+                        CornerRadius = Height / 2,
+                        Origin = Anchor.TopCentre,
+                        AutoSizeAxes = Axes.None,
+                        RelativeSizeAxes = Axes.None,
+                        Masking = true,
+                        BorderColour = new Color4(255, 102, 170, 255),
+                        BorderThickness = 3,
+                        Children = new[]
+                        {
+                            new Box { Colour = Color4.Transparent, RelativeSizeAxes = Axes.Both }
+                        }
+                    },
+                };
             }
 
             [BackgroundDependencyLoader]
@@ -94,20 +109,46 @@ namespace osu.Game.Overlays.Options
                 sample = audio.Sample.Get(@"Sliderbar/sliderbar");
             }
 
-            protected override void UpdateAmount(float amt)
+            private void playSample()
             {
-                if (prevAmount != -1 && (int)(prevAmount * 10) != (int)(amt * 10))
-                    sample?.Play();
-                prevAmount = amt;
-                nub.MoveToX(amt, 300, EasingTypes.OutQuint);
-                SelectionBox.ScaleTo(
-                    new Vector2(DrawWidth * amt - Height / 2 + 1, 1),
-                    300, EasingTypes.OutQuint);
-                Box.MoveToX(DrawWidth * amt + Height / 2 - 1,
-                    300, EasingTypes.OutQuint);
-                Box.ScaleTo(
-                    new Vector2(DrawWidth * (1 - amt) - Height / 2 + 1, 1),
-                    300, EasingTypes.OutQuint);
+                if (Clock == null)
+                    return;
+                if (Clock.CurrentTime - lastSample > 50)
+                {
+                    lastSample = Clock.CurrentTime;
+                    sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
+                    sample.Play();
+                }
+            }
+            
+            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+            {
+                if (args.Key == Key.Left || args.Key == Key.Right)
+                    playSample();
+                return base.OnKeyDown(state, args);
+            }
+            
+            protected override bool OnClick(InputState state)
+            {
+                playSample();
+                return base.OnClick(state);
+            }
+            
+            protected override bool OnDrag(InputState state)
+            {
+                playSample();
+                return base.OnDrag(state);
+            }
+
+            protected override void UpdateValue(float value)
+            {
+                nub.MoveToX(DrawWidth * value, 300, EasingTypes.OutQuint);
+                leftBox.ScaleTo(new Vector2(
+                        MathHelper.Clamp(DrawWidth * value - nub.Width / 2 + 2, 0, DrawWidth),
+                    1), 300, EasingTypes.OutQuint);
+                rightBox.ScaleTo(new Vector2(
+                        MathHelper.Clamp(DrawWidth * (1 - value) - nub.Width / 2 + 2, 0, DrawWidth),
+                    1), 300, EasingTypes.OutQuint);
             }
         }
     }
