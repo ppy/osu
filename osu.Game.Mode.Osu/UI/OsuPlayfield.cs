@@ -51,6 +51,7 @@ namespace osu.Game.Modes.Osu.UI
 
         public override void Add(DrawableHitObject h)
         {
+            h.Depth = (float)h.HitObject.StartTime;
             DrawableHitCircle c = h as DrawableHitCircle;
             if (c != null)
             {

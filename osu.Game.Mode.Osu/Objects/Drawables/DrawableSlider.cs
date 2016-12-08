@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
+using osu.Framework.Input;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -39,17 +40,14 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 },
                 bouncer1 = new SliderBouncer(slider, false) { Position = slider.Curve.PositionAt(1) },
                 bouncer2 = new SliderBouncer(slider, true) { Position = slider.Position },
-                ball = new SliderBall(slider),
                 initialCircle = new DrawableHitCircle(new HitCircle
                 {
                     StartTime = s.StartTime,
                     Position = s.Position,
                     Colour = s.Colour,
                     Sample = s.Sample,
-                })
-                {
-                    Depth = -1 //override time-based depth.
-                },
+                }),
+                ball = new SliderBall(slider),
             };
 
             components.Add(body);
@@ -104,14 +102,22 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             base.UpdateInitialState();
             body.Alpha = 1;
+
+            //we need to be visible to handle input events. note that we still don't get enough events (we don't get a position if the mouse hasn't moved since the slider appeared).
+            ball.Alpha = 0.01f; 
         }
 
         protected override void UpdateState(ArmedState state)
         {
             base.UpdateState(state);
 
+            ball.FadeIn();
+
             Delay(HitObject.Duration, true);
+
             body.FadeOut(160);
+            ball.FadeOut(160);
+
             FadeOut(800);
         }
     }
