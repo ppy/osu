@@ -55,7 +55,10 @@ namespace osu.Game.Modes.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sample = audio.Sample.Get($@"Gameplay/{(HitObject.Sample.Set).ToString().ToLower()}-hit{HitObject.Sample.Type.ToString().ToLower()}");
+            string hitType = (HitObject.Sample.Type == SampleType.None ? SampleType.Normal : HitObject.Sample.Type).ToString().ToLower();
+            string sampleSet = HitObject.Sample.Set.ToString().ToLower();
+
+            sample = audio.Sample.Get($@"Gameplay/{sampleSet}-hit{hitType}");
         }
 
         protected void PlaySample()
