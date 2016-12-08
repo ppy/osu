@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Desktop.VisualTests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Tests", "osu.Game.Tests\osu.Game.Tests.csproj", "{54377672-20B1-40AF-8087-5CF73BF3953A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Modes.Osu", "osu.Game.Mode.Osu\osu.Game.Modes.Osu.csproj", "{C92A607B-1FDD-4954-9F92-03FF547D9080}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Modes.Osu", "osu.Game.Modes.Osu\osu.Game.Modes.Osu.csproj", "{C92A607B-1FDD-4954-9F92-03FF547D9080}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Modes.Catch", "osu.Game.Modes.Catch\osu.Game.Modes.Catch.csproj", "{58F6C80C-1253-4A0E-A465-B8C85EBEADF3}"
 EndProject
