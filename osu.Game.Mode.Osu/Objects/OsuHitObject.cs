@@ -12,6 +12,8 @@ namespace osu.Game.Modes.Osu.Objects
     {
         public Vector2 Position { get; set; }
 
+        public virtual Vector2 EndPosition => Position;
+
         [Flags]
         internal enum HitObjectType
         {

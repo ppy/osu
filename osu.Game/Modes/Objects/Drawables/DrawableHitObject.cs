@@ -47,7 +47,12 @@ namespace osu.Game.Modes.Objects.Drawables
         {
             base.LoadComplete();
 
-            Judgement = CreateJudgementInfo();
+            //we may be setting a custom judgement in test cases or what not.
+            if (Judgement == null)
+                Judgement = CreateJudgementInfo();
+
+            //force application of the state that was set before we loaded.
+            UpdateState(State);
         }
 
         /// <summary>
