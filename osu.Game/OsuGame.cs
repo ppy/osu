@@ -94,10 +94,7 @@ namespace osu.Game
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ActionRequested = delegate(InputState state) {
-                        if(!Config.Get<bool>(OsuConfig.MouseDisableWheel) || (Config.Get<bool>(OsuConfig.MouseDisableWheel) && !(GetCurrentGameMode() is Player)))
-                            volume.Adjust(state);
-                    }
+                    ActionRequested = delegate(InputState state) { volume.Adjust(state); }
                 },
                 mainContent = new Container
                 {
@@ -243,16 +240,6 @@ namespace osu.Game
         private void modeRemoved(GameMode newMode)
         {
             modeChanged(newMode);
-        }
-
-        private GameMode GetCurrentGameMode()
-        {
-            GameMode gm = modeStack;
-            while (!gm.IsCurrentGameMode)
-            {
-                gm = gm.ChildGameMode;
-            }
-            return gm;
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)

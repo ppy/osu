@@ -22,6 +22,8 @@ using osu.Framework.GameModes;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
+using osu.Framework.Configuration;
+using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Play
 {
@@ -43,6 +45,8 @@ namespace osu.Game.Screens.Play
 
         private ScoreProcessor scoreProcessor;
         private HitRenderer hitRenderer;
+
+        private Bindable<bool> mouseWheelDisabled;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game)
@@ -98,6 +102,8 @@ namespace osu.Game.Screens.Play
             if (Autoplay)
                 hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Hit));
 
+            mouseWheelDisabled = game.Config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
+
             Children = new Drawable[]
             {
                 new PlayerInputManager(game.Host)
@@ -149,6 +155,13 @@ namespace osu.Game.Screens.Play
             Content.Alpha = 0;
         }
 
+        protected override bool OnWheel(InputState state)
+        {
+            if (mouseWheelDisabled.Value)
+                return true;
+            return base.OnWheel(state);
+        }
+
         class PlayerInputManager : UserInputManager
         {
             public PlayerInputManager(BasicGameHost host)
@@ -159,12 +172,12 @@ namespace osu.Game.Screens.Play
             bool leftViaKeyboard;
             bool rightViaKeyboard;
 
-            bool mouseButtonsDisabled;
+            Bindable<bool> mouseButtonsDisabled;
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
-                mouseButtonsDisabled = config.Get<bool>(OsuConfig.MouseDisableButtons);
+                mouseButtonsDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableButtons);
             }
 
             protected override void TransformState(InputState state)
@@ -181,7 +194,7 @@ namespace osu.Game.Screens.Play
 
                 if (state.Mouse != null)
                 {
-                    if (mouseButtonsDisabled)
+                    if (mouseButtonsDisabled.Value)
                     {
                         mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = false;
                         mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = false;

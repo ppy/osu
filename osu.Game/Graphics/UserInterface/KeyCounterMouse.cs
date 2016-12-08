@@ -4,6 +4,7 @@
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Configuration;
@@ -17,25 +18,25 @@ namespace osu.Game.Graphics.UserInterface
         {
             Button = button;
         }
-        private bool mouseButtonsDisabled;
+        private Bindable<bool> mouseButtonsDisabled;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            mouseButtonsDisabled = config.Get<bool>(OsuConfig.MouseDisableButtons);
+            mouseButtonsDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableButtons);
         }
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (args.Button == this.Button && !mouseButtonsDisabled) IsLit = true;
+            if (args.Button == this.Button && !mouseButtonsDisabled.Value) IsLit = true;
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            if (args.Button == this.Button && !mouseButtonsDisabled) IsLit = false;
+            if (args.Button == this.Button && !mouseButtonsDisabled.Value) IsLit = false;
             return base.OnMouseUp(state, args);
         }
     }
