@@ -20,7 +20,12 @@ namespace osu.Game.Overlays.Options.Graphics
             // NOTE: Compatability mode omitted
             Children = new Drawable[]
             {
-                new SpriteText { Text = "Frame limiter: TODO dropdown" },
+                // TODO: this needs to be a custom dropdown at some point
+                new DropdownOption<FrameSync>
+                {
+                    LabelText = "Frame limiter",
+                    Bindable = config.GetBindable<FrameSync>(OsuConfig.FrameSync)
+                },
                 new CheckBoxOption
                 {
                     LabelText = "Show FPS counter",
