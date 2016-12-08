@@ -1,18 +1,18 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
 using osu.Game.Modes;
-using osu.Game.Online.API;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Configuration
 {
-    class OsuConfigManager : ConfigManager<OsuConfig>
+    public class OsuConfigManager : ConfigManager<OsuConfig>
     {
         protected override void InitialiseDefaults()
         {
+#pragma warning disable CS0612 // Type or member is obsolete
             Set(OsuConfig.Width, 1366, 640);
             Set(OsuConfig.Height, 768, 480);
             Set(OsuConfig.MouseSpeed, 1.0);
@@ -98,6 +98,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.MouseDisableWheel, false);
             Set(OsuConfig.MouseSpeed, 1, 0.4, 6);
             Set(OsuConfig.Offset, 0, -300, 300);
+            Set(OsuConfig.ScoreMeterScale, 1, 0.5, 2);
             //Set(OsuConfig.ScoreMeterScale, 1, 0.5, OsuGame.Tournament ? 10 : 2);
             Set(OsuConfig.DistanceSpacing, 0.8, 0.1, 6);
             Set(OsuConfig.EditorBeatDivisor, 1, 1, 16);
@@ -111,25 +112,27 @@ namespace osu.Game.Configuration
             Set(OsuConfig.NotifyFriends, true);
             Set(OsuConfig.NotifySubmittedThread, true);
             Set(OsuConfig.PopupDuringGameplay, true);
-            //Set(OsuConfig.ProgressBarType, ProgressBarTypes.Pie);
-            //Set(OsuConfig.RankType, RankingType.Top);
+            Set(OsuConfig.ProgressBarType, ProgressBarType.Pie);
+            Set(OsuConfig.RankType, RankingType.Top);
             Set(OsuConfig.RefreshRate, 60);
             Set(OsuConfig.OverrideRefreshRate, Get<int>(OsuConfig.RefreshRate) != 60);
             //Set(OsuConfig.ScaleMode, ScaleMode.WidescreenConservative);
             Set(OsuConfig.ScoreboardVisible, true);
+            Set(OsuConfig.ScoreMeter, ScoreMeterType.Error);
             //Set(OsuConfig.ScoreMeter, OsuGame.Tournament ? ScoreMeterType.Colour : ScoreMeterType.Error);
             Set(OsuConfig.ScreenshotId, 0);
             Set(OsuConfig.MenuSnow, false);
             Set(OsuConfig.MenuTriangles, true);
             Set(OsuConfig.SongSelectThumbnails, true);
-            //Set(OsuConfig.ScreenshotFormat, ImageFileFormat.Jpg);
+            Set(OsuConfig.ScreenshotFormat, ScreenshotFormat.Jpg);
             Set(OsuConfig.ShowReplayComments, true);
             Set(OsuConfig.ShowSpectators, true);
             Set(OsuConfig.ShowStoryboard, true);
             //Set(OsuConfig.Skin, SkinManager.DEFAULT_SKIN);
             Set(OsuConfig.SkinSamples, true);
             Set(OsuConfig.SkipTablet, false);
-            Set(OsuConfig.SnakingSliders, true);
+            Set(OsuConfig.SnakingInSliders, true);
+            Set(OsuConfig.SnakingOutSliders, false);
             Set(OsuConfig.Tablet, false);
             Set(OsuConfig.UpdatePending, false);
             Set(OsuConfig.UseSkinCursor, false);
@@ -151,10 +154,10 @@ namespace osu.Game.Configuration
             Set(OsuConfig.AlternativeChatFont, false);
             Set(OsuConfig.Password, string.Empty);
             Set(OsuConfig.Username, string.Empty);
-            Set(OsuConfig.DisplayStarsMaximum, 10, 0, 10);
-            Set(OsuConfig.DisplayStarsMinimum, 0, 0, 10);
+            Set(OsuConfig.DisplayStarsMaximum, 10.0, 0.0, 10.0);
+            Set(OsuConfig.DisplayStarsMinimum, 0.0, 0.0, 10.0);
             Set(OsuConfig.AudioDevice, string.Empty);
-            //Set(OsuConfig.ReleaseStream, ReleaseStream.Lazer, true);
+            Set(OsuConfig.ReleaseStream, ReleaseStream.Lazer);
             Set(OsuConfig.UpdateFailCount, 0);
             Set(OsuConfig.SavePassword, false);
             Set(OsuConfig.SaveUsername, true);
@@ -163,7 +166,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.Letterboxing, Get<bool>(OsuConfig.Fullscreen));
             Set(OsuConfig.LetterboxPositionX, 0, -100, 100);
             Set(OsuConfig.LetterboxPositionY, 0, -100, 100);
-            //Set(OsuConfig.FrameSync, FrameSync.Limit120);
+            Set(OsuConfig.FrameSync, FrameSync.Limit120);
             bool unicodeDefault = false;
             switch (Get<string>(OsuConfig.Language))
             {
@@ -178,6 +181,9 @@ namespace osu.Game.Configuration
             Set(OsuConfig.Ticker, false);
             Set(OsuConfig.CompatibilityContext, false);
             Set(OsuConfig.CanForceOptimusCompatibility, true);
+            Set(OsuConfig.ConfineMouse, Get<bool>(OsuConfig.ConfineMouseToFullscreen) ?
+                ConfineMouseMode.Fullscreen : ConfineMouseMode.Never);
+#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         //todo: make a UnicodeString class/struct rather than requiring this helper method.
@@ -189,7 +195,7 @@ namespace osu.Game.Configuration
         }
     }
 
-    enum OsuConfig
+    public enum OsuConfig
     {
         // New osu:
         PlayMode,
@@ -303,7 +309,8 @@ namespace osu.Game.Configuration
         Skin,
         SkinSamples,
         SkipTablet,
-        SnakingSliders,
+        SnakingInSliders,
+        SnakingOutSliders,
         Tablet,
         UpdatePending,
         UserFilter,
@@ -321,6 +328,8 @@ namespace osu.Game.Configuration
         RawInput,
         AbsoluteToOsuWindow,
         ConfineMouse,
+        [Obsolete]
+        ConfineMouseToFullscreen,
         ShowMenuTips,
         HiddenShowFirstApproach,
         ComboColourSliderBall,
@@ -345,5 +354,6 @@ namespace osu.Game.Configuration
         Ticker,
         CompatibilityContext,
         CanForceOptimusCompatibility,
+
     }
 }

@@ -2,6 +2,9 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -58,6 +61,7 @@ namespace osu.Game.Overlays.Toolbar
         private SpriteText tooltip1;
         private SpriteText tooltip2;
         protected FlowContainer Flow;
+        private AudioSample sampleClick;
 
         public ToolbarButton()
         {
@@ -75,7 +79,7 @@ namespace osu.Game.Overlays.Toolbar
                     Direction = FlowDirection.HorizontalOnly,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding { Left = 15, Right = 15 },
+                    Padding = new MarginPadding { Left = 20, Right = 20 },
                     Spacing = new Vector2(5),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
@@ -120,6 +124,12 @@ namespace osu.Game.Overlays.Toolbar
             RelativeSizeAxes = Axes.Y;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleClick = audio.Sample.Get(@"Menu/menuclick");
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -133,7 +143,8 @@ namespace osu.Game.Overlays.Toolbar
         protected override bool OnClick(InputState state)
         {
             Action?.Invoke();
-            HoverBackground.FlashColour(new Color4(255, 255, 255, 180), 800, EasingTypes.OutQuint);
+            sampleClick.Play();
+            HoverBackground.FlashColour(new Color4(255, 255, 255, 100), 500, EasingTypes.OutQuint);
             return true;
         }
 

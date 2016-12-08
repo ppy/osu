@@ -92,6 +92,10 @@
     <Compile Include="Beatmaps\Timing\SampleChange.cs" />
     <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarHomeButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarMusicButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarSettingsButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarOverlayToggleButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarUserButton.cs" />
     <Compile Include="Screens\BackgroundMode.cs" />
     <Compile Include="Screens\Backgrounds\BackgroundModeBeatmap.cs" />
@@ -218,6 +222,15 @@
     <Compile Include="Overlays\Options\CheckBoxOption.cs" />
     <Compile Include="Overlays\Options\SidebarButton.cs" />
     <Compile Include="Overlays\Options\TextBoxOption.cs" />
+    <Compile Include="Overlays\Options\SliderOption.cs" />
+    <Compile Include="Configuration\ProgressBarType.cs" />
+    <Compile Include="Overlays\Options\DropdownOption.cs" />
+    <Compile Include="Configuration\RankingType.cs" />
+    <Compile Include="Configuration\ScoreMeterType.cs" />
+    <Compile Include="Configuration\ReleaseStream.cs" />
+    <Compile Include="Configuration\ScreenshotFormat.cs" />
+    <Compile Include="Configuration\FrameSync.cs" />
+    <Compile Include="Configuration\ConfineMouseMode.cs" />
     <Compile Include="Screens\Select\PlaySongSelectButton.cs" />
     <Compile Include="Screens\Select\PlaySongSelectButtonContainer.cs" />
     <Compile Include="Overlays\PopUpDialogs\PopUpDialog.cs" />

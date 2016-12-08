@@ -24,6 +24,8 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Screens.Play;
 using osu.Framework;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.PopUpDialogs;
@@ -46,6 +48,9 @@ namespace osu.Game.Screens.Select
 
         private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
+
+        private AudioSample sampleChangeDifficulty;
+        private AudioSample sampleChangeBeatmap;
 
         private Box modeLight;
 
@@ -275,6 +280,9 @@ namespace osu.Game.Screens.Select
 
             trackManager = audio.Track;
 
+            sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
+            sampleChangeBeatmap = audio.Sample.Get(@"SongSelect/select-expand");
+
             playSongSelectButtonContainer.On_HoveredChanged += updateModeLight;
 
             initialAddSetsTask = new CancellationTokenSource();
@@ -301,6 +309,12 @@ namespace osu.Game.Screens.Select
             changeBackground(Beatmap);
 
             Content.FadeInFromZero(250);
+
+            beatmapInfoWedge.MoveTo(wedged_container_start_position + new Vector2(-100, 50));
+            beatmapInfoWedge.RotateTo(10);
+
+            beatmapInfoWedge.MoveTo(wedged_container_start_position, 800, EasingTypes.OutQuint);
+            beatmapInfoWedge.RotateTo(0, 800, EasingTypes.OutQuint);
         }
 
         protected override void OnResuming(GameMode last)
@@ -310,16 +324,23 @@ namespace osu.Game.Screens.Select
             base.OnResuming(last);
 
             Content.FadeIn(250);
+
+            Content.ScaleTo(1, 250, EasingTypes.OutSine);
         }
 
         protected override void OnSuspending(GameMode next)
         {
+            Content.ScaleTo(1.1f, 250, EasingTypes.InSine);
+
             Content.FadeOut(250);
             base.OnSuspending(next);
         }
 
         protected override bool OnExiting(GameMode next)
         {
+            beatmapInfoWedge.MoveTo(wedged_container_start_position + new Vector2(-100, 50), 800, EasingTypes.InQuint);
+            beatmapInfoWedge.RotateTo(10, 800, EasingTypes.InQuint);
+
             Content.FadeOut(100);
             return base.OnExiting(next);
         }
@@ -379,7 +400,14 @@ namespace osu.Game.Screens.Select
         private void selectionChanged(BeatmapGroup group, BeatmapInfo beatmap)
         {
             if (!beatmap.Equals(Beatmap?.BeatmapInfo))
+            {
+                if (beatmap.BeatmapSetID == Beatmap?.BeatmapInfo.BeatmapSetID)
+                    sampleChangeDifficulty.Play();
+                else
+                    sampleChangeBeatmap.Play();
+
                 Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
+            }
 
             ensurePlayingSelected();
         }

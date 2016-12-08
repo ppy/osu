@@ -1,5 +1,9 @@
-﻿using osu.Framework;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -16,10 +20,26 @@ namespace osu.Game.Overlays.Options.Gameplay
         {
             Children = new Drawable[]
             {
-                new SpriteText { Text = "Background dim: TODO slider" },
-                new SpriteText { Text = "Progress display: TODO dropdown" },
-                new SpriteText { Text = "Score meter type: TODO dropdown" },
-                new SpriteText { Text = "Score meter size: TODO slider" },
+                new SliderOption<int>
+                {
+                    LabelText = "Background dim",
+                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.DimLevel)
+                },
+                new DropdownOption<ProgressBarType>
+                {
+                    LabelText = "Progress display",
+                    Bindable = config.GetBindable<ProgressBarType>(OsuConfig.ProgressBarType)
+                },
+                new DropdownOption<ScoreMeterType>
+                {
+                    LabelText = "Score meter type",
+                    Bindable = config.GetBindable<ScoreMeterType>(OsuConfig.ScoreMeter)
+                },
+                new SliderOption<double>
+                {
+                    LabelText = "Score meter size",
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.ScoreMeterScale)
+                },
                 new CheckBoxOption
                 {
                     LabelText = "Always show key overlay",

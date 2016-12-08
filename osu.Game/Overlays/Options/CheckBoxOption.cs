@@ -1,5 +1,11 @@
-﻿using System;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -60,6 +66,8 @@ namespace osu.Game.Overlays.Options
 
         private Light light;
         private SpriteText labelSpriteText;
+        private AudioSample sampleChecked;
+        private AudioSample sampleUnchecked;
 
         public CheckBoxOption()
         {
@@ -102,11 +110,19 @@ namespace osu.Game.Overlays.Options
             base.OnHoverLost(state);
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleChecked = audio.Sample.Get(@"Checkbox/check-on");
+            sampleUnchecked = audio.Sample.Get(@"Checkbox/check-off");
+        }
+
         protected override void OnChecked()
         {
             if (bindable != null)
                 bindable.Value = true;
 
+            sampleChecked?.Play();
             light.State = CheckBoxState.Checked;
         }
 
@@ -115,6 +131,7 @@ namespace osu.Game.Overlays.Options
             if (bindable != null)
                 bindable.Value = false;
 
+            sampleUnchecked?.Play();
             light.State = CheckBoxState.Unchecked;
         }
 

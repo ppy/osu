@@ -1,8 +1,9 @@
-﻿using osu.Framework;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Options.Graphics
@@ -18,8 +19,13 @@ namespace osu.Game.Overlays.Options.Graphics
             {
                 new CheckBoxOption
                 {
-                    LabelText = "Snaking sliders",
-                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingSliders)
+                    LabelText = "Snaking in sliders",
+                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingInSliders)
+                },
+                new CheckBoxOption
+                {
+                    LabelText = "Snaking out sliders",
+                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingOutSliders)
                 },
                 new CheckBoxOption
                 {
@@ -51,7 +57,11 @@ namespace osu.Game.Overlays.Options.Graphics
                     LabelText = "Softening filter",
                     Bindable = config.GetBindable<bool>(OsuConfig.BloomSoftening)
                 },
-                new SpriteText { Text = "Screenshot format TODO: dropdown" }
+                new DropdownOption<ScreenshotFormat>
+                {
+                    LabelText = "Screenshot",
+                    Bindable = config.GetBindable<ScreenshotFormat>(OsuConfig.ScreenshotFormat)
+                }
             };
         }
     }
