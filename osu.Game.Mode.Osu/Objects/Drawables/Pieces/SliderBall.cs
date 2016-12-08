@@ -84,7 +84,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         }
 
         bool tracking;
-        protected bool Tracking
+        public bool Tracking
         {
             get { return tracking; }
             set
