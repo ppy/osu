@@ -21,6 +21,7 @@ using OpenTK;
 using osu.Framework.GameModes;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Ranking;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play
 {
@@ -158,6 +159,14 @@ namespace osu.Game.Screens.Play
             bool leftViaKeyboard;
             bool rightViaKeyboard;
 
+            bool mouseButtonsDisabled;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager config)
+            {
+                mouseButtonsDisabled = config.Get<bool>(OsuConfig.MouseDisableButtons);
+            }
+
             protected override void TransformState(InputState state)
             {
                 base.TransformState(state);
@@ -172,6 +181,11 @@ namespace osu.Game.Screens.Play
 
                 if (state.Mouse != null)
                 {
+                    if (mouseButtonsDisabled)
+                    {
+                        mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = false;
+                        mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = false;
+                    }
                     if (leftViaKeyboard) mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = true;
                     if (rightViaKeyboard) mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = true;
                 }
