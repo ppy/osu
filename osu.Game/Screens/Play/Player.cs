@@ -155,12 +155,7 @@ namespace osu.Game.Screens.Play
             Content.Alpha = 0;
         }
 
-        protected override bool OnWheel(InputState state)
-        {
-            if (mouseWheelDisabled.Value)
-                return true;
-            return base.OnWheel(state);
-        }
+        protected override bool OnWheel(InputState state) => mouseWheelDisabled || base.OnWheel(state);
 
         class PlayerInputManager : UserInputManager
         {
