@@ -66,7 +66,7 @@
       <Project>{c76bf5b3-985e-4d39-95fe-97c9c879b83a}</Project>
       <Name>osu.Framework</Name>
     </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Mode.Osu\osu.Game.Modes.Osu.csproj">
+    <ProjectReference Include="..\osu.Game.Modes.Osu\osu.Game.Modes.Osu.csproj">
       <Project>{c92a607b-1fdd-4954-9f92-03ff547d9080}</Project>
       <Name>osu.Game.Modes.Osu</Name>
     </ProjectReference>
