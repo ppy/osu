@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override Type TransformType => typeof(TransformAccuracy);
 
-        protected override double RollingDuration => 20;
+        protected override double RollingDuration => 150;
         protected override bool IsRollingProportional => true;
 
         private float epsilon => 1e-10f;

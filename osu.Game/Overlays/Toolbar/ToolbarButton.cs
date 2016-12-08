@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Toolbar
                     Direction = FlowDirection.HorizontalOnly,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding { Left = 15, Right = 15 },
+                    Padding = new MarginPadding { Left = 20, Right = 20 },
                     Spacing = new Vector2(5),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
