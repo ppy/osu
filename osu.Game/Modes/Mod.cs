@@ -10,18 +10,10 @@ namespace osu.Game.Modes
     public class Mod
     {
         public Mods Name;
-        public ModType Type;
 
         public FontAwesome Icon;
 
         public double ScoreMultiplier;
-    }
-
-    public enum ModType
-    {
-        DiffReducing,
-        DiffIncreasing,
-        Assistance
     }
 
     [Flags]

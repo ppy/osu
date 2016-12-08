@@ -8,8 +8,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Game.Modes;
+using osu.Game.Modes.UI;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.ModSelection
 {
     class ModButton : ClickableContainer, IStateful<ModButtonState>
     {

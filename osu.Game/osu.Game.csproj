@@ -74,9 +74,10 @@
     <Compile Include="Online\API\IOnlineComponent.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
-    <Compile Include="Overlays\DrawableMod.cs" />
-    <Compile Include="Overlays\ModButton.cs" />
-    <Compile Include="Overlays\ModSelection.cs" />
+    <Compile Include="Modes\UI\DrawableMod.cs" />
+    <Compile Include="Overlays\ModSelection\ModButton.cs" />
+    <Compile Include="Overlays\ModSelection\ModSelection.cs" />
+    <Compile Include="Overlays\ModSelection\MultimodButton.cs" />
     <Compile Include="Overlays\MusicController.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\Formats\ConstructableBeatmapDecoder.cs" />

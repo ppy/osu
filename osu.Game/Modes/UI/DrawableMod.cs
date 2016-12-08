@@ -8,9 +8,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Modes;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Modes.UI
 {
     public class ModIcon : Container
     {

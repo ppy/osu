@@ -16,7 +16,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Game.Modes;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.ModSelection
 {
     public class ModSelection : OverlayContainer
     {
@@ -325,25 +325,66 @@ namespace osu.Game.Overlays
             // FIXME: replace with proper mod list
             foreach (Mod mod in TempMods)
             {
+                if (CreateMultimodButton(mod)) // i have no idea how to check if we need multimod button or not without just hardcoding mods inside
+                    continue;
+
                 bool active = ActiveTempMods.Contains(mod);
 
-                switch (mod.Type)
-                {
-                    case ModType.DiffReducing:
-                            easymods.Add(new ModButton(mod, new Color4(164, 204, 0, 255), active) { Action = () => ActivateMod(mod)});
-                            break;
-                    case ModType.DiffIncreasing:
-                            hardmods.Add(new ModButton(mod, new Color4(255, 204, 33, 255), active) { Action = () => ActivateMod(mod) });
-                            break;
-                    case ModType.Assistance:
-                            assistmods.Add(new ModButton(mod, new Color4(102, 204, 255, 255), active) { Action = () => ActivateMod(mod) });
-                            break;
-                }
+                if (mod.ScoreMultiplier < 1 && mod.ScoreMultiplier > 0)
+                    easymods.Add(new ModButton(mod, new Color4(164, 204, 0, 255), active) { Action = () => ActivateMod(mod) });
+                else if ((Mods.ScoreIncreaseMods & mod.Name) == mod.Name)
+                    hardmods.Add(new ModButton(mod, new Color4(255, 204, 33, 255), active) { Action = () => ActivateMod(mod) });
+                else if (mod.ScoreMultiplier == 0)
+                    assistmods.Add(new ModButton(mod, new Color4(102, 204, 255, 255), active) { Action = () => ActivateMod(mod) });
+
             }
         }
-
         // --
         // [ TEMP: remove when proper mod system will be added
+        private bool CreateMultimodButton(Mod mod)
+        {
+            if (mod.Name == Mods.SuddenDeath)
+            {
+                MultimodButton sd;
+                hardmods.Add(sd = new MultimodButton(new Color4(255, 204, 33, 255))
+                {
+                    Action = () => ActivateMod(mod),
+                });
+                sd.AddMod(mod);
+                sd.AddMod(TempMods.Find(m => m.Name == Mods.Perfect));
+
+                return true;
+            }
+            else if (mod.Name == Mods.DoubleTime)
+            {
+                MultimodButton dt;
+                hardmods.Add(dt = new MultimodButton(new Color4(255, 204, 33, 255))
+                {
+                    Action = () => ActivateMod(mod),
+                });
+                dt.AddMod(mod);
+                dt.AddMod(TempMods.Find(m => m.Name == Mods.Nightcore));
+
+                return true;
+            }
+            else if (mod.Name == Mods.Autoplay)
+            {
+                MultimodButton auto;
+                assistmods.Add(auto = new MultimodButton(new Color4(102, 204, 255, 255))
+                {
+                    Action = () => ActivateMod(mod)
+                });
+                auto.AddMod(mod);
+                auto.AddMod(TempMods.Find(m => m.Name == Mods.Cinema));
+
+                return true;
+            }
+            else if (mod.Name == Mods.Perfect || mod.Name == Mods.Nightcore || mod.Name == Mods.Cinema)
+                return true;
+
+            return false;
+        }
+
         private List<Mod> ActiveTempMods;
         private List<Mod> TempMods;
         private void AddTemporaryMods()
@@ -352,93 +393,98 @@ namespace osu.Game.Overlays
             ActiveTempMods = new List<Mod>();
             TempMods.Add(new Mod
             {
-                Type = ModType.DiffReducing,
                 Name = Mods.Easy,
                 Icon = FontAwesome.fa_osu_mod_easy,
                 ScoreMultiplier = 0.5
             });
             TempMods.Add(new Mod
             {
-                Type = ModType.DiffReducing,
                 Name = Mods.NoFail,
                 Icon = FontAwesome.fa_osu_mod_nofail,
                 ScoreMultiplier = 0.5
             });
             TempMods.Add(new Mod
             {
-                Type = ModType.DiffReducing,
                 Name = Mods.HalfTime,
                 Icon = FontAwesome.fa_osu_mod_halftime,
                 ScoreMultiplier = 0.3
             });
             TempMods.Add(new Mod
             {
-                Type = ModType.DiffIncreasing,
                 Name = Mods.HardRock,
                 Icon = FontAwesome.fa_osu_mod_hardrock,
                 ScoreMultiplier = 1.06 // FIXME
             });
             TempMods.Add(new Mod
             {
-                Type = ModType.DiffIncreasing,
                 Name = Mods.SuddenDeath,
                 Icon = FontAwesome.fa_osu_mod_suddendeath,
                 ScoreMultiplier = 1.0
             });
             TempMods.Add(new Mod
             {
-                Type = ModType.DiffIncreasing,
+                Name = Mods.Perfect,
+                Icon = FontAwesome.fa_osu_mod_perfect,
+                ScoreMultiplier = 1.0
+            });
+            TempMods.Add(new Mod
+            {
                 Name = Mods.DoubleTime,
                 Icon = FontAwesome.fa_osu_mod_doubletime,
                 ScoreMultiplier = 1.12 // FIXME
             });
             TempMods.Add(new Mod
             {
-                Type = ModType.DiffIncreasing,
+                Name = Mods.Nightcore,
+                Icon = FontAwesome.fa_osu_mod_nightcore,
+                ScoreMultiplier = 1.12 // FIXME
+            });
+            TempMods.Add(new Mod
+            {
                 Name = Mods.Hidden,
                 Icon = FontAwesome.fa_osu_mod_hidden,
                 ScoreMultiplier = 1.06 // FIXME
             });
             TempMods.Add(new Mod
             {
-                Type = ModType.DiffIncreasing,
                 Name = Mods.Flashlight,
                 Icon = FontAwesome.fa_osu_mod_flashlight,
                 ScoreMultiplier = 1.12 // FIXME
             });
             TempMods.Add(new Mod
             {
-                Type = ModType.Assistance,
                 Name = Mods.Relax,
                 Icon = FontAwesome.fa_osu_mod_relax,
                 ScoreMultiplier = 0
             });
             TempMods.Add(new Mod
             {
-                Type = ModType.Assistance,
                 Name = Mods.Relax2,
                 Icon = FontAwesome.fa_osu_mod_autopilot,
                 ScoreMultiplier = 0
             });
             TempMods.Add(new Mod
             {
-                Type = ModType.Assistance,
                 Name = Mods.Target,
                 Icon = FontAwesome.fa_osu_mod_target,
                 ScoreMultiplier = 0
             });
             TempMods.Add(new Mod
             {
-                Type = ModType.Assistance,
                 Name = Mods.SpunOut,
                 Icon = FontAwesome.fa_osu_mod_spunout,
                 ScoreMultiplier = 0
             });
             TempMods.Add(new Mod
             {
-                Type = ModType.Assistance,
                 Name = Mods.Autoplay,
                 Icon = FontAwesome.fa_osu_mod_auto,
+                ScoreMultiplier = 0
+            });
+            TempMods.Add(new Mod
+            {
+                Name = Mods.Cinema,
+                Icon = FontAwesome.fa_osu_mod_cinema,
                 ScoreMultiplier = 0
             });
         }

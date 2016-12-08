@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Timing;
-using osu.Game.Overlays;
+using osu.Game.Overlays.ModSelection;
 
 namespace osu.Desktop.VisualTests.Tests
 {
