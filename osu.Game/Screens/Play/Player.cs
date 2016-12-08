@@ -132,6 +132,7 @@ namespace osu.Game.Screens.Play
             Delay(1000);
             Schedule(delegate
             {
+                ValidForResume = false;
                 Push(new Results
                 {
                     Score = scoreProcessor.GetScore()
