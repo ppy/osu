@@ -25,6 +25,7 @@ using OpenTK.Graphics;
 using osu.Game.Screens.Play;
 using osu.Framework;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 
@@ -188,6 +189,12 @@ namespace osu.Game.Screens.Select
             changeBackground(Beatmap);
 
             Content.FadeInFromZero(250);
+
+            beatmapInfoWedge.MoveTo(wedged_container_start_position + new Vector2(-100, 50));
+            beatmapInfoWedge.RotateTo(10);
+
+            beatmapInfoWedge.MoveTo(wedged_container_start_position, 800, EasingTypes.OutQuint);
+            beatmapInfoWedge.RotateTo(0, 800, EasingTypes.OutQuint);
         }
 
         protected override void OnResuming(GameMode last)
@@ -197,16 +204,23 @@ namespace osu.Game.Screens.Select
             base.OnResuming(last);
 
             Content.FadeIn(250);
+
+            Content.ScaleTo(1, 250, EasingTypes.OutSine);
         }
 
         protected override void OnSuspending(GameMode next)
         {
+            Content.ScaleTo(1.1f, 250, EasingTypes.InSine);
+
             Content.FadeOut(250);
             base.OnSuspending(next);
         }
 
         protected override bool OnExiting(GameMode next)
         {
+            beatmapInfoWedge.MoveTo(wedged_container_start_position + new Vector2(-100, 50), 800, EasingTypes.InQuint);
+            beatmapInfoWedge.RotateTo(10, 800, EasingTypes.InQuint);
+
             Content.FadeOut(100);
             return base.OnExiting(next);
         }

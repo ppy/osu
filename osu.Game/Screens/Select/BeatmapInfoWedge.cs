@@ -61,7 +61,6 @@ namespace osu.Game.Screens.Select
             (beatmapInfoContainer = new BufferedContainer
             {
                 Depth = newDepth,
-                PixelSnapping = true,
                 CacheDrawnFrameBuffer = true,
                 Shear = -Shear,
                 RelativeSizeAxes = Axes.Both,
