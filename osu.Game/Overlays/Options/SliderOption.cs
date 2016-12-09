@@ -16,8 +16,8 @@ using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Options
 {
-    public class SliderOption<T> : FlowContainer where T : struct,
-        IComparable, IFormattable, IConvertible, IComparable<T>, IEquatable<T>
+    public class SliderOption<T> : FlowContainer
+        where T : struct, IComparable, IFormattable, IConvertible, IComparable<T>, IEquatable<T>
     {
         private SliderBar<T> slider;
         private SpriteText text;
@@ -54,8 +54,8 @@ namespace osu.Game.Overlays.Options
             };
         }
 
-        private class OsuSliderBar<U> : SliderBar<U> where U : struct,
-            IComparable, IFormattable, IConvertible, IComparable<U>, IEquatable<U>
+        private class OsuSliderBar<U> : SliderBar<U>
+            where U : struct, IComparable, IFormattable, IConvertible, IComparable<U>, IEquatable<U>
         {
             private AudioSample sample;
             private double lastSample;
