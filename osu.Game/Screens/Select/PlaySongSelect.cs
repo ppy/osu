@@ -236,6 +236,7 @@ namespace osu.Game.Screens.Select
                                             Width = play_song_select_button_width,
                                             SelectedColour = new Color4(238, 51, 153, 255),
                                             DeselectedColour = new Color4(125, 54, 82, 255),
+                                            Action = deleteBeatmapDialog.ToggleVisibility,
                                         },
                                         beatmapRandomButton = new PlaySongSelectButton
                                         {

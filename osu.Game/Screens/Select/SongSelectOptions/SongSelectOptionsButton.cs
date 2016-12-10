@@ -59,7 +59,6 @@ namespace osu.Game.Screens.Select
 
         public SongSelectOptionsButton()
         {
-            Shear = shearing;
             Masking = true;
             EdgeEffect = new EdgeEffect
             {
