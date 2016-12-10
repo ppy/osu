@@ -190,18 +190,45 @@ namespace osu.Game.Screens.Select
             return 125 + x;
         }
 
+        /// <summary>
+        /// Update a panel's x position and multiplicative alpha based on its y position and
+        /// the current scroll position.
+        /// </summary>
+        /// <param name="p">The panel to be updated.</param>
+        /// <param name="halfHeight">Half the draw height of the carousel container.</param>
+        private void updatePanel(Panel p, float halfHeight)
+        {
+            float panelDrawY = p.Position.Y - Current + p.DrawHeight / 2;
+            float dist = Math.Abs(1f - panelDrawY / halfHeight);
+
+            // Setting the origin position serves as an additive position on top of potential
+            // local transformation we may want to apply (e.g. when a panel gets selected, we
+            // may want to smoothly transform it leftwards.)
+            p.OriginPosition = new Vector2(-offsetX(dist, halfHeight), 0);
+
+            // We are applying a multiplicative alpha (which is internally done by nesting an
+            // additional container and setting that container's alpha) such that we can
+            // layer transformations on top, with a similar reasoning to the previous comment.
+            p.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
+        }
+
         protected override void Update()
         {
             base.Update();
 
+            // Determine which items stopped being on screen for future removal from the lifetimelist.
             float drawHeight = DrawHeight;
+            float halfHeight = drawHeight / 2;
 
-            Lifetime.AliveItems.ForEach(delegate (Panel p)
+            foreach (Panel p in Lifetime.AliveItems)
             {
                 float panelPosY = p.Position.Y;
                 p.IsOnScreen = panelPosY >= Current - p.DrawHeight && panelPosY <= Current + drawHeight;
-            });
+                updatePanel(p, halfHeight);
+            }
 
+            // Determine range of indices for items that are now definitely on screen to be added
+            // to the lifetimelist in the future.
             int firstIndex = yPositions.BinarySearch(Current - Panel.MAX_HEIGHT);
             if (firstIndex < 0) firstIndex = ~firstIndex;
             int lastIndex = yPositions.BinarySearch(Current + drawHeight);
@@ -210,26 +237,11 @@ namespace osu.Game.Screens.Select
             Lifetime.StartIndex = firstIndex;
             Lifetime.EndIndex = lastIndex;
 
-            float halfHeight = drawHeight / 2;
-
             for (int i = firstIndex; i < lastIndex; ++i)
             {
-                var panel = Lifetime[i];
-
-                panel.IsOnScreen = true;
-
-                float panelDrawY = panel.Position.Y - Current + panel.DrawHeight / 2;
-                float dist = Math.Abs(1f - panelDrawY / halfHeight);
-
-                // Setting the origin position serves as an additive position on top of potential
-                // local transformation we may want to apply (e.g. when a panel gets selected, we
-                // may want to smoothly transform it leftwards.)
-                panel.OriginPosition = new Vector2(-offsetX(dist, halfHeight), 0);
-
-                // We are applying a multiplicative alpha (which is internally done by nesting an
-                // additional container and setting that container's alpha) such that we can
-                // layer transformations on top, with a similar reasoning to the previous comment.
-                panel.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
+                Panel p = Lifetime[i];
+                p.IsOnScreen = true;
+                updatePanel(p, halfHeight);
             }
         }
     }
