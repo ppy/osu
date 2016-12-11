@@ -83,7 +83,7 @@ namespace osu.Game.Modes.Osu.Objects
 
                     s.Curve = new SliderCurve
                     {
-                        Path = points,
+                        ControlPoints = points,
                         Length = length,
                         CurveType = curveType
                     };
