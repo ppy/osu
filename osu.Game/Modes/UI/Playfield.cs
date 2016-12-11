@@ -35,6 +35,8 @@ namespace osu.Game.Modes.UI
         public class ScaledContainer : Container
         {
             protected override Vector2 DrawScale => new Vector2(DrawSize.X / 512);
+
+            public override bool Contains(Vector2 screenSpacePos) => true;
         }
 
         public class HitObjectContainer : Container<DrawableHitObject>
