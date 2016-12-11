@@ -35,7 +35,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     Icon = FontAwesome.fa_eercast,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    TextSize = 24,
+                    TextSize = 48,
                 }
             };
         }
