@@ -1,9 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Database;
 using osu.Game.Beatmaps;
-using System;
 using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects
@@ -18,6 +16,8 @@ namespace osu.Game.Modes.Osu.Objects
 
         public override void SetDefaultsFromBeatmap(Beatmap beatmap)
         {
+            base.SetDefaultsFromBeatmap(beatmap);
+
             Velocity = 100 / beatmap.BeatLengthAt(StartTime, true) * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
         }
 
