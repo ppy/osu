@@ -17,7 +17,7 @@ namespace osu.Desktop.Beatmaps.IO
     /// </summary>
     public class LegacyFilesystemReader : ArchiveReader
     {
-        public static void Register() => AddReader<LegacyFilesystemReader>((storage, path) => Directory.Exists(path));
+        public static void Register() => AddReader<LegacyFilesystemReader>((storage, path) => Directory.Exists(path), ArchiveStorageMethod.Directory);
 
         private string basePath { get; set; }
         private string[] beatmaps { get; set; }

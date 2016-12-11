@@ -12,27 +12,40 @@ namespace osu.Game.Beatmaps.IO
 {
     public abstract class ArchiveReader : IDisposable, IResourceStore<byte[]>
     {
+        protected enum ArchiveStorageMethod
+        {
+            Directory, File
+        }
+
         private class Reader
         {
             public Func<BasicStorage, string, bool> Test { get; set; }
             public Type Type { get; set; }
+            public ArchiveStorageMethod ArchiveStorageMethod { get; set; }
         }
 
         private static List<Reader> readers { get; } = new List<Reader>();
-    
+
         public static ArchiveReader GetReader(BasicStorage storage, string path)
         {
             foreach (var reader in readers)
             {
-                if (reader.Test(storage, path))
-                    return (ArchiveReader)Activator.CreateInstance(reader.Type, storage.GetStream(path));
+                if (!reader.Test(storage, path)) continue;
+
+                switch (reader.ArchiveStorageMethod)
+                {
+                    case ArchiveStorageMethod.Directory:
+                        return (ArchiveReader)Activator.CreateInstance(reader.Type, path);
+                    default:
+                        return (ArchiveReader)Activator.CreateInstance(reader.Type, storage.GetStream(path));
+                }
             }
             throw new IOException(@"Unknown file format");
         }
         
-        protected static void AddReader<T>(Func<BasicStorage, string, bool> test) where T : ArchiveReader
+        protected static void AddReader<T>(Func<BasicStorage, string, bool> test, ArchiveStorageMethod archiveStorageMethod) where T : ArchiveReader
         {
-            readers.Add(new Reader { Test = test, Type = typeof(T) });
+            readers.Add(new Reader { Test = test, Type = typeof(T), ArchiveStorageMethod = archiveStorageMethod});
         }
     
         /// <summary>
