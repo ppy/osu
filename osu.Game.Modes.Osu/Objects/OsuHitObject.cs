@@ -5,6 +5,7 @@ using System;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects;
 using OpenTK;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.Osu.Objects
 {
@@ -12,7 +13,16 @@ namespace osu.Game.Modes.Osu.Objects
     {
         public Vector2 Position { get; set; }
 
+        public float Scale { get; set; } = 1;
+
         public virtual Vector2 EndPosition => Position;
+
+        public override void SetDefaultsFromBeatmap(Beatmap beatmap)
+        {
+            base.SetDefaultsFromBeatmap(beatmap);
+
+            Scale = (1.0f - 0.7f * (beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5) / 5) / 2;
+        }
 
         [Flags]
         internal enum HitObjectType

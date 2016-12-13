@@ -13,7 +13,7 @@ namespace osu.Game.Modes.Osu.Objects
         private Vector2[] subdivisionBuffer1;
         private Vector2[] subdivisionBuffer2;
 
-        private const float TOLERANCE = 0.5f;
+        private const float TOLERANCE = 0.25f;
         private const float TOLERANCE_SQ = TOLERANCE * TOLERANCE;
 
         public BezierApproximator(List<Vector2> controlPoints)
@@ -36,7 +36,7 @@ namespace osu.Game.Modes.Osu.Objects
         private static bool IsFlatEnough(Vector2[] controlPoints)
         {
             for (int i = 1; i < controlPoints.Length - 1; i++)
-                if ((controlPoints[i - 1] - 2 * controlPoints[i] + controlPoints[i + 1]).LengthSquared > TOLERANCE_SQ)
+                if ((controlPoints[i - 1] - 2 * controlPoints[i] + controlPoints[i + 1]).LengthSquared > TOLERANCE_SQ * 4)
                     return false;
 
             return true;
@@ -96,7 +96,6 @@ namespace osu.Game.Modes.Osu.Objects
         /// Creates a piecewise-linear approximation of a bezier curve, by adaptively repeatedly subdividing
         /// the control points until their approximation error vanishes below a given threshold.
         /// </summary>
-        /// <param name="controlPoints">The control points describing the curve.</param>
         /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
         public List<Vector2> CreateBezier()
         {
