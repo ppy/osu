@@ -16,7 +16,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         private readonly Slider slider;
         private Box follow;
 
-        const float width = 70;
+        const float width = 140;
 
         public SliderBall(Slider slider)
         {
@@ -25,7 +25,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             AutoSizeAxes = Axes.Both;
             BlendingMode = BlendingMode.Additive;
             Origin = Anchor.Centre;
-            BorderThickness = 5;
+            BorderThickness = 10;
             BorderColour = Color4.Orange;
 
             Children = new Drawable[]
@@ -45,7 +45,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    BorderThickness = 7,
+                    BorderThickness = 14,
                     BorderColour = Color4.White,
                     Alpha = 1,
                     CornerRadius = width / 2,

@@ -27,27 +27,35 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             slider = s;
 
-            Origin = Anchor.TopLeft;
-            Position = Vector2.Zero;
-            RelativeSizeAxes = Axes.Both;
-
             Children = new Drawable[]
             {
                 body = new SliderBody(s)
                 {
                     Position = s.Position,
-                    PathWidth = 36,
+                    PathWidth = s.Scale * 72,
                 },
-                bouncer1 = new SliderBouncer(slider, false) { Position = slider.Curve.PositionAt(1) },
-                bouncer2 = new SliderBouncer(slider, true) { Position = slider.Position },
+                bouncer1 = new SliderBouncer(s, false)
+                {
+                    Position = s.Curve.PositionAt(1),
+                    Scale = new Vector2(s.Scale),
+                },
+                bouncer2 = new SliderBouncer(s, true)
+                {
+                    Position = s.Position,
+                    Scale = new Vector2(s.Scale),
+                },
+                ball = new SliderBall(s)
+                {
+                    Scale = new Vector2(s.Scale),
+                },
                 initialCircle = new DrawableHitCircle(new HitCircle
                 {
                     StartTime = s.StartTime,
                     Position = s.Position,
+                    Scale = s.Scale,
                     Colour = s.Colour,
                     Sample = s.Sample,
                 }),
-                ball = new SliderBall(slider),
             };
 
             components.Add(body);
@@ -55,6 +63,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             components.Add(bouncer1);
             components.Add(bouncer2);
         }
+
+        // Since the DrawableSlider itself is just a container without a size we need to
+        // pass all input through.
+        public override bool Contains(Vector2 screenSpacePos) => true;
 
         int currentRepeat;
 
