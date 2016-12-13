@@ -98,14 +98,14 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             }
         }
 
-        private bool validTrackingTime => Time.Current >= slider.StartTime && Time.Current <= slider.EndTime;
+        private bool canCurrentlyTrack => Time.Current >= slider.StartTime && Time.Current < slider.EndTime;
 
         protected override void Update()
         {
             base.Update();
 
             CornerRadius = DrawWidth / 2;
-            Tracking = validTrackingTime && lastState != null && Contains(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
+            Tracking = canCurrentlyTrack && lastState != null && Contains(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
         }
 
         public void UpdateProgress(double progress, int repeat)
