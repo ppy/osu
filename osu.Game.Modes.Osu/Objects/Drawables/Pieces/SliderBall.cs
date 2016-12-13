@@ -84,7 +84,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         }
 
         bool tracking;
-        protected bool Tracking
+        public bool Tracking
         {
             get { return tracking; }
             set
@@ -98,17 +98,18 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             }
         }
 
+        private bool canCurrentlyTrack => Time.Current >= slider.StartTime && Time.Current < slider.EndTime;
+
         protected override void Update()
         {
             base.Update();
 
             CornerRadius = DrawWidth / 2;
-            Tracking = lastState != null && Contains(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
+            Tracking = canCurrentlyTrack && lastState != null && Contains(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
         }
 
         public void UpdateProgress(double progress, int repeat)
         {
-            Alpha = Time.Current >= slider.StartTime && Time.Current <= slider.EndTime ? 1 : 0;
             Position = slider.Curve.PositionAt(progress);
         }
     }
