@@ -5,7 +5,11 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps.Samples;
 using OpenTK;
 using Container = osu.Framework.Graphics.Containers.Container;
 
@@ -26,7 +30,6 @@ namespace osu.Game.Modes.Objects.Drawables
         public DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
-            Depth = (float)hitObject.StartTime;
         }
 
         private ArmedState state;
@@ -40,7 +43,26 @@ namespace osu.Game.Modes.Objects.Drawables
                 state = value;
 
                 UpdateState(state);
+
+                if (State == ArmedState.Hit)
+                    PlaySample();
             }
+        }
+
+        AudioSample sample;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            string hitType = (HitObject.Sample.Type == SampleType.None ? SampleType.Normal : HitObject.Sample.Type).ToString().ToLower();
+            string sampleSet = HitObject.Sample.Set.ToString().ToLower();
+
+            sample = audio.Sample.Get($@"Gameplay/{sampleSet}-hit{hitType}");
+        }
+
+        protected void PlaySample()
+        {
+            sample?.Play();
         }
 
         protected override void LoadComplete()
