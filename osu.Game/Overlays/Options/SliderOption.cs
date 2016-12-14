@@ -139,16 +139,22 @@ namespace osu.Game.Overlays.Options
                 playSample();
                 return base.OnDrag(state);
             }
-
-            protected override void UpdateValue(float value)
+            
+            protected override void Update()
             {
-                nub.MoveToX(DrawWidth * value, 300, EasingTypes.OutQuint);
-                leftBox.ScaleTo(new Vector2(
-                        MathHelper.Clamp(DrawWidth * value - nub.Width / 2 + 2, 0, DrawWidth),
-                    1), 300, EasingTypes.OutQuint);
-                rightBox.ScaleTo(new Vector2(
-                        MathHelper.Clamp(DrawWidth * (1 - value) - nub.Width / 2 + 2, 0, DrawWidth),
-                    1), 300, EasingTypes.OutQuint);
+                leftBox.Scale = new Vector2(MathHelper.Clamp(
+                    nub.DrawPosition.X - nub.DrawSize.X / 2 + 2, 0, DrawWidth), 1);
+                rightBox.Scale = new Vector2(MathHelper.Clamp(
+                    DrawWidth - nub.DrawPosition.X - nub.DrawSize.X / 2 + 2, 0, DrawWidth), 1);
+                base.Update();
+            }
+
+            protected override void UpdateValue(float value, SliderBarEventSource eventSource)
+            {
+                if (eventSource == SliderBarEventSource.Keyboard)
+                    nub.MoveToX(DrawWidth * value, 300, EasingTypes.OutQuint);
+                else
+                    nub.Position = new Vector2(DrawWidth * value, nub.Position.Y);
             }
         }
     }
