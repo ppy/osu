@@ -117,9 +117,6 @@ namespace osu.Game.Database
                 }
                 catch
                 {
-                    using (var source = File.OpenRead(p))
-                    using (var target = storage.GetStream(Path.Combine(@"beatmaps", @"Failed", Path.GetFileName(p)), FileAccess.Write))
-                        source.CopyTo(target);
                 }
                 finally
                 {
