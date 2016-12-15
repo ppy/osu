@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Select
                 BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
                 PreferredPlayMode = playMode.Value
             };
-            
+
             player.Preload(Game, delegate
             {
                 if (!Push(player))
@@ -336,10 +336,15 @@ namespace osu.Game.Screens.Select
         private void addBeatmapSet(BeatmapSetInfo beatmapSet, BaseGame game)
         {
             beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
-            beatmapSet.Beatmaps.ForEach(b => database.GetChildren(b));
+            beatmapSet.Beatmaps.ForEach(b =>
+            {
+                database.GetChildren(b);
+                if (b.Metadata == null) b.Metadata = beatmapSet.Metadata;
+            });
+
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty).ToList();
 
-            var beatmap = database.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault());
+            var beatmap = new WorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault(), beatmapSet, database);
 
             var group = new BeatmapGroup(beatmap) { SelectionChanged = selectionChanged };
 
