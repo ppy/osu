@@ -279,20 +279,28 @@ namespace osu.Game.Screens.Select
         /// </summary>
         private void selectionChanged(BeatmapGroup group, BeatmapInfo beatmap)
         {
+            bool beatmapSetChange = false;
             if (!beatmap.Equals(Beatmap?.BeatmapInfo))
             {
                 if (beatmap.BeatmapSetID == Beatmap?.BeatmapInfo.BeatmapSetID)
+                {
                     sampleChangeDifficulty.Play();
+                    beatmapSetChange = false;
+                }
                 else
+                {
                     sampleChangeBeatmap.Play();
+                    beatmapSetChange = true;
+
+                }
 
                 Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
             }
-
-            ensurePlayingSelected();
+            
+            ensurePlayingSelected(beatmapSetChange);
         }
 
-        private async Task ensurePlayingSelected()
+        private async Task ensurePlayingSelected(bool preview = false)
         {
             AudioTrack track = null;
 
@@ -303,6 +311,8 @@ namespace osu.Game.Screens.Select
                 if (track != null)
                 {
                     trackManager.SetExclusive(track);
+                    if (preview)
+                        track.Seek(Beatmap.Beatmap.Metadata.PreviewTime);
                     track.Start();
                 }
             });
