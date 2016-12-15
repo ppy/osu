@@ -280,23 +280,19 @@ namespace osu.Game.Screens.Select
         private void selectionChanged(BeatmapGroup group, BeatmapInfo beatmap)
         {
             bool beatmapSetChange = false;
+
             if (!beatmap.Equals(Beatmap?.BeatmapInfo))
             {
                 if (beatmap.BeatmapSetID == Beatmap?.BeatmapInfo.BeatmapSetID)
-                {
                     sampleChangeDifficulty.Play();
-                    beatmapSetChange = false;
-                }
                 else
                 {
                     sampleChangeBeatmap.Play();
                     beatmapSetChange = true;
-
                 }
-
                 Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
             }
-            
+
             ensurePlayingSelected(beatmapSetChange);
         }
 
