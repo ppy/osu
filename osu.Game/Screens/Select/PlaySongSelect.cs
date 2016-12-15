@@ -292,7 +292,6 @@ namespace osu.Game.Screens.Select
                 }
                 Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
             }
-
             ensurePlayingSelected(beatmapSetChange);
         }
 
