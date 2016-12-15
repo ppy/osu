@@ -150,12 +150,26 @@ namespace osu.Game.Screens.Select
             };
         }
 
+        Player player;
+
         private void start()
         {
-            Push(new Player
+            if (player != null)
+                return;
+
+            player = new Player
             {
                 BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
                 PreferredPlayMode = playMode.Value
+            };
+            
+            player.Preload(Game, delegate
+            {
+                if (!Push(player))
+                {
+                    player = null;
+                    //error occured?
+                }
             });
         }
 
@@ -206,6 +220,8 @@ namespace osu.Game.Screens.Select
 
         protected override void OnResuming(GameMode last)
         {
+            player = null;
+
             changeBackground(Beatmap);
             ensurePlayingSelected();
             base.OnResuming(last);
