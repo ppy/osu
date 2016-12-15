@@ -157,6 +157,8 @@ namespace osu.Game.Screens.Select
             if (player != null)
                 return;
 
+            //in the future we may want to move this logic to a PlayerLoader gamemode or similar, so we can rely on the SongSelect transition
+            //and provide a better loading experience (at the moment song select is still accepting input during preload).
             player = new Player
             {
                 BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
