@@ -28,6 +28,8 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Input;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -141,15 +143,20 @@ namespace osu.Game.Screens.Select
                             Width = 100,
                             Text = "Play",
                             Colour = new Color4(238, 51, 153, 255),
-                            Action = () => Push(new Player
-                            {
-                                BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
-                                PreferredPlayMode = playMode.Value
-                            })
+                            Action = start
                         },
                     }
                 }
             };
+        }
+
+        private void start()
+        {
+            Push(new Player
+            {
+                BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
+                PreferredPlayMode = playMode.Value
+            });
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -342,6 +349,18 @@ namespace osu.Game.Screens.Select
                 if (token.IsCancellationRequested) return;
                 addBeatmapSet(beatmapSet, game);
             }
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            switch (args.Key)
+            {
+                case Key.Enter:
+                    start();
+                    return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
     }
 }
