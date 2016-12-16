@@ -59,13 +59,23 @@ namespace osu.Game.Overlays.Options
         private class OsuSliderBar<U> : SliderBar<U> where U : struct
         {
             private AudioSample sample;
-            private double lastSample;
+            private double lastSampleTime;
             
             private Container nub;
             private Box leftBox, rightBox;
+            
+            private float innerWidth
+            {
+                get
+                {
+                    return DrawWidth - Height;
+                }
+            }
+            
             public OsuSliderBar()
             {
                 Height = 22;
+                Padding = new MarginPadding { Left = Height / 2, Right = Height / 2 };
                 Children = new Drawable[]
                 {
                     leftBox = new Box
@@ -104,7 +114,7 @@ namespace osu.Game.Overlays.Options
                                 RelativeSizeAxes = Axes.Both
                             }
                         }
-                    },
+                    }
                 };
             }
 
@@ -116,14 +126,11 @@ namespace osu.Game.Overlays.Options
 
             private void playSample()
             {
-                if (Clock == null)
+                if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
                     return;
-                if (Clock.CurrentTime - lastSample > 50)
-                {
-                    lastSample = Clock.CurrentTime;
-                    sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
-                    sample.Play();
-                }
+                lastSampleTime = Clock.CurrentTime;
+                sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
+                sample.Play();
             }
             
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -149,14 +156,14 @@ namespace osu.Game.Overlays.Options
             {
                 base.Update();
                 leftBox.Scale = new Vector2(MathHelper.Clamp(
-                    nub.DrawPosition.X - nub.DrawSize.X / 2 + 2, 0, DrawWidth), 1);
+                    nub.DrawPosition.X - nub.DrawWidth / 2 + 2, 0, innerWidth), 1);
                 rightBox.Scale = new Vector2(MathHelper.Clamp(
-                    DrawWidth - nub.DrawPosition.X - nub.DrawSize.X / 2 + 2, 0, DrawWidth), 1);
+                    innerWidth - nub.DrawPosition.X - nub.DrawWidth / 2 + 2, 0, innerWidth), 1);
             }
 
             protected override void UpdateValue(float value)
             {
-                nub.Position = new Vector2(DrawWidth * value, nub.Position.Y);
+                nub.MoveToX(innerWidth * value);
             }
         }
     }
