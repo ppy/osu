@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         Direction = FlowDirection.VerticalOnly,
-                        Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 40 },
+                        Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
                         Children = new[]
                         {
@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Select
                             },
                             new FlowContainer
                             {
-                                Margin = new MarginPadding { Top = 10 },
+                                Margin = new MarginPadding { Top = 20 },
                                 Direction = FlowDirection.HorizontalOnly,
                                 AutoSizeAxes = Axes.Both,
                                 Spacing = new Vector2(4, 0),
@@ -184,6 +184,24 @@ namespace osu.Game.Screens.Select
                                     },
                                     new TextAwesome
                                     {
+                                        Icon = FontAwesome.fa_dot_circle_o,
+                                        BorderColour = Color4.Purple,
+                                        Colour = Color4.Yellow,
+                                        TextSize = 17,
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft
+                                    },
+                                    new SpriteText
+                                    {
+                                        Font = @"Exo2.0-Bold",
+                                        Colour = Color4.Yellow,
+                                        Text = ""+beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.HitCircle")),
+                                        TextSize = 17,
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft
+                                    },
+                                    new TextAwesome
+                                    {
                                         Icon = FontAwesome.fa_circle_o,
                                         Colour = Color4.Yellow,
                                         TextSize = 17,
@@ -194,7 +212,7 @@ namespace osu.Game.Screens.Select
                                     {
                                         Font = @"Exo2.0-Bold",
                                         Colour = Color4.Yellow,
-                                        Text = ""+beatmap.Beatmap.HitObjects.Count(),
+                                        Text = ""+beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.Slider")),
                                         TextSize = 17,
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft
