@@ -98,7 +98,11 @@ namespace osu.Game.Overlays.Options
                         BorderThickness = 3,
                         Children = new[]
                         {
-                            new Box { Colour = Color4.Transparent, RelativeSizeAxes = Axes.Both }
+                            new Box
+                            {
+                                Colour = new Color4(255, 102, 170, 0),
+                                RelativeSizeAxes = Axes.Both
+                            }
                         }
                     },
                 };
