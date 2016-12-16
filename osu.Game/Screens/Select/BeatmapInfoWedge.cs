@@ -14,6 +14,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps.Drawables;
+using System.Linq;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -137,11 +139,72 @@ namespace osu.Game.Screens.Select
                                         Shadow = true,
                                     },
                                 }
-                            }
+                            },
+                            new FlowContainer
+                            {
+                                Margin = new MarginPadding { Top = 10 },
+                                Direction = FlowDirection.HorizontalOnly,
+                                AutoSizeAxes = Axes.Both,
+                                Spacing = new Vector2(4, 0),
+                                Children = new[]
+                                {
+                                    new TextAwesome
+                                    {
+                                        Icon = FontAwesome.fa_clock_o,
+                                        Colour = Color4.Yellow,
+                                        TextSize = 17,
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft
+                                    },
+                                    new SpriteText
+                                    {
+                                        Font = @"Exo2.0-Bold",
+                                        Colour = Color4.Yellow,
+                                        Text = ""+TimeSpan.FromMilliseconds((beatmap.Beatmap.HitObjects.Last().EndTime-beatmap.Beatmap.HitObjects.First().StartTime)).ToString(@"m\:s"),
+                                        TextSize = 17,
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft
+                                    },
+                                    new TextAwesome
+                                    {
+                                        Icon = FontAwesome.fa_music,
+                                        Colour = Color4.Yellow,
+                                        TextSize = 17,
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft
+                                    },
+                                    new SpriteText
+                                    {
+                                        Font = @"Exo2.0-Bold",
+                                        Colour = Color4.Yellow,
+                                        Text = ""+60000/beatmap.Beatmap.BeatLengthAt(beatmap.Beatmap.Metadata.PreviewTime)+" bpm",
+                                        TextSize = 17,
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft
+                                    },
+                                    new TextAwesome
+                                    {
+                                        Icon = FontAwesome.fa_circle_o,
+                                        Colour = Color4.Yellow,
+                                        TextSize = 17,
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft
+                                    },
+                                    new SpriteText
+                                    {
+                                        Font = @"Exo2.0-Bold",
+                                        Colour = Color4.Yellow,
+                                        Text = ""+beatmap.Beatmap.HitObjects.Count(),
+                                        TextSize = 17,
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft
+                                    },
+                                }
+                            },
                         }
                     }
                 }
-            }).Preload(game, delegate(Drawable d)
+            }).Preload(game, delegate (Drawable d)
             {
                 FadeIn(250);
 
