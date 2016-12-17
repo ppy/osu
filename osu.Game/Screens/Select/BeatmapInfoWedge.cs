@@ -155,14 +155,13 @@ namespace osu.Game.Screens.Select
                                             {
                                                 Icon = FontAwesome.fa_square,
                                                 Colour = new Color4(68,17,136,255),
-                                                TextSize = 17,
                                                 Rotation = 45,
                                             },
                                             new TextAwesome
                                             {
                                                 Icon = FontAwesome.fa_clock_o,
                                                 Colour = new Color4(255,221,85,255),
-                                                TextSize = 14,
+                                                Scale = new Vector2(0.8f,0.8f),
                                             }
                                         }
                                      },
@@ -183,14 +182,13 @@ namespace osu.Game.Screens.Select
                                             {
                                                 Icon = FontAwesome.fa_square,
                                                 Colour = new Color4(68,17,136,255),
-                                                TextSize = 17,
                                                 Rotation = 45,
                                             },
                                             new TextAwesome
                                             {
                                                 Icon = FontAwesome.fa_circle_o,
                                                 Colour = new Color4(255,221,85,255),
-                                                TextSize = 14,
+                                                Scale = new Vector2(0.8f,0.8f),
                                             }
                                         }
                                      },
@@ -211,14 +209,19 @@ namespace osu.Game.Screens.Select
                                             {
                                                 Icon = FontAwesome.fa_square,
                                                 Colour = new Color4(68,17,136,255),
-                                                TextSize = 17,
                                                 Rotation = 45,
                                             },
                                             new TextAwesome
                                             {
-                                                Icon = FontAwesome.fa_dot_circle_o,
+                                                Icon = FontAwesome.fa_circle_o,
                                                 Colour = new Color4(255,221,85,255),
-                                                TextSize = 14,
+                                                Scale = new Vector2(0.8f,0.8f),
+                                            },
+                                            new TextAwesome
+                                            {
+                                                Icon = FontAwesome.fa_circle_o,
+                                                Colour = new Color4(255,221,85,255),
+                                                Scale = new Vector2(0.4f,0.4f)
                                             }
                                         }
                                      },
@@ -239,14 +242,13 @@ namespace osu.Game.Screens.Select
                                             {
                                                 Icon = FontAwesome.fa_square,
                                                 Colour = new Color4(68,17,136,255),
-                                                TextSize = 17,
                                                 Rotation = 45,
                                             },
                                             new TextAwesome
                                             {
                                                 Icon = FontAwesome.fa_circle_o,
                                                 Colour = new Color4(255,221,85,255),
-                                                TextSize = 14,
+                                                Scale = new Vector2(0.8f,0.8f),
                                             }
                                         }
                                      },
