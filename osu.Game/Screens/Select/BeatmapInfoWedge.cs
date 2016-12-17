@@ -143,29 +143,29 @@ namespace osu.Game.Screens.Select
                             new Container
                             {
                                 Margin = new MarginPadding { Top = 20 },
-                                //AutoSizeAxes = Axes.Both,
+                                AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
                                     new Container
                                     {
-                                         AutoSizeAxes = Axes.Both,
-                                         Children = new[]
-                                         {
-                                             new TextAwesome
-                                             {
-                                                 Icon = FontAwesome.fa_square,
-                                                 Colour = Color4.Purple,
-                                                 TextSize = 17,
-                                                 Rotation = 45,
-                                             },
-                                             new TextAwesome
-                                             {
-                                                 Icon = FontAwesome.fa_clock_o,
-                                                 Colour = Color4.Purple,
-                                                 TextSize = 17,
-                                             }
-                                          }
-                                    },
+                                        Margin = new MarginPadding { Left = 10, Top = 10 },
+                                        AutoSizeAxes = Axes.Both,
+                                        Children = new[] {
+                                            new TextAwesome
+                                            {
+                                                Icon = FontAwesome.fa_square,
+                                                Colour = new Color4(68,17,136,255),
+                                                TextSize = 17,
+                                                Rotation = 45,
+                                            },
+                                            new TextAwesome
+                                            {
+                                                Icon = FontAwesome.fa_clock_o,
+                                                Colour = new Color4(255,221,85,255),
+                                                TextSize = 14,
+                                            }
+                                        }
+                                     },
                                     new SpriteText
                                     {
                                         Margin = new MarginPadding { Left = 23, Bottom = 3 },
@@ -176,17 +176,24 @@ namespace osu.Game.Screens.Select
                                     },
                                     new Container
                                     {
-                                         Margin = new MarginPadding { Left = 100 },
-                                         AutoSizeAxes = Axes.Both,
-                                         Children = new[]
-                                         {
-                                             new Sprite
-                                             {
-
-                                                 Scale = new Vector2(0.5f, 0.5f),
-                                             },
-                                          }
-                                    },
+                                        Margin = new MarginPadding { Left = 110, Top = 10 },
+                                        AutoSizeAxes = Axes.Both,
+                                        Children = new[] {
+                                            new TextAwesome
+                                            {
+                                                Icon = FontAwesome.fa_square,
+                                                Colour = new Color4(68,17,136,255),
+                                                TextSize = 17,
+                                                Rotation = 45,
+                                            },
+                                            new TextAwesome
+                                            {
+                                                Icon = FontAwesome.fa_circle_o,
+                                                Colour = new Color4(255,221,85,255),
+                                                TextSize = 14,
+                                            }
+                                        }
+                                     },
                                     new SpriteText
                                     {
                                         Margin = new MarginPadding { Left = 123, Bottom = 3 },
@@ -197,17 +204,24 @@ namespace osu.Game.Screens.Select
                                     },
                                     new Container
                                     {
-                                         Margin = new MarginPadding { Left = 200 },
-                                         AutoSizeAxes = Axes.Both,
-                                         Children = new[]
-                                         {
-                                             new Sprite
-                                             {
-
-                                                 Scale = new Vector2(0.5f, 0.5f),
-                                             },
-                                          }
-                                    },
+                                        Margin = new MarginPadding { Left = 210, Top = 10 },
+                                        AutoSizeAxes = Axes.Both,
+                                        Children = new[] {
+                                            new TextAwesome
+                                            {
+                                                Icon = FontAwesome.fa_square,
+                                                Colour = new Color4(68,17,136,255),
+                                                TextSize = 17,
+                                                Rotation = 45,
+                                            },
+                                            new TextAwesome
+                                            {
+                                                Icon = FontAwesome.fa_dot_circle_o,
+                                                Colour = new Color4(255,221,85,255),
+                                                TextSize = 14,
+                                            }
+                                        }
+                                     },
                                     new SpriteText
                                     {
                                         Margin = new MarginPadding { Left = 223, Bottom = 3 },
@@ -218,17 +232,24 @@ namespace osu.Game.Screens.Select
                                     },
                                     new Container
                                     {
-                                         Margin = new MarginPadding { Left = 300 },
-                                         AutoSizeAxes = Axes.Both,
-                                         Children = new[]
-                                         {
-                                             new Sprite
-                                             {
- 
-                                                 Scale = new Vector2(0.5f, 0.5f),
-                                             },
-                                          }
-                                    },
+                                        Margin = new MarginPadding { Left = 310, Top = 10 },
+                                        AutoSizeAxes = Axes.Both,
+                                        Children = new[] {
+                                            new TextAwesome
+                                            {
+                                                Icon = FontAwesome.fa_square,
+                                                Colour = new Color4(68,17,136,255),
+                                                TextSize = 17,
+                                                Rotation = 45,
+                                            },
+                                            new TextAwesome
+                                            {
+                                                Icon = FontAwesome.fa_circle_o,
+                                                Colour = new Color4(255,221,85,255),
+                                                TextSize = 14,
+                                            }
+                                        }
+                                     },
                                     new SpriteText
                                     {
                                         Margin = new MarginPadding { Left = 323, Bottom = 3 },
