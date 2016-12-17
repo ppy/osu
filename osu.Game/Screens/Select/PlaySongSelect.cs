@@ -28,6 +28,8 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Input;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -141,15 +143,36 @@ namespace osu.Game.Screens.Select
                             Width = 100,
                             Text = "Play",
                             Colour = new Color4(238, 51, 153, 255),
-                            Action = () => Push(new Player
-                            {
-                                BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
-                                PreferredPlayMode = playMode.Value
-                            })
+                            Action = start
                         },
                     }
                 }
             };
+        }
+
+        Player player;
+
+        private void start()
+        {
+            if (player != null)
+                return;
+
+            //in the future we may want to move this logic to a PlayerLoader gamemode or similar, so we can rely on the SongSelect transition
+            //and provide a better loading experience (at the moment song select is still accepting input during preload).
+            player = new Player
+            {
+                BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
+                PreferredPlayMode = playMode.Value
+            };
+
+            player.Preload(Game, delegate
+            {
+                if (!Push(player))
+                {
+                    player = null;
+                    //error occured?
+                }
+            });
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -199,6 +222,8 @@ namespace osu.Game.Screens.Select
 
         protected override void OnResuming(GameMode last)
         {
+            player = null;
+
             changeBackground(Beatmap);
             ensurePlayingSelected();
             base.OnResuming(last);
@@ -316,10 +341,15 @@ namespace osu.Game.Screens.Select
         private void addBeatmapSet(BeatmapSetInfo beatmapSet, BaseGame game)
         {
             beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
-            beatmapSet.Beatmaps.ForEach(b => database.GetChildren(b));
+            beatmapSet.Beatmaps.ForEach(b =>
+            {
+                database.GetChildren(b);
+                if (b.Metadata == null) b.Metadata = beatmapSet.Metadata;
+            });
+
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty).ToList();
 
-            var beatmap = database.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault());
+            var beatmap = new WorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault(), beatmapSet, database);
 
             var group = new BeatmapGroup(beatmap) { SelectionChanged = selectionChanged };
 
@@ -347,6 +377,18 @@ namespace osu.Game.Screens.Select
                 if (token.IsCancellationRequested) return;
                 addBeatmapSet(beatmapSet, game);
             }
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            switch (args.Key)
+            {
+                case Key.Enter:
+                    start();
+                    return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
     }
 }

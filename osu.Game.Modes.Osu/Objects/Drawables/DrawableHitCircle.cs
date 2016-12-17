@@ -134,7 +134,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     FadeOut(TIME_FADEOUT / 5);
                     break;
                 case ArmedState.Hit:
-                    const double flash_in = 30;
+                    const double flash_in = 40;
 
                     flash.FadeTo(0.8f, flash_in);
                     flash.Delay(flash_in);

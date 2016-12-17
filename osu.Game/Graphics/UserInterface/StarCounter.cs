@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.UserInterface
             protected set;
         }
 
-        private double animationDelay => 150;
+        private double animationDelay => 80;
 
         private double scalingDuration => 500;
         private EasingTypes scalingEasing => EasingTypes.OutElasticHalf;
