@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Select
                                      },
                                     new SpriteText
                                     {
-                                        Margin = new MarginPadding { Left = 23, Bottom = 3 },
+                                        Margin = new MarginPadding { Left = 23},
                                         Font = @"Exo2.0-Bold",
                                         Colour = new Color4(255,221,85,255),
                                         Text = ""+TimeSpan.FromMilliseconds((beatmap.Beatmap.HitObjects.Last().EndTime-beatmap.Beatmap.HitObjects.First().StartTime)).ToString(@"m\:s"),
@@ -196,7 +196,7 @@ namespace osu.Game.Screens.Select
                                      },
                                     new SpriteText
                                     {
-                                        Margin = new MarginPadding { Left = 123, Bottom = 3 },
+                                        Margin = new MarginPadding { Left = 123},
                                         Font = @"Exo2.0-Bold",
                                         Colour = new Color4(255,221,85,255),
                                         Text = ""+60000/beatmap.Beatmap.BeatLengthAt(beatmap.Beatmap.Metadata.PreviewTime)+"bpm",
@@ -224,7 +224,7 @@ namespace osu.Game.Screens.Select
                                      },
                                     new SpriteText
                                     {
-                                        Margin = new MarginPadding { Left = 223, Bottom = 3 },
+                                        Margin = new MarginPadding { Left = 223},
                                         Font = @"Exo2.0-Bold",
                                         Colour = new Color4(255,221,85,255),
                                         Text = ""+beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.HitCircle")),
@@ -252,7 +252,7 @@ namespace osu.Game.Screens.Select
                                      },
                                     new SpriteText
                                     {
-                                        Margin = new MarginPadding { Left = 323, Bottom = 3 },
+                                        Margin = new MarginPadding { Left = 323},
                                         Font = @"Exo2.0-Bold",
                                         Colour = new Color4(255,221,85,255),
                                         Text = ""+beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.Slider")),
