@@ -1,16 +1,25 @@
-﻿using System;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
+using OpenTK;
+using OpenTK.Input;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Options
 {
-    public class SliderOption<T> : FlowContainer where T : struct,
-        IComparable, IFormattable, IConvertible, IComparable<T>, IEquatable<T>
+    public class SliderOption<T> : FlowContainer where T : struct
     {
         private SliderBar<T> slider;
         private SpriteText text;
@@ -39,15 +48,123 @@ namespace osu.Game.Overlays.Options
             Children = new Drawable[]
             {
                 text = new SpriteText { Alpha = 0 },
-                slider = new SliderBar<T>
+                slider = new OsuSliderBar<T>
                 {
                     Margin = new MarginPadding { Top = 5 },
-                    Height = 10,
                     RelativeSizeAxes = Axes.X,
-                    Color = Color4.White,
-                    SelectionColor = new Color4(255, 102, 170, 255),
                 }
             };
+        }
+
+        private class OsuSliderBar<U> : SliderBar<U> where U : struct
+        {
+            private AudioSample sample;
+            private double lastSampleTime;
+            
+            private Container nub;
+            private Box leftBox, rightBox;
+            
+            private float innerWidth
+            {
+                get
+                {
+                    return DrawWidth - Height;
+                }
+            }
+            
+            public OsuSliderBar()
+            {
+                Height = 22;
+                Padding = new MarginPadding { Left = Height / 2, Right = Height / 2 };
+                Children = new Drawable[]
+                {
+                    leftBox = new Box
+                    {
+                        Height = 2,
+                        RelativeSizeAxes = Axes.None,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Colour = new Color4(255, 102, 170, 255),
+                    },
+                    rightBox = new Box
+                    {
+                        Height = 2,
+                        RelativeSizeAxes = Axes.None,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Colour = new Color4(255, 102, 170, 255),
+                        Alpha = 0.5f,
+                    },
+                    nub = new Container
+                    {
+                        Width = Height,
+                        Height = Height,
+                        CornerRadius = Height / 2,
+                        Origin = Anchor.TopCentre,
+                        AutoSizeAxes = Axes.None,
+                        RelativeSizeAxes = Axes.None,
+                        Masking = true,
+                        BorderColour = new Color4(255, 102, 170, 255),
+                        BorderThickness = 3,
+                        Children = new[]
+                        {
+                            new Box
+                            {
+                                Colour = new Color4(255, 102, 170, 0),
+                                RelativeSizeAxes = Axes.Both
+                            }
+                        }
+                    }
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                sample = audio.Sample.Get(@"Sliderbar/sliderbar");
+            }
+
+            private void playSample()
+            {
+                if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
+                    return;
+                lastSampleTime = Clock.CurrentTime;
+                sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
+                sample.Play();
+            }
+            
+            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+            {
+                if (args.Key == Key.Left || args.Key == Key.Right)
+                    playSample();
+                return base.OnKeyDown(state, args);
+            }
+            
+            protected override bool OnClick(InputState state)
+            {
+                playSample();
+                return base.OnClick(state);
+            }
+            
+            protected override bool OnDrag(InputState state)
+            {
+                playSample();
+                return base.OnDrag(state);
+            }
+            
+            protected override void Update()
+            {
+                base.Update();
+                leftBox.Scale = new Vector2(MathHelper.Clamp(
+                    nub.DrawPosition.X - nub.DrawWidth / 2 + 2, 0, innerWidth), 1);
+                rightBox.Scale = new Vector2(MathHelper.Clamp(
+                    innerWidth - nub.DrawPosition.X - nub.DrawWidth / 2 + 2, 0, innerWidth), 1);
+            }
+
+            protected override void UpdateValue(float value)
+            {
+                nub.MoveToX(innerWidth * value);
+            }
         }
     }
 }
