@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps.Drawables;
 using System.Linq;
 using osu.Game.Graphics;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Screens.Select
 {
@@ -24,6 +25,11 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
 
         private Container beatmapInfoContainer;
+
+        private Texture time;
+        private Texture bpm;
+        private Texture hitCircles;
+        private Texture sliders;
 
         private BaseGame game;
 
@@ -43,9 +49,13 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(BaseGame game)
+        private void load(BaseGame game, TextureStore textures)
         {
             this.game = game;
+            time = textures.Get(@"BeatmapInfo/time");
+            bpm = textures.Get(@"BeatmapInfo/bpm");
+            hitCircles = textures.Get(@"BeatmapInfo/hitCircles");
+            sliders = textures.Get(@"BeatmapInfo/sliders");
         }
 
         public void UpdateBeatmap(WorkingBeatmap beatmap)
@@ -84,7 +94,7 @@ namespace osu.Game.Screens.Select
                         ColourInfo = ColourInfo.GradientVertical(Color4.White, new Color4(1f, 1f, 1f, 0.3f)),
                         Children = new []
                         {
-                            // Zoomed-in and cropped beatmap background
+                            // Zoomed-in and cropped beatmap background                          
                             new BeatmapBackgroundSprite(beatmap)
                             {
                                 Anchor = Anchor.Centre,
@@ -101,7 +111,7 @@ namespace osu.Game.Screens.Select
                         Direction = FlowDirection.VerticalOnly,
                         Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
-                        Children = new[]
+                        Children = new Drawable[]
                         {
                             new SpriteText
                             {
@@ -140,87 +150,99 @@ namespace osu.Game.Screens.Select
                                     },
                                 }
                             },
-                            new FlowContainer
+                            new Container
                             {
                                 Margin = new MarginPadding { Top = 20 },
-                                Direction = FlowDirection.HorizontalOnly,
                                 AutoSizeAxes = Axes.Both,
-                                Spacing = new Vector2(4, 0),
-                                Children = new[]
+                                Children = new Drawable[]
                                 {
-                                    new TextAwesome
+                                    new Container
                                     {
-                                        Icon = FontAwesome.fa_clock_o,
-                                        Colour = Color4.Yellow,
-                                        TextSize = 17,
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft
+                                         AutoSizeAxes = Axes.Both,
+                                         Children = new[]
+                                         {
+                                             new Sprite
+                                             {
+                                                 Texture = time,
+                                                 Scale = new Vector2(0.5f, 0.5f),
+                                             },
+                                          }
                                     },
                                     new SpriteText
                                     {
+                                        Margin = new MarginPadding { Left = 23, Bottom = 3 },
                                         Font = @"Exo2.0-Bold",
-                                        Colour = Color4.Yellow,
+                                        Colour = new Color4(255,221,85,255),
                                         Text = ""+TimeSpan.FromMilliseconds((beatmap.Beatmap.HitObjects.Last().EndTime-beatmap.Beatmap.HitObjects.First().StartTime)).ToString(@"m\:s"),
                                         TextSize = 17,
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft
                                     },
-                                    new TextAwesome
+                                    new Container
                                     {
-                                        Icon = FontAwesome.fa_music,
-                                        Colour = Color4.Yellow,
-                                        TextSize = 17,
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft
+                                         Margin = new MarginPadding { Left = 100 },
+                                         AutoSizeAxes = Axes.Both,
+                                         Children = new[]
+                                         {
+                                             new Sprite
+                                             {
+                                                 Texture = bpm,
+                                                 Scale = new Vector2(0.5f, 0.5f),
+                                             },
+                                          }
                                     },
                                     new SpriteText
                                     {
+                                        Margin = new MarginPadding { Left = 123, Bottom = 3 },
                                         Font = @"Exo2.0-Bold",
-                                        Colour = Color4.Yellow,
+                                        Colour = new Color4(255,221,85,255),
                                         Text = ""+60000/beatmap.Beatmap.BeatLengthAt(beatmap.Beatmap.Metadata.PreviewTime)+" bpm",
                                         TextSize = 17,
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft
                                     },
-                                    new TextAwesome
+                                    new Container
                                     {
-                                        Icon = FontAwesome.fa_dot_circle_o,
-                                        BorderColour = Color4.Purple,
-                                        Colour = Color4.Yellow,
-                                        TextSize = 17,
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft
+                                         Margin = new MarginPadding { Left = 200 },
+                                         AutoSizeAxes = Axes.Both,
+                                         Children = new[]
+                                         {
+                                             new Sprite
+                                             {
+                                                 Texture = hitCircles,
+                                                 Scale = new Vector2(0.5f, 0.5f),
+                                             },
+                                          }
                                     },
                                     new SpriteText
                                     {
+                                        Margin = new MarginPadding { Left = 223, Bottom = 3 },
                                         Font = @"Exo2.0-Bold",
-                                        Colour = Color4.Yellow,
+                                        Colour = new Color4(255,221,85,255),
                                         Text = ""+beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.HitCircle")),
                                         TextSize = 17,
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft
                                     },
-                                    new TextAwesome
+                                    new Container
                                     {
-                                        Icon = FontAwesome.fa_circle_o,
-                                        Colour = Color4.Yellow,
-                                        TextSize = 17,
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft
+                                         Margin = new MarginPadding { Left = 300 },
+                                         AutoSizeAxes = Axes.Both,
+                                         Children = new[]
+                                         {
+                                             new Sprite
+                                             {
+                                                 Texture = sliders,
+                                                 Scale = new Vector2(0.5f, 0.5f),
+                                             },
+                                          }
                                     },
                                     new SpriteText
                                     {
+                                        Margin = new MarginPadding { Left = 323, Bottom = 3 },
                                         Font = @"Exo2.0-Bold",
-                                        Colour = Color4.Yellow,
+                                        Colour = new Color4(255,221,85,255),
                                         Text = ""+beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.Slider")),
                                         TextSize = 17,
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft
                                     },
                                 }
                             },
                         }
-                    }
+                    },                   
                 }
             }).Preload(game, delegate (Drawable d)
             {
