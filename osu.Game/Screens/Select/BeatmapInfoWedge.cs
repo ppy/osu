@@ -60,6 +60,11 @@ namespace osu.Game.Screens.Select
             BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
 
+            string length = "" + TimeSpan.FromMilliseconds((beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime)).ToString(@"m\:s");
+            string bpm = 60000 / beatmap.Beatmap.BeatLengthAt(beatmap.Beatmap.Metadata.PreviewTime) + "bpm";
+            string hitCircles = "" + beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.HitCircle"));
+            string sliders = "" + beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.Slider"));
+
             (beatmapInfoContainer = new BufferedContainer
             {
                 Depth = newDepth,
@@ -84,7 +89,7 @@ namespace osu.Game.Screens.Select
                         ColourInfo = ColourInfo.GradientVertical(Color4.White, new Color4(1f, 1f, 1f, 0.3f)),
                         Children = new []
                         {
-                            // Zoomed-in and cropped beatmap background                          
+                            // Zoomed-in and cropped beatmap background
                             new BeatmapBackgroundSprite(beatmap)
                             {
                                 Anchor = Anchor.Centre,
@@ -146,126 +151,16 @@ namespace osu.Game.Screens.Select
                                 AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    new Container
-                                    {
-                                        Margin = new MarginPadding { Left = 10, Top = 10 },
-                                        AutoSizeAxes = Axes.Both,
-                                        Children = new[] {
-                                            new TextAwesome
-                                            {
-                                                Icon = FontAwesome.fa_square,
-                                                Colour = new Color4(68,17,136,255),
-                                                Rotation = 45,
-                                            },
-                                            new TextAwesome
-                                            {
-                                                Icon = FontAwesome.fa_clock_o,
-                                                Colour = new Color4(255,221,85,255),
-                                                Scale = new Vector2(0.8f,0.8f),
-                                            }
-                                        }
-                                     },
-                                    new SpriteText
-                                    {
-                                        Margin = new MarginPadding { Left = 23},
-                                        Font = @"Exo2.0-Bold",
-                                        Colour = new Color4(255,221,85,255),
-                                        Text = ""+TimeSpan.FromMilliseconds((beatmap.Beatmap.HitObjects.Last().EndTime-beatmap.Beatmap.HitObjects.First().StartTime)).ToString(@"m\:s"),
-                                        TextSize = 17,
-                                    },
-                                    new Container
-                                    {
-                                        Margin = new MarginPadding { Left = 110, Top = 10 },
-                                        AutoSizeAxes = Axes.Both,
-                                        Children = new[] {
-                                            new TextAwesome
-                                            {
-                                                Icon = FontAwesome.fa_square,
-                                                Colour = new Color4(68,17,136,255),
-                                                Rotation = 45,
-                                            },
-                                            new TextAwesome
-                                            {
-                                                Icon = FontAwesome.fa_circle_o,
-                                                Colour = new Color4(255,221,85,255),
-                                                Scale = new Vector2(0.8f,0.8f),
-                                            }
-                                        }
-                                     },
-                                    new SpriteText
-                                    {
-                                        Margin = new MarginPadding { Left = 123},
-                                        Font = @"Exo2.0-Bold",
-                                        Colour = new Color4(255,221,85,255),
-                                        Text = ""+60000/beatmap.Beatmap.BeatLengthAt(beatmap.Beatmap.Metadata.PreviewTime)+"bpm",
-                                        TextSize = 17,
-                                    },
-                                    new Container
-                                    {
-                                        Margin = new MarginPadding { Left = 210, Top = 10 },
-                                        AutoSizeAxes = Axes.Both,
-                                        Children = new[] {
-                                            new TextAwesome
-                                            {
-                                                Icon = FontAwesome.fa_square,
-                                                Colour = new Color4(68,17,136,255),
-                                                Rotation = 45,
-                                            },
-                                            new TextAwesome
-                                            {
-                                                Icon = FontAwesome.fa_circle_o,
-                                                Colour = new Color4(255,221,85,255),
-                                                Scale = new Vector2(0.8f,0.8f),
-                                            },
-                                            new TextAwesome
-                                            {
-                                                Icon = FontAwesome.fa_circle_o,
-                                                Colour = new Color4(255,221,85,255),
-                                                Scale = new Vector2(0.4f,0.4f)
-                                            }
-                                        }
-                                     },
-                                    new SpriteText
-                                    {
-                                        Margin = new MarginPadding { Left = 223},
-                                        Font = @"Exo2.0-Bold",
-                                        Colour = new Color4(255,221,85,255),
-                                        Text = ""+beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.HitCircle")),
-                                        TextSize = 17,
-                                    },
-                                    new Container
-                                    {
-                                        Margin = new MarginPadding { Left = 310, Top = 10 },
-                                        AutoSizeAxes = Axes.Both,
-                                        Children = new[] {
-                                            new TextAwesome
-                                            {
-                                                Icon = FontAwesome.fa_square,
-                                                Colour = new Color4(68,17,136,255),
-                                                Rotation = 45,
-                                            },
-                                            new TextAwesome
-                                            {
-                                                Icon = FontAwesome.fa_circle_o,
-                                                Colour = new Color4(255,221,85,255),
-                                                Scale = new Vector2(0.8f,0.8f),
-                                            }
-                                        }
-                                     },
-                                    new SpriteText
-                                    {
-                                        Margin = new MarginPadding { Left = 323},
-                                        Font = @"Exo2.0-Bold",
-                                        Colour = new Color4(255,221,85,255),
-                                        Text = ""+beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.Slider")),
-                                        TextSize = 17,
-                                    },
+                                    InfoLabel(FontAwesome.fa_clock_o, length, 0),
+                                    InfoLabel(FontAwesome.fa_circle, bpm, 1),
+                                    InfoLabel(FontAwesome.fa_dot_circle_o, hitCircles, 2),
+                                    InfoLabel(FontAwesome.fa_circle_o, sliders, 3),
                                 }
                             },
                         }
-                    },                   
+                    },
                 }
-            }).Preload(game, delegate (Drawable d)
+            }).Preload(game, delegate(Drawable d)
             {
                 FadeIn(250);
 
@@ -274,6 +169,38 @@ namespace osu.Game.Screens.Select
 
                 Add(d);
             });
+        }
+        
+        private Container InfoLabel(FontAwesome icon, string text, int pos)
+        {
+            Container cont = new Container
+            {
+                Margin = new MarginPadding {Left = pos*100, Top = 10 },
+                AutoSizeAxes = Axes.Both,
+                Children = new[] {
+                    new TextAwesome
+                    {
+                    Icon = FontAwesome.fa_square,
+                    Colour = new Color4(68,17,136,255),
+                    Rotation = 45,
+                    },
+                    new TextAwesome
+                    {
+                    Icon = icon,
+                    Colour = new Color4(255,221,85,255),
+                    Scale = new Vector2(0.8f,0.8f),
+                    },
+                    new SpriteText
+                    {
+                        Margin = new MarginPadding {Left = 13},
+                        Font = @"Exo2.0-Bold",
+                        Colour = new Color4(255,221,85,255),
+                        Text = text,
+                        TextSize = 17,
+                    },
+                }
+            };
+            return cont;
         }
     }
 }
