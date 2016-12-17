@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps.Drawables;
 using System.Linq;
 using osu.Game.Graphics;
-using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Screens.Select
 {
@@ -25,11 +24,6 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
 
         private Container beatmapInfoContainer;
-
-        private Texture time;
-        private Texture bpm;
-        private Texture hitCircles;
-        private Texture sliders;
 
         private BaseGame game;
 
@@ -49,13 +43,9 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(BaseGame game, TextureStore textures)
+        private void load(BaseGame game)
         {
             this.game = game;
-            time = textures.Get(@"BeatmapInfo/time");
-            bpm = textures.Get(@"BeatmapInfo/bpm");
-            hitCircles = textures.Get(@"BeatmapInfo/hitCircles");
-            sliders = textures.Get(@"BeatmapInfo/sliders");
         }
 
         public void UpdateBeatmap(WorkingBeatmap beatmap)
@@ -153,7 +143,7 @@ namespace osu.Game.Screens.Select
                             new Container
                             {
                                 Margin = new MarginPadding { Top = 20 },
-                                AutoSizeAxes = Axes.Both,
+                                //AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
                                     new Container
@@ -161,11 +151,19 @@ namespace osu.Game.Screens.Select
                                          AutoSizeAxes = Axes.Both,
                                          Children = new[]
                                          {
-                                             new Sprite
+                                             new TextAwesome
                                              {
-                                                 Texture = time,
-                                                 Scale = new Vector2(0.5f, 0.5f),
+                                                 Icon = FontAwesome.fa_square,
+                                                 Colour = Color4.Purple,
+                                                 TextSize = 17,
+                                                 Rotation = 45,
                                              },
+                                             new TextAwesome
+                                             {
+                                                 Icon = FontAwesome.fa_clock_o,
+                                                 Colour = Color4.Purple,
+                                                 TextSize = 17,
+                                             }
                                           }
                                     },
                                     new SpriteText
@@ -184,7 +182,7 @@ namespace osu.Game.Screens.Select
                                          {
                                              new Sprite
                                              {
-                                                 Texture = bpm,
+
                                                  Scale = new Vector2(0.5f, 0.5f),
                                              },
                                           }
@@ -194,7 +192,7 @@ namespace osu.Game.Screens.Select
                                         Margin = new MarginPadding { Left = 123, Bottom = 3 },
                                         Font = @"Exo2.0-Bold",
                                         Colour = new Color4(255,221,85,255),
-                                        Text = ""+60000/beatmap.Beatmap.BeatLengthAt(beatmap.Beatmap.Metadata.PreviewTime)+" bpm",
+                                        Text = ""+60000/beatmap.Beatmap.BeatLengthAt(beatmap.Beatmap.Metadata.PreviewTime)+"bpm",
                                         TextSize = 17,
                                     },
                                     new Container
@@ -205,7 +203,7 @@ namespace osu.Game.Screens.Select
                                          {
                                              new Sprite
                                              {
-                                                 Texture = hitCircles,
+
                                                  Scale = new Vector2(0.5f, 0.5f),
                                              },
                                           }
@@ -226,7 +224,7 @@ namespace osu.Game.Screens.Select
                                          {
                                              new Sprite
                                              {
-                                                 Texture = sliders,
+ 
                                                  Scale = new Vector2(0.5f, 0.5f),
                                              },
                                           }
