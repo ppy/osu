@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps.Drawables;
 using System.Linq;
 using osu.Game.Graphics;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Screens.Select
 {
@@ -60,8 +61,20 @@ namespace osu.Game.Screens.Select
             BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
 
+            double bpmPreview = 60000 / beatmap.Beatmap.BeatLengthAt(beatmap.Beatmap.Metadata.PreviewTime);
+            double bpmMax = bpmPreview;
+            double bpmMin = bpmPreview;
+            foreach( ControlPoint a in beatmap.Beatmap.ControlPoints)
+            {
+                if (a.BeatLength == 0) continue;
+                double tmp = 60000 / a.BeatLength;
+                if (bpmMax < tmp) bpmMax = tmp;
+                if (bpmMin > tmp) bpmMin = tmp;
+            }
+            string bpm;
+            if (bpmMax == bpmMin) bpm = bpmMin + "bpm";
+            else bpm = bpmMin + "-" + bpmMax + "(" + 60000 / beatmap.Beatmap.BeatLengthAt(beatmap.Beatmap.Metadata.PreviewTime) + ")bpm";
             string length = "" + TimeSpan.FromMilliseconds((beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime)).ToString(@"m\:s");
-            string bpm = 60000 / beatmap.Beatmap.BeatLengthAt(beatmap.Beatmap.Metadata.PreviewTime) + "bpm";
             string hitCircles = "" + beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.HitCircle"));
             string sliders = "" + beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.Slider"));
 
@@ -145,16 +158,17 @@ namespace osu.Game.Screens.Select
                                     },
                                 }
                             },
-                            new Container
+                            new FlowContainer
                             {
                                 Margin = new MarginPadding { Top = 20 },
+                                Spacing = new Vector2(40,0),
                                 AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    InfoLabel(FontAwesome.fa_clock_o, length, 0),
-                                    InfoLabel(FontAwesome.fa_circle, bpm, 1),
-                                    InfoLabel(FontAwesome.fa_dot_circle_o, hitCircles, 2),
-                                    InfoLabel(FontAwesome.fa_circle_o, sliders, 3),
+                                    InfoLabel(FontAwesome.fa_clock_o, length),
+                                    InfoLabel(FontAwesome.fa_circle, bpm),
+                                    InfoLabel(FontAwesome.fa_dot_circle_o, hitCircles),
+                                    InfoLabel(FontAwesome.fa_circle_o, sliders),
                                 }
                             },
                         }
@@ -171,11 +185,10 @@ namespace osu.Game.Screens.Select
             });
         }
         
-        private Container InfoLabel(FontAwesome icon, string text, int pos)
+        private Container InfoLabel(FontAwesome icon, string text)
         {
             Container cont = new Container
             {
-                Margin = new MarginPadding {Left = pos*100, Top = 10 },
                 AutoSizeAxes = Axes.Both,
                 Children = new[] {
                     new TextAwesome
