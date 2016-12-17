@@ -149,14 +149,14 @@ namespace osu.Game.Screens.Play
             base.OnEntering(last);
 
             (Background as BackgroundModeBeatmap)?.BlurTo(Vector2.Zero, 1000);
-            (Background as BackgroundModeBeatmap)?.FadeTo((100f- dimLevel)/100,1000);
+            Background?.FadeTo((100f- dimLevel)/100,1000);
 
             Content.Alpha = 0;
         }
 
         protected override bool OnExiting(GameMode next)
         {
-            (Background as BackgroundModeBeatmap)?.FadeTo(1f, 0);
+            Background?.FadeTo(1f, 0);
             return base.OnExiting(next);
         }
 
