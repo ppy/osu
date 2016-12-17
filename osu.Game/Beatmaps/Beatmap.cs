@@ -17,6 +17,11 @@ namespace osu.Game.Beatmaps
         public List<ControlPoint> ControlPoints { get; set; }
         public List<Color4> ComboColors { get; set; }
 
+        public double BPMAt(double time)
+        {
+            return 60000 / BeatLengthAt(time);
+        }
+
         public double BeatLengthAt(double time, bool applyMultipliers = false)
         {
             int point = 0;

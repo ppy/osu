@@ -61,19 +61,7 @@ namespace osu.Game.Screens.Select
             BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
 
-            double bpmPreview = 60000 / beatmap.Beatmap.BeatLengthAt(beatmap.Beatmap.Metadata.PreviewTime);
-            double bpmMax = bpmPreview;
-            double bpmMin = bpmPreview;
-            foreach( ControlPoint a in beatmap.Beatmap.ControlPoints)
-            {
-                if (a.BeatLength == 0) continue;
-                double tmp = 60000 / a.BeatLength;
-                if (bpmMax < tmp) bpmMax = tmp;
-                if (bpmMin > tmp) bpmMin = tmp;
-            }
-            string bpm;
-            if (bpmMax == bpmMin) bpm = bpmMin + "bpm";
-            else bpm = bpmMin + "-" + bpmMax + "(" + 60000 / beatmap.Beatmap.BeatLengthAt(beatmap.Beatmap.Metadata.PreviewTime) + ")bpm";
+            string bpm = GetBPMRange(beatmap);
             string length = "" + TimeSpan.FromMilliseconds((beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime)).ToString(@"m\:s");
             string hitCircles = "" + beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.HitCircle"));
             string sliders = "" + beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.Slider"));
@@ -183,6 +171,21 @@ namespace osu.Game.Screens.Select
 
                 Add(d);
             });
+        }
+
+        private string GetBPMRange(WorkingBeatmap beatmap)
+        {
+            double bpmMax = double.MinValue;
+            double bpmMin = double.MaxValue;
+            foreach (ControlPoint a in beatmap.Beatmap.ControlPoints)
+            {
+                if (a.BeatLength == 0) continue;
+                double tmp = 60000 / a.BeatLength;
+                if (bpmMax < tmp) bpmMax = tmp;
+                if (bpmMin > tmp) bpmMin = tmp;
+            }
+            if (bpmMax == bpmMin) return bpmMin + "bpm";
+            return bpmMin + "-" + bpmMax + "(" + beatmap.Beatmap.BPMAt(beatmap.Beatmap.Metadata.PreviewTime) + ")bpm";
         }
         
         private Container InfoLabel(FontAwesome icon, string text)
