@@ -13,7 +13,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableOsuHitObject
     {
-        private OsuHitObject osuObject;
+        private HitCircle osuObject;
 
         public ApproachCircle ApproachCircle;
         private CirclePiece circle;
@@ -23,12 +23,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private NumberPiece number;
         private GlowPiece glow;
 
-        public DrawableHitCircle(OsuHitObject h) : base(h)
+        public DrawableHitCircle(HitCircle h) : base(h)
         {
             osuObject = h;
 
             Origin = Anchor.Centre;
             Position = osuObject.Position;
+            Scale = new Vector2(osuObject.Scale);
 
             Children = new Drawable[]
             {
@@ -104,7 +105,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             ApproachCircle.Alpha = 0;
             ApproachCircle.Scale = new Vector2(2);
             explode.Alpha = 0;
-            Scale = new Vector2(0.5f); //this will probably need to be moved to DrawableHitObject at some point.
         }
 
         protected override void UpdatePreemptState()
@@ -134,7 +134,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     FadeOut(TIME_FADEOUT / 5);
                     break;
                 case ArmedState.Hit:
-                    const double flash_in = 30;
+                    const double flash_in = 40;
 
                     flash.FadeTo(0.8f, flash_in);
                     flash.Delay(flash_in);

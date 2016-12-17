@@ -58,7 +58,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 ScaleTo(1.6f);
                 ScaleTo(1, 100, EasingTypes.In);
 
-                MoveToRelative(new Vector2(0, 100), 800, EasingTypes.InQuint);
+                MoveToOffset(new Vector2(0, 100), 800, EasingTypes.InQuint);
                 RotateTo(40, 800, EasingTypes.InQuint);
 
                 Delay(600);

@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
+using osu.Framework.Input;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -18,38 +19,43 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private List<ISliderProgress> components = new List<ISliderProgress>();
 
         SliderBody body;
+        SliderBall ball;
 
         SliderBouncer bouncer1, bouncer2;
 
         public DrawableSlider(Slider s) : base(s)
         {
-            SliderBall ball;
-
             slider = s;
-
-            Origin = Anchor.TopLeft;
-            Position = Vector2.Zero;
-            RelativeSizeAxes = Axes.Both;
 
             Children = new Drawable[]
             {
                 body = new SliderBody(s)
                 {
                     Position = s.Position,
-                    PathWidth = 36,
+                    PathWidth = s.Scale * 72,
                 },
-                bouncer1 = new SliderBouncer(slider, false) { Position = slider.Curve.PositionAt(1) },
-                bouncer2 = new SliderBouncer(slider, true) { Position = slider.Position },
-                ball = new SliderBall(slider),
+                bouncer1 = new SliderBouncer(s, false)
+                {
+                    Position = s.Curve.PositionAt(1),
+                    Scale = new Vector2(s.Scale),
+                },
+                bouncer2 = new SliderBouncer(s, true)
+                {
+                    Position = s.Position,
+                    Scale = new Vector2(s.Scale),
+                },
+                ball = new SliderBall(s)
+                {
+                    Scale = new Vector2(s.Scale),
+                },
                 initialCircle = new DrawableHitCircle(new HitCircle
                 {
                     StartTime = s.StartTime,
                     Position = s.Position,
+                    Scale = s.Scale,
                     Colour = s.Colour,
-                })
-                {
-                    Depth = -1 //override time-based depth.
-                },
+                    Sample = s.Sample,
+                }),
             };
 
             components.Add(body);
@@ -57,6 +63,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             components.Add(bouncer1);
             components.Add(bouncer2);
         }
+
+        // Since the DrawableSlider itself is just a container without a size we need to
+        // pass all input through.
+        public override bool Contains(Vector2 screenSpacePos) => true;
+
+        int currentRepeat;
 
         protected override void Update()
         {
@@ -66,6 +78,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             int repeat = (int)(progress * slider.RepeatCount);
             progress = (progress * slider.RepeatCount) % 1;
+
+            if (repeat > currentRepeat)
+            {
+                if (ball.Tracking)
+                    PlaySample();
+                currentRepeat = repeat;
+            }
 
             if (repeat % 2 == 1)
                 progress = 1 - progress;
@@ -95,14 +114,22 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             base.UpdateInitialState();
             body.Alpha = 1;
+
+            //we need to be visible to handle input events. note that we still don't get enough events (we don't get a position if the mouse hasn't moved since the slider appeared).
+            ball.Alpha = 0.01f; 
         }
 
         protected override void UpdateState(ArmedState state)
         {
             base.UpdateState(state);
 
+            ball.FadeIn();
+
             Delay(HitObject.Duration, true);
+
             body.FadeOut(160);
+            ball.FadeOut(160);
+
             FadeOut(800);
         }
     }

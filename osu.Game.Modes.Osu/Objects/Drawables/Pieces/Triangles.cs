@@ -13,6 +13,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
     public class Triangles : Container<Triangle>
     {
+        public override bool HandleInput => false;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();

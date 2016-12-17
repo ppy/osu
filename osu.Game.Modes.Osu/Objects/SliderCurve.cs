@@ -4,9 +4,8 @@
 using System.Collections.Generic;
 using OpenTK;
 using System.Linq;
-using System.Diagnostics;
 using osu.Framework.MathUtils;
-using System;
+using System.Diagnostics;
 
 namespace osu.Game.Modes.Osu.Objects
 {
@@ -14,21 +13,39 @@ namespace osu.Game.Modes.Osu.Objects
     {
         public double Length;
 
-        public List<Vector2> Path;
+        public List<Vector2> ControlPoints;
 
         public CurveTypes CurveType;
 
         private List<Vector2> calculatedPath = new List<Vector2>();
         private List<double> cumulativeLength = new List<double>();
 
-        private List<Vector2> calculateSubpath(List<Vector2> subpath)
+        private List<Vector2> calculateSubpath(List<Vector2> subControlPoints)
         {
             switch (CurveType)
             {
                 case CurveTypes.Linear:
-                    return subpath;
+                    return subControlPoints;
+                case CurveTypes.PerfectCurve:
+                    // If we have a different amount than 3 control points, use bezier for perfect curves.
+                    if (ControlPoints.Count != 3)
+                        return new BezierApproximator(subControlPoints).CreateBezier();
+                    else
+                    {
+                        Debug.Assert(subControlPoints.Count == 3);
+
+                        // Here we have exactly 3 control points. Attempt to fit a circular arc.
+                        List<Vector2> subpath = new CircularArcApproximator(subControlPoints[0], subControlPoints[1], subControlPoints[2]).CreateArc();
+
+                        if (subpath.Count == 0)
+                            // For some reason a circular arc could not be fit to the 3 given points. Fall back
+                            // to a numerically stable bezier approximation.
+                            subpath = new BezierApproximator(subControlPoints).CreateBezier();
+
+                        return subpath;
+                    }
                 default:
-                    return new BezierApproximator(subpath).CreateBezier();
+                    return new BezierApproximator(subControlPoints).CreateBezier();
             }
         }
 
@@ -39,21 +56,19 @@ namespace osu.Game.Modes.Osu.Objects
             // Sliders may consist of various subpaths separated by two consecutive vertices
             // with the same position. The following loop parses these subpaths and computes
             // their shape independently, consecutively appending them to calculatedPath.
-            List<Vector2> subpath = new List<Vector2>();
-            for (int i = 0; i < Path.Count; ++i)
+            List<Vector2> subControlPoints = new List<Vector2>();
+            for (int i = 0; i < ControlPoints.Count; ++i)
             {
-                subpath.Add(Path[i]);
-                if (i == Path.Count - 1 || Path[i] == Path[i + 1])
+                subControlPoints.Add(ControlPoints[i]);
+                if (i == ControlPoints.Count - 1 || ControlPoints[i] == ControlPoints[i + 1])
                 {
-                    // If we already constructed a subpath previously, then the new subpath
-                    // will have as starting position the end position of the previous subpath.
-                    // Hence we can and should remove the previous endpoint to avoid a segment
-                    // with 0 length.
-                    if (calculatedPath.Count > 0)
-                        calculatedPath.RemoveAt(calculatedPath.Count - 1);
+                    List<Vector2> subpath = calculateSubpath(subControlPoints);
+                    for (int j = 0; j < subpath.Count; ++j)
+                        // Only add those vertices that add a new segment to the path.
+                        if (calculatedPath.Count == 0 || calculatedPath.Last() != subpath[j])
+                            calculatedPath.Add(subpath[j]);
 
-                    calculatedPath.AddRange(calculateSubpath(subpath));
-                    subpath.Clear();
+                    subControlPoints.Clear();
                 }
             }
         }
