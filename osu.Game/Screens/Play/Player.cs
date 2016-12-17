@@ -120,7 +120,6 @@ namespace osu.Game.Screens.Play
 
         protected override void LoadComplete()
         {
-
             base.LoadComplete();
 
             Delay(250, true);
