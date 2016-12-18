@@ -177,15 +177,17 @@ namespace osu.Game.Screens.Select
         {
             double bpmMax = double.MinValue;
             double bpmMin = double.MaxValue;
+            //double bpmMost = 60000/ beatmap.Beatmap.ControlPoints.Select(b => b.BeatLength).GroupBy(bl => bl).OrderByDescending(grp => grp.Count()).Select(grp => grp.Key).First();
+            double bpmMost = beatmap.Beatmap.BPMAt(beatmap.Beatmap.ControlPoints.GroupBy(b => b.BeatLength).OrderByDescending(grp => grp.Count()).First().First().Time);
             foreach (ControlPoint a in beatmap.Beatmap.ControlPoints)
             {
                 if (a.BeatLength == 0) continue;
-                double tmp = 60000 / a.BeatLength;
+                double tmp = beatmap.Beatmap.BPMAt(a.Time);
                 if (bpmMax < tmp) bpmMax = tmp;
                 if (bpmMin > tmp) bpmMin = tmp;
             }
-            if (bpmMax == bpmMin) return (int)bpmMin + "bpm";
-            return (int)bpmMin + "-" + (int)bpmMax + "(" + (int)beatmap.Beatmap.BPMAt(beatmap.Beatmap.Metadata.PreviewTime) + ")bpm";
+            if (bpmMax == bpmMin) return Math.Round(bpmMin) + "bpm";
+            return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "(" + Math.Round(bpmMost) + ")bpm";
         }
         
         private Container InfoLabel(FontAwesome icon, string text)
