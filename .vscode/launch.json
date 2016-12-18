@@ -2,13 +2,25 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch",
+            "name": "Launch VisualTests",
             "type": "mono",
             "request": "launch",
             "program": "${workspaceRoot}/osu.Desktop.VisualTests/bin/Debug/osu!.exe",
             "args": [],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "",
+            "preLaunchTask": "build",
+            "runtimeExecutable": null,
+            "env": {},
+            "externalConsole": false
+        },
+        {
+            "name": "Launch Desktop",
+            "type": "mono",
+            "request": "launch",
+            "program": "${workspaceRoot}/osu.Desktop/bin/Debug/osu!.exe",
+            "args": [],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "build",
             "runtimeExecutable": null,
             "env": {},
             "externalConsole": false
