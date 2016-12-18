@@ -30,7 +30,6 @@ namespace osu.Game.Beatmaps.Drawables
         private BeatmapGroupState state;
 
         public List<BeatmapPanel> BeatmapPanels;
-        private WorkingBeatmap beatmap;
 
         public BeatmapGroupState State
         {
@@ -62,8 +61,6 @@ namespace osu.Game.Beatmaps.Drawables
 
         public BeatmapGroup(WorkingBeatmap beatmap, BeatmapSetInfo set = null)
         {
-            this.beatmap = beatmap;
-
             Header = new BeatmapSetHeader(beatmap)
             {
                 GainedSelection = headerGainedSelection,
