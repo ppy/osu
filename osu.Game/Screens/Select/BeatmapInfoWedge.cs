@@ -61,10 +61,10 @@ namespace osu.Game.Screens.Select
             BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
 
-            string bpm = GetBPMRange(beatmap);
-            string length = "" + TimeSpan.FromMilliseconds((beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime)).ToString(@"m\:ss");
-            string hitCircles = "" + beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.HitCircle"));
-            string sliders = "" + beatmap.Beatmap.HitObjects.Count(b => b.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.Slider"));
+            string bpm = getBPMRange(beatmap);
+            string length = TimeSpan.FromMilliseconds((beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime)).ToString(@"m\:ss");
+            string hitCircles = "" + beatmap.Beatmap.HitObjects.Count(h => h.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.HitCircle"));
+            string sliders = "" + beatmap.Beatmap.HitObjects.Count(h => h.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.Slider"));
 
             (beatmapInfoContainer = new BufferedContainer
             {
@@ -153,10 +153,10 @@ namespace osu.Game.Screens.Select
                                 AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    InfoLabel(FontAwesome.fa_clock_o, length),
-                                    InfoLabel(FontAwesome.fa_circle, bpm),
-                                    InfoLabel(FontAwesome.fa_dot_circle_o, hitCircles),
-                                    InfoLabel(FontAwesome.fa_circle_o, sliders),
+                                    infoLabel(FontAwesome.fa_clock_o, length),
+                                    infoLabel(FontAwesome.fa_circle, bpm),
+                                    infoLabel(FontAwesome.fa_dot_circle_o, hitCircles),
+                                    infoLabel(FontAwesome.fa_circle_o, sliders),
                                 }
                             },
                         }
@@ -173,11 +173,11 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        private string GetBPMRange(WorkingBeatmap beatmap)
+        private string getBPMRange(WorkingBeatmap beatmap)
         {
             double bpmMax = double.MinValue;
             double bpmMin = double.MaxValue;
-            double bpmMost = beatmap.Beatmap.BPMAt(beatmap.Beatmap.ControlPoints.GroupBy(b => b.BeatLength).OrderByDescending(grp => grp.Count()).First().First().Time);
+            double bpmMost = beatmap.Beatmap.BPMAt(beatmap.Beatmap.ControlPoints.Where(c => c.BeatLength != 0).GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).First().First().Time);
             foreach (ControlPoint a in beatmap.Beatmap.ControlPoints)
             {
                 if (a.BeatLength == 0) continue;
@@ -189,23 +189,23 @@ namespace osu.Game.Screens.Select
             return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "(" + Math.Round(bpmMost) + ")bpm";
         }
         
-        private Container InfoLabel(FontAwesome icon, string text)
+        private Container infoLabel(FontAwesome icon, string text)
         {
-            Container cont = new Container
+            return new Container
             {
                 AutoSizeAxes = Axes.Both,
                 Children = new[] {
                     new TextAwesome
                     {
-                    Icon = FontAwesome.fa_square,
-                    Colour = new Color4(68,17,136,255),
-                    Rotation = 45
+                        Icon = FontAwesome.fa_square,
+                        Colour = new Color4(68,17,136,255),
+                        Rotation = 45
                     },
                     new TextAwesome
                     {
-                    Icon = icon,
-                    Colour = new Color4(255,221,85,255),
-                    Scale = new Vector2(0.8f,0.8f)
+                        Icon = icon,
+                        Colour = new Color4(255,221,85,255),
+                        Scale = new Vector2(0.8f,0.8f)
                     },
                     new SpriteText
                     {
@@ -218,7 +218,6 @@ namespace osu.Game.Screens.Select
                     },
                 }
             };
-            return cont;
         }
     }
 }
