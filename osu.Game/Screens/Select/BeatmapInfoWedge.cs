@@ -63,8 +63,8 @@ namespace osu.Game.Screens.Select
 
             string bpm = getBPMRange(beatmap);
             string length = TimeSpan.FromMilliseconds((beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime)).ToString(@"m\:ss");
-            string hitCircles = "" + beatmap.Beatmap.HitObjects.Count(h => h.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.HitCircle"));
-            string sliders = "" + beatmap.Beatmap.HitObjects.Count(h => h.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.Slider"));
+            string hitCircles = beatmap.Beatmap.HitObjects.Count(h => h.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.HitCircle")).ToString();
+            string sliders = beatmap.Beatmap.HitObjects.Count(h => h.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.Slider")).ToString();
 
             (beatmapInfoContainer = new BufferedContainer
             {
@@ -194,7 +194,8 @@ namespace osu.Game.Screens.Select
             return new Container
             {
                 AutoSizeAxes = Axes.Both,
-                Children = new[] {
+                Children = new[] 
+                {
                     new TextAwesome
                     {
                         Icon = FontAwesome.fa_square,
