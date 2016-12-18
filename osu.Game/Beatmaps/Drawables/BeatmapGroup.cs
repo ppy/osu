@@ -19,6 +19,11 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         public Action<BeatmapGroup, BeatmapInfo> SelectionChanged;
 
+        /// <summary>
+        /// Fires when one of our difficulties is clicked when already selected. Should start playing the map.
+        /// </summary>
+        public Action<BeatmapInfo> StartRequested;
+
         public BeatmapSetHeader Header;
 
         private BeatmapGroupState state;
@@ -68,6 +73,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 Alpha = 0,
                 GainedSelection = panelGainedSelection,
+                StartRequested = p => { StartRequested?.Invoke(p.Beatmap); },
                 RelativeSizeAxes = Axes.X,
             }).ToList();
         }

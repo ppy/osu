@@ -348,7 +348,11 @@ namespace osu.Game.Screens.Select
 
             var beatmap = new WorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault(), beatmapSet, database);
 
-            var group = new BeatmapGroup(beatmap) { SelectionChanged = selectionChanged };
+            var group = new BeatmapGroup(beatmap)
+            {
+                SelectionChanged = selectionChanged,
+                StartRequested = b => start()
+            };
 
             //for the time being, let's completely load the difficulty panels in the background.
             //this likely won't scale so well, but allows us to completely async the loading flow.
