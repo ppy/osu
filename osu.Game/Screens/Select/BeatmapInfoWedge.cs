@@ -177,7 +177,6 @@ namespace osu.Game.Screens.Select
         {
             double bpmMax = double.MinValue;
             double bpmMin = double.MaxValue;
-            //double bpmMost = 60000/ beatmap.Beatmap.ControlPoints.Select(b => b.BeatLength).GroupBy(bl => bl).OrderByDescending(grp => grp.Count()).Select(grp => grp.Key).First();
             double bpmMost = beatmap.Beatmap.BPMAt(beatmap.Beatmap.ControlPoints.GroupBy(b => b.BeatLength).OrderByDescending(grp => grp.Count()).First().First().Time);
             foreach (ControlPoint a in beatmap.Beatmap.ControlPoints)
             {
