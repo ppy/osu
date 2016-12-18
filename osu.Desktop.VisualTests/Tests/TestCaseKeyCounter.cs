@@ -11,6 +11,8 @@ using osu.Framework.Configuration;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.MathUtils;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transformations;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -44,7 +46,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Key key = (Key)((int)Key.A + RNG.Next(26));
                 kc.Add(new KeyCounterKeyboard(key.ToString(), key));
             });
-            ButtonsContainer.Add(new SliderBar<int>
+            ButtonsContainer.Add(new TestSliderBar<int>
             {
                 Width = 150,
                 Height = 10,
@@ -52,6 +54,39 @@ namespace osu.Desktop.VisualTests.Tests
                 Bindable = bindable
             });
             Add(kc);
+        }
+        private class TestSliderBar<T> : SliderBar<T> where T : struct
+        {
+            public Color4 Color
+            {
+                get { return Box.Colour; }
+                set { Box.Colour = value; }
+            }
+
+            public Color4 SelectionColor
+            {
+                get { return SelectionBox.Colour; }
+                set { SelectionBox.Colour = value; }
+            }
+
+            protected readonly Box SelectionBox;
+            protected readonly Box Box;
+
+            public TestSliderBar()
+            {
+                Children = new Drawable[]
+                {
+                    Box = new Box { RelativeSizeAxes = Axes.Both },
+                    SelectionBox = new Box { RelativeSizeAxes = Axes.Both }
+                };
+            }
+
+            protected override void UpdateValue(float value)
+            {
+                SelectionBox.ScaleTo(
+                    new Vector2(value, 1),
+                    300, EasingTypes.OutQuint);
+            }
         }
     }
 }
