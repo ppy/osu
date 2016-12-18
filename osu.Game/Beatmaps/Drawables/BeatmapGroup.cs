@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Transformations;
 using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -53,7 +54,7 @@ namespace osu.Game.Beatmaps.Drawables
                             SelectedPanel.State = PanelSelectedState.NotSelected;
 
                         foreach (BeatmapPanel panel in BeatmapPanels)
-                            panel.FadeOut(250);
+                            panel.FadeOut(300, EasingTypes.OutQuint);
                         break;
                 }
             }
