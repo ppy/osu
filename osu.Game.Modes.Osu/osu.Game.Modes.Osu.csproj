@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C92A607B-1FDD-4954-9F92-03FF547D9080}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>osu.Game.Modes.Osu</RootNamespace>
+    <AssemblyName>osu.Game.Modes.Osu</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>..\packages\ppy.OpenTK.2.0.50727.1339\lib\net45\OpenTK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Objects\BezierApproximator.cs" />
+    <Compile Include="Objects\CircularArcApproximator.cs" />
+    <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
+    <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
+    <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
+    <Compile Include="Objects\Drawables\DrawableSlider.cs" />
+    <Compile Include="Objects\Drawables\Pieces\ExplodePiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\FlashPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
+    <Compile Include="Objects\Drawables\HitExplosion.cs" />
+    <Compile Include="Objects\Drawables\Pieces\NumberPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\SliderBouncer.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Triangles.cs" />
+    <Compile Include="Objects\Drawables\Pieces\SliderBall.cs" />
+    <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
+    <Compile Include="Objects\OsuHitObjectParser.cs" />
+    <Compile Include="Objects\SliderCurve.cs" />
+    <Compile Include="OsuScore.cs" />
+    <Compile Include="OsuScoreProcessor.cs" />
+    <Compile Include="UI\OsuComboCounter.cs" />
+    <Compile Include="UI\OsuHitRenderer.cs" />
+    <Compile Include="UI\OsuPlayfield.cs" />
+    <Compile Include="OsuRuleset.cs" />
+    <Compile Include="Objects\HitCircle.cs" />
+    <Compile Include="Objects\Drawables\DrawableHitCircle.cs" />
+    <Compile Include="Objects\OsuHitObject.cs" />
+    <Compile Include="Objects\OsuHitObjectConverter.cs" />
+    <Compile Include="Objects\Slider.cs" />
+    <Compile Include="Objects\Spinner.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\OsuScoreOverlay.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
+      <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
+      <Name>osu.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
+      <Project>{0d3fbf8a-7464-4cf7-8c90-3e7886df2d4d}</Project>
+      <Name>osu.Game</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\osu.licenseheader">
+      <Link>osu.licenseheader</Link>
+    </None>
+    <None Include="app.config" />
+    <None Include="OpenTK.dll.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

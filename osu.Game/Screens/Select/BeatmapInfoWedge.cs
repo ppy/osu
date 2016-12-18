@@ -1,4 +1,7 @@
-﻿using System;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using osu.Framework;
 using osu.Framework.Allocation;
 using OpenTK;
@@ -58,7 +61,6 @@ namespace osu.Game.Screens.Select
             (beatmapInfoContainer = new BufferedContainer
             {
                 Depth = newDepth,
-                PixelSnapping = true,
                 CacheDrawnFrameBuffer = true,
                 Shear = -Shear,
                 RelativeSizeAxes = Axes.Both,

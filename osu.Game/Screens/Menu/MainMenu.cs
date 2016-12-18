@@ -1,6 +1,7 @@
 //Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.GameModes;
 using osu.Framework.GameModes.Testing;
@@ -49,7 +50,7 @@ namespace osu.Game.Screens.Menu
                             OnSolo = delegate { Push(new PlaySongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
                             OnTest  = delegate { Push(new TestBrowser()); },
-                            OnExit = delegate { Scheduler.AddDelayed(Exit, ButtonSystem.EXIT_DELAY); },
+                            OnExit = delegate { Exit(); },
                         }
                     }
                 }
@@ -92,6 +93,13 @@ namespace osu.Game.Screens.Menu
 
             Content.FadeIn(length, EasingTypes.OutQuint);
             Content.MoveTo(new Vector2(0, 0), length, EasingTypes.OutQuint);
+        }
+
+        protected override bool OnExiting(GameMode next)
+        {
+            buttons.State = MenuState.Exit;
+            Content.FadeOut(ButtonSystem.EXIT_DELAY);
+            return base.OnExiting(next);
         }
     }
 }

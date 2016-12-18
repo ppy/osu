@@ -1,5 +1,9 @@
-﻿using osu.Framework;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -27,10 +31,16 @@ namespace osu.Game.Overlays.Options.Graphics
                     LabelText = "Letterboxing",
                     Bindable = config.GetBindable<bool>(OsuConfig.Letterboxing),
                 },
-                new SpriteText { Text = "Horizontal position" },
-                new SpriteText { Text = "TODO: slider" },
-                new SpriteText { Text = "Vertical position" },
-                new SpriteText { Text = "TODO: slider" },
+                new SliderOption<int>
+                {
+                    LabelText = "Horizontal position",
+                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.LetterboxPositionX)
+                },
+                new SliderOption<int>
+                {
+                    LabelText = "Vertical position",
+                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.LetterboxPositionY)
+                },
             };
         }
     }
