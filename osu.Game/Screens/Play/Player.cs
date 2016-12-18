@@ -21,6 +21,9 @@ using OpenTK;
 using osu.Framework.GameModes;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Ranking;
+using osu.Game.Configuration;
+using osu.Framework.Configuration;
+using System;
 
 namespace osu.Game.Screens.Play
 {
@@ -42,6 +45,7 @@ namespace osu.Game.Screens.Play
 
         private ScoreProcessor scoreProcessor;
         private HitRenderer hitRenderer;
+        private Bindable<int> dimLevel;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game)
@@ -110,6 +114,7 @@ namespace osu.Game.Screens.Play
                 },
                 scoreOverlay,
             };
+            dimLevel = game.Config.GetBindable<int>(OsuConfig.DimLevel);
         }
 
         protected override void LoadComplete()
@@ -145,8 +150,22 @@ namespace osu.Game.Screens.Play
             base.OnEntering(last);
 
             (Background as BackgroundModeBeatmap)?.BlurTo(Vector2.Zero, 1000);
+            Background?.FadeTo((100f- dimLevel)/100, 1000);
 
             Content.Alpha = 0;
+            dimLevel.ValueChanged += dimChanged;
+        }
+
+        protected override bool OnExiting(GameMode next)
+        {
+            dimLevel.ValueChanged -= dimChanged;
+            Background?.FadeTo(1f, 200);
+            return base.OnExiting(next);
+        }
+
+        private void dimChanged(object sender, EventArgs e)
+        {
+            Background?.FadeTo((100f - dimLevel) / 100, 800);
         }
 
         class PlayerInputManager : UserInputManager
