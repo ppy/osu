@@ -184,8 +184,8 @@ namespace osu.Game.Screens.Select
                 if (bpmMax < tmp) bpmMax = tmp;
                 if (bpmMin > tmp) bpmMin = tmp;
             }
-            if (bpmMax == bpmMin) return bpmMin + "bpm";
-            return bpmMin + "-" + bpmMax + "(" + beatmap.Beatmap.BPMAt(beatmap.Beatmap.Metadata.PreviewTime) + ")bpm";
+            if (bpmMax == bpmMin) return (int)bpmMin + "bpm";
+            return (int)bpmMin + "-" + (int)bpmMax + "(" + (int)beatmap.Beatmap.BPMAt(beatmap.Beatmap.Metadata.PreviewTime) + ")bpm";
         }
         
         private Container InfoLabel(FontAwesome icon, string text)
