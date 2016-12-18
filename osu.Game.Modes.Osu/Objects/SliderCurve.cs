@@ -101,9 +101,11 @@ namespace osu.Game.Modes.Osu.Objects
                 cumulativeLength.Add(l);
             }
 
+            //TODO: Figure out if the following code is needed in some cases. Judging by the map
+            //      "Transform" http://osu.ppy.sh/s/484689 it seems like we should _not_ be doing this.
             // Lengthen slider curves that are too short compared to what's
             // in the .osu file.
-            if (l < Length && calculatedPath.Count > 1)
+            /*if (l < Length && calculatedPath.Count > 1)
             {
                 Vector2 diff = calculatedPath[calculatedPath.Count - 1] - calculatedPath[calculatedPath.Count - 2];
                 double d = diff.Length;
@@ -113,7 +115,7 @@ namespace osu.Game.Modes.Osu.Objects
 
                 calculatedPath[calculatedPath.Count - 1] += diff * (float)((Length - l) / d);
                 cumulativeLength[calculatedPath.Count - 1] = Length;
-            }
+            }*/
         }
 
         public void Calculate()
