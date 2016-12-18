@@ -317,22 +317,17 @@ namespace osu.Game.Screens.Select
             ensurePlayingSelected(beatmapSetChange);
         }
 
-        private async Task ensurePlayingSelected(bool preview = false)
+        private void ensurePlayingSelected(bool preview = false)
         {
-            AudioTrack track = null;
+            AudioTrack track = Beatmap?.Track;
 
-            await Task.Run(() => track = Beatmap?.Track);
-
-            Schedule(delegate
+            if (track != null)
             {
-                if (track != null)
-                {
-                    trackManager.SetExclusive(track);
-                    if (preview)
-                        track.Seek(Beatmap.Beatmap.Metadata.PreviewTime);
-                    track.Start();
-                }
-            });
+                trackManager.SetExclusive(track);
+                if (preview)
+                    track.Seek(Beatmap.Beatmap.Metadata.PreviewTime);
+                track.Start();
+            }
         }
 
         private void addBeatmapSet(BeatmapSetInfo beatmapSet, BaseGame game)
