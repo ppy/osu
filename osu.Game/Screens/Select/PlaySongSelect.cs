@@ -213,11 +213,8 @@ namespace osu.Game.Screens.Select
 
             Content.FadeInFromZero(250);
 
-            beatmapInfoWedge.MoveTo(wedged_container_start_position + new Vector2(-100, 50));
-            beatmapInfoWedge.RotateTo(10);
-
-            beatmapInfoWedge.MoveTo(wedged_container_start_position, 800, EasingTypes.OutQuint);
-            beatmapInfoWedge.RotateTo(0, 800, EasingTypes.OutQuint);
+            beatmapInfoWedge.MoveToX(wedged_container_start_position.X - 50);
+            beatmapInfoWedge.MoveToX(wedged_container_start_position.X, 800, EasingTypes.OutQuint);
         }
 
         protected override void OnResuming(GameMode last)
@@ -351,7 +348,11 @@ namespace osu.Game.Screens.Select
 
             var beatmap = new WorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault(), beatmapSet, database);
 
-            var group = new BeatmapGroup(beatmap) { SelectionChanged = selectionChanged };
+            var group = new BeatmapGroup(beatmap)
+            {
+                SelectionChanged = selectionChanged,
+                StartRequested = b => start()
+            };
 
             //for the time being, let's completely load the difficulty panels in the background.
             //this likely won't scale so well, but allows us to completely async the loading flow.
