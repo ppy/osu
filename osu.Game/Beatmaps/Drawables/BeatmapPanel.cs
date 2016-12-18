@@ -16,6 +16,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Input;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -25,6 +26,7 @@ namespace osu.Game.Beatmaps.Drawables
         private Sprite background;
 
         public Action<BeatmapPanel> GainedSelection;
+        public Action<BeatmapPanel> StartRequested;
 
         Color4 deselectedColour = new Color4(20, 43, 51, 255);
 
@@ -43,6 +45,14 @@ namespace osu.Game.Beatmaps.Drawables
             base.Deselected();
 
             background.Colour = deselectedColour;
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            if (State == PanelSelectedState.Selected)
+                StartRequested?.Invoke(this);
+
+            return base.OnClick(state);
         }
 
         public BeatmapPanel(BeatmapInfo beatmap)
