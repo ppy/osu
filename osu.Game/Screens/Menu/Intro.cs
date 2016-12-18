@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Menu
 
         MainMenu mainMenu;
         private AudioSample welcome;
+        private AudioSample seeya;
         private AudioTrack bgm;
 
         internal override bool ShowOverlays => (ParentGameMode as OsuGameMode)?.ShowOverlays ?? false;
@@ -58,6 +59,7 @@ namespace osu.Game.Screens.Menu
         private void load(AudioManager audio)
         {
             welcome = audio.Sample.Get(@"welcome");
+            seeya = audio.Sample.Get(@"seeya");
 
             bgm = audio.Track.Get(@"circles");
             bgm.Looping = true;
@@ -106,8 +108,15 @@ namespace osu.Game.Screens.Menu
 
         protected override void OnResuming(GameMode last)
         {
-            //we are just an intro. if we are resumed, we just want to exit after a short delay (to allow the last mode to transition out).
-            Scheduler.AddDelayed(Exit, 600);
+            //we also handle the exit transition.
+            seeya.Play();
+
+            double fadeOutTime = (last.LifetimeEnd - Time.Current) + 100;
+
+            Scheduler.AddDelayed(Exit, fadeOutTime);
+
+            //don't want to fade out completely else we will stop running updates and shit will hit the fan.
+            Game.FadeTo(0.01f, fadeOutTime);
 
             base.OnResuming(last);
         }

@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
-        public BeatmapGroup(WorkingBeatmap beatmap)
+        public BeatmapGroup(WorkingBeatmap beatmap, BeatmapSetInfo set = null)
         {
             this.beatmap = beatmap;
 

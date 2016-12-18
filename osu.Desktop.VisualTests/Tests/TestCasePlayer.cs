@@ -82,11 +82,5 @@ namespace osu.Desktop.VisualTests.Tests
                 Beatmap = beatmap
             });
         }
-
-        protected override void Update()
-        {
-            base.Update();
-            Clock.ProcessFrame();
-        }
     }
 }

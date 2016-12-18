@@ -1,6 +1,9 @@
-﻿// Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
@@ -16,19 +19,17 @@ namespace osu.Game.Graphics.UserInterface
     {
         private TextAwesome icon;
 
-        private Container leftContainer;
-        private Container rightContainer;
-
         private Box leftBox;
         private Box rightBox;
 
-        private const double transform_time = 300.0;
+        private const double transform_time = 600;
         private const int pulse_length = 250;
 
         private const float shear = 0.1f;
 
         private static readonly Vector2 size_extended = new Vector2(140, 50);
         private static readonly Vector2 size_retracted = new Vector2(100, 50);
+        private AudioSample sampleClick;
 
         public BackButton()
         {
@@ -36,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                leftContainer = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.4f,
@@ -56,7 +57,7 @@ namespace osu.Game.Graphics.UserInterface
                         },
                     }
                 },
-                rightContainer = new Container
+                new Container
                 {
                     Origin = Anchor.TopRight,
                     Anchor = Anchor.TopRight,
@@ -84,10 +85,7 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        public override bool Contains(Vector2 screenSpacePos)
-        {
-            return leftBox.Contains(screenSpacePos) || rightBox.Contains(screenSpacePos);
-        }
+        public override bool Contains(Vector2 screenSpacePos) => leftBox.Contains(screenSpacePos) || rightBox.Contains(screenSpacePos);
 
         protected override bool OnHover(InputState state)
         {
@@ -141,6 +139,12 @@ namespace osu.Game.Graphics.UserInterface
             });
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleClick = audio.Sample.Get(@"Menu/menuback");
+        }
+
         protected override bool OnClick(InputState state)
         {
             var flash = new Box
@@ -153,6 +157,8 @@ namespace osu.Game.Graphics.UserInterface
 
             flash.FadeOutFromOne(200);
             flash.Expire();
+
+            sampleClick.Play();
 
             return base.OnClick(state);
         }

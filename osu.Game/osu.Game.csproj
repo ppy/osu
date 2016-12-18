@@ -222,6 +222,15 @@
     <Compile Include="Overlays\Options\CheckBoxOption.cs" />
     <Compile Include="Overlays\Options\SidebarButton.cs" />
     <Compile Include="Overlays\Options\TextBoxOption.cs" />
+    <Compile Include="Overlays\Options\SliderOption.cs" />
+    <Compile Include="Configuration\ProgressBarType.cs" />
+    <Compile Include="Overlays\Options\DropdownOption.cs" />
+    <Compile Include="Configuration\RankingType.cs" />
+    <Compile Include="Configuration\ScoreMeterType.cs" />
+    <Compile Include="Configuration\ReleaseStream.cs" />
+    <Compile Include="Configuration\ScreenshotFormat.cs" />
+    <Compile Include="Configuration\FrameSync.cs" />
+    <Compile Include="Configuration\ConfineMouseMode.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

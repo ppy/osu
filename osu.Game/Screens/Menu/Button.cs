@@ -1,5 +1,11 @@
-﻿using System;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -28,6 +34,7 @@ namespace osu.Game.Screens.Menu
         private readonly float extraWidth;
         private Key triggerKey;
         private string text;
+        private AudioSample sampleClick;
 
         public override bool Contains(Vector2 screenSpacePos)
         {
@@ -211,6 +218,14 @@ namespace osu.Game.Screens.Menu
                 box.ScaleTo(new Vector2(1, 1), 500, EasingTypes.OutElastic);
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleClick = audio.Sample.Get($@"Menu/menu-{internalName}-click");
+            if (sampleClick == null)
+                sampleClick = audio.Sample.Get(internalName.Contains(@"back") ? @"Menu/menuback" : @"Menu/menuhit");
+        }
+
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             trigger();
@@ -232,11 +247,9 @@ namespace osu.Game.Screens.Menu
 
         private void trigger()
         {
-            //Game.Audio.PlaySamplePositional($@"menu-{internalName}-click", internalName.Contains(@"back") ? @"menuback" : @"menuhit");
+            sampleClick.Play();
 
             clickAction?.Invoke();
-
-            //box.FlashColour(ColourHelper.Lighten2(colour, 0.7f), 200);
         }
 
         public override bool HandleInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
@@ -250,6 +263,7 @@ namespace osu.Game.Screens.Menu
         public int ContractStyle;
 
         ButtonState state;
+
         public ButtonState State
         {
             get { return state; }

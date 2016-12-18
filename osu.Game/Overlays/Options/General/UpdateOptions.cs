@@ -1,8 +1,12 @@
-﻿using osu.Framework;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.General
@@ -12,11 +16,15 @@ namespace osu.Game.Overlays.Options.General
         protected override string Header => "Updates";
 
         [BackgroundDependencyLoader]
-        private void load(BasicStorage storage)
+        private void load(BasicStorage storage, OsuConfigManager config)
         {
             Children = new Drawable[]
             {
-                new SpriteText { Text = "TODO: Dropdown" },
+                new DropdownOption<ReleaseStream>
+                {
+                    LabelText = "Release stream",
+                    Bindable = config.GetBindable<ReleaseStream>(OsuConfig.ReleaseStream),
+                },
                 new SpriteText { Text = "Your osu! is up to date" }, // TODO: map this to reality
                 new OsuButton
                 {

@@ -32,11 +32,5 @@ namespace osu.Desktop.VisualTests.Tests
             Add(mc);
             AddToggle(@"Show", mc.ToggleVisibility);
         }
-
-        protected override void Update()
-        {
-            base.Update();
-            Clock.ProcessFrame();
-        }
     }
 }
