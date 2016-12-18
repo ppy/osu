@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select
             BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
 
-            string bpm = getBPMRange(beatmap);
+            string bpm = getBPMRange(beatmap.Beatmap);
             string length = TimeSpan.FromMilliseconds((beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime)).ToString(@"m\:ss");
             string hitCircles = beatmap.Beatmap.HitObjects.Count(h => h.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.HitCircle")).ToString();
             string sliders = beatmap.Beatmap.HitObjects.Count(h => h.GetType().ToString().Equals("osu.Game.Modes.Osu.Objects.Slider")).ToString();
@@ -173,15 +173,15 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        private string getBPMRange(WorkingBeatmap beatmap)
+        private string getBPMRange(Beatmap beatmap)
         {
             double bpmMax = double.MinValue;
             double bpmMin = double.MaxValue;
-            double bpmMost = beatmap.Beatmap.BPMAt(beatmap.Beatmap.ControlPoints.Where(c => c.BeatLength != 0).GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).First().First().Time);
-            foreach (ControlPoint a in beatmap.Beatmap.ControlPoints)
+            double bpmMost = beatmap.BPMAt(beatmap.ControlPoints.Where(c => c.BeatLength != 0).GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).First().First().Time);
+            foreach (ControlPoint a in beatmap.ControlPoints)
             {
                 if (a.BeatLength == 0) continue;
-                double tmp = beatmap.Beatmap.BPMAt(a.Time);
+                double tmp = beatmap.BPMAt(a.Time);
                 if (bpmMax < tmp) bpmMax = tmp;
                 if (bpmMin > tmp) bpmMin = tmp;
             }
