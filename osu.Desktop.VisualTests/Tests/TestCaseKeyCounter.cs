@@ -46,6 +46,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Key key = (Key)((int)Key.A + RNG.Next(26));
                 kc.Add(new KeyCounterKeyboard(key.ToString(), key));
             });
+            ButtonsContainer.Add(new SpriteText { Text = "FadeTime" });
             ButtonsContainer.Add(new TestSliderBar<int>
             {
                 Width = 150,
