@@ -50,6 +50,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game)
         {
+            dimLevel = game.Config.GetBindable<int>(OsuConfig.DimLevel);
             try
             {
                 if (Beatmap == null)
@@ -114,7 +115,6 @@ namespace osu.Game.Screens.Play
                 },
                 scoreOverlay,
             };
-            dimLevel = game.Config.GetBindable<int>(OsuConfig.DimLevel);
         }
 
         protected override void LoadComplete()
@@ -158,8 +158,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(GameMode next)
         {
-            if(dimLevel != null)
-                dimLevel.ValueChanged -= dimChanged;
+            dimLevel.ValueChanged -= dimChanged;
             Background?.FadeTo(1f, 200);
             return base.OnExiting(next);
         }
