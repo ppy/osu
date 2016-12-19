@@ -158,7 +158,8 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(GameMode next)
         {
-            dimLevel.ValueChanged -= dimChanged;
+            if(dimLevel != null)
+                dimLevel.ValueChanged -= dimChanged;
             Background?.FadeTo(1f, 200);
             return base.OnExiting(next);
         }
