@@ -13,7 +13,6 @@ using osu.Game.Modes.Catch;
 using osu.Game.Modes.Mania;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Taiko;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -21,6 +20,15 @@ namespace osu.Game.Tests.Beatmaps.IO
     public class ImportBeatmapTest
     {
         const string osz_path = @"../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
+
+        public string OszCopyPath
+        {
+            get
+            {
+                var original = new FileInfo(osz_path);
+                return original.CopyTo(Path.GetFileName(original.FullName), true).FullName;
+            }
+        }
 
         [OneTimeSetUp]
         public void SetUp()
@@ -38,7 +46,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (HeadlessGameHost host = new HeadlessGameHost())
             {
                 var osu = loadOsu(host);
-                osu.Dependencies.Get<BeatmapDatabase>().Import(osz_path);
+                osu.Dependencies.Get<BeatmapDatabase>().Import(OszCopyPath);
                 ensureLoaded(osu);
             }
         }
@@ -55,7 +63,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 var osu = loadOsu(host);
 
                 var importer = new BeatmapImporter(client);
-                if (!importer.Import(osz_path).Wait(1000))
+                if (!importer.Import(OszCopyPath).Wait(1000))
                     Assert.Fail(@"IPC took too long to send");
 
                 ensureLoaded(osu, 10000);
