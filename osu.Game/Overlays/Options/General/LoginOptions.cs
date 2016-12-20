@@ -28,12 +28,6 @@ namespace osu.Game.Overlays.Options.General
             this.api = api;
         }
 
-        private void performLogout()
-        {
-            api.Logout();
-            //TODO: set null strings in username, password, token
-        }
-
         public void APIStateChanged(APIAccess api, APIState state)
         {
             switch (state)
@@ -73,7 +67,7 @@ namespace osu.Game.Overlays.Options.General
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Sign out",
-                            Action = performLogout
+                            Action = api.Logout
                         }
                     };
                     break;
@@ -101,7 +95,6 @@ namespace osu.Game.Overlays.Options.General
                 AutoSizeAxes = Axes.Y;
                 RelativeSizeAxes = Axes.X;
                 Spacing = new Vector2(0, 5);
-                // TODO: Wire things up
                 Children = new Drawable[]
                 {
                     new SpriteText { Text = "Username" },
@@ -137,7 +130,7 @@ namespace osu.Game.Overlays.Options.General
                     {
                         RelativeSizeAxes = Axes.X,
                         Text = "Register",
-                        //Action = performLogin
+                        //Action = registerLink
                     }
                 };
             }
