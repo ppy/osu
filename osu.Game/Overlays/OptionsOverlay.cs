@@ -35,7 +35,9 @@ namespace osu.Game.Overlays
         public const float SIDEBAR_WIDTH = OptionsSidebar.default_width;
 
         private const float width = 400;
-        
+
+        private const float flowcontainer_margin = 300;
+
         private const float sidebar_padding = 10;
 
         private ScrollContainer scrollContainer;
@@ -105,6 +107,7 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.X,
                                     Direction = FlowDirection.VerticalOnly,
                                     Children = sections,
+                                    Margin = new MarginPadding { Bottom = flowcontainer_margin },
                                 }
                             }
                         }
