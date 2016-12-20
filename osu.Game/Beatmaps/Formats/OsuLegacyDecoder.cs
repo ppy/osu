@@ -25,7 +25,6 @@ namespace osu.Game.Beatmaps.Formats
             AddDecoder<OsuLegacyDecoder>(@"osu file format v12");
             AddDecoder<OsuLegacyDecoder>(@"osu file format v11");
             AddDecoder<OsuLegacyDecoder>(@"osu file format v10");
-            AddDecoder<OsuLegacyDecoder>(@"osu file format v9");
             // TODO: Not sure how far back to go, or differences between versions
         }
 
