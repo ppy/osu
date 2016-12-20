@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.Options.General
         private void performLogout()
         {
             api.Logout();
+            //TODO: set null strings in username, password, token
         }
 
         public void APIStateChanged(APIAccess api, APIState state)

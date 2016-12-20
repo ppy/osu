@@ -152,8 +152,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.HiddenShowFirstApproach, true);
             Set(OsuConfig.ComboColourSliderBall, true);
             Set(OsuConfig.AlternativeChatFont, false);
-            Set(OsuConfig.Password, string.Empty);
-            Set(OsuConfig.Username, string.Empty);
             Set(OsuConfig.DisplayStarsMaximum, 10.0, 0.0, 10.0);
             Set(OsuConfig.DisplayStarsMinimum, 0.0, 0.0, 10.0);
             Set(OsuConfig.AudioDevice, string.Empty);
