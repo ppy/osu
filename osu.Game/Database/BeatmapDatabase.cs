@@ -69,8 +69,15 @@ namespace osu.Game.Database
                 using (var reader = ArchiveReader.GetReader(storage, path))
                     metadata = reader.ReadMetadata();
 
-                if (connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
-                    return; // TODO: Update this beatmap instead
+                if (metadata.BeatmapSetID != -1)
+                {
+                    if (connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
+                        return; // TODO: Update this beatmap instead
+                }
+                else
+                {
+                    // TODO: Another method is required to determine whether two beatmaps with no BeatmapSetID are equal.
+                }
 
                 if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
                 {
@@ -144,13 +151,13 @@ namespace osu.Game.Database
 
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
-            var beatmapSetInfo = Query<BeatmapSetInfo>().FirstOrDefault(s => s.BeatmapSetID == beatmapInfo.BeatmapSetID);
+            var beatmapSetInfo = Query<BeatmapSetInfo>().FirstOrDefault(s => s.ID == beatmapInfo.BeatmapSetInfoID);
 
             //we need metadata
             GetChildren(beatmapSetInfo);
 
             if (beatmapSetInfo == null)
-                throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetID} is not in the local database.");
+                throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
 
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapSetInfo.Metadata;
