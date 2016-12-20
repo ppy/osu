@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Options.General
         class LoginForm : FlowContainer
         {
             private TextBox username;
-            private TextBox password;
+            private PasswordTextBox password;
             private APIAccess api;
 
 
