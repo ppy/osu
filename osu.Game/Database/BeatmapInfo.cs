@@ -13,11 +13,15 @@ namespace osu.Game.Database
 {
     public class BeatmapInfo : IEquatable<BeatmapInfo>
     {
-        [PrimaryKey]
+        [PrimaryKey, AutoIncrement]
+        public int ID { get; set; }
+
         public int BeatmapID { get; set; }
 
-        [ForeignKey(typeof(BeatmapSetInfo))]
         public int BeatmapSetID { get; set; }
+
+        [ForeignKey(typeof(BeatmapSetInfo))]
+        public int BeatmapSetInfoID { get; set; }
 
         [ManyToOne]
         public BeatmapSetInfo BeatmapSet { get; set; }

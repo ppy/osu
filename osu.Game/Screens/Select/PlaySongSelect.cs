@@ -332,7 +332,7 @@ namespace osu.Game.Screens.Select
 
         private void addBeatmapSet(BeatmapSetInfo beatmapSet, BaseGame game)
         {
-            beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
+            beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.ID);
             beatmapSet.Beatmaps.ForEach(b =>
             {
                 database.GetChildren(b);
