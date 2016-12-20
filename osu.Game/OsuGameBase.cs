@@ -117,6 +117,8 @@ namespace osu.Game
             //refresh token may have changed.
             if (Config != null && API != null)
             {
+                Config.Set(OsuConfig.Username, Config.Get<bool>(OsuConfig.SaveUsername) ? API.Username : string.Empty);
+                Config.Set(OsuConfig.Password, Config.Get<bool>(OsuConfig.SavePassword) ? API.Password : string.Empty);
                 Config.Set(OsuConfig.Token, Config.Get<bool>(OsuConfig.SavePassword) ? API.Token : string.Empty);
                 Config.Save();
             }
