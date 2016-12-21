@@ -93,7 +93,11 @@ namespace osu.Game.Modes.Osu.Objects
                     result = s;
                     break;
                 case OsuHitObject.HitObjectType.Spinner:
-                    result = new Spinner();
+                    Spinner sp = new Spinner();
+
+                    sp.EndPoint = Convert.ToDouble(split[5]);
+
+                    result = sp;
                     break;
                 default:
                     //throw new InvalidOperationException($@"Unknown hit object type {type}");
