@@ -305,7 +305,7 @@ namespace osu.Game.Screens.Select
 
             if (!beatmap.Equals(Beatmap?.BeatmapInfo))
             {
-                if (beatmap.BeatmapSetID == Beatmap?.BeatmapInfo.BeatmapSetID)
+                if (beatmap.BeatmapSetInfoID == Beatmap?.BeatmapInfo.BeatmapSetInfoID)
                     sampleChangeDifficulty.Play();
                 else
                 {
@@ -332,7 +332,7 @@ namespace osu.Game.Screens.Select
 
         private void addBeatmapSet(BeatmapSetInfo beatmapSet, BaseGame game)
         {
-            beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
+            beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.ID);
             beatmapSet.Beatmaps.ForEach(b =>
             {
                 database.GetChildren(b);

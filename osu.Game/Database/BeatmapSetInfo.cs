@@ -10,8 +10,10 @@ namespace osu.Game.Database
 {
     public class BeatmapSetInfo
     {
-        [PrimaryKey]
-        public int BeatmapSetID { get; set; }
+        [PrimaryKey, AutoIncrement]
+        public int ID { get; set; }
+
+        public int BeatmapSetID { get; set; } = -1;
 
         [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BeatmapMetadata Metadata { get; set; }
