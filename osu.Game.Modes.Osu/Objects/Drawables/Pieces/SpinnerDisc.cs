@@ -93,7 +93,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         private float angleAdded;
         private float lastAngleAdded;
         private float totalAngleSpinned = 0;
-        public float Progress;
+        public float Progress = 0;
         private float spinsPerMinuteNeeded = 100 + (5 * 15);
         private float rotationsNeeded;
         
@@ -102,7 +102,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         {
             
             base.Update();
-            Progress = (float)MathHelper.Clamp((Time.Current - spinner.StartTime) / spinner.Duration, 0, 1);
+            Progress = MathHelper.Clamp(((totalAngleSpinned / 360) / rotationsNeeded), 0, 1);
             if (Tracking)
             {
                 rotationsNeeded = (float)(spinsPerMinuteNeeded * (spinner.EndTime - spinner.StartTime) / 60000f);
@@ -113,10 +113,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                 disc.RotateTo(Rotation + angleAdded, 500, EasingTypes.OutExpo);
             }
             else
-            {
-                disc.RotateTo(angleAdded);
                 actualAngle = null;
-            }
+            if(!canCurrentlySpin)
+                disc.RotateTo(angleAdded);
+                
             Tracking = canCurrentlySpin && lastState != null && Contains(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
         }
         private float GetMouseAngledPosition()
