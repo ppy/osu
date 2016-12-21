@@ -24,6 +24,8 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
 using osu.Framework.Configuration;
 using System;
+using osu.Framework.Graphics.UserInterface;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -46,6 +48,7 @@ namespace osu.Game.Screens.Play
         private ScoreProcessor scoreProcessor;
         private HitRenderer hitRenderer;
         private Bindable<int> dimLevel;
+        private Button skipButton;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game)
@@ -113,6 +116,16 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 scoreOverlay,
+                skipButton = new Button()
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Height = 60,
+                    Width = 100,
+                    Text = "skip",
+                    Colour = new Color4(238, 51, 153, 255),
+                    Action = skip
+                }
             };
             dimLevel = game.Config.GetBindable<int>(OsuConfig.DimLevel);
         }
@@ -130,6 +143,7 @@ namespace osu.Game.Screens.Play
             {
                 sourceClock.Start();
             });
+            skipButton.Delay(Beatmap.Beatmap.HitObjects.First().StartTime - 3000).FadeOut(250);
         }
 
         private void hitRenderer_OnAllJudged()
@@ -161,6 +175,26 @@ namespace osu.Game.Screens.Play
             dimLevel.ValueChanged -= dimChanged;
             Background?.FadeTo(1f, 200);
             return base.OnExiting(next);
+        }
+
+
+        private void skip()
+        {
+                sourceClock.Seek(Beatmap.Beatmap.HitObjects.First().StartTime - 3000);
+                skipButton.FadeOut(250);
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            switch (args.Key)
+            {
+                case Key.Space:
+                    if(sourceClock.CurrentTime + 3000 < Beatmap.Beatmap.HitObjects.First().StartTime)
+                        skip();
+                    return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
 
         private void dimChanged(object sender, EventArgs e)
