@@ -16,9 +16,9 @@ namespace osu.Game.Database
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
 
-        public int BeatmapID { get; set; }
+        public int BeatmapID { get; set; } = 0;
 
-        public int BeatmapSetID { get; set; }
+        public int BeatmapSetID { get; set; } = -1;
 
         [ForeignKey(typeof(BeatmapSetInfo))]
         public int BeatmapSetInfoID { get; set; }
@@ -75,7 +75,7 @@ namespace osu.Game.Database
 
         public bool Equals(BeatmapInfo other)
         {
-            return BeatmapID == other?.BeatmapID;
+            return ID == other?.ID;
         }
 
         public bool AudioEquals(BeatmapInfo other) => other != null &&
