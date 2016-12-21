@@ -69,15 +69,9 @@ namespace osu.Game.Database
                 using (var reader = ArchiveReader.GetReader(storage, path))
                     metadata = reader.ReadMetadata();
 
-                if (metadata.BeatmapSetID != -1)
-                {
-                    if (connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
-                        return; // TODO: Update this beatmap instead
-                }
-                else
-                {
-                    // TODO: Another method is required to determine whether two beatmaps with no BeatmapSetID are equal.
-                }
+                if (metadata.BeatmapSetID != -1 &&
+                    connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
+                    return; // TODO: Update this beatmap instead
 
                 if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
                 {

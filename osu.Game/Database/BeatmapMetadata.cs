@@ -9,8 +9,9 @@ namespace osu.Game.Database
     {
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
-        
-        public int BeatmapSetID { get; set; }
+
+        public int BeatmapSetID { get; set; } = -1;
+
         public string Title { get; set; }
         public string TitleUnicode { get; set; }
         public string Artist { get; set; }
