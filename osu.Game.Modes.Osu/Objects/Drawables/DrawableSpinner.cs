@@ -1,5 +1,8 @@
 ﻿using osu.Framework.Graphics;
+using OpenTK.Graphics;
+using osu.Framework.Graphics.Transformations;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 
@@ -9,12 +12,19 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
     {
         private Spinner spinner;
 
-        SpinnerDisc disc;
-        BackSpinner backBox;
+        private SpinnerDisc disc;
+        private BackSpinner backBox;
+        private CirclePiece circle;
+        private GlowPiece circleGlow;
+        private NumberPiece number;
+        private ExplodePiece explode;
+        private RingPiece ring;
+        private Container contCircle;
 
         public DrawableSpinner(Spinner s) : base(s)
         {
             spinner = s;
+            Position = s.Position;
 
             Children = new Drawable[]
             {
@@ -28,6 +38,41 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
+                contCircle = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new Drawable[]
+                    {
+                        circleGlow = new GlowPiece
+                        {
+                            Scale = new Vector2(s.Scale),
+                            Colour = s.Colour,
+                        },
+                        circle = new CirclePiece
+                        {
+                            //Position = s.Position,
+                            Scale = new Vector2(s.Scale),
+                            Colour = s.Colour,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                        number = new NumberPiece
+                        {
+                            Scale = new Vector2(s.Scale)
+                        },
+                        ring = new RingPiece
+                        {
+                            Scale = new Vector2(s.Scale),
+                        },
+
+                    }
+                },
+                explode = new ExplodePiece
+                {
+                    Scale = new Vector2(s.Scale),
+                    Colour = s.Colour,
+                },
             };
         }
 
@@ -37,6 +82,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             base.Update();
         }
+        private OsuJudgementInfo j;
 
         protected override void CheckJudgement(bool userTriggered)
         {
@@ -64,6 +110,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     j.Score = OsuScoreResult.Miss;
                     j.Result = HitResult.Miss;
                 }
+
+                this.j = j;
             }
         }
 
@@ -76,11 +124,17 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             base.UpdateState(state);
 
-            //backBox.ScaleTo(0, spinner.Duration);
+            backBox.ScaleTo(0, spinner.Duration);
 
             Delay(HitObject.Duration, true);
 
-            FadeOut(160);
+            disc.FadeOut(160);
+            backBox.FadeOut(160);
+            contCircle.FadeOut(160);
+            explode.FadeIn(40);
+            Delay(40, true);
+            FadeOut(800);
+            explode.ScaleTo(spinner.Scale * 1.5f, 400, EasingTypes.OutQuad);
         }
 
     }

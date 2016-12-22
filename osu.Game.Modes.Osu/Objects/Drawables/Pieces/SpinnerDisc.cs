@@ -14,16 +14,16 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
     public class SpinnerDisc : Container
     {
         public override bool HandleInput => true;
-        private readonly Spinner spinner;
+        private readonly Spinner s;
         private Sprite disc;
         private Box trigger;
 
         const float size = 500;
         public SpinnerDisc(Spinner spinner)
         {
-            this.spinner = spinner;
+            s = spinner;
 
-            Position = spinner.Position;
+            //Position = spinner.Position;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             AutoSizeAxes = Axes.Both;
@@ -81,7 +81,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             }
         }
 
-        private bool canCurrentlySpin => Time.Current >= spinner.StartTime && Time.Current < spinner.EndTime;
+        private bool canCurrentlySpin => Time.Current >= s.StartTime && Time.Current < s.EndTime;
 
         private float? lastAngle;
         private float? actualAngle;
@@ -100,7 +100,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             Progress = MathHelper.Clamp(((totalAngleSpinned / 360) / rotationsNeeded), 0, 1);
             if (Tracking)
             {
-                rotationsNeeded = (float)(spinsPerMinuteNeeded * (spinner.EndTime - spinner.StartTime) / 60000f);
+                rotationsNeeded = (float)(spinsPerMinuteNeeded * (s.EndTime - s.StartTime) / 60000f);
                 lastAngleAdded = angleAdded;
                 angleAdded += GetAngledDifference();
                 SetAngleSpinned(lastAngleAdded, angleAdded);
@@ -116,8 +116,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         }
         private float GetMouseAngledPosition()
         {
-            float mouseXFromCenter = lastState.Mouse.LastPosition.X - spinner.Position.X;
-            float mouseYFromCenter = lastState.Mouse.LastPosition.Y - spinner.Position.Y;
+            float mouseXFromCenter = lastState.Mouse.LastPosition.X - Position.X;
+            float mouseYFromCenter = lastState.Mouse.LastPosition.Y - Position.Y;
             return (float)MathHelper.RadiansToDegrees(Math.Atan2(mouseYFromCenter,mouseXFromCenter));
         }
 

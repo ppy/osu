@@ -1,6 +1,7 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
@@ -14,7 +15,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         const float size = 400;
         public BackSpinner(Spinner spinner)
         {
-            Position = spinner.Position;
+            //Position = spinner.Position;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
@@ -33,7 +34,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     {
                         backBox = new Box
                         {
-                            Colour = spinner.Colour,
+                            Colour = Color4.Black,
                             Alpha = 0.5f,
                             Width = size,
                             Height = size,
