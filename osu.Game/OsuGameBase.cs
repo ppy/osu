@@ -68,7 +68,6 @@ namespace osu.Game
             Dependencies.Cache(API = new APIAccess
             {
                 Username = Config.Get<string>(OsuConfig.Username),
-                Password = Config.Get<string>(OsuConfig.Password),
                 Token = Config.Get<string>(OsuConfig.Token)
             });
 
@@ -81,7 +80,6 @@ namespace osu.Game
             {
                 case APIState.Online:
                     Config.Set(OsuConfig.Username, Config.Get<bool>(OsuConfig.SaveUsername) ? API.Username : string.Empty);
-                    Config.Set(OsuConfig.Password, Config.Get<bool>(OsuConfig.SavePassword) ? API.Password : string.Empty);
                     break;
             }
         }
@@ -117,7 +115,6 @@ namespace osu.Game
             //refresh token may have changed.
             if (Config != null && API != null)
             {
-                Config.Set(OsuConfig.Username, Config.Get<bool>(OsuConfig.SaveUsername) ? API.Username : string.Empty);
                 Config.Set(OsuConfig.Token, Config.Get<bool>(OsuConfig.SavePassword) ? API.Token : string.Empty);
                 Config.Save();
             }
