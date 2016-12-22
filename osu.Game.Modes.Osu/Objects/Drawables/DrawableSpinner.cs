@@ -76,7 +76,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             base.UpdateState(state);
 
-            //backBox.ScaleTo(0, spinner.Duration);
+            backBox.ScaleTo(0, spinner.Duration);
 
             Delay(HitObject.Duration, true);
 
