@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Transformations;
-using osu.Game.Beatmaps;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -94,7 +89,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         private float lastAngleAdded;
         private float totalAngleSpinned = 0;
         public float Progress = 0;
-        private float spinsPerMinuteNeeded = 100 + (5 * 15);
+        private float spinsPerMinuteNeeded = 100 + (5 * 15); //TODO: read per-map OD and place it on the 5
         private float rotationsNeeded;
         
 
@@ -121,8 +116,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         }
         private float GetMouseAngledPosition()
         {
-            float mouseXFromCenter = lastState.Mouse.LastPosition.X - 256;
-            float mouseYFromCenter = lastState.Mouse.LastPosition.Y - 192;
+            float mouseXFromCenter = lastState.Mouse.LastPosition.X - spinner.Position.X;
+            float mouseYFromCenter = lastState.Mouse.LastPosition.Y - spinner.Position.Y;
             return (float)MathHelper.RadiansToDegrees(Math.Atan2(mouseYFromCenter,mouseXFromCenter));
         }
 

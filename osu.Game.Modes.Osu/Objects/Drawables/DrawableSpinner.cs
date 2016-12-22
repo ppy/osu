@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
+﻿using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
@@ -68,11 +66,17 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 }
             }
         }
+
+        /*protected override void UpdatePreemptState()
+        {
+            base.UpdatePreemptState();
+
+        }*/
         protected override void UpdateState(ArmedState state)
         {
             base.UpdateState(state);
 
-            backBox.ScaleTo(0, spinner.Duration);
+            //backBox.ScaleTo(0, spinner.Duration);
 
             Delay(HitObject.Duration, true);
 
