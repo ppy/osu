@@ -1,7 +1,9 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Samples;
 using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects
@@ -22,6 +24,8 @@ namespace osu.Game.Modes.Osu.Objects
         }
 
         public int RepeatCount;
+
+        public List<HitSampleInfo> EdgeSamples = new List<HitSampleInfo>();
 
         public SliderCurve Curve;
     }

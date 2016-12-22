@@ -35,6 +35,7 @@ namespace osu.Game.Modes.Osu.Objects
                     int repeatCount = 0;
                     double length = 0;
                     List<Vector2> points = new List<Vector2>();
+                    List<HitSampleInfo> edgeSamples = new List<HitSampleInfo>();
 
                     points.Add(new Vector2(int.Parse(split[0]), int.Parse(split[1])));
 
@@ -79,7 +80,20 @@ namespace osu.Game.Modes.Osu.Objects
                     if (split.Length > 7)
                         length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
 
+                    if (split.Length > 8)
+                    {
+                        string[] samplesplit = split[8].Split('|');
+                        for (int i = 0; i < samplesplit.Length; i++)
+                        {
+                            edgeSamples.Add(new HitSampleInfo {
+                                Type = (SampleType)Convert.ToInt32(samplesplit[i], CultureInfo.InvariantCulture),
+                                Set = SampleSet.Soft,
+                            });
+                        }
+                    }
+
                     s.RepeatCount = repeatCount;
+                    s.EdgeSamples = edgeSamples;
 
                     s.Curve = new SliderCurve
                     {
