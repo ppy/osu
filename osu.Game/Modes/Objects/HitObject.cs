@@ -16,6 +16,7 @@ namespace osu.Game.Modes.Objects
         public virtual double EndTime => StartTime;
 
         public bool NewCombo { get; set; }
+        public int ComboOffset { get; set; } = 0;
 
         public Color4 Colour = new Color4(17, 136, 170, 255);
 
