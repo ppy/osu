@@ -18,7 +18,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.MouseSpeed, 1.0);
 
             Set(OsuConfig.Username, string.Empty);
-            Set(OsuConfig.Password, string.Empty);
             Set(OsuConfig.Token, string.Empty);
 
             Set(OsuConfig.PlayMode, PlayMode.Osu);
@@ -332,7 +331,6 @@ namespace osu.Game.Configuration
         HiddenShowFirstApproach,
         ComboColourSliderBall,
         AlternativeChatFont,
-        Password,
         Username,
         DisplayStarsMaximum,
         DisplayStarsMinimum,
