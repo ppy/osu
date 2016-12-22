@@ -21,14 +21,14 @@ namespace osu.Game.Graphics.UserInterface
             Action = skip;
             sourceClock = clock;
             this.time = time;
-            Scheduler.AddDelayed(Fade, time - 1000);
         }
 
-        private void Fade()
+        protected override void LoadComplete()
         {
-            if (time - 3000 < 2000)
-                FadeOut(0);
-            FadeOut(250);
+            base.LoadComplete();
+
+            Delay(time - 3000, true);
+            Content.FadeOut(250);
         }
 
         private void skip()

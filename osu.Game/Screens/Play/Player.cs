@@ -164,7 +164,6 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(next);
         }
 
-
         private void dimChanged(object sender, EventArgs e)
         {
             Background?.FadeTo((100f - dimLevel) / 100, 800);
