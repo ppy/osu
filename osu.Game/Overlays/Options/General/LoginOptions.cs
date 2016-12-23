@@ -80,22 +80,11 @@ namespace osu.Game.Overlays.Options.General
             private PasswordTextBox password;
             private APIAccess api;
 
-            private CheckBoxOption saveUsername;
-            private CheckBoxOption savePassword;
 
             private void performLogin()
             {
                 if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
                     api.Login(username.Text, password.Text);
-            }
-
-
-            private void dependentChecking(CheckBoxOption saveUsername, CheckBoxOption savePassword)
-            {
-                if (savePassword.State == CheckBoxState.Checked)
-                {
-                    saveUsername.State = CheckBoxState.Checked;
-                }
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
@@ -121,12 +110,12 @@ namespace osu.Game.Overlays.Options.General
                         Height = 20,
                         RelativeSizeAxes = Axes.X
                     },
-                    saveUsername = new CheckBoxOption
+                    new CheckBoxOption
                     {
                         LabelText = "Remember Username",
                         Bindable = config.GetBindable<bool>(OsuConfig.SaveUsername),
                     },
-                    savePassword = new CheckBoxOption
+                    new CheckBoxOption
                     {
                         LabelText = "Remember Password",
                         Bindable = config.GetBindable<bool>(OsuConfig.SavePassword),
@@ -144,7 +133,6 @@ namespace osu.Game.Overlays.Options.General
                         //Action = registerLink
                     }
                 };
-                dependentChecking(saveUsername, savePassword);
             }
         }
     }
