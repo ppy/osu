@@ -80,6 +80,8 @@ namespace osu.Game.Overlays.Options.General
             private PasswordTextBox password;
             private APIAccess api;
 
+            private CheckBoxOption saveUsername;
+            private CheckBoxOption savePassword;
 
             private void performLogin()
             {
@@ -110,12 +112,12 @@ namespace osu.Game.Overlays.Options.General
                         Height = 20,
                         RelativeSizeAxes = Axes.X
                     },
-                    new CheckBoxOption
+                    saveUsername = new CheckBoxOption
                     {
                         LabelText = "Remember Username",
                         Bindable = config.GetBindable<bool>(OsuConfig.SaveUsername),
                     },
-                    new CheckBoxOption
+                    savePassword = new CheckBoxOption
                     {
                         LabelText = "Remember Password",
                         Bindable = config.GetBindable<bool>(OsuConfig.SavePassword),
