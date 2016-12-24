@@ -68,7 +68,7 @@ namespace osu.Game
             Dependencies.Cache(API = new APIAccess
             {
                 Username = Config.Get<string>(OsuConfig.Username),
-                Token = Config.Get<string>(OsuConfig.Username)
+                Token = Config.Get<string>(OsuConfig.Token)
             });
 
             API.Register(this);
