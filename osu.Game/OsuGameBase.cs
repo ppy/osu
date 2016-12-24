@@ -68,7 +68,7 @@ namespace osu.Game
             Dependencies.Cache(API = new APIAccess
             {
                 Username = Config.Get<string>(OsuConfig.Username),
-                Token = string.IsNullOrEmpty(Config.Get<string>(OsuConfig.Username)) ? string.Empty : Config.Get<string>(OsuConfig.Token)
+                Token = Config.Get<string>(OsuConfig.Username)
             });
 
             API.Register(this);
