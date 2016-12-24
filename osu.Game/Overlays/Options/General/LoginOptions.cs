@@ -87,6 +87,7 @@ namespace osu.Game.Overlays.Options.General
             {
                 if (savePassword.State == CheckBoxState.Checked)
                 {
+                    if(saveUsername.State == CheckBoxState.Unchecked)
                     saveUsername.State = CheckBoxState.Checked;
                 }
             }
