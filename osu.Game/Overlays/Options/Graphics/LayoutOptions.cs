@@ -15,6 +15,25 @@ namespace osu.Game.Overlays.Options.Graphics
     {
         protected override string Header => "Layout";
 
+        private CheckBoxOption letterboxing;
+
+        private SliderOption<int> letterboxPositionX;
+        private SliderOption<int> letterboxPositionY;
+
+        private void eventLetterboxing()
+        {
+            if (letterboxing.State == CheckBoxState.Unchecked)
+            {
+                letterboxPositionX.FadeOut(150);
+                letterboxPositionY.FadeOut(150);
+            }
+            else
+            {
+                letterboxPositionX.FadeIn(150);
+                letterboxPositionY.FadeIn(150);
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
@@ -26,22 +45,30 @@ namespace osu.Game.Overlays.Options.Graphics
                     LabelText = "Fullscreen mode",
                     Bindable = config.GetBindable<bool>(OsuConfig.Fullscreen),
                 },
-                new CheckBoxOption
+                letterboxing = new CheckBoxOption
                 {
                     LabelText = "Letterboxing",
                     Bindable = config.GetBindable<bool>(OsuConfig.Letterboxing),
                 },
-                new SliderOption<int>
+                letterboxPositionX = new SliderOption<int>
                 {
                     LabelText = "Horizontal position",
                     Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.LetterboxPositionX)
                 },
-                new SliderOption<int>
+                letterboxPositionY = new SliderOption<int>
                 {
                     LabelText = "Vertical position",
                     Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.LetterboxPositionY)
                 },
             };
+
+            if (!config.GetBindable<bool>(OsuConfig.Letterboxing))
+            {
+                letterboxPositionX.Hide();
+                letterboxPositionY.Hide();
+            }
+
+            config.GetBindable<bool>(OsuConfig.Letterboxing).ValueChanged += delegate { eventLetterboxing(); };
         }
     }
 }
