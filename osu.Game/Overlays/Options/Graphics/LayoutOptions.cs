@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -24,13 +25,17 @@ namespace osu.Game.Overlays.Options.Graphics
         {
             if (letterboxing.State == CheckBoxState.Unchecked)
             {
-                letterboxPositionX.FadeOut(150);
-                letterboxPositionY.FadeOut(150);
+                letterboxPositionX.FadeOut(100);
+                letterboxPositionY.FadeOut(100);
+                letterboxPositionX.Scale = new Vector2(1, 0);
+                letterboxPositionY.Scale = new Vector2(1, 0);
             }
             else
             {
-                letterboxPositionX.FadeIn(150);
-                letterboxPositionY.FadeIn(150);
+                letterboxPositionX.Scale = new Vector2(1, 1);
+                letterboxPositionY.Scale = new Vector2(1, 1);
+                letterboxPositionX.FadeIn(350);
+                letterboxPositionY.FadeIn(350);
             }
         }
 
