@@ -20,7 +20,7 @@ namespace osu.Game.Modes.Osu.Objects
             string[] split = text.Split(',');
             var type = (OsuHitObject.HitObjectType)int.Parse(split[3]);
             bool combo = type.HasFlag(OsuHitObject.HitObjectType.NewCombo);
-            int comboOffset = ((int)type & 0x70) >> 4;
+            int comboColourOffset = ((int)type & 0x70) >> 4;
             type &= (OsuHitObject.HitObjectType)0x8B;
             OsuHitObject result;
             switch (type)
@@ -120,8 +120,7 @@ namespace osu.Game.Modes.Osu.Objects
                 Set = SampleSet.Soft,
             };
             result.NewCombo = combo;
-            result.ComboOffset = comboOffset;
-            // TODO: "addition" field
+            result.ComboColourOffset = comboColourOffset;
             return result;
         }
     }

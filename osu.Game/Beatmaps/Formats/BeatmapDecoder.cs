@@ -57,7 +57,7 @@ namespace osu.Game.Beatmaps.Formats
 
             foreach (HitObject h in b.HitObjects)
             {
-                if (h.NewCombo || i == -1) i = (i + 1 + h.ComboOffset) % colours.Count;
+                if (h.NewCombo || i == -1) i = (i + 1 + h.ComboColourOffset) % colours.Count;
                 h.Colour = colours[i];
             }
         }
