@@ -63,7 +63,6 @@ namespace osu.Game.Modes.Osu.Objects
                     }
 
                     CurveTypes curveType = CurveTypes.Catmull;
-                    int repeatCount = 0;
                     double length = 0;
                     List<Vector2> points = new List<Vector2>();
                     List<HitSampleInfo> edgeSamples = new List<HitSampleInfo>();
@@ -103,13 +102,12 @@ namespace osu.Game.Modes.Osu.Objects
 
                     length = Convert.ToDouble(split[7], NumberFormatInfo.InvariantInfo);
 
-                    string[] samplesplit = split[8].Split('|');
-                    for (int i = 0; i < samplesplit.Length; i++)
-                        edgeSamples.Add(new HitSampleInfo
-                        {
-                            Type = (SampleType)Convert.ToInt32(samplesplit[i], NumberFormatInfo.InvariantInfo),
-                            Set = SampleSet.Soft
-                        });
+                    string[] sampleSplit = split[8].Split('|');
+                    string[] additionSplit = split[9].Split('|');
+                    if (sampleSplit.Length != additionSplit.Length)
+                        throw new ArgumentException("Sliders must have the same amount of samples and additions");
+                    for (int i = 0; i < sampleSplit.Length; i++)
+                        edgeSamples.Add(ParseHitSample(section, sampleSplit[i], additionSplit[i]));
 
                     s.RepeatCount = Convert.ToInt32(split[6], NumberFormatInfo.InvariantInfo);
                     s.EdgeSamples = edgeSamples;
