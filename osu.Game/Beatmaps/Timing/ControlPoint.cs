@@ -15,6 +15,6 @@ namespace osu.Game.Beatmaps.Timing
         public double Time;
         public double Meter;
         public SampleInfo Sample;
-        public bool Kiai;
+        public KiaiType Kiai;
     }
 }

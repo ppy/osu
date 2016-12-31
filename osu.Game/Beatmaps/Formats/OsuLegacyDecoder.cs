@@ -190,25 +190,38 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleTimingPoints(Beatmap beatmap, string val)
         {
-            ControlPoint cp = null;
-
             string[] split = val.Split(',');
+            if (split.Length != 8)
+                throw new ArgumentException("Control points must have 8 values");
 
-            if (split.Length > 2)
+            ControlPoint point;
+            if (split[6].Trim() == "1")
             {
-                int kiai_flags = split.Length > 7 ? Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : 0;
-                double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
-                cp = new ControlPoint
+                point = new UninheritedControlPoint
                 {
-                    Time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo),
-                    BeatLength = beatLength > 0 ? beatLength : 0,
-                    VelocityAdjustment = beatLength < 0 ? -beatLength / 100.0 : 1,
-                    TimingChange = split.Length <= 6 || split[6][0] == '1',
+                    BeatLength = Math.Abs(Convert.ToDouble(split[1].Trim(), NumberFormatInfo.InvariantInfo))
+                };
+            }
+            else
+            {
+                point = new InheritedControlPoint
+                {
+                    VelocityMultiplier = Math.Abs(Convert.ToDouble(split[1].Trim(), NumberFormatInfo.InvariantInfo)) / 100.0
                 };
             }
 
-            if (cp != null)
-                beatmap.ControlPoints.Add(cp);
+            point.Time = Convert.ToDouble(split[0].Trim(), NumberFormatInfo.InvariantInfo);
+            point.Meter = Convert.ToDouble(split[2].Trim(), NumberFormatInfo.InvariantInfo);
+            point.Kiai = (KiaiType)Convert.ToInt32(split[7].Trim(), NumberFormatInfo.InvariantInfo);
+
+            point.Sample = new SampleInfo
+            {
+                Set = (SampleSet)Convert.ToInt32(split[3].Trim(), NumberFormatInfo.InvariantInfo),
+                Bank = (SampleBank)Convert.ToInt32(split[4].Trim(), NumberFormatInfo.InvariantInfo),
+                Volume = Convert.ToInt32(split[5].Trim(), NumberFormatInfo.InvariantInfo)
+            };
+
+            beatmap.ControlPoints.Add(point);
         }
 
         private void handleColours(Beatmap beatmap, string key, string val)
@@ -227,6 +240,17 @@ namespace osu.Game.Beatmaps.Formats
                 B = b / 255f,
                 A = 1f,
             });
+        }
+
+        private void handleHitObjects(Beatmap beatmap, HitObjectParser parser, string val)
+        {
+            var obj = parser?.Parse(beatmap, val);
+
+            if (obj != null)
+            {
+                obj.SetDefaultsFromBeatmap(beatmap);
+                beatmap.HitObjects.Add(obj);
+            }
         }
 
         protected override Beatmap ParseFile(TextReader stream)
@@ -295,13 +319,7 @@ namespace osu.Game.Beatmaps.Formats
                         handleColours(beatmap, key, val);
                         break;
                     case Section.HitObjects:
-                        var obj = parser?.Parse(val);
-
-                        if (obj != null)
-                        {
-                            obj.SetDefaultsFromBeatmap(beatmap);
-                            beatmap.HitObjects.Add(obj);
-                        }
+                        handleHitObjects(beatmap, parser, val);
                         break;
                 }
             }
