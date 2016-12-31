@@ -15,6 +15,16 @@ namespace osu.Game.Modes.Objects
     {
         public abstract HitObject Parse(string text);
 
+        public class UnknownHitObjectException : Exception
+        {
+            public int Type { get; }
+            public UnknownHitObjectException(int type)
+                : base($@"Unknown HitObject type {type}")
+            {
+                Type = type;
+            }
+        }
+
         protected HitSampleInfo ParseHitSample(SampleInfo section, string sample, string addition)
         {
             HitSampleInfo hitSample = new HitSampleInfo

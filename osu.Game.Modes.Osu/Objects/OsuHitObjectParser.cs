@@ -110,8 +110,7 @@ namespace osu.Game.Modes.Osu.Objects
                     result = new Spinner();
                     break;
                 default:
-                    //throw new InvalidOperationException($@"Unknown hit object type {type}");
-                    return null;
+                    throw new UnknownHitObjectException((int)type);
             }
             result.Position = new Vector2(int.Parse(split[0]), int.Parse(split[1]));
             result.StartTime = double.Parse(split[2]);
