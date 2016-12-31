@@ -5,8 +5,6 @@ namespace osu.Game.Beatmaps.Samples
 {
     public enum SampleBank
     {
-        Default = 0,
-        Custom1 = 1,
-        Custom2 = 2
+        None = 0
     }
 }
