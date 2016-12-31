@@ -22,20 +22,20 @@ namespace osu.Game.Beatmaps
             ControlPoint point = ControlPointAt(time);
             double mult = 1;
 
-            if (!point.TimingChange)
+            if (point is InheritedControlPoint)
             {
                 if (applyMultipliers)
-                    mult = point.VelocityAdjustment;
-                point = ControlPointAt(time, true);
+                    mult = ((InheritedControlPoint)point).VelocityMultiplier;
+                point = ControlPointAt(time, false);
             }
 
-            return point.BeatLength * mult;
+            return ((UninheritedControlPoint)point).BeatLength * mult;
         }
 
         public ControlPoint ControlPointAt(double time) =>
-            ControlPoints.FindLast(controlPoint => controlPoint.Time <= time);
+            ControlPoints.FindLast(point => point.Time <= time);
 
-        public ControlPoint ControlPointAt(double time, bool timingChange) =>
-            ControlPoints.FindLast(controlPoint => controlPoint.Time <= time && controlPoint.TimingChange == timingChange);
+        public ControlPoint ControlPointAt(double time, bool inherited) =>
+            ControlPoints.FindLast(point => point.Time <= time && point is InheritedControlPoint == inherited);
     }
 }
