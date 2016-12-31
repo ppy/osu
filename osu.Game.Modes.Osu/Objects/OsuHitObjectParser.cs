@@ -125,6 +125,7 @@ namespace osu.Game.Modes.Osu.Objects
                     break;
                 case OsuHitObject.HitObjectType.Spinner:
                     result = new Spinner();
+                    combo = false;
                     switch (split.Length)
                     {
                         case 7:
