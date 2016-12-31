@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Samples;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace osu.Game.Modes.Objects
 {
     public abstract class HitObjectParser
     {
-        public abstract HitObject Parse(string text);
+        public abstract HitObject Parse(Beatmap beatmap, string text);
 
         public class UnknownHitObjectException : Exception
         {
@@ -37,6 +38,7 @@ namespace osu.Game.Modes.Objects
                 File = null
             };
 
+            addition = string.IsNullOrWhiteSpace(addition) ? "0:0" : addition;
             string[] split = addition.Split(':');
             switch (split.Length)
             {
