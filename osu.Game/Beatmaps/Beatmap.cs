@@ -19,24 +19,23 @@ namespace osu.Game.Beatmaps
 
         public double BeatLengthAt(double time, bool applyMultipliers = false)
         {
-            int point = 0;
-            int samplePoint = 0;
-
-            for (int i = 0; i < ControlPoints.Count; i++)
-                if (ControlPoints[i].Time <= time)
-                {
-                    if (ControlPoints[i].TimingChange)
-                        point = i;
-                    else
-                        samplePoint = i;
-                }
-
+            ControlPoint point = ControlPointAt(time);
             double mult = 1;
 
-            if (applyMultipliers && samplePoint > point)
-                mult = ControlPoints[samplePoint].VelocityAdjustment;
+            if (!point.TimingChange)
+            {
+                if (applyMultipliers)
+                    mult = point.VelocityAdjustment;
+                point = ControlPointAt(time, true);
+            }
 
-            return ControlPoints[point].BeatLength * mult;
+            return point.BeatLength * mult;
         }
+
+        public ControlPoint ControlPointAt(double time) =>
+            ControlPoints.FindLast(controlPoint => controlPoint.Time <= time);
+
+        public ControlPoint ControlPointAt(double time, bool timingChange) =>
+            ControlPoints.FindLast(controlPoint => controlPoint.Time <= time && controlPoint.TimingChange == timingChange);
     }
 }
