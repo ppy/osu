@@ -7,5 +7,7 @@ namespace osu.Game.Beatmaps.Samples
     {
         public SampleBank Bank;
         public SampleSet Set;
+        public SampleSet AdditionSet;
+        public int Volume;
     }
 }

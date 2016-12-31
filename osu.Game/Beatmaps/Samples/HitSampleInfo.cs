@@ -6,5 +6,6 @@ namespace osu.Game.Beatmaps.Samples
     public class HitSampleInfo : SampleInfo
     {
         public SampleType Type { get; set; }
+        public string File { get; set; }
     }
 }
