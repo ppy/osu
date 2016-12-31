@@ -1,6 +1,7 @@
 //Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
@@ -19,17 +20,18 @@ namespace osu.Game.Beatmaps
 
         public double BeatLengthAt(double time, bool applyMultipliers = false)
         {
-            ControlPoint point = ControlPointAt(time);
-            double mult = 1;
+            UninheritedControlPoint pointUninherited = ControlPointAt(time, false) as UninheritedControlPoint;
+            if (pointUninherited == null)
+                throw new ArgumentException("Cannot get BeatLength before the first UninheritedControlPoint");
 
-            if (point is InheritedControlPoint)
+            if (applyMultipliers)
             {
-                if (applyMultipliers)
-                    mult = ((InheritedControlPoint)point).VelocityMultiplier;
-                point = ControlPointAt(time, false);
+                InheritedControlPoint pointInherited = ControlPointAt(time, true) as InheritedControlPoint;
+                if (pointInherited == null || pointUninherited.Time > pointInherited.Time)
+                    return pointUninherited.BeatLength;
+                return pointUninherited.BeatLength * pointInherited.VelocityMultiplier;
             }
-
-            return ((UninheritedControlPoint)point).BeatLength * mult;
+            return pointUninherited.BeatLength;
         }
 
         public ControlPoint ControlPointAt(double time) =>
