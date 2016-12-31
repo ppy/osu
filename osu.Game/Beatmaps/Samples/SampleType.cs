@@ -13,5 +13,5 @@ namespace osu.Game.Beatmaps.Samples
         Whistle = 2,
         Finish = 4,
         Clap = 8
-    };
+    }
 }

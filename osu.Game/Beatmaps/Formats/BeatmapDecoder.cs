@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using osu.Game.Modes.Objects;
 using OpenTK.Graphics;
+using osu.Game.Modes.Objects;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -51,13 +51,15 @@ namespace osu.Game.Beatmaps.Formats
                 new Color4(121,9,13, 255),
             };
 
-            if (colours.Count == 0) return;
+            if (colours.Count == 0)
+                return;
 
             int i = -1;
 
             foreach (HitObject h in b.HitObjects)
             {
-                if (h.NewCombo || i == -1) i = (i + 1 + h.ComboColourOffset) % colours.Count;
+                if (h.NewCombo || i == -1)
+                    i = (i + 1 + h.ComboColourOffset) % colours.Count;
                 h.Colour = colours[i];
             }
         }

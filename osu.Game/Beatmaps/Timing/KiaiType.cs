@@ -11,5 +11,5 @@ namespace osu.Game.Beatmaps.Timing
         None = 0,
         Kiai = 1,
         OmitFirstBarLine = 8
-    };
+    }
 }

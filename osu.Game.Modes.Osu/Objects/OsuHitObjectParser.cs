@@ -4,13 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects;
-using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects
 {
