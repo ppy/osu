@@ -64,6 +64,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
+    <Compile Include="Beatmaps\Timing\InheritedControlPoint.cs" />
+    <Compile Include="Beatmaps\Timing\KiaiType.cs" />
+    <Compile Include="Beatmaps\Timing\UninheritedControlPoint.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
@@ -89,8 +92,6 @@
     <Compile Include="Beatmaps\Samples\SampleSet.cs" />
     <Compile Include="Beatmaps\Samples\SampleType.cs" />
     <Compile Include="Beatmaps\Timing\ControlPoint.cs" />
-    <Compile Include="Beatmaps\Timing\SampleChange.cs" />
-    <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarHomeButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarMusicButton.cs" />
