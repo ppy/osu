@@ -9,15 +9,9 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Beatmaps.Timing
 {
-    class TimingChange : ControlPoint
+    class UninheritedControlPoint : ControlPoint
     {
         public double BeatLength;
-
-        public TimingChange(double beatLength)
-        {
-            BeatLength = beatLength;
-        }
-
         public double BPM => 60000 / BeatLength;
     }
 }
