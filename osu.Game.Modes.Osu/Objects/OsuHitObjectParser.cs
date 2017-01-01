@@ -47,6 +47,9 @@ namespace osu.Game.Modes.Osu.Objects
                     break;
                 case OsuHitObject.HitObjectType.Slider:
                     Slider s = new Slider();
+
+                    List<HitSampleInfo> edgeSamples = new List<HitSampleInfo>();
+
                     switch (split.Length)
                     {
                         case 11:
@@ -55,14 +58,30 @@ namespace osu.Game.Modes.Osu.Objects
                         case 10:
                             s.Sample = ParseHitSample(section, split[4], null);
                             break;
+                        case 8:
+                            s.RepeatCount = Convert.ToInt32(split[6], NumberFormatInfo.InvariantInfo);
+                            for (int i = 0; i <= s.RepeatCount; i++)
+                                edgeSamples.Add(ParseHitSample(section, null, null));
+                            goto case 10;
                         default:
-                            throw new ArgumentException("Sliders must have between 10 and 11 values");
+                            throw new ArgumentException("Sliders must have 8, 10 or 11 values");
+                    }
+
+                    if (edgeSamples.Count == 0)
+                    {
+                        s.RepeatCount = Convert.ToInt32(split[6], NumberFormatInfo.InvariantInfo);
+
+                        string[] sampleSplit = split[8].Split('|');
+                        string[] additionSplit = split[9].Split('|');
+                        if (sampleSplit.Length != additionSplit.Length || sampleSplit.Length != s.RepeatCount + 1)
+                            throw new ArgumentException("Sliders must have the same amount of samples, additions and points");
+                        for (int i = 0; i <= s.RepeatCount; i++)
+                            edgeSamples.Add(ParseHitSample(section, sampleSplit[i], additionSplit[i]));
                     }
 
                     CurveTypes curveType = CurveTypes.Catmull;
                     double length = 0;
                     List<Vector2> points = new List<Vector2>();
-                    List<HitSampleInfo> edgeSamples = new List<HitSampleInfo>();
 
                     points.Add(new Vector2(Convert.ToInt32(split[0], NumberFormatInfo.InvariantInfo), Convert.ToInt32(split[1], NumberFormatInfo.InvariantInfo)));
 
@@ -99,14 +118,6 @@ namespace osu.Game.Modes.Osu.Objects
 
                     length = Convert.ToDouble(split[7], NumberFormatInfo.InvariantInfo);
 
-                    string[] sampleSplit = split[8].Split('|');
-                    string[] additionSplit = split[9].Split('|');
-                    if (sampleSplit.Length != additionSplit.Length)
-                        throw new ArgumentException("Sliders must have the same amount of samples and additions");
-                    for (int i = 0; i < sampleSplit.Length; i++)
-                        edgeSamples.Add(ParseHitSample(section, sampleSplit[i], additionSplit[i]));
-
-                    s.RepeatCount = Convert.ToInt32(split[6], NumberFormatInfo.InvariantInfo);
                     s.EdgeSamples = edgeSamples;
 
                     s.Curve = new SliderCurve
