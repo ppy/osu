@@ -13,7 +13,7 @@ namespace osu.Game.Modes.Mania
 {
     public class ManiaRuleset : Ruleset
     {
-        public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
+        public override ScoreOverlay CreateScoreOverlay() => null;
 
         public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new ManiaHitRenderer { Objects = objects };
 
@@ -21,6 +21,6 @@ namespace osu.Game.Modes.Mania
 
         public override ScoreProcessor CreateScoreProcessor() => null;
 
-        public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
+        public override HitObjectParser CreateHitObjectParser() => null;
     }
 }
