@@ -213,9 +213,10 @@ namespace osu.Game.Beatmaps.Formats
             point.Meter = Convert.ToDouble(split[2].Trim(), NumberFormatInfo.InvariantInfo);
             point.Kiai = (KiaiType)Convert.ToInt32(split[7].Trim(), NumberFormatInfo.InvariantInfo);
 
+            SampleSet set = (SampleSet)Convert.ToInt32(split[3].Trim(), NumberFormatInfo.InvariantInfo);
             point.Sample = new SampleInfo
             {
-                Set = (SampleSet)Convert.ToInt32(split[3].Trim(), NumberFormatInfo.InvariantInfo),
+                Set = set == SampleSet.None ? SampleSet.Normal : set,
                 Bank = (SampleBank)Convert.ToInt32(split[4].Trim(), NumberFormatInfo.InvariantInfo),
                 Volume = Convert.ToInt32(split[5].Trim(), NumberFormatInfo.InvariantInfo)
             };
