@@ -235,7 +235,9 @@ namespace osu.Game.Overlays
 
         void preferUnicode_changed(object sender, EventArgs e)
         {
-            updateDisplay(current, TransformDirection.None);
+            if (current != null)
+                updateDisplay(current, TransformDirection.None);
+            //else: we can show something in correspond laguage
         }
 
         private void workingChanged(object sender = null, EventArgs e = null)
