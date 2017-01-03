@@ -235,9 +235,7 @@ namespace osu.Game.Overlays
 
         void preferUnicode_changed(object sender, EventArgs e)
         {
-            if (current != null)
-                updateDisplay(current, TransformDirection.None);
-            //else: we can show something in correspond laguage
+            updateDisplay(current, TransformDirection.None);
         }
 
         private void workingChanged(object sender = null, EventArgs e = null)
@@ -320,7 +318,7 @@ namespace osu.Game.Overlays
         {
             Task.Run(() =>
             {
-                if (beatmap.Beatmap == null)
+                if (beatmap?.Beatmap == null)
                     //todo: we may need to display some default text here (currently in the constructor).
                     return;
 
