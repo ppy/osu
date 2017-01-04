@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
@@ -97,6 +98,7 @@ namespace osu.Game.Overlays.Options
             {
                 ComboBox.CornerRadius = 4;
                 DropDown.CornerRadius = 4;
+                DropDown.Masking = true;
             }
 
             protected override void AnimateOpen()
@@ -121,45 +123,74 @@ namespace osu.Game.Overlays.Options
 
         private class StyledDropDownComboBox : DropDownComboBox
         {
-            protected override Color4 BackgroundColour => new Color4(255, 255, 255, 100);
-            protected override Color4 BackgroundColourHover => Color4.HotPink;
+            protected override Color4 BackgroundColour => new Color4(0, 0, 0, 128);
+            protected override Color4 BackgroundColourHover => new Color4(187, 17, 119, 255);
+
+            private SpriteText label;
+            protected override string Label
+            {
+                get { return label.Text; }
+                set { label.Text = value; }
+            }
 
             public StyledDropDownComboBox()
             {
                 Foreground.Padding = new MarginPadding(4);
+
+                Children = new[]
+                {
+                    label = new SpriteText(),
+                    new TextAwesome
+                    {
+                        Icon = FontAwesome.fa_chevron_down,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Margin = new MarginPadding { Right = 4 },
+                    }
+                };
             }
         }
 
         private class StyledDropDownMenuItem<U> : DropDownMenuItem<U>
         {
+            protected override Color4 BackgroundColour => new Color4(0, 0, 0, 128);
+            protected override Color4 BackgroundColourSelected => new Color4(0, 0, 0, 128);
+            protected override Color4 BackgroundColourHover => new Color4(187, 17, 119, 255);
+        
             public StyledDropDownMenuItem(string text, U value) : base(text, value)
             {
                 AutoSizeAxes = Axes.None;
                 Height = 0;
                 Foreground.Padding = new MarginPadding(2);
-            }
 
-            protected override void OnSelectChange()
-            {
-                if (!IsLoaded)
-                    return;
-
-                FormatBackground();
-                FormatCaret();
-                FormatLabel();
-            }
-
-            protected override void FormatCaret()
-            {
-                (Caret as SpriteText).Text = IsSelected ? @"+" : @"-";
-            }
-
-            protected override void FormatLabel()
-            {
-                if (IsSelected)
-                    (Label as SpriteText).Text = @"*" + Value + @"*";
-                else
-                    (Label as SpriteText).Text = Value.ToString();
+                Children = new[]
+                {
+                    new FlowContainer
+                    {
+                        Direction = FlowDirection.HorizontalOnly,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
+                        {
+                            new Framework.Graphics.Containers.Container
+                            {
+                                Width = 20,
+                                Height = 20,
+                                Margin = new MarginPadding { Top = 1, Right = 3 },
+                                Children = new[]
+                                {
+                                    new TextAwesome
+                                    {
+                                        Icon = FontAwesome.fa_chevron_right,
+                                        Colour = Color4.Black,
+                                        Anchor = Anchor.Centre,
+                                    }
+                                }
+                            },
+                            new SpriteText { Text = text }
+                        }
+                    }
+                };
             }
         }
     }
