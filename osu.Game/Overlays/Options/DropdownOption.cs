@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -69,9 +70,6 @@ namespace osu.Game.Overlays.Options
             Direction = FlowDirection.VerticalOnly;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            var items = typeof(T).GetFields().Where(f => !f.IsSpecialName).Zip(
-                (T[])Enum.GetValues(typeof(T)), (a, b) => new Tuple<string, T>(
-                    a.GetCustomAttribute<DescriptionAttribute>()?.Description ?? a.Name, b));
             Children = new Drawable[]
             {
                 text = new SpriteText { Alpha = 0 },
@@ -79,7 +77,7 @@ namespace osu.Game.Overlays.Options
                 {
                     Margin = new MarginPadding { Top = 5 },
                     RelativeSizeAxes = Axes.X,
-                    Items = items.Select(item => new StyledDropDownMenuItem<T>(item.Item1, item.Item2))
+                    Items = (T[])Enum.GetValues(typeof(T)),
                 }
             };
             dropdown.ValueChanged += Dropdown_ValueChanged;
@@ -92,6 +90,17 @@ namespace osu.Game.Overlays.Options
             protected override DropDownComboBox CreateComboBox()
             {
                 return new StyledDropDownComboBox();
+            }
+            
+            protected override IEnumerable<DropDownMenuItem<U>> GetDropDownItems(IEnumerable<U> values)
+            {
+                return values.Select(v =>
+                {
+                    var field = typeof(U).GetField(Enum.GetName(typeof(U), v));
+                    return new StyledDropDownMenuItem<U>(
+                        field.GetCustomAttribute<DescriptionAttribute>()?.Description ?? field.Name, v);
+                });
+                    
             }
 
             public StyledDropDownMenu()
