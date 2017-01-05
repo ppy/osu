@@ -107,7 +107,6 @@ namespace osu.Game.Overlays.Options
             {
                 ComboBox.CornerRadius = 4;
                 DropDown.CornerRadius = 4;
-                DropDown.Masking = true;
             }
 
             protected override void AnimateOpen()
@@ -181,20 +180,13 @@ namespace osu.Game.Overlays.Options
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            new Framework.Graphics.Containers.Container
+                            new TextAwesome
                             {
-                                Width = 20,
-                                Height = 20,
-                                Margin = new MarginPadding { Top = 1, Right = 3 },
-                                Children = new[]
-                                {
-                                    new TextAwesome
-                                    {
-                                        Icon = FontAwesome.fa_chevron_right,
-                                        Colour = Color4.Black,
-                                        Anchor = Anchor.Centre,
-                                    }
-                                }
+                                Icon = FontAwesome.fa_chevron_right,
+                                Colour = Color4.Black,
+                                Margin = new MarginPadding { Right = 3 },
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
                             },
                             new SpriteText { Text = text }
                         }
