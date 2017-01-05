@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Options
 
             protected override void AnimateOpen()
             {
-                foreach (StyledDropDownMenuItem<U> child in DropDownList.Children)
+                foreach (StyledDropDownMenuItem<U> child in DropDownItemsContainer.Children)
                 {
                     child.FadeIn(200);
                     child.ResizeTo(new Vector2(1, 24), 200);
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.Options
 
             protected override void AnimateClose()
             {
-                foreach (StyledDropDownMenuItem<U> child in DropDownList.Children)
+                foreach (StyledDropDownMenuItem<U> child in DropDownItemsContainer.Children)
                 {
                     child.ResizeTo(new Vector2(1, 0), 200);
                     child.FadeOut(200);
