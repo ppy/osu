@@ -17,15 +17,12 @@ namespace osu.Game.Overlays.Options.General
 {
     public class LoginOptions : OptionsSubsection, IOnlineComponent
     {
-        private APIAccess api;
-
         protected override string Header => "Sign In";
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(APIAccess api)
         {
             api?.Register(this);
-            this.api = api;
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
