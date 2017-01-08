@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -15,6 +16,29 @@ namespace osu.Game.Overlays.Options.Graphics
     {
         protected override string Header => "Layout";
 
+        private CheckBoxOption letterboxing;
+
+        private SliderOption<int> letterboxPositionX;
+        private SliderOption<int> letterboxPositionY;
+
+        private void eventLetterboxing()
+        {
+            if (letterboxing.State == CheckBoxState.Unchecked)
+            {
+                letterboxPositionX.FadeOut(100);
+                letterboxPositionY.FadeOut(100);
+                letterboxPositionX.Scale = new Vector2(1, 0);
+                letterboxPositionY.Scale = new Vector2(1, 0);
+            }
+            else
+            {
+                letterboxPositionX.Scale = new Vector2(1, 1);
+                letterboxPositionY.Scale = new Vector2(1, 1);
+                letterboxPositionX.FadeIn(350);
+                letterboxPositionY.FadeIn(350);
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
@@ -26,22 +50,30 @@ namespace osu.Game.Overlays.Options.Graphics
                     LabelText = "Fullscreen mode",
                     Bindable = config.GetBindable<bool>(OsuConfig.Fullscreen),
                 },
-                new CheckBoxOption
+                letterboxing = new CheckBoxOption
                 {
                     LabelText = "Letterboxing",
                     Bindable = config.GetBindable<bool>(OsuConfig.Letterboxing),
                 },
-                new SliderOption<int>
+                letterboxPositionX = new SliderOption<int>
                 {
                     LabelText = "Horizontal position",
                     Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.LetterboxPositionX)
                 },
-                new SliderOption<int>
+                letterboxPositionY = new SliderOption<int>
                 {
                     LabelText = "Vertical position",
                     Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.LetterboxPositionY)
                 },
             };
+
+            if (!config.GetBindable<bool>(OsuConfig.Letterboxing))
+            {
+                letterboxPositionX.Hide();
+                letterboxPositionY.Hide();
+            }
+
+            config.GetBindable<bool>(OsuConfig.Letterboxing).ValueChanged += delegate { eventLetterboxing(); };
         }
     }
 }
