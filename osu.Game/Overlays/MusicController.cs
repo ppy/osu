@@ -318,7 +318,7 @@ namespace osu.Game.Overlays
         {
             Task.Run(() =>
             {
-                if (beatmap.Beatmap == null)
+                if (beatmap?.Beatmap == null)
                     //todo: we may need to display some default text here (currently in the constructor).
                     return;
 
