@@ -13,6 +13,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Modes;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -52,7 +53,7 @@ namespace osu.Game.Overlays.Toolbar
                     EdgeEffect = new EdgeEffect
                     {
                         Type = EdgeEffectType.Glow,
-                        Colour = new Color4(255, 194, 224, 100),
+                        Colour = OsuColor.ToolbarModeButtonIconActiveGlow,
                         Radius = 15,
                         Roundness = 15,
                     },

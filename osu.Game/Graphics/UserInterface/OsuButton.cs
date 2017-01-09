@@ -12,7 +12,7 @@ namespace osu.Game.Graphics.UserInterface
         public OsuButton()
         {
             Height = 25;
-            Colour = new Color4(14, 132, 165, 255);
+            Colour = OsuColor.Button;
         }
     }
 }

@@ -30,6 +30,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK.Input;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -142,7 +143,7 @@ namespace osu.Game.Screens.Select
                             RelativeSizeAxes = Axes.Y,
                             Width = 100,
                             Text = "Play",
-                            Colour = new Color4(238, 51, 153, 255),
+                            Colour = OsuColor.PlayButton,
                             Action = start
                         },
                     }

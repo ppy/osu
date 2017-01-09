@@ -23,6 +23,7 @@ using osu.Game.Overlays.Options.Graphics;
 using osu.Game.Overlays.Options.Input;
 using osu.Game.Overlays.Options.Online;
 using System;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -94,7 +95,7 @@ namespace osu.Game.Overlays
                                 },
                                 new SpriteText
                                 {
-                                    Colour = new Color4(255, 102, 170, 255),
+                                    Colour = OsuColor.OsuPink,
                                     Text = "Change the way osu! behaves",
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
