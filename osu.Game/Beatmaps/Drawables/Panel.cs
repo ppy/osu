@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -35,7 +36,7 @@ namespace osu.Game.Beatmaps.Drawables
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
                 CornerRadius = 10,
-                BorderColour = new Color4(221, 255, 255, 255),
+                BorderColour = OsuColor.PanelBorder,
             });
         }
 
@@ -84,7 +85,7 @@ namespace osu.Game.Beatmaps.Drawables
             nestedContainer.EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Glow,
-                Colour = new Color4(130, 204, 255, 150),
+                Colour = OsuColor.PanelGlowSelected,
                 Radius = 20,
                 Roundness = 10,
             };
@@ -98,7 +99,7 @@ namespace osu.Game.Beatmaps.Drawables
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(1),
                 Radius = 10,
-                Colour = new Color4(0, 0, 0, 100),
+                Colour = OsuColor.PanelGlowUnselected,
             };
         }
 

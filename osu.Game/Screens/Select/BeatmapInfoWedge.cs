@@ -14,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -29,12 +30,12 @@ namespace osu.Game.Screens.Select
         {
             Shear = wedged_container_shear;
             Masking = true;
-            BorderColour = new Color4(221, 255, 255, 255);
+            BorderColour = OsuColor.BeatmapInfoWedgeBorder;
             BorderThickness = 2.5f;
             EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Glow,
-                Colour = new Color4(130, 204, 255, 150),
+                Colour = OsuColor.BeatmapInfoWedgeGlow,
                 Radius = 20,
                 Roundness = 15,
             };

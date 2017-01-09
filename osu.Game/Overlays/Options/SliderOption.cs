@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
@@ -84,7 +85,7 @@ namespace osu.Game.Overlays.Options
                         RelativeSizeAxes = Axes.None,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Colour = new Color4(255, 102, 170, 255),
+                        Colour = OsuColor.OsuPink,
                     },
                     rightBox = new Box
                     {
@@ -92,7 +93,7 @@ namespace osu.Game.Overlays.Options
                         RelativeSizeAxes = Axes.None,
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
-                        Colour = new Color4(255, 102, 170, 255),
+                        Colour = OsuColor.SliderbarBackground,
                         Alpha = 0.5f,
                     },
                     nub = new Container
@@ -104,13 +105,14 @@ namespace osu.Game.Overlays.Options
                         AutoSizeAxes = Axes.None,
                         RelativeSizeAxes = Axes.None,
                         Masking = true,
-                        BorderColour = new Color4(255, 102, 170, 255),
+                        BorderColour = OsuColor.SliderbarNub,
                         BorderThickness = 3,
                         Children = new[]
                         {
                             new Box
                             {
-                                Colour = new Color4(255, 102, 170, 0),
+                                Colour = new Color4(OsuColor.SliderbarNub.R,
+                                    OsuColor.SliderbarNub.G, OsuColor.SliderbarNub.B, 0),
                                 RelativeSizeAxes = Axes.Both
                             }
                         }

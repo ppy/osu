@@ -16,6 +16,7 @@ using osu.Framework.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Input;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
@@ -141,21 +142,17 @@ namespace osu.Game.Overlays.Options
 
             const float border_width = 3;
 
-            Color4 hoverColour = new Color4(255, 221, 238, 255);
-            Color4 defaultColour = new Color4(255, 102, 170, 255);
-            Color4 glowColour = new Color4(187, 17, 119, 0);
-
             public Light()
             {
                 Size = new Vector2(40, 12);
 
                 Masking = true;
 
-                Colour = defaultColour;
+                Colour = OsuColor.OsuPink;
 
                 EdgeEffect = new EdgeEffect
                 {
-                    Colour = glowColour,
+                    Colour = OsuColor.CheckBoxGlow,
                     Type = EdgeEffectType.Glow,
                     Radius = 10,
                     Roundness = 8,
@@ -182,13 +179,13 @@ namespace osu.Game.Overlays.Options
                 {
                     if (value)
                     {
-                        FadeColour(hoverColour, 500, EasingTypes.OutQuint);
+                        FadeColour(OsuColor.CheckBoxHover, 500, EasingTypes.OutQuint);
                         FadeGlowTo(1, 500, EasingTypes.OutQuint);
                     }
                     else
                     {
                         FadeGlowTo(0, 500);
-                        FadeColour(defaultColour, 500);
+                        FadeColour(OsuColor.OsuPink, 500);
                     }
                 }
             }

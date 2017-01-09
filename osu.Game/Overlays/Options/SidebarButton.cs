@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Options
                     {
                         RelativeSizeAxes = Axes.Both,
                         BlendingMode = BlendingMode.Additive,
-                        Colour = new Color4(60, 60, 60, 255),
+                        Colour = OsuColor.SidebarButtonBackground,
                         Alpha = 0,
                     },
                     new Container
@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Options
                         Width = 5,
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
-                        Colour = new Color4(247, 198, 35, 255)
+                        Colour = OsuColor.SidebarButtonSelectionIndicator
                     }
             };
         }

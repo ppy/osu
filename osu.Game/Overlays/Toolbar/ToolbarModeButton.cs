@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Toolbar
                     DrawableIcon.EdgeEffect = new EdgeEffect
                     {
                         Type = EdgeEffectType.Glow,
-                        Colour = new Color4(255, 194, 224, 100),
+                        Colour = OsuColor.ToolbarModeButtonIconActiveGlow,
                         Radius = 15,
                         Roundness = 15,
                     };
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Toolbar
                 else
                 {
                     DrawableIcon.Masking = false;
-                    DrawableIcon.Colour = new Color4(255, 194, 224, 255);
+                    DrawableIcon.Colour = OsuColor.ToolbarModeButtonIcon;
                 }
             }
         }

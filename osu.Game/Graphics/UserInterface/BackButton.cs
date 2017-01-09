@@ -46,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
                         leftBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = new Color4(195, 40, 140, 255),
+                            Colour = OsuColor.BackButtonLeft,
                             Shear = new Vector2(shear, 0),
                         },
                         icon = new TextAwesome
@@ -67,7 +67,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         rightBox = new Box
                         {
-                            Colour = new Color4(238, 51, 153, 255),
+                            Colour = OsuColor.BackButtonRight,
                             Origin = Anchor.TopLeft,
                             Anchor = Anchor.TopLeft,
                             RelativeSizeAxes = Axes.Both,

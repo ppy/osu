@@ -4,6 +4,7 @@
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Samples;
 using OpenTK.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Objects
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Modes.Objects
 
         public bool NewCombo { get; set; }
 
-        public Color4 Colour = new Color4(17, 136, 170, 255);
+        public Color4 Colour = OsuColor.Combo1;
 
         public double Duration => EndTime - StartTime;
 
