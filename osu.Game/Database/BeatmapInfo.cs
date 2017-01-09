@@ -16,9 +16,9 @@ namespace osu.Game.Database
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
 
-        public int BeatmapID { get; set; } = 0;
+        public int? OnlineBeatmapID { get; set; } = null;
 
-        public int BeatmapSetID { get; set; } = -1;
+        public int? OnlineBeatmapSetID { get; set; } = null;
 
         [ForeignKey(typeof(BeatmapSetInfo))]
         public int BeatmapSetInfoID { get; set; }

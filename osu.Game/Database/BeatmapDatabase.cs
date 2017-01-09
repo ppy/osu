@@ -69,8 +69,8 @@ namespace osu.Game.Database
                 using (var reader = ArchiveReader.GetReader(storage, path))
                     metadata = reader.ReadMetadata();
 
-                if (metadata.BeatmapSetID != -1 &&
-                    connection.Table<BeatmapSetInfo>().Count(b => b.BeatmapSetID == metadata.BeatmapSetID) != 0)
+                if (metadata.OnlineBeatmapSetID.HasValue &&
+                    connection.Table<BeatmapSetInfo>().Count(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID) != 0)
                     return; // TODO: Update this beatmap instead
 
                 if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
@@ -87,7 +87,7 @@ namespace osu.Game.Database
                 }
                 var beatmapSet = new BeatmapSetInfo
                 {
-                    BeatmapSetID = metadata.BeatmapSetID,
+                    OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
                     Beatmaps = new List<BeatmapInfo>(),
                     Path = path,
                     Hash = hash,
@@ -140,7 +140,7 @@ namespace osu.Game.Database
 
         public BeatmapSetInfo GetBeatmapSet(int id)
         {
-            return Query<BeatmapSetInfo>().FirstOrDefault(s => s.BeatmapSetID == id);
+            return Query<BeatmapSetInfo>().FirstOrDefault(s => s.OnlineBeatmapSetID == id);
         }
 
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)

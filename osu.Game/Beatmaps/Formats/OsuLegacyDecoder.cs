@@ -136,11 +136,11 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.Metadata.Tags = val;
                     break;
                 case @"BeatmapID":
-                    beatmap.BeatmapInfo.BeatmapID = int.Parse(val);
+                    beatmap.BeatmapInfo.OnlineBeatmapID = int.Parse(val);
                     break;
                 case @"BeatmapSetID":
-                    beatmap.BeatmapInfo.BeatmapSetID = int.Parse(val);
-                    metadata.BeatmapSetID = int.Parse(val);
+                    beatmap.BeatmapInfo.OnlineBeatmapSetID = int.Parse(val);
+                    metadata.OnlineBeatmapSetID = int.Parse(val);
                     break;
             }
         }
