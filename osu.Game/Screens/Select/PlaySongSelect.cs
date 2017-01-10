@@ -127,6 +127,11 @@ namespace osu.Game.Screens.Select
                         },
                     }
                 },
+                new FilterSongSelect
+                {
+                    Position = wedged_container_start_position,
+                    RelativeSizeAxes = Axes.X,
+                },
                 carousel = new CarouselContainer
                 {
                     RelativeSizeAxes = Axes.Y,
