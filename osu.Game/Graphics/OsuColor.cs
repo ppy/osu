@@ -6,6 +6,11 @@ namespace osu.Game.Graphics
 {
     public static class OsuColor
     {
+        public static Color4 Opacity(this Color4 color, float a) => new Color4(color.R, color.G, color.B, a);
+        public static Color4 Opacity(this Color4 color, byte a) => new Color4(color.R, color.G, color.B, a / 255f);
+        public static Color4 Gray(float amt) => new Color4(amt, amt, amt, 1f);
+        public static Color4 Gray(byte amt) => new Color4(amt, amt, amt, 255);
+    
         public static readonly Color4 OsuPink = new Color4(255, 102, 170, 255);
     
         public static readonly Color4 BeatmapPanelUnselected = new Color4(20, 43, 51, 255);

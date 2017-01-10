@@ -111,8 +111,7 @@ namespace osu.Game.Overlays.Options
                         {
                             new Box
                             {
-                                Colour = new Color4(OsuColor.SliderbarNub.R,
-                                    OsuColor.SliderbarNub.G, OsuColor.SliderbarNub.B, 0),
+                                Colour = OsuColor.SliderbarNub.Opacity(0),
                                 RelativeSizeAxes = Axes.Both
                             }
                         }
