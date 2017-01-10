@@ -27,6 +27,7 @@ namespace osu.Game.Modes.UI
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.White,
+                    Scale = new Vector2(0, 1),
                 }, 
             };
         }
