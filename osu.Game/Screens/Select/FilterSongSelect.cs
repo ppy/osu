@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select
@@ -84,27 +85,48 @@ namespace osu.Game.Screens.Select
                 get { return text.Text; }
                 set { text.Text = value; }
             }
-            
+
+            private void FadeActive()
+            {
+                box.FadeIn(300);
+                text.FadeColour(Color4.White, 300);
+            }
+
+            private void FadeInactive()
+            {
+                box.FadeOut(300);
+                text.FadeColour(new Color4(102, 204, 255, 255), 300);
+            }
+
+            private bool active;
             public bool Active
             {
-                get { return box.Alpha != 0; }
+                get { return active; }
                 set
                 {
-                    if (value)
-                    {
-                        box.FadeIn(300);
-                        text.FadeColour(Color4.White, 300);
-                    }
+                    active = value;
+                    if (active)
+                        FadeActive();
                     else
-                    {
-                        box.FadeOut(300);
-                        text.FadeColour(new Color4(102, 204, 255, 255), 300);
-                    }
+                        FadeInactive();
                 }
             }
         
             private SpriteText text;
             private Box box;
+            
+            protected override bool OnHover(InputState state)
+            {
+                if (!active)
+                    FadeActive();
+                return true;
+            }
+            
+            protected override void OnHoverLost(InputState state)
+            {
+                if (!active)
+                    FadeInactive();
+            }
         
             public GroupSortItem()
             {
@@ -116,6 +138,7 @@ namespace osu.Game.Screens.Select
                         Colour = new Color4(102, 204, 255, 255),
                         Margin = new MarginPadding(5),
                         TextSize = 14,
+                        Font = @"Exo2.0-Bold",
                     },
                     box = new Box
                     {
@@ -190,6 +213,7 @@ namespace osu.Game.Screens.Select
                         {
                             new SpriteText
                             {
+                                Font = @"Exo2.0-Bold",
                                 Text = "Sort results by",
                                 Colour = new Color4(165, 204, 0, 255),
                                 TextSize = 14,
