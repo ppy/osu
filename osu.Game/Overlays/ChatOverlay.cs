@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Threading;
+using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
@@ -45,7 +46,7 @@ namespace osu.Game.Overlays
                 {
                     Depth = float.MaxValue,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0.1f, 0.1f, 0.1f, 0.4f),
+                    Colour = OsuColor.Gray(0.1f).Opacity(0.4f),
                 },
                 content = new Container
                 {

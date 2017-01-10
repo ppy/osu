@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Select
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        ColourInfo = ColourInfo.GradientVertical(Color4.White, new Color4(1f, 1f, 1f, 0.3f)),
+                        ColourInfo = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
                         Children = new []
                         {
                             // Zoomed-in and cropped beatmap background

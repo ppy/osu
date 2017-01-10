@@ -56,7 +56,7 @@ namespace osu.Game.Overlays
             EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Shadow,
-                Colour = new Color4(0, 0, 0, 40),
+                Colour = Color4.Black.Opacity(40),
                 Radius = 5,
             };
 
@@ -402,7 +402,7 @@ namespace osu.Game.Overlays
                         Height = 50,
                         Origin = Anchor.BottomCentre,
                         Anchor = Anchor.BottomCentre,
-                        Colour = new Color4(0, 0, 0, 127)
+                        Colour = Color4.Black.Opacity(0.5f)
                     }
                 };
             }

@@ -151,7 +151,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 RelativeSizeAxes = Axes.Both,
                 Shear = new Vector2(shear, 0),
-                Colour = new Color4(255, 255, 255, 128),
+                Colour = Color4.White.Opacity(0.5f),
             };
             Add(flash);
 
