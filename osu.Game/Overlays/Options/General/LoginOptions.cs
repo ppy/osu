@@ -82,19 +82,13 @@ namespace osu.Game.Overlays.Options.General
 
             private void eventPassword()
             {
-                if (savePassword.State == CheckBoxState.Checked)
-                {
-                    if(saveUsername.State == CheckBoxState.Unchecked)
+                if ((savePassword.State == CheckBoxState.Checked) && (saveUsername.State == CheckBoxState.Unchecked))
                     saveUsername.State = CheckBoxState.Checked;
-                }
             }
             private void eventUsername()
             {
-                if (savePassword.State == CheckBoxState.Checked)
-                {
-                    if(saveUsername.State == CheckBoxState.Unchecked)
+                if ((saveUsername.State == CheckBoxState.Unchecked) && (savePassword.State == CheckBoxState.Checked))
                     savePassword.State = CheckBoxState.Unchecked;
-                }
             }
 
             private void performLogin()
