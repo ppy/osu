@@ -95,7 +95,7 @@ namespace osu.Game.Overlays
                                 },
                                 new SpriteText
                                 {
-                                    Colour = OsuColor.OsuPink,
+                                    Colour = OsuColour.Pink,
                                     Text = "Change the way osu! behaves",
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },

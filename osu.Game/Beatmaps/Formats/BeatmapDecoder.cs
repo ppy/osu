@@ -46,10 +46,10 @@ namespace osu.Game.Beatmaps.Formats
         public virtual void ApplyColours(Beatmap b)
         {
             List<Color4> colours = b.ComboColors ?? new List<Color4> {
-                OsuColor.Combo1,
-                OsuColor.Combo2,
-                OsuColor.Combo3,
-                OsuColor.Combo4,
+                new Color4(17, 136, 170, 255),
+                new Color4(102, 136, 0, 255),
+                new Color4(204, 102, 0, 255),
+                new Color4(121, 9, 13, 255),
             };
 
             if (colours.Count == 0) return;

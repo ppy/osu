@@ -131,8 +131,8 @@ namespace osu.Game.Overlays.Options
 
         private class StyledDropDownComboBox : DropDownComboBox
         {
-            protected override Color4 BackgroundColour => OsuColor.DropDownBackground;
-            protected override Color4 BackgroundColourHover => OsuColor.DropDownHover;
+            protected override Color4 BackgroundColour => Color4.Black.Opacity(0.5f);
+            protected override Color4 BackgroundColourHover => OsuColour.PinkDarker;
 
             private SpriteText label;
             protected override string Label
@@ -161,9 +161,9 @@ namespace osu.Game.Overlays.Options
 
         private class StyledDropDownMenuItem<U> : DropDownMenuItem<U>
         {
-            protected override Color4 BackgroundColour => OsuColor.DropDownBackground;
-            protected override Color4 BackgroundColourSelected => OsuColor.DropDownBackground;
-            protected override Color4 BackgroundColourHover => OsuColor.DropDownHover;
+            protected override Color4 BackgroundColour => Color4.Black.Opacity(0.5f);
+            protected override Color4 BackgroundColourSelected => Color4.Black.Opacity(0.5f);
+            protected override Color4 BackgroundColourHover => OsuColour.PinkDarker;
         
             public StyledDropDownMenuItem(string text, U value) : base(text, value)
             {

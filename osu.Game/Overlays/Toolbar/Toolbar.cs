@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Toolbar
                 solidBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColor.Gray(0.1f),
+                    Colour = OsuColour.Gray(0.1f),
                     Alpha = alpha_normal,
                 },
                 gradientBackground = new Box
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Toolbar
                     Alpha = 0,
                     Height = 90,
                     ColourInfo = ColourInfo.GradientVertical(
-                        OsuColor.Gray(0.1f).Opacity(0.5f), OsuColor.Gray(0.1f).Opacity(0)),
+                        OsuColour.Gray(0.1f).Opacity(0.5f), OsuColour.Gray(0.1f).Opacity(0)),
                 },
                 new FlowContainer
                 {

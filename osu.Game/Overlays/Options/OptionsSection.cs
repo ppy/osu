@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Options
                         new SpriteText
                         {
                             TextSize = headerSize,
-                            Colour = OsuColor.OptionSectionHeader,
+                            Colour = OsuColour.Pink,
                             Text = Header,
                         },
                         content = new FlowContainer

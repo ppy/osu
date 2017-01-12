@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps.Drawables
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
                 CornerRadius = 10,
-                BorderColour = OsuColor.PanelBorder,
+                BorderColour = new Color4(221, 255, 255, 255),
             });
         }
 
@@ -85,7 +85,7 @@ namespace osu.Game.Beatmaps.Drawables
             nestedContainer.EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Glow,
-                Colour = OsuColor.PanelGlowSelected,
+                Colour = new Color4(130, 204, 255, 150),
                 Radius = 20,
                 Roundness = 10,
             };
@@ -99,7 +99,7 @@ namespace osu.Game.Beatmaps.Drawables
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(1),
                 Radius = 10,
-                Colour = OsuColor.PanelGlowUnselected,
+                Colour = Color4.Black.Opacity(100),
             };
         }
 

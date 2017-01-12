@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Menu
                         {
                             RelativeSizeAxes = Axes.Both,
                             Size = new Vector2(2, 1),
-                            Colour = OsuColor.Gray(50),
+                            Colour = OsuColour.Gray(50),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },

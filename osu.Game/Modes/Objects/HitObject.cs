@@ -18,7 +18,7 @@ namespace osu.Game.Modes.Objects
 
         public bool NewCombo { get; set; }
 
-        public Color4 Colour = OsuColor.Combo1;
+        public Color4 Colour = new Color4(17, 136, 170, 255);
 
         public double Duration => EndTime - StartTime;
 

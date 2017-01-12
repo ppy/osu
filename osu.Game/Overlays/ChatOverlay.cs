@@ -46,7 +46,7 @@ namespace osu.Game.Overlays
                 {
                     Depth = float.MaxValue,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColor.Gray(0.1f).Opacity(0.4f),
+                    Colour = OsuColour.Gray(0.1f).Opacity(0.4f),
                 },
                 content = new Container
                 {

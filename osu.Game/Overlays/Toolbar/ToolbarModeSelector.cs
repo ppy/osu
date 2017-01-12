@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Toolbar
                     EdgeEffect = new EdgeEffect
                     {
                         Type = EdgeEffectType.Glow,
-                        Colour = OsuColor.ToolbarModeButtonIconActiveGlow,
+                        Colour = new Color4(255, 194, 224, 100),
                         Radius = 15,
                         Roundness = 15,
                     },

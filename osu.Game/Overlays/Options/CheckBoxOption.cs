@@ -148,11 +148,11 @@ namespace osu.Game.Overlays.Options
 
                 Masking = true;
 
-                Colour = OsuColor.OsuPink;
+                Colour = OsuColour.Pink;
 
                 EdgeEffect = new EdgeEffect
                 {
-                    Colour = OsuColor.CheckBoxGlow,
+                    Colour = OsuColour.PinkDarker,
                     Type = EdgeEffectType.Glow,
                     Radius = 10,
                     Roundness = 8,
@@ -179,13 +179,13 @@ namespace osu.Game.Overlays.Options
                 {
                     if (value)
                     {
-                        FadeColour(OsuColor.CheckBoxHover, 500, EasingTypes.OutQuint);
+                        FadeColour(OsuColour.PinkLighter, 500, EasingTypes.OutQuint);
                         FadeGlowTo(1, 500, EasingTypes.OutQuint);
                     }
                     else
                     {
                         FadeGlowTo(0, 500);
-                        FadeColour(OsuColor.OsuPink, 500);
+                        FadeColour(OsuColour.Pink, 500);
                     }
                 }
             }
