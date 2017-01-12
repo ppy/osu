@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Select
                             RelativeSizeAxes = Axes.Y,
                             Width = 100,
                             Text = "Play",
-                            Colour = OsuColor.PlayButton,
+                            Colour = OsuColour.Pink,
                             Action = start
                         },
                     }

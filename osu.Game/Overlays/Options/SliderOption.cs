@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Options
                         RelativeSizeAxes = Axes.None,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Colour = OsuColor.OsuPink,
+                        Colour = OsuColour.Pink,
                     },
                     rightBox = new Box
                     {
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Options
                         RelativeSizeAxes = Axes.None,
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
-                        Colour = OsuColor.SliderbarBackground,
+                        Colour = OsuColour.Pink,
                         Alpha = 0.5f,
                     },
                     nub = new Container
@@ -105,13 +105,13 @@ namespace osu.Game.Overlays.Options
                         AutoSizeAxes = Axes.None,
                         RelativeSizeAxes = Axes.None,
                         Masking = true,
-                        BorderColour = OsuColor.SliderbarNub,
+                        BorderColour = OsuColour.Pink,
                         BorderThickness = 3,
                         Children = new[]
                         {
                             new Box
                             {
-                                Colour = OsuColor.SliderbarNub.Opacity(0),
+                                Colour = OsuColour.Pink.Opacity(0),
                                 RelativeSizeAxes = Axes.Both
                             }
                         }

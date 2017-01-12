@@ -171,7 +171,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
                     Height = 10,
-                    Colour = OsuColor.MusicControllerProgress,
+                    Colour = OsuColour.Yellow,
                     SeekRequested = seek
                 }
             };
@@ -393,7 +393,7 @@ namespace osu.Game.Overlays
                 {
                     sprite = new Sprite
                     {
-                        Colour = OsuColor.MusicControllerBackground,
+                        Colour = OsuColour.Gray(150),
                         FillMode = FillMode.Fill,
                     },
                     new Box

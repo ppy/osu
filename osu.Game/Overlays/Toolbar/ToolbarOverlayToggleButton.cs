@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Toolbar
             Add(StateBackground = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = OsuColor.Gray(150).Opacity(180),
+                Colour = OsuColour.Gray(150).Opacity(180),
                 BlendingMode = BlendingMode.Additive,
                 Depth = 2,
                 Alpha = 0,

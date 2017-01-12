@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Toolbar
                 HoverBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColor.Gray(80).Opacity(180),
+                    Colour = OsuColour.Gray(80).Opacity(180),
                     BlendingMode = BlendingMode.Additive,
                     Alpha = 0,
                 },
@@ -174,7 +174,7 @@ namespace osu.Game.Overlays.Toolbar
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColor.Gray(30)
+                    Colour = OsuColour.Gray(30)
                 },
                 new Triangles
                 {

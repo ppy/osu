@@ -139,19 +139,22 @@ namespace osu.Game.Beatmaps.Drawables
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ColourInfo = OsuColor.BeatmapHeaderBackgroundA,
+                                ColourInfo = ColourInfo.GradientHorizontal(
+                                    Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
                                 Width = 0.05f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ColourInfo = OsuColor.BeatmapHeaderBackgroundB,
+                                ColourInfo = ColourInfo.GradientHorizontal(
+                                    new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
                                 Width = 0.2f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ColourInfo = OsuColor.BeatmapHeaderBackgroundC,
+                                ColourInfo = ColourInfo.GradientHorizontal(
+                                    new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
                                 Width = 0.05f,
                             },
                         }
