@@ -23,7 +23,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             OsuLegacyDecoder.Register();
             Ruleset.Register(new OsuRuleset());
         }
-        [Test]
+
+        [Test]
         public void TestDecodeMetadata()
         {
             var decoder = new OsuLegacyDecoder();
@@ -125,7 +126,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        [Test]        public void TestDecodeHitObjects()
+        [Test]
+        public void TestDecodeHitObjects()
         {
             var decoder = new OsuLegacyDecoder();
             using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
@@ -135,7 +137,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsNotNull(slider);
                 Assert.AreEqual(new Vector2(192, 168), slider.Position);
                 Assert.AreEqual(956, slider.StartTime);
-                Assert.AreEqual(SampleType.None, slider.Sample.Type);
+                Assert.AreEqual(SampleType.Normal, slider.Sample.Type);
                 var circle = beatmap.HitObjects[1] as HitCircle;
                 Assert.IsNotNull(circle);
                 Assert.AreEqual(new Vector2(304, 56), circle.Position);

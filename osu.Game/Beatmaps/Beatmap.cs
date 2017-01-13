@@ -1,6 +1,7 @@
 //Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
@@ -19,24 +20,24 @@ namespace osu.Game.Beatmaps
 
         public double BeatLengthAt(double time, bool applyMultipliers = false)
         {
-            int point = 0;
-            int samplePoint = 0;
+            UninheritedControlPoint pointUninherited = ControlPointAt(time, false) as UninheritedControlPoint;
+            if (pointUninherited == null)
+                throw new ArgumentException("Cannot get BeatLength before the first UninheritedControlPoint");
 
-            for (int i = 0; i < ControlPoints.Count; i++)
-                if (ControlPoints[i].Time <= time)
-                {
-                    if (ControlPoints[i].TimingChange)
-                        point = i;
-                    else
-                        samplePoint = i;
-                }
-
-            double mult = 1;
-
-            if (applyMultipliers && samplePoint > point)
-                mult = ControlPoints[samplePoint].VelocityAdjustment;
-
-            return ControlPoints[point].BeatLength * mult;
+            if (applyMultipliers)
+            {
+                InheritedControlPoint pointInherited = ControlPointAt(time, true) as InheritedControlPoint;
+                if (pointInherited == null || pointUninherited.Time > pointInherited.Time)
+                    return pointUninherited.BeatLength;
+                return pointUninherited.BeatLength * pointInherited.VelocityMultiplier;
+            }
+            return pointUninherited.BeatLength;
         }
+
+        public ControlPoint ControlPointAt(double time) =>
+            ControlPoints.FindLast(point => point.Time <= time);
+
+        public ControlPoint ControlPointAt(double time, bool inherited) =>
+            ControlPoints.FindLast(point => point.Time <= time && point is InheritedControlPoint == inherited);
     }
 }

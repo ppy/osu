@@ -2,19 +2,16 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Game.Beatmaps.Samples;
-using osu.Game.Modes.Objects;
 using OpenTK;
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Objects;
 
 namespace osu.Game.Modes.Osu.Objects
 {
     public abstract class OsuHitObject : HitObject
     {
         public Vector2 Position { get; set; }
-
         public float Scale { get; set; } = 1;
-
         public virtual Vector2 EndPosition => Position;
 
         public override void SetDefaultsFromBeatmap(Beatmap beatmap)
@@ -30,12 +27,8 @@ namespace osu.Game.Modes.Osu.Objects
             Circle = 1,
             Slider = 2,
             NewCombo = 4,
-            CircleNewCombo = 5,
-            SliderNewCombo = 6,
             Spinner = 8,
-            ColourHax = 122,
-            Hold = 128,
-            ManiaLong = 128,
+            Hold = 128
         }
     }
 }
