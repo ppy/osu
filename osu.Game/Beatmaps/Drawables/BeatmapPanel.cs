@@ -28,8 +28,6 @@ namespace osu.Game.Beatmaps.Drawables
         public Action<BeatmapPanel> GainedSelection;
         public Action<BeatmapPanel> StartRequested;
 
-        Color4 deselectedColour = new Color4(20, 43, 51, 255);
-
         protected override void Selected()
         {
             base.Selected();
@@ -44,7 +42,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             base.Deselected();
 
-            background.Colour = deselectedColour;
+            background.Colour = new Color4(20, 43, 51, 255);
         }
 
         protected override bool OnClick(InputState state)
@@ -74,7 +72,7 @@ namespace osu.Game.Beatmaps.Drawables
                     CornerRadius = Content.CornerRadius,
                     RelativeSizeAxes = Axes.Both,
                     BlendingMode = BlendingMode.Additive,
-                    Colour = deselectedColour,
+                    Colour = new Color4(20, 43, 51, 255),
                 },
                 new FlowContainer
                 {
