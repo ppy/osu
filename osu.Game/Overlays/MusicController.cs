@@ -65,7 +65,31 @@ namespace osu.Game.Overlays
             Origin = Anchor.TopRight;
             Position = start_position;
             Margin = new MarginPadding(10);
+        }
 
+        protected override bool OnDragStart(InputState state) => true;
+
+        protected override bool OnDrag(InputState state)
+        {
+            Vector2 change = (state.Mouse.Position - state.Mouse.PositionMouseDown.Value);
+
+            // Diminish the drag distance as we go further to simulate "rubber band" feeling.
+            change *= (float)Math.Pow(change.Length, 0.7f) / change.Length;
+
+            MoveTo(start_position + change);
+            return base.OnDrag(state);
+        }
+
+        protected override bool OnDragEnd(InputState state)
+        {
+            MoveTo(start_position, 800, EasingTypes.OutElastic);
+            return base.OnDragEnd(state);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase osuGame, BeatmapDatabase beatmaps, AudioManager audio,
+            TextureStore textures, OsuColour colours)
+        {
             Children = new Drawable[]
             {
                 title = new SpriteText
@@ -171,34 +195,11 @@ namespace osu.Game.Overlays
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
                     Height = 10,
-                    Colour = OsuColour.Yellow,
+                    Colour = colours.Yellow,
                     SeekRequested = seek
                 }
             };
-        }
-
-        protected override bool OnDragStart(InputState state) => true;
-
-        protected override bool OnDrag(InputState state)
-        {
-            Vector2 change = (state.Mouse.Position - state.Mouse.PositionMouseDown.Value);
-
-            // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-            change *= (float)Math.Pow(change.Length, 0.7f) / change.Length;
-
-            MoveTo(start_position + change);
-            return base.OnDrag(state);
-        }
-
-        protected override bool OnDragEnd(InputState state)
-        {
-            MoveTo(start_position, 800, EasingTypes.OutElastic);
-            return base.OnDragEnd(state);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, BeatmapDatabase beatmaps, AudioManager audio, TextureStore textures)
-        {
+        
             this.beatmaps = beatmaps;
             trackManager = osuGame.Audio.Track;
             config = osuGame.Config;

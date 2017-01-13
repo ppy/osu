@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -19,14 +20,16 @@ namespace osu.Game.Overlays.Options
         public abstract FontAwesome Icon { get; }
         public abstract string Header { get; }
 
+        private SpriteText headerLabel;
+
         public OptionsSection()
         {
             Margin = new MarginPadding { Top = 20 };
-
-            const int headerSize = 26, headerMargin = 25;
-            const int borderSize = 2;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
+            
+            const int headerSize = 26, headerMargin = 25;
+            const int borderSize = 2;
             AddInternal(new Drawable[]
             {
                 new Box
@@ -48,10 +51,9 @@ namespace osu.Game.Overlays.Options
                     AutoSizeAxes = Axes.Y,
                     Children = new[]
                     {
-                        new SpriteText
+                        headerLabel = new SpriteText
                         {
                             TextSize = headerSize,
-                            Colour = OsuColour.Pink,
                             Text = Header,
                         },
                         content = new FlowContainer
@@ -65,6 +67,12 @@ namespace osu.Game.Overlays.Options
                     }
                 },
             });
+        }
+        
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            headerLabel.Colour = colours.Pink;
         }
     }
 }

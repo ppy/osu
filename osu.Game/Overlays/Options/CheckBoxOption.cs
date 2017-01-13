@@ -141,22 +141,13 @@ namespace osu.Game.Overlays.Options
             private Box fill;
 
             const float border_width = 3;
+            private Color4 glowingColour, idleColour;
 
             public Light()
             {
                 Size = new Vector2(40, 12);
 
-                Masking = true;
-
-                Colour = OsuColour.Pink;
-
-                EdgeEffect = new EdgeEffect
-                {
-                    Colour = OsuColour.PinkDarker,
-                    Type = EdgeEffectType.Glow,
-                    Radius = 10,
-                    Roundness = 8,
-                };
+                Masking = true;                
 
                 CornerRadius = Height / 2;
                 Masking = true;
@@ -173,19 +164,33 @@ namespace osu.Game.Overlays.Options
                 };
             }
 
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Colour = idleColour = colours.Pink;
+
+                EdgeEffect = new EdgeEffect
+                {
+                    Colour = glowingColour = colours.PinkDarker,
+                    Type = EdgeEffectType.Glow,
+                    Radius = 10,
+                    Roundness = 8,
+                };
+            }
+
             public bool Glowing
             {
                 set
                 {
                     if (value)
                     {
-                        FadeColour(OsuColour.PinkLighter, 500, EasingTypes.OutQuint);
+                        FadeColour(glowingColour, 500, EasingTypes.OutQuint);
                         FadeGlowTo(1, 500, EasingTypes.OutQuint);
                     }
                     else
                     {
                         FadeGlowTo(0, 500);
-                        FadeColour(OsuColour.Pink, 500);
+                        FadeColour(idleColour, 500);
                     }
                 }
             }

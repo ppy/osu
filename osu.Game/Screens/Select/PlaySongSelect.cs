@@ -81,7 +81,34 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public PlaySongSelect()
+        Player player;
+
+        private void start()
+        {
+            if (player != null)
+                return;
+
+            //in the future we may want to move this logic to a PlayerLoader gamemode or similar, so we can rely on the SongSelect transition
+            //and provide a better loading experience (at the moment song select is still accepting input during preload).
+            player = new Player
+            {
+                BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
+                PreferredPlayMode = playMode.Value
+            };
+
+            player.Preload(Game, delegate
+            {
+                if (!Push(player))
+                {
+                    player = null;
+                    //error occured?
+                }
+            });
+        }
+
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(BeatmapDatabase beatmaps, AudioManager audio, BaseGame game,
+            OsuGame osuGame, OsuColour colours)
         {
             const float carouselWidth = 640;
             const float bottomToolHeight = 50;
@@ -143,42 +170,13 @@ namespace osu.Game.Screens.Select
                             RelativeSizeAxes = Axes.Y,
                             Width = 100,
                             Text = "Play",
-                            Colour = OsuColour.Pink,
+                            Colour = colours.Pink,
                             Action = start
                         },
                     }
                 }
             };
-        }
-
-        Player player;
-
-        private void start()
-        {
-            if (player != null)
-                return;
-
-            //in the future we may want to move this logic to a PlayerLoader gamemode or similar, so we can rely on the SongSelect transition
-            //and provide a better loading experience (at the moment song select is still accepting input during preload).
-            player = new Player
-            {
-                BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
-                PreferredPlayMode = playMode.Value
-            };
-
-            player.Preload(Game, delegate
-            {
-                if (!Push(player))
-                {
-                    player = null;
-                    //error occured?
-                }
-            });
-        }
-
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase beatmaps, AudioManager audio, BaseGame game, OsuGame osuGame)
-        {
+        
             if (osuGame != null)
             {
                 playMode = osuGame.PlayMode;
