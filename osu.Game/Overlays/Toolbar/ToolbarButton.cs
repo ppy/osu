@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Toolbar
                 HoverBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(80, 80, 80, 180),
+                    Colour = OsuColour.Gray(80).Opacity(180),
                     BlendingMode = BlendingMode.Additive,
                     Alpha = 0,
                 },
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             Action?.Invoke();
             sampleClick.Play();
-            HoverBackground.FlashColour(new Color4(255, 255, 255, 100), 500, EasingTypes.OutQuint);
+            HoverBackground.FlashColour(Color4.White.Opacity(100), 500, EasingTypes.OutQuint);
             return true;
         }
 
@@ -174,7 +174,7 @@ namespace osu.Game.Overlays.Toolbar
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(30, 30, 30, 255)
+                    Colour = OsuColour.Gray(30)
                 },
                 new Triangles
                 {

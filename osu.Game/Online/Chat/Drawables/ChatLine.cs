@@ -35,7 +35,7 @@ namespace osu.Game.Online.Chat.Drawables
                         {
                             Text = Message.Timestamp.LocalDateTime.ToLongTimeString(),
                             TextSize = text_size,
-                            Colour = new Color4(128, 128, 128, 255)
+                            Colour = Color4.Gray
                         },
                         new SpriteText
                         {
