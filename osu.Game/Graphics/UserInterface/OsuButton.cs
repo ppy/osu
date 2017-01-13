@@ -3,6 +3,7 @@
 
 using System;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
@@ -12,7 +13,12 @@ namespace osu.Game.Graphics.UserInterface
         public OsuButton()
         {
             Height = 25;
-            Colour = OsuColour.BlueDark;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            Colour = colours.BlueDark;
         }
     }
 }

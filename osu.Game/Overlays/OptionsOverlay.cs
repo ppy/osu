@@ -47,6 +47,13 @@ namespace osu.Game.Overlays
 
         public OptionsOverlay()
         {
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
+        }
+
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuGame game, OsuColour colours)
+        {
             sections = new OptionsSection[]
             {
                 new GeneralSection(),
@@ -59,10 +66,6 @@ namespace osu.Game.Overlays
                 new OnlineSection(),
                 new MaintenanceSection(),
             };
-
-            RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
-
             Children = new Drawable[]
             {
                 new Box
@@ -95,7 +98,7 @@ namespace osu.Game.Overlays
                                 },
                                 new SpriteText
                                 {
-                                    Colour = OsuColour.Pink,
+                                    Colour = colours.Pink,
                                     Text = "Change the way osu! behaves",
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
@@ -124,11 +127,7 @@ namespace osu.Game.Overlays
                     ).ToArray()
                 }
             };
-        }
-
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGame game)
-        {
+        
             scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
         }
 

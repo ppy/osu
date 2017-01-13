@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using System.Linq;
 
 namespace osu.Game.Overlays.Options
 {
@@ -85,7 +86,6 @@ namespace osu.Game.Overlays.Options
                         RelativeSizeAxes = Axes.None,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Colour = OsuColour.Pink,
                     },
                     rightBox = new Box
                     {
@@ -93,7 +93,6 @@ namespace osu.Game.Overlays.Options
                         RelativeSizeAxes = Axes.None,
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
-                        Colour = OsuColour.Pink,
                         Alpha = 0.5f,
                     },
                     nub = new Container
@@ -105,13 +104,11 @@ namespace osu.Game.Overlays.Options
                         AutoSizeAxes = Axes.None,
                         RelativeSizeAxes = Axes.None,
                         Masking = true,
-                        BorderColour = OsuColour.Pink,
                         BorderThickness = 3,
                         Children = new[]
                         {
                             new Box
                             {
-                                Colour = OsuColour.Pink.Opacity(0),
                                 RelativeSizeAxes = Axes.Both
                             }
                         }
@@ -120,9 +117,13 @@ namespace osu.Game.Overlays.Options
             }
 
             [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
+            private void load(AudioManager audio, OsuColour colours)
             {
                 sample = audio.Sample.Get(@"Sliderbar/sliderbar");
+                leftBox.Colour = colours.Pink;
+                rightBox.Colour = colours.Pink;
+                nub.BorderColour = colours.Pink;
+                (nub.Children.First() as Box).Colour = colours.Pink.Opacity(0);
             }
 
             private void playSample()

@@ -4,6 +4,7 @@
 using System;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -55,42 +56,47 @@ namespace osu.Game.Overlays.Options
             RelativeSizeAxes = Axes.X;
             Children = new Drawable[]
             {
-                    backgroundBox = new Box
+                backgroundBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    BlendingMode = BlendingMode.Additive,
+                    Colour = OsuColour.Gray(60),
+                    Alpha = 0,
+                },
+                new Container
+                {
+                    Width = OptionsSidebar.default_width,
+                    RelativeSizeAxes = Axes.Y,
+                    Children = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        BlendingMode = BlendingMode.Additive,
-                        Colour = OsuColour.Gray(60),
-                        Alpha = 0,
-                    },
-                    new Container
-                    {
-                        Width = OptionsSidebar.default_width,
-                        RelativeSizeAxes = Axes.Y,
-                        Children = new[]
+                        drawableIcon = new TextAwesome
                         {
-                            drawableIcon = new TextAwesome
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            },
-                        }
-                    },
-                    headerText = new SpriteText
-                    {
-                        Position = new Vector2(OptionsSidebar.default_width + 10, 0),
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    },
-                    selectionIndicator = new Box
-                    {
-                        Alpha = 0,
-                        RelativeSizeAxes = Axes.Y,
-                        Width = 5,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Colour = OsuColour.Pink
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
                     }
+                },
+                headerText = new SpriteText
+                {
+                    Position = new Vector2(OptionsSidebar.default_width + 10, 0),
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                selectionIndicator = new Box
+                {
+                    Alpha = 0,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 5,
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            selectionIndicator.Colour = colours.Pink;
         }
 
         protected override bool OnClick(InputState state)

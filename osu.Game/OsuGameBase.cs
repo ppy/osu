@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
@@ -41,6 +42,7 @@ namespace osu.Game
             Dependencies.Cache(this);
             Dependencies.Cache(Config);
             Dependencies.Cache(new BeatmapDatabase(Host.Storage, Host));
+            Dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
             Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 0.01f }, true);

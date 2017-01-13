@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -131,9 +132,6 @@ namespace osu.Game.Overlays.Options
 
         private class StyledDropDownComboBox : DropDownComboBox
         {
-            protected override Color4 BackgroundColour => Color4.Black.Opacity(0.5f);
-            protected override Color4 BackgroundColourHover => OsuColour.PinkDarker;
-
             private SpriteText label;
             protected override string Label
             {
@@ -157,14 +155,17 @@ namespace osu.Game.Overlays.Options
                     }
                 };
             }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                BackgroundColour = Color4.Black.Opacity(0.5f);
+                BackgroundColourHover = colours.PinkDarker;
+            }
         }
 
         private class StyledDropDownMenuItem<U> : DropDownMenuItem<U>
         {
-            protected override Color4 BackgroundColour => Color4.Black.Opacity(0.5f);
-            protected override Color4 BackgroundColourSelected => Color4.Black.Opacity(0.5f);
-            protected override Color4 BackgroundColourHover => OsuColour.PinkDarker;
-        
             public StyledDropDownMenuItem(string text, U value) : base(text, value)
             {
                 AutoSizeAxes = Axes.None;
@@ -192,6 +193,14 @@ namespace osu.Game.Overlays.Options
                         }
                     }
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                BackgroundColour = Color4.Black.Opacity(0.5f);
+                BackgroundColourHover = colours.PinkDarker;
+                BackgroundColourSelected = Color4.Black.Opacity(0.5f);
             }
         }
     }
