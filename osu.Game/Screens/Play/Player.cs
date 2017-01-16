@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Play
 
         internal override bool ShowOverlays => false;
 
+        protected bool CanFail => true;
+
         public BeatmapInfo BeatmapInfo;
 
         public PlayMode PreferredPlayMode;
