@@ -19,7 +19,7 @@ namespace osu.Game.Modes.Taiko
 
         protected override PlayMode PlayMode => PlayMode.Taiko;
 
-        public override ScoreProcessor CreateScoreProcessor() => null;
+        public override ScoreProcessor CreateScoreProcessor(int hitObjectsNumber) => null;
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
     }
