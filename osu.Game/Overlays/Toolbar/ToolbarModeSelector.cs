@@ -13,6 +13,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Modes;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
