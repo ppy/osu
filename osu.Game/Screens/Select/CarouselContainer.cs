@@ -14,6 +14,8 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps.Drawables;
 using osu.Framework.Timing;
+using osu.Framework.Input;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -243,6 +245,48 @@ namespace osu.Game.Screens.Select
                 p.IsOnScreen = true;
                 updatePanel(p, halfHeight);
             }
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            int direction = 0;
+            bool skipDifficulties = false;
+
+            switch (args.Key)
+            {
+                case Key.Up:
+                    direction = -1;
+                    break;
+                case Key.Down:
+                    direction = 1;
+                    break;
+                case Key.Left:
+                    direction = -1;
+                    skipDifficulties = true;
+                    break;
+                case Key.Right:
+                    direction = 1;
+                    skipDifficulties = true;
+                    break;
+            }
+
+            if (direction != 0)
+            {
+                int index = SelectedGroup.BeatmapPanels.IndexOf(SelectedPanel) + direction;
+
+                if (!skipDifficulties && index >= 0 && index < SelectedGroup.BeatmapPanels.Count)
+                    //changing difficulty panel, not set.
+                    SelectGroup(SelectedGroup, SelectedGroup.BeatmapPanels[index]);
+                else
+                {
+                    index = (groups.IndexOf(SelectedGroup) + direction + groups.Count) % groups.Count;
+                    SelectBeatmap(groups[index].BeatmapPanels.First().Beatmap);
+                }
+
+                return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
     }
 }

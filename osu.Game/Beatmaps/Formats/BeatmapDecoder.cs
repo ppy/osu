@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Game.Modes.Objects;
 using OpenTK.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -44,11 +45,11 @@ namespace osu.Game.Beatmaps.Formats
 
         public virtual void ApplyColours(Beatmap b)
         {
-            List<Color4> colours = b.ComboColors ?? new List<Color4>() {
+            List<Color4> colours = b.ComboColors ?? new List<Color4> {
                 new Color4(17, 136, 170, 255),
-                new Color4(102,136,0, 255),
-                new Color4(204,102,0, 255),
-                new Color4(121,9,13, 255),
+                new Color4(102, 136, 0, 255),
+                new Color4(204, 102, 0, 255),
+                new Color4(121, 9, 13, 255),
             };
 
             if (colours.Count == 0) return;

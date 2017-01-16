@@ -44,6 +44,8 @@ namespace osu.Game.Modes.Objects.Drawables
 
                 UpdateState(state);
 
+                Expire();
+
                 if (State == ArmedState.Hit)
                     PlaySample();
             }
@@ -75,6 +77,8 @@ namespace osu.Game.Modes.Objects.Drawables
 
             //force application of the state that was set before we loaded.
             UpdateState(State);
+
+            Expire(true);
         }
 
         /// <summary>
