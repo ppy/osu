@@ -232,6 +232,7 @@
     <Compile Include="Configuration\ScreenshotFormat.cs" />
     <Compile Include="Configuration\FrameSync.cs" />
     <Compile Include="Configuration\ConfineMouseMode.cs" />
+    <Compile Include="Graphics\OsuColour.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
