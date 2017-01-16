@@ -167,50 +167,5 @@ namespace osu.Game.Screens.Play
         {
             Background?.FadeTo((100f - dimLevel) / 100, 800);
         }
-
-        class PlayerInputManager : UserInputManager
-        {
-            public PlayerInputManager(BasicGameHost host)
-                : base(host)
-            {
-            }
-
-            bool leftViaKeyboard;
-            bool rightViaKeyboard;
-            Bindable<bool> mouseDisabled;
-
-            [BackgroundDependencyLoader]
-            private void load(OsuConfigManager config)
-            {
-                mouseDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableButtons)
-                    ?? new Bindable<bool>(false);
-            }
-
-            protected override void TransformState(InputState state)
-            {
-                base.TransformState(state);
-
-                if (state.Keyboard != null)
-                {
-                    leftViaKeyboard = state.Keyboard.Keys.Contains(Key.Z);
-                    rightViaKeyboard = state.Keyboard.Keys.Contains(Key.X);
-                }
-                    
-                MouseState mouse = (MouseState)state.Mouse;
-                if (state.Mouse != null)
-                {
-                    if (mouseDisabled.Value)
-                    {
-                        mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = false;
-                        mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = false;
-                    }
-                
-                    if (leftViaKeyboard)
-                        mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = true;
-                    if (rightViaKeyboard)
-                        mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = true;
-                }
-            }
-        }
     }
 }
