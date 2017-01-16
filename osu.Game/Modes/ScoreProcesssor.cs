@@ -29,11 +29,12 @@ namespace osu.Game.Modes
 
         public readonly BindableInt HighestCombo = new BindableInt();
 
-        public readonly List<JudgementInfo> Judgements = new List<JudgementInfo>();
+        public readonly List<JudgementInfo> Judgements;
 
-        public ScoreProcessor()
+        public ScoreProcessor(int hitObjectsNumber)
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
+            Judgements = new List<JudgementInfo>(hitObjectsNumber);
         }
 
         public void AddJudgement(JudgementInfo judgement)
