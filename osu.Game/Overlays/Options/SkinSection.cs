@@ -62,7 +62,6 @@ namespace osu.Game.Overlays.Options
                     LabelText = "Always use skin cursor",
                     Bindable = config.GetBindable<bool>(OsuConfig.UseSkinCursor)
                 },
-                new SpriteText { Text = "Cursor size: TODO slider" },
                 new SliderOption<double>
                 {
                     LabelText = "Cursor size",

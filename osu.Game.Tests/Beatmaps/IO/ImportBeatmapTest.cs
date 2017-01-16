@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             Action waitAction = () =>
             {
                 while ((resultSets = osu.Dependencies.Get<BeatmapDatabase>()
-                    .Query<BeatmapSetInfo>().Where(s => s.BeatmapSetID == 241526)).Count() != 1)
+                    .Query<BeatmapSetInfo>().Where(s => s.OnlineBeatmapSetID == 241526)).Count() != 1)
                     Thread.Sleep(1);
             };
 
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             waitAction = () =>
             {
                 while ((resultBeatmaps = osu.Dependencies.Get<BeatmapDatabase>()
-                    .Query<BeatmapInfo>().Where(s => s.BeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() != 12)
+                    .Query<BeatmapInfo>().Where(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() != 12)
                     Thread.Sleep(1);
             };
 
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             Assert.IsTrue(set.Beatmaps.Count == resultBeatmaps.Count());
 
             foreach (BeatmapInfo b in resultBeatmaps)
-                Assert.IsTrue(set.Beatmaps.Any(c => c.BeatmapID == b.BeatmapID));
+                Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineBeatmapID == b.OnlineBeatmapID));
 
             Assert.IsTrue(set.Beatmaps.Count > 0);
 
