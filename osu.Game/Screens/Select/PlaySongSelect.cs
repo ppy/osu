@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Select
 
         private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)
         {
-            Schedule(() => addBeatmapSet(s, Game));
+            Schedule(() => addBeatmapSet(s, Game, true));
         }
 
         protected override void OnEntering(GameMode last)
@@ -334,7 +334,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void addBeatmapSet(BeatmapSetInfo beatmapSet, BaseGame game)
+        private void addBeatmapSet(BeatmapSetInfo beatmapSet, BaseGame game, bool select = false)
         {
             beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.ID);
             beatmapSet.Beatmaps.ForEach(b =>
@@ -359,7 +359,7 @@ namespace osu.Game.Screens.Select
             {
                 carousel.AddGroup(group);
 
-                if (Beatmap == null)
+                if (Beatmap == null || select)
                     carousel.SelectBeatmap(beatmapSet.Beatmaps.First());
                 else
                 {
