@@ -22,7 +22,6 @@ namespace osu.Game.Screens.Backgrounds
             {
                 return beatmap;
             }
-
             set
             {
                 if (beatmap == value)
@@ -56,6 +55,8 @@ namespace osu.Game.Screens.Backgrounds
         public BackgroundModeBeatmap(WorkingBeatmap beatmap)
         {
             Beatmap = beatmap;
+            if (beatmap == null)
+                Add(background = new Background(@"Backgrounds/bg1"));
         }
 
         public void BlurTo(Vector2 sigma, double duration)
@@ -84,7 +85,6 @@ namespace osu.Game.Screens.Backgrounds
             {
                 Sprite.Texture = beatmap.Background;
             }
-
         }
     }
 }
