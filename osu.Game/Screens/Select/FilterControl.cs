@@ -1,6 +1,7 @@
 ﻿using System;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -11,7 +12,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select
 {
-    public class FilterSongSelect : Container
+    public class FilterControl : Container
     {
         public enum SortMode
         {
@@ -48,7 +49,7 @@ namespace osu.Game.Screens.Select
         public string Search { get; private set; } = string.Empty;
         public SortMode Sort { get; private set; } = SortMode.Title;
 
-        public FilterSongSelect()
+        public FilterControl()
         {
             AutoSizeAxes = Axes.Y;
 
@@ -78,7 +79,7 @@ namespace osu.Game.Screens.Select
             };
         }
 
-        private class GroupSortItem : ClickableContainer
+        private class TabItem : ClickableContainer
         {
             public string Text
             {
@@ -95,7 +96,7 @@ namespace osu.Game.Screens.Select
             private void FadeInactive()
             {
                 box.FadeOut(300);
-                text.FadeColour(new Color4(102, 204, 255, 255), 300);
+                text.FadeColour(fadeColour, 300);
             }
 
             private bool active;
@@ -114,6 +115,7 @@ namespace osu.Game.Screens.Select
         
             private SpriteText text;
             private Box box;
+            private Color4 fadeColour;
             
             protected override bool OnHover(InputState state)
             {
@@ -128,14 +130,13 @@ namespace osu.Game.Screens.Select
                     FadeInactive();
             }
         
-            public GroupSortItem()
+            public TabItem()
             {
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
                     text = new SpriteText
                     {
-                        Colour = new Color4(102, 204, 255, 255),
                         Margin = new MarginPadding(5),
                         TextSize = 14,
                         Font = @"Exo2.0-Bold",
@@ -151,10 +152,20 @@ namespace osu.Game.Screens.Select
                     }
                 };
             }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                text.Colour = colours.Blue;
+                fadeColour = colours.Blue;
+            }
         }
 
         private class GroupSortTabs : Container
         {
+            private TextAwesome groupsEllipsis, sortEllipsis;
+            private SpriteText sortLabel;
+        
             public GroupSortTabs()
             {
                 RelativeSizeAxes = Axes.X;
@@ -165,7 +176,7 @@ namespace osu.Game.Screens.Select
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
-                        Colour = new Color4(80, 80, 80, 255),
+                        Colour = OsuColour.Gray(80),
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                     },
@@ -176,25 +187,24 @@ namespace osu.Game.Screens.Select
                         Spacing = new Vector2(10, 0),
                         Children = new Drawable[]
                         {
-                            new GroupSortItem
+                            new TabItem
                             {
                                 Text = "All",
                                 Active = true,
                             },
-                            new GroupSortItem
+                            new TabItem
                             {
                                 Text = "Recently Played",
                                 Active = false,
                             },
-                            new GroupSortItem
+                            new TabItem
                             {
                                 Text = "Collections",
                                 Active = false,
                             },
-                            new TextAwesome
+                            groupsEllipsis = new TextAwesome
                             {
                                 Icon = FontAwesome.fa_ellipsis_h,
-                                Colour = new Color4(102, 204, 255, 255),
                                 TextSize = 14,
                                 Margin = new MarginPadding { Top = 5, Bottom = 5 },
                                 Origin = Anchor.BottomLeft,
@@ -211,7 +221,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.TopRight,
                         Children = new Drawable[]
                         {
-                            new SpriteText
+                            sortLabel = new SpriteText
                             {
                                 Font = @"Exo2.0-Bold",
                                 Text = "Sort results by",
@@ -219,12 +229,12 @@ namespace osu.Game.Screens.Select
                                 TextSize = 14,
                                 Margin = new MarginPadding { Top = 5, Bottom = 5 },
                             },
-                            new GroupSortItem
+                            new TabItem
                             {
                                 Text = "Artist",
                                 Active = true,
                             },
-                            new TextAwesome
+                            sortEllipsis = new TextAwesome
                             {
                                 Icon = FontAwesome.fa_ellipsis_h,
                                 Colour = new Color4(165, 204, 0, 255),
@@ -236,6 +246,12 @@ namespace osu.Game.Screens.Select
                         }
                     },
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                groupsEllipsis.Colour = colours.Blue;
             }
         }
     }

@@ -134,7 +134,7 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                 },
-                new FilterSongSelect
+                new FilterControl
                 {
                     Position = wedged_container_start_position,
                     RelativeSizeAxes = Axes.X,
