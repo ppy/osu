@@ -225,7 +225,6 @@ namespace osu.Game.Screens.Select
                             {
                                 Font = @"Exo2.0-Bold",
                                 Text = "Sort results by",
-                                Colour = new Color4(165, 204, 0, 255),
                                 TextSize = 14,
                                 Margin = new MarginPadding { Top = 5, Bottom = 5 },
                             },
@@ -237,7 +236,6 @@ namespace osu.Game.Screens.Select
                             sortEllipsis = new TextAwesome
                             {
                                 Icon = FontAwesome.fa_ellipsis_h,
-                                Colour = new Color4(165, 204, 0, 255),
                                 TextSize = 14,
                                 Margin = new MarginPadding { Top = 5, Bottom = 5 },
                                 Origin = Anchor.BottomLeft,
@@ -252,6 +250,8 @@ namespace osu.Game.Screens.Select
             private void load(OsuColour colours)
             {
                 groupsEllipsis.Colour = colours.Blue;
+                sortLabel.Colour = colours.GreenLight;
+                sortEllipsis.Colour = colours.GreenLight;
             }
         }
     }
