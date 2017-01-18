@@ -18,12 +18,15 @@ namespace osu.Game.Modes
             TotalScore = TotalScore,
             Combo = Combo,
             MaxCombo = HighestCombo,
-            Accuracy = Accuracy
+            Accuracy = Accuracy,
+            Health = Health,
         };
 
         public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
 
         public readonly BindableDouble Accuracy = new BindableDouble { MinValue = 0, MaxValue = 1 };
+
+        public readonly BindableDouble Health = new BindableDouble { MinValue = 0, MaxValue = 1 };
 
         public readonly BindableInt Combo = new BindableInt();
 
