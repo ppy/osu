@@ -17,14 +17,14 @@ namespace osu.Game.Modes.UI
         public ComboCounter ComboCounter;
         public ScoreCounter ScoreCounter;
         public PercentageCounter AccuracyCounter;
-        public HPDisplay HPDisplay;
+        public HealthDisplay HealthDisplay;
         public Score Score { get; set; }
 
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract ComboCounter CreateComboCounter();
         protected abstract PercentageCounter CreateAccuracyCounter();
         protected abstract ScoreCounter CreateScoreCounter();
-        protected virtual HPDisplay CreateHPDisplay() => new HPDisplay
+        protected virtual HealthDisplay CreateHealthDisplay() => new HealthDisplay
         {
             Size = new Vector2(0.5f, 20),
             RelativeSizeAxes = Axes.X,
@@ -53,7 +53,7 @@ namespace osu.Game.Modes.UI
                 ComboCounter = CreateComboCounter(),
                 ScoreCounter = CreateScoreCounter(),
                 AccuracyCounter = CreateAccuracyCounter(),
-                HPDisplay = CreateHPDisplay(),
+                HealthDisplay = CreateHealthDisplay(),
             };
         }
 
@@ -63,7 +63,7 @@ namespace osu.Game.Modes.UI
             processor.TotalScore.ValueChanged += delegate { ScoreCounter?.Set((ulong)processor.TotalScore.Value); };
             processor.Accuracy.ValueChanged += delegate { AccuracyCounter?.Set((float)processor.Accuracy.Value); };
             processor.Combo.ValueChanged += delegate { ComboCounter?.Set((ulong)processor.Combo.Value); };
-            processor.Health.ValueChanged += delegate { HPDisplay?.Set(processor.Health.Value); };
+            processor.Health.ValueChanged += delegate { HealthDisplay?.Set(processor.Health.Value); };
         }
     }
 }
