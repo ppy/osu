@@ -70,6 +70,7 @@
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Modes\Score.cs" />
     <Compile Include="Modes\ScoreProcesssor.cs" />
+    <Compile Include="Modes\UI\HealthDisplay.cs" />
     <Compile Include="Online\API\IOnlineComponent.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
