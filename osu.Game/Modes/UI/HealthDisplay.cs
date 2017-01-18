@@ -14,6 +14,8 @@ namespace osu.Game.Modes.UI
         private Box background;
         private Box fill;
 
+        public BindableDouble Current = new BindableDouble();
+
         public HealthDisplay()
         {
             Children = new Drawable[]
@@ -30,13 +32,12 @@ namespace osu.Game.Modes.UI
                     Scale = new Vector2(0, 1),
                 }, 
             };
+
+            Current.ValueChanged += current_ValueChanged;
         }
 
-        public double Current;
-
-        public void Set(double value)
+        private void current_ValueChanged(object sender, EventArgs e)
         {
-            Current = value;
             fill.ScaleTo(new Vector2((float)Current, 1), 200, EasingTypes.OutQuint);
         }
     }
