@@ -31,10 +31,14 @@ namespace osu.Game.Modes
 
         public readonly List<JudgementInfo> Judgements;
 
-        public ScoreProcessor(int hitObjectsNumber)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScoreProcessor"/> class.
+        /// </summary>
+        /// <param name="hitObjectCount">Number of HitObjects. It is used for specifying Judgements collection Capacity</param>
+        public ScoreProcessor(int hitObjectCount = 0)
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
-            Judgements = new List<JudgementInfo>(hitObjectsNumber);
+            Judgements = new List<JudgementInfo>(hitObjectCount);
         }
 
         public void AddJudgement(JudgementInfo judgement)

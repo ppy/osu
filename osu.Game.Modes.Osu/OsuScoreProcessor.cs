@@ -8,8 +8,8 @@ namespace osu.Game.Modes.Osu
 {
     class OsuScoreProcessor : ScoreProcessor
     {
-        public OsuScoreProcessor(int hitObjectsNumber)
-            : base(hitObjectsNumber)
+        public OsuScoreProcessor(int hitObjectCount)
+            : base(hitObjectCount)
         {
         }
 

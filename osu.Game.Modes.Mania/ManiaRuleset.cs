@@ -19,7 +19,7 @@ namespace osu.Game.Modes.Mania
 
         protected override PlayMode PlayMode => PlayMode.Mania;
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectsNumber) => null;
+        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => null;
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
     }
