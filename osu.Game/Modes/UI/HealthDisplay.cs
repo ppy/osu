@@ -9,12 +9,12 @@ using System;
 
 namespace osu.Game.Modes.UI
 {
-    public class HPDisplay : Container
+    public class HealthDisplay : Container
     {
         private Box background;
         private Box fill;
 
-        public HPDisplay()
+        public HealthDisplay()
         {
             Children = new Drawable[]
             {
