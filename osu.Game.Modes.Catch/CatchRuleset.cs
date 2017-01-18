@@ -18,7 +18,7 @@ namespace osu.Game.Modes.Catch
 
         protected override PlayMode PlayMode => PlayMode.Catch;
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectsNumber) => null;
+        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => null;
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
     }
