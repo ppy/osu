@@ -49,6 +49,8 @@ namespace osu.Game.Screens.Select
         public string Search { get; private set; } = string.Empty;
         public SortMode Sort { get; private set; } = SortMode.Title;
 
+        private SearchTextBox searchTextBox;
+
         public FilterControl()
         {
             AutoSizeAxes = Axes.Y;
@@ -72,10 +74,16 @@ namespace osu.Game.Screens.Select
                     Direction = FlowDirection.VerticalOnly,
                     Children = new Drawable[]
                     {
-                        new SearchTextBox { RelativeSizeAxes = Axes.X },
+                        searchTextBox = new SearchTextBox { RelativeSizeAxes = Axes.X },
                         new GroupSortTabs()
                     }
                 }
+            };
+
+            searchTextBox.OnChange += (sender, text) =>
+            {
+                Search = searchTextBox.Text;
+                FilterChanged?.Invoke();
             };
         }
 

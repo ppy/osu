@@ -31,6 +31,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         public List<BeatmapPanel> BeatmapPanels;
 
+        public BeatmapSetInfo BeatmapSet;
+
         public BeatmapGroupState State
         {
             get { return state; }
@@ -74,6 +76,8 @@ namespace osu.Game.Beatmaps.Drawables
                 StartRequested = p => { StartRequested?.Invoke(p.Beatmap); },
                 RelativeSizeAxes = Axes.X,
             }).ToList();
+
+            BeatmapSet = set;
         }
 
         private void headerGainedSelection(BeatmapSetHeader panel)

@@ -31,6 +31,7 @@ using osu.Game.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Game.Graphics;
+using System.Collections.Generic;
 
 namespace osu.Game.Screens.Select
 {
@@ -52,6 +53,8 @@ namespace osu.Game.Screens.Select
 
         private AudioSample sampleChangeDifficulty;
         private AudioSample sampleChangeBeatmap;
+        
+        private List<BeatmapGroup> beatmapGroups;
 
         class WedgeBackground : Container
         {
@@ -82,6 +85,7 @@ namespace osu.Game.Screens.Select
         }
 
         Player player;
+        FilterControl filter;
 
         private void start()
         {
@@ -112,6 +116,7 @@ namespace osu.Game.Screens.Select
         {
             const float carouselWidth = 640;
             const float bottomToolHeight = 50;
+            beatmapGroups = new List<BeatmapGroup>();
             Children = new Drawable[]
             {
                 new ParallaxContainer
@@ -134,10 +139,11 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                 },
-                new FilterControl
+                filter = new FilterControl
                 {
                     Position = wedged_container_start_position,
                     RelativeSizeAxes = Axes.X,
+                    FilterChanged = filterChanged,
                 },
                 beatmapInfoWedge = new BeatmapInfoWedge
                 {
@@ -201,6 +207,41 @@ namespace osu.Game.Screens.Select
             initialAddSetsTask = new CancellationTokenSource();
 
             Task.Factory.StartNew(() => addBeatmapSets(game, initialAddSetsTask.Token), initialAddSetsTask.Token);
+        }
+
+        private void filterChanged()
+        {
+            var search = filter.Search;
+            BeatmapGroup newSelection = null;
+            bool changed = false;
+            foreach (var beatmapGroup in carousel)
+            {
+                var set = beatmapGroup.BeatmapSet;
+                if (set == null)
+                    continue;
+                bool match = string.IsNullOrEmpty(search)
+                    || (set.Metadata.Artist ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
+                    || (set.Metadata.ArtistUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
+                    || (set.Metadata.Title ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
+                    || (set.Metadata.TitleUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1;
+                if (match)
+                {
+                    changed = changed && beatmapGroup.Header.Alpha == 1;
+                    beatmapGroup.Header.Alpha = 1;
+                    if (newSelection == null || beatmapGroup.BeatmapSet.OnlineBeatmapSetID == Beatmap.BeatmapSetInfo.OnlineBeatmapSetID)
+                        newSelection = beatmapGroup;
+                }
+                else
+                {
+                    changed = changed && beatmapGroup.Header.Alpha == 0;
+                    beatmapGroup.Header.Alpha = 0;
+                    beatmapGroup.State = BeatmapGroupState.Collapsed;
+                }
+            }
+            if (newSelection != null)
+                selectBeatmap(newSelection.BeatmapSet.Beatmaps[0]);
+            if (changed)
+                carousel.InvalidateVisible();
         }
 
         private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)
@@ -347,7 +388,7 @@ namespace osu.Game.Screens.Select
 
             var beatmap = new WorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault(), beatmapSet, database);
 
-            var group = new BeatmapGroup(beatmap)
+            var group = new BeatmapGroup(beatmap, beatmapSet)
             {
                 SelectionChanged = selectionChanged,
                 StartRequested = b => start()
@@ -357,6 +398,8 @@ namespace osu.Game.Screens.Select
             //this likely won't scale so well, but allows us to completely async the loading flow.
             Task.WhenAll(group.BeatmapPanels.Select(panel => panel.Preload(game))).ContinueWith(task => Schedule(delegate
             {
+                beatmapGroups.Add(group);
+
                 carousel.AddGroup(group);
 
                 if (Beatmap == null || select)

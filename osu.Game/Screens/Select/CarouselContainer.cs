@@ -16,10 +16,11 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Framework.Timing;
 using osu.Framework.Input;
 using OpenTK.Input;
+using System.Collections;
 
 namespace osu.Game.Screens.Select
 {
-    class CarouselContainer : ScrollContainer
+    class CarouselContainer : ScrollContainer, IEnumerable<BeatmapGroup>
     {
         private Container<Panel> scrollableContent;
         private List<BeatmapGroup> groups = new List<BeatmapGroup>();
@@ -100,7 +101,7 @@ namespace osu.Game.Screens.Select
             yPositions.Add(currentY);
             panel.MoveToY(currentY, 750, EasingTypes.OutExpo);
 
-            if (advance)
+            if (advance && panel.IsVisible)
                 currentY += panel.DrawHeight + 5;
         }
 
@@ -200,7 +201,9 @@ namespace osu.Game.Screens.Select
         /// <param name="halfHeight">Half the draw height of the carousel container.</param>
         private void updatePanel(Panel p, float halfHeight)
         {
-            float panelDrawY = p.Position.Y - Current + p.DrawHeight / 2;
+            var height = p.IsVisible ? p.DrawHeight : 0;
+        
+            float panelDrawY = p.Position.Y - Current + height / 2;
             float dist = Math.Abs(1f - panelDrawY / halfHeight);
 
             // Setting the origin position serves as an additive position on top of potential
@@ -247,6 +250,13 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        public void InvalidateVisible()
+        {
+            Lifetime.StartIndex = 0;
+            Lifetime.EndIndex = groups.Count - 1;
+            computeYPositions();
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             int direction = 0;
@@ -287,6 +297,16 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(state, args);
+        }
+
+        public IEnumerator<BeatmapGroup> GetEnumerator()
+        {
+            return groups.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
