@@ -14,7 +14,7 @@ namespace osu.Game.Modes.UI
         private Box background;
         private Box fill;
 
-        public BindableDouble Current = new BindableDouble();
+        public BindableDouble Current = new BindableDouble() { MinValue = 0, MaxValue = 1 };
 
         public HealthDisplay()
         {
