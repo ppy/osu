@@ -30,6 +30,22 @@ namespace osu.Game.Modes
 
         public readonly BindableInt Combo = new BindableInt();
 
+        /// <summary>
+        /// Are we allowed to fail?
+        /// </summary>
+        protected bool CanFail => true;
+
+        protected bool HasFailed;
+
+        /// <summary>
+        /// Called when we reach a failing health of zero.
+        /// </summary>
+        public event Action Failed;
+
+        /// <summary>
+        /// Keeps track of the highest combo ever achieved in this play.
+        /// This is handled automatically by ScoreProcessor.
+        /// </summary>
         public readonly BindableInt HighestCombo = new BindableInt();
 
         public readonly List<JudgementInfo> Judgements;
@@ -51,6 +67,11 @@ namespace osu.Game.Modes
             UpdateCalculations(judgement);
 
             judgement.ComboAtHit = (ulong)Combo.Value;
+            if (Health.Value == Health.MinValue && !HasFailed)
+            {
+                HasFailed = true;
+                Failed?.Invoke();
+            }
         }
 
         /// <summary>

@@ -24,6 +24,7 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
 using osu.Framework.Configuration;
 using System;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -31,11 +32,9 @@ namespace osu.Game.Screens.Play
     {
         public bool Autoplay;
 
-        protected override BackgroundMode CreateBackground() => null;
+        protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
-
-        protected bool CanFail => true;
 
         public BeatmapInfo BeatmapInfo;
 
@@ -98,8 +97,12 @@ namespace osu.Game.Screens.Play
 
             hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
+            //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
-            hitRenderer.OnAllJudged += hitRenderer_OnAllJudged;
+            hitRenderer.OnAllJudged += onPass;
+
+            //bind ScoreProcessor to ourselves (for a fail situation)
+            scoreProcessor.Failed += onFail;
 
             if (Autoplay)
                 hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Hit));
@@ -134,7 +137,7 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private void hitRenderer_OnAllJudged()
+        private void onPass()
         {
             Delay(1000);
             Schedule(delegate
@@ -144,6 +147,19 @@ namespace osu.Game.Screens.Play
                 {
                     Score = scoreProcessor.GetScore()
                 });
+            });
+        }
+
+        private void onFail()
+        {
+            Content.FadeColour(Color4.Red, 500);
+            sourceClock.Stop();
+
+            Delay(500);
+            Schedule(delegate
+            {
+                ValidForResume = false;
+                Push(new FailDialog());
             });
         }
 
