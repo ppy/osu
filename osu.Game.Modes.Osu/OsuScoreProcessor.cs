@@ -11,6 +11,7 @@ namespace osu.Game.Modes.Osu
         public OsuScoreProcessor(int hitObjectCount)
             : base(hitObjectCount)
         {
+            Health.Value = 1;
         }
 
         protected override void UpdateCalculations(JudgementInfo judgement)
