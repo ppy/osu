@@ -110,11 +110,9 @@ namespace osu.Game
 
             (modeStack = new Intro()).Preload(this, d =>
             {
-                mainContent.Add(d);
-
                 modeStack.ModePushed += modeAdded;
                 modeStack.Exited += modeRemoved;
-                modeStack.DisplayAsRoot();
+                mainContent.Add(modeStack);
             });
 
             //overlay elements
