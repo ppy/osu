@@ -14,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -80,7 +81,7 @@ namespace osu.Game.Screens.Select
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        ColourInfo = ColourInfo.GradientVertical(Color4.White, new Color4(1f, 1f, 1f, 0.3f)),
+                        ColourInfo = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
                         Children = new []
                         {
                             // Zoomed-in and cropped beatmap background

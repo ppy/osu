@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,6 +13,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
@@ -68,9 +71,6 @@ namespace osu.Game.Overlays.Options
             Direction = FlowDirection.VerticalOnly;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            var items = typeof(T).GetFields().Where(f => !f.IsSpecialName).Zip(
-                (T[])Enum.GetValues(typeof(T)), (a, b) => new Tuple<string, T>(
-                    a.GetCustomAttribute<DescriptionAttribute>()?.Description ?? a.Name, b));
             Children = new Drawable[]
             {
                 text = new SpriteText { Alpha = 0 },
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Options
                 {
                     Margin = new MarginPadding { Top = 5 },
                     RelativeSizeAxes = Axes.X,
-                    Items = items.Select(item => new StyledDropDownMenuItem<T>(item.Item1, item.Item2))
+                    Items = (T[])Enum.GetValues(typeof(T)),
                 }
             };
             dropdown.ValueChanged += Dropdown_ValueChanged;
@@ -92,6 +92,17 @@ namespace osu.Game.Overlays.Options
             {
                 return new StyledDropDownComboBox();
             }
+            
+            protected override IEnumerable<DropDownMenuItem<U>> GetDropDownItems(IEnumerable<U> values)
+            {
+                return values.Select(v =>
+                {
+                    var field = typeof(U).GetField(Enum.GetName(typeof(U), v));
+                    return new StyledDropDownMenuItem<U>(
+                        field.GetCustomAttribute<DescriptionAttribute>()?.Description ?? field.Name, v);
+                });
+                    
+            }
 
             public StyledDropDownMenu()
             {
@@ -101,7 +112,7 @@ namespace osu.Game.Overlays.Options
 
             protected override void AnimateOpen()
             {
-                foreach (StyledDropDownMenuItem<U> child in DropDownList.Children)
+                foreach (StyledDropDownMenuItem<U> child in DropDownItemsContainer.Children)
                 {
                     child.FadeIn(200);
                     child.ResizeTo(new Vector2(1, 24), 200);
@@ -111,7 +122,7 @@ namespace osu.Game.Overlays.Options
 
             protected override void AnimateClose()
             {
-                foreach (StyledDropDownMenuItem<U> child in DropDownList.Children)
+                foreach (StyledDropDownMenuItem<U> child in DropDownItemsContainer.Children)
                 {
                     child.ResizeTo(new Vector2(1, 0), 200);
                     child.FadeOut(200);
@@ -121,12 +132,35 @@ namespace osu.Game.Overlays.Options
 
         private class StyledDropDownComboBox : DropDownComboBox
         {
-            protected override Color4 BackgroundColour => new Color4(255, 255, 255, 100);
-            protected override Color4 BackgroundColourHover => Color4.HotPink;
+            private SpriteText label;
+            protected override string Label
+            {
+                get { return label.Text; }
+                set { label.Text = value; }
+            }
 
             public StyledDropDownComboBox()
             {
                 Foreground.Padding = new MarginPadding(4);
+
+                Children = new[]
+                {
+                    label = new SpriteText(),
+                    new TextAwesome
+                    {
+                        Icon = FontAwesome.fa_chevron_down,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Margin = new MarginPadding { Right = 4 },
+                    }
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                BackgroundColour = Color4.Black.Opacity(0.5f);
+                BackgroundColourHover = colours.PinkDarker;
             }
         }
 
@@ -137,29 +171,36 @@ namespace osu.Game.Overlays.Options
                 AutoSizeAxes = Axes.None;
                 Height = 0;
                 Foreground.Padding = new MarginPadding(2);
+
+                Children = new[]
+                {
+                    new FlowContainer
+                    {
+                        Direction = FlowDirection.HorizontalOnly,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
+                        {
+                            new TextAwesome
+                            {
+                                Icon = FontAwesome.fa_chevron_right,
+                                Colour = Color4.Black,
+                                Margin = new MarginPadding { Right = 3 },
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                            },
+                            new SpriteText { Text = text }
+                        }
+                    }
+                };
             }
 
-            protected override void OnSelectChange()
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
             {
-                if (!IsLoaded)
-                    return;
-
-                FormatBackground();
-                FormatCaret();
-                FormatLabel();
-            }
-
-            protected override void FormatCaret()
-            {
-                (Caret as SpriteText).Text = IsSelected ? @"+" : @"-";
-            }
-
-            protected override void FormatLabel()
-            {
-                if (IsSelected)
-                    (Label as SpriteText).Text = @"*" + Value + @"*";
-                else
-                    (Label as SpriteText).Text = Value.ToString();
+                BackgroundColour = Color4.Black.Opacity(0.5f);
+                BackgroundColourHover = colours.PinkDarker;
+                BackgroundColourSelected = Color4.Black.Opacity(0.5f);
             }
         }
     }

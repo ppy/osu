@@ -26,6 +26,10 @@ namespace osu.Game.Beatmaps.Formats
             AddDecoder<OsuLegacyDecoder>(@"osu file format v11");
             AddDecoder<OsuLegacyDecoder>(@"osu file format v10");
             AddDecoder<OsuLegacyDecoder>(@"osu file format v9");
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v8");
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v7");
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v6");
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v5");
             // TODO: Not sure how far back to go, or differences between versions
         }
 
@@ -132,11 +136,11 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.Metadata.Tags = val;
                     break;
                 case @"BeatmapID":
-                    beatmap.BeatmapInfo.BeatmapID = int.Parse(val);
+                    beatmap.BeatmapInfo.OnlineBeatmapID = int.Parse(val);
                     break;
                 case @"BeatmapSetID":
-                    beatmap.BeatmapInfo.BeatmapSetID = int.Parse(val);
-                    metadata.BeatmapSetID = int.Parse(val);
+                    beatmap.BeatmapInfo.OnlineBeatmapSetID = int.Parse(val);
+                    metadata.OnlineBeatmapSetID = int.Parse(val);
                     break;
             }
         }
