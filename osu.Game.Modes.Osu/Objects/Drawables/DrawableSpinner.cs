@@ -12,14 +12,20 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
     {
         private Spinner spinner;
 
-        private SpinnerDisc disc;
-        private BackSpinner backBox;
+        private SpinnerDisc disc; //Change to SpinnerTrigger
+        private BackSpinner backBox; //This is not neccesary
         private CirclePiece circle;
         private GlowPiece circleGlow;
         private NumberPiece number;
         private ExplodePiece explode;
         private RingPiece ring;
         private Container contCircle;
+        private SpinnerBottom bottom;
+        private SpinnerMiddle middle;
+        private SpinnerCursorTrail follow;
+        private SpinnerProgress progress;
+
+        private const float scaleSpinner = 1;
 
         public DrawableSpinner(Spinner s) : base(s)
         {
@@ -28,16 +34,26 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             Children = new Drawable[]
             {
-                backBox = new BackSpinner(spinner)
+                explode = new ExplodePiece
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
+                    Scale = new Vector2(s.Scale),
+                    Colour = s.Colour,
                 },
-                disc = new SpinnerDisc(spinner)
+                backBox = new BackSpinner(spinner),
+                bottom = new SpinnerBottom(spinner)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
+                    Scale = new Vector2(s.Scale)
                 },
+                middle = new SpinnerMiddle(spinner)
+                {
+                    Scale = new Vector2(s.Scale)
+                },
+                progress = new SpinnerProgress(spinner)
+                {
+                    Scale = new Vector2(s.Scale)
+                },
+                follow = new SpinnerCursorTrail(spinner),
+                disc = new SpinnerDisc(spinner),
                 contCircle = new Container
                 {
                     Anchor = Anchor.Centre,
@@ -54,8 +70,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                             //Position = s.Position,
                             Scale = new Vector2(s.Scale),
                             Colour = s.Colour,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
                         },
                         number = new NumberPiece
                         {
@@ -68,11 +82,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
                     }
                 },
-                explode = new ExplodePiece
-                {
-                    Scale = new Vector2(s.Scale),
-                    Colour = s.Colour,
-                },
             };
         }
 
@@ -80,7 +89,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void Update()
         {
+            
             base.Update();
+            progress.Progress = disc.SpinProgress;
+            progress.IsSpinningLeft = disc.IsSpinningLeft;
+            follow.MousePosition = disc.DistanceToCentre;
+            follow.MouseAngle = disc.ActualAngle;
+            follow.Tracking = disc.Tracking;
         }
         private OsuJudgementInfo j;
 
@@ -90,17 +105,17 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             if (!userTriggered && Time.Current >= HitObject.EndTime)
             {
-                if (disc.Progress == 1)
+                if (disc.SpinProgress == 1)
                 {
                     j.Score = OsuScoreResult.Hit300;
                     j.Result = HitResult.Hit;
                 }
-                else if (disc.Progress > .9)
+                else if (disc.SpinProgress > .9)
                 {
                     j.Score = OsuScoreResult.Hit100;
                     j.Result = HitResult.Hit;
                 }
-                else if (disc.Progress >.75)
+                else if (disc.SpinProgress >.75)
                 {
                     j.Score = OsuScoreResult.Hit50;
                     j.Result = HitResult.Hit;
@@ -115,13 +130,23 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             }
         }
 
-        /*protected override void UpdatePreemptState()
+        protected override void UpdatePreemptState()
         {
             base.UpdatePreemptState();
+            
 
-        }*/
+            bottom.ScaleTo(scaleSpinner * 2f, TIME_PREEMPT, EasingTypes.OutQuad);
+            middle.ScaleTo(scaleSpinner * 1.65f, TIME_PREEMPT, EasingTypes.OutSine);
+            progress.ScaleTo(scaleSpinner * 1.65f);
+            Delay(60);
+            progress.FadeTo(1, TIME_PREEMPT - 100);
+
+
+        }
         protected override void UpdateState(ArmedState state)
         {
+            if (!IsLoaded) return;
+
             base.UpdateState(state);
 
             backBox.ScaleTo(0, spinner.Duration);
@@ -129,8 +154,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             Delay(HitObject.Duration, true);
 
             disc.FadeOut(160);
+            bottom.FadeOut(160);
+            middle.FadeOut(160);
             backBox.FadeOut(160);
             contCircle.FadeOut(160);
+            follow.FadeOut(160);
+            progress.FadeOut(160);
             explode.FadeIn(40);
             Delay(40, true);
             FadeOut(800);

@@ -18,6 +18,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             //Position = spinner.Position;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+            Alpha = 0.1f;
 
             Children = new Drawable[]
             {

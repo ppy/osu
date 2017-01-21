@@ -3,6 +3,7 @@ using osu.Framework.Input;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -15,10 +16,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
     {
         public override bool HandleInput => true;
         private readonly Spinner s;
-        private Sprite disc;
         private Box trigger;
 
-        const float size = 500;
         public SpinnerDisc(Spinner spinner)
         {
             s = spinner;
@@ -40,12 +39,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     Alpha = 0.01f,
                     Width = 1080,
                     Height = 1080
-                },
-                disc = new Sprite
-                {
-                    Size = new Vector2(size,size),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
                 }
             };
         }
@@ -84,36 +77,39 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         private bool canCurrentlySpin => Time.Current >= s.StartTime && Time.Current < s.EndTime;
 
         private float? lastAngle;
-        private float? actualAngle;
+        public float? ActualAngle;
         private float angleAdded;
         private float lastAngleAdded;
         private float totalAngleSpinned = 0;
-        public float Progress = 0;
+        public float SpinProgress = 0;
         private float spinsPerMinuteNeeded = 100 + (5 * 15); //TODO: read per-map OD and place it on the 5
-        private float rotationsNeeded;
-        
+        private float rotationsNeeded => (float)(spinsPerMinuteNeeded * (s.EndTime - s.StartTime) / 60000f);
+        public float DistanceToCentre;
+        public bool IsSpinningLeft;
+        private double spinDirectionDiscriminator;
 
         protected override void Update()
         {
             
-            base.Update();
-            Progress = MathHelper.Clamp(((totalAngleSpinned / 360) / rotationsNeeded), 0, 1);
+            base.Update();  
+            SpinProgress = MathHelper.Clamp(((totalAngleSpinned / 360) / rotationsNeeded), 0, 1);
             if (Tracking)
             {
-                rotationsNeeded = (float)(spinsPerMinuteNeeded * (s.EndTime - s.StartTime) / 60000f);
                 lastAngleAdded = angleAdded;
                 angleAdded += GetAngledDifference();
-                SetAngleSpinned(lastAngleAdded, angleAdded);
-                discScale();
-                disc.RotateTo(Rotation + angleAdded, 500, EasingTypes.OutExpo);
+                if (angleAdded > lastAngleAdded)
+                    totalAngleSpinned += angleAdded - lastAngleAdded;
+                else
+                    totalAngleSpinned += lastAngleAdded - angleAdded;
+                DistanceToCentre = GetDistanceToCentre();
+                if (spinDirectionDiscriminator > 20)
+                    IsSpinningLeft = false;
+                else if (spinDirectionDiscriminator < -20)
+                    IsSpinningLeft = true;
             }
-            else
-                actualAngle = null;
-            if(!canCurrentlySpin)
-                disc.RotateTo(angleAdded);
-                
             Tracking = canCurrentlySpin && lastState != null && Contains(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
         }
+
         private float GetMouseAngledPosition()
         {
             float mouseXFromCenter = lastState.Mouse.LastPosition.X - Position.X;
@@ -121,38 +117,24 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             return (float)MathHelper.RadiansToDegrees(Math.Atan2(mouseYFromCenter,mouseXFromCenter));
         }
 
-        private void discScale()
+        private float GetDistanceToCentre()
         {
-            disc.ScaleTo(1 + (MathHelper.Clamp(((totalAngleSpinned / 360) / rotationsNeeded), 0, 1)/10), 100);
+            float distanceX = (float)Math.Pow(lastState.Mouse.LastPosition.X - Position.X, 2);
+            float distanceY = (float)Math.Pow(lastState.Mouse.LastPosition.Y - Position.Y, 2);
+            return (float)Math.Sqrt(distanceX + distanceY);
         }
 
-        private float GetAngledDifference()
+        public float GetAngledDifference()
         {
-            lastAngle = actualAngle ?? GetMouseAngledPosition();
+            lastAngle = ActualAngle ?? GetMouseAngledPosition();
             Delay(1);
-            actualAngle = GetMouseAngledPosition();
-            if (lastAngle < -60 && actualAngle > 60)
-            {
+            ActualAngle = GetMouseAngledPosition();
+            if (lastAngle < -60 && ActualAngle > 60)
                 lastAngle += 360;
-            }
-            else if (lastAngle > 60 && actualAngle < -60)
-            {
+            else if (lastAngle > 60 && ActualAngle < -60)
                 lastAngle -= 360;
-            }
-            return (float)(actualAngle - lastAngle);
-        }
-
-        private void SetAngleSpinned(float a, float b)
-        {
-            if (b > a)
-                totalAngleSpinned += b - a;
-            else
-                totalAngleSpinned += a - b;
-        }
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            disc.Texture = textures.Get(@"Menu/logo@2x");
+            spinDirectionDiscriminator = MathHelper.Clamp(spinDirectionDiscriminator += (float)(ActualAngle - lastAngle), -110, 110);
+            return (float)(ActualAngle - lastAngle);
         }
     }
 }
