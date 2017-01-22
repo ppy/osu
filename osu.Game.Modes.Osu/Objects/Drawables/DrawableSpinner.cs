@@ -13,7 +13,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private Spinner spinner;
 
         private SpinnerDisc disc; //Change to SpinnerTrigger
-        private BackSpinner backBox; //This is not neccesary
         private CirclePiece circle;
         private GlowPiece circleGlow;
         private NumberPiece number;
@@ -39,7 +38,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Scale = new Vector2(s.Scale),
                     Colour = s.Colour,
                 },
-                backBox = new BackSpinner(spinner),
                 bottom = new SpinnerBottom(spinner)
                 {
                     Scale = new Vector2(s.Scale)
@@ -149,14 +147,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             base.UpdateState(state);
 
-            backBox.ScaleTo(0, spinner.Duration);
-
             Delay(HitObject.Duration, true);
 
             disc.FadeOut(160);
             bottom.FadeOut(160);
             middle.FadeOut(160);
-            backBox.FadeOut(160);
             contCircle.FadeOut(160);
             follow.FadeOut(160);
             progress.FadeOut(160);

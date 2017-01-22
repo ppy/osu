@@ -45,7 +45,6 @@
     <Compile Include="Objects\CircularArcApproximator.cs" />
     <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
-    <Compile Include="Objects\Drawables\Pieces\BackSpinner.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
     <Compile Include="Objects\Drawables\DrawableSlider.cs" />
     <Compile Include="Objects\Drawables\DrawableSpinner.cs" />
