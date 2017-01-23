@@ -36,23 +36,37 @@ namespace osu.Game.Database
 
             if (connection == null)
             {
-                retry:
                 try
                 {
-                    connection = storage.GetDatabase(@"beatmaps");
-                    connection.CreateTable<BeatmapMetadata>();
-                    connection.CreateTable<BaseDifficulty>();
-                    connection.CreateTable<BeatmapSetInfo>();
-                    connection.CreateTable<BeatmapInfo>();
+                    connection = prepareConnection();
                 }
                 catch
                 {
-                    Debug.WriteLine(@"Beatmap database was unable to be migrated; starting fresh!");
-                    connection?.Close();
+                    Console.WriteLine(@"Failed to initialise the beatmap database! Trying again with a clean database...");
                     storage.DeleteDatabase(@"beatmaps");
-                    goto retry;
+                    connection = prepareConnection();
                 }
             }
+        }
+
+        private SQLiteConnection prepareConnection()
+        {
+            var conn = storage.GetDatabase(@"beatmaps");
+
+            try
+            {
+                conn.CreateTable<BeatmapMetadata>();
+                conn.CreateTable<BaseDifficulty>();
+                conn.CreateTable<BeatmapSetInfo>();
+                conn.CreateTable<BeatmapInfo>();
+            }
+            catch
+            {
+                conn.Close();
+                throw;
+            }
+
+            return conn;
         }
 
         public void Reset()
