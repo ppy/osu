@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
             ruleset = Ruleset.GetRuleset(usablePlayMode);
 
             var scoreOverlay = ruleset.CreateScoreOverlay();
-            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor());
+            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
 
             hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
