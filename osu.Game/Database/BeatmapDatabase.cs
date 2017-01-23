@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -35,11 +36,22 @@ namespace osu.Game.Database
 
             if (connection == null)
             {
-                connection = storage.GetDatabase(@"beatmaps");
-                connection.CreateTable<BeatmapMetadata>();
-                connection.CreateTable<BaseDifficulty>();
-                connection.CreateTable<BeatmapSetInfo>();
-                connection.CreateTable<BeatmapInfo>();
+                retry:
+                try
+                {
+                    connection = storage.GetDatabase(@"beatmaps");
+                    connection.CreateTable<BeatmapMetadata>();
+                    connection.CreateTable<BaseDifficulty>();
+                    connection.CreateTable<BeatmapSetInfo>();
+                    connection.CreateTable<BeatmapInfo>();
+                }
+                catch
+                {
+                    Debug.WriteLine(@"Beatmap database was unable to be migrated; starting fresh!");
+                    connection?.Close();
+                    storage.DeleteDatabase(@"beatmaps");
+                    goto retry;
+                }
             }
         }
 
