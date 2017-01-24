@@ -38,12 +38,8 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            //ensure we are at offset 0
-            Clock = new FramedClock();
-
-            if (beatmap == null)
+            if (beatmap?.Track == null)
             {
-
                 var objects = new List<HitObject>();
 
                 int time = 1500;
