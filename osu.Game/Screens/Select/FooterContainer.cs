@@ -11,10 +11,10 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
 {
-    public class PlaySongSelectButtonContainer : FlowContainer
+    public class FooterContainer : FlowContainer
     {
-        private PlaySongSelectButton hoveredButton;
-        public PlaySongSelectButton HoveredButton
+        private FooterButton hoveredButton;
+        public FooterButton HoveredButton
         {
             get { return hoveredButton; }
             set
@@ -32,9 +32,9 @@ namespace osu.Game.Screens.Select
             set
             {
                 base.Children = value;
-                foreach (PlaySongSelectButton p in value)
+                foreach (FooterButton p in value)
                 {
-                    p.On_Hovered += () => HoveredButton = p;
+                    p.Hovered += () => HoveredButton = p;
                 }
             }
         }
@@ -42,21 +42,21 @@ namespace osu.Game.Screens.Select
         public override void Add(Drawable drawable)
         {
             base.Add(drawable);
-            PlaySongSelectButton p = drawable as PlaySongSelectButton;
+            FooterButton p = drawable as FooterButton;
             if (p != null)
-                p.On_Hovered += () => HoveredButton = p;
+                p.Hovered += () => HoveredButton = p;
         }
 
         public Action On_HoveredChanged;
 
-        public PlaySongSelectButtonContainer()
+        public FooterContainer()
         {
             AutoSizeAxes = Axes.Both;
             Direction = FlowDirection.HorizontalOnly;
             Spacing = new Vector2(0.2f, 0);
         }
 
-        public void HoveredOver(PlaySongSelectButton P)
+        public void HoveredOver(FooterButton P)
         {
             if (HoveredButton == P)
                 return;

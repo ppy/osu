@@ -32,7 +32,6 @@ using osu.Game.Overlays.PopUpDialogs;
 using osu.Game.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
-using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -57,10 +56,8 @@ namespace osu.Game.Screens.Select
 
         private Box modeLight;
 
-        private PlaySongSelectButtonContainer playSongSelectButtonContainer;
-        private PlaySongSelectButton beatmapModsButton;
-        private PlaySongSelectButton beatmapRandomButton;
-        private PlaySongSelectButton beatmapOptionsButton;
+        private FooterContainer footer;
+
         private const float play_song_select_button_width = 100;
         private const float play_song_select_button_height = 50;
         private const int mode_light_transition_time = 200;
@@ -251,11 +248,11 @@ namespace osu.Game.Screens.Select
                                     Origin = Anchor.BottomLeft,
                                     Action = Exit,
                                 },
-                                playSongSelectButtonContainer = new PlaySongSelectButtonContainer
+                                footer = new FooterContainer
                                 {
                                     Children = new Drawable[]
                                     {
-                                        beatmapModsButton = new PlaySongSelectButton
+                                        new FooterButton
                                         {
                                             Text = "mods",
                                             Height = play_song_select_button_height,
@@ -263,7 +260,7 @@ namespace osu.Game.Screens.Select
                                             SelectedColour = new Color4(238, 51, 153, 255),
                                             DeselectedColour = new Color4(125, 54, 82, 255),
                                         },
-                                        beatmapRandomButton = new PlaySongSelectButton
+                                        new FooterButton
                                         {
                                             Text = "random",
                                             Height = play_song_select_button_height,
@@ -272,7 +269,7 @@ namespace osu.Game.Screens.Select
                                             DeselectedColour = new Color4(79, 99, 8, 255),
                                             Action = carousel.SelectRandom,
                                         },
-                                        beatmapOptionsButton = new PlaySongSelectButton
+                                        new FooterButton
                                         {
                                             Text = "options",
                                             Height = play_song_select_button_height,
@@ -305,7 +302,7 @@ namespace osu.Game.Screens.Select
             sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
             sampleChangeBeatmap = audio.Sample.Get(@"SongSelect/select-expand");
 
-            playSongSelectButtonContainer.On_HoveredChanged += updateModeLight;
+            footer.On_HoveredChanged += updateModeLight;
 
             initialAddSetsTask = new CancellationTokenSource();
 
@@ -315,7 +312,7 @@ namespace osu.Game.Screens.Select
         private void updateModeLight()
         {
             modeLight.FadeIn(mode_light_transition_time);
-            modeLight.FadeColour(playSongSelectButtonContainer.HoveredButton.SelectedColour, mode_light_transition_time);
+            modeLight.FadeColour(footer.HoveredButton.SelectedColour, mode_light_transition_time);
         }
 
         private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)

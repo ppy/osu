@@ -232,14 +232,17 @@
     <Compile Include="Configuration\ScreenshotFormat.cs" />
     <Compile Include="Configuration\FrameSync.cs" />
     <Compile Include="Configuration\ConfineMouseMode.cs" />
-    <Compile Include="Graphics\OsuColour.cs" />
-    <Compile Include="Screens\Select\FooterButton.cs" />
-    <Compile Include="Screens\Select\FooterContainer.cs" />
+<<<<<<< HEAD
+    <Compile Include="Screens\Select\PlaySongSelectButton.cs" />
+    <Compile Include="Screens\Select\PlaySongSelectButtonContainer.cs" />
     <Compile Include="Overlays\PopUpDialogs\PopUpDialog.cs" />
     <Compile Include="Overlays\PopUpDialogs\PopUpDialogButton.cs" />
     <Compile Include="Overlays\PopUpDialogs\DeleteBeatmapDialog.cs" />
     <Compile Include="Screens\Select\SongSelectOptions\SongSelectOptionsContainer.cs" />
     <Compile Include="Screens\Select\SongSelectOptions\SongSelectOptionsButton.cs" />
+=======
+    <Compile Include="Graphics\OsuColour.cs" />
+>>>>>>> master
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -260,7 +263,10 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Overlays\PopUpDialogs\" />
+    <Folder Include="Screens\Select\SongSelectOptions\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

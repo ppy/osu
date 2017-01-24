@@ -7,12 +7,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
-using osu.Framework.Graphics.Transformations;
 using System;
 
 namespace osu.Game.Screens.Select
 {
-    public class PlaySongSelectButton : ClickableContainer
+    public class FooterButton : ClickableContainer
     {
         private const int selection_transition_length = 200;
         private const int click_flash_length = 400;
@@ -55,7 +54,7 @@ namespace osu.Game.Screens.Select
         private Box box;
         private Box light;
 
-        public PlaySongSelectButton()
+        public FooterButton()
         {
             Children = new Drawable[]
             {
@@ -82,11 +81,11 @@ namespace osu.Game.Screens.Select
             Colour = Color4.Black;
         }
 
-        public Action On_Hovered;
+        public Action Hovered;
 
         protected override bool OnHover(InputState state)
         {
-            On_Hovered.Invoke();
+            Hovered.Invoke();
             light.ScaleTo(new Vector2(1, 2), selection_transition_length);
             light.FadeColour(SelectedColour, selection_transition_length);
             return true;
