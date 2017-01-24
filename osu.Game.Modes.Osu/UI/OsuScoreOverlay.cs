@@ -7,6 +7,7 @@ using osu.Game.Modes.UI;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Graphics.Primitives;
+using System;
 
 namespace osu.Game.Modes.Osu.UI
 {
@@ -34,7 +35,14 @@ namespace osu.Game.Modes.Osu.UI
             Origin = Anchor.BottomLeft,
         };
 
-        protected override KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
+        protected override HealthDisplay CreateHealthDisplay() => new HealthDisplay()
+        {
+            Size = new Vector2(0.5f, 20),
+            RelativeSizeAxes = Axes.X,
+            Padding = new MarginPadding(5)
+        };
+
+    protected override KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
         {
             IsCounting = true,
             FadeTime = 50,

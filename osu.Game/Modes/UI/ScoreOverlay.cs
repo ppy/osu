@@ -24,12 +24,7 @@ namespace osu.Game.Modes.UI
         protected abstract ComboCounter CreateComboCounter();
         protected abstract PercentageCounter CreateAccuracyCounter();
         protected abstract ScoreCounter CreateScoreCounter();
-        protected virtual HealthDisplay CreateHealthDisplay() => new HealthDisplay
-        {
-            Size = new Vector2(0.5f, 20),
-            RelativeSizeAxes = Axes.X,
-            Padding = new MarginPadding(5)
-        };
+        protected abstract HealthDisplay CreateHealthDisplay();
 
         public virtual void OnHit(HitObject h)
         {
