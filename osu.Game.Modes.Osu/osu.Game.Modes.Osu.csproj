@@ -56,7 +56,8 @@
     <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBouncer.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerBottom.cs" />
-    <Compile Include="Objects\Drawables\Pieces\SpinnerDisc.cs" />
+    <Compile Include="Objects\Drawables\Pieces\SpinnerProgressSegment.cs" />
+    <Compile Include="Objects\Drawables\Pieces\SpinnerTrigger.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerFollow.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerMiddle.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerProgress.cs" />

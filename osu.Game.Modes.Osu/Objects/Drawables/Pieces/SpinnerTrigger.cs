@@ -1,24 +1,20 @@
 ﻿using System;
 using osu.Framework.Input;
-using osu.Framework.Graphics.Transformations;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
-    public class SpinnerDisc : Container
+    public class SpinnerTrigger : Container
     {
         public override bool HandleInput => true;
         private readonly Spinner s;
         private Box trigger;
 
-        public SpinnerDisc(Spinner spinner)
+        public SpinnerTrigger(Spinner spinner)
         {
             s = spinner;
 
@@ -102,9 +98,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                 else
                     totalAngleSpinned += lastAngleAdded - angleAdded;
                 DistanceToCentre = GetDistanceToCentre();
-                if (spinDirectionDiscriminator > 20)
+                if (spinDirectionDiscriminator > 5)
                     IsSpinningLeft = false;
-                else if (spinDirectionDiscriminator < -20)
+                else if (spinDirectionDiscriminator < -5)
                     IsSpinningLeft = true;
             }
             Tracking = canCurrentlySpin && lastState != null && Contains(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
@@ -127,13 +123,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         public float GetAngledDifference()
         {
             lastAngle = ActualAngle ?? GetMouseAngledPosition();
-            Delay(1);
             ActualAngle = GetMouseAngledPosition();
             if (lastAngle < -60 && ActualAngle > 60)
                 lastAngle += 360;
             else if (lastAngle > 60 && ActualAngle < -60)
                 lastAngle -= 360;
-            spinDirectionDiscriminator = MathHelper.Clamp(spinDirectionDiscriminator += (float)(ActualAngle - lastAngle), -110, 110);
+            spinDirectionDiscriminator = MathHelper.Clamp(spinDirectionDiscriminator += (float)(ActualAngle - lastAngle), -90, 90);
             return (float)(ActualAngle - lastAngle);
         }
     }

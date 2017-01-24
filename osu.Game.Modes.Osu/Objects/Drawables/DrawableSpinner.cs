@@ -12,7 +12,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
     {
         private Spinner spinner;
 
-        private SpinnerDisc disc; //Change to SpinnerTrigger
+        private SpinnerTrigger trigger;
         private CirclePiece circle;
         private GlowPiece circleGlow;
         private NumberPiece number;
@@ -20,7 +20,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private RingPiece ring;
         private Container contCircle;
         private SpinnerBottom bottom;
-        private SpinnerMiddle middle;
+        //private SpinnerMiddle middle; //We don't need this anymore
         private SpinnerCursorTrail follow;
         private SpinnerProgress progress;
 
@@ -42,16 +42,16 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 {
                     Scale = new Vector2(s.Scale)
                 },
-                middle = new SpinnerMiddle(spinner)
+                /*middle = new SpinnerMiddle(spinner)
                 {
                     Scale = new Vector2(s.Scale)
-                },
+                },*/
                 progress = new SpinnerProgress(spinner)
                 {
                     Scale = new Vector2(s.Scale)
                 },
                 follow = new SpinnerCursorTrail(spinner),
-                disc = new SpinnerDisc(spinner),
+                trigger = new SpinnerTrigger(spinner),
                 contCircle = new Container
                 {
                     Anchor = Anchor.Centre,
@@ -89,11 +89,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             
             base.Update();
-            progress.Progress = disc.SpinProgress;
-            progress.IsSpinningLeft = disc.IsSpinningLeft;
-            follow.MousePosition = disc.DistanceToCentre;
-            follow.MouseAngle = disc.ActualAngle;
-            follow.Tracking = disc.Tracking;
+            progress.Progress = trigger.SpinProgress;
+            progress.IsSpinningLeft = trigger.IsSpinningLeft;
+            follow.MousePosition = trigger.DistanceToCentre;
+            follow.MouseAngle = trigger.ActualAngle;
+            follow.Tracking = trigger.Tracking;
         }
         private OsuJudgementInfo j;
 
@@ -103,17 +103,17 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             if (!userTriggered && Time.Current >= HitObject.EndTime)
             {
-                if (disc.SpinProgress == 1)
+                if (trigger.SpinProgress == 1)
                 {
                     j.Score = OsuScoreResult.Hit300;
                     j.Result = HitResult.Hit;
                 }
-                else if (disc.SpinProgress > .9)
+                else if (trigger.SpinProgress > .9)
                 {
                     j.Score = OsuScoreResult.Hit100;
                     j.Result = HitResult.Hit;
                 }
-                else if (disc.SpinProgress >.75)
+                else if (trigger.SpinProgress >.75)
                 {
                     j.Score = OsuScoreResult.Hit50;
                     j.Result = HitResult.Hit;
@@ -134,8 +134,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             
 
             bottom.ScaleTo(scaleSpinner * 2f, TIME_PREEMPT, EasingTypes.OutQuad);
-            middle.ScaleTo(scaleSpinner * 1.65f, TIME_PREEMPT, EasingTypes.OutSine);
-            progress.ScaleTo(scaleSpinner * 1.65f);
+            //middle.ScaleTo(scaleSpinner * 1.65f, TIME_PREEMPT, EasingTypes.OutSine);
+            progress.ScaleTo(scaleSpinner * 1.65f, TIME_PREEMPT, EasingTypes.OutQuad);
             Delay(60);
             progress.FadeTo(1, TIME_PREEMPT - 100);
 
@@ -149,9 +149,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             Delay(HitObject.Duration, true);
 
-            disc.FadeOut(160);
+            trigger.FadeOut(160);
             bottom.FadeOut(160);
-            middle.FadeOut(160);
+            //middle.FadeOut(160);
             contCircle.FadeOut(160);
             follow.FadeOut(160);
             progress.FadeOut(160);
