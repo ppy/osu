@@ -35,7 +35,7 @@ namespace osu.Game.Modes
         /// </summary>
         protected bool CanFail => true;
 
-        protected bool HasFailed;
+        protected bool HasFailed { get; private set; }
 
         /// <summary>
         /// Called when we reach a failing health of zero.
