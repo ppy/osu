@@ -43,8 +43,8 @@ namespace osu.Game.Modes.Objects.Drawables
                 state = value;
 
                 UpdateState(state);
-
-                Expire();
+                if (IsLoaded)
+                    Expire();
 
                 if (State == ArmedState.Hit)
                     PlaySample();

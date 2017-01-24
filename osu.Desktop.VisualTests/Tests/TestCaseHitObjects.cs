@@ -49,7 +49,6 @@ namespace osu.Desktop.VisualTests.Tests
                 DrawableHitCircle d = new DrawableHitCircle(h)
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                     Depth = i,
                     State = ArmedState.Hit,
                     Judgement = new OsuJudgementInfo { Result = HitResult.Hit }
