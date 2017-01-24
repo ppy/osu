@@ -29,7 +29,9 @@ namespace osu.Desktop.VisualTests.Tests
         [BackgroundDependencyLoader]
         private void load(BeatmapDatabase db)
         {
-            beatmap = db.GetWorkingBeatmap(db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault());
+            var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault();
+            if (beatmapInfo != null)
+                beatmap = db.GetWorkingBeatmap(beatmapInfo);
         }
 
         public override void Reset()
