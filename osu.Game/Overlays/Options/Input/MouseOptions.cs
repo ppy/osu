@@ -20,7 +20,6 @@ namespace osu.Game.Overlays.Options.Input
         {
             Children = new Drawable[]
             {
-                new SpriteText { Text = "Sensitivity: TODO slider" },
                 new SliderOption<double>
                 {
                     LabelText = "Sensitivity",

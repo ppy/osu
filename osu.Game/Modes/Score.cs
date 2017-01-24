@@ -15,5 +15,6 @@ namespace osu.Game.Modes
         public double Accuracy { get; set; }
         public double Combo { get; set; }
         public double MaxCombo { get; set; }
+        public double Health { get; set; }
     }
 }

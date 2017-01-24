@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -98,7 +99,7 @@ namespace osu.Game.Beatmaps.Drawables
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(1),
                 Radius = 10,
-                Colour = new Color4(0, 0, 0, 100),
+                Colour = Color4.Black.Opacity(100),
             };
         }
 

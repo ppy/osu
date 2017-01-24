@@ -49,12 +49,12 @@ namespace osu.Desktop.VisualTests.Tests
         {
             return new BeatmapSetInfo
             {
-                BeatmapSetID = 1234 + i,
+                OnlineBeatmapSetID = 1234 + i,
                 Hash = "d8e8fca2dc0f896fd7cb4cb0031ba249",
                 Path = string.Empty,
                 Metadata = new BeatmapMetadata
                 {
-                    BeatmapSetID = 1234 + i,
+                    OnlineBeatmapSetID = 1234 + i,
                     Artist = "MONACA",
                     Title = "Black Song",
                     Author = "Some Guy",
@@ -63,7 +63,7 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     new BeatmapInfo
                     {
-                        BeatmapID = 1234 + i,
+                        OnlineBeatmapID = 1234 + i,
                         Mode = PlayMode.Osu,
                         Path = "normal.osu",
                         Version = "Normal",
@@ -74,7 +74,7 @@ namespace osu.Desktop.VisualTests.Tests
                     },
                     new BeatmapInfo
                     {
-                        BeatmapID = 1235 + i,
+                        OnlineBeatmapID = 1235 + i,
                         Mode = PlayMode.Osu,
                         Path = "hard.osu",
                         Version = "Hard",
@@ -85,7 +85,7 @@ namespace osu.Desktop.VisualTests.Tests
                     },
                     new BeatmapInfo
                     {
-                        BeatmapID = 1236 + i,
+                        OnlineBeatmapID = 1236 + i,
                         Mode = PlayMode.Osu,
                         Path = "insane.osu",
                         Version = "Insane",
