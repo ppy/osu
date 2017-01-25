@@ -230,7 +230,6 @@
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ReleaseStream.cs" />
     <Compile Include="Configuration\ScreenshotFormat.cs" />
-    <Compile Include="Configuration\FrameSync.cs" />
     <Compile Include="Configuration\ConfineMouseMode.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
   </ItemGroup>
