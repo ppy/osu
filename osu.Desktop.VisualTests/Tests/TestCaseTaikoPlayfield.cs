@@ -51,11 +51,23 @@ namespace osu.Desktop.VisualTests.Tests
                             Size = new Vector2(0.25f, 1),
                         },
                         // Track area
-                        new TaikoTrackArea()
+                        new Container()
                         {
                             RelativeSizeAxes = Axes.Both,
                             Size = new Vector2(0.75f, 1),
-                        }
+
+                            Children = new Drawable[]
+                            {
+                                new TaikoTrackArea()
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new TaikoHitTarget()
+                                {
+                                    Size = new Vector2(100, 100)
+                                }
+                            }
+                        },
                     }
                 }
             });
@@ -70,6 +82,44 @@ namespace osu.Desktop.VisualTests.Tests
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
+        }
+
+        class TaikoHitTarget : Container
+        {
+            private Sprite drumBase;
+
+            public TaikoHitTarget()
+            {
+                Children = new Drawable[]
+                {
+                    new Box()
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+
+                        RelativeSizeAxes = Axes.Y,
+                        Size = new Vector2(5, 1),
+
+                        Colour = Color4.Black,
+                        Alpha = 0.5f,
+                    },
+                    drumBase = new Sprite()
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+
+                        RelativeSizeAxes = Axes.Both,
+
+                        Scale = new Vector2(0.7f),
+                    }
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                drumBase.Texture = textures.Get("Play/Taiko/taiko-drum@2x");
+            }
         }
 
         class TaikoHitCircle : CircularContainer

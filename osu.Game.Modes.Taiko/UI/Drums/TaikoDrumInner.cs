@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.UI.Drums
 {
-    public class TaikoDrumInner : FlowContainer
+    class TaikoDrumInner : FlowContainer
     {
         private TaikoHalfDrum rightHalf;
         private TaikoHalfDrum leftHalf;
