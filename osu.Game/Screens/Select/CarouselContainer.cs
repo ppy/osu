@@ -16,6 +16,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Framework.Timing;
 using osu.Framework.Input;
 using OpenTK.Input;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Screens.Select
 {
@@ -287,6 +288,17 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(state, args);
+        }
+
+        public void SelectRandom()
+        {
+            if (groups.Count < 1)
+                return;
+            BeatmapGroup group = groups[RNG.Next(groups.Count)];
+            BeatmapPanel panel = group?.BeatmapPanels.First();
+            if (panel == null)
+                return;
+            SelectGroup(group, panel);
         }
     }
 }
