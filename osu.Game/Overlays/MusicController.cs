@@ -43,7 +43,6 @@ namespace osu.Game.Overlays
         private TrackManager trackManager;
         private Bindable<WorkingBeatmap> beatmapSource;
         private Bindable<bool> preferUnicode;
-        private OsuConfigManager config;
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
         private BaseGame game;
@@ -87,9 +86,11 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, BeatmapDatabase beatmaps, AudioManager audio,
+        private void load(OsuGameBase osuGame, OsuConfigManager config, BeatmapDatabase beatmaps, AudioManager audio,
             TextureStore textures, OsuColour colours)
         {
+            unicodeString = config.GetUnicodeString;
+
             Children = new Drawable[]
             {
                 title = new SpriteText
@@ -202,8 +203,7 @@ namespace osu.Game.Overlays
         
             this.beatmaps = beatmaps;
             trackManager = osuGame.Audio.Track;
-            config = osuGame.Config;
-            preferUnicode = osuGame.Config.GetBindable<bool>(OsuConfig.ShowUnicode);
+            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
             preferUnicode.ValueChanged += preferUnicode_changed;
 
             beatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
@@ -324,8 +324,8 @@ namespace osu.Game.Overlays
                     return;
 
                 BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
-                title.Text = config.GetUnicodeString(metadata.Title, metadata.TitleUnicode);
-                artist.Text = config.GetUnicodeString(metadata.Artist, metadata.ArtistUnicode);
+                title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
+                artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
             });
 
             MusicControllerBackground newBackground;
@@ -353,6 +353,8 @@ namespace osu.Game.Overlays
                 backgroundSprite = newBackground;
             });
         }
+
+        private Func<string, string, string> unicodeString;
 
         private void seek(float position)
         {
