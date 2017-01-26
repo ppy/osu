@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -35,12 +36,37 @@ namespace osu.Game.Database
 
             if (connection == null)
             {
-                connection = storage.GetDatabase(@"beatmaps");
-                connection.CreateTable<BeatmapMetadata>();
-                connection.CreateTable<BaseDifficulty>();
-                connection.CreateTable<BeatmapSetInfo>();
-                connection.CreateTable<BeatmapInfo>();
+                try
+                {
+                    connection = prepareConnection();
+                }
+                catch
+                {
+                    Console.WriteLine(@"Failed to initialise the beatmap database! Trying again with a clean database...");
+                    storage.DeleteDatabase(@"beatmaps");
+                    connection = prepareConnection();
+                }
             }
+        }
+
+        private SQLiteConnection prepareConnection()
+        {
+            var conn = storage.GetDatabase(@"beatmaps");
+
+            try
+            {
+                conn.CreateTable<BeatmapMetadata>();
+                conn.CreateTable<BaseDifficulty>();
+                conn.CreateTable<BeatmapSetInfo>();
+                conn.CreateTable<BeatmapInfo>();
+            }
+            catch
+            {
+                conn.Close();
+                throw;
+            }
+
+            return conn;
         }
 
         public void Reset()

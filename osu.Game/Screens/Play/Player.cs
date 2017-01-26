@@ -48,9 +48,9 @@ namespace osu.Game.Screens.Play
         private Bindable<int> dimLevel;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game)
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
         {
-            dimLevel = game.Config.GetBindable<int>(OsuConfig.DimLevel);
+            dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
             try
             {
                 if (Beatmap == null)
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
             ruleset = Ruleset.GetRuleset(usablePlayMode);
 
             var scoreOverlay = ruleset.CreateScoreOverlay();
-            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor());
+            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
 
             hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
