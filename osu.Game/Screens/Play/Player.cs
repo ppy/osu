@@ -12,7 +12,6 @@ using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Database;
 using osu.Game.Modes;
-using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Backgrounds;
 using OpenTK.Input;
@@ -24,6 +23,7 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
 using osu.Framework.Configuration;
 using System;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play
 {
@@ -114,6 +114,7 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 scoreOverlay,
+                new SkipButton(sourceClock, beatmap.HitObjects.First().StartTime)
             };
         }
 
