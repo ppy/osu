@@ -18,22 +18,30 @@ namespace osu.Game.Modes
             TotalScore = TotalScore,
             Combo = Combo,
             MaxCombo = HighestCombo,
-            Accuracy = Accuracy
+            Accuracy = Accuracy,
+            Health = Health,
         };
 
         public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
 
         public readonly BindableDouble Accuracy = new BindableDouble { MinValue = 0, MaxValue = 1 };
 
+        public readonly BindableDouble Health = new BindableDouble { MinValue = 0, MaxValue = 1 };
+
         public readonly BindableInt Combo = new BindableInt();
 
         public readonly BindableInt HighestCombo = new BindableInt();
 
-        public readonly List<JudgementInfo> Judgements = new List<JudgementInfo>();
+        public readonly List<JudgementInfo> Judgements;
 
-        public ScoreProcessor()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScoreProcessor"/> class.
+        /// </summary>
+        /// <param name="hitObjectCount">Number of HitObjects. It is used for specifying Judgements collection Capacity</param>
+        public ScoreProcessor(int hitObjectCount = 0)
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
+            Judgements = new List<JudgementInfo>(hitObjectCount);
         }
 
         public void AddJudgement(JudgementInfo judgement)

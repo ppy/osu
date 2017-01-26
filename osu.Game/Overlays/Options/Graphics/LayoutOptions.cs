@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Options.Graphics
         protected override string Header => "Layout";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(FrameworkConfigManager config)
         {
             Children = new Drawable[]
             {
@@ -24,22 +24,22 @@ namespace osu.Game.Overlays.Options.Graphics
                 new CheckBoxOption
                 {
                     LabelText = "Fullscreen mode",
-                    Bindable = config.GetBindable<bool>(OsuConfig.Fullscreen),
+                    Bindable = config.GetBindable<bool>(FrameworkConfig.Fullscreen),
                 },
                 new CheckBoxOption
                 {
                     LabelText = "Letterboxing",
-                    Bindable = config.GetBindable<bool>(OsuConfig.Letterboxing),
+                    Bindable = config.GetBindable<bool>(FrameworkConfig.Letterboxing),
                 },
                 new SliderOption<int>
                 {
                     LabelText = "Horizontal position",
-                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.LetterboxPositionX)
+                    Bindable = (BindableInt)config.GetBindable<int>(FrameworkConfig.LetterboxPositionX)
                 },
                 new SliderOption<int>
                 {
                     LabelText = "Vertical position",
-                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.LetterboxPositionY)
+                    Bindable = (BindableInt)config.GetBindable<int>(FrameworkConfig.LetterboxPositionY)
                 },
             };
         }
