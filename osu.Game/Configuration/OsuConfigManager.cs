@@ -325,7 +325,6 @@ namespace osu.Game.Configuration
         SaveUsername,
         TreeSortMode,
         TreeSortMode2,
-        FrameSync,
         ShowUnicode,
         PermanentSongInfo,
         Ticker,

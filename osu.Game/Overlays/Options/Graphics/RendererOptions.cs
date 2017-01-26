@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Options.Graphics
         protected override string Header => "Renderer";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
         {
             // NOTE: Compatability mode omitted
             Children = new Drawable[]
@@ -25,22 +25,22 @@ namespace osu.Game.Overlays.Options.Graphics
                 new DropdownOption<FrameSync>
                 {
                     LabelText = "Frame limiter",
-                    Bindable = config.GetBindable<FrameSync>(OsuConfig.FrameSync)
+                    Bindable = config.GetBindable<FrameSync>(FrameworkConfig.FrameSync)
                 },
                 new CheckBoxOption
                 {
                     LabelText = "Show FPS counter",
-                    Bindable = config.GetBindable<bool>(OsuConfig.FpsCounter),
+                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.FpsCounter),
                 },
                 new CheckBoxOption
                 {
                     LabelText = "Reduce dropped frames",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ForceFrameFlush),
+                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.ForceFrameFlush),
                 },
                 new CheckBoxOption
                 {
                     LabelText = "Detect performance issues",
-                    Bindable = config.GetBindable<bool>(OsuConfig.DetectPerformanceIssues),
+                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.DetectPerformanceIssues),
                 },
             };
         }
