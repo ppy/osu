@@ -102,6 +102,8 @@ namespace osu.Game.Screens.Play
             pauseOverlay = new PauseOverlay();
             pauseOverlay.OnPause += onPause;
             pauseOverlay.OnPlay += onPlay;
+            pauseOverlay.OnRetry += onRetry;
+            pauseOverlay.OnQuit += onQuit;
 
             hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
@@ -183,6 +185,16 @@ namespace osu.Game.Screens.Play
         {
             scoreOverlay.KeyCounter.IsCounting = true;
             sourceClock.Start();
+        }
+
+        private void onRetry()
+        {
+
+        }
+
+        private void onQuit()
+        {
+            Exit();
         }
 
         protected override void OnEntering(GameMode last)

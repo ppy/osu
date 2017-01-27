@@ -1,12 +1,11 @@
 ﻿using System;
-using osu.Framework.GameModes.Testing;
+using OpenTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
-using OpenTK.Input;
 using osu.Game.Overlays.Pause;
 using osu.Framework.Graphics.Containers;
-
-
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.GameModes.Testing;
 namespace osu.Desktop.VisualTests.Tests
 {
     class TestCasePauseOverlay : TestCase
@@ -21,7 +20,13 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            Children = new[] { pauseOverlay = new PauseOverlay() };
+            Add(new Box
+            {
+                ColourInfo = ColourInfo.GradientVertical(Color4.Gray, Color4.WhiteSmoke),
+                RelativeSizeAxes = Framework.Graphics.Axes.Both,
+            });
+            Add(pauseOverlay = new PauseOverlay());
+
             pauseOverlay.ToggleVisibility();
         }
     }
