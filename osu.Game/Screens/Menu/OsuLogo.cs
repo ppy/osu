@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
@@ -63,6 +64,7 @@ namespace osu.Game.Screens.Menu
 
         public bool Interactive = true;
         private Box colourLayer;
+        private Box flashLayer;
 
         public OsuLogo()
         {
@@ -112,7 +114,13 @@ namespace osu.Game.Screens.Menu
                                                         },
                                                     }
                                                 },
-
+                                                flashLayer = new Box
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    BlendingMode = BlendingMode.Additive,
+                                                    Colour = Color4.White,
+                                                    Alpha = 0,
+                                                },
                                             },
                                         },
                                         logo = new Sprite
@@ -190,6 +198,10 @@ namespace osu.Game.Screens.Menu
         protected override bool OnClick(InputState state)
         {
             if (!Interactive) return false;
+
+            flashLayer.ClearTransformations();
+            flashLayer.Alpha = 0.4f;
+            flashLayer.FadeOut(1500, EasingTypes.OutExpo);
 
             Action?.Invoke();
             return true;
