@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 scoreOverlay,
-                new SkipButton(sourceClock, beatmap.HitObjects.First().StartTime)
+                //new SkipButton(sourceClock, beatmap.HitObjects.First().StartTime)
             };
         }
 
