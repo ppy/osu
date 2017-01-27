@@ -15,7 +15,7 @@ namespace osu.Game.Graphics
         public static Color4 Gray(float amt) => new Color4(amt, amt, amt, 1f);
         public static Color4 Gray(byte amt) => new Color4(amt, amt, amt, 255);
 
-        private static Color4 FromHex(string hex)
+        public static Color4 FromHex(string hex)
         {
             return new Color4(
                 Convert.ToByte(hex.Substring(0, 2), 16),
@@ -23,12 +23,6 @@ namespace osu.Game.Graphics
                 Convert.ToByte(hex.Substring(4, 2), 16),
                 255);
         }
-
-        //used for osu! logo and triangles contained within.
-        public Color4 OsuPink = FromHex(@"e967a1");
-        public Color4 OsuPinkLight = FromHex(@"ff7db7");
-        public Color4 OsuPinkDark= FromHex(@"de5b95");
-
 
         // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
         public Color4 PurpleLighter = FromHex(@"eeeeff");
