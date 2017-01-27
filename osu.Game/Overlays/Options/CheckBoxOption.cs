@@ -168,14 +168,17 @@ namespace osu.Game.Overlays.Options
             private void load(OsuColour colours)
             {
                 Colour = idleColour = colours.Pink;
+                glowingColour = colours.PinkLighter;
 
                 EdgeEffect = new EdgeEffect
                 {
-                    Colour = glowingColour = colours.PinkDarker,
+                    Colour = colours.PinkDarker,
                     Type = EdgeEffectType.Glow,
                     Radius = 10,
                     Roundness = 8,
                 };
+
+                FadeGlowTo(0);
             }
 
             public bool Glowing
