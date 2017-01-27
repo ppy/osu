@@ -16,9 +16,10 @@ namespace osu.Game.Overlays.Pause
     public class PauseOverlay : OverlayContainer
     {
         private bool paused = false;
+        private int fadeDuration = 100;
 
         public event Action OnPause;
-        public event Action OnPlay;
+        public event Action OnResume;
         public event Action OnRetry;
         public event Action OnQuit;
 
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays.Pause
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Position = new Vector2(0, -200),
-                    Action = Play
+                    Action = Resume
                 },
                 new PauseButton
                 {
@@ -61,13 +62,13 @@ namespace osu.Game.Overlays.Pause
 
         protected override void PopIn()
         {
-            this.FadeTo(1, 100, EasingTypes.In);
+            this.FadeTo(1, fadeDuration, EasingTypes.In);
             paused = true;
         }
 
         protected override void PopOut()
         {
-            this.FadeTo(0, 100, EasingTypes.In);
+            this.FadeTo(0, fadeDuration, EasingTypes.In);
             paused = false;
         }
 
@@ -76,23 +77,28 @@ namespace osu.Game.Overlays.Pause
             switch (args.Key)
             {
                 case Key.Escape:
-                    paused = !paused;
-                    (paused ? (Action)Pause : Play)?.Invoke();
+                    TogglePaused();
                     return true;
             }
             return base.OnKeyDown(state, args);
         }
 
-        private void Pause()
+        public void Pause()
         {
             Show();
             OnPause?.Invoke();
         }
 
-        private void Play()
+        public void Resume()
         {
             Hide();
-            OnPlay?.Invoke();
+            OnResume?.Invoke();
+        }
+
+        public void TogglePaused()
+        {
+            ToggleVisibility();
+            (paused ? (Action)Pause : Resume)?.Invoke();
         }
 
         private void Retry()

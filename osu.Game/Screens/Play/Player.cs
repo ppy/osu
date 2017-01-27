@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Play
 
             pauseOverlay = new PauseOverlay();
             pauseOverlay.OnPause += onPause;
-            pauseOverlay.OnPlay += onPlay;
+            pauseOverlay.OnResume += onResume;
             pauseOverlay.OnRetry += onRetry;
             pauseOverlay.OnQuit += onQuit;
 
@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Play
             sourceClock.Stop();
         }
 
-        private void onPlay()
+        private void onResume()
         {
             scoreOverlay.KeyCounter.IsCounting = true;
             sourceClock.Start();
