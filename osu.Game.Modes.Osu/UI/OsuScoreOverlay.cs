@@ -7,6 +7,7 @@ using osu.Game.Modes.UI;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.Osu.UI
 {

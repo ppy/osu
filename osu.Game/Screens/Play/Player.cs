@@ -1,21 +1,16 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
-using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Backgrounds;
-using OpenTK.Input;
-using MouseState = osu.Framework.Input.MouseState;
 using OpenTK;
 using osu.Framework.GameModes;
 using osu.Game.Modes.UI;
@@ -23,7 +18,8 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
 using osu.Framework.Configuration;
 using System;
-using osu.Game.Graphics.UserInterface;
+using System.Linq;
+using osu.Game.Beatmaps;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
@@ -47,6 +43,7 @@ namespace osu.Game.Screens.Play
         private ScoreProcessor scoreProcessor;
         private HitRenderer hitRenderer;
         private Bindable<int> dimLevel;
+        private SkipButton skipButton;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
@@ -116,11 +113,38 @@ namespace osu.Game.Screens.Play
                     Children = new Drawable[]
                     {
                         hitRenderer,
+                        skipButton = new SkipButton { Alpha = 0 },
                     }
                 },
                 scoreOverlay,
-                //new SkipButton(sourceClock, beatmap.HitObjects.First().StartTime)
             };
+        }
+
+        private void initializeSkipButton()
+        {
+            const double skip_required_cutoff = 3000;
+            const double fade_time = 300;
+
+            double firstHitObject = Beatmap.Beatmap.HitObjects.First().StartTime;
+
+            if (firstHitObject < skip_required_cutoff)
+            {
+                skipButton.Alpha = 0;
+                skipButton.Expire();
+                return;
+            }
+
+            skipButton.FadeInFromZero(fade_time);
+
+            skipButton.Action = () =>
+            {
+                sourceClock.Seek(firstHitObject - skip_required_cutoff - fade_time);
+                skipButton.Action = null;
+            };
+
+            skipButton.Delay(firstHitObject - skip_required_cutoff - fade_time);
+            skipButton.FadeOut(fade_time);
+            skipButton.Expire();
         }
 
         protected override void LoadComplete()
@@ -135,6 +159,7 @@ namespace osu.Game.Screens.Play
             Schedule(() =>
             {
                 sourceClock.Start();
+                initializeSkipButton();
             });
         }
 

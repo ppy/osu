@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -21,7 +22,6 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(new BackButton());
             Add(new SkipButton());
-
         }
     }
 }
