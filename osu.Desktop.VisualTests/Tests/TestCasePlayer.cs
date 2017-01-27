@@ -29,19 +29,17 @@ namespace osu.Desktop.VisualTests.Tests
         [BackgroundDependencyLoader]
         private void load(BeatmapDatabase db)
         {
-            beatmap = db.GetWorkingBeatmap(db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault());
+            var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault();
+            if (beatmapInfo != null)
+                beatmap = db.GetWorkingBeatmap(beatmapInfo);
         }
 
         public override void Reset()
         {
             base.Reset();
 
-            //ensure we are at offset 0
-            Clock = new FramedClock();
-
-            if (beatmap == null)
+            if (beatmap?.Track == null)
             {
-
                 var objects = new List<HitObject>();
 
                 int time = 1500;

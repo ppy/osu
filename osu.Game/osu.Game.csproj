@@ -116,6 +116,8 @@
     <Compile Include="Screens\Multiplayer\Lobby.cs" />
     <Compile Include="Screens\Multiplayer\Match.cs" />
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
+    <Compile Include="Screens\Play\FailDialog.cs" />
+    <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Select\CarouselContainer.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameMode.cs" />
@@ -234,6 +236,8 @@
     <Compile Include="Graphics\OsuColour.cs" />
     <Compile Include="Screens\Select\FilterControl.cs" />
     <Compile Include="Screens\Select\SearchTextBox.cs" />
+    <Compile Include="Screens\Select\FooterButton.cs" />
+    <Compile Include="Screens\Select\Footer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
