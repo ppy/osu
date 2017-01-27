@@ -3,30 +3,24 @@ using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
-using osu.Framework.Audio;
+using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 using osu.Framework.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
-using osu.Game.Graphics.Backgrounds;
-using osu.Game.Screens.Menu;
 
 namespace osu.Game.Overlays.Pause
 {
     public class PauseOverlay : OverlayContainer
     {
-        public event Action OnPause;
-        public event Action OnResume;
-        public event Action OnRetry;
-        public event Action OnQuit;
-
-        public bool isPaused = false;
-
         private int fadeDuration = 100;
-        private double pauseCooldown = 1000;
-        private double lastActionTime = 0;
+
+        public Action OnResume;
+        public Action OnRetry;
+        public Action OnQuit;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -96,23 +90,34 @@ namespace osu.Game.Overlays.Pause
                             Type = PauseButtonType.Resume,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Action = Resume,
+                            Action = (delegate
+                            {
+                                Hide();
+                                OnResume?.Invoke();
+                            }),
                         },
                         new PauseButton
                         {
                             Type = PauseButtonType.Retry,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Action = Retry,
+                            Action = (delegate
+                            {
+                                Hide();
+                                OnRetry?.Invoke();
+                            }),
                         },
                         new PauseButton
                         {
                             Type = PauseButtonType.Quit,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Action = Quit,
+                            Action = (delegate
+                            {
+                                Hide();
+                                OnQuit?.Invoke();
+                            }),
                         },
-                        new Button(@"solo", @"freeplay", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnPause?.Invoke(), 300, Key.P),
                     }
                 },
             };
@@ -121,13 +126,11 @@ namespace osu.Game.Overlays.Pause
         protected override void PopIn()
         {
             FadeTo(1, fadeDuration, EasingTypes.In);
-            isPaused = true;
         }
 
         protected override void PopOut()
         {
             FadeTo(0, fadeDuration, EasingTypes.In);
-            isPaused = false;
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -135,49 +138,11 @@ namespace osu.Game.Overlays.Pause
             switch (args.Key)
             {
                 case Key.Escape:
-                    TogglePaused();
+                    Hide();
+                    OnResume?.Invoke();
                     return true;
             }
             return base.OnKeyDown(state, args);
-        }
-
-        public void Pause()
-        {
-            if (Time.Current >= (lastActionTime + pauseCooldown))
-            {
-                lastActionTime = Time.Current;
-                Show();
-                OnPause?.Invoke();
-            }
-            else
-            {
-                isPaused = false;
-            }
-        }
-
-        public void Resume()
-        {
-            lastActionTime = Time.Current;
-            Hide();
-            OnResume?.Invoke();
-        }
-
-        public void TogglePaused()
-        {
-            isPaused = !isPaused;
-            (isPaused ? (Action)Pause : Resume)?.Invoke();
-        }
-
-        private void Retry()
-        {
-            Hide();
-            OnRetry?.Invoke();
-        }
-
-        private void Quit()
-        {
-            Hide();
-            OnQuit?.Invoke();
         }
 
         public PauseOverlay()
