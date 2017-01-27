@@ -2,8 +2,6 @@
 using OpenTK.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Transformations;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Overlays.Pause
@@ -14,16 +12,8 @@ namespace osu.Game.Overlays.Pause
         private float width = 300;
         private float expandedWidth = 350;
 
-        private AudioSample sampleClick;
-        private AudioSample sampleHover;
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            // Placeholder till the actual samples are added to osu-resources
-            sampleClick = audio.Sample.Get(@"Menu/menuhit");
-            sampleHover = audio.Sample.Get(@"Menu/menuclick");
-        }
+        public AudioSample sampleClick;
+        public AudioSample sampleHover;
 
         protected override bool OnMouseDown(Framework.Input.InputState state, Framework.Graphics.MouseDownEventArgs args)
         {

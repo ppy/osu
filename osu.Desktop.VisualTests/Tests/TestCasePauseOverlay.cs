@@ -38,7 +38,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Width = 100,
                 Height = 50,
                 Colour = Color4.Black,
-                Action = (() => pauseOverlay.Pause())
+                Action = (() => pauseOverlay.Pause()),
             });
 
             pauseOverlay.OnPause += (() => Logger.Log(@"Pause"));
