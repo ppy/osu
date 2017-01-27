@@ -27,14 +27,14 @@ namespace osu.Game.Overlays.Pause
 
         protected override bool OnMouseDown(Framework.Input.InputState state, Framework.Graphics.MouseDownEventArgs args)
         {
-            sampleClick.Play();
+            sampleClick?.Play();
 
             return true;
         }
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            sampleHover.Play();
+            sampleHover?.Play();
             ResizeTo(new Vector2(expandedWidth, height), 500, EasingTypes.OutElastic);
 
             return true;
