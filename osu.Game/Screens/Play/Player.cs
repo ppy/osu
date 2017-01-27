@@ -177,7 +177,6 @@ namespace osu.Game.Screens.Play
         private void onPause()
         {
             scoreOverlay.KeyCounter.IsCounting = false;
-
             sourceClock.Stop();
         }
 
