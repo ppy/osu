@@ -3,6 +3,7 @@ using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
+using osu.Framework.Audio;
 using osu.Framework.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -15,17 +16,28 @@ namespace osu.Game.Overlays.Pause
 {
     public class PauseOverlay : OverlayContainer
     {
-        private bool paused = false;
-        private int fadeDuration = 100;
-
         public event Action OnPause;
         public event Action OnResume;
         public event Action OnRetry;
         public event Action OnQuit;
 
+        public bool isPaused = false;
+
+        private int fadeDuration = 100;
+        private double pauseDisableTime = 1000;
+        private double lastActionTime = -1000;
+
+        private PauseButton resumeButton;
+        private PauseButton retryButton;
+        private PauseButton quitButton;
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(AudioManager audio, OsuColour colours)
         {
+            var sampleHover = audio.Sample.Get(@"Menu/menuclick");
+            var sampleBack = audio.Sample.Get(@"Menu/menuback");
+            var samplePlayClick = audio.Sample.Get(@"Menu/menu-play-click");
+
             Children = new Drawable[]
             {
                 new Box
@@ -34,42 +46,51 @@ namespace osu.Game.Overlays.Pause
                     Colour = Color4.Black,
                     Alpha = 0.6f,
                 },
-                new PauseButton
+                resumeButton = new PauseButton
                 {
                     Text = @"Resume",
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Position = new Vector2(0, -200),
-                    Action = Resume
+                    Action = Resume,
                 },
-                new PauseButton
+                retryButton = new PauseButton
                 {
                     Text = @"Retry",
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Action = Retry
+                    Action = Retry,
                 },
-                new PauseButton
+                quitButton = new PauseButton
                 {
                     Text = @"Quit",
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Position = new Vector2(0, 200),
-                    Action = Quit
-                }
+                    Action = Quit,
+                },
             };
+
+            resumeButton.sampleHover = sampleHover;
+            resumeButton.sampleClick = sampleBack;
+
+            retryButton.sampleHover = sampleHover;
+            retryButton.sampleClick = samplePlayClick;
+
+            quitButton.sampleHover = sampleHover;
+            quitButton.sampleClick = sampleBack;
         }
 
         protected override void PopIn()
         {
-            this.FadeTo(1, fadeDuration, EasingTypes.In);
-            paused = true;
+            FadeTo(1, fadeDuration, EasingTypes.In);
+            isPaused = true;
         }
 
         protected override void PopOut()
         {
-            this.FadeTo(0, fadeDuration, EasingTypes.In);
-            paused = false;
+            FadeTo(0, fadeDuration, EasingTypes.In);
+            isPaused = false;
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -85,20 +106,30 @@ namespace osu.Game.Overlays.Pause
 
         public void Pause()
         {
-            Show();
-            OnPause?.Invoke();
+            // Only allow pausing once a second
+            if (Time.Current >= (lastActionTime + pauseDisableTime))
+            {
+                lastActionTime = Time.Current;
+                Show();
+                OnPause?.Invoke();
+            }
+            else
+            {
+                isPaused = false;
+            }
         }
 
         public void Resume()
         {
+            lastActionTime = Time.Current;
             Hide();
             OnResume?.Invoke();
         }
 
         public void TogglePaused()
         {
-            ToggleVisibility();
-            (paused ? (Action)Pause : Resume)?.Invoke();
+            isPaused = !isPaused;
+            (isPaused ? (Action)Pause : Resume)?.Invoke();
         }
 
         private void Retry()
