@@ -111,6 +111,7 @@ namespace osu.Game.Overlays.Pause
         {
             RelativeSizeAxes = Axes.Both;
             AutoSizeAxes = Axes.Both;
+            Depth = -1;
         }
     }
 }
