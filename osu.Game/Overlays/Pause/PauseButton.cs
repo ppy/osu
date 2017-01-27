@@ -46,7 +46,8 @@ namespace osu.Game.Overlays.Pause
         }
 
         public PauseButton()
-        {            Size = new Vector2(width, height);
+        {
+            Size = new Vector2(width, height);
             Colour = Color4.Black;
             Shear = new Vector2(0.1f, 0);
         }
