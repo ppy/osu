@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public partial class OsuLogo : Container
     {
+        public Color4 OsuPink = OsuColour.FromHex(@"e967a1");
+
         private Sprite logo;
         private CircularContainer logoContainer;
         private Container logoBounceContainer;
@@ -107,6 +109,7 @@ namespace osu.Game.Screens.Menu
                                                         colourLayer = new Box
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
+                                                            Colour = OsuPink,
                                                         },
                                                         new OsuLogoTriangles
                                                         {
@@ -163,10 +166,8 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, OsuColour colour)
+        private void load(TextureStore textures)
         {
-            colourLayer.Colour = colour.OsuPink;
-
             logo.Texture = textures.Get(@"Menu/logo@2x");
             ripple.Texture = textures.Get(@"Menu/logo@2x");
         }
@@ -221,22 +222,16 @@ namespace osu.Game.Screens.Menu
 
         class OsuLogoTriangles : Triangles
         {
-            private Color4 range1;
-            private Color4 range2;
+            public Color4 OsuPinkLight = OsuColour.FromHex(@"ff7db7");
+            public Color4 OsuPinkDark = OsuColour.FromHex(@"de5b95");
 
             public OsuLogoTriangles()
             {
                 TriangleScale = 4;
                 Alpha = 1;
+
             }
             
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colour)
-            {
-                range1 = colour.OsuPinkDark;
-                range2 = colour.OsuPinkLight;
-            }
-
             protected override Triangle CreateTriangle()
             {
                 var triangle = base.CreateTriangle();
@@ -249,8 +244,8 @@ namespace osu.Game.Screens.Menu
             {
                 float val = RNG.NextSingle();
                 return Interpolation.ValueAt(val,
-                    range1,
-                    range2,
+                    OsuPinkDark,
+                    OsuPinkLight,
                     0, 1);
             }
         }
