@@ -28,9 +28,10 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays.PopUpDialogs;
+using osu.Game.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
-using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -52,6 +53,20 @@ namespace osu.Game.Screens.Select
 
         private AudioSample sampleChangeDifficulty;
         private AudioSample sampleChangeBeatmap;
+
+        private Box modeLight;
+
+        private FooterContainer footer;
+
+        private const float play_song_select_button_width = 100;
+        private const float play_song_select_button_height = 50;
+        private const int mode_light_transition_time = 200;
+
+        private SongSelectOptionsContainer songSelectOptionsContainer;
+        private const float options_button_width = 140;
+        private const float options_button_height = 125;
+
+        private DeleteBeatmapDialog deleteBeatmapDialog;
 
         class WedgeBackground : Container
         {
@@ -127,6 +142,50 @@ namespace osu.Game.Screens.Select
                         },
                     }
                 },
+                deleteBeatmapDialog = new DeleteBeatmapDialog(),
+                songSelectOptionsContainer = new SongSelectOptionsContainer
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Position = new Vector2(0, -53),
+                    Depth = -10,
+                    Children = new SongSelectOptionsButton[]
+                    {
+                        new SongSelectOptionsButton
+                        {
+                            Icon = FontAwesome.fa_osu_cross_o,
+                            TextLineA = "Remove",
+                            TextLineB = "from Unplayed",
+                            Size = new Vector2(options_button_width, options_button_height),
+                            Colour = new Color4(103, 83, 196, 255),
+                        },
+                        new SongSelectOptionsButton
+                        {
+                            Icon = FontAwesome.fa_eraser,
+                            TextLineA = "Clear",
+                            TextLineB = "local scores",
+                            Size = new Vector2(options_button_width, options_button_height),
+                            Colour = new Color4(103, 83, 196, 255),
+                        },
+                        new SongSelectOptionsButton
+                        {
+                            Icon = FontAwesome.fa_pencil,
+                            TextLineA = "Edit",
+                            TextLineB = "Beatmap",
+                            Size = new Vector2(options_button_width, options_button_height),
+                            Colour = new Color4(227, 159, 12, 255),
+                        },
+                        new SongSelectOptionsButton
+                        {
+                            Icon = FontAwesome.fa_trash,
+                            TextLineA = "Delete",
+                            TextLineB = "Beatmap",
+                            Size = new Vector2(options_button_width, options_button_height),
+                            Colour = new Color4(238, 51, 153, 255),
+                            Action = deleteBeatmapDialog.ToggleVisibility,
+                        },
+                    }
+                },
                 carousel = new CarouselContainer
                 {
                     RelativeSizeAxes = Axes.Y,
@@ -156,12 +215,12 @@ namespace osu.Game.Screens.Select
                             Size = Vector2.One,
                             Colour = Color4.Black.Opacity(0.5f),
                         },
-                        new BackButton
+                        modeLight = new Box
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            //RelativeSizeAxes = Axes.Y,
-                            Action = () => Exit()
+                            RelativeSizeAxes = Axes.X,
+                            Height = 3,
+                            Alpha = 0f,
+                            Position = new Vector2(0, -3),
                         },
                         new Button
                         {
@@ -173,6 +232,56 @@ namespace osu.Game.Screens.Select
                             Colour = colours.Pink,
                             Action = start
                         },
+                        new FlowContainer
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+                            Direction = FlowDirection.HorizontalOnly,
+                            Spacing = new Vector2(80, 0),
+                            Children = new Drawable[]
+                            {
+                                new BackButton
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Action = Exit,
+                                },
+                                footer = new FooterContainer
+                                {
+                                    Children = new Drawable[]
+                                    {
+                                        new FooterButton
+                                        {
+                                            Text = "mods",
+                                            Height = play_song_select_button_height,
+                                            Width = play_song_select_button_width,
+                                            SelectedColour = new Color4(238, 51, 153, 255),
+                                            DeselectedColour = new Color4(125, 54, 82, 255),
+                                        },
+                                        new FooterButton
+                                        {
+                                            Text = "random",
+                                            Height = play_song_select_button_height,
+                                            Width = play_song_select_button_width,
+                                            SelectedColour = new Color4(165, 204, 0, 225),
+                                            DeselectedColour = new Color4(79, 99, 8, 255),
+                                            Action = carousel.SelectRandom,
+                                        },
+                                        new FooterButton
+                                        {
+                                            Text = "options",
+                                            Height = play_song_select_button_height,
+                                            Width = play_song_select_button_width,
+                                            SelectedColour = new Color4(68, 170, 221, 225),
+                                            DeselectedColour = new Color4(14, 116, 145, 255),
+                                            Action = songSelectOptionsContainer.ToggleState,
+                                        },
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             };
@@ -193,9 +302,17 @@ namespace osu.Game.Screens.Select
             sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
             sampleChangeBeatmap = audio.Sample.Get(@"SongSelect/select-expand");
 
+            footer.On_HoveredChanged += updateModeLight;
+
             initialAddSetsTask = new CancellationTokenSource();
 
             Task.Factory.StartNew(() => addBeatmapSets(game, initialAddSetsTask.Token), initialAddSetsTask.Token);
+        }
+
+        private void updateModeLight()
+        {
+            modeLight.FadeIn(mode_light_transition_time);
+            modeLight.FadeColour(footer.HoveredButton.SelectedColour, mode_light_transition_time);
         }
 
         private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)
@@ -286,7 +403,7 @@ namespace osu.Game.Screens.Select
 
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
-
+            deleteBeatmapDialog.UpdateSelectedBeatmap(beatmap);
             selectBeatmap(beatmap.BeatmapInfo);
         }
 

@@ -49,9 +49,13 @@ namespace osu.Game.Graphics.Backgrounds
             }
 
             bool useRandomX = Children.Count() < aimTriangleCount / 2;
-            while (Children.Count() < aimTriangleCount)
-                addTriangle(useRandomX);
-
+            while (Children.Count() != aimTriangleCount)
+            {
+                if (Children.Count() < aimTriangleCount)
+                    addTriangle(useRandomX);
+                else if (Children.Count() > aimTriangleCount)
+                    Remove(Children.First(), true);
+            }
         }
 
         protected virtual Triangle CreateTriangle()
