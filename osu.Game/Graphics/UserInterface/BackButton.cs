@@ -27,13 +27,13 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float shear = 0.1f;
 
-        private static readonly Vector2 size_extended = new Vector2(140, 50);
-        private static readonly Vector2 size_retracted = new Vector2(100, 50);
+        public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
+        public  static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
         private AudioSample sampleClick;
 
         public BackButton()
         {
-            Size = size_retracted;
+            Size = SIZE_RETRACTED;
         }
 
         public override bool Contains(Vector2 screenSpacePos) => leftBox.Contains(screenSpacePos) || rightBox.Contains(screenSpacePos);
@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             icon.ClearTransformations();
 
-            ResizeTo(size_extended, transform_time, EasingTypes.OutElastic);
+            ResizeTo(SIZE_EXTENDED, transform_time, EasingTypes.OutElastic);
 
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
             if (duration == 0) duration = pulse_length;
@@ -69,7 +69,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             icon.ClearTransformations();
 
-            ResizeTo(size_retracted, transform_time, EasingTypes.OutElastic);
+            ResizeTo(SIZE_RETRACTED, transform_time, EasingTypes.OutElastic);
 
             int duration = 0; //(int)(Game.Audio.BeatLength);
             if (duration == 0) duration = pulse_length * 2;

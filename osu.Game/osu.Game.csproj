@@ -234,6 +234,8 @@
     <Compile Include="Configuration\ScreenshotFormat.cs" />
     <Compile Include="Configuration\ConfineMouseMode.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
+    <Compile Include="Screens\Select\FooterButton.cs" />
+    <Compile Include="Screens\Select\Footer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
