@@ -14,12 +14,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Screens.Play;
@@ -28,9 +26,9 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
-using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -52,6 +50,8 @@ namespace osu.Game.Screens.Select
 
         private AudioSample sampleChangeDifficulty;
         private AudioSample sampleChangeBeatmap;
+
+        private Footer footer;
 
         class WedgeBackground : Container
         {
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Select
             OsuGame osuGame, OsuColour colours)
         {
             const float carouselWidth = 640;
-            const float bottomToolHeight = 50;
+
             Children = new Drawable[]
             {
                 new ParallaxContainer
@@ -142,41 +142,17 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.X,
                     Margin = new MarginPadding { Top = 20, Right = 20, },
                 },
-                new Container
+                footer = new Footer()
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = bottomToolHeight,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Size = Vector2.One,
-                            Colour = Color4.Black.Opacity(0.5f),
-                        },
-                        new BackButton
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            //RelativeSizeAxes = Axes.Y,
-                            Action = () => Exit()
-                        },
-                        new Button
-                        {
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 100,
-                            Text = "Play",
-                            Colour = colours.Pink,
-                            Action = start
-                        },
-                    }
+                    OnBack = Exit,
+                    OnStart = start,
                 }
             };
-        
+
+            footer.AddButton(@"mods", colours.Yellow, null);
+            footer.AddButton(@"random", colours.Green, carousel.SelectRandom);
+            footer.AddButton(@"options", colours.Blue, null);
+
             if (osuGame != null)
             {
                 playMode = osuGame.PlayMode;
@@ -286,14 +262,10 @@ namespace osu.Game.Screens.Select
 
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
-
             selectBeatmap(beatmap.BeatmapInfo);
         }
 
-        private void selectBeatmap(BeatmapInfo beatmap)
-        {
-            carousel.SelectBeatmap(beatmap);
-        }
+        private void selectBeatmap(BeatmapInfo beatmap) => carousel.SelectBeatmap(beatmap);
 
         /// <summary>
         /// selection has been changed as the result of interaction with the carousel.
