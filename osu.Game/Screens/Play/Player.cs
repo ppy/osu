@@ -22,6 +22,7 @@ using osu.Framework.GameModes;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
+using osu.Game.Overlays.Pause;
 using osu.Framework.Configuration;
 using System;
 using OpenTK.Graphics;
@@ -40,6 +41,11 @@ namespace osu.Game.Screens.Play
 
         public PlayMode PreferredPlayMode;
 
+        public bool isPaused;
+
+        private double pauseCooldown = 1000;
+        private double lastActionTime = 0;
+
         private IAdjustableClock sourceClock;
 
         private Ruleset ruleset;
@@ -47,6 +53,9 @@ namespace osu.Game.Screens.Play
         private ScoreProcessor scoreProcessor;
         private HitRenderer hitRenderer;
         private Bindable<int> dimLevel;
+
+        private ScoreOverlay scoreOverlay;
+        private PauseOverlay pauseOverlay;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
@@ -92,8 +101,13 @@ namespace osu.Game.Screens.Play
 
             ruleset = Ruleset.GetRuleset(usablePlayMode);
 
-            var scoreOverlay = ruleset.CreateScoreOverlay();
+            scoreOverlay = ruleset.CreateScoreOverlay();
             scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
+
+            pauseOverlay = new PauseOverlay();
+            pauseOverlay.OnResume = Resume;
+            //pauseOverlay.OnRetry = Retry; Add when retrying is implemented
+            pauseOverlay.OnQuit = Exit;
 
             hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
@@ -119,7 +133,39 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 scoreOverlay,
+                pauseOverlay
             };
+        }
+
+        public void Pause()
+        {
+            if (Time.Current >= (lastActionTime + pauseCooldown))
+            {
+                lastActionTime = Time.Current;
+                isPaused = true;
+                scoreOverlay.KeyCounter.IsCounting = false;
+                pauseOverlay.Show();
+                sourceClock.Stop();
+            }
+            else
+            {
+                isPaused = false;
+            }
+        }
+
+        public void Resume()
+        {
+            lastActionTime = Time.Current;
+            isPaused = false;
+            scoreOverlay.KeyCounter.IsCounting = true;
+            pauseOverlay.Hide();
+            sourceClock.Start();
+        }
+
+        public void TogglePaused()
+        {
+            isPaused = !isPaused;
+            (isPaused ? (Action)Pause : Resume)?.Invoke();
         }
 
         protected override void LoadComplete()
@@ -179,6 +225,21 @@ namespace osu.Game.Screens.Play
             dimLevel.ValueChanged -= dimChanged;
             Background?.FadeTo(1f, 200);
             return base.OnExiting(next);
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            switch (args.Key)
+            {
+                case Key.Escape:
+                    if (!isPaused)
+                    {
+                        Pause();
+                        return true;
+                    }
+                    else { return false; }
+            }
+            return base.OnKeyDown(state, args);
         }
 
         private void dimChanged(object sender, EventArgs e)
