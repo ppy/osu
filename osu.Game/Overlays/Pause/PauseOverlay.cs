@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Pause
         public bool isPaused = false;
 
         private int fadeDuration = 100;
-        private double pauseDisableTime = 1000;
+        private double pauseCooldown = 1000;
         private double lastActionTime = -1000;
 
         private PauseButton resumeButton;
@@ -106,8 +106,7 @@ namespace osu.Game.Overlays.Pause
 
         public void Pause()
         {
-            // Only allow pausing once a second
-            if (Time.Current >= (lastActionTime + pauseDisableTime))
+            if (Time.Current >= (lastActionTime + pauseCooldown))
             {
                 lastActionTime = Time.Current;
                 Show();
