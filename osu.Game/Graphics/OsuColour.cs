@@ -24,8 +24,13 @@ namespace osu.Game.Graphics
                 255);
         }
 
-        // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
+        //used for osu! logo and triangles contained within.
+        public Color4 OsuPink = FromHex(@"e967a1");
+        public Color4 OsuPinkLight = FromHex(@"ff7db7");
+        public Color4 OsuPinkDark= FromHex(@"de5b95");
 
+
+        // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
         public Color4 PurpleLighter = FromHex(@"eeeeff");
         public Color4 PurpleLight = FromHex(@"aa88ff");
         public Color4 Purple = FromHex(@"8866ee");
