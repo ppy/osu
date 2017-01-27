@@ -62,6 +62,7 @@ namespace osu.Game.Screens.Menu
         }
 
         public bool Interactive = true;
+        private Box colourLayer;
 
         public OsuLogo()
         {
@@ -101,10 +102,9 @@ namespace osu.Game.Screens.Menu
                                                     Origin = Anchor.Centre,
                                                     Children = new Drawable[]
                                                     {
-                                                        new Box
+                                                        colourLayer = new Box
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
-                                                            Colour = new Color4(233, 103, 161, 255),
                                                         },
                                                         new OsuLogoTriangles
                                                         {
@@ -155,8 +155,10 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(TextureStore textures, OsuColour colour)
         {
+            colourLayer.Colour = colour.OsuPink;
+
             logo.Texture = textures.Get(@"Menu/logo@2x");
             ripple.Texture = textures.Get(@"Menu/logo@2x");
         }
@@ -207,10 +209,20 @@ namespace osu.Game.Screens.Menu
 
         class OsuLogoTriangles : Triangles
         {
+            private Color4 range1;
+            private Color4 range2;
+
             public OsuLogoTriangles()
             {
                 TriangleScale = 4;
                 Alpha = 1;
+            }
+            
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colour)
+            {
+                range1 = colour.OsuPinkDark;
+                range2 = colour.OsuPinkLight;
             }
 
             protected override Triangle CreateTriangle()
@@ -225,8 +237,8 @@ namespace osu.Game.Screens.Menu
             {
                 float val = RNG.NextSingle();
                 return Interpolation.ValueAt(val,
-                    new Color4(222, 91, 149, 255),
-                    new Color4(255, 125, 183, 255),
+                    range1,
+                    range2,
                     0, 1);
             }
         }
