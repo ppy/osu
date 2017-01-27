@@ -31,7 +31,8 @@ namespace osu.Desktop.VisualTests.Tests
             Add(pauseOverlay = new PauseOverlay());
 
             Add(new Button
-            {                Text = @"Pause",
+            {
+                Text = @"Pause",
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,
                 Width = 100,
