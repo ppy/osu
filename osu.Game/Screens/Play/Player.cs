@@ -15,6 +15,7 @@ using osu.Game.Modes;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Overlays.Pause;
 using OpenTK.Input;
 using MouseState = osu.Framework.Input.MouseState;
 using OpenTK;
@@ -39,7 +40,7 @@ namespace osu.Game.Screens.Play
         public BeatmapInfo BeatmapInfo;
 
         public PlayMode PreferredPlayMode;
-        
+
         private IAdjustableClock sourceClock;
 
         private Ruleset ruleset;
@@ -47,6 +48,9 @@ namespace osu.Game.Screens.Play
         private ScoreProcessor scoreProcessor;
         private HitRenderer hitRenderer;
         private Bindable<int> dimLevel;
+
+        private PauseOverlay pauseOverlay;
+        private ScoreOverlay scoreOverlay;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
@@ -92,8 +96,12 @@ namespace osu.Game.Screens.Play
 
             ruleset = Ruleset.GetRuleset(usablePlayMode);
 
-            var scoreOverlay = ruleset.CreateScoreOverlay();
+            scoreOverlay = ruleset.CreateScoreOverlay();
             scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
+
+            pauseOverlay = new PauseOverlay();
+            pauseOverlay.OnPause += onPause;
+            pauseOverlay.OnPlay += onPlay;
 
             hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
@@ -119,6 +127,7 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 scoreOverlay,
+                pauseOverlay
             };
         }
 
@@ -163,12 +172,25 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        private void onPause()
+        {
+            scoreOverlay.KeyCounter.IsCounting = false;
+
+            sourceClock.Stop();
+        }
+
+        private void onPlay()
+        {
+            scoreOverlay.KeyCounter.IsCounting = true;
+            sourceClock.Start();
+        }
+
         protected override void OnEntering(GameMode last)
         {
             base.OnEntering(last);
 
             (Background as BackgroundModeBeatmap)?.BlurTo(Vector2.Zero, 1000);
-            Background?.FadeTo((100f- dimLevel)/100, 1000);
+            Background?.FadeTo((100f - dimLevel) / 100, 1000);
 
             Content.Alpha = 0;
             dimLevel.ValueChanged += dimChanged;
@@ -179,6 +201,17 @@ namespace osu.Game.Screens.Play
             dimLevel.ValueChanged -= dimChanged;
             Background?.FadeTo(1f, 200);
             return base.OnExiting(next);
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Key != Key.Escape)
+            {
+                return base.OnKeyDown(state, args);
+            }
+            else {
+                return pauseOverlay.TriggerKeyDown(state, args);
+            }
         }
 
         private void dimChanged(object sender, EventArgs e)
