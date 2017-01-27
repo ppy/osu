@@ -32,6 +32,7 @@ using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Game.Graphics;
 using System.Collections.Generic;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Select
 {
@@ -209,39 +210,50 @@ namespace osu.Game.Screens.Select
             Task.Factory.StartNew(() => addBeatmapSets(game, initialAddSetsTask.Token), initialAddSetsTask.Token);
         }
 
+        private ScheduledDelegate filterTask;
+
         private void filterChanged()
         {
-            var search = filter.Search;
-            BeatmapGroup newSelection = null;
-            bool changed = false;
-            foreach (var beatmapGroup in carousel)
+            if (filterTask != null)
+                filterTask.Cancel();
+            filterTask = Scheduler.AddDelayed(() =>
             {
-                var set = beatmapGroup.BeatmapSet;
-                if (set == null)
-                    continue;
-                bool match = string.IsNullOrEmpty(search)
-                    || (set.Metadata.Artist ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (set.Metadata.ArtistUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (set.Metadata.Title ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (set.Metadata.TitleUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1;
-                if (match)
+                filterTask = null;
+                var search = filter.Search;
+                BeatmapGroup newSelection = null;
+                bool changed = false;
+                foreach (var beatmapGroup in carousel)
                 {
-                    changed = changed && beatmapGroup.Header.Alpha == 1;
-                    beatmapGroup.Header.Alpha = 1;
-                    if (newSelection == null || beatmapGroup.BeatmapSet.OnlineBeatmapSetID == Beatmap.BeatmapSetInfo.OnlineBeatmapSetID)
-                        newSelection = beatmapGroup;
+                    var set = beatmapGroup.BeatmapSet;
+                    if (set == null)
+                        continue;
+                    bool match = string.IsNullOrEmpty(search)
+                        || (set.Metadata.Artist ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
+                        || (set.Metadata.ArtistUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
+                        || (set.Metadata.Title ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
+                        || (set.Metadata.TitleUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1;
+                    if (match)
+                    {
+                        changed = changed && !beatmapGroup.Hidden;
+                        beatmapGroup.Hidden = false;
+                        beatmapGroup.Header.Alpha = 1;
+                        if (newSelection == null || beatmapGroup.BeatmapSet.OnlineBeatmapSetID == Beatmap.BeatmapSetInfo.OnlineBeatmapSetID)
+                            newSelection = beatmapGroup;
+                    }
+                    else
+                    {
+                        changed = changed && beatmapGroup.Hidden;
+                        beatmapGroup.Hidden = true;
+                        beatmapGroup.Header.Alpha = 0;
+                        beatmapGroup.Header.Masking = false;
+                        beatmapGroup.State = BeatmapGroupState.Collapsed;
+                    }
                 }
-                else
-                {
-                    changed = changed && beatmapGroup.Header.Alpha == 0;
-                    beatmapGroup.Header.Alpha = 0;
-                    beatmapGroup.State = BeatmapGroupState.Collapsed;
-                }
-            }
-            if (newSelection != null)
-                selectBeatmap(newSelection.BeatmapSet.Beatmaps[0]);
-            if (changed)
-                carousel.InvalidateVisible();
+                if (newSelection != null)
+                    selectBeatmap(newSelection.BeatmapSet.Beatmaps[0]);
+                if (changed || true)
+                    carousel.InvalidateVisible();
+            }, 250);
         }
 
         private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)

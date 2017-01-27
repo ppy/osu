@@ -28,10 +28,12 @@ namespace osu.Game.Beatmaps.Drawables
         public BeatmapSetHeader Header;
 
         private BeatmapGroupState state;
-
+        
         public List<BeatmapPanel> BeatmapPanels;
 
         public BeatmapSetInfo BeatmapSet;
+
+        public bool Hidden;
 
         public BeatmapGroupState State
         {
