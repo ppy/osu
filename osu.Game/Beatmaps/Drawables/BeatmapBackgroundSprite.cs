@@ -18,7 +18,8 @@ namespace osu.Game.Beatmaps.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
-            Texture = working.Background;
+            if (working.Background != null)
+                Texture = working.Background;
         }
     }
 }

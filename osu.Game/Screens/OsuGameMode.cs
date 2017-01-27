@@ -130,7 +130,7 @@ namespace osu.Game.Screens
             {
                 if (nextOsu != null)
                     //We need to use MakeCurrent in case we are jumping up multiple game modes.
-                    nextOsu.Background.MakeCurrent();
+                    nextOsu.Background?.MakeCurrent();
                 else
                     Background.Exit();
             }
