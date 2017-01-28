@@ -21,6 +21,7 @@ namespace osu.Game.Overlays.Pause
         private float colourExpandTime = 500;
         private float shear = 0.2f;
         private float glowGradientEndAlpha = 0f;
+        private double pressExpandTime = 100;
 
         private Color4 buttonColour;
         private Color4 backgroundColour = OsuColour.Gray(34);
@@ -54,12 +55,18 @@ namespace osu.Game.Overlays.Pause
         private Container backgroundContainer;
         private Container colourContainer;
         private Container glowContainer;
-        private SpriteText spriteText;
 
         public override bool Contains(Vector2 screenSpacePos) => backgroundContainer.Contains(screenSpacePos);
 
+        protected override bool OnMouseDown(Framework.Input.InputState state, MouseDownEventArgs args)
+        {
+            colourContainer.ResizeTo(new Vector2(colourWidth, 1f), 1000, EasingTypes.Out);
+            return true;
+        }
+
         protected override bool OnMouseUp(Framework.Input.InputState state, MouseUpEventArgs args)
         {
+            colourContainer.ResizeTo(new Vector2(1.1f, 1f), pressExpandTime, EasingTypes.In);
             sampleClick?.Play();
             return true;
         }
@@ -67,7 +74,7 @@ namespace osu.Game.Overlays.Pause
         protected override bool OnHover(Framework.Input.InputState state)
         {
             colourContainer.ResizeTo(new Vector2(colourExpandedWidth, 1f), colourExpandTime, EasingTypes.OutElastic);
-            glowContainer.FadeTo(1f, colourExpandTime, EasingTypes.Out);
+            glowContainer.FadeTo(1f, colourExpandTime / 2, EasingTypes.Out);
             sampleHover?.Play();
             return true;
         }
@@ -75,7 +82,7 @@ namespace osu.Game.Overlays.Pause
         protected override void OnHoverLost(Framework.Input.InputState state)
         {
             colourContainer.ResizeTo(new Vector2(colourWidth, 1f), colourExpandTime, EasingTypes.OutElastic);
-            glowContainer.FadeTo(0f, colourExpandTime, EasingTypes.Out);
+            glowContainer.FadeTo(0f, colourExpandTime / 2, EasingTypes.Out);
         }
 
         [BackgroundDependencyLoader]
@@ -187,7 +194,7 @@ namespace osu.Game.Overlays.Pause
                         },
                     }
                 },
-                spriteText = new SpriteText
+                new SpriteText
                 {
                     Text = Text,
                     Anchor = Anchor.Centre,

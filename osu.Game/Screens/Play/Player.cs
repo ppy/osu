@@ -104,9 +104,9 @@ namespace osu.Game.Screens.Play
             scoreOverlay = ruleset.CreateScoreOverlay();
             scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
 
-            pauseOverlay = new PauseOverlay();
+            pauseOverlay = new PauseOverlay { Depth = -1 };
             pauseOverlay.OnResume = Resume;
-            //pauseOverlay.OnRetry = Retry; Add when retrying is implemented
+            pauseOverlay.OnRetry = Restart;
             pauseOverlay.OnQuit = Exit;
 
             hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
@@ -137,9 +137,9 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        public void Pause()
+        public void Pause(bool force = false)
         {
-            if (Time.Current >= (lastActionTime + pauseCooldown))
+            if (Time.Current >= (lastActionTime + pauseCooldown) || force)
             {
                 lastActionTime = Time.Current;
                 isPaused = true;
@@ -165,7 +165,12 @@ namespace osu.Game.Screens.Play
         public void TogglePaused()
         {
             isPaused = !isPaused;
-            (isPaused ? (Action)Pause : Resume)?.Invoke();
+            if (isPaused) Pause(); else Resume();
+        }
+
+        public void Restart()
+        {
+            // TODO: Implement retrying
         }
 
         protected override void LoadComplete()
