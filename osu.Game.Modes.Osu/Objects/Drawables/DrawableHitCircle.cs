@@ -42,6 +42,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Colour = osuObject.Colour,
                     Hit = () =>
                     {
+                        if (Judgement.Result.HasValue) return false;
+
                         ((PositionalJudgementInfo)Judgement).PositionOffset = Vector2.Zero; //todo: set to correct value
                         UpdateJudgement(true);
                         return true;

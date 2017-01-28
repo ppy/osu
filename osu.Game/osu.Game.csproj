@@ -70,6 +70,7 @@
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Modes\Score.cs" />
     <Compile Include="Modes\ScoreProcesssor.cs" />
+    <Compile Include="Modes\UI\HealthDisplay.cs" />
     <Compile Include="Online\API\IOnlineComponent.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
@@ -115,6 +116,8 @@
     <Compile Include="Screens\Multiplayer\Lobby.cs" />
     <Compile Include="Screens\Multiplayer\Match.cs" />
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
+    <Compile Include="Screens\Play\FailDialog.cs" />
+    <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Select\CarouselContainer.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameMode.cs" />
@@ -229,8 +232,10 @@
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ReleaseStream.cs" />
     <Compile Include="Configuration\ScreenshotFormat.cs" />
-    <Compile Include="Configuration\FrameSync.cs" />
     <Compile Include="Configuration\ConfineMouseMode.cs" />
+    <Compile Include="Graphics\OsuColour.cs" />
+    <Compile Include="Screens\Select\FooterButton.cs" />
+    <Compile Include="Screens\Select\Footer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

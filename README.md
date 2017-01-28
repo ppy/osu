@@ -6,6 +6,10 @@
 
 Rhythm is just a *click* away. The future of osu! and the beginning of an open era!
 
+# Status
+
+This is still heavily under development and is not intended for end-user use. This repository is intended for developer collaboration. You're welcome to try and use it but please do not submit bug reports without a patch. Please do not ask for help building or using this software.
+
 # Requirements
 
 - A desktop platform which can compile .NET 4.5.

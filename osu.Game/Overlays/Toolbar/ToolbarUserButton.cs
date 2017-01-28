@@ -16,6 +16,7 @@ using osu.Game.Configuration;
 using osu.Game.Online.API;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -73,7 +74,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Type = EdgeEffectType.Shadow,
                     Radius = 4,
-                    Colour = new Color4(0, 0, 0, 0.1f),
+                    Colour = Color4.Black.Opacity(0.1f),
                 };
 
                 Masking = true;

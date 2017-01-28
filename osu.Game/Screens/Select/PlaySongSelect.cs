@@ -14,12 +14,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Screens.Play;
@@ -28,6 +26,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
 
@@ -52,6 +51,8 @@ namespace osu.Game.Screens.Select
         private AudioSample sampleChangeDifficulty;
         private AudioSample sampleChangeBeatmap;
 
+        private Footer footer;
+
         class WedgeBackground : Container
         {
             public WedgeBackground()
@@ -62,7 +63,7 @@ namespace osu.Game.Screens.Select
                     {
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(1, 0.5f),
-                        Colour = new Color4(0, 0, 0, 0.5f),
+                        Colour = Color4.Black.Opacity(0.5f),
                         Shear = new Vector2(0.15f, 0),
                         EdgeSmoothness = new Vector2(2, 0),
                     },
@@ -72,7 +73,7 @@ namespace osu.Game.Screens.Select
                         RelativePositionAxes = Axes.Y,
                         Size = new Vector2(1, -0.5f),
                         Position = new Vector2(0, 1),
-                        Colour = new Color4(0, 0, 0, 0.5f),
+                        Colour = Color4.Black.Opacity(0.5f),
                         Shear = new Vector2(-0.15f, 0),
                         EdgeSmoothness = new Vector2(2, 0),
                     },
@@ -80,10 +81,37 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public PlaySongSelect()
+        Player player;
+
+        private void start()
+        {
+            if (player != null)
+                return;
+
+            //in the future we may want to move this logic to a PlayerLoader gamemode or similar, so we can rely on the SongSelect transition
+            //and provide a better loading experience (at the moment song select is still accepting input during preload).
+            player = new Player
+            {
+                BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
+                PreferredPlayMode = playMode.Value
+            };
+
+            player.Preload(Game, delegate
+            {
+                if (!Push(player))
+                {
+                    player = null;
+                    //error occured?
+                }
+            });
+        }
+
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(BeatmapDatabase beatmaps, AudioManager audio, BaseGame game,
+            OsuGame osuGame, OsuColour colours)
         {
             const float carouselWidth = 640;
-            const float bottomToolHeight = 50;
+
             Children = new Drawable[]
             {
                 new ParallaxContainer
@@ -114,70 +142,17 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.X,
                     Margin = new MarginPadding { Top = 20, Right = 20, },
                 },
-                new Container
+                footer = new Footer()
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = bottomToolHeight,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Size = Vector2.One,
-                            Colour = new Color4(0, 0, 0, 0.5f),
-                        },
-                        new BackButton
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            //RelativeSizeAxes = Axes.Y,
-                            Action = () => Exit()
-                        },
-                        new Button
-                        {
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 100,
-                            Text = "Play",
-                            Colour = new Color4(238, 51, 153, 255),
-                            Action = start
-                        },
-                    }
+                    OnBack = Exit,
+                    OnStart = start,
                 }
             };
-        }
 
-        Player player;
+            footer.AddButton(@"mods", colours.Yellow, null);
+            footer.AddButton(@"random", colours.Green, carousel.SelectRandom);
+            footer.AddButton(@"options", colours.Blue, null);
 
-        private void start()
-        {
-            if (player != null)
-                return;
-
-            //in the future we may want to move this logic to a PlayerLoader gamemode or similar, so we can rely on the SongSelect transition
-            //and provide a better loading experience (at the moment song select is still accepting input during preload).
-            player = new Player
-            {
-                BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
-                PreferredPlayMode = playMode.Value
-            };
-
-            player.Preload(Game, delegate
-            {
-                if (!Push(player))
-                {
-                    player = null;
-                    //error occured?
-                }
-            });
-        }
-
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase beatmaps, AudioManager audio, BaseGame game, OsuGame osuGame)
-        {
             if (osuGame != null)
             {
                 playMode = osuGame.PlayMode;
@@ -287,14 +262,10 @@ namespace osu.Game.Screens.Select
 
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
-
             selectBeatmap(beatmap.BeatmapInfo);
         }
 
-        private void selectBeatmap(BeatmapInfo beatmap)
-        {
-            carousel.SelectBeatmap(beatmap);
-        }
+        private void selectBeatmap(BeatmapInfo beatmap) => carousel.SelectBeatmap(beatmap);
 
         /// <summary>
         /// selection has been changed as the result of interaction with the carousel.
@@ -305,7 +276,7 @@ namespace osu.Game.Screens.Select
 
             if (!beatmap.Equals(Beatmap?.BeatmapInfo))
             {
-                if (beatmap.BeatmapSetID == Beatmap?.BeatmapInfo.BeatmapSetID)
+                if (beatmap.BeatmapSetInfoID == Beatmap?.BeatmapInfo.BeatmapSetInfoID)
                     sampleChangeDifficulty.Play();
                 else
                 {
@@ -332,7 +303,7 @@ namespace osu.Game.Screens.Select
 
         private void addBeatmapSet(BeatmapSetInfo beatmapSet, BaseGame game)
         {
-            beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.BeatmapSetID);
+            beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.ID);
             beatmapSet.Beatmaps.ForEach(b =>
             {
                 database.GetChildren(b);

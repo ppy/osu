@@ -13,8 +13,7 @@ namespace osu.Game.Configuration
         protected override void InitialiseDefaults()
         {
 #pragma warning disable CS0612 // Type or member is obsolete
-            Set(OsuConfig.Width, 1366, 640);
-            Set(OsuConfig.Height, 768, 480);
+            
             Set(OsuConfig.MouseSpeed, 1.0);
 
             Set(OsuConfig.Username, string.Empty);
@@ -23,11 +22,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.PlayMode, PlayMode.Osu);
             
             Set(OsuConfig.BeatmapDirectory, @"Songs"); // TODO: use this
-            
-            Set(OsuConfig.VolumeUniversal, 0.8, 0, 1);
-            Set(OsuConfig.VolumeMusic, 1.0, 0, 1);
-            Set(OsuConfig.VolumeEffect, 1.0, 0, 1);
-            
+
             Set(OsuConfig.AllowPublicInvites, true);
             Set(OsuConfig.AutoChatHide, true);
             Set(OsuConfig.AutomaticDownload, true);
@@ -55,7 +50,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.DisplayCityLocation, false);
             Set(OsuConfig.DistanceSpacingEnabled, true);
             Set(OsuConfig.EditorTip, 0);
-            Set(OsuConfig.VideoEditor, Get<bool>(OsuConfig.Fullscreen));
+            Set(OsuConfig.VideoEditor, true);
             Set(OsuConfig.EditorDefaultSkin, false);
             Set(OsuConfig.EditorSnakingSliders, true);
             Set(OsuConfig.EditorHitAnimations, false);
@@ -103,9 +98,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.EditorBeatDivisor, 1, 1, 16);
             Set(OsuConfig.EditorGridSize, 32, 4, 32);
             Set(OsuConfig.EditorGridSizeDesign, 32, 4, 32);
-            Set(OsuConfig.HeightFullscreen, 9999, 240, 9999);
             Set(OsuConfig.CustomFrameLimit, 240, 240, 999);
-            Set(OsuConfig.WidthFullscreen, 9999, 320, 9999);
             Set(OsuConfig.MsnIntegration, false);
             Set(OsuConfig.MyPcSucks, false);
             Set(OsuConfig.NotifyFriends, true);
@@ -141,7 +134,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.YahooIntegration, false);
             Set(OsuConfig.ForceFrameFlush, false);
             Set(OsuConfig.DetectPerformanceIssues, true);
-            Set(OsuConfig.Fullscreen, true);
             Set(OsuConfig.MenuMusic, true);
             Set(OsuConfig.MenuVoice, true);
             Set(OsuConfig.MenuParallax, true);
@@ -160,10 +152,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.SaveUsername, true);
             //Set(OsuConfig.TreeSortMode, TreeGroupMode.Show_All);
             //Set(OsuConfig.TreeSortMode2, TreeSortMode.Title);
-            Set(OsuConfig.Letterboxing, Get<bool>(OsuConfig.Fullscreen));
-            Set(OsuConfig.LetterboxPositionX, 0, -100, 100);
-            Set(OsuConfig.LetterboxPositionY, 0, -100, 100);
-            Set(OsuConfig.FrameSync, FrameSync.Limit120);
             bool unicodeDefault = false;
             switch (Get<string>(OsuConfig.Language))
             {
@@ -199,9 +187,6 @@ namespace osu.Game.Configuration
         Token,
         // Imported from old osu:
         BeatmapDirectory,
-        VolumeUniversal,
-        VolumeEffect,
-        VolumeMusic,
         AllowPublicInvites,
         AutoChatHide,
         AutomaticDownload,
@@ -278,11 +263,7 @@ namespace osu.Game.Configuration
         EditorBeatDivisor,
         EditorGridSize,
         EditorGridSizeDesign,
-        Height,
-        Width,
-        HeightFullscreen,
         CustomFrameLimit,
-        WidthFullscreen,
         MsnIntegration,
         MyPcSucks,
         NotifyFriends,
@@ -318,7 +299,6 @@ namespace osu.Game.Configuration
         YahooIntegration,
         ForceFrameFlush,
         DetectPerformanceIssues,
-        Fullscreen,
         MenuMusic,
         MenuVoice,
         MenuParallax,
@@ -341,10 +321,6 @@ namespace osu.Game.Configuration
         SaveUsername,
         TreeSortMode,
         TreeSortMode2,
-        Letterboxing,
-        LetterboxPositionX,
-        LetterboxPositionY,
-        FrameSync,
         ShowUnicode,
         PermanentSongInfo,
         Ticker,

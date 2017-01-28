@@ -16,6 +16,7 @@ using osu.Framework.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Input;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
@@ -140,26 +141,13 @@ namespace osu.Game.Overlays.Options
             private Box fill;
 
             const float border_width = 3;
-
-            Color4 hoverColour = new Color4(255, 221, 238, 255);
-            Color4 defaultColour = new Color4(255, 102, 170, 255);
-            Color4 glowColour = new Color4(187, 17, 119, 0);
+            private Color4 glowingColour, idleColour;
 
             public Light()
             {
                 Size = new Vector2(40, 12);
 
-                Masking = true;
-
-                Colour = defaultColour;
-
-                EdgeEffect = new EdgeEffect
-                {
-                    Colour = glowColour,
-                    Type = EdgeEffectType.Glow,
-                    Radius = 10,
-                    Roundness = 8,
-                };
+                Masking = true;                
 
                 CornerRadius = Height / 2;
                 Masking = true;
@@ -176,19 +164,36 @@ namespace osu.Game.Overlays.Options
                 };
             }
 
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Colour = idleColour = colours.Pink;
+                glowingColour = colours.PinkLighter;
+
+                EdgeEffect = new EdgeEffect
+                {
+                    Colour = colours.PinkDarker,
+                    Type = EdgeEffectType.Glow,
+                    Radius = 10,
+                    Roundness = 8,
+                };
+
+                FadeGlowTo(0);
+            }
+
             public bool Glowing
             {
                 set
                 {
                     if (value)
                     {
-                        FadeColour(hoverColour, 500, EasingTypes.OutQuint);
+                        FadeColour(glowingColour, 500, EasingTypes.OutQuint);
                         FadeGlowTo(1, 500, EasingTypes.OutQuint);
                     }
                     else
                     {
                         FadeGlowTo(0, 500);
-                        FadeColour(defaultColour, 500);
+                        FadeColour(idleColour, 500);
                     }
                 }
             }

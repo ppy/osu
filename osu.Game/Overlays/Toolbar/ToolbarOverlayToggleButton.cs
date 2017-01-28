@@ -17,6 +17,7 @@ using osu.Game.Configuration;
 using osu.Game.Online.API;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -41,7 +42,7 @@ namespace osu.Game.Overlays.Toolbar
             Add(StateBackground = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = new Color4(150, 150, 150, 180),
+                Colour = OsuColour.Gray(150).Opacity(180),
                 BlendingMode = BlendingMode.Additive,
                 Depth = 2,
                 Alpha = 0,
