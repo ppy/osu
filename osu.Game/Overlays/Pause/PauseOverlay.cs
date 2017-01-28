@@ -3,8 +3,6 @@ using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Screens.Menu;
-using osu.Game.Screens.Play;
 using osu.Framework.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -22,16 +20,27 @@ namespace osu.Game.Overlays.Pause
         public Action OnRetry;
         public Action OnQuit;
 
+        private SpriteText retryCounter;        private PauseProgressBar progressBar;
+
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Children = new Drawable[]
             {
-                new Box
+                new ClickableContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.75f,
+
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                            Alpha = 0.75f,
+                        }
+                    }
                 },
                 new SpriteText
                 {
@@ -56,7 +65,7 @@ namespace osu.Game.Overlays.Pause
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
                 },
-                new SpriteText
+                retryCounter = new SpriteText
                 {
                     Text = @"You've retried 0 times in this session",
                     Origin = Anchor.TopCentre,
@@ -66,6 +75,12 @@ namespace osu.Game.Overlays.Pause
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
                     TextSize = 18,
+                },
+                progressBar = new PauseProgressBar
+                {
+                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomCentre,
+                    Width = 1f,
                 },
                 new FlowContainer
                 {
@@ -82,7 +97,6 @@ namespace osu.Game.Overlays.Pause
                         Radius = 50,
                         Offset = new Vector2(0, 0),
                     },
-
                     Children = new Drawable[]
                     {
                         new PauseButton
@@ -138,6 +152,7 @@ namespace osu.Game.Overlays.Pause
             switch (args.Key)
             {
                 case Key.Escape:
+                    if (State == Visibility.Hidden) return false;
                     Hide();
                     OnResume?.Invoke();
                     return true;
@@ -149,7 +164,6 @@ namespace osu.Game.Overlays.Pause
         {
             RelativeSizeAxes = Axes.Both;
             AutoSizeAxes = Axes.Both;
-            Depth = -1;
         }
     }
 }
