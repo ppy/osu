@@ -1,11 +1,6 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables;
 
@@ -13,6 +8,12 @@ namespace osu.Game.Modes.Osu
 {
     class OsuScoreProcessor : ScoreProcessor
     {
+        public OsuScoreProcessor(int hitObjectCount)
+            : base(hitObjectCount)
+        {
+            Health.Value = 1;
+        }
+
         protected override void UpdateCalculations(JudgementInfo judgement)
         {
             if (judgement != null)
@@ -21,9 +22,11 @@ namespace osu.Game.Modes.Osu
                 {
                     case HitResult.Hit:
                         Combo.Value++;
+                        Health.Value += 0.1f;
                         break;
                     case HitResult.Miss:
                         Combo.Value = 0;
+                        Health.Value -= 0.2f;
                         break;
                 }
             }

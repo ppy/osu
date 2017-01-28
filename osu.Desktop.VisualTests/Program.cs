@@ -18,7 +18,7 @@ namespace osu.Desktop.VisualTests
         [STAThread]
         public static void Main(string[] args)
         {
-            using (BasicGameHost host = Host.GetSuitableHost(@"osu-visual-tests"))
+            using (BasicGameHost host = Host.GetSuitableHost(@"osu"))
             {
                 Ruleset.Register(new OsuRuleset());
                 Ruleset.Register(new TaikoRuleset());

@@ -13,11 +13,15 @@ namespace osu.Game.Database
 {
     public class BeatmapInfo : IEquatable<BeatmapInfo>
     {
-        [PrimaryKey]
-        public int BeatmapID { get; set; }
+        [PrimaryKey, AutoIncrement]
+        public int ID { get; set; }
+
+        public int? OnlineBeatmapID { get; set; } = null;
+
+        public int? OnlineBeatmapSetID { get; set; } = null;
 
         [ForeignKey(typeof(BeatmapSetInfo))]
-        public int BeatmapSetID { get; set; }
+        public int BeatmapSetInfoID { get; set; }
 
         [ManyToOne]
         public BeatmapSetInfo BeatmapSet { get; set; }
@@ -71,7 +75,7 @@ namespace osu.Game.Database
 
         public bool Equals(BeatmapInfo other)
         {
-            return BeatmapID == other?.BeatmapID;
+            return ID == other?.ID;
         }
 
         public bool AudioEquals(BeatmapInfo other) => other != null &&

@@ -2,16 +2,12 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Threading;
 using osu.Framework.Configuration;
 using osu.Framework.GameModes;
 using osu.Game.Configuration;
-using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Platform;
 using osu.Game.Overlays;
-using osu.Framework;
 using osu.Framework.Input;
 using osu.Game.Input;
 using OpenTK.Input;
@@ -25,7 +21,6 @@ using osu.Game.Modes;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Play;
 
 namespace osu.Game
 {
@@ -55,13 +50,6 @@ namespace osu.Game
             this.args = args;
         }
 
-        public override void SetHost(BasicGameHost host)
-        {
-            base.SetHost(host);
-
-            host.Size = new Vector2(Config.Get<int>(OsuConfig.Width), Config.Get<int>(OsuConfig.Height));
-        }
-
         public void ToggleOptions() => options.ToggleVisibility();
 
         [BackgroundDependencyLoader]
@@ -78,12 +66,7 @@ namespace osu.Game
 
             Dependencies.Cache(this);
 
-            //attach our bindables to the audio subsystem.
-            Audio.Volume.Weld(Config.GetBindable<double>(OsuConfig.VolumeUniversal));
-            Audio.VolumeSample.Weld(Config.GetBindable<double>(OsuConfig.VolumeEffect));
-            Audio.VolumeTrack.Weld(Config.GetBindable<double>(OsuConfig.VolumeMusic));
-
-            PlayMode = Config.GetBindable<PlayMode>(OsuConfig.PlayMode);
+            PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
         }
 
         protected override void LoadComplete()
@@ -110,11 +93,9 @@ namespace osu.Game
 
             (modeStack = new Intro()).Preload(this, d =>
             {
-                mainContent.Add(d);
-
                 modeStack.ModePushed += modeAdded;
                 modeStack.Exited += modeRemoved;
-                modeStack.DisplayAsRoot();
+                mainContent.Add(modeStack);
             });
 
             //overlay elements
@@ -240,18 +221,6 @@ namespace osu.Game
         private void modeRemoved(GameMode newMode)
         {
             modeChanged(newMode);
-        }
-
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-        {
-            if (!base.Invalidate(invalidation, source, shallPropagate)) return false;
-
-            if (Parent != null)
-            {
-                Config.Set(OsuConfig.Width, DrawSize.X);
-                Config.Set(OsuConfig.Height, DrawSize.Y);
-            }
-            return true;
         }
     }
 }

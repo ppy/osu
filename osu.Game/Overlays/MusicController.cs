@@ -43,7 +43,6 @@ namespace osu.Game.Overlays
         private TrackManager trackManager;
         private Bindable<WorkingBeatmap> beatmapSource;
         private Bindable<bool> preferUnicode;
-        private OsuConfigManager config;
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
         private BaseGame game;
@@ -56,7 +55,7 @@ namespace osu.Game.Overlays
             EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Shadow,
-                Colour = new Color4(0, 0, 0, 40),
+                Colour = Color4.Black.Opacity(40),
                 Radius = 5,
             };
 
@@ -65,6 +64,32 @@ namespace osu.Game.Overlays
             Origin = Anchor.TopRight;
             Position = start_position;
             Margin = new MarginPadding(10);
+        }
+
+        protected override bool OnDragStart(InputState state) => true;
+
+        protected override bool OnDrag(InputState state)
+        {
+            Vector2 change = (state.Mouse.Position - state.Mouse.PositionMouseDown.Value);
+
+            // Diminish the drag distance as we go further to simulate "rubber band" feeling.
+            change *= (float)Math.Pow(change.Length, 0.7f) / change.Length;
+
+            MoveTo(start_position + change);
+            return base.OnDrag(state);
+        }
+
+        protected override bool OnDragEnd(InputState state)
+        {
+            MoveTo(start_position, 800, EasingTypes.OutElastic);
+            return base.OnDragEnd(state);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase osuGame, OsuConfigManager config, BeatmapDatabase beatmaps, AudioManager audio,
+            TextureStore textures, OsuColour colours)
+        {
+            unicodeString = config.GetUnicodeString;
 
             Children = new Drawable[]
             {
@@ -171,38 +196,14 @@ namespace osu.Game.Overlays
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
                     Height = 10,
-                    Colour = new Color4(255, 204, 34, 255),
+                    Colour = colours.Yellow,
                     SeekRequested = seek
                 }
             };
-        }
-
-        protected override bool OnDragStart(InputState state) => true;
-
-        protected override bool OnDrag(InputState state)
-        {
-            Vector2 change = (state.Mouse.Position - state.Mouse.PositionMouseDown.Value);
-
-            // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-            change *= (float)Math.Pow(change.Length, 0.7f) / change.Length;
-
-            MoveTo(start_position + change);
-            return base.OnDrag(state);
-        }
-
-        protected override bool OnDragEnd(InputState state)
-        {
-            MoveTo(start_position, 800, EasingTypes.OutElastic);
-            return base.OnDragEnd(state);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, BeatmapDatabase beatmaps, AudioManager audio, TextureStore textures)
-        {
+        
             this.beatmaps = beatmaps;
             trackManager = osuGame.Audio.Track;
-            config = osuGame.Config;
-            preferUnicode = osuGame.Config.GetBindable<bool>(OsuConfig.ShowUnicode);
+            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
             preferUnicode.ValueChanged += preferUnicode_changed;
 
             beatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
@@ -323,8 +324,8 @@ namespace osu.Game.Overlays
                     return;
 
                 BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
-                title.Text = config.GetUnicodeString(metadata.Title, metadata.TitleUnicode);
-                artist.Text = config.GetUnicodeString(metadata.Artist, metadata.ArtistUnicode);
+                title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
+                artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
             });
 
             MusicControllerBackground newBackground;
@@ -352,6 +353,8 @@ namespace osu.Game.Overlays
                 backgroundSprite = newBackground;
             });
         }
+
+        private Func<string, string, string> unicodeString;
 
         private void seek(float position)
         {
@@ -393,7 +396,7 @@ namespace osu.Game.Overlays
                 {
                     sprite = new Sprite
                     {
-                        Colour = new Color4(150, 150, 150, 255),
+                        Colour = OsuColour.Gray(150),
                         FillMode = FillMode.Fill,
                     },
                     new Box
@@ -402,7 +405,7 @@ namespace osu.Game.Overlays
                         Height = 50,
                         Origin = Anchor.BottomCentre,
                         Anchor = Anchor.BottomCentre,
-                        Colour = new Color4(0, 0, 0, 127)
+                        Colour = Color4.Black.Opacity(0.5f)
                     }
                 };
             }

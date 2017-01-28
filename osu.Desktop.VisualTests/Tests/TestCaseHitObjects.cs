@@ -42,14 +42,13 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 var h = new HitCircle
                 {
-                    StartTime = Clock.CurrentTime + 1000 + i * 80,
+                    StartTime = Clock.CurrentTime + 600 + i * 80,
                     Position = new Vector2((i - count / 2) * 14),
                 };
 
                 DrawableHitCircle d = new DrawableHitCircle(h)
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                     Depth = i,
                     State = ArmedState.Hit,
                     Judgement = new OsuJudgementInfo { Result = HitResult.Hit }

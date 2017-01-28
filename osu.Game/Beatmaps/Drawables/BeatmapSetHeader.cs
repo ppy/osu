@@ -92,7 +92,8 @@ namespace osu.Game.Beatmaps.Drawables
             preferUnicode.ValueChanged += preferUnicode_changed;
             preferUnicode_changed(preferUnicode, null);
         }
-        private void preferUnicode_changed(object sender, EventArgs e)
+
+        private void preferUnicode_changed(object sender, EventArgs e)
         {
             title.Text = config.GetUnicodeString(beatmap.BeatmapSetInfo.Metadata.Title, beatmap.BeatmapSetInfo.Metadata.TitleUnicode);
             artist.Text = config.GetUnicodeString(beatmap.BeatmapSetInfo.Metadata.Artist, beatmap.BeatmapSetInfo.Metadata.ArtistUnicode);
@@ -138,19 +139,22 @@ namespace osu.Game.Beatmaps.Drawables
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ColourInfo = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
+                                ColourInfo = ColourInfo.GradientHorizontal(
+                                    Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
                                 Width = 0.05f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ColourInfo = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
+                                ColourInfo = ColourInfo.GradientHorizontal(
+                                    new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
                                 Width = 0.2f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ColourInfo = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
+                                ColourInfo = ColourInfo.GradientHorizontal(
+                                    new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
                                 Width = 0.05f,
                             },
                         }
