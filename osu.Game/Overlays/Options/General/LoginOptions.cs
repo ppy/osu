@@ -80,17 +80,6 @@ namespace osu.Game.Overlays.Options.General
             private CheckBoxOption saveUsername;
             private CheckBoxOption savePassword;
 
-            private void eventPassword()
-            {
-                if ((savePassword.State == CheckBoxState.Checked) && (saveUsername.State == CheckBoxState.Unchecked))
-                    saveUsername.State = CheckBoxState.Checked;
-            }
-            private void eventUsername()
-            {
-                if ((saveUsername.State == CheckBoxState.Unchecked) && (savePassword.State == CheckBoxState.Checked))
-                    savePassword.State = CheckBoxState.Unchecked;
-            }
-
             private void performLogin()
             {
                 if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
@@ -143,8 +132,6 @@ namespace osu.Game.Overlays.Options.General
                         //Action = registerLink
                     }
                 };
-                config.GetBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate { eventPassword(); };
-                config.GetBindable<bool>(OsuConfig.SaveUsername).ValueChanged += delegate { eventUsername(); };
             }
         }
     }
