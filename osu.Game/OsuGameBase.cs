@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
@@ -21,7 +22,7 @@ namespace osu.Game
 {
     public class OsuGameBase : BaseGame, IOnlineComponent
     {
-        internal OsuConfigManager Config;
+        protected OsuConfigManager LocalConfig;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -39,8 +40,9 @@ namespace osu.Game
         private void load()
         {
             Dependencies.Cache(this);
-            Dependencies.Cache(Config);
+            Dependencies.Cache(LocalConfig);
             Dependencies.Cache(new BeatmapDatabase(Host.Storage, Host));
+            Dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
             Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 0.01f }, true);
@@ -67,8 +69,8 @@ namespace osu.Game
 
             Dependencies.Cache(API = new APIAccess
             {
-                Username = Config.Get<string>(OsuConfig.Username),
-                Token = Config.Get<string>(OsuConfig.Token)
+                Username = LocalConfig.Get<string>(OsuConfig.Username),
+                Token = LocalConfig.Get<string>(OsuConfig.Token)
             });
 
             API.Register(this);
@@ -79,7 +81,7 @@ namespace osu.Game
             switch (state)
             {
                 case APIState.Online:
-                    Config.Set(OsuConfig.Username, Config.Get<bool>(OsuConfig.SaveUsername) ? API.Username : string.Empty);
+                    LocalConfig.Set(OsuConfig.Username, LocalConfig.Get<bool>(OsuConfig.SaveUsername) ? API.Username : string.Empty);
                     break;
             }
         }
@@ -99,8 +101,8 @@ namespace osu.Game
 
         public override void SetHost(BasicGameHost host)
         {
-            if (Config == null)
-                Config = new OsuConfigManager(host.Storage);
+            if (LocalConfig == null)
+                LocalConfig = new OsuConfigManager(host.Storage);
             base.SetHost(host);
         }
 
@@ -113,10 +115,10 @@ namespace osu.Game
         protected override void Dispose(bool isDisposing)
         {
             //refresh token may have changed.
-            if (Config != null && API != null)
+            if (LocalConfig != null && API != null)
             {
-                Config.Set(OsuConfig.Token, Config.Get<bool>(OsuConfig.SavePassword) ? API.Token : string.Empty);
-                Config.Save();
+                LocalConfig.Set(OsuConfig.Token, LocalConfig.Get<bool>(OsuConfig.SavePassword) ? API.Token : string.Empty);
+                LocalConfig.Save();
             }
 
             base.Dispose(isDisposing);

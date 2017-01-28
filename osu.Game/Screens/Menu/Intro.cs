@@ -65,9 +65,10 @@ namespace osu.Game.Screens.Menu
             bgm.Looping = true;
         }
 
-        protected override void LoadComplete()
+        protected override void OnEntering(GameMode last)
         {
-            base.LoadComplete();
+            base.OnEntering(last);
+
             Scheduler.Add(delegate
             {
                 welcome.Play();
