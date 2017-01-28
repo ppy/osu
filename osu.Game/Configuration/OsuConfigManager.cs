@@ -172,13 +172,11 @@ namespace osu.Game.Configuration
 
             GetBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate
             {
-                if (Get<bool>(OsuConfig.SavePassword) && !Get<bool>(OsuConfig.SaveUsername))
-                    Set(OsuConfig.SaveUsername, true);
+                if (Get<bool>(OsuConfig.SavePassword)) Set(OsuConfig.SaveUsername, true);
             };
             GetBindable<bool>(OsuConfig.SaveUsername).ValueChanged += delegate
             {
-                if (!Get<bool>(OsuConfig.SaveUsername) && Get<bool>(OsuConfig.SavePassword))
-                    Set(OsuConfig.SavePassword, false);
+                if (!Get<bool>(OsuConfig.SaveUsername)) Set(OsuConfig.SavePassword, false);
             };
 #pragma warning restore CS0612 // Type or member is obsolete
         }
