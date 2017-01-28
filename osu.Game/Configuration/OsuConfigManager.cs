@@ -169,20 +169,18 @@ namespace osu.Game.Configuration
             Set(OsuConfig.ConfineMouse, Get<bool>(OsuConfig.ConfineMouseToFullscreen) ?
                 ConfineMouseMode.Fullscreen : ConfineMouseMode.Never);
 
-            GetBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate { eventPassword(); };
-            GetBindable<bool>(OsuConfig.SaveUsername).ValueChanged += delegate { eventUsername(); };
-#pragma warning restore CS0612 // Type or member is obsolete
-        }
 
-        private void eventPassword()
-        {
-            if ((GetBindable<bool>(OsuConfig.SavePassword) == true) && (GetBindable<bool>(OsuConfig.SaveUsername) == false))
-                Set(OsuConfig.SaveUsername, true);
-        }
-        private void eventUsername()
-        {
-            if ((GetBindable<bool>(OsuConfig.SaveUsername) == false) && (GetBindable<bool>(OsuConfig.SavePassword) == true))
-                Set(OsuConfig.SavePassword, false);
+            GetBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate
+            {
+                if (Get<bool>(OsuConfig.SavePassword) && !Get<bool>(OsuConfig.SaveUsername))
+                    Set(OsuConfig.SaveUsername, true);
+            };
+            GetBindable<bool>(OsuConfig.SaveUsername).ValueChanged += delegate
+            {
+                if (!Get<bool>(OsuConfig.SaveUsername) && Get<bool>(OsuConfig.SavePassword))
+                    Set(OsuConfig.SavePassword, false);
+            };
+#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         //todo: make a UnicodeString class/struct rather than requiring this helper method.
