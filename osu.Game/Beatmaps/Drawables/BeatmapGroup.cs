@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Transformations;
 using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -19,12 +20,16 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         public Action<BeatmapGroup, BeatmapInfo> SelectionChanged;
 
+        /// <summary>
+        /// Fires when one of our difficulties is clicked when already selected. Should start playing the map.
+        /// </summary>
+        public Action<BeatmapInfo> StartRequested;
+
         public BeatmapSetHeader Header;
 
         private BeatmapGroupState state;
 
         public List<BeatmapPanel> BeatmapPanels;
-        private WorkingBeatmap beatmap;
 
         public BeatmapGroupState State
         {
@@ -48,16 +53,14 @@ namespace osu.Game.Beatmaps.Drawables
                             SelectedPanel.State = PanelSelectedState.NotSelected;
 
                         foreach (BeatmapPanel panel in BeatmapPanels)
-                            panel.FadeOut(250);
+                            panel.FadeOut(300, EasingTypes.OutQuint);
                         break;
                 }
             }
         }
 
-        public BeatmapGroup(WorkingBeatmap beatmap)
+        public BeatmapGroup(WorkingBeatmap beatmap, BeatmapSetInfo set = null)
         {
-            this.beatmap = beatmap;
-
             Header = new BeatmapSetHeader(beatmap)
             {
                 GainedSelection = headerGainedSelection,
@@ -68,6 +71,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 Alpha = 0,
                 GainedSelection = panelGainedSelection,
+                StartRequested = p => { StartRequested?.Invoke(p.Beatmap); },
                 RelativeSizeAxes = Axes.X,
             }).ToList();
         }

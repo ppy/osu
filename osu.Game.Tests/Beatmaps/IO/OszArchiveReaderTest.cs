@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             {
                 var reader = new OszArchiveReader(osz);
                 var meta = reader.ReadMetadata();
-                Assert.AreEqual(241526, meta.BeatmapSetID);
+                Assert.AreEqual(241526, meta.OnlineBeatmapSetID);
                 Assert.AreEqual("Soleily", meta.Artist);
                 Assert.AreEqual("Soleily", meta.ArtistUnicode);
                 Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", meta.AudioFile);
@@ -65,7 +65,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                 Assert.AreEqual("Renatus", meta.TitleUnicode);
             }
         }
-        [Test]
+
+        [Test]
         public void TestReadFile()
         {
             using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))

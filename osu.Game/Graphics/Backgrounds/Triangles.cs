@@ -15,6 +15,8 @@ namespace osu.Game.Graphics.Backgrounds
 {
     public class Triangles : Container<Triangle>
     {
+        public override bool HandleInput => false;
+
         public Triangles()
         {
             Alpha = 0.3f;

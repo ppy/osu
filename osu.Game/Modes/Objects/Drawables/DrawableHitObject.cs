@@ -43,6 +43,8 @@ namespace osu.Game.Modes.Objects.Drawables
                 state = value;
 
                 UpdateState(state);
+                if (IsLoaded)
+                    Expire();
 
                 if (State == ArmedState.Hit)
                     PlaySample();
@@ -54,8 +56,8 @@ namespace osu.Game.Modes.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            string hitType = (HitObject.Sample.Type == SampleType.None ? SampleType.Normal : HitObject.Sample.Type).ToString().ToLower();
-            string sampleSet = HitObject.Sample.Set.ToString().ToLower();
+            string hitType = ((HitObject.Sample?.Type ?? SampleType.None) == SampleType.None ? SampleType.Normal : HitObject.Sample.Type).ToString().ToLower();
+            string sampleSet = (HitObject.Sample?.Set ?? SampleSet.Normal).ToString().ToLower();
 
             sample = audio.Sample.Get($@"Gameplay/{sampleSet}-hit{hitType}");
         }
@@ -75,6 +77,8 @@ namespace osu.Game.Modes.Objects.Drawables
 
             //force application of the state that was set before we loaded.
             UpdateState(State);
+
+            Expire(true);
         }
 
         /// <summary>

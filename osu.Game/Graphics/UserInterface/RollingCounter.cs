@@ -1,7 +1,6 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -9,10 +8,6 @@ using osu.Framework.Graphics.Transformations;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -64,7 +59,6 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected T prevCount;
         protected T count;
 
         /// <summary>
@@ -78,7 +72,6 @@ namespace osu.Game.Graphics.UserInterface
             }
             set
             {
-                prevCount = count;
                 count = value;
                 if (IsLoaded)
                 {

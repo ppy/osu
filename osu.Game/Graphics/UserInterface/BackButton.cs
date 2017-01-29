@@ -27,62 +27,13 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float shear = 0.1f;
 
-        private static readonly Vector2 size_extended = new Vector2(140, 50);
-        private static readonly Vector2 size_retracted = new Vector2(100, 50);
+        public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
+        public  static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
         private AudioSample sampleClick;
 
         public BackButton()
         {
-            Size = size_retracted;
-
-            Children = new Drawable[]
-            {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.4f,
-                    Children = new Drawable[]
-                    {
-                        leftBox = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = new Color4(195, 40, 140, 255),
-                            Shear = new Vector2(shear, 0),
-                        },
-                        icon = new TextAwesome
-                        {
-                            Anchor = Anchor.Centre,
-                            TextSize = 25,
-                            Icon = FontAwesome.fa_osu_left_o
-                        },
-                    }
-                },
-                new Container
-                {
-                    Origin = Anchor.TopRight,
-                    Anchor = Anchor.TopRight,
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.6f,
-                    Children = new Drawable[]
-                    {
-                        rightBox = new Box
-                        {
-                            Colour = new Color4(238, 51, 153, 255),
-                            Origin = Anchor.TopLeft,
-                            Anchor = Anchor.TopLeft,
-                            RelativeSizeAxes = Axes.Both,
-                            Shear = new Vector2(shear, 0),
-                            EdgeSmoothness = new Vector2(1.5f, 0),
-                        },
-                        new SpriteText
-                        {
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                            Text = @"Back",
-                        }
-                    }
-                }
-            };
+            Size = SIZE_RETRACTED;
         }
 
         public override bool Contains(Vector2 screenSpacePos) => leftBox.Contains(screenSpacePos) || rightBox.Contains(screenSpacePos);
@@ -91,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             icon.ClearTransformations();
 
-            ResizeTo(size_extended, transform_time, EasingTypes.OutElastic);
+            ResizeTo(SIZE_EXTENDED, transform_time, EasingTypes.OutElastic);
 
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
             if (duration == 0) duration = pulse_length;
@@ -118,7 +69,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             icon.ClearTransformations();
 
-            ResizeTo(size_retracted, transform_time, EasingTypes.OutElastic);
+            ResizeTo(SIZE_RETRACTED, transform_time, EasingTypes.OutElastic);
 
             int duration = 0; //(int)(Game.Audio.BeatLength);
             if (duration == 0) duration = pulse_length * 2;
@@ -140,9 +91,57 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, OsuColour colours)
         {
             sampleClick = audio.Sample.Get(@"Menu/menuback");
+            Children = new Drawable[]
+            {
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.4f,
+                    Children = new Drawable[]
+                    {
+                        leftBox = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.PinkDark,
+                            Shear = new Vector2(shear, 0),
+                        },
+                        icon = new TextAwesome
+                        {
+                            Anchor = Anchor.Centre,
+                            TextSize = 25,
+                            Icon = FontAwesome.fa_osu_left_o
+                        },
+                    }
+                },
+                new Container
+                {
+                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.6f,
+                    Children = new Drawable[]
+                    {
+                        rightBox = new Box
+                        {
+                            Colour = colours.Pink,
+                            Origin = Anchor.TopLeft,
+                            Anchor = Anchor.TopLeft,
+                            RelativeSizeAxes = Axes.Both,
+                            Shear = new Vector2(shear, 0),
+                            EdgeSmoothness = new Vector2(1.5f, 0),
+                        },
+                        new SpriteText
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Text = @"Back",
+                        }
+                    }
+                }
+            };
         }
 
         protected override bool OnClick(InputState state)
@@ -151,7 +150,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 RelativeSizeAxes = Axes.Both,
                 Shear = new Vector2(shear, 0),
-                Colour = new Color4(255, 255, 255, 128),
+                Colour = Color4.White.Opacity(0.5f),
             };
             Add(flash);
 
