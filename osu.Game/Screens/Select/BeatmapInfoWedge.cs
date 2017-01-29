@@ -152,18 +152,18 @@ namespace osu.Game.Screens.Select
                                 Margin = new MarginPadding { Top = 20 },
                                 Spacing = new Vector2(40,0),
                                 AutoSizeAxes = Axes.Both,
-                                Children = new Drawable[]
+                                Children = new []
                                 {
-                                    infoLabel(FontAwesome.fa_clock_o, length),
-                                    infoLabel(FontAwesome.fa_circle, bpm),
-                                    infoLabel(FontAwesome.fa_dot_circle_o, hitCircles),
-                                    infoLabel(FontAwesome.fa_circle_o, sliders),
+                                    new InfoLabel(FontAwesome.fa_clock_o, length),
+                                    new InfoLabel(FontAwesome.fa_circle, bpm),
+                                    new InfoLabel(FontAwesome.fa_dot_circle_o, hitCircles),
+                                    new InfoLabel(FontAwesome.fa_circle_o, sliders),
                                 }
                             },
                         }
                     },
                 }
-            }).Preload(game, delegate(Drawable d)
+            }).Preload(game, delegate (Drawable d)
             {
                 FadeIn(250);
 
@@ -187,15 +187,15 @@ namespace osu.Game.Screens.Select
                 if (bpmMin > tmp) bpmMin = tmp;
             }
             if (bpmMax == bpmMin) return Math.Round(bpmMin) + "bpm";
-            return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "(" + Math.Round(bpmMost) + ")bpm";
+            return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "bpm (avg. " + Math.Round(bpmMost) + "bpm)";
         }
-        
-        private Container infoLabel(FontAwesome icon, string text)
+
+        public class InfoLabel : Container
         {
-            return new Container
+            public InfoLabel(FontAwesome icon, string text)
             {
-                AutoSizeAxes = Axes.Both,
-                Children = new[] 
+                AutoSizeAxes = Axes.Both;
+                Children = new[]
                 {
                     new TextAwesome
                     {
@@ -218,8 +218,8 @@ namespace osu.Game.Screens.Select
                         TextSize = 17,
                         Origin = Anchor.CentreLeft
                     },
-                }
-            };
+                };
+            }
         }
     }
 }
