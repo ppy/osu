@@ -28,7 +28,7 @@ namespace osu.Desktop.VisualTests.Tests
                 ColourInfo = ColourInfo.GradientVertical(Color4.Gray, Color4.WhiteSmoke),
                 RelativeSizeAxes = Framework.Graphics.Axes.Both,
             });
-            Add(pauseOverlay = new PauseOverlay());
+            Add(pauseOverlay = new PauseOverlay { Depth = -1 });
 
             Add(new Button
             {

@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Pause
         public Action OnRetry;
         public Action OnQuit;
 
-        private SpriteText retryCounter;        private PauseProgressBar progressBar;
+        private SpriteText retryCounter;
 
 
         [BackgroundDependencyLoader]
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Pause
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
                     TextSize = 18,
                 },
-                progressBar = new PauseProgressBar
+                new PauseProgressBar
                 {
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
