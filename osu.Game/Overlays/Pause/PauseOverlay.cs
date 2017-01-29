@@ -23,13 +23,15 @@ namespace osu.Game.Overlays.Pause
 
         private SpriteText retryCounter;
 
+        public override bool Contains(Vector2 screenSpacePos) => true;
+
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Children = new Drawable[]
             {
-                new ClickableContainer
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
 
@@ -147,15 +149,8 @@ namespace osu.Game.Overlays.Pause
                 retryCounter.Text = $"You've retried {String.Format("{0:n0}", count)} time{(count == 1) ? "" : "s"} in this session";
         }
 
-        protected override void PopIn()
-        {
-            FadeTo(1, fadeDuration, EasingTypes.In);
-        }
-
-        protected override void PopOut()
-        {
-            FadeTo(0, fadeDuration, EasingTypes.In);
-        }
+        protected override void PopIn() => FadeIn(fadeDuration, EasingTypes.In);
+        protected override void PopOut() => FadeOut(fadeDuration, EasingTypes.In);
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {

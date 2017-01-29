@@ -21,7 +21,6 @@ namespace osu.Game.Overlays.Pause
         private float colourExpandTime = 500;
         private float shear = 0.2f;
         private float glowGradientEndAlpha = 0f;
-        private double pressExpandTime = 100;
 
         private Color4 buttonColour;
         private Color4 backgroundColour = OsuColour.Gray(34);
@@ -60,7 +59,7 @@ namespace osu.Game.Overlays.Pause
 
         protected override bool OnMouseDown(Framework.Input.InputState state, MouseDownEventArgs args)
         {
-            colourContainer.ResizeTo(new Vector2(1.1f, 1f), pressExpandTime, EasingTypes.In);
+            colourContainer.ResizeTo(new Vector2(1.1f, 1f), 200, EasingTypes.In);
             sampleClick?.Play();
             Action?.Invoke();
             return true;
@@ -204,7 +203,7 @@ namespace osu.Game.Overlays.Pause
                     Font = "Exo2.0-Bold",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.1f),
-                    Colour = Color4.White
+                    Colour = Color4.White,
                 }
             });
         }
