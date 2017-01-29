@@ -115,8 +115,8 @@ namespace osu.Game.Overlays.Pause
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = backgroundColour,
-                        },
+                            Colour = backgroundColour
+                        }
                     }
                 },
                 glowContainer = new Container
@@ -132,7 +132,15 @@ namespace osu.Game.Overlays.Pause
                             Origin = Anchor.TopLeft,
                             Anchor = Anchor.TopLeft,
                             Width = 0.125f,
-                            ColourInfo = ColourInfo.GradientHorizontal(new Color4(buttonColour.R, buttonColour.G, buttonColour.B, glowGradientEndAlpha), buttonColour),
+                            ColourInfo = ColourInfo.GradientHorizontal(new Color4(buttonColour.R, buttonColour.G, buttonColour.B, glowGradientEndAlpha), buttonColour)
+                        },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Width = 0.75f,
+                            Colour = buttonColour
                         },
                         new Box
                         {
@@ -140,8 +148,8 @@ namespace osu.Game.Overlays.Pause
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
                             Width = 0.125f,
-                            ColourInfo = ColourInfo.GradientHorizontal(buttonColour, new Color4(buttonColour.R, buttonColour.G, buttonColour.B, glowGradientEndAlpha)),
-                        },
+                            ColourInfo = ColourInfo.GradientHorizontal(buttonColour, new Color4(buttonColour.R, buttonColour.G, buttonColour.B, glowGradientEndAlpha))
+                        }
                     }
                 },
                 new Container
@@ -164,7 +172,7 @@ namespace osu.Game.Overlays.Pause
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.2f),
-                                Radius = 5,
+                                Radius = 5
                             },
                             Colour = buttonColour,
                             Shear = new Vector2(shear, 0),
@@ -173,7 +181,7 @@ namespace osu.Game.Overlays.Pause
                                 new Box
                                 {
                                     EdgeSmoothness = new Vector2(2, 0),
-                                    RelativeSizeAxes = Axes.Both,
+                                    RelativeSizeAxes = Axes.Both
                                 },
                                 new Triangles
                                 {
@@ -181,10 +189,10 @@ namespace osu.Game.Overlays.Pause
                                     RelativeSizeAxes = Axes.Both,
                                     TriangleScale = 4,
                                     Alpha = 0.05f,
-                                    Shear = new Vector2(-shear, 0),
-                                },
+                                    Shear = new Vector2(-shear, 0)
+                                }
                             }
-                        },
+                        }
                     }
                 },
                 new SpriteText
@@ -196,8 +204,8 @@ namespace osu.Game.Overlays.Pause
                     Font = "Exo2.0-Bold",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.1f),
-                    Colour = Color4.White,
-                },
+                    Colour = Color4.White
+                }
             });
         }
 
