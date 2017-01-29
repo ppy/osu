@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Pause
 {
     public class PauseOverlay : OverlayContainer
     {
-        private int fadeDuration = 100;
+        private int fadeDuration = 200;
 
         public Action OnResume;
         public Action OnRetry;
