@@ -68,7 +68,6 @@ namespace osu.Game.Overlays.Pause
                 },
                 retryCounter = new SpriteText
                 {
-                    Text = @"You've retried 0 times in this session",
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.Centre,
                     Width = 100,
@@ -108,7 +107,7 @@ namespace osu.Game.Overlays.Pause
                             Action = (delegate
                             {
                                 Hide();
-                                Task.Delay(fadeDuration * 2).ContinueWith(t=> OnResume?.Invoke());
+                                Task.Delay(fadeDuration * 2).ContinueWith(task => OnResume?.Invoke());
                             }),
                         },
                         new PauseButton
@@ -136,6 +135,16 @@ namespace osu.Game.Overlays.Pause
                     }
                 },
             };
+
+            SetRetries(0);
+        }
+
+        public void SetRetries(int count)
+        {
+            if (retryCounter != null)
+                // "You've retried 1,065 times in this session"
+                // "You've retried 1 time in this session"
+                retryCounter.Text = $"You've retried {String.Format("{0:n0}", count)} time{(count == 1) ? "" : "s"} in this session";
         }
 
         protected override void PopIn()
@@ -155,7 +164,7 @@ namespace osu.Game.Overlays.Pause
                 case Key.Escape:
                     if (State == Visibility.Hidden) return false;
                     Hide();
-                    Task.Delay(fadeDuration * 2).ContinueWith(t => OnResume?.Invoke());
+                    Task.Delay(fadeDuration * 2).ContinueWith(task => OnResume?.Invoke());
                     return true;
             }
             return base.OnKeyDown(state, args);
