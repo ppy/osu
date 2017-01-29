@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
+using System.Threading.Tasks;
 
 namespace osu.Game.Overlays.Pause
 {
@@ -107,7 +108,7 @@ namespace osu.Game.Overlays.Pause
                             Action = (delegate
                             {
                                 Hide();
-                                OnResume?.Invoke();
+                                Task.Delay(fadeDuration * 2).ContinueWith(t=> OnResume?.Invoke());
                             }),
                         },
                         new PauseButton
@@ -154,7 +155,7 @@ namespace osu.Game.Overlays.Pause
                 case Key.Escape:
                     if (State == Visibility.Hidden) return false;
                     Hide();
-                    OnResume?.Invoke();
+                    Task.Delay(fadeDuration * 2).ContinueWith(t => OnResume?.Invoke());
                     return true;
             }
             return base.OnKeyDown(state, args);
