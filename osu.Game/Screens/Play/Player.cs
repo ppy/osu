@@ -21,6 +21,10 @@ using OpenTK;
 using osu.Framework.GameModes;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Ranking;
+using osu.Game.Configuration;
+using osu.Framework.Configuration;
+using System;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -28,7 +32,7 @@ namespace osu.Game.Screens.Play
     {
         public bool Autoplay;
 
-        protected override BackgroundMode CreateBackground() => null;
+        protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
 
@@ -42,10 +46,12 @@ namespace osu.Game.Screens.Play
 
         private ScoreProcessor scoreProcessor;
         private HitRenderer hitRenderer;
+        private Bindable<int> dimLevel;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game)
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
         {
+            dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
             try
             {
                 if (Beatmap == null)
@@ -87,12 +93,16 @@ namespace osu.Game.Screens.Play
             ruleset = Ruleset.GetRuleset(usablePlayMode);
 
             var scoreOverlay = ruleset.CreateScoreOverlay();
-            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor());
+            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
 
             hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
+            //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
-            hitRenderer.OnAllJudged += hitRenderer_OnAllJudged;
+            hitRenderer.OnAllJudged += onPass;
+
+            //bind ScoreProcessor to ourselves (for a fail situation)
+            scoreProcessor.Failed += onFail;
 
             if (Autoplay)
                 hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Hit));
@@ -127,7 +137,7 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private void hitRenderer_OnAllJudged()
+        private void onPass()
         {
             Delay(1000);
             Schedule(delegate
@@ -140,44 +150,40 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        private void onFail()
+        {
+            Content.FadeColour(Color4.Red, 500);
+            sourceClock.Stop();
+
+            Delay(500);
+            Schedule(delegate
+            {
+                ValidForResume = false;
+                Push(new FailDialog());
+            });
+        }
+
         protected override void OnEntering(GameMode last)
         {
             base.OnEntering(last);
 
             (Background as BackgroundModeBeatmap)?.BlurTo(Vector2.Zero, 1000);
+            Background?.FadeTo((100f- dimLevel)/100, 1000);
 
             Content.Alpha = 0;
+            dimLevel.ValueChanged += dimChanged;
         }
 
-        class PlayerInputManager : UserInputManager
+        protected override bool OnExiting(GameMode next)
         {
-            public PlayerInputManager(BasicGameHost host)
-                : base(host)
-            {
-            }
+            dimLevel.ValueChanged -= dimChanged;
+            Background?.FadeTo(1f, 200);
+            return base.OnExiting(next);
+        }
 
-            bool leftViaKeyboard;
-            bool rightViaKeyboard;
-
-            protected override void TransformState(InputState state)
-            {
-                base.TransformState(state);
-
-                MouseState mouse = (MouseState)state.Mouse;
-
-                if (state.Keyboard != null)
-                {
-                    leftViaKeyboard = state.Keyboard.Keys.Contains(Key.Z);
-                    rightViaKeyboard = state.Keyboard.Keys.Contains(Key.X);
-                }
-
-                if (state.Mouse != null)
-                {
-                    if (leftViaKeyboard) mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = true;
-                    if (rightViaKeyboard) mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = true;
-                }
-
-            }
+        private void dimChanged(object sender, EventArgs e)
+        {
+            Background?.FadeTo((100f - dimLevel) / 100, 800);
         }
     }
 }

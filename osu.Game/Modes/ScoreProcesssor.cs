@@ -18,22 +18,46 @@ namespace osu.Game.Modes
             TotalScore = TotalScore,
             Combo = Combo,
             MaxCombo = HighestCombo,
-            Accuracy = Accuracy
+            Accuracy = Accuracy,
+            Health = Health,
         };
 
         public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
 
         public readonly BindableDouble Accuracy = new BindableDouble { MinValue = 0, MaxValue = 1 };
 
+        public readonly BindableDouble Health = new BindableDouble { MinValue = 0, MaxValue = 1 };
+
         public readonly BindableInt Combo = new BindableInt();
 
+        /// <summary>
+        /// Are we allowed to fail?
+        /// </summary>
+        protected bool CanFail => true;
+
+        protected bool HasFailed { get; private set; }
+
+        /// <summary>
+        /// Called when we reach a failing health of zero.
+        /// </summary>
+        public event Action Failed;
+
+        /// <summary>
+        /// Keeps track of the highest combo ever achieved in this play.
+        /// This is handled automatically by ScoreProcessor.
+        /// </summary>
         public readonly BindableInt HighestCombo = new BindableInt();
 
-        public readonly List<JudgementInfo> Judgements = new List<JudgementInfo>();
+        public readonly List<JudgementInfo> Judgements;
 
-        public ScoreProcessor()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScoreProcessor"/> class.
+        /// </summary>
+        /// <param name="hitObjectCount">Number of HitObjects. It is used for specifying Judgements collection Capacity</param>
+        public ScoreProcessor(int hitObjectCount = 0)
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
+            Judgements = new List<JudgementInfo>(hitObjectCount);
         }
 
         public void AddJudgement(JudgementInfo judgement)
@@ -43,6 +67,11 @@ namespace osu.Game.Modes
             UpdateCalculations(judgement);
 
             judgement.ComboAtHit = (ulong)Combo.Value;
+            if (Health.Value == Health.MinValue && !HasFailed)
+            {
+                HasFailed = true;
+                Failed?.Invoke();
+            }
         }
 
         /// <summary>

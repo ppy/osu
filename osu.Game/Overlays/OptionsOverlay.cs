@@ -23,6 +23,7 @@ using osu.Game.Overlays.Options.Graphics;
 using osu.Game.Overlays.Options.Input;
 using osu.Game.Overlays.Options.Online;
 using System;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -46,6 +47,13 @@ namespace osu.Game.Overlays
 
         public OptionsOverlay()
         {
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
+        }
+
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuGame game, OsuColour colours)
+        {
             sections = new OptionsSection[]
             {
                 new GeneralSection(),
@@ -58,10 +66,6 @@ namespace osu.Game.Overlays
                 new OnlineSection(),
                 new MaintenanceSection(),
             };
-
-            RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
-
             Children = new Drawable[]
             {
                 new Box
@@ -94,7 +98,7 @@ namespace osu.Game.Overlays
                                 },
                                 new SpriteText
                                 {
-                                    Colour = new Color4(255, 102, 170, 255),
+                                    Colour = colours.Pink,
                                     Text = "Change the way osu! behaves",
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
@@ -123,11 +127,7 @@ namespace osu.Game.Overlays
                     ).ToArray()
                 }
             };
-        }
-
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGame game)
-        {
+        
             scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
         }
 
