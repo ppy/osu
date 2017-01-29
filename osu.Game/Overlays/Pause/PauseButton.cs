@@ -60,14 +60,9 @@ namespace osu.Game.Overlays.Pause
 
         protected override bool OnMouseDown(Framework.Input.InputState state, MouseDownEventArgs args)
         {
-            colourContainer.ResizeTo(new Vector2(colourWidth, 1f), 1000, EasingTypes.Out);
-            return true;
-        }
-
-        protected override bool OnMouseUp(Framework.Input.InputState state, MouseUpEventArgs args)
-        {
             colourContainer.ResizeTo(new Vector2(1.1f, 1f), pressExpandTime, EasingTypes.In);
             sampleClick?.Play();
+            Action?.Invoke();
             return true;
         }
 
@@ -170,7 +165,6 @@ namespace osu.Game.Overlays.Pause
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.2f),
                                 Radius = 5,
-                                Offset = new Vector2(0, 5),
                             },
                             Colour = buttonColour,
                             Shear = new Vector2(shear, 0),
@@ -183,7 +177,6 @@ namespace osu.Game.Overlays.Pause
                                 },
                                 new Triangles
                                 {
-                                    Masking = true,
                                     BlendingMode = BlendingMode.Additive,
                                     RelativeSizeAxes = Axes.Both,
                                     TriangleScale = 4,
