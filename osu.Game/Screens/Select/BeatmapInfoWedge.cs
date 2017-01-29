@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Select
                 if (bpmMin > tmp) bpmMin = tmp;
             }
             if (bpmMax == bpmMin) return Math.Round(bpmMin) + "bpm";
-            return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "bpm (avg. " + Math.Round(bpmMost) + "bpm)";
+            return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "bpm (mostly " + Math.Round(bpmMost) + "bpm)";
         }
 
         public class InfoLabel : Container
