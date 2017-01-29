@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play
 
         public PlayMode PreferredPlayMode;
 
-        public bool isPaused;
+        public bool IsPaused;
 
         private double pauseCooldown = 1000;
         private double lastActionTime = 0;
@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Play
 
         private ScoreOverlay scoreOverlay;
         private PauseOverlay pauseOverlay;
+        private PlayerInputManager playerInputManager;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
@@ -123,7 +124,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                new PlayerInputManager(game.Host)
+                playerInputManager = new PlayerInputManager(game.Host)
                 {
                     Clock = new InterpolatingFramedClock(sourceClock),
                     PassThrough = false,
@@ -142,35 +143,38 @@ namespace osu.Game.Screens.Play
             if (Time.Current >= (lastActionTime + pauseCooldown) || force)
             {
                 lastActionTime = Time.Current;
-                isPaused = true;
+                playerInputManager.PassThrough = true;
                 scoreOverlay.KeyCounter.IsCounting = false;
                 pauseOverlay.Show();
                 sourceClock.Stop();
+                IsPaused = true;
             }
             else
             {
-                isPaused = false;
+                IsPaused = false;
             }
         }
 
         public void Resume()
         {
             lastActionTime = Time.Current;
-            isPaused = false;
+            playerInputManager.PassThrough = false;
             scoreOverlay.KeyCounter.IsCounting = true;
             pauseOverlay.Hide();
             sourceClock.Start();
+            IsPaused = false;
         }
 
         public void TogglePaused()
         {
-            isPaused = !isPaused;
-            if (isPaused) Pause(); else Resume();
+            IsPaused = !IsPaused;
+            if (IsPaused) Pause(); else Resume();
         }
 
         public void Restart()
         {
             // TODO: Implement retrying
+            if (IsPaused) Resume();
         }
 
         protected override void LoadComplete()
@@ -237,12 +241,12 @@ namespace osu.Game.Screens.Play
             switch (args.Key)
             {
                 case Key.Escape:
-                    if (!isPaused)
+                    if (!IsPaused)
                     {
                         Pause();
                         return true;
                     }
-                    else { return false; }
+                    return false;
             }
             return base.OnKeyDown(state, args);
         }
