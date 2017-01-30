@@ -17,7 +17,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.MouseSpeed, 1.0);
 
             Set(OsuConfig.Username, string.Empty);
-            Set(OsuConfig.Password, string.Empty);
             Set(OsuConfig.Token, string.Empty);
 
             Set(OsuConfig.PlayMode, PlayMode.Osu);
@@ -144,8 +143,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.HiddenShowFirstApproach, true);
             Set(OsuConfig.ComboColourSliderBall, true);
             Set(OsuConfig.AlternativeChatFont, false);
-            Set(OsuConfig.Password, string.Empty);
-            Set(OsuConfig.Username, string.Empty);
             Set(OsuConfig.DisplayStarsMaximum, 10.0, 0.0, 10.0);
             Set(OsuConfig.DisplayStarsMinimum, 0.0, 0.0, 10.0);
             Set(OsuConfig.AudioDevice, string.Empty);
@@ -171,6 +168,16 @@ namespace osu.Game.Configuration
             Set(OsuConfig.CanForceOptimusCompatibility, true);
             Set(OsuConfig.ConfineMouse, Get<bool>(OsuConfig.ConfineMouseToFullscreen) ?
                 ConfineMouseMode.Fullscreen : ConfineMouseMode.Never);
+
+
+            GetBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate
+            {
+                if (Get<bool>(OsuConfig.SavePassword)) Set(OsuConfig.SaveUsername, true);
+            };
+            GetBindable<bool>(OsuConfig.SaveUsername).ValueChanged += delegate
+            {
+                if (!Get<bool>(OsuConfig.SaveUsername)) Set(OsuConfig.SavePassword, false);
+            };
 #pragma warning restore CS0612 // Type or member is obsolete
         }
 
@@ -314,7 +321,6 @@ namespace osu.Game.Configuration
         HiddenShowFirstApproach,
         ComboColourSliderBall,
         AlternativeChatFont,
-        Password,
         Username,
         DisplayStarsMaximum,
         DisplayStarsMinimum,
