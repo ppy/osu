@@ -89,9 +89,9 @@ namespace osu.Game.Overlays.Options.General
                 Children = new Drawable[]
                 {
                     new SpriteText { Text = "Username" },
-                    username = new TextBox { Height = 20, RelativeSizeAxes = Axes.X, Text = api?.Username ?? string.Empty },
+                    username = new OsuTextBox { RelativeSizeAxes = Axes.X, Text = api?.Username ?? string.Empty },
                     new SpriteText { Text = "Password" },
-                    password = new PasswordTextBox { Height = 20, RelativeSizeAxes = Axes.X },
+                    password = new OsuPasswordTextBox { RelativeSizeAxes = Axes.X },
                     new OsuButton
                     {
                         RelativeSizeAxes = Axes.X,
