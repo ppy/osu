@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Select
     {
         protected override Color4 BackgroundUnfocused => new Color4(10, 10, 10, 255);
         protected override Color4 BackgroundFocused => new Color4(10, 10, 10, 255);
-        public override bool HasFocus => true;
+        public bool GrabFocus = false;
         
         private SpriteText placeholder;
 
@@ -63,12 +63,19 @@ namespace osu.Game.Screens.Select
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            OnFocus(null);
+        }
+        
+        protected override void Update()
+        {
+            if (GrabFocus && !HasFocus && IsVisible)
+                TriggerFocus();
+            base.Update();
         }
         
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Key == Key.Left || args.Key == Key.Right || args.Key == Key.Enter)
+            if (args.Key == Key.Left || args.Key == Key.Right
+                    || args.Key == Key.Enter || args.Key == Key.Escape)
                 return false;
             return base.OnKeyDown(state, args);
         }
