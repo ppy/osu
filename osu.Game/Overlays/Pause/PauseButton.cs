@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Pause
             Schedule(delegate {
                 colourContainer.ResizeTo(new Vector2(0.8f, 1f), 0, EasingTypes.None);
                 spriteText.Spacing = Vector2.Zero;
-                glowContainer.Alpha = 0;
+                glowContainer.FadeOut();
             });
 
             return true;
