@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Allocation;
 using OpenTK;
@@ -15,8 +16,10 @@ using osu.Game.Database;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps.Drawables;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Graphics;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Modes;
 
 namespace osu.Game.Screens.Select
 {
@@ -26,7 +29,7 @@ namespace osu.Game.Screens.Select
 
         private Container beatmapInfoContainer;
 
-        private BaseGame game;
+        private OsuGame game;
 
         public BeatmapInfoWedge()
         {
@@ -44,7 +47,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(BaseGame game)
+        private void load(OsuGame game)
         {
             this.game = game;
         }
@@ -62,9 +65,16 @@ namespace osu.Game.Screens.Select
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
 
             string bpm = getBPMRange(beatmap.Beatmap);
-            string length = TimeSpan.FromMilliseconds((beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime)).ToString(@"m\:ss");
-            string hitCircles = beatmap.Beatmap.HitObjects.Count(h => h.Duration == 0).ToString();
-            string sliders = beatmap.Beatmap.HitObjects.Count(h => h.Duration > 0).ToString();
+            string length = TimeSpan.FromMilliseconds(beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss");
+
+            List<InfoLabel> labels = new List<InfoLabel>
+            {
+                new InfoLabel(new BeatmapStatistic { Name = "Length", Content = length, Icon = FontAwesome.fa_clock_o }),
+                new InfoLabel(new BeatmapStatistic { Name = "BPM", Content = bpm, Icon = FontAwesome.fa_circle }),
+            };
+
+            //get statistics fromt he current ruleset.
+            Ruleset.GetRuleset(game.PlayMode.Value).GetBeatmapStatistics(beatmap).ForEach(s => labels.Add(new InfoLabel(s)));
 
             (beatmapInfoContainer = new BufferedContainer
             {
@@ -152,13 +162,7 @@ namespace osu.Game.Screens.Select
                                 Margin = new MarginPadding { Top = 20 },
                                 Spacing = new Vector2(40,0),
                                 AutoSizeAxes = Axes.Both,
-                                Children = new []
-                                {
-                                    new InfoLabel(FontAwesome.fa_clock_o, length),
-                                    new InfoLabel(FontAwesome.fa_circle, bpm),
-                                    new InfoLabel(FontAwesome.fa_dot_circle_o, hitCircles),
-                                    new InfoLabel(FontAwesome.fa_circle_o, sliders),
-                                }
+                                Children = labels
                             },
                         }
                     },
@@ -192,7 +196,7 @@ namespace osu.Game.Screens.Select
 
         public class InfoLabel : Container
         {
-            public InfoLabel(FontAwesome icon, string text)
+            public InfoLabel(BeatmapStatistic statistic)
             {
                 AutoSizeAxes = Axes.Both;
                 Children = new[]
@@ -205,7 +209,7 @@ namespace osu.Game.Screens.Select
                     },
                     new TextAwesome
                     {
-                        Icon = icon,
+                        Icon = statistic.Icon,
                         Colour = new Color4(255, 221, 85, 255),
                         Scale = new Vector2(0.8f)
                     },
@@ -214,7 +218,7 @@ namespace osu.Game.Screens.Select
                         Margin = new MarginPadding { Left = 13 },
                         Font = @"Exo2.0-Bold",
                         Colour = new Color4(255, 221, 85, 255),
-                        Text = text,
+                        Text = statistic.Content,
                         TextSize = 17,
                         Origin = Anchor.CentreLeft
                     },
