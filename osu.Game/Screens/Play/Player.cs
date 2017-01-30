@@ -41,10 +41,19 @@ namespace osu.Game.Screens.Play
 
         public PlayMode PreferredPlayMode;
 
-        public bool IsPaused;
+        private bool isPaused;
+        public bool IsPaused
+        {
+            get
+            {
+                return isPaused;
+            }
+        }
+
+        public int RestartCount;
 
         private double pauseCooldown = 1000;
-        private double lastActionTime = 0;
+        private double lastPauseActionTime = 0;
 
         private IAdjustableClock sourceClock;
 
@@ -140,41 +149,57 @@ namespace osu.Game.Screens.Play
 
         public void Pause(bool force = false)
         {
-            if (Time.Current >= (lastActionTime + pauseCooldown) || force)
+            if (Time.Current >= (lastPauseActionTime + pauseCooldown) || force)
             {
-                lastActionTime = Time.Current;
+                lastPauseActionTime = Time.Current;
                 playerInputManager.PassThrough = true;
                 scoreOverlay.KeyCounter.IsCounting = false;
+                pauseOverlay.SetRetries(RestartCount);
                 pauseOverlay.Show();
                 sourceClock.Stop();
-                IsPaused = true;
+                isPaused = true;
             }
             else
             {
-                IsPaused = false;
+                isPaused = false;
             }
         }
 
         public void Resume()
         {
-            lastActionTime = Time.Current;
+            lastPauseActionTime = Time.Current;
             playerInputManager.PassThrough = false;
             scoreOverlay.KeyCounter.IsCounting = true;
             pauseOverlay.Hide();
             sourceClock.Start();
-            IsPaused = false;
+            isPaused = false;
         }
 
         public void TogglePaused()
         {
-            IsPaused = !IsPaused;
+            isPaused = !IsPaused;
             if (IsPaused) Pause(); else Resume();
         }
 
         public void Restart()
         {
-            // TODO: Implement retrying
-            if (IsPaused) Resume();
+            sourceClock.Stop(); // If the clock is not stopped and Restart is called alot of lag will happen until the game is relaunched
+
+            var newPlayer = new Player();
+
+            newPlayer.Preload(Game, delegate
+            {
+                RestartCount++;
+                newPlayer.RestartCount = RestartCount;
+                Exit();
+
+                if (!(last?.Push(newPlayer) ?? false))
+                {
+                    // Error(?)
+                }
+
+                Dispose();
+            });
         }
 
         protected override void LoadComplete()
@@ -218,6 +243,8 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        private GameMode last;
+
         protected override void OnEntering(GameMode last)
         {
             base.OnEntering(last);
@@ -227,6 +254,8 @@ namespace osu.Game.Screens.Play
 
             Content.Alpha = 0;
             dimLevel.ValueChanged += dimChanged;
+
+            this.last = last;
         }
 
         protected override bool OnExiting(GameMode next)

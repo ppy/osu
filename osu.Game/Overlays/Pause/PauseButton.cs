@@ -1,7 +1,7 @@
-﻿using OpenTK;
+﻿using System;
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.Colour;
@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Overlays.Pause
@@ -55,15 +56,27 @@ namespace osu.Game.Overlays.Pause
         private Container colourContainer;
         private Container glowContainer;
 
+        private bool didClick;
+
         public override bool Contains(Vector2 screenSpacePos) => backgroundContainer.Contains(screenSpacePos);
 
         protected override bool OnMouseDown(Framework.Input.InputState state, MouseDownEventArgs args)
         {
-            colourContainer.ResizeTo(new Vector2(1.1f, 1f), 200, EasingTypes.In);
+            didClick = true;
+            colourContainer.ResizeTo(new Vector2(1.5f, 1f), 200, EasingTypes.In);
             sampleClick?.Play();
             Action?.Invoke();
+
+            Delay(200);
+            Schedule(delegate {
+                colourContainer.ResizeTo(new Vector2(colourWidth, 1f), 0, EasingTypes.None);
+                glowContainer.Alpha = 0;
+            });
+
             return true;
         }
+
+        protected override bool OnClick(Framework.Input.InputState state) => false;
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
@@ -75,8 +88,13 @@ namespace osu.Game.Overlays.Pause
 
         protected override void OnHoverLost(Framework.Input.InputState state)
         {
-            colourContainer.ResizeTo(new Vector2(colourWidth, 1f), colourExpandTime, EasingTypes.OutElastic);
-            glowContainer.FadeTo(0f, colourExpandTime / 2, EasingTypes.Out);
+            if (!didClick)
+            {
+                colourContainer.ResizeTo(new Vector2(colourWidth, 1f), colourExpandTime, EasingTypes.OutElastic);
+                glowContainer.FadeTo(0f, colourExpandTime / 2, EasingTypes.Out);
+            }
+
+            didClick = false;
         }
 
         [BackgroundDependencyLoader]

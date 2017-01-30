@@ -1,15 +1,8 @@
-﻿using System;
-using OpenTK;
-using OpenTK.Input;
-using OpenTK.Graphics;
-using osu.Game.Graphics;
-using osu.Framework.Input;
+﻿using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transformations;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Framework.Graphics.Primitives;
 
@@ -43,6 +36,17 @@ namespace osu.Game.Overlays.Pause
 
             Children = new Drawable[]
             {
+                new PauseProgressGraph
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomCentre,
+                    Height = 35,
+                    Margin = new MarginPadding
+                    {
+                        Bottom = 5
+                    }
+                },
                 new Container
                 {
                     Origin = Anchor.BottomRight,

@@ -239,6 +239,7 @@
     <Compile Include="Overlays\Pause\PauseButton.cs" />
     <Compile Include="Overlays\Pause\PauseOverlay.cs" />
     <Compile Include="Overlays\Pause\PauseProgressBar.cs" />
+    <Compile Include="Overlays\Pause\PauseProgressGraph.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
