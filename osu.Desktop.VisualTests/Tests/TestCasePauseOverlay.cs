@@ -18,6 +18,7 @@ namespace osu.Desktop.VisualTests.Tests
         public override string Description => @"Tests the pause overlay";
 
         private PauseOverlay pauseOverlay;
+        private int retryCount;
 
         public override void Reset()
         {
@@ -26,19 +27,46 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new Box
             {
                 ColourInfo = ColourInfo.GradientVertical(Color4.Gray, Color4.WhiteSmoke),
-                RelativeSizeAxes = Framework.Graphics.Axes.Both,
+                RelativeSizeAxes = Framework.Graphics.Axes.Both
             });
-            Add(pauseOverlay = new PauseOverlay { Depth = -1 });
 
-            Add(new Button
+            Add(pauseOverlay = new PauseOverlay { Depth = -1 });
+            pauseOverlay.OnResume += (() => Logger.Log(@"Resume"));
+            pauseOverlay.OnRetry += (() => Logger.Log(@"Retry"));
+            pauseOverlay.OnQuit += (() => Logger.Log(@"Quit"));
+
+            Add(new FlowContainer
             {
-                Text = @"Pause",
-                Anchor = Anchor.TopLeft,
+                RelativeSizeAxes = Axes.Both,
                 Origin = Anchor.TopLeft,
-                Width = 100,
-                Height = 50,
-                Colour = Color4.Black,
-                Action = (() => pauseOverlay.Show()),
+                Anchor = Anchor.TopLeft,
+                Direction = FlowDirection.VerticalOnly,
+                Children = new Drawable[]
+                {
+                    new Button
+                    {
+                        Text = @"Pause",
+                        Anchor = Anchor.TopLeft,
+                        Origin = Anchor.TopLeft,
+                        Width = 100,
+                        Height = 50,
+                        Colour = Color4.Black,
+                        Action = (() => pauseOverlay.Show())
+                    },
+                    new Button
+                    {
+                        Text = @"Add Retry",
+                        Anchor = Anchor.TopLeft,
+                        Origin = Anchor.TopLeft,
+                        Width = 100,
+                        Height = 50,
+                        Colour = Color4.Black,
+                        Action = (delegate {
+                            retryCount++;
+                            pauseOverlay.SetRetries(retryCount);
+                        }),
+                    }
+                }
             });
         }
     }

@@ -24,7 +24,23 @@ namespace osu.Game.Overlays.Pause
         private SpriteText retryCounter;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
+        public override bool HandleInput => State == Visibility.Visible;
 
+        protected override void PopIn() => FadeIn(fadeDuration, EasingTypes.In);
+        protected override void PopOut() => FadeOut(fadeDuration, EasingTypes.In);
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            switch (args.Key)
+            {
+                case Key.Escape:
+                    if (State == Visibility.Hidden) return false;
+                    Hide();
+                    Task.Delay(fadeDuration * 2).ContinueWith(task => OnResume?.Invoke());
+                    return true;
+            }
+            return base.OnKeyDown(state, args);
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -147,22 +163,6 @@ namespace osu.Game.Overlays.Pause
                 // "You've retried 1,065 times in this session"
                 // "You've retried 1 time in this session"
                 retryCounter.Text = $"You've retried {String.Format("{0:n0}", count)} time{(count == 1) ? "" : "s"} in this session";
-        }
-
-        protected override void PopIn() => FadeIn(fadeDuration, EasingTypes.In);
-        protected override void PopOut() => FadeOut(fadeDuration, EasingTypes.In);
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            switch (args.Key)
-            {
-                case Key.Escape:
-                    if (State == Visibility.Hidden) return false;
-                    Hide();
-                    Task.Delay(fadeDuration * 2).ContinueWith(task => OnResume?.Invoke());
-                    return true;
-            }
-            return base.OnKeyDown(state, args);
         }
 
         public PauseOverlay()
