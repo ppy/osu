@@ -50,9 +50,9 @@ namespace osu.Game.Overlays.Pause
             }
         }
 
-        private Container backgroundContainer;
-        private Container colourContainer;
-        private Container glowContainer;
+        private Container backgroundContainer, colourContainer, glowContainer;
+
+        private SpriteText spriteText;
 
         private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's
 
@@ -68,6 +68,7 @@ namespace osu.Game.Overlays.Pause
             Delay(200);
             Schedule(delegate {
                 colourContainer.ResizeTo(new Vector2(colourWidth, 1f), 0, EasingTypes.None);
+                spriteText.Spacing = Vector2.Zero;
                 glowContainer.Alpha = 0;
             });
 
@@ -79,6 +80,7 @@ namespace osu.Game.Overlays.Pause
         protected override bool OnHover(Framework.Input.InputState state)
         {
             colourContainer.ResizeTo(new Vector2(colourExpandedWidth, 1f), colourExpandTime, EasingTypes.OutElastic);
+            spriteText.TransformSpacingTo(new Vector2(3f, 0f), colourExpandTime, EasingTypes.OutElastic);
             glowContainer.FadeTo(1f, colourExpandTime / 2, EasingTypes.Out);
             sampleHover?.Play();
             return true;
@@ -89,6 +91,7 @@ namespace osu.Game.Overlays.Pause
             if (!didClick)
             {
                 colourContainer.ResizeTo(new Vector2(colourWidth, 1f), colourExpandTime, EasingTypes.OutElastic);
+                spriteText.TransformSpacingTo(Vector2.Zero, colourExpandTime, EasingTypes.OutElastic);
                 glowContainer.FadeTo(0f, colourExpandTime / 2, EasingTypes.Out);
             }
 
@@ -209,12 +212,12 @@ namespace osu.Game.Overlays.Pause
                         }
                     }
                 },
-                new SpriteText
+                spriteText = new SpriteText
                 {
                     Text = Text,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    TextSize = 25,
+                    TextSize = 28,
                     Font = "Exo2.0-Bold",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.1f),
