@@ -242,6 +242,8 @@ namespace osu.Game.Screens.Select
 
             beatmapInfoWedge.MoveToX(wedged_container_start_position.X - 50);
             beatmapInfoWedge.MoveToX(wedged_container_start_position.X, 800, EasingTypes.OutQuint);
+            
+            filter.Activate();
         }
 
         protected override void OnResuming(GameMode last)
@@ -255,6 +257,8 @@ namespace osu.Game.Screens.Select
             Content.FadeIn(250);
 
             Content.ScaleTo(1, 250, EasingTypes.OutSine);
+
+            filter.Activate();
         }
 
         protected override void OnSuspending(GameMode next)
@@ -262,6 +266,8 @@ namespace osu.Game.Screens.Select
             Content.ScaleTo(1.1f, 250, EasingTypes.InSine);
 
             Content.FadeOut(250);
+            
+            filter.Deactivate();
             base.OnSuspending(next);
         }
 
@@ -271,6 +277,8 @@ namespace osu.Game.Screens.Select
             beatmapInfoWedge.RotateTo(10, 800, EasingTypes.InQuint);
 
             Content.FadeOut(100);
+
+            filter.Deactivate();            
             return base.OnExiting(next);
         }
 

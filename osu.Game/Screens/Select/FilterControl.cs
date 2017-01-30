@@ -56,6 +56,17 @@ namespace osu.Game.Screens.Select
             };
         }
 
+        public void Deactivate()
+        {
+            searchTextBox.GrabFocus = false;
+            searchTextBox.TriggerFocusLost();
+        }
+        
+        public void Activate()
+        {
+            searchTextBox.GrabFocus = true;
+        }
+
         private class TabItem : ClickableContainer
         {
             public string Text
