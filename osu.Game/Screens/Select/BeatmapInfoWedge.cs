@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
 
         private Container beatmapInfoContainer;
 
-        private OsuGame game;
+        private OsuGameBase game;
 
         public BeatmapInfoWedge()
         {
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame game)
+        private void load(OsuGameBase game)
         {
             this.game = game;
         }
@@ -64,17 +64,27 @@ namespace osu.Game.Screens.Select
             BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
 
-            string bpm = getBPMRange(beatmap.Beatmap);
-            string length = TimeSpan.FromMilliseconds(beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss");
+            List<InfoLabel> labels = new List<InfoLabel>();
 
-            List<InfoLabel> labels = new List<InfoLabel>
+            if (beatmap.Beatmap != null)
             {
-                new InfoLabel(new BeatmapStatistic { Name = "Length", Content = length, Icon = FontAwesome.fa_clock_o }),
-                new InfoLabel(new BeatmapStatistic { Name = "BPM", Content = bpm, Icon = FontAwesome.fa_circle }),
-            };
+                labels.Add(new InfoLabel(new BeatmapStatistic
+                {
+                    Name = "Length",
+                    Icon = FontAwesome.fa_clock_o,
+                    Content = TimeSpan.FromMilliseconds(beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
+                }));
 
-            //get statistics fromt he current ruleset.
-            Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).GetBeatmapStatistics(beatmap).ForEach(s => labels.Add(new InfoLabel(s)));
+                labels.Add(new InfoLabel(new BeatmapStatistic
+                {
+                    Name = "BPM",
+                    Icon = FontAwesome.fa_circle,
+                    Content = getBPMRange(beatmap.Beatmap),
+                }));
+
+                //get statistics fromt he current ruleset.
+                Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).GetBeatmapStatistics(beatmap).ForEach(s => labels.Add(new InfoLabel(s)));
+            }
 
             (beatmapInfoContainer = new BufferedContainer
             {
