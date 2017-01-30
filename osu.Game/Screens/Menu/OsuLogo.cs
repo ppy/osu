@@ -65,7 +65,6 @@ namespace osu.Game.Screens.Menu
         }
 
         public bool Interactive = true;
-        private Box colourLayer;
         private Box flashLayer;
 
         public OsuLogo()
@@ -106,7 +105,7 @@ namespace osu.Game.Screens.Menu
                                                     Origin = Anchor.Centre,
                                                     Children = new Drawable[]
                                                     {
-                                                        colourLayer = new Box
+                                                        new Box
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
                                                             Colour = OsuPink,
