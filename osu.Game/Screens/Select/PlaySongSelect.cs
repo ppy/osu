@@ -191,8 +191,7 @@ namespace osu.Game.Screens.Select
 
         private void filterChanged()
         {
-            if (filterTask != null)
-                filterTask.Cancel();
+            filterTask?.Cancel();
             filterTask = Scheduler.AddDelayed(() =>
             {
                 filterTask = null;
