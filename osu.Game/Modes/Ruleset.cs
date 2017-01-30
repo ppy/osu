@@ -4,19 +4,27 @@
 using System.Collections.Generic;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
-using System.Reflection;
-using osu.Framework.Extensions;
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 
 namespace osu.Game.Modes
 {
+    public class BeatmapStatistic
+    {
+        public FontAwesome Icon;
+        public string Content;
+        public string Name;
+    }
+
     public abstract class Ruleset
     {
         private static ConcurrentDictionary<PlayMode, Type> availableRulesets = new ConcurrentDictionary<PlayMode, Type>();
 
         public abstract ScoreOverlay CreateScoreOverlay();
+
+        public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
         public abstract ScoreProcessor CreateScoreProcessor(int hitObjectCount);
 
@@ -27,6 +35,8 @@ namespace osu.Game.Modes
         public static void Register(Ruleset ruleset) => availableRulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
 
         protected abstract PlayMode PlayMode { get; }
+
+        public virtual FontAwesome Icon => FontAwesome.fa_question_circle;
 
         public static Ruleset GetRuleset(PlayMode mode)
         {
