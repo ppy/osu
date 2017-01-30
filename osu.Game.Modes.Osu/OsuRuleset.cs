@@ -34,6 +34,8 @@ namespace osu.Game.Modes.Osu
             }
         };
 
+        public override FontAwesome Icon => FontAwesome.fa_osu_osu_o;
+
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => new OsuScoreProcessor(hitObjectCount);

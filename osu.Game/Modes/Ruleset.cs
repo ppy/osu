@@ -4,11 +4,8 @@
 using System.Collections.Generic;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
-using System.Reflection;
-using osu.Framework.Extensions;
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
@@ -38,6 +35,8 @@ namespace osu.Game.Modes
         public static void Register(Ruleset ruleset) => availableRulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
 
         protected abstract PlayMode PlayMode { get; }
+
+        public virtual FontAwesome Icon => FontAwesome.fa_question_circle;
 
         public static Ruleset GetRuleset(PlayMode mode)
         {

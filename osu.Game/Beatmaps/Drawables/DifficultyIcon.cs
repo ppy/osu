@@ -3,7 +3,9 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Modes;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -11,7 +13,7 @@ namespace osu.Game.Beatmaps.Drawables
 {
     class DifficultyIcon : Container
     {
-        public DifficultyIcon(FontAwesome icon, Color4 color)
+        public DifficultyIcon(BeatmapInfo beatmap)
         {
             const float size = 20;
             Size = new Vector2(size);
@@ -21,8 +23,8 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     Anchor = Anchor.Centre,
                     TextSize = size,
-                    Colour = color,
-                    Icon = icon
+                    Colour = new Color4(159, 198, 0, 255),
+                    Icon = Ruleset.GetRuleset(beatmap.Mode).Icon
                 }
             };
         }
