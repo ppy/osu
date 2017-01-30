@@ -1,10 +1,12 @@
 ﻿using System;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select
@@ -62,6 +64,13 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
             OnFocus(null);
+        }
+        
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Key == Key.Left || args.Key == Key.Right || args.Key == Key.Enter)
+                return false;
+            return base.OnKeyDown(state, args);
         }
     }
 }
