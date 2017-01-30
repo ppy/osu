@@ -26,14 +26,16 @@ namespace osu.Desktop
         public static int Main(string[] args)
         {
             LegacyFilesystemReader.Register();
-            
-            var cwd = Directory.GetCurrentDirectory();
+
+            // Back up the cwd before DesktopGameHost changes it
+            var cwd = Environment.CurrentDirectory;
 
             using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
             {
                 if (!host.IsPrimaryInstance)
                 {
                     var importer = new BeatmapImporter(host);
+                    // Restore the cwd so relative paths given at the command line work correctly
                     Directory.SetCurrentDirectory(cwd);
                     foreach (var file in args)
                     {
