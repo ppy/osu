@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
@@ -18,6 +19,8 @@ namespace osu.Game.Modes.Taiko
         public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new TaikoHitRenderer { Objects = objects };
 
         protected override PlayMode PlayMode => PlayMode.Taiko;
+
+        public override FontAwesome Icon => FontAwesome.fa_osu_taiko_o;
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => null;
 

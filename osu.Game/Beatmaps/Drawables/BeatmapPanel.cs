@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Input;
+using osu.Game.Modes;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -83,7 +84,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        new DifficultyIcon(FontAwesome.fa_dot_circle_o, new Color4(159, 198, 0, 255))
+                        new DifficultyIcon(beatmap)
                         {
                             Scale = new Vector2(1.8f),
                             Anchor = Anchor.CentreLeft,

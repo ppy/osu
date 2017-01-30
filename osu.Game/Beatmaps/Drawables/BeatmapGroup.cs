@@ -74,6 +74,8 @@ namespace osu.Game.Beatmaps.Drawables
                 StartRequested = p => { StartRequested?.Invoke(p.Beatmap); },
                 RelativeSizeAxes = Axes.X,
             }).ToList();
+
+            Header.AddDifficultyIcons(BeatmapPanels);
         }
 
         private void headerGainedSelection(BeatmapSetHeader panel)
