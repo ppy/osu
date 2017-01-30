@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Play
         private double pauseCooldown = 1000;
         private double lastPauseActionTime = 0;
 
+        private bool clockWasStarted = false;
+
         private IAdjustableClock sourceClock;
 
         private Ruleset ruleset;
@@ -183,14 +185,13 @@ namespace osu.Game.Screens.Play
 
         public void Restart()
         {
-            sourceClock.Stop(); // If the clock is not stopped and Restart is called alot of lag will happen until the game is relaunched
+            sourceClock.Stop(); // If the clock is running and Restart is called the game will lag until relaunch
 
             var newPlayer = new Player();
 
             newPlayer.Preload(Game, delegate
             {
-                RestartCount++;
-                newPlayer.RestartCount = RestartCount;
+                newPlayer.RestartCount = RestartCount + 1;
                 Exit();
 
                 if (!(last?.Push(newPlayer) ?? false))
@@ -214,6 +215,7 @@ namespace osu.Game.Screens.Play
             Schedule(() =>
             {
                 sourceClock.Start();
+                clockWasStarted = true;
             });
         }
 
@@ -270,12 +272,12 @@ namespace osu.Game.Screens.Play
             switch (args.Key)
             {
                 case Key.Escape:
-                    if (!IsPaused)
+                    if (!IsPaused && clockWasStarted) // For if the user presses escape quickly when entering the map
                     {
                         Pause();
                         return true;
                     }
-                    return false;
+                    break;
             }
             return base.OnKeyDown(state, args);
         }

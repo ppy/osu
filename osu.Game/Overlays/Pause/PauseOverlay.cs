@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Pause
         public Action OnRetry;
         public Action OnQuit;
 
-        private SpriteText retryCounter;
+        private FlowContainer retryCounterContainer;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
         public override bool HandleInput => State == Visibility.Visible;
@@ -48,116 +48,121 @@ namespace osu.Game.Overlays.Pause
         {
             Children = new Drawable[]
             {
-                new Container
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-
+                    Colour = Color4.Black,
+                    Alpha = 0.75f,
+                },
+                new FlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FlowDirection.VerticalOnly,
+                    Spacing = new Vector2(0f, 50f),
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        new Box
+                        new FlowContainer
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                            Alpha = 0.75f,
-                        }
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FlowDirection.VerticalOnly,
+                            Spacing = new Vector2(0f, 20f),
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            Children = new Drawable[]
+                            {
+                                new SpriteText
+                                {
+                                    Text = @"paused",
+                                    Font = @"Exo2.0-Medium",
+                                    Spacing = new Vector2(5, 0),
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    TextSize = 30,
+                                    Colour = colours.Yellow,
+                                    Shadow = true,
+                                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                                },
+                                new SpriteText
+                                {
+                                    Text = @"you're not going to do what i think you're going to do, ain't ya?",
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Shadow = true,
+                                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                                },
+                            }
+                        },
+                        new FlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Masking = true,
+                            EdgeEffect = new EdgeEffect
+                            {
+                                Type = EdgeEffectType.Shadow,
+                                Colour = new Color4(0, 0, 0, 150),
+                                Radius = 50,
+                                Offset = new Vector2(0, 0),
+                            },
+                            Children = new Drawable[]
+                            {
+                                new PauseButton
+                                {
+                                    Type = PauseButtonType.Resume,
+                                    RelativeSizeAxes = Axes.X,
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Height = buttonHeight,
+                                    Action = (delegate
+                                    {
+                                        Hide();
+                                        Task.Delay(fadeDuration * 2).ContinueWith(task => OnResume?.Invoke());
+                                    }),
+                                },
+                                new PauseButton
+                                {
+                                    Type = PauseButtonType.Retry,
+                                    RelativeSizeAxes = Axes.X,
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Height = buttonHeight,
+                                    Action = (delegate
+                                    {
+                                        Hide();
+                                        OnRetry?.Invoke();
+                                    }),
+                                },
+                                new PauseButton
+                                {
+                                    Type = PauseButtonType.Quit,
+                                    RelativeSizeAxes = Axes.X,
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Height = buttonHeight,
+                                    Action = (delegate
+                                    {
+                                        Hide();
+                                        OnQuit?.Invoke();
+                                    }),
+                                },
+                            }
+                        },
+                        retryCounterContainer = new FlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                        },
                     }
-                },
-                new SpriteText
-                {
-                    Text = @"paused",
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.Centre,
-                    Position = new Vector2(0, -175),
-                    Font = @"Exo2.0-Medium",
-                    Spacing = new Vector2(5, 0),
-                    TextSize = 30,
-                    Colour = colours.Yellow,
-                    Shadow = true,
-                    ShadowColour = new Color4(0, 0, 0, 0.25f),
-                },
-                new SpriteText
-                {
-                    Text = @"you're not going to do what i think you're going to do, ain't ya?",
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.Centre,
-                    Width = 100,
-                    Position = new Vector2(0, -125),
-                    Shadow = true,
-                    ShadowColour = new Color4(0, 0, 0, 0.25f),
-                },
-                retryCounter = new SpriteText
-                {
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.Centre,
-                    Width = 100,
-                    Position = new Vector2(0, 175),
-                    Shadow = true,
-                    ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    TextSize = 18,
                 },
                 new PauseProgressBar
                 {
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
                     Width = 1f,
-                },
-                new FlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Position = new Vector2(0, 25),
-                    Masking = true,
-                    EdgeEffect = new EdgeEffect
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = new Color4(0, 0, 0, 150),
-                        Radius = 50,
-                        Offset = new Vector2(0, 0),
-                    },
-                    Children = new Drawable[]
-                    {
-                        new PauseButton
-                        {
-                            Type = PauseButtonType.Resume,
-                            RelativeSizeAxes = Axes.X,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Height = buttonHeight,
-                            Action = (delegate
-                            {
-                                Hide();
-                                Task.Delay(fadeDuration * 2).ContinueWith(task => OnResume?.Invoke());
-                            }),
-                        },
-                        new PauseButton
-                        {
-                            Type = PauseButtonType.Retry,
-                            RelativeSizeAxes = Axes.X,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Height = buttonHeight,
-                            Action = (delegate
-                            {
-                                Hide();
-                                OnRetry?.Invoke();
-                            }),
-                        },
-                        new PauseButton
-                        {
-                            Type = PauseButtonType.Quit,
-                            RelativeSizeAxes = Axes.X,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Height = buttonHeight,
-                            Action = (delegate
-                            {
-                                Hide();
-                                OnQuit?.Invoke();
-                            }),
-                        },
-                    }
                 },
             };
 
@@ -166,16 +171,46 @@ namespace osu.Game.Overlays.Pause
 
         public void SetRetries(int count)
         {
-            if (retryCounter != null)
+            if (retryCounterContainer != null)
+            {
                 // "You've retried 1,065 times in this session"
                 // "You've retried 1 time in this session"
-                retryCounter.Text = $"You've retried {String.Format("{0:n0}", count)} time{(count == 1) ? "" : "s"} in this session";
+
+                string leading = "You've retried ";
+                string countString = String.Format("{0:n0}", count);
+                string trailing = $" time{((count == 1) ? "" : "s")} in this session";
+
+                retryCounterContainer.Children = new Drawable[]
+                {
+                    new SpriteText
+                    {
+                        Text = leading,
+                        Shadow = true,
+                        ShadowColour = new Color4(0, 0, 0, 0.25f),
+                        TextSize = 18
+                    },
+                    new SpriteText
+                    {
+                        Text = countString,
+                        Font = @"Exo2.0-Bold",
+                        Shadow = true,
+                        ShadowColour = new Color4(0, 0, 0, 0.25f),
+                        TextSize = 18
+                    },
+                    new SpriteText
+                    {
+                        Text = trailing,
+                        Shadow = true,
+                        ShadowColour = new Color4(0, 0, 0, 0.25f),
+                        TextSize = 18
+                    }
+                };
+            }
         }
 
         public PauseOverlay()
         {
             RelativeSizeAxes = Axes.Both;
-            AutoSizeAxes = Axes.Both;
         }
     }
 }
