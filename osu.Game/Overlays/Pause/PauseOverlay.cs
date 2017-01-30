@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Pause
                 case Key.Escape:
                     if (State == Visibility.Hidden) return false;
                     Hide();
-                    Task.Delay(transitionDuration * 2).ContinueWith(task => OnResume?.Invoke());
+                    OnResume?.Invoke();
                     return true;
             }
             return base.OnKeyDown(state, args);
@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.Pause
                                     Action = delegate
                                     {
                                         Hide();
-                                        Task.Delay(transitionDuration * 2).ContinueWith(task => OnResume?.Invoke());
+                                        OnResume?.Invoke();
                                     }
                                 },
                                 new RetryButton
