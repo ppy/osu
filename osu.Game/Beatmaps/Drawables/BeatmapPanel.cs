@@ -131,7 +131,7 @@ namespace osu.Game.Beatmaps.Drawables
                                         },
                                     }
                                 },
-                                new StarCounter { Count = beatmap.BaseDifficulty?.OverallDifficulty ?? 5, StarSize = 8 }
+                                new StarCounter { Count = beatmap.StarDifficulty, StarSize = 8 }
                             }
                         }
                     }
