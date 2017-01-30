@@ -252,7 +252,7 @@ namespace osu.Game.Screens.Play
             base.OnEntering(last);
 
             (Background as BackgroundModeBeatmap)?.BlurTo(Vector2.Zero, 1000);
-            Background?.FadeTo((100f - dimLevel) / 100, 1000);
+            Background?.FadeTo((100f- dimLevel)/100, 1000);
 
             Content.Alpha = 0;
             dimLevel.ValueChanged += dimChanged;
