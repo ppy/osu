@@ -11,14 +11,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Options.General
 {
     public class LoginOptions : OptionsSubsection, IOnlineComponent
     {
-        private Container loginForm;
-
-        private Action performLogout;
         protected override string Header => "Sign In";
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -76,30 +74,11 @@ namespace osu.Game.Overlays.Options.General
         class LoginForm : FlowContainer
         {
             private TextBox username;
-            private TextBox password;
+            private PasswordTextBox password;
             private APIAccess api;
 
-            public LoginForm()
-            {
-                Direction = FlowDirection.VerticalOnly;
-                AutoSizeAxes = Axes.Y;
-                RelativeSizeAxes = Axes.X;
-                Spacing = new Vector2(0, 5);
-                // TODO: Wire things up
-                Children = new Drawable[]
-                {
-                    new SpriteText { Text = "Username" },
-                    username = new TextBox { Height = 20, RelativeSizeAxes = Axes.X, Text = api?.Username ?? string.Empty },
-                    new SpriteText { Text = "Password" },
-                    password = new PasswordTextBox { Height = 20, RelativeSizeAxes = Axes.X },
-                    new OsuButton
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Text = "Log in",
-                        Action = performLogin
-                    }
-                };
-            }
+            private CheckBoxOption saveUsername;
+            private CheckBoxOption savePassword;
 
             private void performLogin()
             {
@@ -108,9 +87,51 @@ namespace osu.Game.Overlays.Options.General
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
-            private void load(APIAccess api)
+            private void load(APIAccess api, OsuConfigManager config)
             {
                 this.api = api;
+                Direction = FlowDirection.VerticalOnly;
+                AutoSizeAxes = Axes.Y;
+                RelativeSizeAxes = Axes.X;
+                Spacing = new Vector2(0, 5);
+                Children = new Drawable[]
+                {
+                    new SpriteText { Text = "Username" },
+                    username = new TextBox
+                    {
+                        Height = 20,
+                        RelativeSizeAxes = Axes.X,
+                        Text = api?.Username ?? string.Empty
+                    },
+                    new SpriteText { Text = "Password" },
+                    password = new PasswordTextBox
+                    {
+                        Height = 20,
+                        RelativeSizeAxes = Axes.X
+                    },
+                    saveUsername = new CheckBoxOption
+                    {
+                        LabelText = "Remember Username",
+                        Bindable = config.GetBindable<bool>(OsuConfig.SaveUsername),
+                    },
+                    savePassword = new CheckBoxOption
+                    {
+                        LabelText = "Remember Password",
+                        Bindable = config.GetBindable<bool>(OsuConfig.SavePassword),
+                    },
+                    new OsuButton
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Text = "Log in",
+                        Action = performLogin
+                    },
+                    new OsuButton
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Text = "Register",
+                        //Action = registerLink
+                    }
+                };
             }
         }
     }

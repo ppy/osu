@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -23,6 +24,7 @@ namespace osu.Game.Beatmaps.Drawables
         private OsuConfigManager config;
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap beatmap;
+        private FlowContainer difficultyIcons;
 
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
@@ -56,15 +58,10 @@ namespace osu.Game.Beatmaps.Drawables
                             TextSize = 17,
                             Shadow = true,
                         },
-                        new FlowContainer
+                        difficultyIcons = new FlowContainer
                         {
                             Margin = new MarginPadding { Top = 5 },
                             AutoSizeAxes = Axes.Both,
-                            Children = new[]
-                            {
-                                new DifficultyIcon(FontAwesome.fa_dot_circle_o, new Color4(159, 198, 0, 255)),
-                                new DifficultyIcon(FontAwesome.fa_dot_circle_o, new Color4(246, 101, 166, 255)),
-                            }
                         }
                     }
                 }
@@ -176,6 +173,12 @@ namespace osu.Game.Beatmaps.Drawables
                     ForceRedraw();
                 });
             }
+        }
+
+        public void AddDifficultyIcons(IEnumerable<BeatmapPanel> panels)
+        {
+            foreach (var p in panels)
+                difficultyIcons.Add(new DifficultyIcon(p.Beatmap));
         }
     }
 }

@@ -80,6 +80,7 @@ namespace osu.Game.Beatmaps.Drawables
             }).ToList();
 
             BeatmapSet = set;
+            Header.AddDifficultyIcons(BeatmapPanels);
         }
 
         private void headerGainedSelection(BeatmapSetHeader panel)
