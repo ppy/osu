@@ -109,9 +109,8 @@ namespace osu.Game.Overlays.Pause
                             },
                             Children = new Drawable[]
                             {
-                                new PauseButton
+                                new ResumeButton
                                 {
-                                    Type = PauseButtonType.Resume,
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
@@ -122,9 +121,8 @@ namespace osu.Game.Overlays.Pause
                                         Task.Delay(fadeDuration * 2).ContinueWith(task => OnResume?.Invoke());
                                     }),
                                 },
-                                new PauseButton
+                                new RetryButton
                                 {
-                                    Type = PauseButtonType.Retry,
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
@@ -135,9 +133,8 @@ namespace osu.Game.Overlays.Pause
                                         OnRetry?.Invoke();
                                     }),
                                 },
-                                new PauseButton
+                                new QuitButton
                                 {
-                                    Type = PauseButtonType.Quit,
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,

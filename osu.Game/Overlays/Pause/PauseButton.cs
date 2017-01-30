@@ -1,13 +1,10 @@
-﻿using System;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -21,37 +18,41 @@ namespace osu.Game.Overlays.Pause
         private const float colourExpandTime = 500;
         private Vector2 colourShear = new Vector2(0.2f, 0);
 
-        private Color4 buttonColour;
         private Color4 backgroundColour = OsuColour.Gray(34);
 
-        private AudioSample sampleClick;
-        private AudioSample sampleHover;
+        private Color4 buttonColour;
+        public Color4 ButtonColour
+        {
+            get
+            {
+                return buttonColour;
+            }
+            set
+            {
+                buttonColour = value;
+                if (colourContainer == null) return;
+                colourContainer.Colour = ButtonColour;
+            }
+        }
 
-        public PauseButtonType Type;
-
+        private string text;
         public string Text
         {
             get
             {
-                switch (Type)
-                {
-                    case PauseButtonType.Resume:
-                        return "Continue";
-
-                    case PauseButtonType.Retry:
-                        return "Retry";
-
-                    case PauseButtonType.Quit:
-                        return "Quit to Main Menu";
-
-                    default:
-                        return "Unknown";
-                }
+                return text;
+            }
+            set
+            {
+                text = value;
+                if (spriteText == null) return;
+                spriteText.Text = Text;
             }
         }
 
-        private Container backgroundContainer, colourContainer, glowContainer;
+        public AudioSample SampleClick, SampleHover;
 
+        private Container backgroundContainer, colourContainer, glowContainer;
         private SpriteText spriteText;
 
         private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's
@@ -62,7 +63,7 @@ namespace osu.Game.Overlays.Pause
         {
             didClick = true;
             colourContainer.ResizeTo(new Vector2(1.5f, 1f), 200, EasingTypes.In);
-            sampleClick?.Play();
+            SampleClick?.Play();
             Action?.Invoke();
 
             Delay(200);
@@ -82,7 +83,7 @@ namespace osu.Game.Overlays.Pause
             colourContainer.ResizeTo(new Vector2(colourExpandedWidth, 1f), colourExpandTime, EasingTypes.OutElastic);
             spriteText.TransformSpacingTo(new Vector2(3f, 0f), colourExpandTime, EasingTypes.OutElastic);
             glowContainer.FadeTo(1f, colourExpandTime / 2, EasingTypes.Out);
-            sampleHover?.Play();
+            SampleHover?.Play();
             return true;
         }
 
@@ -98,30 +99,8 @@ namespace osu.Game.Overlays.Pause
             didClick = false;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        public PauseButton()
         {
-            switch (Type)
-            {
-                case PauseButtonType.Resume:
-                    buttonColour = colours.Green;
-                    sampleClick = audio.Sample.Get(@"Menu/menuback");
-                    break;
-
-                case PauseButtonType.Retry:
-                    buttonColour = colours.YellowDark;
-                    sampleClick = audio.Sample.Get(@"Menu/menu-play-click");
-                    break;
-
-                case PauseButtonType.Quit:
-                    // The red from the design isn't in the palette so it's used directly
-                    buttonColour = new Color4(170, 27, 39, 255);
-                    sampleClick = audio.Sample.Get(@"Menu/menuback");
-                    break;
-            }
-
-            sampleHover = audio.Sample.Get(@"Menu/menuclick");
-
             Add(new Drawable[]
             {
                 backgroundContainer = new Container
@@ -150,7 +129,7 @@ namespace osu.Game.Overlays.Pause
                             Origin = Anchor.TopLeft,
                             Anchor = Anchor.TopLeft,
                             Width = 0.125f,
-                            ColourInfo = ColourInfo.GradientHorizontal(new Color4(buttonColour.R, buttonColour.G, buttonColour.B, 0f), buttonColour)
+                            ColourInfo = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour)
                         },
                         new Box
                         {
@@ -158,7 +137,7 @@ namespace osu.Game.Overlays.Pause
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
                             Width = 0.75f,
-                            Colour = buttonColour
+                            Colour = ButtonColour
                         },
                         new Box
                         {
@@ -166,7 +145,7 @@ namespace osu.Game.Overlays.Pause
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
                             Width = 0.125f,
-                            ColourInfo = ColourInfo.GradientHorizontal(buttonColour, new Color4(buttonColour.R, buttonColour.G, buttonColour.B, 0f))
+                            ColourInfo = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f))
                         }
                     }
                 },
@@ -191,7 +170,7 @@ namespace osu.Game.Overlays.Pause
                                 Colour = Color4.Black.Opacity(0.2f),
                                 Radius = 5
                             },
-                            Colour = buttonColour,
+                            Colour = ButtonColour,
                             Shear = colourShear,
                             Children = new Drawable[]
                             {
@@ -225,17 +204,5 @@ namespace osu.Game.Overlays.Pause
                 }
             });
         }
-
-        public PauseButton()
-        {
-            
-        }
-    }
-
-    public enum PauseButtonType
-    {
-        Resume,
-        Retry,
-        Quit
     }
 }
