@@ -14,36 +14,6 @@ namespace osu.Game.Screens.Select
 {
     public class FilterControl : Container
     {
-        public enum SortMode
-        {
-            Arist,
-            BPM,
-            Creator,
-            DateAdded,
-            Difficulty,
-            Length,
-            RankAchieved,
-            Title
-        }
-
-        public enum GroupMode
-        {
-            NoGrouping,
-            Arist,
-            BPM,
-            Creator,
-            DateAdded,
-            Difficulty,
-            Length,
-            RankAchieved,
-            Title,
-            Collections,
-            Favorites,
-            MyMaps,
-            RankedStatus,
-            RecentlyPlayed
-        }
-    
         public Action FilterChanged;
 
         public string Search => searchTextBox.Text;
@@ -260,6 +230,36 @@ namespace osu.Game.Screens.Select
                 sortLabel.Colour = colours.GreenLight;
                 sortEllipsis.Colour = colours.GreenLight;
             }
+        }
+        
+        public enum SortMode
+        {
+            Arist,
+            BPM,
+            Creator,
+            DateAdded,
+            Difficulty,
+            Length,
+            RankAchieved,
+            Title
+        }
+
+        public enum GroupMode
+        {
+            NoGrouping,
+            Arist,
+            BPM,
+            Creator,
+            DateAdded,
+            Difficulty,
+            Length,
+            RankAchieved,
+            Title,
+            Collections,
+            Favorites,
+            MyMaps,
+            RankedStatus,
+            RecentlyPlayed
         }
     }
 }
