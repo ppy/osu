@@ -73,6 +73,8 @@ namespace osu.Game.Database
         // Metadata
         public string Version { get; set; }
 
+        public float StarDifficulty => BaseDifficulty?.OverallDifficulty ?? 5; //todo: implement properly
+
         public bool Equals(BeatmapInfo other)
         {
             return ID == other?.ID;
