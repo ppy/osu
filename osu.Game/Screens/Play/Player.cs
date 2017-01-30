@@ -117,7 +117,14 @@ namespace osu.Game.Screens.Play
             scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
 
             pauseOverlay = new PauseOverlay { Depth = -1 };
-            pauseOverlay.OnResume = Resume;
+            pauseOverlay.OnResume = delegate
+            {
+                Delay(400);
+                Schedule(() =>
+                {
+                    Resume();
+                });
+            };
             pauseOverlay.OnRetry = Restart;
             pauseOverlay.OnQuit = Exit;
 
