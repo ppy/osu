@@ -106,6 +106,8 @@ namespace osu.Game
             {
                 Depth = -3,
                 Position = new Vector2(0, Toolbar.HEIGHT),
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
             }).Preload(this, overlayContent.Add);
 
             Dependencies.Cache(options);
