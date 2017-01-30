@@ -16,12 +16,10 @@ namespace osu.Game.Overlays.Pause
 {
     public class PauseButton : ClickableContainer
     {
-        private float height = 70;
-        private float colourWidth = 0.8f;
-        private float colourExpandedWidth = 0.9f;
-        private float colourExpandTime = 500;
-        private float shear = 0.2f;
-        private float glowGradientEndAlpha = 0f;
+        private const float colourWidth = 0.8f;
+        private const float colourExpandedWidth = 0.9f;
+        private const float colourExpandTime = 500;
+        private Vector2 colourShear = new Vector2(0.2f, 0);
 
         private Color4 buttonColour;
         private Color4 backgroundColour = OsuColour.Gray(34);
@@ -56,7 +54,7 @@ namespace osu.Game.Overlays.Pause
         private Container colourContainer;
         private Container glowContainer;
 
-        private bool didClick;
+        private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's
 
         public override bool Contains(Vector2 screenSpacePos) => backgroundContainer.Contains(screenSpacePos);
 
@@ -113,7 +111,7 @@ namespace osu.Game.Overlays.Pause
                     break;
 
                 case PauseButtonType.Quit:
-                    // For whatever reason the red from the mockup is not in the osu! palette
+                    // The red from the design isn't in the palette so it's used directly
                     buttonColour = new Color4(170, 27, 39, 255);
                     sampleClick = audio.Sample.Get(@"Menu/menuback");
                     break;
@@ -149,7 +147,7 @@ namespace osu.Game.Overlays.Pause
                             Origin = Anchor.TopLeft,
                             Anchor = Anchor.TopLeft,
                             Width = 0.125f,
-                            ColourInfo = ColourInfo.GradientHorizontal(new Color4(buttonColour.R, buttonColour.G, buttonColour.B, glowGradientEndAlpha), buttonColour)
+                            ColourInfo = ColourInfo.GradientHorizontal(new Color4(buttonColour.R, buttonColour.G, buttonColour.B, 0f), buttonColour)
                         },
                         new Box
                         {
@@ -165,14 +163,13 @@ namespace osu.Game.Overlays.Pause
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
                             Width = 0.125f,
-                            ColourInfo = ColourInfo.GradientHorizontal(buttonColour, new Color4(buttonColour.R, buttonColour.G, buttonColour.B, glowGradientEndAlpha))
+                            ColourInfo = ColourInfo.GradientHorizontal(buttonColour, new Color4(buttonColour.R, buttonColour.G, buttonColour.B, 0f))
                         }
                     }
                 },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = height,
+                    RelativeSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Masking = true,
@@ -192,7 +189,7 @@ namespace osu.Game.Overlays.Pause
                                 Radius = 5
                             },
                             Colour = buttonColour,
-                            Shear = new Vector2(shear, 0),
+                            Shear = colourShear,
                             Children = new Drawable[]
                             {
                                 new Box
@@ -206,7 +203,7 @@ namespace osu.Game.Overlays.Pause
                                     RelativeSizeAxes = Axes.Both,
                                     TriangleScale = 4,
                                     Alpha = 0.05f,
-                                    Shear = new Vector2(-shear, 0)
+                                    Shear = -colourShear
                                 }
                             }
                         }
@@ -228,8 +225,7 @@ namespace osu.Game.Overlays.Pause
 
         public PauseButton()
         {
-            Height = height;
-            RelativeSizeAxes = Axes.X;
+            
         }
     }
 

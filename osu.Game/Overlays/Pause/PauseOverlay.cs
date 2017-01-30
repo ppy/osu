@@ -15,7 +15,8 @@ namespace osu.Game.Overlays.Pause
 {
     public class PauseOverlay : OverlayContainer
     {
-        private int fadeDuration = 200;
+        private const int fadeDuration = 200;
+        private const int buttonHeight = 70;
 
         public Action OnResume;
         public Action OnRetry;
@@ -120,8 +121,10 @@ namespace osu.Game.Overlays.Pause
                         new PauseButton
                         {
                             Type = PauseButtonType.Resume,
+                            RelativeSizeAxes = Axes.X,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
+                            Height = buttonHeight,
                             Action = (delegate
                             {
                                 Hide();
@@ -131,8 +134,10 @@ namespace osu.Game.Overlays.Pause
                         new PauseButton
                         {
                             Type = PauseButtonType.Retry,
+                            RelativeSizeAxes = Axes.X,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
+                            Height = buttonHeight,
                             Action = (delegate
                             {
                                 Hide();
@@ -142,8 +147,10 @@ namespace osu.Game.Overlays.Pause
                         new PauseButton
                         {
                             Type = PauseButtonType.Quit,
+                            RelativeSizeAxes = Axes.X,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
+                            Height = buttonHeight,
                             Action = (delegate
                             {
                                 Hide();
