@@ -110,8 +110,11 @@ namespace osu.Game.Screens.Menu
                                                             RelativeSizeAxes = Axes.Both,
                                                             Colour = OsuPink,
                                                         },
-                                                        new OsuLogoTriangles
+                                                        new Triangles
                                                         {
+                                                            TriangleScale = 4,
+                                                            ColourLight = OsuColour.FromHex(@"ff7db7"),
+                                                            ColourDark = OsuColour.FromHex(@"de5b95"),
                                                             RelativeSizeAxes = Axes.Both,
                                                         },
                                                     }
@@ -217,36 +220,6 @@ namespace osu.Game.Screens.Menu
         protected override void OnHoverLost(InputState state)
         {
             logoHoverContainer.ScaleTo(1, 500, EasingTypes.OutElastic);
-        }
-
-        class OsuLogoTriangles : Triangles
-        {
-            public Color4 OsuPinkLight = OsuColour.FromHex(@"ff7db7");
-            public Color4 OsuPinkDark = OsuColour.FromHex(@"de5b95");
-
-            public OsuLogoTriangles()
-            {
-                TriangleScale = 4;
-                Alpha = 1;
-
-            }
-            
-            protected override Triangle CreateTriangle()
-            {
-                var triangle = base.CreateTriangle();
-                triangle.Alpha = 1;
-                triangle.Colour = getTriangleShade();
-                return triangle;
-            }
-
-            private Color4 getTriangleShade()
-            {
-                float val = RNG.NextSingle();
-                return Interpolation.ValueAt(val,
-                    OsuPinkDark,
-                    OsuPinkLight,
-                    0, 1);
-            }
         }
     }
 }
