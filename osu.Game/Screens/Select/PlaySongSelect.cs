@@ -201,8 +201,6 @@ namespace osu.Game.Screens.Select
                 foreach (var beatmapGroup in carousel)
                 {
                     var set = beatmapGroup.BeatmapSet;
-                    if (set == null)
-                        continue;
                     bool match = string.IsNullOrEmpty(search)
                         || (set.Metadata.Artist ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
                         || (set.Metadata.ArtistUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
@@ -210,14 +208,14 @@ namespace osu.Game.Screens.Select
                         || (set.Metadata.TitleUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1;
                     if (match)
                     {
-                        changed = changed && !beatmapGroup.Hidden;
+                        changed &= !beatmapGroup.Hidden;
                         beatmapGroup.Hidden = false;
                         if (newSelection == null || beatmapGroup.BeatmapSet.OnlineBeatmapSetID == Beatmap.BeatmapSetInfo.OnlineBeatmapSetID)
                             newSelection = beatmapGroup;
                     }
                     else
                     {
-                        changed = changed && beatmapGroup.Hidden;
+                        changed &= beatmapGroup.Hidden;
                         beatmapGroup.Hidden = true;
                     }
                 }
