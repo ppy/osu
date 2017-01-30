@@ -51,7 +51,7 @@ namespace osu.Desktop.VisualTests.Tests
                             Width = 100,
                             Height = 50,
                             Colour = Color4.Black,
-                            Action = (() => pauseOverlay.Show())
+                            Action = () => pauseOverlay.Show()
                         },
                         new Button
                         {
@@ -70,9 +70,9 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             };
 
-            pauseOverlay.OnResume += (() => Logger.Log(@"Resume"));
-            pauseOverlay.OnRetry += (() => Logger.Log(@"Retry"));
-            pauseOverlay.OnQuit += (() => Logger.Log(@"Quit"));
+            pauseOverlay.OnResume += () => Logger.Log(@"Resume");
+            pauseOverlay.OnRetry += () => Logger.Log(@"Retry");
+            pauseOverlay.OnQuit += () => Logger.Log(@"Quit");
         }
     }
 }
