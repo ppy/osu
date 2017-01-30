@@ -61,10 +61,10 @@ namespace osu.Desktop.VisualTests.Tests
                             Width = 100,
                             Height = 50,
                             Colour = Color4.Black,
-                            Action = (delegate {
+                            Action = delegate {
                                 retryCount++;
                                 pauseOverlay.SetRetries(retryCount);
-                            }),
+                            },
                         }
                     }
                 }
