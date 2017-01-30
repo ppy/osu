@@ -12,17 +12,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Configuration;
 using osu.Game.Online.API;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Toolbar
 {
     class ToolbarUserButton : ToolbarButton, IOnlineComponent
     {
         private Avatar avatar;
+        private LoginOverlay loginOverlay;
 
         public ToolbarUserButton()
         {
@@ -33,10 +34,29 @@ namespace osu.Game.Overlays.Toolbar
             Flow.Add(avatar = new Avatar());
         }
 
+        public override bool Contains(Vector2 screenSpacePos) => base.Contains(screenSpacePos) || loginOverlay.Contains(screenSpacePos);
+
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, OsuConfigManager config)
+        private void load(APIAccess api, OsuGameBase game)
         {
             api.Register(this);
+
+            (loginOverlay = new LoginOverlay
+            {
+                Position = new Vector2(0, 1),
+                RelativePositionAxes = Axes.Y,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+            }).Preload(game, Add);
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            if (!base.Contains(state.Mouse.NativeState.Position)) return false;
+
+            loginOverlay.ToggleVisibility();
+
+            return base.OnClick(state);
         }
 
         public void APIStateChanged(APIAccess api, APIState state)

@@ -52,8 +52,6 @@ namespace osu.Game.Overlays
             Width = 400;
             Height = 130;
 
-            Anchor = Anchor.TopRight;//placeholder
-            Origin = Anchor.TopRight;
             Margin = new MarginPadding(10);
         }
 

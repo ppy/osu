@@ -111,24 +111,24 @@ namespace osu.Game.Overlays.Options.General
                     },
                     saveUsername = new CheckBoxOption
                     {
-                        LabelText = "Remember Username",
+                        LabelText = "Remember username",
                         Bindable = config.GetBindable<bool>(OsuConfig.SaveUsername),
                     },
                     savePassword = new CheckBoxOption
                     {
-                        LabelText = "Remember Password",
+                        LabelText = "Stay logged in",
                         Bindable = config.GetBindable<bool>(OsuConfig.SavePassword),
                     },
                     new OsuButton
                     {
                         RelativeSizeAxes = Axes.X,
-                        Text = "Log in",
+                        Text = "Sign in",
                         Action = performLogin
                     },
                     new OsuButton
                     {
                         RelativeSizeAxes = Axes.X,
-                        Text = "Register",
+                        Text = "Register new account",
                         //Action = registerLink
                     }
                 };

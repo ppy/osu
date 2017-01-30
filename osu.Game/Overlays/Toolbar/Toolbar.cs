@@ -33,31 +33,7 @@ namespace osu.Game.Overlays.Toolbar
         private const float alpha_hovering = 0.8f;
         private const float alpha_normal = 0.6f;
 
-
-        protected override void PopIn()
-        {
-            MoveToY(0, transition_time, EasingTypes.OutQuint);
-            FadeIn(transition_time, EasingTypes.OutQuint);
-        }
-
-        protected override void PopOut()
-        {
-            MoveToY(-DrawSize.Y, transition_time, EasingTypes.InQuint);
-            FadeOut(transition_time, EasingTypes.InQuint);
-        }
-
-        protected override bool OnHover(InputState state)
-        {
-            solidBackground.FadeTo(alpha_hovering, transition_time, EasingTypes.OutQuint);
-            gradientBackground.FadeIn(transition_time, EasingTypes.OutQuint);
-            return true;
-        }
-
-        protected override void OnHoverLost(InputState state)
-        {
-            solidBackground.FadeTo(alpha_normal, transition_time, EasingTypes.OutQuint);
-            gradientBackground.FadeOut(transition_time, EasingTypes.OutQuint);
-        }
+        public override bool Contains(Vector2 screenSpacePos) => true;
 
         public Toolbar()
         {
@@ -96,7 +72,7 @@ namespace osu.Game.Overlays.Toolbar
                         }
                     }
                 },
-                new FlowContainer
+                new PassThroughFlowContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -124,5 +100,36 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
+
+        protected override void PopIn()
+        {
+            MoveToY(0, transition_time, EasingTypes.OutQuint);
+            FadeIn(transition_time, EasingTypes.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            MoveToY(-DrawSize.Y, transition_time, EasingTypes.InQuint);
+            FadeOut(transition_time, EasingTypes.InQuint);
+        }
+
+        protected override bool OnHover(InputState state)
+        {
+            solidBackground.FadeTo(alpha_hovering, transition_time, EasingTypes.OutQuint);
+            gradientBackground.FadeIn(transition_time, EasingTypes.OutQuint);
+            return true;
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            solidBackground.FadeTo(alpha_normal, transition_time, EasingTypes.OutQuint);
+            gradientBackground.FadeOut(transition_time, EasingTypes.OutQuint);
+        }
+
+        class PassThroughFlowContainer : FlowContainer
+        {
+            //needed to get input to the login overlay.
+            public override bool Contains(Vector2 screenSpacePos) => true;
+        }
     }
 }
