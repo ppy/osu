@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Select
     
         public Action FilterChanged;
 
-        public string Search { get; private set; } = string.Empty;
+        public string Search => searchTextBox.Text;
         public SortMode Sort { get; private set; } = SortMode.Title;
 
         private SearchTextBox searchTextBox;
@@ -82,7 +82,6 @@ namespace osu.Game.Screens.Select
 
             searchTextBox.OnChange += (sender, text) =>
             {
-                Search = searchTextBox.Text;
                 FilterChanged?.Invoke();
             };
         }
