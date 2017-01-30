@@ -21,6 +21,7 @@ using osu.Game.Modes;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
+using OpenTK;
 
 namespace osu.Game
 {
@@ -101,7 +102,11 @@ namespace osu.Game
             //overlay elements
             (chat = new ChatOverlay { Depth = 0 }).Preload(this, overlayContent.Add);
             (options = new OptionsOverlay { Depth = -1 }).Preload(this, overlayContent.Add);
-            (musicController = new MusicController() { Depth = -3 }).Preload(this, overlayContent.Add);
+            (musicController = new MusicController()
+            {
+                Depth = -3,
+                Position = new Vector2(0, Toolbar.HEIGHT),
+            }).Preload(this, overlayContent.Add);
 
             Dependencies.Cache(options);
             Dependencies.Cache(musicController);

@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class Toolbar : OverlayContainer
     {
-        private const float height = 50;
+        public const float HEIGHT = 50;
 
         public Action OnHome;
         public Action<PlayMode> OnPlayModeChange;
@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.Toolbar
             };
 
             RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, height);
+            Size = new Vector2(1, HEIGHT);
         }
 
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
