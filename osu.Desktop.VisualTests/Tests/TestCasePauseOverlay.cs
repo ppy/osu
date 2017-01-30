@@ -73,6 +73,7 @@ namespace osu.Desktop.VisualTests.Tests
             pauseOverlay.OnResume += () => Logger.Log(@"Resume");
             pauseOverlay.OnRetry += () => Logger.Log(@"Retry");
             pauseOverlay.OnQuit += () => Logger.Log(@"Quit");
+            retryCount = 0;
         }
     }
 }
