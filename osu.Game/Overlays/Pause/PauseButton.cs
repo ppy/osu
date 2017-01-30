@@ -32,6 +32,7 @@ namespace osu.Game.Overlays.Pause
                 buttonColour = value;
                 if (colourContainer == null) return;
                 colourContainer.Colour = ButtonColour;
+                reapplyGlow();
             }
         }
 
@@ -53,6 +54,7 @@ namespace osu.Game.Overlays.Pause
         public AudioSample SampleClick, SampleHover;
 
         private Container backgroundContainer, colourContainer, glowContainer;
+        private Box leftGlow, centerGlow, rightGlow;
         private SpriteText spriteText;
 
         private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's
@@ -99,6 +101,14 @@ namespace osu.Game.Overlays.Pause
             didClick = false;
         }
 
+        private void reapplyGlow()
+        {
+            if (leftGlow == null || centerGlow == null || rightGlow == null) return;
+            leftGlow.ColourInfo = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
+            centerGlow.Colour = ButtonColour;
+            rightGlow.ColourInfo = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
+        }
+
         public PauseButton()
         {
             Add(new Drawable[]
@@ -123,7 +133,7 @@ namespace osu.Game.Overlays.Pause
                     Alpha = 0f,
                     Children = new Drawable[]
                     {
-                        new Box
+                        leftGlow = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.TopLeft,
@@ -131,7 +141,7 @@ namespace osu.Game.Overlays.Pause
                             Width = 0.125f,
                             ColourInfo = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour)
                         },
-                        new Box
+                        centerGlow = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
@@ -139,7 +149,7 @@ namespace osu.Game.Overlays.Pause
                             Width = 0.75f,
                             Colour = ButtonColour
                         },
-                        new Box
+                        rightGlow = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.TopRight,
@@ -203,6 +213,8 @@ namespace osu.Game.Overlays.Pause
                     Colour = Color4.White,
                 }
             });
+
+            reapplyGlow();
         }
     }
 }
