@@ -10,6 +10,9 @@ namespace osu.Game.Overlays.Pause
 {
     public class PauseProgressBar : Container
     {
+        private Color4 fillColour = new Color4(221, 255, 255, 255);
+        private Color4 glowColour = new Color4(221, 255, 255, 150);
+
         private Container fill;
         private WorkingBeatmap current;
 
@@ -53,14 +56,13 @@ namespace osu.Game.Overlays.Pause
                     Anchor = Anchor.BottomRight,
                     RelativeSizeAxes = Axes.X,
                     Height = 5,
-
                     Children = new Drawable[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = new Color4(0, 0, 0, 255),
-                            Alpha = 0.5f,
+                            Colour = Color4.Black,
+                            Alpha = 0.5f
                         }
                     }
                 },
@@ -91,18 +93,18 @@ namespace osu.Game.Overlays.Pause
                                     EdgeEffect = new EdgeEffect
                                     {
                                         Type = EdgeEffectType.Glow,
-                                        Colour = new Color4(130, 204, 255, 150),
-                                        Radius = 5,
+                                        Colour = glowColour,
+                                        Radius = 5
                                     },
                                     Children = new Drawable[]
                                     {
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = new Color4(221, 255, 255, 255),
+                                            Colour = fillColour
                                         }
                                     }
-                                },
+                                }
                             }
                         },
                         new Container
@@ -116,7 +118,7 @@ namespace osu.Game.Overlays.Pause
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.White,
+                                    Colour = Color4.White
                                 },
                                 new Container
                                 {

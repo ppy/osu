@@ -13,10 +13,10 @@ namespace osu.Game.Overlays.Pause
 {
     public class PauseButton : ClickableContainer
     {
-        private const float colourWidth = 0.8f;
-        private const float colourExpandedWidth = 0.9f;
-        private const float colourExpandTime = 500;
-        private Vector2 colourShear = new Vector2(0.2f, 0);
+        private const float hoverWidth = 0.9f;
+        private const float hoverDuration = 500;
+        private const float glowFadeDuration = 250;
+        private const float clickDuration = 200;
 
         private Color4 backgroundColour = OsuColour.Gray(34);
 
@@ -57,20 +57,20 @@ namespace osu.Game.Overlays.Pause
         private Box leftGlow, centerGlow, rightGlow;
         private SpriteText spriteText;
 
-        private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's
+        private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's when clicking
 
         public override bool Contains(Vector2 screenSpacePos) => backgroundContainer.Contains(screenSpacePos);
 
         protected override bool OnMouseDown(Framework.Input.InputState state, MouseDownEventArgs args)
         {
             didClick = true;
-            colourContainer.ResizeTo(new Vector2(1.5f, 1f), 200, EasingTypes.In);
+            colourContainer.ResizeTo(new Vector2(1.5f, 1f), clickDuration, EasingTypes.In);
             SampleClick?.Play();
             Action?.Invoke();
 
-            Delay(200);
+            Delay(clickDuration);
             Schedule(delegate {
-                colourContainer.ResizeTo(new Vector2(colourWidth, 1f), 0, EasingTypes.None);
+                colourContainer.ResizeTo(new Vector2(0.8f, 1f), 0, EasingTypes.None);
                 spriteText.Spacing = Vector2.Zero;
                 glowContainer.Alpha = 0;
             });
@@ -82,9 +82,9 @@ namespace osu.Game.Overlays.Pause
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            colourContainer.ResizeTo(new Vector2(colourExpandedWidth, 1f), colourExpandTime, EasingTypes.OutElastic);
-            spriteText.TransformSpacingTo(new Vector2(3f, 0f), colourExpandTime, EasingTypes.OutElastic);
-            glowContainer.FadeTo(1f, colourExpandTime / 2, EasingTypes.Out);
+            colourContainer.ResizeTo(new Vector2(hoverWidth, 1f), hoverDuration, EasingTypes.OutElastic);
+            spriteText.TransformSpacingTo(new Vector2(3f, 0f), hoverDuration, EasingTypes.OutElastic);
+            glowContainer.FadeOut(glowFadeDuration, EasingTypes.Out);
             SampleHover?.Play();
             return true;
         }
@@ -93,9 +93,9 @@ namespace osu.Game.Overlays.Pause
         {
             if (!didClick)
             {
-                colourContainer.ResizeTo(new Vector2(colourWidth, 1f), colourExpandTime, EasingTypes.OutElastic);
-                spriteText.TransformSpacingTo(Vector2.Zero, colourExpandTime, EasingTypes.OutElastic);
-                glowContainer.FadeTo(0f, colourExpandTime / 2, EasingTypes.Out);
+                colourContainer.ResizeTo(new Vector2(0.8f, 1f), hoverDuration, EasingTypes.OutElastic);
+                spriteText.TransformSpacingTo(Vector2.Zero, hoverDuration, EasingTypes.OutElastic);
+                glowContainer.FadeOut(glowFadeDuration, EasingTypes.Out);
             }
 
             didClick = false;
@@ -172,7 +172,7 @@ namespace osu.Game.Overlays.Pause
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Width = colourWidth,
+                            Width = 0.8f,
                             Masking = true,
                             EdgeEffect = new EdgeEffect
                             {
@@ -181,7 +181,7 @@ namespace osu.Game.Overlays.Pause
                                 Radius = 5
                             },
                             Colour = ButtonColour,
-                            Shear = colourShear,
+                            Shear = new Vector2(0.2f, 0),
                             Children = new Drawable[]
                             {
                                 new Box
@@ -195,7 +195,7 @@ namespace osu.Game.Overlays.Pause
                                     RelativeSizeAxes = Axes.Both,
                                     TriangleScale = 4,
                                     Alpha = 0.05f,
-                                    Shear = -colourShear
+                                    Shear = new Vector2(-0.2f, 0)
                                 }
                             }
                         }
@@ -210,7 +210,7 @@ namespace osu.Game.Overlays.Pause
                     Font = "Exo2.0-Bold",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.1f),
-                    Colour = Color4.White,
+                    Colour = Color4.White
                 }
             });
 
