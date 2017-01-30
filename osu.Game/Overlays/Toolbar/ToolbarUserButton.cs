@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Toolbar
             Flow.Add(avatar = new Avatar());
         }
 
-        public override bool Contains(Vector2 screenSpacePos) => base.Contains(screenSpacePos) || loginOverlay.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => base.Contains(screenSpacePos) || (loginOverlay.IsVisible && loginOverlay.Contains(screenSpacePos));
 
         [BackgroundDependencyLoader]
         private void load(APIAccess api, OsuGameBase game)
