@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Select
             };
 
             //get statistics fromt he current ruleset.
-            Ruleset.GetRuleset(game.PlayMode.Value).GetBeatmapStatistics(beatmap).ForEach(s => labels.Add(new InfoLabel(s)));
+            Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).GetBeatmapStatistics(beatmap).ForEach(s => labels.Add(new InfoLabel(s)));
 
             (beatmapInfoContainer = new BufferedContainer
             {
