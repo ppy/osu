@@ -183,6 +183,7 @@
     <Compile Include="Tests\TestCaseScoreCounter.cs" />
     <Compile Include="Tests\TestCaseTextAwesome.cs" />
     <Compile Include="Tests\TestCasePlaySongSelect.cs" />
+    <Compile Include="Tests\TestCaseModSelection.cs" />
     <Compile Include="VisualTestGame.cs" />
     <Compile Include="Platform\TestStorage.cs" />
     <Compile Include="Tests\TestCaseOptions.cs" />
