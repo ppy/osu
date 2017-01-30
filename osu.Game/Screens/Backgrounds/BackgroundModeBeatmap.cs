@@ -24,14 +24,17 @@ namespace osu.Game.Screens.Backgrounds
             }
             set
             {
-                if (beatmap == value)
+                if (beatmap == value && beatmap != null)
                     return;
-
                 beatmap = value;
 
                 Schedule(() =>
                 {
-                    Background newBackground = new BeatmapBackground(beatmap);
+                    Background newBackground;
+                    if (beatmap == null)
+                        newBackground = new Background(@"Backgrounds/bg1");
+                    else
+                        newBackground = new BeatmapBackground(beatmap);
 
                     newBackground.Preload(Game, delegate
                     {
@@ -55,8 +58,6 @@ namespace osu.Game.Screens.Backgrounds
         public BackgroundModeBeatmap(WorkingBeatmap beatmap)
         {
             Beatmap = beatmap;
-            if (beatmap == null)
-                Add(background = new Background(@"Backgrounds/bg1"));
         }
 
         public void BlurTo(Vector2 sigma, double duration)
