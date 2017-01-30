@@ -25,8 +25,6 @@ namespace osu.Game.Overlays.Toolbar
         public Action<PlayMode> OnPlayModeChange;
 
         private ToolbarModeSelector modeSelector;
-        private Box solidBackground;
-        private Box gradientBackground;
 
         private const int transition_time = 250;
 
@@ -39,21 +37,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             Children = new Drawable[]
             {
-                solidBackground = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.1f),
-                    Alpha = alpha_normal,
-                },
-                gradientBackground = new Box
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.BottomLeft,
-                    Alpha = 0,
-                    Height = 90,
-                    ColourInfo = ColourInfo.GradientVertical(
-                        OsuColour.Gray(0.1f).Opacity(0.5f), OsuColour.Gray(0.1f).Opacity(0)),
-                },
+                new ToolbarBackground(),
                 new FlowContainer
                 {
                     Direction = FlowDirection.HorizontalOnly,
@@ -99,6 +83,48 @@ namespace osu.Game.Overlays.Toolbar
             Size = new Vector2(1, HEIGHT);
         }
 
+        public class ToolbarBackground : Container
+        {
+            private Box solidBackground;
+            private Box gradientBackground;
+
+            public ToolbarBackground()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Children = new Drawable[]
+                {
+                    solidBackground = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = OsuColour.Gray(0.1f),
+                        Alpha = alpha_normal,
+                    },
+                    gradientBackground = new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.BottomLeft,
+                        Alpha = 0,
+                        Height = 90,
+                        ColourInfo = ColourInfo.GradientVertical(
+                            OsuColour.Gray(0.1f).Opacity(0.5f), OsuColour.Gray(0.1f).Opacity(0)),
+                    },
+                };
+            }
+
+            protected override bool OnHover(InputState state)
+            {
+                solidBackground.FadeTo(alpha_hovering, transition_time, EasingTypes.OutQuint);
+                gradientBackground.FadeIn(transition_time, EasingTypes.OutQuint);
+                return true;
+            }
+
+            protected override void OnHoverLost(InputState state)
+            {
+                solidBackground.FadeTo(alpha_normal, transition_time, EasingTypes.OutQuint);
+                gradientBackground.FadeOut(transition_time, EasingTypes.OutQuint);
+            }
+        }
+
         public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
 
         protected override void PopIn()
@@ -111,19 +137,6 @@ namespace osu.Game.Overlays.Toolbar
         {
             MoveToY(-DrawSize.Y, transition_time, EasingTypes.InQuint);
             FadeOut(transition_time, EasingTypes.InQuint);
-        }
-
-        protected override bool OnHover(InputState state)
-        {
-            solidBackground.FadeTo(alpha_hovering, transition_time, EasingTypes.OutQuint);
-            gradientBackground.FadeIn(transition_time, EasingTypes.OutQuint);
-            return true;
-        }
-
-        protected override void OnHoverLost(InputState state)
-        {
-            solidBackground.FadeTo(alpha_normal, transition_time, EasingTypes.OutQuint);
-            gradientBackground.FadeOut(transition_time, EasingTypes.OutQuint);
         }
 
         class PassThroughFlowContainer : FlowContainer
