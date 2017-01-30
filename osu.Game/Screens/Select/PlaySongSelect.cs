@@ -298,18 +298,15 @@ namespace osu.Game.Screens.Select
 
         private void changeBackground(WorkingBeatmap beatmap)
         {
-            if (beatmap == null)
-                return;
-
             var backgroundModeBeatmap = Background as BackgroundModeBeatmap;
             if (backgroundModeBeatmap != null)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
-                // TODO: Remove this once we have non-nullable Beatmap
-                (Background as BackgroundModeBeatmap)?.BlurTo(BACKGROUND_BLUR, 1000);
+                backgroundModeBeatmap.BlurTo(BACKGROUND_BLUR, 1000);
             }
 
-            beatmapInfoWedge.UpdateBeatmap(beatmap);
+            if (beatmap != null)
+                beatmapInfoWedge.UpdateBeatmap(beatmap);
         }
 
         /// <summary>
