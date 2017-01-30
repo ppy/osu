@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps.Drawables;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes;
@@ -190,18 +191,12 @@ namespace osu.Game.Screens.Select
 
         private string getBPMRange(Beatmap beatmap)
         {
-            double bpmMax = double.MinValue;
-            double bpmMin = double.MaxValue;
-            double bpmMost = beatmap.BPMAt(beatmap.ControlPoints.Where(c => c.BeatLength != 0).GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).First().First().Time);
-            foreach (ControlPoint a in beatmap.ControlPoints)
-            {
-                if (a.BeatLength == 0) continue;
-                double tmp = beatmap.BPMAt(a.Time);
-                if (bpmMax < tmp) bpmMax = tmp;
-                if (bpmMin > tmp) bpmMin = tmp;
-            }
-            if (bpmMax == bpmMin) return Math.Round(bpmMin) + "bpm";
-            return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "bpm (mostly " + Math.Round(bpmMost) + "bpm)";
+            double bpmMax = beatmap.BPMMaximum; 
+            double bpmMin = beatmap.BPMMinimum;
+
+            if (Precision.AlmostEquals(bpmMin, bpmMax)) return Math.Round(bpmMin) + "bpm";
+
+            return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "bpm (mostly " + Math.Round(beatmap.BPMMode) + "bpm)";
         }
 
         public class InfoLabel : Container
