@@ -4,7 +4,9 @@
 using System;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -12,13 +14,22 @@ namespace osu.Game.Graphics.UserInterface
     {
         public OsuButton()
         {
-            Height = 25;
+            Height = 40;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Colour = colours.BlueDark;
+            Masking = true;
+            CornerRadius = 5;
+
+            Add(new Triangles
+            {
+                RelativeSizeAxes = Axes.Both,
+                ColourDark = colours.BlueDarker,
+                ColourLight = colours.Blue,
+            });
         }
     }
 }
