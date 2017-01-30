@@ -33,7 +33,18 @@ namespace osu.Game.Beatmaps.Drawables
 
         public BeatmapSetInfo BeatmapSet;
 
-        public bool Hidden;
+        private bool hidden;
+        public bool Hidden
+        {
+            get { return hidden; }
+            set
+            {
+                hidden = value;
+                Header.Alpha = hidden ? 0 : 1;
+                if (hidden)
+                    State = BeatmapGroupState.Collapsed;
+            }
+        }
 
         public BeatmapGroupState State
         {

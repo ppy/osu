@@ -213,7 +213,6 @@ namespace osu.Game.Screens.Select
                     {
                         changed = changed && !beatmapGroup.Hidden;
                         beatmapGroup.Hidden = false;
-                        beatmapGroup.Header.Alpha = 1;
                         if (newSelection == null || beatmapGroup.BeatmapSet.OnlineBeatmapSetID == Beatmap.BeatmapSetInfo.OnlineBeatmapSetID)
                             newSelection = beatmapGroup;
                     }
@@ -221,9 +220,6 @@ namespace osu.Game.Screens.Select
                     {
                         changed = changed && beatmapGroup.Hidden;
                         beatmapGroup.Hidden = true;
-                        beatmapGroup.Header.Alpha = 0;
-                        beatmapGroup.Header.Masking = false;
-                        beatmapGroup.State = BeatmapGroupState.Collapsed;
                     }
                 }
                 if (newSelection != null)
