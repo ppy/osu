@@ -30,9 +30,9 @@ namespace osu.Game.Overlays.Pause
             set
             {
                 buttonColour = value;
+                reapplyGlow();
                 if (colourContainer == null) return;
                 colourContainer.Colour = ButtonColour;
-                reapplyGlow();
             }
         }
 
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Pause
         {
             colourContainer.ResizeTo(new Vector2(hoverWidth, 1f), hoverDuration, EasingTypes.OutElastic);
             spriteText.TransformSpacingTo(new Vector2(3f, 0f), hoverDuration, EasingTypes.OutElastic);
-            glowContainer.FadeOut(glowFadeDuration, EasingTypes.Out);
+            glowContainer.FadeIn(glowFadeDuration, EasingTypes.Out);
             SampleHover?.Play();
             return true;
         }
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Pause
 
         public PauseButton()
         {
-            Add(new Drawable[]
+            Children = new Drawable[]
             {
                 backgroundContainer = new Container
                 {
@@ -138,24 +138,21 @@ namespace osu.Game.Overlays.Pause
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.TopLeft,
                             Anchor = Anchor.TopLeft,
-                            Width = 0.125f,
-                            ColourInfo = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour)
+                            Width = 0.125f
                         },
                         centerGlow = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Width = 0.75f,
-                            Colour = ButtonColour
+                            Width = 0.75f
                         },
                         rightGlow = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
-                            Width = 0.125f,
-                            ColourInfo = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f))
+                            Width = 0.125f
                         }
                     }
                 },
@@ -212,7 +209,7 @@ namespace osu.Game.Overlays.Pause
                     ShadowColour = new Color4(0, 0, 0, 0.1f),
                     Colour = Color4.White
                 }
-            });
+            };
 
             reapplyGlow();
         }
