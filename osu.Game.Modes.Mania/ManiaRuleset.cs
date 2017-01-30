@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Game.Graphics;
 using osu.Game.Modes.Mania.UI;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu;
@@ -18,6 +19,8 @@ namespace osu.Game.Modes.Mania
         public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new ManiaHitRenderer { Objects = objects };
 
         protected override PlayMode PlayMode => PlayMode.Mania;
+
+        public override FontAwesome Icon => FontAwesome.fa_osu_mania_o;
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => null;
 

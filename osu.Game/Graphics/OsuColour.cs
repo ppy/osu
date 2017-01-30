@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Colour;
 
@@ -17,11 +18,23 @@ namespace osu.Game.Graphics
 
         public static Color4 FromHex(string hex)
         {
-            return new Color4(
-                Convert.ToByte(hex.Substring(0, 2), 16),
-                Convert.ToByte(hex.Substring(2, 2), 16),
-                Convert.ToByte(hex.Substring(4, 2), 16),
-                255);
+            switch (hex.Length)
+            {
+                default:
+                    throw new Exception(@"Invalid hex string length!");
+                case 3:
+                    return new Color4(
+                        (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
+                        (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
+                        (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
+                        255);
+                case 6:
+                    return new Color4(
+                        Convert.ToByte(hex.Substring(0, 2), 16),
+                        Convert.ToByte(hex.Substring(2, 2), 16),
+                        Convert.ToByte(hex.Substring(4, 2), 16),
+                        255);
+            }
         }
 
         // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
@@ -54,6 +67,23 @@ namespace osu.Game.Graphics
         public Color4 Green = FromHex(@"88b300");
         public Color4 GreenDark = FromHex(@"668800");
         public Color4 GreenDarker = FromHex(@"445500");
+
+        public Color4 Gray0 = FromHex(@"000");
+        public Color4 Gray1 = FromHex(@"111");
+        public Color4 Gray2 = FromHex(@"222");
+        public Color4 Gray3 = FromHex(@"333");
+        public Color4 Gray4 = FromHex(@"444");
+        public Color4 Gray5 = FromHex(@"555");
+        public Color4 Gray6 = FromHex(@"666");
+        public Color4 Gray7 = FromHex(@"777");
+        public Color4 Gray8 = FromHex(@"888");
+        public Color4 Gray9 = FromHex(@"999");
+        public Color4 GrayA = FromHex(@"aaa");
+        public Color4 GrayB = FromHex(@"bbb");
+        public Color4 GrayC = FromHex(@"ccc");
+        public Color4 GrayD = FromHex(@"ddd");
+        public Color4 GrayE = FromHex(@"eee");
+        public Color4 GrayF = FromHex(@"fff");
 
         public Color4 Red = FromHex(@"fc4549");
     }

@@ -2,6 +2,7 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Game.Graphics;
 using osu.Game.Modes.Catch.UI;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
@@ -17,6 +18,8 @@ namespace osu.Game.Modes.Catch
         public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new CatchHitRenderer { Objects = objects };
 
         protected override PlayMode PlayMode => PlayMode.Catch;
+
+        public override FontAwesome Icon => FontAwesome.fa_osu_fruits_o;
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => null;
 

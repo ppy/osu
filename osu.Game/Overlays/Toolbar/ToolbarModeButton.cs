@@ -3,7 +3,6 @@
 
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Modes;
 using OpenTK.Graphics;
 
@@ -20,7 +19,7 @@ namespace osu.Game.Overlays.Toolbar
                 mode = value;
                 TooltipMain = mode.GetDescription();
                 TooltipSub = $"Play some {mode.GetDescription()}";
-                Icon = getModeIcon(mode);
+                Icon = Ruleset.GetRuleset(mode).Icon;
             }
         }
 
@@ -45,17 +44,6 @@ namespace osu.Game.Overlays.Toolbar
                     DrawableIcon.Masking = false;
                     DrawableIcon.Colour = new Color4(255, 194, 224, 255);
                 }
-            }
-        }
-
-        private FontAwesome getModeIcon(PlayMode mode)
-        {
-            switch (mode)
-            {
-                default: return FontAwesome.fa_osu_osu_o;
-                case PlayMode.Taiko: return FontAwesome.fa_osu_taiko_o;
-                case PlayMode.Catch: return FontAwesome.fa_osu_fruits_o;
-                case PlayMode.Mania: return FontAwesome.fa_osu_mania_o;
             }
         }
 
