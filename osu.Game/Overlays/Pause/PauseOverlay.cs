@@ -15,8 +15,9 @@ namespace osu.Game.Overlays.Pause
 {
     public class PauseOverlay : OverlayContainer
     {
-        private const int fadeDuration = 200;
+        private const int transitionDuration = 200;
         private const int buttonHeight = 70;
+        private const float backgroundAlpha = 0.75f;
 
         public Action OnResume;
         public Action OnRetry;
@@ -27,8 +28,8 @@ namespace osu.Game.Overlays.Pause
         public override bool Contains(Vector2 screenSpacePos) => true;
         public override bool HandleInput => State == Visibility.Visible;
 
-        protected override void PopIn() => FadeIn(fadeDuration, EasingTypes.In);
-        protected override void PopOut() => FadeOut(fadeDuration, EasingTypes.In);
+        protected override void PopIn() => FadeIn(transitionDuration, EasingTypes.In);
+        protected override void PopOut() => FadeOut(transitionDuration, EasingTypes.In);
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays.Pause
                 case Key.Escape:
                     if (State == Visibility.Hidden) return false;
                     Hide();
-                    Task.Delay(fadeDuration * 2).ContinueWith(task => OnResume?.Invoke());
+                    Task.Delay(transitionDuration * 2).ContinueWith(task => OnResume?.Invoke());
                     return true;
             }
             return base.OnKeyDown(state, args);
@@ -52,7 +53,7 @@ namespace osu.Game.Overlays.Pause
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
-                    Alpha = 0.75f,
+                    Alpha = backgroundAlpha,
                 },
                 new FlowContainer
                 {
@@ -83,7 +84,7 @@ namespace osu.Game.Overlays.Pause
                                     TextSize = 30,
                                     Colour = colours.Yellow,
                                     Shadow = true,
-                                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
                                 },
                                 new SpriteText
                                 {
@@ -91,8 +92,8 @@ namespace osu.Game.Overlays.Pause
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Shadow = true,
-                                    ShadowColour = new Color4(0, 0, 0, 0.25f),
-                                },
+                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                }
                             }
                         },
                         new FlowContainer
@@ -115,11 +116,11 @@ namespace osu.Game.Overlays.Pause
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = buttonHeight,
-                                    Action = (delegate
+                                    Action = delegate
                                     {
                                         Hide();
-                                        Task.Delay(fadeDuration * 2).ContinueWith(task => OnResume?.Invoke());
-                                    }),
+                                        Task.Delay(transitionDuration * 2).ContinueWith(task => OnResume?.Invoke());
+                                    }
                                 },
                                 new RetryButton
                                 {
@@ -127,11 +128,11 @@ namespace osu.Game.Overlays.Pause
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = buttonHeight,
-                                    Action = (delegate
+                                    Action = delegate
                                     {
                                         Hide();
                                         OnRetry?.Invoke();
-                                    }),
+                                    }
                                 },
                                 new QuitButton
                                 {
@@ -139,28 +140,28 @@ namespace osu.Game.Overlays.Pause
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = buttonHeight,
-                                    Action = (delegate
+                                    Action = delegate
                                     {
                                         Hide();
                                         OnQuit?.Invoke();
-                                    }),
-                                },
+                                    }
+                                }
                             }
                         },
                         retryCounterContainer = new FlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                        },
+                            Anchor = Anchor.TopCentre
+                        }
                     }
                 },
                 new PauseProgressBar
                 {
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
-                    Width = 1f,
-                },
+                    Width = 1f
+                }
             };
 
             SetRetries(0);
