@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Options
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            selectionIndicator.Colour = colours.Pink;
+            selectionIndicator.Colour = colours.Yellow;
         }
 
         protected override bool OnClick(InputState state)
