@@ -208,15 +208,15 @@ namespace osu.Game.Screens.Select
                         || (set.Metadata.TitleUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1;
                     if (match)
                     {
-                        changed &= !beatmapGroup.Hidden;
-                        beatmapGroup.Hidden = false;
+                        changed |= beatmapGroup.State != BeatmapGroupState.Hidden;
+                        beatmapGroup.State = BeatmapGroupState.Collapsed;
                         if (newSelection == null || beatmapGroup.BeatmapSet.OnlineBeatmapSetID == Beatmap.BeatmapSetInfo.OnlineBeatmapSetID)
                             newSelection = beatmapGroup;
                     }
                     else
                     {
-                        changed &= beatmapGroup.Hidden;
-                        beatmapGroup.Hidden = true;
+                        changed |= beatmapGroup.State == BeatmapGroupState.Hidden;
+                        beatmapGroup.State = BeatmapGroupState.Hidden;
                     }
                 }
                 if (newSelection != null)
