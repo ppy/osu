@@ -9,7 +9,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Gameplay
 {
-    public class GeneralGameplayOptions : OptionsSubsection
+    public class GeneralOptions : OptionsSubsection
     {
         protected override string Header => "General";
 

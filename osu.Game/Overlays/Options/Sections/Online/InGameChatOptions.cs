@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Options.Sections.Online
     {
         private OptionTextBox chatIgnoreList;
         private OptionTextBox chatHighlightWords;
-        protected override string Header => "In-game Chat";
+        protected override string Header => "Chat";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

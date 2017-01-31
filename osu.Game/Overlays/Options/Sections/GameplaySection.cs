@@ -14,10 +14,10 @@ namespace osu.Game.Overlays.Options.Sections
 
         public GameplaySection()
         {
-            Children = new Drawable[]
+            base.Children = new Drawable[]
             {
-                new GeneralGameplayOptions(),
-                new SongSelectGameplayOptions(),
+                new Gameplay.GeneralOptions(),
+                new SongSelectOptions(),
             };
         }
     }
