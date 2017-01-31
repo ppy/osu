@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -15,6 +16,7 @@ namespace osu.Game.Graphics.UserInterface
         public OsuButton()
         {
             Height = 40;
+            SpriteText.TextSize = OptionsOverlay.FONT_SIZE;
         }
 
         [BackgroundDependencyLoader]
