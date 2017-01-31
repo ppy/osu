@@ -13,6 +13,9 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTextBox : TextBox
     {
+        protected override Color4 BackgroundUnfocused => Color4.Black.Opacity(0.5f);
+        protected override Color4 BackgroundFocused => OsuColour.Gray(0.3f).Opacity(0.8f);
+
         public OsuTextBox()
         {
             Height = 40;
