@@ -122,6 +122,7 @@ namespace osu.Game.Overlays.Toolbar
             };
 
             RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]

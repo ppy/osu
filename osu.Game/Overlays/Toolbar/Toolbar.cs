@@ -63,14 +63,14 @@ namespace osu.Game.Overlays.Toolbar
                     Direction = FlowDirection.HorizontalOnly,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Children = new []
+                    Children = new Drawable[]
                     {
                         new ToolbarMusicButton(),
                         new ToolbarButton
                         {
                             Icon = FontAwesome.fa_search
                         },
-                        new ToolbarUserButton(),
+                        new ToolbarUserArea(),
                         new ToolbarButton
                         {
                             Icon = FontAwesome.fa_bars
