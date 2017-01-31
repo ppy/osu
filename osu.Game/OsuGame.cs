@@ -104,7 +104,7 @@ namespace osu.Game
             (options = new OptionsOverlay { Depth = -1 }).Preload(this, overlayContent.Add);
             (musicController = new MusicController()
             {
-                Depth = -3,
+                Depth = -2,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -115,7 +115,7 @@ namespace osu.Game
 
             (Toolbar = new Toolbar
             {
-                Depth = -2,
+                Depth = -3,
                 OnHome = delegate { mainMenu?.MakeCurrent(); },
                 OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
             }).Preload(this, t =>
