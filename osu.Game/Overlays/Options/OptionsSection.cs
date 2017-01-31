@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Options
                         {
                             Margin = new MarginPadding { Top = headerSize + headerMargin },
                             Direction = FlowDirection.VerticalOnly,
-                            Spacing = new Vector2(0, 50),
+                            Spacing = new Vector2(0, 30),
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                         },
