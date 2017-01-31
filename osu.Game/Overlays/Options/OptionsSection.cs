@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Options
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            headerLabel.Colour = colours.Pink;
+            headerLabel.Colour = colours.Yellow;
         }
     }
 }
