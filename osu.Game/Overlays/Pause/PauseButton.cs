@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Pause
             set
             {
                 buttonColour = value;
-                reapplyGlow();
+                updateGlow();
                 if (colourContainer == null) return;
                 colourContainer.Colour = ButtonColour;
             }
@@ -118,9 +118,8 @@ namespace osu.Game.Overlays.Pause
             flash.Expire();
         }
 
-        private void reapplyGlow()
+        private void updateGlow()
         {
-            if (leftGlow == null || centerGlow == null || rightGlow == null) return;
             leftGlow.ColourInfo = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
             centerGlow.Colour = ButtonColour;
             rightGlow.ColourInfo = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
@@ -228,7 +227,7 @@ namespace osu.Game.Overlays.Pause
                 }
             };
 
-            reapplyGlow();
+            updateGlow();
         }
     }
 }

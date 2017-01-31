@@ -29,7 +29,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton("Add Retry", delegate
             {
                 retryCount++;
-                pauseOverlay.SetRetries(retryCount);
+                pauseOverlay.Retries = retryCount;
             });
 
             pauseOverlay.OnResume += () => Logger.Log(@"Resume");

@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Play
                 lastPauseActionTime = Time.Current;
                 playerInputManager.PassThrough = true;
                 scoreOverlay.KeyCounter.IsCounting = false;
-                pauseOverlay.SetRetries(RestartCount);
+                pauseOverlay.Retries = RestartCount;
                 pauseOverlay.Show();
                 sourceClock.Stop();
                 isPaused = true;

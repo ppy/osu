@@ -15,31 +15,67 @@ namespace osu.Game.Overlays.Pause
 {
     public class PauseOverlay : OverlayContainer
     {
-        private const int transitionDuration = 200;
-        private const int buttonHeight = 70;
-        private const float backgroundAlpha = 0.75f;
+        private const int transition_duration = 200;
+        private const int button_height = 70;
+        private const float background_alpha = 0.75f;
 
         public Action OnResume;
         public Action OnRetry;
         public Action OnQuit;
+
+        public int Retries
+        {
+            set
+            {
+                if (retryCounterContainer != null)
+                {
+                    // "You've retried 1,065 times in this session"
+                    // "You've retried 1 time in this session"
+
+                    retryCounterContainer.Children = new Drawable[]
+                    {
+                        new SpriteText
+                        {
+                            Text = "You've retried ",
+                            Shadow = true,
+                            ShadowColour = new Color4(0, 0, 0, 0.25f),
+                            TextSize = 18
+                        },
+                        new SpriteText
+                        {
+                            Text = String.Format("{0:n0}", value),
+                            Font = @"Exo2.0-Bold",
+                            Shadow = true,
+                            ShadowColour = new Color4(0, 0, 0, 0.25f),
+                            TextSize = 18
+                        },
+                        new SpriteText
+                        {
+                            Text = $" time{((value == 1) ? "" : "s")} in this session",
+                            Shadow = true,
+                            ShadowColour = new Color4(0, 0, 0, 0.25f),
+                            TextSize = 18
+                        }
+                    };
+                }
+            }
+        }
 
         private FlowContainer retryCounterContainer;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
         public override bool HandleInput => State == Visibility.Visible;
 
-        protected override void PopIn() => FadeIn(transitionDuration, EasingTypes.In);
-        protected override void PopOut() => FadeOut(transitionDuration, EasingTypes.In);
+        protected override void PopIn() => FadeIn(transition_duration, EasingTypes.In);
+        protected override void PopOut() => FadeOut(transition_duration, EasingTypes.In);
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            switch (args.Key)
+            if (args.Key == Key.Escape)
             {
-                case Key.Escape:
-                    if (State == Visibility.Hidden) return false;
-                    Hide();
-                    OnResume?.Invoke();
-                    return true;
+                if (State == Visibility.Hidden) return false;
+                resume();
+                return true;
             }
             return base.OnKeyDown(state, args);
         }
@@ -53,7 +89,7 @@ namespace osu.Game.Overlays.Pause
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
-                    Alpha = backgroundAlpha,
+                    Alpha = background_alpha,
                 },
                 new FlowContainer
                 {
@@ -88,7 +124,7 @@ namespace osu.Game.Overlays.Pause
                                 },
                                 new SpriteText
                                 {
-                                    Text = @"you're not going to do what i think you're going to do, ain't ya?",
+                                    Text = @"you're not going to do what i think you're going to do, are ya?",
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Shadow = true,
@@ -104,9 +140,8 @@ namespace osu.Game.Overlays.Pause
                             EdgeEffect = new EdgeEffect
                             {
                                 Type = EdgeEffectType.Shadow,
-                                Colour = new Color4(0, 0, 0, 150),
-                                Radius = 50,
-                                Offset = new Vector2(0, 0),
+                                Colour = Color4.Black.Opacity(0.6f),
+                                Radius = 50
                             },
                             Children = new Drawable[]
                             {
@@ -115,19 +150,15 @@ namespace osu.Game.Overlays.Pause
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    Height = buttonHeight,
-                                    Action = delegate
-                                    {
-                                        Hide();
-                                        OnResume?.Invoke();
-                                    }
+                                    Height = button_height,
+                                    Action = resume
                                 },
                                 new RetryButton
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    Height = buttonHeight,
+                                    Height = button_height,
                                     Action = delegate
                                     {
                                         Hide();
@@ -139,7 +170,7 @@ namespace osu.Game.Overlays.Pause
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    Height = buttonHeight,
+                                    Height = button_height,
                                     Action = delegate
                                     {
                                         Hide();
@@ -164,46 +195,13 @@ namespace osu.Game.Overlays.Pause
                 }
             };
 
-            SetRetries(0);
+            Retries = 0;
         }
 
-        public void SetRetries(int count)
+        private void resume()
         {
-            if (retryCounterContainer != null)
-            {
-                // "You've retried 1,065 times in this session"
-                // "You've retried 1 time in this session"
-
-                string leading = "You've retried ";
-                string countString = String.Format("{0:n0}", count);
-                string trailing = $" time{((count == 1) ? "" : "s")} in this session";
-
-                retryCounterContainer.Children = new Drawable[]
-                {
-                    new SpriteText
-                    {
-                        Text = leading,
-                        Shadow = true,
-                        ShadowColour = new Color4(0, 0, 0, 0.25f),
-                        TextSize = 18
-                    },
-                    new SpriteText
-                    {
-                        Text = countString,
-                        Font = @"Exo2.0-Bold",
-                        Shadow = true,
-                        ShadowColour = new Color4(0, 0, 0, 0.25f),
-                        TextSize = 18
-                    },
-                    new SpriteText
-                    {
-                        Text = trailing,
-                        Shadow = true,
-                        ShadowColour = new Color4(0, 0, 0, 0.25f),
-                        TextSize = 18
-                    }
-                };
-            }
+            Hide();
+            OnResume?.Invoke();
         }
 
         public PauseOverlay()
