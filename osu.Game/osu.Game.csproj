@@ -198,7 +198,7 @@
     <Compile Include="Overlays\Options\OptionsSection.cs" />
     <Compile Include="Overlays\Options\OptionsSubsection.cs" />
     <Compile Include="Graphics\UserInterface\LoadingAnimation.cs" />
-    <Compile Include="Overlays\Options\OptionsSidebar.cs" />
+    <Compile Include="Overlays\Options\Sidebar.cs" />
     <Compile Include="Overlays\Options\Sections\GeneralSection.cs" />
     <Compile Include="Overlays\Options\Sections\General\LoginOptions.cs" />
     <Compile Include="Overlays\Options\Sections\General\UpdateOptions.cs" />
