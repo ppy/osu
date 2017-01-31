@@ -16,19 +16,16 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Options;
-using osu.Game.Overlays.Options.Audio;
-using osu.Game.Overlays.Options.Gameplay;
-using osu.Game.Overlays.Options.General;
-using osu.Game.Overlays.Options.Graphics;
-using osu.Game.Overlays.Options.Input;
-using osu.Game.Overlays.Options.Online;
 using System;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Options.Sections;
 
 namespace osu.Game.Overlays
 {
     public class OptionsOverlay : OverlayContainer
     {
+        public const float FONT_SIZE = 16;
+
         internal const float CONTENT_MARGINS = 10;
 
         public const float TRANSITION_LENGTH = 600;
