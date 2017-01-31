@@ -15,6 +15,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override Color4 BackgroundUnfocused => Color4.Black.Opacity(0.5f);
         protected override Color4 BackgroundFocused => OsuColour.Gray(0.3f).Opacity(0.8f);
+        protected override Color4 BackgroundCommit => BorderColour;
 
         public OsuTextBox()
         {
