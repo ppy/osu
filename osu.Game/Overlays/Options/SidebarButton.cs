@@ -79,6 +79,7 @@ namespace osu.Game.Overlays.Options
                 headerText = new SpriteText
                 {
                     Position = new Vector2(OptionsSidebar.default_width + 10, 0),
+                    TextSize = OptionsOverlay.FONT_SIZE,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                 },
