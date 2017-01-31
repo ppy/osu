@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Options.General
             set
             {
                 bounding = value;
-                Invalidate(Invalidation.SizeInParentSpace);
+                Invalidate(Invalidation.Geometry);
             }
         }
 
