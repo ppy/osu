@@ -14,13 +14,13 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionsSidebar : Container
+    public class Sidebar : Container
     {
         private FlowContainer content;
         internal const int default_width = 60, expanded_width = 200;
         protected override Container<Drawable> Content => content;
 
-        public OptionsSidebar()
+        public Sidebar()
         {
             RelativeSizeAxes = Axes.Y;
             InternalChildren = new Drawable[]

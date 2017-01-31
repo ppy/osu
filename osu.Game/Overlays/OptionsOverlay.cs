@@ -29,14 +29,14 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        public const float SIDEBAR_WIDTH = OptionsSidebar.default_width;
+        public const float SIDEBAR_WIDTH = Sidebar.default_width;
 
         private const float width = 400;
         
         private const float sidebar_padding = 10;
 
         private ScrollContainer scrollContainer;
-        private OptionsSidebar sidebar;
+        private Sidebar sidebar;
         private SidebarButton[] sidebarButtons;
         private OptionsSection[] sections;
         private float lastKnownScroll;
@@ -110,7 +110,7 @@ namespace osu.Game.Overlays
                         }
                     }
                 },
-                sidebar = new OptionsSidebar
+                sidebar = new Sidebar
                 {
                     Width = SIDEBAR_WIDTH,
                     Children = sidebarButtons = sections.Select(section =>
