@@ -65,6 +65,7 @@ namespace osu.Game.Overlays.Pause
         {
             didClick = true;
             colourContainer.ResizeTo(new Vector2(1.5f, 1f), clickDuration, EasingTypes.In);
+            flash();
             SampleClick?.Play();
             Action?.Invoke();
 
@@ -99,6 +100,22 @@ namespace osu.Game.Overlays.Pause
             }
 
             didClick = false;
+        }
+
+        private void flash()
+        {
+            var flash = new Box
+            {
+                RelativeSizeAxes = Axes.Both
+            };
+
+            colourContainer.Add(flash);
+
+            flash.Colour = ButtonColour;
+            flash.BlendingMode = BlendingMode.Additive;
+            flash.Alpha = 0.3f;
+            flash.FadeOutFromOne(clickDuration);
+            flash.Expire();
         }
 
         private void reapplyGlow()
