@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Options.Sections
             {
                 new AudioDevicesOptions { Alpha = RuntimeInfo.IsWindows ? 1 : 0 },
                 new VolumeOptions(),
-                new OffsetAdjustmentOptions(),
+                new OffsetOptions(),
             };
         }
     }

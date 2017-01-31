@@ -8,7 +8,7 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Options.Sections.Gameplay
 {
-    public class SongSelectGameplayOptions : OptionsSubsection
+    public class SongSelectOptions : OptionsSubsection
     {
         protected override string Header => "Song Select";
 

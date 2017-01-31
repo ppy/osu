@@ -9,7 +9,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Audio
 {
-    public class OffsetAdjustmentOptions : OptionsSubsection
+    public class OffsetOptions : OptionsSubsection
     {
         protected override string Header => "Offset Adjustment";
 

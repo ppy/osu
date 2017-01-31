@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Options.Sections
                 new InGameChatOptions(),
                 new PrivacyOptions(),
                 new NotificationsOptions(),
-                new OnlineIntegrationOptions(),
+                new IntegrationOptions(),
             };
         }
     }

@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Online
 {
-    public class OnlineIntegrationOptions : OptionsSubsection
+    public class IntegrationOptions : OptionsSubsection
     {
         protected override string Header => "Integration";
 
