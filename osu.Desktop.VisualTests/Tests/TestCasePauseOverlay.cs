@@ -24,51 +24,13 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            Children = new Drawable[]
+            Add(pauseOverlay = new PauseOverlay { Depth = -1 });
+            AddButton("Pause", pauseOverlay.Show);
+            AddButton("Add Retry", delegate
             {
-                new Box
-                {
-                    ColourInfo = ColourInfo.GradientVertical(Color4.Gray, Color4.WhiteSmoke),
-                    RelativeSizeAxes = Framework.Graphics.Axes.Both
-                },
-                pauseOverlay = new PauseOverlay
-                {
-                    Depth = -1
-                },
-                new FlowContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.TopLeft,
-                    Anchor = Anchor.TopLeft,
-                    Direction = FlowDirection.VerticalOnly,
-                    Children = new Drawable[]
-                    {
-                        new Button
-                        {
-                            Text = @"Pause",
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Width = 100,
-                            Height = 50,
-                            Colour = Color4.Black,
-                            Action = () => pauseOverlay.Show()
-                        },
-                        new Button
-                        {
-                            Text = @"Add Retry",
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Width = 100,
-                            Height = 50,
-                            Colour = Color4.Black,
-                            Action = delegate {
-                                retryCount++;
-                                pauseOverlay.SetRetries(retryCount);
-                            },
-                        }
-                    }
-                }
-            };
+                retryCount++;
+                pauseOverlay.SetRetries(retryCount);
+            });
 
             pauseOverlay.OnResume += () => Logger.Log(@"Resume");
             pauseOverlay.OnRetry += () => Logger.Log(@"Retry");
