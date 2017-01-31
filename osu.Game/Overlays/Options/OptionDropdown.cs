@@ -194,12 +194,15 @@ namespace osu.Game.Overlays.Options
                             {
                                 Icon = FontAwesome.fa_chevron_right,
                                 Colour = Color4.Black,
+                                TextSize = 12,
                                 Margin = new MarginPadding { Right = 3 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             },
                             new OsuSpriteText {
                                 Text = text,
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
                             }
                         }
                     }
