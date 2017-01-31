@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Options.General
         class LoginForm : FlowContainer
         {
             private TextBox username;
-            private PasswordTextBox password;
+            private TextBox password;
             private APIAccess api;
 
             private CheckBoxOption saveUsername;
@@ -112,16 +112,14 @@ namespace osu.Game.Overlays.Options.General
                 Children = new Drawable[]
                 {
                     new SpriteText { Text = "Username" },
-                    username = new TextBox
+                    username = new OsuTextBox
                     {
-                        Height = 20,
                         RelativeSizeAxes = Axes.X,
                         Text = api?.Username ?? string.Empty
                     },
                     new SpriteText { Text = "Password" },
-                    password = new PasswordTextBox
+                    password = new OsuPasswordTextBox
                     {
-                        Height = 20,
                         RelativeSizeAxes = Axes.X
                     },
                     saveUsername = new CheckBoxOption
