@@ -18,7 +18,7 @@ namespace osu.Game.Overlays
     {
         private LoginOptions optionsSection;
 
-        const float transition_time = 300;
+        const float transition_time = 400;
 
         public LoginOverlay()
         {
@@ -71,7 +71,7 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             optionsSection.Bounding = false;
-            FadeOut(transition_time, EasingTypes.OutQuint);
+            FadeOut(transition_time);
         }
     }
 }
