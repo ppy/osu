@@ -18,10 +18,11 @@ namespace osu.Game.Overlays
     {
         private LoginOptions optionsSection;
 
+        const float transition_time = 300;
+
         public LoginOverlay()
         {
-            Width = 360;
-            AutoSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
@@ -34,31 +35,43 @@ namespace osu.Game.Overlays
                     Colour = Color4.Black,
                     Alpha = 0.8f,
                 },
-                optionsSection = new LoginOptions()
+                new Container
                 {
-                    Padding = new MarginPadding(10),
-                },
-                new Box {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 3,
-                    Colour = colours.Yellow,
-                    Alpha = 1,
-                },
+                    Width = 360,
+                    AutoSizeAxes = Axes.Y,
+                    Masking = true,
+                    AutoSizeDuration = transition_time,
+                    AutoSizeEasing = EasingTypes.OutQuint,
+                    Children = new Drawable[]
+                    {
+                        optionsSection = new LoginOptions
+                        {
+                            Padding = new MarginPadding(10),
+                        },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Height = 3,
+                            Colour = colours.Yellow,
+                            Alpha = 1,
+                        },
+                    }
+                }
             };
         }
 
         protected override void PopIn()
         {
-            optionsSection.ScaleTo(new Vector2(1, 1), 300, EasingTypes.OutExpo);
-            FadeIn(200);
+            optionsSection.Bounding = true;
+            FadeIn(transition_time, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
         {
-            optionsSection.ScaleTo(new Vector2(1, 0), 300, EasingTypes.OutExpo);
-            FadeOut(200);
+            optionsSection.Bounding = false;
+            FadeOut(transition_time, EasingTypes.OutQuint);
         }
     }
 }

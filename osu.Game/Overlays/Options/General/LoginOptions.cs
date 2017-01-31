@@ -12,12 +12,27 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Configuration;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Overlays.Options.General
 {
     public class LoginOptions : OptionsSubsection, IOnlineComponent
     {
+        private bool bounding = true;
+
         protected override string Header => "Sign In";
+
+        public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
+
+        public bool Bounding
+        {
+            get { return bounding; }
+            set
+            {
+                bounding = value;
+                Invalidate(Invalidation.SizeInParentSpace);
+            }
+        }
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(APIAccess api)
