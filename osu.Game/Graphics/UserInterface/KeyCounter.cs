@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -86,7 +87,7 @@ namespace osu.Game.Graphics.UserInterface
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = Name,
                             Anchor = Anchor.Centre,
@@ -95,7 +96,7 @@ namespace osu.Game.Graphics.UserInterface
                             Position = new Vector2(0, -0.25f),
                             Colour = KeyUpTextColor
                         },
-                        countSpriteText = new SpriteText
+                        countSpriteText = new OsuSpriteText
                         {
                             Text = Count.ToString(@"#,0"),
                             Anchor = Anchor.Centre,

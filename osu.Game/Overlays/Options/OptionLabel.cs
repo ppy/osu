@@ -4,16 +4,12 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
 {
-    class OptionLabel : SpriteText
+    class OptionLabel : OsuSpriteText
     {
-        public OptionLabel()
-        {
-            TextSize = OptionsOverlay.FONT_SIZE;
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {

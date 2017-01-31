@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
@@ -98,14 +99,14 @@ namespace osu.Game.Screens
                     Origin = Anchor.Centre,
                     Children = new[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = GetType().Name,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             TextSize = 50,
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = GetType().Namespace,
                             Anchor = Anchor.Centre,

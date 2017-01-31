@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using OpenTK.Graphics;
 
@@ -15,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
         public OsuTextBox()
         {
             Height = 40;
-            TextContainer.Height = OptionsOverlay.FONT_SIZE / Height;
+            TextContainer.Height = OsuSpriteText.FONT_SIZE / Height;
             CornerRadius = 5;
         }
 

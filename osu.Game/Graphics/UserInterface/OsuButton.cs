@@ -5,8 +5,10 @@ using System;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
@@ -16,8 +18,14 @@ namespace osu.Game.Graphics.UserInterface
         public OsuButton()
         {
             Height = 40;
-            SpriteText.TextSize = OptionsOverlay.FONT_SIZE;
         }
+
+        protected override SpriteText CreateText() => new OsuSpriteText
+        {
+            Depth = -1,
+            Origin = Anchor.Centre,
+            Anchor = Anchor.Centre,
+        };
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

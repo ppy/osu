@@ -23,6 +23,7 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
@@ -95,7 +96,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        title = new SpriteText
+                        title = new OsuSpriteText
                         {
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.TopCentre,
@@ -105,7 +106,7 @@ namespace osu.Game.Overlays
                             Text = @"Nothing to play",
                             Font = @"Exo2.0-MediumItalic"
                         },
-                        artist = new SpriteText
+                        artist = new OsuSpriteText
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,

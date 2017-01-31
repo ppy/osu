@@ -18,6 +18,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using System.Linq;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
 {
@@ -49,9 +50,8 @@ namespace osu.Game.Overlays.Options
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
-                text = new SpriteText {
+                text = new OsuSpriteText {
                     Alpha = 0,
-                    TextSize = OptionsOverlay.FONT_SIZE,
                 },
                 slider = new OsuSliderBar<T>
                 {

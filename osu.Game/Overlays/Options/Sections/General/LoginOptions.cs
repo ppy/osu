@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using OpenTK;
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.Options.Sections.General
                 case APIState.Failing:
                     Children = new Drawable[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = "Connection failing :(",
                         },
@@ -60,7 +61,7 @@ namespace osu.Game.Overlays.Options.Sections.General
                 case APIState.Connecting:
                     Children = new Drawable[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = "Connecting...",
                         },
@@ -69,7 +70,7 @@ namespace osu.Game.Overlays.Options.Sections.General
                 case APIState.Online:
                     Children = new Drawable[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = $"Connected as {api.Username}!",
                         },
