@@ -68,13 +68,7 @@ namespace osu.Game.Screens.Select
         protected override void Update()
         {
             if (GrabFocus && !HasFocus && IsVisible)
-            {
-                var inputManager = Parent;
-                while (inputManager != null && !(inputManager is InputManager))
-                    inputManager = inputManager.Parent;
-                if (inputManager != null && (inputManager as InputManager)?.FocusedDrawable == null)
-                    TriggerFocus();
-            }
+                TriggerFocus();
             base.Update();
         }
         
