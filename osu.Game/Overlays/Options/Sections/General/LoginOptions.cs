@@ -109,13 +109,11 @@ namespace osu.Game.Overlays.Options.Sections.General
                 Spacing = new Vector2(0, 5);
                 Children = new Drawable[]
                 {
-                    new SpriteText { Text = "Username" },
                     username = new OsuTextBox
                     {
                         RelativeSizeAxes = Axes.X,
                         Text = api?.Username ?? string.Empty
                     },
-                    new SpriteText { Text = "Password" },
                     password = new OsuPasswordTextBox
                     {
                         RelativeSizeAxes = Axes.X
