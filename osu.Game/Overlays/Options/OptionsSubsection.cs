@@ -4,12 +4,13 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
 {
-    public abstract class OptionsSubsection : Container
+    public abstract class OptionsSubsection : FlowContainer
     {
         private Container<Drawable> content;
         protected override Container<Drawable> Content => content;
@@ -20,23 +21,21 @@ namespace osu.Game.Overlays.Options
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+            Direction = FlowDirection.VerticalOnly;
             AddInternal(new Drawable[]
             {
+                new OsuSpriteText
+                {
+                    Text = Header.ToUpper(),
+                    Margin = new MarginPadding { Bottom = 10 },
+                    Font = @"Exo2.0-Black",
+                },
                 content = new FlowContainer
                 {
                     Direction = FlowDirection.VerticalOnly,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(0, 5),
-                    Children = new[]
-                    {
-                        new OsuSpriteText
-                        {
-                            TextSize = 17,
-                            Text = Header.ToUpper(),
-                            Font = @"Exo2.0-Black",
-                        }
-                    }
                 },
             });
         }
