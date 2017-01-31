@@ -33,28 +33,16 @@ namespace osu.Game.Beatmaps.Drawables
 
         public BeatmapSetInfo BeatmapSet;
 
-        private bool hidden;
-        public bool Hidden
-        {
-            get { return hidden; }
-            set
-            {
-                hidden = value;
-                Header.Alpha = hidden ? 0 : 1;
-                if (hidden)
-                    State = BeatmapGroupState.Collapsed;
-            }
-        }
-
         public BeatmapGroupState State
         {
             get { return state; }
             set
             {
-                state = value;
-                switch (state)
+                switch (value)
                 {
                     case BeatmapGroupState.Expanded:
+                        if (state == BeatmapGroupState.Hidden)
+                            Header.Alpha = 1;
                         foreach (BeatmapPanel panel in BeatmapPanels)
                             panel.FadeIn(250);
 
@@ -63,14 +51,20 @@ namespace osu.Game.Beatmaps.Drawables
                             SelectedPanel.State = PanelSelectedState.Selected;
                         break;
                     case BeatmapGroupState.Collapsed:
+                    case BeatmapGroupState.Hidden:
+                        if (state == BeatmapGroupState.Hidden && state != value)
+                            Header.Alpha = 1;
                         Header.State = PanelSelectedState.NotSelected;
                         if (SelectedPanel != null)
                             SelectedPanel.State = PanelSelectedState.NotSelected;
 
                         foreach (BeatmapPanel panel in BeatmapPanels)
                             panel.FadeOut(300, EasingTypes.OutQuint);
+                        if (value == BeatmapGroupState.Hidden)
+                            Header.Alpha = 0;
                         break;
                 }
+                state = value;
             }
         }
 
@@ -127,5 +121,6 @@ namespace osu.Game.Beatmaps.Drawables
     {
         Collapsed,
         Expanded,
+        Hidden,
     }
 }
