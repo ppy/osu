@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.MathUtils;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -17,10 +18,8 @@ namespace osu.Game.Graphics.Backgrounds
     {
         public override bool HandleInput => false;
 
-        public Triangles()
-        {
-            Alpha = 0.3f;
-        }
+        public Color4 ColourLight = Color4.White;
+        public Color4 ColourDark = Color4.Black;
 
         private float triangleScale = 1;
 
@@ -65,11 +64,13 @@ namespace osu.Game.Graphics.Backgrounds
                 RelativePositionAxes = Axes.Both,
                 Scale = new Vector2(scale),
                 // Scaling height by 0.866 results in equiangular triangles (== 60° and equal side length)
+                Colour = GetTriangleShade(),
                 Size = new Vector2(size, 0.866f * size),
-                Alpha = RNG.NextSingle(),
                 Depth = scale,
             };
         }
+
+        protected virtual Color4 GetTriangleShade() => Interpolation.ValueAt(RNG.NextSingle(), ColourDark, ColourLight, 0, 1);
 
         private void addTriangle(bool randomX)
         {
