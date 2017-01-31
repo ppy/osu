@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Input;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -105,7 +106,7 @@ namespace osu.Game.Beatmaps.Drawables
                                     Spacing = new Vector2(4, 0),
                                     Children = new[]
                                     {
-                                        new SpriteText
+                                        new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-Medium",
                                             Text = beatmap.Version,
@@ -113,7 +114,7 @@ namespace osu.Game.Beatmaps.Drawables
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
                                         },
-                                        new SpriteText
+                                        new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-Medium",
                                             Text = "mapped by",
@@ -121,7 +122,7 @@ namespace osu.Game.Beatmaps.Drawables
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
                                         },
-                                        new SpriteText
+                                        new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-MediumItalic",
                                             Text = $"{(beatmap.Metadata ?? beatmap.BeatmapSet.Metadata).Author}",

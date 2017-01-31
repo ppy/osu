@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using OpenTK;
 using OpenTK.Graphics;
@@ -77,10 +78,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                labelSpriteText = new SpriteText
-                {
-                    TextSize = OptionsOverlay.FONT_SIZE,
-                },
+                labelSpriteText = new OsuSpriteText(),
                 light = new Light
                 {
                     Anchor = Anchor.CentreRight,

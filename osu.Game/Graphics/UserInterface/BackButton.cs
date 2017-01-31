@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -133,7 +134,7 @@ namespace osu.Game.Graphics.UserInterface
                             Shear = new Vector2(shear, 0),
                             EdgeSmoothness = new Vector2(1.5f, 0),
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,

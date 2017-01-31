@@ -18,14 +18,13 @@ using osu.Game.Configuration;
 using osu.Game.Overlays.Options;
 using System;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Options.Sections;
 
 namespace osu.Game.Overlays
 {
     public class OptionsOverlay : OverlayContainer
     {
-        public const float FONT_SIZE = 16;
-
         internal const float CONTENT_MARGINS = 10;
 
         public const float TRANSITION_LENGTH = 600;
@@ -87,13 +86,13 @@ namespace osu.Game.Overlays
 
                             Children = new Drawable[]
                             {
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Text = "settings",
                                     TextSize = 40,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS, Top = 30 },
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Colour = colours.Pink,
                                     Text = "Change the way osu! behaves",

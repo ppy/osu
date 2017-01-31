@@ -5,6 +5,7 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
 {
@@ -29,7 +30,7 @@ namespace osu.Game.Overlays.Options
                     Spacing = new Vector2(0, 5),
                     Children = new[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             TextSize = 17,
                             Text = Header.ToUpper(),

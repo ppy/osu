@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using System;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
 {
@@ -72,7 +73,7 @@ namespace osu.Game.Screens.Select
                     EdgeSmoothness = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.X,
                 },
-                spriteText = new SpriteText
+                spriteText = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

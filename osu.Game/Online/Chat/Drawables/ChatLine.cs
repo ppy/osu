@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -31,13 +32,13 @@ namespace osu.Game.Online.Chat.Drawables
                     Size = new Vector2(padding, text_size),
                     Children = new Drawable[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = Message.Timestamp.LocalDateTime.ToLongTimeString(),
                             TextSize = text_size,
                             Colour = Color4.Gray
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = Message.User.Name,
                             TextSize = text_size,
@@ -53,7 +54,7 @@ namespace osu.Game.Online.Chat.Drawables
                     Padding = new MarginPadding { Left = padding + 10 },
                     Children = new Drawable[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = Message.Content,
                             TextSize = text_size,

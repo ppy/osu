@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
 {
@@ -72,9 +73,8 @@ namespace osu.Game.Overlays.Options
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
-                text = new SpriteText {
+                text = new OsuSpriteText {
                     Alpha = 0,
-                    TextSize = OptionsOverlay.FONT_SIZE
                 },
                 dropdown = new StyledDropDownMenu<T>
                 {
@@ -150,11 +150,10 @@ namespace osu.Game.Overlays.Options
 
                 Children = new[]
                 {
-                    label = new SpriteText()
+                    label = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        TextSize = OptionsOverlay.FONT_SIZE,
                     },
                     new TextAwesome
                     {
@@ -199,9 +198,8 @@ namespace osu.Game.Overlays.Options
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             },
-                            new SpriteText {
+                            new OsuSpriteText {
                                 Text = text,
-                                TextSize = OptionsOverlay.FONT_SIZE,
                             }
                         }
                     }

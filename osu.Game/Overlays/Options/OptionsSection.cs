@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
 {
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.Options
                     AutoSizeAxes = Axes.Y,
                     Children = new[]
                     {
-                        headerLabel = new SpriteText
+                        headerLabel = new OsuSpriteText
                         {
                             TextSize = headerSize,
                             Text = Header,
