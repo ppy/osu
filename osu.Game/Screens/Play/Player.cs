@@ -55,6 +55,14 @@ namespace osu.Game.Screens.Play
         private double pauseCooldown = 1000;
         private double lastPauseActionTime = 0;
 
+        private bool canPause
+        {
+            get
+            {
+                return Time.Current >= (lastPauseActionTime + pauseCooldown);
+            }
+        }
+
         private IAdjustableClock sourceClock;
 
         private Ruleset ruleset;
@@ -155,7 +163,7 @@ namespace osu.Game.Screens.Play
 
         public void Pause(bool force = false)
         {
-            if (Time.Current >= (lastPauseActionTime + pauseCooldown) || force)
+            if (canPause || force)
             {
                 lastPauseActionTime = Time.Current;
                 playerInputManager.PassThrough = true;
@@ -259,6 +267,8 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(GameMode next)
         {
+            if (!canPause) return true;
+
             if (!IsPaused && sourceClock.IsRunning) // For if the user presses escape quickly when entering the map
             {
                 Pause();
