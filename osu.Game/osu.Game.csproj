@@ -239,6 +239,13 @@
     <Compile Include="Screens\Select\SearchTextBox.cs" />
     <Compile Include="Screens\Select\FooterButton.cs" />
     <Compile Include="Screens\Select\Footer.cs" />
+    <Compile Include="Overlays\Pause\PauseButton.cs" />
+    <Compile Include="Overlays\Pause\PauseOverlay.cs" />
+    <Compile Include="Overlays\Pause\PauseProgressBar.cs" />
+    <Compile Include="Overlays\Pause\PauseProgressGraph.cs" />
+    <Compile Include="Overlays\Pause\ResumeButton.cs" />
+    <Compile Include="Overlays\Pause\RetryButton.cs" />
+    <Compile Include="Overlays\Pause\QuitButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

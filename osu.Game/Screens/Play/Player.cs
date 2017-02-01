@@ -22,6 +22,7 @@ using osu.Framework.GameModes;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
+using osu.Game.Overlays.Pause;
 using osu.Framework.Configuration;
 using System;
 using OpenTK.Graphics;
@@ -39,7 +40,23 @@ namespace osu.Game.Screens.Play
         public BeatmapInfo BeatmapInfo;
 
         public PlayMode PreferredPlayMode;
-        
+
+        private bool isPaused;
+        public bool IsPaused
+        {
+            get
+            {
+                return isPaused;
+            }
+        }
+
+        public int RestartCount;
+
+        private double pauseCooldown = 1000;
+        private double lastPauseActionTime = 0;
+
+        private bool canPause => Time.Current >= (lastPauseActionTime + pauseCooldown);
+
         private IAdjustableClock sourceClock;
 
         private Ruleset ruleset;
@@ -47,6 +64,10 @@ namespace osu.Game.Screens.Play
         private ScoreProcessor scoreProcessor;
         private HitRenderer hitRenderer;
         private Bindable<int> dimLevel;
+
+        private ScoreOverlay scoreOverlay;
+        private PauseOverlay pauseOverlay;
+        private PlayerInputManager playerInputManager;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
@@ -92,8 +113,19 @@ namespace osu.Game.Screens.Play
 
             ruleset = Ruleset.GetRuleset(usablePlayMode);
 
-            var scoreOverlay = ruleset.CreateScoreOverlay();
+            scoreOverlay = ruleset.CreateScoreOverlay();
             scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
+
+            pauseOverlay = new PauseOverlay
+            {
+                Depth = -1,
+                OnResume = delegate {
+                    Delay(400);
+                    Schedule(Resume);
+                },
+                OnRetry = Restart,
+                OnQuit = Exit
+            };
 
             hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
@@ -109,7 +141,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                new PlayerInputManager(game.Host)
+                playerInputManager = new PlayerInputManager(game.Host)
                 {
                     Clock = new InterpolatingFramedClock(sourceClock),
                     PassThrough = false,
@@ -119,7 +151,60 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 scoreOverlay,
+                pauseOverlay
             };
+        }
+
+        public void Pause(bool force = false)
+        {
+            if (canPause || force)
+            {
+                lastPauseActionTime = Time.Current;
+                playerInputManager.PassThrough = true;
+                scoreOverlay.KeyCounter.IsCounting = false;
+                pauseOverlay.Retries = RestartCount;
+                pauseOverlay.Show();
+                sourceClock.Stop();
+                isPaused = true;
+            }
+            else
+            {
+                isPaused = false;
+            }
+        }
+
+        public void Resume()
+        {
+            lastPauseActionTime = Time.Current;
+            playerInputManager.PassThrough = false;
+            scoreOverlay.KeyCounter.IsCounting = true;
+            pauseOverlay.Hide();
+            sourceClock.Start();
+            isPaused = false;
+        }
+
+        public void TogglePaused()
+        {
+            isPaused = !IsPaused;
+            if (IsPaused) Pause(); else Resume();
+        }
+
+        public void Restart()
+        {
+            sourceClock.Stop(); // If the clock is running and Restart is called the game will lag until relaunch
+
+            var newPlayer = new Player();
+
+            newPlayer.Preload(Game, delegate
+            {
+                newPlayer.RestartCount = RestartCount + 1;
+                ValidForResume = false;
+
+                if (!Push(newPlayer))
+                {
+                    // Error(?)
+                }
+            });
         }
 
         protected override void LoadComplete()
@@ -173,9 +258,19 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(GameMode next)
         {
-            dimLevel.ValueChanged -= dimChanged;
-            Background?.FadeTo(1f, 200);
-            return base.OnExiting(next);
+            if (!canPause) return true;
+
+            if (!IsPaused && sourceClock.IsRunning) // For if the user presses escape quickly when entering the map
+            {
+                Pause();
+                return true;
+            }
+            else
+            {
+                dimLevel.ValueChanged -= dimChanged;
+                Background?.FadeTo(1f, 200);
+                return base.OnExiting(next);
+            }
         }
 
         private void dimChanged(object sender, EventArgs e)
