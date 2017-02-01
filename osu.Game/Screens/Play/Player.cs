@@ -55,8 +55,6 @@ namespace osu.Game.Screens.Play
         private double pauseCooldown = 1000;
         private double lastPauseActionTime = 0;
 
-        private bool clockWasStarted = false;
-
         private IAdjustableClock sourceClock;
 
         private Ruleset ruleset;
@@ -116,17 +114,16 @@ namespace osu.Game.Screens.Play
             scoreOverlay = ruleset.CreateScoreOverlay();
             scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
 
-            pauseOverlay = new PauseOverlay { Depth = -1 };
-            pauseOverlay.OnResume = delegate
+            pauseOverlay = new PauseOverlay
             {
-                Delay(400);
-                Schedule(() =>
-                {
-                    Resume();
-                });
+                Depth = -1,
+                OnResume = delegate {
+                    Delay(400);
+                    Schedule(Resume);
+                },
+                OnRetry = Restart,
+                OnQuit = Exit
             };
-            pauseOverlay.OnRetry = Restart;
-            pauseOverlay.OnQuit = Exit;
 
             hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
@@ -199,14 +196,12 @@ namespace osu.Game.Screens.Play
             newPlayer.Preload(Game, delegate
             {
                 newPlayer.RestartCount = RestartCount + 1;
-                Exit();
+                ValidForResume = false;
 
-                if (!(last?.Push(newPlayer) ?? false))
+                if (!Push(newPlayer))
                 {
                     // Error(?)
                 }
-
-                Dispose();
             });
         }
 
@@ -222,7 +217,6 @@ namespace osu.Game.Screens.Play
             Schedule(() =>
             {
                 sourceClock.Start();
-                clockWasStarted = true;
             });
         }
 
@@ -252,8 +246,6 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private GameMode last;
-
         protected override void OnEntering(GameMode last)
         {
             base.OnEntering(last);
@@ -263,30 +255,21 @@ namespace osu.Game.Screens.Play
 
             Content.Alpha = 0;
             dimLevel.ValueChanged += dimChanged;
-
-            this.last = last;
         }
 
         protected override bool OnExiting(GameMode next)
         {
-            dimLevel.ValueChanged -= dimChanged;
-            Background?.FadeTo(1f, 200);
-            return base.OnExiting(next);
-        }
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            switch (args.Key)
+            if (!IsPaused && sourceClock.IsRunning) // For if the user presses escape quickly when entering the map
             {
-                case Key.Escape:
-                    if (!IsPaused && clockWasStarted) // For if the user presses escape quickly when entering the map
-                    {
-                        Pause();
-                        return true;
-                    }
-                    break;
+                Pause();
+                return true;
             }
-            return base.OnKeyDown(state, args);
+            else
+            {
+                dimLevel.ValueChanged -= dimChanged;
+                Background?.FadeTo(1f, 200);
+                return base.OnExiting(next);
+            }
         }
 
         private void dimChanged(object sender, EventArgs e)
