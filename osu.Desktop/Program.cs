@@ -42,7 +42,6 @@ namespace osu.Desktop
                         Console.WriteLine(@"Importing {0}", file);
                         if (!importer.Import(Path.GetFullPath(file)).Wait(3000))
                             throw new TimeoutException(@"IPC took too long to send");
-                        Thread.Sleep(500);
                     }
                 }
                 else
