@@ -189,13 +189,9 @@ namespace osu.Game.Screens.Select
         }
 
         private ScheduledDelegate filterTask;
-        private string previousFilter = string.Empty;
 
         private void filterChanged()
         {
-            if (previousFilter == filter.Search)
-                return;
-            previousFilter = filter.Search;
             filterTask?.Cancel();
             filterTask = Scheduler.AddDelayed(() =>
             {
