@@ -186,6 +186,7 @@
     <Compile Include="VisualTestGame.cs" />
     <Compile Include="Platform\TestStorage.cs" />
     <Compile Include="Tests\TestCaseOptions.cs" />
+    <Compile Include="Tests\TestCasePauseOverlay.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
