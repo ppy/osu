@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Select
         }
 
         private ScheduledDelegate filterTask;
-        private string previousFilter = null;
+        private string previousFilter = string.Empty;
 
         private void filterChanged()
         {
