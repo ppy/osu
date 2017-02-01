@@ -55,13 +55,7 @@ namespace osu.Game.Screens.Play
         private double pauseCooldown = 1000;
         private double lastPauseActionTime = 0;
 
-        private bool canPause
-        {
-            get
-            {
-                return Time.Current >= (lastPauseActionTime + pauseCooldown);
-            }
-        }
+        private bool canPause => Time.Current >= (lastPauseActionTime + pauseCooldown);
 
         private IAdjustableClock sourceClock;
 
