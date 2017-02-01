@@ -146,6 +146,7 @@ namespace osu.Game.Screens.Select
                     Position = wedged_container_start_position,
                     RelativeSizeAxes = Axes.X,
                     FilterChanged = filterChanged,
+                    Exit = () => Exit(),
                 },
                 beatmapInfoWedge = new BeatmapInfoWedge
                 {

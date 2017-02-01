@@ -18,6 +18,7 @@ namespace osu.Game.Screens.Select
 
         public string Search => searchTextBox.Text;
         public SortMode Sort { get; private set; } = SortMode.Title;
+        public Action Exit;
 
         private SearchTextBox searchTextBox;
 
@@ -50,10 +51,8 @@ namespace osu.Game.Screens.Select
                 }
             };
 
-            searchTextBox.OnChange += (sender, text) =>
-            {
-                FilterChanged?.Invoke();
-            };
+            searchTextBox.OnChange += (sender, text) => FilterChanged?.Invoke();
+            searchTextBox.Exit = () => Exit?.Invoke();
         }
 
         public void Deactivate()
