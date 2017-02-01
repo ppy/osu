@@ -24,7 +24,13 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            Add(pauseOverlay = new PauseOverlay { Depth = -1 });
+            Add(pauseOverlay = new PauseOverlay
+            {
+                Depth = -1,
+                OnResume = () => Logger.Log(@"Resume"),
+                OnRetry = () => Logger.Log(@"Retry"),
+                OnQuit = () => Logger.Log(@"Quit")
+            });
             AddButton("Pause", pauseOverlay.Show);
             AddButton("Add Retry", delegate
             {
@@ -32,9 +38,6 @@ namespace osu.Desktop.VisualTests.Tests
                 pauseOverlay.Retries = retryCount;
             });
 
-            pauseOverlay.OnResume += () => Logger.Log(@"Resume");
-            pauseOverlay.OnRetry += () => Logger.Log(@"Retry");
-            pauseOverlay.OnQuit += () => Logger.Log(@"Quit");
             retryCount = 0;
         }
     }
