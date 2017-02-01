@@ -43,13 +43,11 @@ namespace osu.Game.Overlays.Options.Online
                 },
                 new SpriteText { Text = "Chat ignore list (space-seperated list)" },
                 chatIgnoreList = new TextBoxOption {
-                    Height = 20,
                     RelativeSizeAxes = Axes.X,
                     Bindable = config.GetBindable<string>(OsuConfig.IgnoreList)
                 },
                 new SpriteText { Text = "Chat highlight words (space-seperated list)" },
                 chatHighlightWords = new TextBoxOption {
-                    Height = 20,
                     RelativeSizeAxes = Axes.X,
                     Bindable = config.GetBindable<string>(OsuConfig.HighlightWords)
                 },

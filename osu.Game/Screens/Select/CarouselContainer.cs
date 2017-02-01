@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Select
         private static float offsetX(float dist, float halfHeight)
         {
             // The radius of the circle the carousel moves on.
-            const float CIRCLE_RADIUS = 4;
+            const float CIRCLE_RADIUS = 3;
             double discriminant = Math.Max(0, CIRCLE_RADIUS * CIRCLE_RADIUS - dist * dist);
             float x = (CIRCLE_RADIUS - (float)Math.Sqrt(discriminant)) * halfHeight;
 
