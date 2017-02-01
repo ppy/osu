@@ -67,6 +67,7 @@
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Modes\Score.cs" />
     <Compile Include="Modes\ScoreProcesssor.cs" />
@@ -236,6 +237,13 @@
     <Compile Include="Graphics\OsuColour.cs" />
     <Compile Include="Screens\Select\FooterButton.cs" />
     <Compile Include="Screens\Select\Footer.cs" />
+    <Compile Include="Overlays\Pause\PauseButton.cs" />
+    <Compile Include="Overlays\Pause\PauseOverlay.cs" />
+    <Compile Include="Overlays\Pause\PauseProgressBar.cs" />
+    <Compile Include="Overlays\Pause\PauseProgressGraph.cs" />
+    <Compile Include="Overlays\Pause\ResumeButton.cs" />
+    <Compile Include="Overlays\Pause\RetryButton.cs" />
+    <Compile Include="Overlays\Pause\QuitButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

@@ -249,6 +249,8 @@ namespace osu.Game.Screens.Menu
         {
             sampleClick.Play();
 
+            box.FlashColour(Color4.White, 500, EasingTypes.OutExpo);
+
             clickAction?.Invoke();
         }
 

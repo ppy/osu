@@ -16,7 +16,7 @@ namespace osu.Game.Graphics
         public static Color4 Gray(float amt) => new Color4(amt, amt, amt, 1f);
         public static Color4 Gray(byte amt) => new Color4(amt, amt, amt, 255);
 
-        private static Color4 FromHex(string hex)
+        public static Color4 FromHex(string hex)
         {
             switch (hex.Length)
             {
@@ -38,7 +38,6 @@ namespace osu.Game.Graphics
         }
 
         // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
-
         public Color4 PurpleLighter = FromHex(@"eeeeff");
         public Color4 PurpleLight = FromHex(@"aa88ff");
         public Color4 Purple = FromHex(@"8866ee");
