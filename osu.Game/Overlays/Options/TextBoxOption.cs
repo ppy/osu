@@ -4,10 +4,11 @@
 using System;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class TextBoxOption : TextBox
+    public class TextBoxOption : OsuTextBox
     {
         private Bindable<string> bindable;
 
