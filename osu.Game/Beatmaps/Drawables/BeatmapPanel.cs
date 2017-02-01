@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Input;
+using osu.Game.Modes;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -27,6 +28,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public Action<BeatmapPanel> GainedSelection;
         public Action<BeatmapPanel> StartRequested;
+        private Triangles triangles;
 
         protected override void Selected()
         {
@@ -36,6 +38,8 @@ namespace osu.Game.Beatmaps.Drawables
             background.ColourInfo = ColourInfo.GradientVertical(
                 new Color4(20, 43, 51, 255),
                 new Color4(40, 86, 102, 255));
+
+            triangles.Colour = Color4.White;
         }
 
         protected override void Deselected()
@@ -43,6 +47,7 @@ namespace osu.Game.Beatmaps.Drawables
             base.Deselected();
 
             background.Colour = new Color4(20, 43, 51, 255);
+            triangles.Colour = OsuColour.Gray(0.5f);
         }
 
         protected override bool OnClick(InputState state)
@@ -64,15 +69,11 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                new Triangles
+                triangles = new Triangles
                 {
-                    // The border is drawn in the shader of the children. Being additive, triangles would over-emphasize
-                    // the border wherever they cross it, and thus they get their own masking container without a border.
-                    Masking = true,
-                    CornerRadius = Content.CornerRadius,
                     RelativeSizeAxes = Axes.Both,
-                    BlendingMode = BlendingMode.Additive,
-                    Colour = new Color4(20, 43, 51, 255),
+                    ColourLight = OsuColour.FromHex(@"3a7285"),
+                    ColourDark = OsuColour.FromHex(@"123744")
                 },
                 new FlowContainer
                 {
@@ -83,7 +84,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        new DifficultyIcon(FontAwesome.fa_dot_circle_o, new Color4(159, 198, 0, 255))
+                        new DifficultyIcon(beatmap)
                         {
                             Scale = new Vector2(1.8f),
                             Anchor = Anchor.CentreLeft,
@@ -130,7 +131,7 @@ namespace osu.Game.Beatmaps.Drawables
                                         },
                                     }
                                 },
-                                new StarCounter { Count = beatmap.BaseDifficulty?.OverallDifficulty ?? 5, StarSize = 8 }
+                                new StarCounter { Count = beatmap.StarDifficulty, StarSize = 8 }
                             }
                         }
                     }

@@ -310,7 +310,7 @@ namespace osu.Game.Screens.Select
                 if (b.Metadata == null) b.Metadata = beatmapSet.Metadata;
             });
 
-            beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.BaseDifficulty.OverallDifficulty).ToList();
+            beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.StarDifficulty).ToList();
 
             var beatmap = new WorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault(), beatmapSet, database);
 
