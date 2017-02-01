@@ -26,6 +26,7 @@ using osu.Game.Overlays.Pause;
 using osu.Framework.Configuration;
 using System;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Play
 {
@@ -261,7 +262,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(GameMode next)
         {
-            if (!canPause) return true;
+            if (pauseOverlay.State != Visibility.Visible && !canPause) return true;
 
             if (!IsPaused && sourceClock.IsRunning) // For if the user presses escape quickly when entering the map
             {
