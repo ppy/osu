@@ -161,8 +161,8 @@ namespace osu.Game.Overlays.Pause
                                     Height = button_height,
                                     Action = delegate
                                     {
-                                        Hide();
                                         OnRetry?.Invoke();
+                                        Hide();
                                     }
                                 },
                                 new QuitButton
@@ -173,8 +173,8 @@ namespace osu.Game.Overlays.Pause
                                     Height = button_height,
                                     Action = delegate
                                     {
-                                        Hide();
                                         OnQuit?.Invoke();
+                                        Hide();
                                     }
                                 }
                             }
@@ -200,8 +200,8 @@ namespace osu.Game.Overlays.Pause
 
         private void resume()
         {
-            Hide();
             OnResume?.Invoke();
+            Hide();
         }
 
         public PauseOverlay()
