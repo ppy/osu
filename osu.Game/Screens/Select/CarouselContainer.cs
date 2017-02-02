@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Select
         private void updatePanel(Panel p, float halfHeight)
         {
             var height = p.IsVisible ? p.DrawHeight : 0;
-        
+
             float panelDrawY = p.Position.Y - Current + height / 2;
             float dist = Math.Abs(1f - panelDrawY / halfHeight);
 
@@ -275,23 +275,35 @@ namespace osu.Game.Screens.Select
                     break;
             }
 
-            if (direction != 0)
+            if (direction == 0)
+                return base.OnKeyDown(state, args);
+
+            if (!skipDifficulties)
             {
-                int index = SelectedGroup.BeatmapPanels.IndexOf(SelectedPanel) + direction;
+                int i = SelectedGroup.BeatmapPanels.IndexOf(SelectedPanel) + direction;
 
-                if (!skipDifficulties && index >= 0 && index < SelectedGroup.BeatmapPanels.Count)
-                    //changing difficulty panel, not set.
-                    SelectGroup(SelectedGroup, SelectedGroup.BeatmapPanels[index]);
-                else
+                if (i >= 0 && i < SelectedGroup.BeatmapPanels.Count)
                 {
-                    index = (groups.IndexOf(SelectedGroup) + direction + groups.Count) % groups.Count;
-                    SelectBeatmap(groups[index].BeatmapPanels.First().Beatmap);
+                    //changing difficulty panel, not set.
+                    SelectGroup(SelectedGroup, SelectedGroup.BeatmapPanels[i]);
+                    return true;
                 }
-
-                return true;
             }
 
-            return base.OnKeyDown(state, args);
+            int startIndex = groups.IndexOf(SelectedGroup);
+            int index = startIndex;
+
+            do
+            {
+                index = (index + direction + groups.Count) % groups.Count;
+                if (groups[index].State != BeatmapGroupState.Hidden)
+                {
+                    SelectBeatmap(groups[index].BeatmapPanels.First().Beatmap);
+                    return true;
+                }
+            } while (index != startIndex);
+
+            return true;
         }
 
         public void SelectRandom()
