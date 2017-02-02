@@ -38,7 +38,7 @@ namespace osu.Game.Beatmaps.Drawables
             get { return state; }
             set
             {
-                Header.Alpha = state == BeatmapGroupState.Hidden ? 0 : 1;
+                Header.Alpha = value == BeatmapGroupState.Hidden ? 0 : 1;
                 switch (value)
                 {
                     case BeatmapGroupState.Expanded:
