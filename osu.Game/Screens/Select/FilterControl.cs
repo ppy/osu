@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Select
                 }
             };
 
-            searchTextBox.OnCommit += (sender, newText) =>
+            searchTextBox.OnChange += (TextBox sender, bool newText) =>
             {
                 if (newText)
                     FilterChanged?.Invoke();

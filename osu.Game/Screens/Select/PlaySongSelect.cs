@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Select
                 }
                 if (newSelection != null)
                     selectBeatmap(newSelection.BeatmapSet.Beatmaps[0]);
-                if (changed || true)
+                if (changed)
                     carousel.InvalidateVisible();
             }, 250);
         }
