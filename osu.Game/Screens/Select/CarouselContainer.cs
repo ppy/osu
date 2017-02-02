@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Select
 
         public void SelectGroup(BeatmapGroup group, BeatmapPanel panel, bool animated = true)
         {
-            if (SelectedGroup != null && SelectedGroup != group)
+            if (SelectedGroup != null && SelectedGroup != group && SelectedGroup.State != BeatmapGroupState.Hidden)
                 SelectedGroup.State = BeatmapGroupState.Collapsed;
 
             SelectedGroup = group;
