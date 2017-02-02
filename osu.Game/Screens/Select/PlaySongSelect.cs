@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Select
                     Position = wedged_container_start_position,
                     RelativeSizeAxes = Axes.X,
                     FilterChanged = filterChanged,
-                    Exit = () => Exit(),
+                    Exit = Exit,
                 },
                 beatmapInfoWedge = new BeatmapInfoWedge
                 {
@@ -198,7 +198,6 @@ namespace osu.Game.Screens.Select
                 filterTask = null;
                 var search = filter.Search;
                 BeatmapGroup newSelection = null;
-                bool changed = false;
                 foreach (var beatmapGroup in carousel)
                 {
                     var set = beatmapGroup.BeatmapSet;
@@ -209,21 +208,17 @@ namespace osu.Game.Screens.Select
                         || (set.Metadata.TitleUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1;
                     if (match)
                     {
-                        changed |= beatmapGroup.State != BeatmapGroupState.Hidden;
                         beatmapGroup.State = BeatmapGroupState.Collapsed;
                         if (newSelection == null || beatmapGroup.BeatmapSet.OnlineBeatmapSetID == Beatmap.BeatmapSetInfo.OnlineBeatmapSetID)
                             newSelection = beatmapGroup;
                     }
                     else
                     {
-                        changed |= beatmapGroup.State == BeatmapGroupState.Hidden;
                         beatmapGroup.State = BeatmapGroupState.Hidden;
                     }
                 }
                 if (newSelection != null)
-                    selectBeatmap(newSelection.BeatmapSet.Beatmaps[0]);
-                if (changed)
-                    carousel.InvalidateVisible();
+                    carousel.SelectBeatmap(newSelection.BeatmapSet.Beatmaps[0], false);
             }, 250);
         }
 
@@ -320,10 +315,8 @@ namespace osu.Game.Screens.Select
 
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
-            selectBeatmap(beatmap.BeatmapInfo);
+            carousel.SelectBeatmap(beatmap.BeatmapInfo);
         }
-
-        private void selectBeatmap(BeatmapInfo beatmap) => carousel.SelectBeatmap(beatmap);
 
         /// <summary>
         /// selection has been changed as the result of interaction with the carousel.
