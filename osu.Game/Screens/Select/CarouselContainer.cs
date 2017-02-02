@@ -134,10 +134,10 @@ namespace osu.Game.Screens.Select
                         panel.MoveToX(-50, 500, EasingTypes.OutExpo);
 
                         //on first display we want to begin hidden under our group's header.
-                        if (panel.Alpha == 0 && group.State != BeatmapGroupState.Hidden)
+                        if (panel.Alpha == 0)
                             panel.MoveToY(headerY);
 
-                        movePanel(panel, group.State != BeatmapGroupState.Hidden, ref currentY);
+                        movePanel(panel, true, ref currentY);
                     }
                 }
                 else
