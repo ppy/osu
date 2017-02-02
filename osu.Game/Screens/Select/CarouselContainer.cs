@@ -311,14 +311,8 @@ namespace osu.Game.Screens.Select
             SelectGroup(group, panel);
         }
 
-        public IEnumerator<BeatmapGroup> GetEnumerator()
-        {
-            return groups.GetEnumerator();
-        }
+        public IEnumerator<BeatmapGroup> GetEnumerator() => groups.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
