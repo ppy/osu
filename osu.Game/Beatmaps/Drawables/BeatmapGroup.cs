@@ -38,25 +38,22 @@ namespace osu.Game.Beatmaps.Drawables
             get { return state; }
             set
             {
-                Header.Alpha = value == BeatmapGroupState.Hidden ? 0 : 1;
                 switch (value)
                 {
                     case BeatmapGroupState.Expanded:
-                        foreach (BeatmapPanel panel in BeatmapPanels)
-                            panel.FadeIn(250);
-
                         Header.State = PanelSelectedState.Selected;
-                        if (SelectedPanel != null)
-                            SelectedPanel.State = PanelSelectedState.Selected;
+                        foreach (BeatmapPanel panel in BeatmapPanels)
+                            panel.State = panel == SelectedPanel ? PanelSelectedState.Selected : PanelSelectedState.NotSelected;
                         break;
                     case BeatmapGroupState.Collapsed:
-                    case BeatmapGroupState.Hidden:
                         Header.State = PanelSelectedState.NotSelected;
-                        if (SelectedPanel != null)
-                            SelectedPanel.State = PanelSelectedState.NotSelected;
-
                         foreach (BeatmapPanel panel in BeatmapPanels)
-                            panel.FadeOut(300, EasingTypes.OutQuint);
+                            panel.State = PanelSelectedState.Hidden;
+                        break;
+                    case BeatmapGroupState.Hidden:
+                        Header.State = PanelSelectedState.Hidden;
+                        foreach (BeatmapPanel panel in BeatmapPanels)
+                            panel.State = PanelSelectedState.Hidden;
                         break;
                 }
                 state = value;
