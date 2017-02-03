@@ -16,14 +16,10 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Options;
-using osu.Game.Overlays.Options.Audio;
-using osu.Game.Overlays.Options.Gameplay;
-using osu.Game.Overlays.Options.General;
-using osu.Game.Overlays.Options.Graphics;
-using osu.Game.Overlays.Options.Input;
-using osu.Game.Overlays.Options.Online;
 using System;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays.Options.Sections;
 
 namespace osu.Game.Overlays
 {
@@ -33,14 +29,14 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        public const float SIDEBAR_WIDTH = OptionsSidebar.default_width;
+        public const float SIDEBAR_WIDTH = Sidebar.default_width;
 
         private const float width = 400;
         
         private const float sidebar_padding = 10;
 
         private ScrollContainer scrollContainer;
-        private OptionsSidebar sidebar;
+        private Sidebar sidebar;
         private SidebarButton[] sidebarButtons;
         private OptionsSection[] sections;
         private float lastKnownScroll;
@@ -90,13 +86,13 @@ namespace osu.Game.Overlays
 
                             Children = new Drawable[]
                             {
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Text = "settings",
                                     TextSize = 40,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS, Top = 30 },
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Colour = colours.Pink,
                                     Text = "Change the way osu! behaves",
@@ -114,7 +110,7 @@ namespace osu.Game.Overlays
                         }
                     }
                 },
-                sidebar = new OptionsSidebar
+                sidebar = new Sidebar
                 {
                     Width = SIDEBAR_WIDTH,
                     Children = sidebarButtons = sections.Select(section =>

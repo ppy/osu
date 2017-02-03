@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Graphics;
-using osu.Game.Overlays.Options.General;
+using osu.Game.Overlays.Options.Sections.General;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
                 new Box {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
-                    Alpha = 0.8f,
+                    Alpha = 0.6f,
                 },
                 new Container
                 {

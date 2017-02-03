@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -43,14 +44,14 @@ namespace osu.Game.Beatmaps.Drawables
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        title = new SpriteText
+                        title = new OsuSpriteText
                         {
                             Font = @"Exo2.0-BoldItalic",
                             Text = beatmap.BeatmapSetInfo.Metadata.Title,
                             TextSize = 22,
                             Shadow = true,
                         },
-                        artist = new SpriteText
+                        artist = new OsuSpriteText
                         {
                             Margin = new MarginPadding { Top = -1 },
                             Font = @"Exo2.0-SemiBoldItalic",

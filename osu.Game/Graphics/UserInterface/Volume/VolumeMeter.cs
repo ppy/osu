@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -51,7 +52,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
                         }
                     }
                 },
-                new SpriteText
+                new OsuSpriteText
                 {
                     Text = meterName,
                     Anchor = Anchor.BottomCentre,

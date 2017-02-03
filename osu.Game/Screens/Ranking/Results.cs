@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
@@ -71,17 +72,17 @@ namespace osu.Game.Screens.Ranking
                     Direction = FlowDirection.VerticalOnly,
                     Children = new Drawable[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             TextSize = 40,
                             Text = $@"Accuracy: {s.Accuracy:#0.00%}",
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             TextSize = 40,
                             Text = $@"Score: {s.TotalScore}",
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             TextSize = 40,
                             Text = $@"MaxCombo: {s.MaxCombo}",

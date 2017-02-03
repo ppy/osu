@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 
 namespace osu.Game.Online.Chat.Drawables
@@ -27,7 +28,7 @@ namespace osu.Game.Online.Chat.Drawables
 
             Children = new Drawable[]
             {
-                new SpriteText
+                new OsuSpriteText
                 {
                     Text = channel.Name,
                     TextSize = 50,

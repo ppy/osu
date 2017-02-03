@@ -5,16 +5,22 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTextBox : TextBox
     {
+        protected override Color4 BackgroundUnfocused => Color4.Black.Opacity(0.5f);
+        protected override Color4 BackgroundFocused => OsuColour.Gray(0.3f).Opacity(0.8f);
+        protected override Color4 BackgroundCommit => BorderColour;
+
         public OsuTextBox()
         {
             Height = 40;
-            TextContainer.Height = 0.6f;
+            TextContainer.Height = OsuSpriteText.FONT_SIZE / Height;
             CornerRadius = 5;
         }
 

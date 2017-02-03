@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
 {
@@ -19,6 +20,7 @@ namespace osu.Game.Overlays.Options
         private SpriteText headerText;
         private Box backgroundBox;
         private Box selectionIndicator;
+        public Container text;
         public Action Action;
 
         private OptionsSection section;
@@ -44,15 +46,21 @@ namespace osu.Game.Overlays.Options
             {
                 selected = value;
                 if (selected)
+                {
                     selectionIndicator.FadeIn(50);
+                    text.FadeColour(Color4.White, 50);
+                }
                 else
+                {
                     selectionIndicator.FadeOut(50);
+                    text.FadeColour(OsuColour.Gray(0.6f), 50);
+                }
             }
         }
 
         public SidebarButton()
         {
-            Height = OptionsSidebar.default_width;
+            Height = Sidebar.default_width;
             RelativeSizeAxes = Axes.X;
             Children = new Drawable[]
             {
@@ -63,24 +71,24 @@ namespace osu.Game.Overlays.Options
                     Colour = OsuColour.Gray(60),
                     Alpha = 0,
                 },
-                new Container
+                text = new Container
                 {
-                    Width = OptionsSidebar.default_width,
+                    Width = Sidebar.default_width,
                     RelativeSizeAxes = Axes.Y,
                     Children = new[]
                     {
+                        headerText = new OsuSpriteText
+                        {
+                            Position = new Vector2(Sidebar.default_width + 10, 0),
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
                         drawableIcon = new TextAwesome
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
                     }
-                },
-                headerText = new SpriteText
-                {
-                    Position = new Vector2(OptionsSidebar.default_width + 10, 0),
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
                 },
                 selectionIndicator = new Box
                 {
@@ -96,7 +104,7 @@ namespace osu.Game.Overlays.Options
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            selectionIndicator.Colour = colours.Pink;
+            selectionIndicator.Colour = colours.Yellow;
         }
 
         protected override bool OnClick(InputState state)

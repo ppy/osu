@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.MathUtils;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Modes.UI
 {
@@ -100,11 +101,11 @@ namespace osu.Game.Modes.UI
 
             Children = new Drawable[]
             {
-                DisplayedCountSpriteText = new SpriteText
+                DisplayedCountSpriteText = new OsuSpriteText
                 {
                     Alpha = 0,
                 },
-                PopOutCount = new SpriteText
+                PopOutCount = new OsuSpriteText
                 {
                     Alpha = 0,
                     Margin = new MarginPadding(0.05f),
