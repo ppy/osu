@@ -3,6 +3,7 @@
 
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -10,6 +11,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using osu.Game.Configuration;
+using System;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -38,6 +41,8 @@ namespace osu.Game.Graphics.Cursor
 
         class OsuCursor : Container
         {
+            private BindableDouble cursorScale;
+            private Sprite sprite;
             public OsuCursor()
             {
                 Origin = Anchor.Centre;
@@ -45,15 +50,24 @@ namespace osu.Game.Graphics.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(TextureStore textures, OsuConfigManager config)
             {
+                cursorScale = (BindableDouble)config.GetBindable<double>(OsuConfig.CursorSize);
+
                 Children = new Drawable[]
                 {
-                    new Sprite
+                    sprite = new Sprite
                     {
+                        Scale = new Vector2((float)cursorScale),
                         Texture = textures.Get(@"Cursor/cursor")
                     }
                 };
+                cursorScale.ValueChanged += scaleChanged;
+            }
+
+            private void scaleChanged(object sender, EventArgs e)
+            {
+                sprite.Scale = new Vector2((float)cursorScale);
             }
         }
     }
