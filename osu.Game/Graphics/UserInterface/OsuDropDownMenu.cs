@@ -9,6 +9,7 @@ using System.Reflection;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -31,6 +32,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             //TODO: breaks padding; figure why.
             //ContentContainer.CornerRadius = 4;
+            ContentBackground.Colour = Color4.Black.Opacity(0.5f);
         }
 
         protected override void AnimateOpen()
