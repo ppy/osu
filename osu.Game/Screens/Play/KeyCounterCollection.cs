@@ -2,11 +2,11 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.Screens.Play
 {
     public class KeyCounterCollection : FlowContainer<KeyCounter>
     {

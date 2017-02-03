@@ -55,6 +55,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             switch (state)
             {
+                case PanelSelectedState.Hidden:
                 case PanelSelectedState.NotSelected:
                     Deselected();
                     break;
@@ -62,6 +63,11 @@ namespace osu.Game.Beatmaps.Drawables
                     Selected();
                     break;
             }
+
+            if (state == PanelSelectedState.Hidden)
+                FadeOut(300, EasingTypes.OutQuint);
+            else
+                FadeIn(250);
         }
 
         private PanelSelectedState state = PanelSelectedState.NotSelected;
@@ -112,6 +118,7 @@ namespace osu.Game.Beatmaps.Drawables
 
     enum PanelSelectedState
     {
+        Hidden,
         NotSelected,
         Selected
     }

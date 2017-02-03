@@ -22,17 +22,19 @@ namespace osu.Game.Screens.Backgrounds
             {
                 return beatmap;
             }
-
             set
             {
-                if (beatmap == value)
+                if (beatmap == value && beatmap != null)
                     return;
-
                 beatmap = value;
 
                 Schedule(() =>
                 {
-                    Background newBackground = new BeatmapBackground(beatmap);
+                    Background newBackground;
+                    if (beatmap == null)
+                        newBackground = new Background(@"Backgrounds/bg1");
+                    else
+                        newBackground = new BeatmapBackground(beatmap);
 
                     newBackground.Preload(Game, delegate
                     {
@@ -84,7 +86,6 @@ namespace osu.Game.Screens.Backgrounds
             {
                 Sprite.Texture = beatmap.Background;
             }
-
         }
     }
 }
