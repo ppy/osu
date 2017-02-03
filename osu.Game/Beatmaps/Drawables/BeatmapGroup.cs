@@ -31,31 +31,32 @@ namespace osu.Game.Beatmaps.Drawables
 
         public List<BeatmapPanel> BeatmapPanels;
 
+        public BeatmapSetInfo BeatmapSet;
+
         public BeatmapGroupState State
         {
             get { return state; }
             set
             {
-                state = value;
-                switch (state)
+                switch (value)
                 {
                     case BeatmapGroupState.Expanded:
-                        foreach (BeatmapPanel panel in BeatmapPanels)
-                            panel.FadeIn(250);
-
                         Header.State = PanelSelectedState.Selected;
-                        if (SelectedPanel != null)
-                            SelectedPanel.State = PanelSelectedState.Selected;
+                        foreach (BeatmapPanel panel in BeatmapPanels)
+                            panel.State = panel == SelectedPanel ? PanelSelectedState.Selected : PanelSelectedState.NotSelected;
                         break;
                     case BeatmapGroupState.Collapsed:
                         Header.State = PanelSelectedState.NotSelected;
-                        if (SelectedPanel != null)
-                            SelectedPanel.State = PanelSelectedState.NotSelected;
-
                         foreach (BeatmapPanel panel in BeatmapPanels)
-                            panel.FadeOut(300, EasingTypes.OutQuint);
+                            panel.State = PanelSelectedState.Hidden;
+                        break;
+                    case BeatmapGroupState.Hidden:
+                        Header.State = PanelSelectedState.Hidden;
+                        foreach (BeatmapPanel panel in BeatmapPanels)
+                            panel.State = PanelSelectedState.Hidden;
                         break;
                 }
+                state = value;
             }
         }
 
@@ -75,6 +76,7 @@ namespace osu.Game.Beatmaps.Drawables
                 RelativeSizeAxes = Axes.X,
             }).ToList();
 
+            BeatmapSet = set;
             Header.AddDifficultyIcons(BeatmapPanels);
         }
 
@@ -111,5 +113,6 @@ namespace osu.Game.Beatmaps.Drawables
     {
         Collapsed,
         Expanded,
+        Hidden,
     }
 }

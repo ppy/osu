@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using osu.Desktop.Beatmaps.IO;
 using osu.Framework;
 using osu.Framework.Desktop;
@@ -26,16 +27,22 @@ namespace osu.Desktop
         {
             LegacyFilesystemReader.Register();
 
+            // Back up the cwd before DesktopGameHost changes it
+            var cwd = Environment.CurrentDirectory;
+
             using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
             {
                 if (!host.IsPrimaryInstance)
                 {
                     var importer = new BeatmapImporter(host);
-
+                    // Restore the cwd so relative paths given at the command line work correctly
+                    Directory.SetCurrentDirectory(cwd);
                     foreach (var file in args)
-                        if (!importer.Import(file).Wait(1000))
+                    {
+                        Console.WriteLine(@"Importing {0}", file);
+                        if (!importer.Import(Path.GetFullPath(file)).Wait(3000))
                             throw new TimeoutException(@"IPC took too long to send");
-                    Console.WriteLine(@"Sent import requests to running instance");
+                    }
                 }
                 else
                 {
