@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -100,7 +101,7 @@ namespace osu.Game.Screens.Menu
                             Position = new Vector2(0, 0),
                             Icon = symbol
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Shadow = true,
                             Direction = FlowDirection.HorizontalOnly,

@@ -20,6 +20,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 
 namespace osu.Game.Screens.Select
@@ -131,14 +132,14 @@ namespace osu.Game.Screens.Select
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            new SpriteText
+                            new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
                                 Text = beatmapSetInfo.Metadata.Artist + " -- " + beatmapSetInfo.Metadata.Title,
                                 TextSize = 28,
                                 Shadow = true,
                             },
-                            new SpriteText
+                            new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
                                 Text = beatmapInfo.Version,
@@ -152,14 +153,14 @@ namespace osu.Game.Screens.Select
                                 AutoSizeAxes = Axes.Both,
                                 Children = new []
                                 {
-                                    new SpriteText
+                                    new OsuSpriteText
                                     {
                                         Font = @"Exo2.0-Medium",
                                         Text = "mapped by ",
                                         TextSize = 15,
                                         Shadow = true,
                                     },
-                                    new SpriteText
+                                    new OsuSpriteText
                                     {
                                         Font = @"Exo2.0-Bold",
                                         Text = beatmapSetInfo.Metadata.Author,
@@ -204,7 +205,7 @@ namespace osu.Game.Screens.Select
             public InfoLabel(BeatmapStatistic statistic)
             {
                 AutoSizeAxes = Axes.Both;
-                Children = new[]
+                Children = new Drawable[]
                 {
                     new TextAwesome
                     {
@@ -218,7 +219,7 @@ namespace osu.Game.Screens.Select
                         Colour = new Color4(255, 221, 85, 255),
                         Scale = new Vector2(0.8f)
                     },
-                    new SpriteText
+                    new OsuSpriteText
                     {
                         Margin = new MarginPadding { Left = 13 },
                         Font = @"Exo2.0-Bold",
