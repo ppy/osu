@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Action = onOsuLogo,
                     Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre
+                    Anchor = Anchor.Centre,
                 }
             };
 
