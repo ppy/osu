@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Transformations;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -106,7 +107,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             Children = new Drawable[]
             {
-                DisplayedCountSpriteText = new SpriteText(),
+                DisplayedCountSpriteText = new OsuSpriteText(),
             };
 
             TextSize = 40;

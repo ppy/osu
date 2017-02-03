@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
@@ -21,7 +22,7 @@ namespace osu.Game.Screens.Play
 
         public FailDialog()
         {
-            Add(new SpriteText
+            Add(new OsuSpriteText
             {
                 Text = "You failed!",
                 Anchor = Anchor.Centre,

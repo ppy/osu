@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -90,7 +91,7 @@ namespace osu.Game.Overlays.Toolbar
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
-                        DrawableText = new SpriteText
+                        DrawableText = new OsuSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
@@ -106,13 +107,13 @@ namespace osu.Game.Overlays.Toolbar
                     Alpha = 0,
                     Children = new[]
                     {
-                        tooltip1 = new SpriteText
+                        tooltip1 = new OsuSpriteText
                         {
                             Shadow = true,
                             TextSize = 22,
                             Font = @"Exo2.0-Bold",
                         },
-                        tooltip2 = new SpriteText
+                        tooltip2 = new OsuSpriteText
                         {
                             Shadow = true,
                             TextSize = 16
