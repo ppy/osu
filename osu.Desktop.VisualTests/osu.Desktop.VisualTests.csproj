@@ -188,6 +188,7 @@
     <Compile Include="Platform\TestStorage.cs" />
     <Compile Include="Tests\TestCaseOptions.cs" />
     <Compile Include="Tests\TestCasePauseOverlay.cs" />
+    <Compile Include="Tests\TestCaseSongProgressBar.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
