@@ -122,6 +122,7 @@ namespace osu.Game.Overlays.Toolbar
             };
 
             RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
@@ -168,6 +169,12 @@ namespace osu.Game.Overlays.Toolbar
         {
             RelativeSizeAxes = Axes.Both;
             Masking = true;
+            EdgeEffect = new EdgeEffect
+            {
+                Type = EdgeEffectType.Shadow,
+                Colour = Color4.Black.Opacity(40),
+                Radius = 5,
+            };
 
             Children = new Drawable[]
             {

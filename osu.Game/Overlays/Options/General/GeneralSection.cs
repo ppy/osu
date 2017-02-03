@@ -15,7 +15,6 @@ namespace osu.Game.Overlays.Options.General
         {
             Children = new Drawable[]
             {
-                new LoginOptions(),
                 new LanguageOptions(),
                 new UpdateOptions(),
             };
