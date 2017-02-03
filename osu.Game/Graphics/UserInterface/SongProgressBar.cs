@@ -6,12 +6,16 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Framework.Graphics.Primitives;
 
-namespace osu.Game.Overlays.Pause
+namespace osu.Game.Graphics.UserInterface
 {
-    public class PauseProgressBar : Container
+    public class SongProgressBar : Container
     {
-        private Color4 fillColour = new Color4(221, 255, 255, 255);
-        private Color4 glowColour = new Color4(221, 255, 255, 150);
+        private const int bar_height = 5;
+        private const int graph_height = 40;
+        private const int handle_height = 25;
+        private const int handle_width = 14;
+        private Color4 fill_colour = new Color4(221, 255, 255, 255);
+        private Color4 glow_colour = new Color4(221, 255, 255, 150);
 
         private Container fill;
         private WorkingBeatmap current;
@@ -32,22 +36,22 @@ namespace osu.Game.Overlays.Pause
             }
         }
 
-        public PauseProgressBar()
+        public SongProgressBar()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 60;
+            Height = bar_height + graph_height + handle_height;
 
             Children = new Drawable[]
             {
-                new PauseProgressGraph
+                new SongProgressGraph
                 {
                     RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
-                    Height = 35,
+                    Height = graph_height,
                     Margin = new MarginPadding
                     {
-                        Bottom = 5
+                        Bottom = bar_height
                     }
                 },
                 new Container
@@ -55,7 +59,7 @@ namespace osu.Game.Overlays.Pause
                     Origin = Anchor.BottomRight,
                     Anchor = Anchor.BottomRight,
                     RelativeSizeAxes = Axes.X,
-                    Height = 5,
+                    Height = bar_height,
                     Children = new Drawable[]
                     {
                         new Box
@@ -72,7 +76,7 @@ namespace osu.Game.Overlays.Pause
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Width = 0,
-                    Height = 60,
+                    Height = bar_height + graph_height + handle_height,
                     Children = new Drawable[]
                     {
                         new Container
@@ -88,12 +92,12 @@ namespace osu.Game.Overlays.Pause
                                     Origin = Anchor.BottomLeft,
                                     Anchor = Anchor.BottomLeft,
                                     RelativeSizeAxes = Axes.X,
-                                    Height = 5,
+                                    Height = bar_height,
                                     Masking = true,
                                     EdgeEffect = new EdgeEffect
                                     {
                                         Type = EdgeEffectType.Glow,
-                                        Colour = glowColour,
+                                        Colour = glow_colour,
                                         Radius = 5
                                     },
                                     Children = new Drawable[]
@@ -101,7 +105,7 @@ namespace osu.Game.Overlays.Pause
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = fillColour
+                                            Colour = fill_colour
                                         }
                                     }
                                 }
@@ -112,7 +116,7 @@ namespace osu.Game.Overlays.Pause
                             Origin = Anchor.BottomRight,
                             Anchor = Anchor.BottomRight,
                             Width = 2,
-                            Height = 35,
+                            Height = bar_height + graph_height ,
                             Children = new Drawable[]
                             {
                                 new Box
@@ -124,8 +128,8 @@ namespace osu.Game.Overlays.Pause
                                 {
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.TopCentre,
-                                    Width = 14,
-                                    Height = 25,
+                                    Width = handle_width,
+                                    Height = handle_height,
                                     CornerRadius = 5,
                                     Masking = true,
                                     Children = new Drawable[]

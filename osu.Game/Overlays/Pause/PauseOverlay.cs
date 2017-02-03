@@ -186,12 +186,6 @@ namespace osu.Game.Overlays.Pause
                             Anchor = Anchor.TopCentre
                         }
                     }
-                },
-                new PauseProgressBar
-                {
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
-                    Width = 1f
                 }
             };
 
