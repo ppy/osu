@@ -1,12 +1,12 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
+using OpenTK;
+using OpenTK.Input;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.Screens.Play
 {
     public class KeyCounterMouse : KeyCounter
     {
