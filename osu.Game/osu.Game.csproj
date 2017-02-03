@@ -76,6 +76,7 @@
     <Compile Include="Online\API\IOnlineComponent.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
+    <Compile Include="Overlays\LoginOverlay.cs" />
     <Compile Include="Overlays\MusicController.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\Formats\ConstructableBeatmapDecoder.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="Overlays\Toolbar\ToolbarMusicButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarSettingsButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarOverlayToggleButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarUserArea.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarUserButton.cs" />
     <Compile Include="Screens\BackgroundMode.cs" />
     <Compile Include="Screens\Backgrounds\BackgroundModeBeatmap.cs" />
