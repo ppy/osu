@@ -235,6 +235,8 @@
     <Compile Include="Configuration\ScreenshotFormat.cs" />
     <Compile Include="Configuration\ConfineMouseMode.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
+    <Compile Include="Screens\Select\FilterControl.cs" />
+    <Compile Include="Screens\Select\SearchTextBox.cs" />
     <Compile Include="Screens\Select\FooterButton.cs" />
     <Compile Include="Screens\Select\Footer.cs" />
     <Compile Include="Overlays\Pause\PauseButton.cs" />
