@@ -187,6 +187,7 @@ namespace osu.Game.Overlays.Pause
                             Anchor = Anchor.Centre,
                             Width = 0.8f,
                             Masking = true,
+                            MaskingSmoothness = 2,
                             EdgeEffect = new EdgeEffect
                             {
                                 Type = EdgeEffectType.Shadow,
