@@ -48,8 +48,8 @@ namespace osu.Game.Overlays.Options
                 },
                 slider = new OsuSliderBar<T>
                 {
-                    Margin = new MarginPadding { Top = 5 },
-                    RelativeSizeAxes = Axes.X,
+                    Margin = new MarginPadding { Top = 5, Bottom = 5 },
+                    RelativeSizeAxes = Axes.X
                 }
             };
         }
