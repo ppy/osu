@@ -83,6 +83,7 @@ namespace osu.Game.Graphics.UserInterface
                             RelativeSizeAxes = Axes.Both,
                             Shear = new Vector2(shear, 0),
                             Masking = true,
+                            MaskingSmoothness = 2,
                             EdgeEffect = new EdgeEffect {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.2f),
@@ -93,7 +94,7 @@ namespace osu.Game.Graphics.UserInterface
                                 IconLayer = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    EdgeSmoothness = new Vector2(1.5f, 0),
+                                    EdgeSmoothness = new Vector2(2, 0),
                                 },
                             }
                         },
@@ -116,6 +117,7 @@ namespace osu.Game.Graphics.UserInterface
                             RelativeSizeAxes = Axes.Both,
                             Shear = new Vector2(shear, 0),
                             Masking = true,
+                            MaskingSmoothness = 2,
                             EdgeEffect = new EdgeEffect {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.2f),
@@ -128,7 +130,7 @@ namespace osu.Game.Graphics.UserInterface
                                     Origin = Anchor.TopLeft,
                                     Anchor = Anchor.TopLeft,
                                     RelativeSizeAxes = Axes.Both,
-                                    EdgeSmoothness = new Vector2(1.5f, 0),
+                                    EdgeSmoothness = new Vector2(2, 0),
                                 },
                             }
                         },
