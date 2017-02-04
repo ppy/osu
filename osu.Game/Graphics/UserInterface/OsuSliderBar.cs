@@ -114,9 +114,9 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnDrag(state);
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
             leftBox.Scale = new Vector2(MathHelper.Clamp(
                 nub.DrawPosition.X - nub.DrawWidth / 2, 0, DrawWidth), 1);
             rightBox.Scale = new Vector2(MathHelper.Clamp(
