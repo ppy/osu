@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface
                 fill = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.01f, //todo: remove once we figure why containers aren't drawing at all times
+                    Alpha = 0.01f,
                 },
             };
         }

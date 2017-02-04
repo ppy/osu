@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarUserArea()
         {
             RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
 
             Children = new Drawable[] {
                 button = new ToolbarUserButton
