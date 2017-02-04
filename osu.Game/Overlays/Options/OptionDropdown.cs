@@ -1,23 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionDropdown<T> : FlowContainer
+    public class OptionDropDown<T> : FlowContainer
     {
         private DropDownMenu<T> dropdown;
         private SpriteText text;
@@ -28,7 +21,6 @@ namespace osu.Game.Overlays.Options
             set
             {
                 text.Text = value;
-                text.Alpha = string.IsNullOrEmpty(value) ? 0 : 1;
             }
         }
 
@@ -64,7 +56,7 @@ namespace osu.Game.Overlays.Options
             base.Dispose(isDisposing);
         }
 
-        public OptionDropdown()
+        public OptionDropDown()
         {
             if (!typeof(T).IsEnum)
                 throw new InvalidOperationException("OptionsDropdown only supports enums as the generic type argument");
@@ -76,7 +68,7 @@ namespace osu.Game.Overlays.Options
                 text = new OsuSpriteText {
                     Alpha = 0,
                 },
-                dropdown = new StyledDropDownMenu<T>
+                dropdown = new OsuDropDownMenu<T>
                 {
                     Margin = new MarginPadding { Top = 5 },
                     RelativeSizeAxes = Axes.X,
@@ -84,138 +76,6 @@ namespace osu.Game.Overlays.Options
                 }
             };
             dropdown.ValueChanged += Dropdown_ValueChanged;
-        }
-
-        private class StyledDropDownMenu<U> : DropDownMenu<U>
-        {
-            protected override float DropDownListSpacing => 4;
-
-            protected override DropDownComboBox CreateComboBox()
-            {
-                return new StyledDropDownComboBox();
-            }
-
-            protected override IEnumerable<DropDownMenuItem<U>> GetDropDownItems(IEnumerable<U> values)
-            {
-                return values.Select(v =>
-                {
-                    var field = typeof(U).GetField(Enum.GetName(typeof(U), v));
-                    return new StyledDropDownMenuItem<U>(
-                        field.GetCustomAttribute<DescriptionAttribute>()?.Description ?? field.Name, v);
-                });
-
-            }
-
-            public StyledDropDownMenu()
-            {
-                ComboBox.CornerRadius = 4;
-                DropDown.CornerRadius = 4;
-            }
-
-            protected override void AnimateOpen()
-            {
-                foreach (StyledDropDownMenuItem<U> child in DropDownItemsContainer.Children)
-                {
-                    child.FadeIn(200);
-                    child.ResizeTo(new Vector2(1, 24), 200);
-                }
-                DropDown.Show();
-            }
-
-            protected override void AnimateClose()
-            {
-                foreach (StyledDropDownMenuItem<U> child in DropDownItemsContainer.Children)
-                {
-                    child.ResizeTo(new Vector2(1, 0), 200);
-                    child.FadeOut(200);
-                }
-            }
-        }
-
-        private class StyledDropDownComboBox : DropDownComboBox
-        {
-            private SpriteText label;
-            protected override string Label
-            {
-                get { return label.Text; }
-                set { label.Text = value; }
-            }
-
-            public StyledDropDownComboBox()
-            {
-                Foreground.Padding = new MarginPadding(4);
-
-                AutoSizeAxes = Axes.None;
-                Height = 40;
-
-                Children = new[]
-                {
-                    label = new OsuSpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    },
-                    new TextAwesome
-                    {
-                        Icon = FontAwesome.fa_chevron_down,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Margin = new MarginPadding { Right = 4 },
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                BackgroundColour = Color4.Black.Opacity(0.5f);
-                BackgroundColourHover = colours.PinkDarker;
-            }
-        }
-
-        private class StyledDropDownMenuItem<U> : DropDownMenuItem<U>
-        {
-            public StyledDropDownMenuItem(string text, U value) : base(text, value)
-            {
-                AutoSizeAxes = Axes.None;
-                Height = 0;
-                Foreground.Padding = new MarginPadding(2);
-
-                Children = new[]
-                {
-                    new FlowContainer
-                    {
-                        Direction = FlowDirection.HorizontalOnly,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Children = new Drawable[]
-                        {
-                            new TextAwesome
-                            {
-                                Icon = FontAwesome.fa_chevron_right,
-                                Colour = Color4.Black,
-                                TextSize = 12,
-                                Margin = new MarginPadding { Right = 3 },
-                                Origin = Anchor.CentreLeft,
-                                Anchor = Anchor.CentreLeft,
-                            },
-                            new OsuSpriteText {
-                                Text = text,
-                                Origin = Anchor.CentreLeft,
-                                Anchor = Anchor.CentreLeft,
-                            }
-                        }
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                BackgroundColour = Color4.Black.Opacity(0.5f);
-                BackgroundColourHover = colours.PinkDarker;
-                BackgroundColourSelected = Color4.Black.Opacity(0.5f);
-            }
         }
     }
 }
