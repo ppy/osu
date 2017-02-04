@@ -31,6 +31,7 @@ namespace osu.Game.Graphics.UserInterface
                 leftBox = new Box
                 {
                     Height = 2,
+                    EdgeSmoothness = new Vector2(0, 0.5f),
                     Position = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.None,
                     Anchor = Anchor.CentreLeft,
@@ -39,6 +40,7 @@ namespace osu.Game.Graphics.UserInterface
                 rightBox = new Box
                 {
                     Height = 2,
+                    EdgeSmoothness = new Vector2(0, 0.5f),
                     Position = new Vector2(-2, 0),
                     RelativeSizeAxes = Axes.None,
                     Anchor = Anchor.CentreRight,
@@ -114,9 +116,9 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnDrag(state);
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
             leftBox.Scale = new Vector2(MathHelper.Clamp(
                 nub.DrawPosition.X - nub.DrawWidth / 2, 0, DrawWidth), 1);
             rightBox.Scale = new Vector2(MathHelper.Clamp(
