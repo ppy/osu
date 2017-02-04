@@ -61,13 +61,13 @@ namespace osu.Game.Screens.Select
 
         public void Deactivate()
         {
-            searchTextBox.GrabFocus = false;
+            searchTextBox.HoldFocus = false;
             searchTextBox.TriggerFocusLost();
         }
         
         public void Activate()
         {
-            searchTextBox.GrabFocus = true;
+            searchTextBox.HoldFocus = true;
         }
 
         private class TabItem : ClickableContainer
