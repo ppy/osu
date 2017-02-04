@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private OsuNub nub;
+        private Nub nub;
         private SpriteText labelSpriteText;
         private AudioSample sampleChecked;
         private AudioSample sampleUnchecked;
@@ -79,7 +79,7 @@ namespace osu.Game.Graphics.UserInterface
             Children = new Drawable[]
             {
                 labelSpriteText = new OsuSpriteText(),
-                nub = new OsuNub
+                nub = new Nub
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,

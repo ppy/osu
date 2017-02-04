@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
         private AudioSample sample;
         private double lastSampleTime;
 
-        private OsuNub nub;
+        private Nub nub;
         private Box leftBox, rightBox;
 
         public OsuSliderBar()
@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.CentreRight,
                     Alpha = 0.5f,
                 },
-                nub = new OsuNub
+                nub = new Nub
                 {
                     Origin = Anchor.TopCentre,
                     State = CheckBoxState.Unchecked,
