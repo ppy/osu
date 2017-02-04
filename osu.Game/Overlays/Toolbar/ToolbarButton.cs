@@ -169,6 +169,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             RelativeSizeAxes = Axes.Both;
             Masking = true;
+            MaskingSmoothness = 0;
             EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Shadow,
@@ -186,7 +187,8 @@ namespace osu.Game.Overlays.Toolbar
                 new Triangles
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.05f,
+                    ColourLight = OsuColour.Gray(40),
+                    ColourDark = OsuColour.Gray(20),
                 },
             };
         }
