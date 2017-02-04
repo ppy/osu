@@ -68,7 +68,7 @@
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
-    <Compile Include="Graphics\UserInterface\OsuNub.cs" />
+    <Compile Include="Graphics\UserInterface\Nub.cs" />
     <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
