@@ -30,8 +30,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public OsuDropDownMenu()
         {
-            //TODO: breaks padding; figure why.
-            //ContentContainer.CornerRadius = 4;
+            ContentContainer.CornerRadius = 4;
             ContentBackground.Colour = Color4.Black.Opacity(0.5f);
         }
 
