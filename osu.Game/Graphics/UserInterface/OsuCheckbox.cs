@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private Light light;
+        private OsuNub nub;
         private SpriteText labelSpriteText;
         private AudioSample sampleChecked;
         private AudioSample sampleUnchecked;
@@ -79,7 +79,7 @@ namespace osu.Game.Graphics.UserInterface
             Children = new Drawable[]
             {
                 labelSpriteText = new OsuSpriteText(),
-                light = new Light
+                nub = new OsuNub
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
@@ -102,13 +102,15 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(InputState state)
         {
-            light.Glowing = true;
+            nub.Glowing = true;
+            nub.Expanded = true;
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            light.Glowing = false;
+            nub.Glowing = false;
+            nub.Expanded = false;
             base.OnHoverLost(state);
         }
 
@@ -125,7 +127,7 @@ namespace osu.Game.Graphics.UserInterface
                 bindable.Value = true;
 
             sampleChecked?.Play();
-            light.State = CheckBoxState.Checked;
+            nub.State = CheckBoxState.Checked;
         }
 
         protected override void OnUnchecked()
@@ -134,97 +136,7 @@ namespace osu.Game.Graphics.UserInterface
                 bindable.Value = false;
 
             sampleUnchecked?.Play();
-            light.State = CheckBoxState.Unchecked;
+            nub.State = CheckBoxState.Unchecked;
         }
-
-        private class Light : Container, IStateful<CheckBoxState>
-        {
-            private Box fill;
-
-            const float border_width = 3;
-            private Color4 glowingColour, idleColour;
-
-            public Light()
-            {
-                Size = new Vector2(20, 12);
-
-                Masking = true;                
-
-                CornerRadius = Height / 2;
-                Masking = true;
-                BorderColour = Color4.White;
-                BorderThickness = border_width;
-
-                Children = new[]
-                {
-                    fill = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.01f, //todo: remove once we figure why containers aren't drawing at all times
-                    },
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Colour = idleColour = colours.Pink;
-                glowingColour = colours.PinkLighter;
-
-                EdgeEffect = new EdgeEffect
-                {
-                    Colour = colours.PinkDarker,
-                    Type = EdgeEffectType.Glow,
-                    Radius = 10,
-                    Roundness = 8,
-                };
-
-                FadeGlowTo(0);
-            }
-
-            public bool Glowing
-            {
-                set
-                {
-                    if (value)
-                    {
-                        ResizeTo(new Vector2(40, 12), 500, EasingTypes.OutQuint);
-                        FadeColour(glowingColour, 500, EasingTypes.OutQuint);
-                        FadeGlowTo(1, 500, EasingTypes.OutQuint);
-                    }
-                    else
-                    {
-                        ResizeTo(new Vector2(20, 12), 500, EasingTypes.OutQuint);
-                        FadeGlowTo(0, 500);
-                        FadeColour(idleColour, 500);
-                    }
-                }
-            }
-
-            private CheckBoxState state;
-
-            public CheckBoxState State
-            {
-                get
-                {
-                    return state;
-                }
-                set
-                {
-                    state = value;
-
-                    switch (state)
-                    {
-                        case CheckBoxState.Checked:
-                            fill.FadeIn(200, EasingTypes.OutQuint);
-                            break;
-                        case CheckBoxState.Unchecked:
-                            fill.FadeTo(0.01f, 200, EasingTypes.OutQuint); //todo: remove once we figure why containers aren't drawing at all times
-                            break;
-                    }
-                }
-            }
-        }
-
     }
 }
