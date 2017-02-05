@@ -39,7 +39,8 @@ namespace osu.Game.Graphics.UserInterface
                 fill = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.01f,
+                    Alpha = 0,
+                    AlwaysPresent = true,
                 },
             };
         }
