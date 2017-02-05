@@ -130,7 +130,8 @@ namespace osu.Game.Overlays.Pause
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Alpha = 0.01f
+                                            Alpha = 0,
+                                            AlwaysPresent = true
                                         },
                                     },
                                 }
