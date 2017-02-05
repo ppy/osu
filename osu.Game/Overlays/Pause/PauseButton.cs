@@ -205,10 +205,9 @@ namespace osu.Game.Overlays.Pause
                                 },
                                 new Triangles
                                 {
-                                    BlendingMode = BlendingMode.Additive,
                                     RelativeSizeAxes = Axes.Both,
                                     TriangleScale = 4,
-                                    Alpha = 0.05f,
+                                    ColourDark = OsuColour.Gray(0.88f),
                                     Shear = new Vector2(-0.2f, 0)
                                 }
                             }
