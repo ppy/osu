@@ -1,4 +1,3 @@
-﻿using OpenTK;
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
@@ -65,7 +64,7 @@ namespace osu.Game.Overlays.Pause
 
         public override bool Contains(Vector2 screenSpacePos) => backgroundContainer.Contains(screenSpacePos);
 
-        protected override bool OnMouseDown(Framework.Input.InputState state, MouseDownEventArgs args)
+        protected override bool OnClick(Framework.Input.InputState state)
         {
             didClick = true;
             colourContainer.ResizeTo(new Vector2(1.5f, 1f), clickDuration, EasingTypes.In);
@@ -82,8 +81,6 @@ namespace osu.Game.Overlays.Pause
 
             return true;
         }
-
-        protected override bool OnClick(Framework.Input.InputState state) => false;
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
