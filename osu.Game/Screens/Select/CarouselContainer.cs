@@ -202,7 +202,7 @@ namespace osu.Game.Screens.Select
         /// <param name="halfHeight">Half the draw height of the carousel container.</param>
         private void updatePanel(Panel p, float halfHeight)
         {
-            var height = p.IsVisible ? p.DrawHeight : 0;
+            var height = p.IsPresent ? p.DrawHeight : 0;
 
             float panelDrawY = p.Position.Y - Current + height / 2;
             float dist = Math.Abs(1f - panelDrawY / halfHeight);

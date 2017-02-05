@@ -115,8 +115,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             base.UpdateInitialState();
             body.Alpha = 1;
 
-            //we need to be visible to handle input events. note that we still don't get enough events (we don't get a position if the mouse hasn't moved since the slider appeared).
-            ball.Alpha = 0.01f; 
+            //we need to be present to handle input events. note that we still don't get enough events (we don't get a position if the mouse hasn't moved since the slider appeared).
+            ball.AlwaysPresent = true;
+            ball.Alpha = 0;
         }
 
         protected override void UpdateState(ArmedState state)
