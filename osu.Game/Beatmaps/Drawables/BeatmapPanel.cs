@@ -69,6 +69,7 @@ namespace osu.Game.Beatmaps.Drawables
                 },
                 triangles = new Triangles
                 {
+                    TriangleScale = 2,
                     RelativeSizeAxes = Axes.Both,
                     ColourLight = OsuColour.FromHex(@"3a7285"),
                     ColourDark = OsuColour.FromHex(@"123744")
