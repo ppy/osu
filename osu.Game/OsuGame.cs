@@ -22,6 +22,7 @@ using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using OpenTK;
+using System.Linq;
 
 namespace osu.Game
 {
@@ -63,11 +64,16 @@ namespace osu.Game
             }
 
             if (args?.Length > 0)
-                Schedule(delegate { Dependencies.Get<BeatmapDatabase>().Import(args); });
+                ImportBeatmaps(args);
 
             Dependencies.Cache(this);
 
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
+        }
+
+        public void ImportBeatmaps(params string[] paths)
+        {
+            Schedule(delegate { Dependencies.Get<BeatmapDatabase>().Import(paths); });
         }
 
         protected override void LoadComplete()
