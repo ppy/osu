@@ -203,13 +203,22 @@ namespace osu.Game.Overlays.Pause
                                     EdgeSmoothness = new Vector2(2, 0),
                                     RelativeSizeAxes = Axes.Both
                                 },
-                                new Triangles
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    TriangleScale = 4,
-                                    ColourDark = OsuColour.Gray(0.88f),
-                                    Shear = new Vector2(-0.2f, 0)
-                                }
+                                    Masking = true,
+                                    MaskingSmoothness = 0,
+                                    Children = new[]
+                                    {
+                                        new Triangles
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            TriangleScale = 4,
+                                            ColourDark = OsuColour.Gray(0.88f),
+                                            Shear = new Vector2(-0.2f, 0)
+                                        }
+                                    }
+                                },
                             }
                         }
                     }
