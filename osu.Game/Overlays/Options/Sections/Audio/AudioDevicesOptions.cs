@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Options.Sections.Audio
             base.LoadComplete();
 
             var deviceItems = new List<KeyValuePair<string, string>>();
-            deviceItems.Add(new KeyValuePair<string, string>("Standard", ""));
+            deviceItems.Add(new KeyValuePair<string, string>("Default", string.Empty));
             deviceItems.AddRange(audio.GetDeviceNames().Select(d => new KeyValuePair<string, string>(d, d)));
             Children = new Drawable[]
             {
