@@ -19,8 +19,6 @@ namespace osu.Game.Overlays.Pause
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
 
-        private CircularContainer circle;
-
         public Action OnResume;
         public Action OnRetry;
         public Action OnQuit;
@@ -114,29 +112,13 @@ namespace osu.Game.Overlays.Pause
                             Anchor = Anchor.TopCentre,
                             Children = new Drawable[]
                             {
-                                circle = new CircularContainer
+                                new TextAwesome
                                 {
+                                    Icon = FontAwesome.fa_circle_thin,
+                                    Colour = Color4.White,
+                                    TextSize = 100,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    Size = new Vector2(90),
-                                    Masking = true,
-                                    BorderThickness = 6,
-                                    BorderColour = Color4.White,
-                                    EdgeEffect = new EdgeEffect
-                                    {
-                                        Colour = Color4.White,
-                                        Type = EdgeEffectType.Glow,
-                                        Radius = 10,
-                                    },
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Alpha = 0,
-                                            AlwaysPresent = true
-                                        },
-                                    },
                                 }
                             }
                         },
