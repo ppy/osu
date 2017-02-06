@@ -11,7 +11,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
     {
         public ExplodePiece()
         {
-            Size = new Vector2(144);
+            Size = new Vector2(128);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
