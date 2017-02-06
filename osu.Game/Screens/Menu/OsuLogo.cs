@@ -132,7 +132,6 @@ namespace osu.Game.Screens.Menu
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Scale = new Vector2(0.5f),
                                         },
                                     }
                                 },
@@ -147,7 +146,6 @@ namespace osu.Game.Screens.Menu
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             BlendingMode = BlendingMode.Additive,
-                                            Scale = new Vector2(0.5f),
                                             Alpha = 0.15f
                                         }
                                     }
@@ -170,8 +168,8 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            logo.Texture = textures.Get(@"Menu/logo@2x");
-            ripple.Texture = textures.Get(@"Menu/logo@2x");
+            logo.Texture = textures.Get(@"Menu/logo");
+            ripple.Texture = textures.Get(@"Menu/logo");
         }
 
         protected override void LoadComplete()

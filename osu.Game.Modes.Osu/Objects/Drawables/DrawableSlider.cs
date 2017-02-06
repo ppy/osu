@@ -32,7 +32,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 body = new SliderBody(s)
                 {
                     Position = s.Position,
-                    PathWidth = s.Scale * 72,
+                    PathWidth = s.Scale * 64,
                 },
                 bouncer1 = new SliderBouncer(s, false)
                 {

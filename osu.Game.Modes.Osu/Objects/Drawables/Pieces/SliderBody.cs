@@ -89,7 +89,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             var bytes = upload.Data;
 
             const float aa_portion = 0.02f;
-            const float border_portion = 0.18f;
+            const float border_portion = 0.128f;
             const float gradient_portion = 1 - border_portion;
 
             const float opacity_at_centre = 0.3f;
