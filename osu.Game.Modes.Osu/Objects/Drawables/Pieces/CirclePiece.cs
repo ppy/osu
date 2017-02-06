@@ -22,9 +22,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 
         public CirclePiece()
         {
-            Size = new Vector2(144);
+            Size = new Vector2(128);
             Masking = true;
-            CornerRadius = DrawSize.X / 2;
+            CornerRadius = Size.X / 2;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -47,7 +47,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            disc.Texture = textures.Get(@"Play/osu/disc@2x");
+            disc.Texture = textures.Get(@"Play/osu/disc");
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
