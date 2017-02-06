@@ -17,16 +17,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override DropDownHeader CreateHeader() => new OsuDropDownHeader();
 
-        protected override IEnumerable<DropDownMenuItem<U>> GetDropDownItems(IEnumerable<U> values)
-        {
-            return values.Select(v =>
-            {
-                var field = typeof(U).GetField(Enum.GetName(typeof(U), v));
-                return new OsuDropDownMenuItem<U>(
-                    field.GetCustomAttribute<DescriptionAttribute>()?.Description ?? field.Name, v);
-            });
-
-        }
+        protected override IEnumerable<DropDownMenuItem<U>> GetDropDownItems(IEnumerable<KeyValuePair<string, U>> values)
+            => values.Select(v => new OsuDropDownMenuItem<U>(v.Key, v.Value));
 
         public OsuDropDownMenu()
         {
