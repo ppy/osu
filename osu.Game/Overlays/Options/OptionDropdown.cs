@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Options
 {
@@ -56,10 +57,25 @@ namespace osu.Game.Overlays.Options
             base.Dispose(isDisposing);
         }
 
+        private IEnumerable<KeyValuePair<string, T>> items;
+        public IEnumerable<KeyValuePair<string, T>> Items
+        {
+            get
+            {
+                return items;
+            }
+            set
+            {
+                items = value;
+                if(dropdown != null)
+                    dropdown.Items = value;
+            }
+        }
+
         public OptionDropDown()
         {
-            if (!typeof(T).IsEnum)
-                throw new InvalidOperationException("OptionsDropdown only supports enums as the generic type argument");
+            Items = new KeyValuePair<string, T>[0];
+
             Direction = FlowDirection.VerticalOnly;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -72,7 +88,7 @@ namespace osu.Game.Overlays.Options
                 {
                     Margin = new MarginPadding { Top = 5 },
                     RelativeSizeAxes = Axes.X,
-                    Items = (T[])Enum.GetValues(typeof(T)),
+                    Items = this.Items,
                 }
             };
             dropdown.ValueChanged += Dropdown_ValueChanged;
