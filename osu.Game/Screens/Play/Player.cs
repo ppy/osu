@@ -65,6 +65,7 @@ namespace osu.Game.Screens.Play
 
         private ScoreOverlay scoreOverlay;
         private PauseOverlay pauseOverlay;
+        private FailOverlay failOverlay;
         private PlayerInputManager playerInputManager;
 
         [BackgroundDependencyLoader]
@@ -125,6 +126,13 @@ namespace osu.Game.Screens.Play
                 OnQuit = Exit
             };
 
+            failOverlay = new FailOverlay
+            {
+                Depth = -1,
+                OnRetry = Restart,
+                OnQuit = Exit
+            };
+
             hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
@@ -150,7 +158,8 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 scoreOverlay,
-                pauseOverlay
+                pauseOverlay,
+                failOverlay
             };
         }
 
@@ -217,6 +226,7 @@ namespace osu.Game.Screens.Play
 
         public void Restart()
         {
+            Content.FadeColour(Color4.White);
             sourceClock.Stop(); // If the clock is running and Restart is called the game will lag until relaunch
 
             var newPlayer = new Player();
@@ -268,11 +278,7 @@ namespace osu.Game.Screens.Play
             sourceClock.Stop();
 
             Delay(500);
-            Schedule(delegate
-            {
-                ValidForResume = false;
-                Push(new FailDialog());
-            });
+            failOverlay.ToggleVisibility();
         }
 
         protected override void OnEntering(GameMode last)
