@@ -20,8 +20,8 @@ namespace osu.Game.Online.API
         private OAuth authentication;
 
         public string Endpoint = @"https://new.ppy.sh";
-        const string ClientId = @"5";
-        const string ClientSecret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
+        const string client_id = @"5";
+        const string client_secret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
 
         ConcurrentQueue<APIRequest> queue = new ConcurrentQueue<APIRequest>();
 
@@ -57,7 +57,7 @@ namespace osu.Game.Online.API
 
         public APIAccess()
         {
-            authentication = new OAuth(ClientId, ClientSecret, Endpoint);
+            authentication = new OAuth(client_id, client_secret, Endpoint);
             log = Logger.GetLogger(LoggingTarget.Network);
 
             thread = new Thread(run) { IsBackground = true };
@@ -125,7 +125,7 @@ namespace osu.Game.Online.API
                             //todo: this fails even on network-related issues. we should probably handle those differently.
                             //NotificationManager.ShowMessage("Login failed!");
                             log.Add(@"Login failed!");
-                            ClearCredentials();
+                            clearCredentials();
                             continue;
                         }
 
@@ -168,7 +168,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        private void ClearCredentials()
+        private void clearCredentials()
         {
             Username = null;
             Password = null;
@@ -295,7 +295,7 @@ namespace osu.Game.Online.API
 
         public void Logout()
         {
-            ClearCredentials();
+            clearCredentials();
             authentication.Clear();
             State = APIState.Offline;
         }

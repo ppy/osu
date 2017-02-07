@@ -17,7 +17,8 @@ namespace osu.Game.Overlays.Options
     public class Sidebar : Container
     {
         private FlowContainer content;
-        internal const int default_width = 60, expanded_width = 200;
+        internal const int DEFAULT_WIDTH = 60;
+        internal const int EXPANDED_WIDTH = 200;
         protected override Container<Drawable> Content => content;
 
         public Sidebar()
@@ -54,7 +55,7 @@ namespace osu.Game.Overlays.Options
             expandEvent = Scheduler.AddDelayed(() =>
             {
                 expandEvent = null;
-                ResizeTo(new Vector2(expanded_width, Height), 150, EasingTypes.OutQuad);
+                ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 150, EasingTypes.OutQuad);
             }, 750);
             return true;
         }
@@ -62,7 +63,7 @@ namespace osu.Game.Overlays.Options
         protected override void OnHoverLost(InputState state)
         {
             expandEvent?.Cancel();
-            ResizeTo(new Vector2(default_width, Height), 150, EasingTypes.OutQuad);
+            ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 150, EasingTypes.OutQuad);
             base.OnHoverLost(state);
         }
 

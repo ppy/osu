@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Toolbar
 {
     class ToolbarOverlayToggleButton : ToolbarButton
     {
-        private Box StateBackground;
+        private Box stateBackground;
 
         private OverlayContainer stateContainer;
 
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarOverlayToggleButton()
         {
-            Add(StateBackground = new Box
+            Add(stateBackground = new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = OsuColour.Gray(150).Opacity(180),
@@ -61,10 +61,10 @@ namespace osu.Game.Overlays.Toolbar
             switch (state)
             {
                 case Visibility.Hidden:
-                    StateBackground.FadeOut(200);
+                    stateBackground.FadeOut(200);
                     break;
                 case Visibility.Visible:
-                    StateBackground.FadeIn(200);
+                    stateBackground.FadeIn(200);
                     break;
             }
         }
