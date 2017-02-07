@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Menu
                             Children = new[]
                             {
                                 settingsButton = new Button(@"settings", @"options", FontAwesome.fa_gear, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
-                                backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -WEDGE_WIDTH, Key.Escape),
+                                backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -WEDGE_WIDTH),
                                 iconFacade = new Container //need a container to make the osu! icon flow properly.
 								{
                                     Size = new Vector2(0, BUTTON_AREA_HEIGHT)
@@ -140,11 +140,18 @@ namespace osu.Game.Screens.Menu
                     osuLogo.TriggerClick(state);
                     return true;
                 case Key.Escape:
-                    if (State == MenuState.Initial)
-                        return false;
+                    switch (State)
+                    {
+                        case MenuState.TopLevel:
+                            State = MenuState.Initial;
+                            return true;
+                        case MenuState.Play:
+                            State = MenuState.TopLevel;
+                            return true;
+                    }
 
-                    State = MenuState.Initial;
-                    return true;
+                    
+                    return false;
             }
 
             return false;
