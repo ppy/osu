@@ -257,7 +257,7 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            base.OnKeyDown(state, args);
+            if (args.Repeat) return false;
 
             if (triggerKey == args.Key && triggerKey != Key.Unknown)
             {
