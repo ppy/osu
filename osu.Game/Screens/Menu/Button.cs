@@ -272,11 +272,11 @@ namespace osu.Game.Screens.Menu
         {
             sampleClick.Play();
 
+            clickAction?.Invoke();
+
             boxHoverLayer.ClearTransformations();
             boxHoverLayer.Alpha = 0.9f;
             boxHoverLayer.FadeOut(800, EasingTypes.OutExpo);
-
-            clickAction?.Invoke();
         }
 
         public override bool HandleInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;

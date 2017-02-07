@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Menu
                             State = MenuState.Initial;
                             return true;
                         case MenuState.Play:
-                            State = MenuState.TopLevel;
+                            backButton.TriggerClick();
                             return true;
                     }
 
@@ -216,7 +216,7 @@ namespace osu.Game.Screens.Menu
                 {
                     case MenuState.Initial:
                         buttonAreaBackground.ScaleTo(Vector2.One, 500, EasingTypes.Out);
-                        buttonArea.FadeOut(500);
+                        buttonArea.FadeOut(300);
 
                         osuLogo.Delay(150);
                         osuLogo.MoveTo(Vector2.Zero, 800, EasingTypes.OutExpo);
@@ -229,6 +229,8 @@ namespace osu.Game.Screens.Menu
                             b.State = ButtonState.Contracted;
                         break;
                     case MenuState.TopLevel:
+                        buttonArea.Flush(true);
+
                         buttonAreaBackground.ScaleTo(Vector2.One, 200, EasingTypes.Out);
 
                         osuLogo.MoveTo(buttonFlow.DrawPosition, 200, EasingTypes.In);
