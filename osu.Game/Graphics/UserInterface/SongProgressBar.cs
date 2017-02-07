@@ -11,13 +11,14 @@ namespace osu.Game.Graphics.UserInterface
     public class SongProgressBar : Container
     {
         private const int bar_height = 5;
-        private const int graph_height = 40;
+        private const int graph_height = 34;
         private const int handle_height = 25;
         private const int handle_width = 14;
         private Color4 fill_colour = new Color4(221, 255, 255, 255);
         private Color4 glow_colour = new Color4(221, 255, 255, 150);
 
         private Container fill;
+        private SongProgressGraph progressGraph;
         private WorkingBeatmap current;
 
         [BackgroundDependencyLoader]
@@ -33,6 +34,7 @@ namespace osu.Game.Graphics.UserInterface
             if (current?.TrackLoaded ?? false)
             {
                 fill.Width = (float)(current.Track.CurrentTime / current.Track.Length);
+                progressGraph.Progress = fill.Width;
             }
         }
 
@@ -43,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                new SongProgressGraph
+                progressGraph = new SongProgressGraph
                 {
                     RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomCentre,
@@ -116,7 +118,7 @@ namespace osu.Game.Graphics.UserInterface
                             Origin = Anchor.BottomRight,
                             Anchor = Anchor.BottomRight,
                             Width = 2,
-                            Height = bar_height + graph_height ,
+                            Height = bar_height + graph_height,
                             Children = new Drawable[]
                             {
                                 new Box

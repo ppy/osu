@@ -1,7 +1,11 @@
 ﻿using System;
+using OpenTK.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics;
 using osu.Framework.GameModes.Testing;
-using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.GameModes.Testing;
+using osu.Framework.Graphics.Colour;
 
 namespace osu.Desktop.VisualTests
 {
@@ -15,6 +19,11 @@ namespace osu.Desktop.VisualTests
         {
             base.Reset();
 
+            Add(new Box
+            {
+                ColourInfo = ColourInfo.GradientVertical(Color4.WhiteSmoke, Color4.Gray),
+                RelativeSizeAxes = Framework.Graphics.Axes.Both,
+            });
             Add(new SongProgressBar
             {
                 Anchor = Anchor.BottomCentre,
