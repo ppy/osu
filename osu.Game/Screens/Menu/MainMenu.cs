@@ -65,9 +65,10 @@ namespace osu.Game.Screens.Menu
             buttons.OnSettings = game.ToggleOptions;
         }
 
-        protected override void LoadComplete()
+        protected override void OnEntering(GameMode last)
         {
-            base.LoadComplete();
+
+            base.OnEntering(last);
             buttons.FadeInFromZero(500);
         }
 

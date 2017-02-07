@@ -288,6 +288,8 @@ namespace osu.Game.Screens.Menu
             //if (OsuGame.IdleTime > 6000 && State != MenuState.Exit)
             //    State = MenuState.Initial;
 
+            osuLogo.Interactive = Alpha >= 0.8f;
+
             iconFacade.Width = osuLogo.SizeForFlow * 0.5f;
             base.Update();
         }
