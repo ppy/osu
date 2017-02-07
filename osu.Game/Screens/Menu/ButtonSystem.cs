@@ -172,10 +172,10 @@ namespace osu.Game.Screens.Menu
                     State = MenuState.TopLevel;
                     return;
                 case MenuState.TopLevel:
-                    buttonsTopLevel.First().TriggerMouseDown();
+                    buttonsTopLevel.First().TriggerClick();
                     return;
                 case MenuState.Play:
-                    buttonsPlay.First().TriggerMouseDown();
+                    buttonsPlay.First().TriggerClick();
                     return;
             }
         }
