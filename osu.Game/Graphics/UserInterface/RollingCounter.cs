@@ -60,7 +60,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected T count;
+        private T count;
 
         /// <summary>
         /// Actual value of counter.
@@ -88,7 +88,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public abstract void Increment(T amount);
 
-        protected float textSize;
+        private float textSize;
 
         public float TextSize
         {

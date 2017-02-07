@@ -18,14 +18,14 @@ namespace osu.Game.Screens.Ranking
     {
         protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
 
-        private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
+        private static readonly Vector2 background_blur = new Vector2(20);
 
         ScoreDisplay scoreDisplay;
 
         protected override void OnEntering(GameMode last)
         {
             base.OnEntering(last);
-            Background.Schedule(() => (Background as BackgroundModeBeatmap)?.BlurTo(BACKGROUND_BLUR, 1000));
+            Background.Schedule(() => (Background as BackgroundModeBeatmap)?.BlurTo(background_blur, 1000));
         }
 
         protected override bool OnExiting(GameMode next)

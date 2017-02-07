@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Options.Sections
 
         public MaintenanceSection()
         {
-            content.Spacing = new Vector2(0, 5);
+            FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
                 new OsuButton

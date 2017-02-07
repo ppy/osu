@@ -81,13 +81,13 @@ namespace osu.Game.Screens.Select
                 set { text.Text = value; }
             }
 
-            private void FadeActive()
+            private void fadeActive()
             {
                 box.FadeIn(300);
                 text.FadeColour(Color4.White, 300);
             }
 
-            private void FadeInactive()
+            private void fadeInactive()
             {
                 box.FadeOut(300);
                 text.FadeColour(fadeColour, 300);
@@ -101,9 +101,9 @@ namespace osu.Game.Screens.Select
                 {
                     active = value;
                     if (active)
-                        FadeActive();
+                        fadeActive();
                     else
-                        FadeInactive();
+                        fadeInactive();
                 }
             }
         
@@ -114,14 +114,14 @@ namespace osu.Game.Screens.Select
             protected override bool OnHover(InputState state)
             {
                 if (!active)
-                    FadeActive();
+                    fadeActive();
                 return true;
             }
             
             protected override void OnHoverLost(InputState state)
             {
                 if (!active)
-                    FadeInactive();
+                    fadeInactive();
             }
         
             public TabItem()
