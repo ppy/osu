@@ -30,8 +30,8 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private SongProgressGraphColumnState state;
-        public SongProgressGraphColumnState State
+        private ColumnState state;
+        public ColumnState State
         {
             get
             {
@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (value == state) return;
                 state = value;
 
-                fillActive(value == SongProgressGraphColumnState.Lit ? lit_colour : dimmed_colour);
+                fillActive(value == ColumnState.Lit ? lit_colour : dimmed_colour);
             }
         }
 
@@ -74,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface
         }
     }
 
-    public enum SongProgressGraphColumnState
+    public enum ColumnState
     {
         Lit, Dimmed
     }
