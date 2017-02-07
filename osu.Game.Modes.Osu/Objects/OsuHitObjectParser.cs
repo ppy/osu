@@ -39,7 +39,7 @@ namespace osu.Game.Modes.Osu.Objects
                             result.Sample = ParseHitSample(section, split[4], split[5]);
                             break;
                         case 5:
-                            result.Sample = ParseHitSample(section, split[4], null);
+                            result.Sample = ParseHitSample(section, split[4]);
                             break;
                         default:
                             throw new ArgumentException("HitCircles must have between 5 and 6 values");
@@ -56,12 +56,12 @@ namespace osu.Game.Modes.Osu.Objects
                             s.Sample = ParseHitSample(section, split[4], split[10]);
                             break;
                         case 10:
-                            s.Sample = ParseHitSample(section, split[4], null);
+                            s.Sample = ParseHitSample(section, split[4]);
                             break;
                         case 8:
                             s.RepeatCount = Convert.ToInt32(split[6], NumberFormatInfo.InvariantInfo);
                             for (int i = 0; i <= s.RepeatCount; i++)
-                                edgeSamples.Add(ParseHitSample(section, null, null));
+                                edgeSamples.Add(ParseHitSample(section));
                             goto case 10;
                         default:
                             throw new ArgumentException("Sliders must have 8, 10 or 11 values");
@@ -140,7 +140,7 @@ namespace osu.Game.Modes.Osu.Objects
                             result.Sample = ParseHitSample(section, split[4], split[6]);
                             break;
                         case 6:
-                            result.Sample = ParseHitSample(section, split[4], null);
+                            result.Sample = ParseHitSample(section, split[4]);
                             break;
                         default:
                             throw new ArgumentException("Spinners must have between 6 and 7 values");

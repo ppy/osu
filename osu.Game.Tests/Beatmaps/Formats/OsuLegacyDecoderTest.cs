@@ -1,15 +1,12 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using NUnit.Framework;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Osu.Objects;
-using osu.Game.Screens.Play;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Beatmaps.Formats
@@ -142,7 +139,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsNotNull(circle);
                 Assert.AreEqual(new Vector2(304, 56), circle.Position);
                 Assert.AreEqual(1285, circle.StartTime);
-                Assert.AreEqual(SampleType.Clap, circle.Sample.Type);
+                Assert.AreEqual(SampleType.Normal | SampleType.Clap, circle.Sample.Type);
             }
         }
     }

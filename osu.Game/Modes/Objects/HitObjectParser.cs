@@ -22,45 +22,49 @@ namespace osu.Game.Modes.Objects
             }
         }
 
-        protected HitSampleInfo ParseHitSample(SampleInfo section, string sample, string addition)
+        protected HitSampleInfo ParseHitSample(SampleInfo section, string sample = null, string addition = "0:0")
         {
             HitSampleInfo hitSample = new HitSampleInfo
             {
-                Type = (SampleType)Convert.ToInt32(sample, NumberFormatInfo.InvariantInfo) == SampleType.None ?
-                    SampleType.Normal :
-                    (SampleType)Convert.ToInt32(sample, NumberFormatInfo.InvariantInfo),
+                Type = (SampleType)Convert.ToInt32(sample, NumberFormatInfo.InvariantInfo) | SampleType.Normal,
                 Bank = section.Bank,
                 Volume = section.Volume,
                 File = null
             };
 
-            addition = string.IsNullOrWhiteSpace(addition) ? "0:0" : addition;
             string[] split = addition.Split(':');
-            switch (split.Length)
+            if (split.Length < 2)
+                split = "0:0".Split(':');
+            if (split.Length > 5)
+                Array.Resize(ref split, 5);
+            for (int i = 0; i < split.Length; i++)
             {
-                case 5:
-                    hitSample.File = string.IsNullOrWhiteSpace(split[4]) ? null : split[4];
-                    goto case 4;
-                case 4:
-                    hitSample.Volume = Convert.ToInt32(split[3], NumberFormatInfo.InvariantInfo) == 0 ?
-                        section.Volume :
-                        Convert.ToInt32(split[3], NumberFormatInfo.InvariantInfo);
-                    goto case 3;
-                case 3:
-                    hitSample.Bank = (SampleBank)Convert.ToInt32(split[2], NumberFormatInfo.InvariantInfo) == SampleBank.None ?
-                        section.Bank :
-                        (SampleBank)Convert.ToInt32(split[2], NumberFormatInfo.InvariantInfo);
-                    goto case 2;
-                case 2:
-                    hitSample.Set = (SampleSet)Convert.ToInt32(split[0], NumberFormatInfo.InvariantInfo) == SampleSet.None ?
-                        section.Set :
-                        (SampleSet)Convert.ToInt32(split[0], NumberFormatInfo.InvariantInfo);
-                    hitSample.AdditionSet = (SampleSet)Convert.ToInt32(split[1], NumberFormatInfo.InvariantInfo) == SampleSet.None ?
-                        hitSample.Set :
-                        (SampleSet)Convert.ToInt32(split[1], NumberFormatInfo.InvariantInfo);
-                    break;
-                default:
-                    throw new ArgumentException("Additions must have between 2 and 5 values");
+                int value;
+                int.TryParse(split[i], NumberStyles.None, NumberFormatInfo.InvariantInfo, out value);
+                switch (i)
+                {
+                    case 0:
+                        SampleSet hitSampleSet = (SampleSet)value;
+                        hitSample.Set = hitSampleSet == SampleSet.None ? section.Set : hitSampleSet;
+                        break;
+                    case 1:
+                        SampleSet hitAdditionSet = (SampleSet)value;
+                        hitSample.AdditionSet = hitAdditionSet == SampleSet.None ? hitSample.Set : hitAdditionSet;
+                        break;
+                    case 2:
+                        SampleBank hitSampleBank = (SampleBank)value;
+                        if (hitSampleBank != SampleBank.None)
+                            hitSample.Bank = hitSampleBank;
+                        break;
+                    case 3:
+                        if (value != 0)
+                            hitSample.Volume = value;
+                        break;
+                    case 4:
+                        if (!string.IsNullOrWhiteSpace(split[i]))
+                            hitSample.File = split[i];
+                        break;
+                }
             }
 
             return hitSample;
