@@ -27,6 +27,8 @@ namespace osu.Game.Screens.Menu
     {
         private Container iconText;
         private Container box;
+        private Box boxColourLayer;
+        private Box boxHoverLayer;
         private Color4 colour;
         private TextAwesome icon;
         private string internalName;
@@ -72,16 +74,24 @@ namespace osu.Game.Screens.Menu
                     },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = colour,
                     Scale = new Vector2(0, 1),
                     Size = boxSize,
                     Shear = new Vector2(ButtonSystem.WEDGE_WIDTH / boxSize.Y, 0),
-                    Children = new Drawable[]
+                    Children = new []
                     {
-                        new Box
+                        boxColourLayer = new Box
                         {
                             EdgeSmoothness = new Vector2(1.5f, 0),
                             RelativeSizeAxes = Axes.Both,
+                            Colour = colour,
+                        },
+                        boxHoverLayer = new Box
+                        {
+                            EdgeSmoothness = new Vector2(1.5f, 0),
+                            RelativeSizeAxes = Axes.Both,
+                            BlendingMode = BlendingMode.Additive,
+                            Colour = Color4.White,
+                            Alpha = 0,
                         },
                     }
                 },
@@ -229,13 +239,25 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
+            boxHoverLayer.FadeTo(0.1f, 1000, EasingTypes.OutQuint);
+            return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            boxHoverLayer.FadeTo(0, 1000, EasingTypes.OutQuint);
+            return base.OnMouseUp(state, args);
+        }
+
+        protected override bool OnClick(InputState state)
+        {
             trigger();
             return true;
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            base.OnKeyDown(state, args);
+            if (args.Repeat) return false;
 
             if (triggerKey == args.Key && triggerKey != Key.Unknown)
             {
@@ -250,9 +272,11 @@ namespace osu.Game.Screens.Menu
         {
             sampleClick.Play();
 
-            box.FlashColour(Color4.White, 500, EasingTypes.OutExpo);
-
             clickAction?.Invoke();
+
+            boxHoverLayer.ClearTransformations();
+            boxHoverLayer.Alpha = 0.9f;
+            boxHoverLayer.FadeOut(800, EasingTypes.OutExpo);
         }
 
         public override bool HandleInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
