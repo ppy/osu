@@ -1,0 +1,81 @@
+﻿using OpenTK;
+using OpenTK.Graphics;
+using System.Collections.Generic;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+
+namespace osu.Game.Graphics.UserInterface
+{
+    public class SongProgressGraphColumn : Container
+    {
+        private int rows = 11;
+        private Color4 empty_colour = Color4.White.Opacity(50);
+        private Color4 lit_colour = new Color4(221, 255, 255, 255);
+        private Color4 dimmed_colour = Color4.White.Opacity(175);
+
+        private List<Box> drawableRows = new List<Box>();
+
+        private int filled;
+        public int Filled
+        {
+            get
+            {
+                return filled;
+            }
+            set
+            {
+                if (value == filled) return;
+                filled = value;
+            }
+        }
+
+        private SongProgressGraphColumnState state;
+        public SongProgressGraphColumnState State
+        {
+            get
+            {
+                return state;
+            }
+            set
+            {
+                if (value == state) return;
+                state = value;
+
+                fillActive(value == SongProgressGraphColumnState.Lit ? lit_colour : dimmed_colour);
+            }
+        }
+
+        private void fillActive(Color4 color)
+        {
+            for (int i = 0; i < drawableRows.Count; i++)
+            {
+                drawableRows[i].Colour = i <= Filled ? color : empty_colour;
+            }
+        }
+
+        public SongProgressGraphColumn()
+        {
+            Size = new Vector2(4, rows * 3);
+
+            for (int row = 0; row < rows * 3; row += 3)
+            {
+                drawableRows.Add(new Box
+                {
+                    Size = new Vector2(2),
+                    Position = new Vector2(0, row + 1)
+                });
+
+                Add(drawableRows[drawableRows.Count - 1]);
+            }
+
+            // Reverse drawableRows so when iterating through them they start at the bottom
+            drawableRows.Reverse();
+        }
+    }
+
+    public enum SongProgressGraphColumnState
+    {
+        Lit, Dimmed
+    }
+}

@@ -257,6 +257,7 @@
     <Compile Include="Overlays\Pause\QuitButton.cs" />
     <Compile Include="Graphics\UserInterface\SongProgressBar.cs" />
     <Compile Include="Graphics\UserInterface\SongProgressGraph.cs" />
+    <Compile Include="Graphics\UserInterface\SongProgressGraphColumn.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
