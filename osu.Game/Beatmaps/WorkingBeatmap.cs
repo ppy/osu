@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.IO;
@@ -18,7 +18,7 @@ namespace osu.Game.Beatmaps
         public readonly BeatmapSetInfo BeatmapSetInfo;
         private readonly BeatmapDatabase database;
 
-        private ArchiveReader GetReader() => database?.GetReader(BeatmapSetInfo);
+        private ArchiveReader getReader() => database?.GetReader(BeatmapSetInfo);
 
         private Texture background;
         private object backgroundLock = new object();
@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps
 
                     try
                     {
-                        using (var reader = GetReader())
+                        using (var reader = getReader())
                             background = new TextureStore(new RawTextureLoaderStore(reader), false).Get(BeatmapInfo.Metadata.BackgroundFile);
                     }
                     catch { }
@@ -57,7 +57,7 @@ namespace osu.Game.Beatmaps
 
                     try
                     {
-                        using (var reader = GetReader())
+                        using (var reader = getReader())
                         using (var stream = new StreamReader(reader.GetStream(BeatmapInfo.Path)))
                             beatmap = BeatmapDecoder.GetDecoder(stream)?.Decode(stream);
                     }
@@ -83,7 +83,7 @@ namespace osu.Game.Beatmaps
                     try
                     {
                         //store a reference to the reader as we may continue accessing the stream in the background.
-                        trackReader = GetReader();
+                        trackReader = getReader();
                         var trackData = trackReader?.GetStream(BeatmapInfo.Metadata.AudioFile);
                         if (trackData != null)
                             track = new AudioTrackBass(trackData);

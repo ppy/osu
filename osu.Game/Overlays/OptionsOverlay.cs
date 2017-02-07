@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Diagnostics;
 using System.Linq;
@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        public const float SIDEBAR_WIDTH = Sidebar.default_width;
+        public const float SIDEBAR_WIDTH = Sidebar.DEFAULT_WIDTH;
 
         private const float width = 400;
         

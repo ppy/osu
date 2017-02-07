@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Linq;
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 wedged_container_start_position = new Vector2(0, 50);
         private BeatmapInfoWedge beatmapInfoWedge;
 
-        private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
+        private static readonly Vector2 background_blur = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
 
         private AudioSample sampleChangeDifficulty;
@@ -116,8 +116,8 @@ namespace osu.Game.Screens.Select
         private void load(BeatmapDatabase beatmaps, AudioManager audio, BaseGame game,
             OsuGame osuGame, OsuColour colours)
         {
-            const float carouselWidth = 640;
-            const float bottomToolHeight = 50;
+            const float carousel_width = 640;
+            const float bottom_tool_height = 50;
             beatmapGroups = new List<BeatmapGroup>();
             Children = new Drawable[]
             {
@@ -130,14 +130,14 @@ namespace osu.Game.Screens.Select
                         new WedgeBackground
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = carouselWidth * 0.76f },
+                            Padding = new MarginPadding { Right = carousel_width * 0.76f },
                         },
                     }
                 },
                 carousel = new CarouselContainer
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(carouselWidth, 1),
+                    Size = new Vector2(carousel_width, 1),
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                 },
@@ -299,7 +299,7 @@ namespace osu.Game.Screens.Select
             if (backgroundModeBeatmap != null)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurTo(BACKGROUND_BLUR, 1000);
+                backgroundModeBeatmap.BlurTo(background_blur, 1000);
             }
 
             if (beatmap != null)
