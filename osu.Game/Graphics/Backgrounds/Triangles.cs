@@ -76,6 +76,7 @@ namespace osu.Game.Graphics.Backgrounds
                 Origin = Anchor.TopCentre,
                 RelativePositionAxes = Axes.Both,
                 Scale = new Vector2(scale),
+                EdgeSmoothness = new Vector2(1),
                 // Scaling height by 0.866 results in equiangular triangles (== 60° and equal side length)
                 Colour = GetTriangleShade(),
                 Size = new Vector2(size, 0.866f * size),
