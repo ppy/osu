@@ -13,7 +13,7 @@ namespace osu.Desktop.VisualTests.Tests
         public override string Name => @"Music Controller";
         public override string Description => @"Tests music controller ui.";
 
-        protected MusicController mc;
+        private MusicController mc;
 
         public TestCaseMusicController()
         {

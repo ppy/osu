@@ -56,7 +56,7 @@ namespace osu.Game.Modes.UI
             }
         }
 
-        protected ulong count;
+        private ulong count;
 
         /// <summary>
         /// Actual value of counter.

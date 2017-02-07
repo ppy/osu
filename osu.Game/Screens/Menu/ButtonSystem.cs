@@ -36,9 +36,9 @@ namespace osu.Game.Screens.Menu
         private FlowContainerWithOrigin buttonFlow;
 
         //todo: make these non-internal somehow.
-        internal const float button_area_height = 100;
-        internal const float button_width = 140f;
-        internal const float wedge_width = 20;
+        internal const float BUTTON_AREA_HEIGHT = 100;
+        internal const float BUTTON_WIDTH = 140f;
+        internal const float WEDGE_WIDTH = 20;
 
         public const int EXIT_DELAY = 3000;
 
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(1, button_area_height),
+                    Size = new Vector2(1, BUTTON_AREA_HEIGHT),
                     Alpha = 0,
                     Children = new Drawable[]
                     {
@@ -81,14 +81,14 @@ namespace osu.Game.Screens.Menu
                             Direction = FlowDirection.HorizontalOnly,
                             Anchor = Anchor.Centre,
                             AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(-wedge_width, 0),
+                            Spacing = new Vector2(-WEDGE_WIDTH, 0),
                             Children = new[]
                             {
-                                settingsButton = new Button(@"settings", @"options", FontAwesome.fa_gear, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -wedge_width, Key.O),
-                                backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -wedge_width, Key.Escape),
+                                settingsButton = new Button(@"settings", @"options", FontAwesome.fa_gear, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
+                                backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -WEDGE_WIDTH, Key.Escape),
                                 iconFacade = new Container //need a container to make the osu! icon flow properly.
 								{
-                                    Size = new Vector2(0, button_area_height)
+                                    Size = new Vector2(0, BUTTON_AREA_HEIGHT)
                                 }
                             },
                             CentreTarget = iconFacade
@@ -103,11 +103,11 @@ namespace osu.Game.Screens.Menu
                 }
             };
 
-            buttonsPlay.Add(new Button(@"solo", @"freeplay", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), wedge_width, Key.P));
+            buttonsPlay.Add(new Button(@"solo", @"freeplay", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
             buttonsPlay.Add(new Button(@"multi", @"multiplayer", FontAwesome.fa_users, new Color4(94, 63, 186, 255), () => OnMulti?.Invoke(), 0, Key.M));
             buttonsPlay.Add(new Button(@"chart", @"charts", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
 
-            buttonsTopLevel.Add(new Button(@"play", @"play", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, wedge_width, Key.P));
+            buttonsTopLevel.Add(new Button(@"play", @"play", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, WEDGE_WIDTH, Key.P));
             buttonsTopLevel.Add(new Button(@"osu!editor", @"edit", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
             buttonsTopLevel.Add(new Button(@"osu!direct", @"direct", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
             buttonsTopLevel.Add(new Button(@"exit", @"exit", FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), onExit, 0, Key.Q));
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Menu
             base.LoadComplete();
 
             // osuLogo.SizeForFlow relies on loading to be complete.
-            buttonFlow.Position = new Vector2(wedge_width * 2 - (button_width + osuLogo.SizeForFlow / 4), 0);
+            buttonFlow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + osuLogo.SizeForFlow / 4), 0);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
