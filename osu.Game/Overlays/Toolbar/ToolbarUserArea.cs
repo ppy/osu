@@ -17,11 +17,10 @@ namespace osu.Game.Overlays.Toolbar
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
-        public override Vector2 Size => button.Size;
-
         public ToolbarUserArea()
         {
             RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
 
             Children = new Drawable[] {
                 button = new ToolbarUserButton
@@ -30,6 +29,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 loginOverlay = new LoginOverlay
                 {
+                    BypassAutoSizeAxes = Axes.Both,
                     Position = new Vector2(0, 1),
                     RelativePositionAxes = Axes.Y,
                     Anchor = Anchor.TopRight,

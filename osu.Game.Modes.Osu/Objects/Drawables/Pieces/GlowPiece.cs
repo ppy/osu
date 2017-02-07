@@ -33,7 +33,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            layer.Texture = textures.Get(@"Play/osu/ring-glow@2x");
+            layer.Texture = textures.Get(@"Play/osu/ring-glow");
         }
     }
 }

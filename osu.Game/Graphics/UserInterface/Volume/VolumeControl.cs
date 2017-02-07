@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         public void Adjust(InputState state)
         {
-            if (!IsVisible)
+            if (State == Visibility.Hidden)
             {
                 Show();
                 return;

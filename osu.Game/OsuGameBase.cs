@@ -45,7 +45,7 @@ namespace osu.Game
             Dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 0.01f }, true);
+            Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 }, true);
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));

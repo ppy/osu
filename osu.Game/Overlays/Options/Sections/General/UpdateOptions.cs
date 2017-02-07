@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Options.Sections.General
         {
             Children = new Drawable[]
             {
-                new OptionDropdown<ReleaseStream>
+                new OptionDropDown<ReleaseStream>
                 {
                     LabelText = "Release stream",
                     Bindable = config.GetBindable<ReleaseStream>(OsuConfig.ReleaseStream),
