@@ -32,7 +32,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            number.Texture = textures.Get(@"Play/osu/number@2x");
+            number.Texture = textures.Get(@"Play/osu/number");
         }
     }
 }

@@ -32,7 +32,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            approachCircle.Texture = textures.Get(@"Play/osu/approachcircle@2x");
+            approachCircle.Texture = textures.Get(@"Play/osu/approachcircle");
         }
     }
 }
