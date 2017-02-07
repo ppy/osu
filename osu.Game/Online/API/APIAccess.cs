@@ -133,16 +133,16 @@ namespace osu.Game.Online.API
                         var userReq = new GetUserRequest();
                         userReq.Success += (u) => {
                             LocalUser.Value = u;
+                            //we're connected!
+                            State = APIState.Online;
+                            failureCount = 0;
                         };
+
                         if (!handleRequest(userReq))
                         {
                             State = APIState.Failing;
                             continue;
                         }
-
-                        //we're connected!
-                        State = APIState.Online;
-                        failureCount = 0;
                         break;
                 }
 
