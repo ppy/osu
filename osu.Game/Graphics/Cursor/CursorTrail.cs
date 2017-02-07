@@ -74,6 +74,7 @@ namespace osu.Game.Graphics.Cursor
         {
             shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.Texture);
             texture = textures.Get(@"Cursor/cursortrail");
+            Scale = new Vector2(1 / texture.ScaleAdjust);
         }
 
         protected override void Update()

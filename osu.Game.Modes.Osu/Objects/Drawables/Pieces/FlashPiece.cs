@@ -12,7 +12,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
     {
         public FlashPiece()
         {
-            Size = new Vector2(144);
+            Size = new Vector2(128);
 
             Masking = true;
             CornerRadius = Size.X / 2;

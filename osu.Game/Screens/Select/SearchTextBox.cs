@@ -17,8 +17,19 @@ namespace osu.Game.Screens.Select
         protected override Color4 BackgroundUnfocused => new Color4(10, 10, 10, 255);
         protected override Color4 BackgroundFocused => new Color4(10, 10, 10, 255);
         public Action Exit;
-        public bool GrabFocus = false;
-        
+
+        private bool focus;
+        public bool HoldFocus
+        {
+            get { return focus; }
+            set
+            {
+                focus = value;
+                if (!focus)
+                    TriggerFocusLost();
+            }
+        }
+
         private SpriteText placeholder;
 
         protected override string InternalText
@@ -36,7 +47,7 @@ namespace osu.Game.Screens.Select
                 }
             }
         }
-    
+
         public SearchTextBox()
         {
             Height = 35;
@@ -61,21 +72,20 @@ namespace osu.Game.Screens.Select
                 }
             });
         }
-        
+
         protected override void Update()
         {
-            if (GrabFocus && !HasFocus && IsVisible)
-                TriggerFocus();
+            if (HoldFocus) RequestFocus();
             base.Update();
         }
-        
+
         protected override void OnFocusLost(InputState state)
         {
             if (state.Keyboard.Keys.Any(key => key == Key.Escape))
                 Exit?.Invoke();
             base.OnFocusLost(state);
         }
-        
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Key == Key.Left || args.Key == Key.Right || args.Key == Key.Enter)

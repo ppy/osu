@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Graphics;
+using System;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -34,7 +35,14 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
-        private int aimTriangleCount => (int)((DrawWidth * DrawHeight) / 800 / triangleScale);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            for (int i = 0; i < aimTriangleCount; i++)
+                addTriangle(true);
+        }
+
+        private int aimTriangleCount => (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale));
 
         protected override void Update()
         {
@@ -42,20 +50,25 @@ namespace osu.Game.Graphics.Backgrounds
 
             foreach (Drawable d in Children)
             {
-                d.Position -= new Vector2(0, (float)(d.Scale.X * (50 / DrawHeight) * (Time.Elapsed / 880)) / triangleScale);
+                d.Position -= new Vector2(0, (float)(d.Scale.X * (50 / DrawHeight) * (Time.Elapsed / 950)) / triangleScale);
                 if (d.DrawPosition.Y + d.DrawSize.Y * d.Scale.Y < 0)
                     d.Expire();
             }
 
-            bool useRandomX = Children.Count() < aimTriangleCount / 2;
             while (Children.Count() < aimTriangleCount)
-                addTriangle(useRandomX);
-
+                addTriangle(false);
         }
 
         protected virtual Triangle CreateTriangle()
         {
-            var scale = triangleScale * RNG.NextSingle() * 0.4f + 0.2f;
+            float stdDev = 0.16f;
+            float mean = 0.5f;
+
+            float u1 = 1 - RNG.NextSingle(); //uniform(0,1] random floats
+            float u2 = 1 - RNG.NextSingle();
+            float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); //random normal(0,1)
+            var scale = Math.Max(triangleScale * (mean + stdDev * randStdNormal), 0.1f); //random normal(mean,stdDev^2)
+
             const float size = 100;
 
             return new Triangle
@@ -72,10 +85,11 @@ namespace osu.Game.Graphics.Backgrounds
 
         protected virtual Color4 GetTriangleShade() => Interpolation.ValueAt(RNG.NextSingle(), ColourDark, ColourLight, 0, 1);
 
-        private void addTriangle(bool randomX)
+        private void addTriangle(bool randomY)
         {
             var sprite = CreateTriangle();
-            sprite.Position = new Vector2(RNG.NextSingle(), randomX ? RNG.NextSingle() : 1);
+            var triangleHeight = sprite.DrawHeight / DrawHeight;
+            sprite.Position = new Vector2(RNG.NextSingle(), randomY ? (RNG.NextSingle() * (1 + triangleHeight) - triangleHeight) : 1);
             Add(sprite);
         }
     }

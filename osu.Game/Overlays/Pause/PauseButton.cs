@@ -1,4 +1,7 @@
-﻿using OpenTK;
+﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
@@ -61,7 +64,7 @@ namespace osu.Game.Overlays.Pause
 
         public override bool Contains(Vector2 screenSpacePos) => backgroundContainer.Contains(screenSpacePos);
 
-        protected override bool OnMouseDown(Framework.Input.InputState state, MouseDownEventArgs args)
+        protected override bool OnClick(Framework.Input.InputState state)
         {
             didClick = true;
             colourContainer.ResizeTo(new Vector2(1.5f, 1f), clickDuration, EasingTypes.In);
@@ -78,8 +81,6 @@ namespace osu.Game.Overlays.Pause
 
             return true;
         }
-
-        protected override bool OnClick(Framework.Input.InputState state) => false;
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
@@ -187,6 +188,7 @@ namespace osu.Game.Overlays.Pause
                             Anchor = Anchor.Centre,
                             Width = 0.8f,
                             Masking = true,
+                            MaskingSmoothness = 2,
                             EdgeEffect = new EdgeEffect
                             {
                                 Type = EdgeEffectType.Shadow,
@@ -202,14 +204,22 @@ namespace osu.Game.Overlays.Pause
                                     EdgeSmoothness = new Vector2(2, 0),
                                     RelativeSizeAxes = Axes.Both
                                 },
-                                new Triangles
+                                new Container
                                 {
-                                    BlendingMode = BlendingMode.Additive,
                                     RelativeSizeAxes = Axes.Both,
-                                    TriangleScale = 4,
-                                    Alpha = 0.05f,
-                                    Shear = new Vector2(-0.2f, 0)
-                                }
+                                    Masking = true,
+                                    MaskingSmoothness = 0,
+                                    Children = new[]
+                                    {
+                                        new Triangles
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            TriangleScale = 4,
+                                            ColourDark = OsuColour.Gray(0.88f),
+                                            Shear = new Vector2(-0.2f, 0)
+                                        }
+                                    }
+                                },
                             }
                         }
                     }

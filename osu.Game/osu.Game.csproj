@@ -68,6 +68,8 @@
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
+    <Compile Include="Graphics\UserInterface\Nub.cs" />
+    <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
@@ -98,6 +100,9 @@
     <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
+    <Compile Include="Graphics\UserInterface\OsuDropDownHeader.cs" />
+    <Compile Include="Graphics\UserInterface\OsuDropDownMenu.cs" />
+    <Compile Include="Graphics\UserInterface\OsuDropDownMenuItem.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarHomeButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarMusicButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarSettingsButton.cs" />
@@ -234,7 +239,7 @@
     <Compile Include="Overlays\Options\OptionTextBox.cs" />
     <Compile Include="Overlays\Options\OptionSlider.cs" />
     <Compile Include="Configuration\ProgressBarType.cs" />
-    <Compile Include="Overlays\Options\OptionDropdown.cs" />
+    <Compile Include="Overlays\Options\OptionDropDown.cs" />
     <Compile Include="Configuration\RankingType.cs" />
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ReleaseStream.cs" />

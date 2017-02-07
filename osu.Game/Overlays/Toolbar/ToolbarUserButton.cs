@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Toolbar
             {
                 this.game = game;
 
-                guestTexture = textures.Get(@"Online/avatar-guest@2x");
+                guestTexture = textures.Get(@"Online/avatar-guest");
             }
 
             public int UserId

@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Toolbar
                 tooltipContainer = new FlowContainer
                 {
                     Direction = FlowDirection.VerticalOnly,
-                    AutoSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both, //stops us being considered in parent's autosize
                     Anchor = Anchor.BottomLeft,
                     Position = new Vector2(5, 5),
                     Alpha = 0,
@@ -130,14 +130,6 @@ namespace osu.Game.Overlays.Toolbar
         private void load(AudioManager audio)
         {
             sampleClick = audio.Sample.Get(@"Menu/menuclick");
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            //todo: find a way to avoid using this (autosize needs to be able to ignore certain drawables.. in this case the tooltip)
-            Size = new Vector2(Flow.DrawSize.X, 1);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
@@ -170,6 +162,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             RelativeSizeAxes = Axes.Both;
             Masking = true;
+            MaskingSmoothness = 0;
             EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Shadow,
@@ -187,7 +180,8 @@ namespace osu.Game.Overlays.Toolbar
                 new Triangles
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.05f,
+                    ColourLight = OsuColour.Gray(40),
+                    ColourDark = OsuColour.Gray(20),
                 },
             };
         }

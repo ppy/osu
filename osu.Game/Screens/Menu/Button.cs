@@ -62,6 +62,7 @@ namespace osu.Game.Screens.Menu
                 box = new Container
                 {
                     Masking = true,
+                    MaskingSmoothness = 2,
                     EdgeEffect = new EdgeEffect
                     {
                         Type = EdgeEffectType.Shadow,
@@ -75,12 +76,11 @@ namespace osu.Game.Screens.Menu
                     Scale = new Vector2(0, 1),
                     Size = boxSize,
                     Shear = new Vector2(ButtonSystem.wedge_width / boxSize.Y, 0),
-
                     Children = new Drawable[]
                     {
                         new Box
                         {
-                            EdgeSmoothness = new Vector2(2, 0),
+                            EdgeSmoothness = new Vector2(1.5f, 0),
                             RelativeSizeAxes = Axes.Both,
                         },
                     }
