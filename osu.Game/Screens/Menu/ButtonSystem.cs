@@ -132,6 +132,8 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (args.Repeat) return false;
+
             switch (args.Key)
             {
                 case Key.Space:
@@ -288,7 +290,7 @@ namespace osu.Game.Screens.Menu
             //if (OsuGame.IdleTime > 6000 && State != MenuState.Exit)
             //    State = MenuState.Initial;
 
-            osuLogo.Interactive = Alpha >= 0.8f;
+            osuLogo.Interactive = Alpha > 0.2f;
 
             iconFacade.Width = osuLogo.SizeForFlow * 0.5f;
             base.Update();
