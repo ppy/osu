@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Menu
             AutoSizeAxes = Axes.Both;
             Alpha = 0;
 
-            Vector2 boxSize = new Vector2(ButtonSystem.button_width + Math.Abs(extraWidth), ButtonSystem.button_area_height);
+            Vector2 boxSize = new Vector2(ButtonSystem.BUTTON_WIDTH + Math.Abs(extraWidth), ButtonSystem.BUTTON_AREA_HEIGHT);
 
             Children = new Drawable[]
             {
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Menu
                     Colour = colour,
                     Scale = new Vector2(0, 1),
                     Size = boxSize,
-                    Shear = new Vector2(ButtonSystem.wedge_width / boxSize.Y, 0),
+                    Shear = new Vector2(ButtonSystem.WEDGE_WIDTH / boxSize.Y, 0),
                     Children = new Drawable[]
                     {
                         new Box

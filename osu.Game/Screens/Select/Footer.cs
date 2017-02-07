@@ -54,10 +54,10 @@ namespace osu.Game.Screens.Select
 
         public Footer()
         {
-            const float bottomToolHeight = 50;
+            const float bottom_tool_height = 50;
 
             RelativeSizeAxes = Axes.X;
-            Height = bottomToolHeight;
+            Height = bottom_tool_height;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]

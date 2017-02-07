@@ -16,10 +16,10 @@ namespace osu.Game.Overlays.Pause
 {
     public class PauseButton : ClickableContainer
     {
-        private const float hoverWidth = 0.9f;
-        private const float hoverDuration = 500;
-        private const float glowFadeDuration = 250;
-        private const float clickDuration = 200;
+        private const float hover_width = 0.9f;
+        private const float hover_duration = 500;
+        private const float glow_fade_duration = 250;
+        private const float click_duration = 200;
 
         private Color4 backgroundColour = OsuColour.Gray(34);
 
@@ -67,12 +67,12 @@ namespace osu.Game.Overlays.Pause
         protected override bool OnClick(Framework.Input.InputState state)
         {
             didClick = true;
-            colourContainer.ResizeTo(new Vector2(1.5f, 1f), clickDuration, EasingTypes.In);
+            colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, EasingTypes.In);
             flash();
             SampleClick?.Play();
             Action?.Invoke();
 
-            Delay(clickDuration);
+            Delay(click_duration);
             Schedule(delegate {
                 colourContainer.ResizeTo(new Vector2(0.8f, 1f), 0, EasingTypes.None);
                 spriteText.Spacing = Vector2.Zero;
@@ -84,9 +84,9 @@ namespace osu.Game.Overlays.Pause
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            colourContainer.ResizeTo(new Vector2(hoverWidth, 1f), hoverDuration, EasingTypes.OutElastic);
-            spriteText.TransformSpacingTo(new Vector2(3f, 0f), hoverDuration, EasingTypes.OutElastic);
-            glowContainer.FadeIn(glowFadeDuration, EasingTypes.Out);
+            colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, EasingTypes.OutElastic);
+            spriteText.TransformSpacingTo(new Vector2(3f, 0f), hover_duration, EasingTypes.OutElastic);
+            glowContainer.FadeIn(glow_fade_duration, EasingTypes.Out);
             SampleHover?.Play();
             return true;
         }
@@ -95,9 +95,9 @@ namespace osu.Game.Overlays.Pause
         {
             if (!didClick)
             {
-                colourContainer.ResizeTo(new Vector2(0.8f, 1f), hoverDuration, EasingTypes.OutElastic);
-                spriteText.TransformSpacingTo(Vector2.Zero, hoverDuration, EasingTypes.OutElastic);
-                glowContainer.FadeOut(glowFadeDuration, EasingTypes.Out);
+                colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, EasingTypes.OutElastic);
+                spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, EasingTypes.OutElastic);
+                glowContainer.FadeOut(glow_fade_duration, EasingTypes.Out);
             }
 
             didClick = false;
@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Pause
             flash.Colour = ButtonColour;
             flash.BlendingMode = BlendingMode.Additive;
             flash.Alpha = 0.3f;
-            flash.FadeOutFromOne(clickDuration);
+            flash.FadeOutFromOne(click_duration);
             flash.Expire();
         }
 
