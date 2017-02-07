@@ -159,7 +159,11 @@ namespace osu.Game.Overlays
             }
         }
 
+        protected override bool OnHover(InputState state) => true;
+
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+
+        protected override bool OnClick(InputState state) => true;
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
