@@ -5,6 +5,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Framework.Graphics.Primitives;
+using OpenTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -119,6 +120,7 @@ namespace osu.Game.Graphics.UserInterface
                             Anchor = Anchor.BottomRight,
                             Width = 2,
                             Height = bar_height + graph_height,
+                            Position = new Vector2(2, 0),
                             Children = new Drawable[]
                             {
                                 new Box
