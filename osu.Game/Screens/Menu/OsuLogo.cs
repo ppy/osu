@@ -4,6 +4,8 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -31,6 +33,8 @@ namespace osu.Game.Screens.Menu
         private Container logoBounceContainer;
         private Container logoHoverContainer;
         private MenuVisualisation vis;
+
+        private AudioSample sampleClick;
 
         private Container colourAndTriangles;
 
@@ -166,8 +170,9 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(TextureStore textures, AudioManager audio)
         {
+            sampleClick = audio.Sample.Get(@"Menu/menuhit");
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
         }
@@ -199,6 +204,8 @@ namespace osu.Game.Screens.Menu
         protected override bool OnClick(InputState state)
         {
             if (!Interactive) return false;
+
+            sampleClick.Play();
 
             flashLayer.ClearTransformations();
             flashLayer.Alpha = 0.4f;
