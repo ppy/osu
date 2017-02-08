@@ -4,17 +4,18 @@
 using OpenTK;
 using OpenTK.Graphics;
 using System.Collections.Generic;
+using osu.Game.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.Screens.Play
 {
     public class SongProgressGraphColumn : Container
     {
         private int rows = 11;
         private Color4 empty_colour = Color4.White.Opacity(50);
-        private Color4 lit_colour = new Color4(221, 255, 255, 255);
+        private Color4 lit_colour = SongProgress.FILL_COLOUR;
         private Color4 dimmed_colour = Color4.White.Opacity(175);
 
         private List<Box> drawableRows = new List<Box>();
