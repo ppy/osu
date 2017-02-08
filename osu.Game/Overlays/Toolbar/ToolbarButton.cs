@@ -21,6 +21,8 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarButton : Container
     {
+        public const float WIDTH = Toolbar.HEIGHT * 1.4f;
+
         public FontAwesome Icon
         {
             get { return DrawableIcon.Icon; }
@@ -66,6 +68,9 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarButton()
         {
+            Width = WIDTH;
+            RelativeSizeAxes = Axes.Y;
+
             Children = new Drawable[]
             {
                 HoverBackground = new Box
@@ -80,7 +85,7 @@ namespace osu.Game.Overlays.Toolbar
                     Direction = FlowDirection.HorizontalOnly,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding { Left = 20, Right = 20 },
+                    Padding = new MarginPadding { Left = Toolbar.HEIGHT / 2, Right = Toolbar.HEIGHT / 2 },
                     Spacing = new Vector2(5),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
@@ -121,9 +126,6 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 }
             };
-
-            RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
