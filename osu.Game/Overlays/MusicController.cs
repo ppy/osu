@@ -33,6 +33,7 @@ namespace osu.Game.Overlays
         private DragBar progress;
         private TextAwesome playButton, listButton;
         private SpriteText title, artist;
+        private RollingContainer titleContainer, artistContainer;
 
         private List<BeatmapSetInfo> playList;
         private List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
@@ -96,8 +97,9 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new RollingContainer
+                        titleContainer = new RollingContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.TopCentre,
                             Position = new Vector2(0, 40),
@@ -114,8 +116,9 @@ namespace osu.Game.Overlays
                                 }
                             }
                         },
-                        new RollingContainer
+                        artistContainer = new RollingContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Position = new Vector2(0, 45),
@@ -373,8 +376,6 @@ namespace osu.Game.Overlays
                 backgroundSprite.Expire();
                 backgroundSprite = newBackground;
             });
-
-            title.MoveToX(0);
         }
 
         private Func<string, string, string> unicodeString;
