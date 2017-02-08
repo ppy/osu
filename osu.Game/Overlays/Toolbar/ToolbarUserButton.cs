@@ -20,6 +20,8 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarUserButton()
         {
+            AutoSizeAxes = Axes.X;
+
             DrawableText.Font = @"Exo2.0-MediumItalic";
 
             Add(new OpaqueBackground { Depth = 1 });

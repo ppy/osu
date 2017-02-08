@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class Toolbar : OverlayContainer
     {
-        public const float HEIGHT = 50;
+        public const float HEIGHT = 40;
 
         public Action OnHome;
         public Action<PlayMode> OnPlayModeChange;
