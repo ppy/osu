@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.Screens.Play
 {
     public class SongProgressGraph : BufferedContainer
     {
@@ -16,9 +16,10 @@ namespace osu.Game.Graphics.UserInterface
         private float lastDrawWidth;
 
         public override bool HandleInput => false;
+        public int ColumnCount => columns.Count;
 
-        private float progress;
-        public float Progress
+        private int progress;
+        public int Progress
         {
             get
             {
@@ -37,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             for (int i = 0; i < columns.Count; i++)
             {
-                columns[i].State = i <= (columns.Count * progress) ? ColumnState.Lit : ColumnState.Dimmed;
+                columns[i].State = i <= progress ? ColumnState.Lit : ColumnState.Dimmed;
             }
 
             ForceRedraw();
@@ -48,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
             RemoveAll(delegate { return true; }, true);
             columns.RemoveAll(delegate { return true; });
 
-            // Random filled values used for testing
+            // Random filled values used for testing for now
             var random = new Random();
             for (int column = 0; column < DrawWidth; column += 3)
             {
@@ -70,7 +71,7 @@ namespace osu.Game.Graphics.UserInterface
             base.Update();
 
             if (DrawWidth == lastDrawWidth) return;
-            recreateGraph();
+            //recreateGraph();
             lastDrawWidth = DrawWidth;
         }
 

@@ -3,7 +3,7 @@
 
 using System;
 using OpenTK.Graphics;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Play;
 using osu.Framework.Graphics;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics.Sprites;
@@ -12,11 +12,11 @@ using osu.Framework.Graphics.Colour;
 
 namespace osu.Desktop.VisualTests
 {
-    public class TestCaseSongProgressBar : TestCase
+    public class TestCaseSongProgress : TestCase
     {
-        public override string Name => @"SongProgressBar";
+        public override string Name => @"Song Progress";
 
-        public override string Description => @"Tests the song progress bar";
+        public override string Description => @"With real data";
 
         public override void Reset()
         {
@@ -27,7 +27,7 @@ namespace osu.Desktop.VisualTests
                 ColourInfo = ColourInfo.GradientVertical(Color4.WhiteSmoke, Color4.Gray),
                 RelativeSizeAxes = Framework.Graphics.Axes.Both,
             });
-            Add(new SongProgressBar
+            Add(new SongProgress
             {
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
