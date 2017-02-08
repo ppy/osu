@@ -26,16 +26,16 @@ namespace osu.Game.Overlays.Options
                 }
             }
         }
-        
-        protected override string InternalText
+
+        public OptionTextBox()
         {
-            get { return base.InternalText; }
-            set
-            {
-                base.InternalText = value;
-                if (bindable != null)
-                    bindable.Value = value;
-            }
+            OnChange += onChange;
+        }
+
+        private void onChange(TextBox sender, bool newText)
+        {
+            if (bindable != null)
+                bindable.Value = Text;
         }
 
         private void bindableValueChanged(object sender, EventArgs e)

@@ -3,19 +3,20 @@
 
 using System;
 using System.Linq;
-using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
 {
-    public class SearchTextBox : TextBox
+    /// <summary>
+    /// A textbox which holds focus eagerly.
+    /// </summary>
+    public class SearchTextBox : OsuTextBox
     {
         protected override Color4 BackgroundUnfocused => new Color4(10, 10, 10, 255);
         protected override Color4 BackgroundFocused => new Color4(10, 10, 10, 255);
@@ -33,39 +34,13 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private SpriteText placeholder;
-
-        protected override string InternalText
-        {
-            get { return base.InternalText; }
-            set
-            {
-                base.InternalText = value;
-                if (placeholder != null)
-                {
-                    if (string.IsNullOrEmpty(value))
-                        placeholder.Text = "type to search";
-                    else
-                        placeholder.Text = string.Empty;
-                }
-            }
-        }
+        public override bool RequestingFocus => HoldFocus;
 
         public SearchTextBox()
         {
             Height = 35;
-            TextContainer.Padding = new MarginPadding(5);
             Add(new Drawable[]
             {
-                placeholder = new SpriteText
-                {
-                    Font = @"Exo2.0-MediumItalic",
-                    Text = "type to search",
-                    Colour = new Color4(180, 180, 180, 255),
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Margin = new MarginPadding { Left = 10 },
-                },
                 new TextAwesome
                 {
                     Icon = FontAwesome.fa_search,
@@ -74,25 +49,44 @@ namespace osu.Game.Screens.Select
                     Margin = new MarginPadding { Right = 10 },
                 }
             });
+
+            PlaceholderText = "type to search";
         }
 
-        protected override void Update()
+        protected override bool OnFocus(InputState state)
         {
-            if (HoldFocus) RequestFocus();
-            base.Update();
+            var result = base.OnFocus(state);
+            BorderThickness = 0;
+            return result;
         }
 
         protected override void OnFocusLost(InputState state)
         {
             if (state.Keyboard.Keys.Any(key => key == Key.Escape))
-                Exit?.Invoke();
+            {
+                if (Text.Length > 0)
+                    Text = string.Empty;
+                else
+                    Exit?.Invoke();
+            }
             base.OnFocusLost(state);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Key == Key.Left || args.Key == Key.Right || args.Key == Key.Enter)
-                return false;
+            if (!state.Keyboard.ControlPressed && !state.Keyboard.ShiftPressed)
+            {
+                switch (args.Key)
+                {
+                    case Key.Left:
+                    case Key.Right:
+                    case Key.Up:
+                    case Key.Down:
+                    case Key.Enter:
+                        return false;
+                }
+            }
+
             return base.OnKeyDown(state, args);
         }
     }
