@@ -24,8 +24,6 @@ namespace osu.Game.Screens
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        protected float ToolbarPadding => ShowOverlays ? (Game as OsuGame)?.Toolbar.DrawHeight ?? 0 : 0;
-
         private bool boundToBeatmap;
         private Bindable<WorkingBeatmap> beatmap;
 
