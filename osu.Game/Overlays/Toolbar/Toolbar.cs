@@ -22,8 +22,9 @@ namespace osu.Game.Overlays.Toolbar
         public Action<PlayMode> OnPlayModeChange;
 
         private ToolbarModeSelector modeSelector;
+        private ToolbarUserArea userArea;
 
-        private const int transition_time = 300;
+        private const int transition_time = 500;
 
         private const float alpha_hovering = 0.8f;
         private const float alpha_normal = 0.6f;
@@ -67,7 +68,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Icon = FontAwesome.fa_search
                         },
-                        new ToolbarUserArea(),
+                        userArea = new ToolbarUserArea(),
                         new ToolbarButton
                         {
                             Icon = FontAwesome.fa_bars
@@ -132,6 +133,8 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void PopOut()
         {
+            userArea?.LoginOverlay.Hide();
+
             MoveToY(-DrawSize.Y, transition_time, EasingTypes.OutQuint);
             FadeOut(transition_time);
         }
