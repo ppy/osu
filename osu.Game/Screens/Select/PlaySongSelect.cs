@@ -11,15 +11,12 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Game.Screens.Play;
 using osu.Framework;
 using osu.Framework.Audio.Sample;
@@ -45,7 +42,6 @@ namespace osu.Game.Screens.Select
         private TrackManager trackManager;
 
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
-        private static readonly Vector2 wedged_container_start_position = new Vector2(0, 50);
         private BeatmapInfoWedge beatmapInfoWedge;
 
         private static readonly Vector2 background_blur = new Vector2(20);
@@ -57,34 +53,6 @@ namespace osu.Game.Screens.Select
         private List<BeatmapGroup> beatmapGroups;
 
         private Footer footer;
-
-        class WedgeBackground : Container
-        {
-            public WedgeBackground()
-            {
-                Children = new[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(1, 0.5f),
-                        Colour = Color4.Black.Opacity(0.5f),
-                        Shear = new Vector2(0.15f, 0),
-                        EdgeSmoothness = new Vector2(2, 0),
-                    },
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        RelativePositionAxes = Axes.Y,
-                        Size = new Vector2(1, -0.5f),
-                        Position = new Vector2(0, 1),
-                        Colour = Color4.Black.Opacity(0.5f),
-                        Shear = new Vector2(-0.15f, 0),
-                        EdgeSmoothness = new Vector2(2, 0),
-                    },
-                };
-            }
-        }
 
         Player player;
         FilterControl filter;
@@ -117,12 +85,12 @@ namespace osu.Game.Screens.Select
             OsuGame osuGame, OsuColour colours)
         {
             const float carousel_width = 640;
-            const float bottom_tool_height = 50;
             beatmapGroups = new List<BeatmapGroup>();
             Children = new Drawable[]
             {
                 new ParallaxContainer
                 {
+                    Masking = true,
                     ParallaxAmount = 0.005f,
                     RelativeSizeAxes = Axes.Both,
                     Children = new []
@@ -143,7 +111,6 @@ namespace osu.Game.Screens.Select
                 },
                 filter = new FilterControl
                 {
-                    Position = wedged_container_start_position,
                     RelativeSizeAxes = Axes.X,
                     FilterChanged = filterChanged,
                     Exit = Exit,
@@ -151,7 +118,6 @@ namespace osu.Game.Screens.Select
                 beatmapInfoWedge = new BeatmapInfoWedge
                 {
                     Alpha = 0,
-                    Position = wedged_container_start_position,
                     Size = wedged_container_size,
                     RelativeSizeAxes = Axes.X,
                     Margin = new MarginPadding { Top = 20, Right = 20, },
@@ -236,8 +202,8 @@ namespace osu.Game.Screens.Select
 
             Content.FadeInFromZero(250);
 
-            beatmapInfoWedge.MoveToX(wedged_container_start_position.X - 50);
-            beatmapInfoWedge.MoveToX(wedged_container_start_position.X, 800, EasingTypes.OutQuint);
+            beatmapInfoWedge.MoveToX(-50);
+            beatmapInfoWedge.MoveToX(0, 800, EasingTypes.OutQuint);
             
             filter.Activate();
         }
@@ -269,7 +235,7 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnExiting(GameMode next)
         {
-            beatmapInfoWedge.MoveTo(wedged_container_start_position + new Vector2(-100, 50), 800, EasingTypes.InQuint);
+            beatmapInfoWedge.MoveToX(-100, 800, EasingTypes.InQuint);
             beatmapInfoWedge.RotateTo(10, 800, EasingTypes.InQuint);
 
             Content.FadeOut(100);
