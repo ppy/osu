@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    class LoginOverlay : OverlayContainer
+    class LoginOverlay : FocusedOverlayContainer
     {
         private LoginOptions optionsSection;
 
@@ -64,6 +64,8 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
+            base.PopIn();
+
             optionsSection.Bounding = true;
             FadeIn(transition_time, EasingTypes.OutQuint);
         }
