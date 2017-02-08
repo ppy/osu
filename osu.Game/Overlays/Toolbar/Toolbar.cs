@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private ToolbarModeSelector modeSelector;
 
-        private const int transition_time = 250;
+        private const int transition_time = 300;
 
         private const float alpha_hovering = 0.8f;
         private const float alpha_normal = 0.6f;
@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Toolbar
         protected override void PopIn()
         {
             MoveToY(0, transition_time, EasingTypes.OutQuint);
-            FadeIn(transition_time, EasingTypes.OutQuint);
+            FadeIn(transition_time / 2, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
