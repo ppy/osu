@@ -168,6 +168,9 @@ namespace osu.Game
             {
                 switch (args.Key)
                 {
+                    case Key.T:
+                        Toolbar.ToggleVisibility();
+                        return true;
                     case Key.O:
                         options.ToggleVisibility();
                         return true;
