@@ -23,6 +23,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game
 {
@@ -224,6 +225,14 @@ namespace osu.Game
             }
 
             return base.OnExiting();
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (modeStack.ChildGameMode != null)
+                modeStack.ChildGameMode.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
         }
 
         private void modeAdded(GameMode newMode)

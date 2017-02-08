@@ -8,12 +8,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Modes;
-using osu.Game.Online.API;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -135,8 +132,8 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void PopOut()
         {
-            MoveToY(-DrawSize.Y, transition_time, EasingTypes.InQuint);
-            FadeOut(transition_time, EasingTypes.InQuint);
+            MoveToY(-DrawSize.Y, transition_time, EasingTypes.OutQuint);
+            FadeOut(transition_time);
         }
 
         class PassThroughFlowContainer : FlowContainer
