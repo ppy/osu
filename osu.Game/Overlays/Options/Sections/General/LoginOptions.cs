@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Options.Sections.General
     {
         private bool bounding = true;
 
-        protected override string Header => "Sign In";
+        protected override string Header => "Account";
 
         public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
 
@@ -112,11 +112,13 @@ namespace osu.Game.Overlays.Options.Sections.General
                 {
                     username = new OsuTextBox
                     {
+                        PlaceholderText = "Username",
                         RelativeSizeAxes = Axes.X,
                         Text = api?.Username ?? string.Empty
                     },
                     password = new OsuPasswordTextBox
                     {
+                        PlaceholderText = "Password",
                         RelativeSizeAxes = Axes.X
                     },
                     saveUsername = new OsuCheckbox
