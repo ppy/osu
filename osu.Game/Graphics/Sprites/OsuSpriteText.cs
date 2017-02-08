@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.Sprites
             TextSize = FONT_SIZE;
         }
 
-        protected override Drawable GetUndrawableCharacter()
+        protected override Drawable CreateFallbackCharacterDrawable()
         {
             var tex = GetTextureForCharacter('?');
 
@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.Sprites
                 };
             }
 
-            return base.GetUndrawableCharacter();
+            return base.CreateFallbackCharacterDrawable();
         }
     }
 }
