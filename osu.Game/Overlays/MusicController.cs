@@ -237,6 +237,18 @@ namespace osu.Game.Overlays
 
                 if (current.Track.HasCompleted && !current.Track.Looping) next();
             }
+
+            if (title.Size.X > Size.X)
+            {
+                title.MoveToOffset(new Vector2(-0.2f, 0));
+
+                if (title.Position.X < -(title.Size.X / 2 + Size.X / 2))
+                {
+                    title.Hide();
+                    title.MoveToX(title.Size.X / 2 + Size.X / 2);
+                    title.Show();
+                }
+            }
         }
 
         void preferUnicode_changed(object sender, EventArgs e)
@@ -357,6 +369,8 @@ namespace osu.Game.Overlays
                 backgroundSprite.Expire();
                 backgroundSprite = newBackground;
             });
+
+            title.MoveToX(0);
         }
 
         private Func<string, string, string> unicodeString;
