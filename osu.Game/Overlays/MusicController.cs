@@ -96,25 +96,41 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        title = new OsuSpriteText
+                        new RollingContainer
                         {
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.TopCentre,
                             Position = new Vector2(0, 40),
-                            TextSize = 25,
-                            Colour = Color4.White,
-                            Text = @"Nothing to play",
-                            Font = @"Exo2.0-MediumItalic"
+                            Children = new Drawable[]
+                            {
+                                title = new OsuSpriteText
+                                {
+                                    Origin = Anchor.BottomCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    TextSize = 25,
+                                    Colour = Color4.White,
+                                    Text = @"Nothing to play",
+                                    Font = @"Exo2.0-MediumItalic"
+                                }
+                            }
                         },
-                        artist = new OsuSpriteText
+                        new RollingContainer
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Position = new Vector2(0, 45),
-                            TextSize = 15,
-                            Colour = Color4.White,
-                            Text = @"Nothing to play",
-                            Font = @"Exo2.0-BoldItalic"
+                            Children = new Drawable[]
+                            {
+                                artist = new OsuSpriteText
+                                {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    TextSize = 15,
+                                    Colour = Color4.White,
+                                    Text = @"Nothing to play",
+                                    Font = @"Exo2.0-BoldItalic"
+                                },
+                            }
                         },
                         new ClickableContainer
                         {
@@ -236,18 +252,6 @@ namespace osu.Game.Overlays
                 playButton.Icon = current.Track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
                 if (current.Track.HasCompleted && !current.Track.Looping) next();
-            }
-
-            if (title.Size.X > Size.X)
-            {
-                title.MoveToOffset(new Vector2(-0.2f, 0));
-
-                if (title.Position.X < -(title.Size.X / 2 + Size.X / 2))
-                {
-                    title.Hide();
-                    title.MoveToX(title.Size.X / 2 + Size.X / 2);
-                    title.Show();
-                }
             }
         }
 
@@ -435,5 +439,14 @@ namespace osu.Game.Overlays
                 sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
             }
         }
+
+        private class RollingContainer : Container
+        {
+            public RollingContainer()
+            {
+
+            }
+        }
+
     }
 }
