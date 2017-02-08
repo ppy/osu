@@ -34,38 +34,11 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private SpriteText placeholder;
-
-        protected override string InternalText
-        {
-            get { return base.InternalText; }
-            set
-            {
-                base.InternalText = value;
-                if (placeholder != null)
-                {
-                    if (string.IsNullOrEmpty(value))
-                        placeholder.Text = "type to search";
-                    else
-                        placeholder.Text = string.Empty;
-                }
-            }
-        }
-
         public SearchTextBox()
         {
             Height = 35;
             Add(new Drawable[]
             {
-                placeholder = new SpriteText
-                {
-                    Font = @"Exo2.0-MediumItalic",
-                    Text = "type to search",
-                    Colour = new Color4(180, 180, 180, 255),
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Margin = new MarginPadding { Left = 10 },
-                },
                 new TextAwesome
                 {
                     Icon = FontAwesome.fa_search,
@@ -74,6 +47,8 @@ namespace osu.Game.Screens.Select
                     Margin = new MarginPadding { Right = 10 },
                 }
             });
+
+            PlaceholderText = "type to search";
         }
 
         protected override void Update()
