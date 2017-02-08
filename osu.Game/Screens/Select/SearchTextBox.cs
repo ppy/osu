@@ -74,8 +74,19 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Key == Key.Left || args.Key == Key.Right || args.Key == Key.Enter)
-                return false;
+            if (!state.Keyboard.ControlPressed && !state.Keyboard.ShiftPressed)
+            {
+                switch (args.Key)
+                {
+                    case Key.Left:
+                    case Key.Right:
+                    case Key.Up:
+                    case Key.Down:
+                    case Key.Enter:
+                        return false;
+                }
+            }
+
             return base.OnKeyDown(state, args);
         }
     }
