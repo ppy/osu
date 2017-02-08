@@ -16,6 +16,9 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
 {
+    /// <summary>
+    /// A textbox which holds focus eagerly.
+    /// </summary>
     public class SearchTextBox : OsuTextBox
     {
         protected override Color4 BackgroundUnfocused => new Color4(10, 10, 10, 255);
@@ -34,6 +37,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        public override bool RequestingFocus => HoldFocus;
+
         public SearchTextBox()
         {
             Height = 35;
@@ -49,12 +54,6 @@ namespace osu.Game.Screens.Select
             });
 
             PlaceholderText = "type to search";
-        }
-
-        protected override void Update()
-        {
-            if (HoldFocus) RequestFocus();
-            base.Update();
         }
 
         protected override bool OnFocus(InputState state)
