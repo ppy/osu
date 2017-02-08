@@ -3,13 +3,10 @@
 
 using System;
 using System.Linq;
-using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -66,7 +63,12 @@ namespace osu.Game.Screens.Select
         protected override void OnFocusLost(InputState state)
         {
             if (state.Keyboard.Keys.Any(key => key == Key.Escape))
-                Exit?.Invoke();
+            {
+                if (Text.Length > 0)
+                    Text = string.Empty;
+                else
+                    Exit?.Invoke();
+            }
             base.OnFocusLost(state);
         }
 
