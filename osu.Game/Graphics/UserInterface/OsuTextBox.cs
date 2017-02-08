@@ -8,7 +8,6 @@ using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using OpenTK.Graphics;
-using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -47,13 +46,6 @@ namespace osu.Game.Graphics.UserInterface
             base.OnFocusLost(state);
         }
 
-        protected override SpriteText GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString() };
-    }
-
-    public class OsuPasswordTextBox : OsuTextBox
-    {
-        protected virtual char MaskCharacter => '*';
-
-        protected override Drawable AddCharacterToFlow(char c) => base.AddCharacterToFlow(MaskCharacter);
+        protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), TextSize = CalculatedTextSize };
     }
 }
