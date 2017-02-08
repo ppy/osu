@@ -8,25 +8,23 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Modes;
-using osu.Game.Online.API;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
     public class Toolbar : OverlayContainer
     {
-        public const float HEIGHT = 50;
+        public const float HEIGHT = 40;
 
         public Action OnHome;
         public Action<PlayMode> OnPlayModeChange;
 
         private ToolbarModeSelector modeSelector;
+        private ToolbarUserArea userArea;
 
-        private const int transition_time = 250;
+        private const int transition_time = 500;
 
         private const float alpha_hovering = 0.8f;
         private const float alpha_normal = 0.6f;
@@ -70,7 +68,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Icon = FontAwesome.fa_search
                         },
-                        new ToolbarUserArea(),
+                        userArea = new ToolbarUserArea(),
                         new ToolbarButton
                         {
                             Icon = FontAwesome.fa_bars
@@ -130,13 +128,15 @@ namespace osu.Game.Overlays.Toolbar
         protected override void PopIn()
         {
             MoveToY(0, transition_time, EasingTypes.OutQuint);
-            FadeIn(transition_time, EasingTypes.OutQuint);
+            FadeIn(transition_time / 2, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
         {
-            MoveToY(-DrawSize.Y, transition_time, EasingTypes.InQuint);
-            FadeOut(transition_time, EasingTypes.InQuint);
+            userArea?.LoginOverlay.Hide();
+
+            MoveToY(-DrawSize.Y, transition_time, EasingTypes.OutQuint);
+            FadeOut(transition_time);
         }
 
         class PassThroughFlowContainer : FlowContainer

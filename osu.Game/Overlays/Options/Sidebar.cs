@@ -11,13 +11,14 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Toolbar;
 
 namespace osu.Game.Overlays.Options
 {
     public class Sidebar : Container
     {
         private FlowContainer content;
-        internal const int DEFAULT_WIDTH = 60;
+        internal const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
         internal const int EXPANDED_WIDTH = 200;
         protected override Container<Drawable> Content => content;
 
