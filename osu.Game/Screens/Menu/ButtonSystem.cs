@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Toolbar;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.Menu
         public Action OnTest;
 
         private AudioSample sampleOsuClick;
+
+        private Toolbar toolbar;
 
         private FlowContainerWithOrigin buttonFlow;
 
@@ -117,9 +120,10 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, OsuGame game)
         {
             sampleOsuClick = audio.Sample.Get(@"Menu/menuhit");
+            toolbar = game.Toolbar;
         }
 
         protected override void LoadComplete()
@@ -150,7 +154,7 @@ namespace osu.Game.Screens.Menu
                             return true;
                     }
 
-                    
+
                     return false;
             }
 
@@ -215,6 +219,8 @@ namespace osu.Game.Screens.Menu
                 switch (state)
                 {
                     case MenuState.Initial:
+                        toolbar?.Hide();
+
                         buttonAreaBackground.ScaleTo(Vector2.One, 500, EasingTypes.Out);
                         buttonArea.FadeOut(300);
 
@@ -239,8 +245,9 @@ namespace osu.Game.Screens.Menu
                         buttonArea.FadeIn(300);
 
                         if (lastState == MenuState.Initial)
-                            //todo: this propagates to invisible children and causes delays later down the track (on first MenuState.Play)
                             buttonArea.Delay(150, true);
+
+                        Scheduler.AddDelayed(() => toolbar?.Show(), 150);
 
                         foreach (Button b in buttonsTopLevel)
                             b.State = ButtonState.Expanded;

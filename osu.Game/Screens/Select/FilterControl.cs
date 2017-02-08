@@ -27,14 +27,12 @@ namespace osu.Game.Screens.Select
 
         public FilterControl()
         {
-            AutoSizeAxes = Axes.Y;
-
             Children = new Drawable[]
             {
                 new Box
                 {
                     Colour = Color4.Black,
-                    Alpha = 0.6f,
+                    Alpha = 0.8f,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new FlowContainer
