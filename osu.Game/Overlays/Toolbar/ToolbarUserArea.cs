@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Toolbar
 {
     class ToolbarUserArea : Container
     {
-        private LoginOverlay loginOverlay;
+        public LoginOverlay LoginOverlay;
         private ToolbarUserButton button;
 
         public override RectangleF BoundingBox => button.BoundingBox;
@@ -25,9 +25,9 @@ namespace osu.Game.Overlays.Toolbar
             Children = new Drawable[] {
                 button = new ToolbarUserButton
                 {
-                    Action = toggle,
+                    Action = () => LoginOverlay.ToggleVisibility(),
                 },
-                loginOverlay = new LoginOverlay
+                LoginOverlay = new LoginOverlay
                 {
                     BypassAutoSizeAxes = Axes.Both,
                     Position = new Vector2(0, 1),
@@ -36,11 +36,6 @@ namespace osu.Game.Overlays.Toolbar
                     Origin = Anchor.TopRight,
                 }
             };
-        }
-
-        private void toggle()
-        {
-            loginOverlay.ToggleVisibility();
         }
     }
 }
