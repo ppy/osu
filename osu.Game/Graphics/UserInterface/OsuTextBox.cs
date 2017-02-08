@@ -8,6 +8,7 @@ using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -17,10 +18,12 @@ namespace osu.Game.Graphics.UserInterface
         protected override Color4 BackgroundFocused => OsuColour.Gray(0.3f).Opacity(0.8f);
         protected override Color4 BackgroundCommit => BorderColour;
 
+        protected override float LeftRightPadding => 10;
+
         public OsuTextBox()
         {
             Height = 40;
-            TextContainer.Height = OsuSpriteText.FONT_SIZE / Height;
+            TextContainer.Height = 0.5f;
             CornerRadius = 5;
         }
 
@@ -43,6 +46,8 @@ namespace osu.Game.Graphics.UserInterface
 
             base.OnFocusLost(state);
         }
+
+        protected override SpriteText GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString() };
     }
 
     public class OsuPasswordTextBox : OsuTextBox
