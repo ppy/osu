@@ -27,6 +27,7 @@ using osu.Game.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
 using System.Collections.Generic;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Select
@@ -48,7 +49,7 @@ namespace osu.Game.Screens.Select
 
         private AudioSample sampleChangeDifficulty;
         private AudioSample sampleChangeBeatmap;
-        
+
         private List<BeatmapGroup> beatmapGroups;
 
         private Footer footer;
@@ -84,20 +85,25 @@ namespace osu.Game.Screens.Select
             OsuGame osuGame, OsuColour colours)
         {
             const float carousel_width = 640;
+            const float filter_height = 100;
+
             beatmapGroups = new List<BeatmapGroup>();
             Children = new Drawable[]
             {
                 new ParallaxContainer
                 {
-                    Masking = true,
+                    Padding = new MarginPadding { Top = filter_height },
                     ParallaxAmount = 0.005f,
                     RelativeSizeAxes = Axes.Both,
-                    Children = new []
+                    Children = new[]
                     {
                         new WedgeBackground
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = carousel_width * 0.76f },
+                            Padding = new MarginPadding
+                            {
+                                Right = carousel_width * 0.76f
+                            },
                         },
                     }
                 },
@@ -111,7 +117,7 @@ namespace osu.Game.Screens.Select
                 filter = new FilterControl
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 100,
+                    Height = filter_height,
                     FilterChanged = filterChanged,
                     Exit = Exit,
                 },
@@ -120,7 +126,11 @@ namespace osu.Game.Screens.Select
                     Alpha = 0,
                     Size = wedged_container_size,
                     RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding { Top = 20, Right = 20, },
+                    Margin = new MarginPadding
+                    {
+                        Top = 20,
+                        Right = 20,
+                    },
                 },
                 footer = new Footer()
                 {
@@ -204,7 +214,7 @@ namespace osu.Game.Screens.Select
 
             beatmapInfoWedge.MoveToX(-50);
             beatmapInfoWedge.MoveToX(0, 800, EasingTypes.OutQuint);
-            
+
             filter.Activate();
         }
 
@@ -228,7 +238,7 @@ namespace osu.Game.Screens.Select
             Content.ScaleTo(1.1f, 250, EasingTypes.InSine);
 
             Content.FadeOut(250);
-            
+
             filter.Deactivate();
             base.OnSuspending(next);
         }
@@ -240,7 +250,7 @@ namespace osu.Game.Screens.Select
 
             Content.FadeOut(100);
 
-            filter.Deactivate();            
+            filter.Deactivate();
             return base.OnExiting(next);
         }
 
