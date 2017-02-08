@@ -26,7 +26,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
-using osu.Game.Graphics;
 using System.Collections.Generic;
 using osu.Framework.Threading;
 
@@ -112,6 +111,7 @@ namespace osu.Game.Screens.Select
                 filter = new FilterControl
                 {
                     RelativeSizeAxes = Axes.X,
+                    Height = 100,
                     FilterChanged = filterChanged,
                     Exit = Exit,
                 },
