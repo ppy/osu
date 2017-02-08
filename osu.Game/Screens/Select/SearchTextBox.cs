@@ -12,10 +12,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
 {
-    public class SearchTextBox : TextBox
+    public class SearchTextBox : OsuTextBox
     {
         protected override Color4 BackgroundUnfocused => new Color4(10, 10, 10, 255);
         protected override Color4 BackgroundFocused => new Color4(10, 10, 10, 255);
@@ -54,7 +55,6 @@ namespace osu.Game.Screens.Select
         public SearchTextBox()
         {
             Height = 35;
-            TextContainer.Padding = new MarginPadding(5);
             Add(new Drawable[]
             {
                 placeholder = new SpriteText
@@ -80,6 +80,13 @@ namespace osu.Game.Screens.Select
         {
             if (HoldFocus) RequestFocus();
             base.Update();
+        }
+
+        protected override bool OnFocus(InputState state)
+        {
+            var result = base.OnFocus(state);
+            BorderThickness = 0;
+            return result;
         }
 
         protected override void OnFocusLost(InputState state)
