@@ -24,6 +24,10 @@ namespace osu.Game.Overlays.Toolbar
         private ToolbarModeSelector modeSelector;
         private ToolbarUserArea userArea;
 
+        protected override bool HideOnEscape => false;
+
+        protected override bool BlockPassThroughInput => false;
+
         private const int transition_time = 500;
 
         private const float alpha_hovering = 0.8f;

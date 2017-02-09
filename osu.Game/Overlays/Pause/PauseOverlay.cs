@@ -22,6 +22,8 @@ namespace osu.Game.Overlays.Pause
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
 
+        protected override bool HideOnEscape => false;
+
         public Action OnResume;
         public Action OnRetry;
         public Action OnQuit;
@@ -83,6 +85,7 @@ namespace osu.Game.Overlays.Pause
                 resume();
                 return true;
             }
+
             return base.OnKeyDown(state, args);
         }
 
