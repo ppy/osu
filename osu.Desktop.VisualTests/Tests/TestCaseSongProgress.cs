@@ -22,6 +22,11 @@ namespace osu.Desktop.VisualTests
         {
             base.Reset();
 
+            Add(new Box
+            {
+                Colour = Color4.Gray,
+                RelativeSizeAxes = Axes.Both
+            });
             Add(new SongProgress
             {
                 Anchor = Anchor.BottomCentre,
