@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Play
                 OnQuit = Exit
             };
 
-            hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
+            hitRenderer = ruleset.CreateHitRendererWith(beatmap);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             hitRenderer.OnJudgement += scoreProcessor.AddJudgement;

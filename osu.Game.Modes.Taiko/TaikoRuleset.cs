@@ -9,6 +9,7 @@ using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.Taiko.UI;
 using osu.Game.Modes.UI;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.Taiko
 {
@@ -16,7 +17,7 @@ namespace osu.Game.Modes.Taiko
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new TaikoHitRenderer { Objects = objects };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new TaikoHitRenderer { Beatmap = beatmap };
 
         protected override PlayMode PlayMode => PlayMode.Taiko;
 
