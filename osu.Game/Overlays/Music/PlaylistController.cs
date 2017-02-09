@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -57,11 +58,20 @@ namespace osu.Game.Overlays.Music
                     Spacing = new Vector2(0,5),
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SearchTextBox {RelativeSizeAxes=Axes.X, Height = 40},
+                        searchTextBox = new SearchTextBox
+                        {
+                            RelativeSizeAxes=Axes.X,
+                            Height = 40,
+                        },
                         new SpriteText {Text = "TODO: Collections" },
                         playlistView = new Playlist()
                     }
                 }
+            };
+            searchTextBox.OnChange += (TextBox sender, bool newText) =>
+            {
+                if (newText)
+                    playlistView.Filter(searchTextBox.Text);
             };
         }
 

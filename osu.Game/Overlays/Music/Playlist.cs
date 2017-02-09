@@ -68,5 +68,23 @@ namespace osu.Game.Overlays.Music
         }
 
         private void PlaylistItem_OnSelected(BeatmapSetInfo newSelection) => SelectedItem = newSelection;
+
+        public void Filter(string text)
+        {
+            foreach (var playlistItem in playlistFlow.Children)
+            {
+                var metadata = playlistItem.BeatmapSetInfo.Metadata;
+                var match = string.IsNullOrEmpty(text)
+                    || (metadata.Artist ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1
+                    || (metadata.ArtistUnicode ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1
+                    || (metadata.Title ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1
+                    || (metadata.TitleUnicode ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1;
+                if (match)
+                    playlistItem.Show();
+                else
+                    playlistItem.Hide();
+            }
+            playlistFlow.Invalidate();
+        }
     }
 }
