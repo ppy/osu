@@ -28,7 +28,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
-    public class MusicController : OverlayContainer
+    public class MusicController : FocusedOverlayContainer
     {
         private MusicControllerBackground backgroundSprite;
         private DragBar progress;
@@ -86,6 +86,8 @@ namespace osu.Game.Overlays
             {
                 dragContainer = new Container
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Masking = true,
                     CornerRadius = 5,
                     EdgeEffect = new EdgeEffect
@@ -388,14 +390,23 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        protected override bool OnClick(InputState state) => true;
+        const float transition_length = 800;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        protected override void PopIn()
+        {
+            base.PopIn();
 
-        //placeholder for toggling
-        protected override void PopIn() => FadeIn(100);
+            FadeIn(transition_length, EasingTypes.OutQuint);
+            dragContainer.ScaleTo(1, transition_length, EasingTypes.OutElastic);
+        }
 
-        protected override void PopOut() => FadeOut(100);
+        protected override void PopOut()
+        {
+            base.PopOut();
+
+            FadeOut(transition_length, EasingTypes.OutQuint);
+            dragContainer.ScaleTo(0.9f, transition_length, EasingTypes.OutQuint);
+        }
 
         private enum TransformDirection { None, Next, Prev }
 
