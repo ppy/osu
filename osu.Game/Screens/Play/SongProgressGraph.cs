@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Play
             base.Update();
 
             if (DrawWidth == lastDrawWidth) return;
-            //recreateGraph();
+            recreateGraph();
             lastDrawWidth = DrawWidth;
         }
 
