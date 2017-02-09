@@ -85,17 +85,6 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
-
-            // TODO: Remove
-            var random = new Random();
-
-            List<int> newValues = new List<int>();
-            for (int i = 0; i < 1000; i++)
-            {
-                newValues.Add(random.Next(1, 11));
-            }
-
-            DisplayValues(newValues);
         }
     }
 }
