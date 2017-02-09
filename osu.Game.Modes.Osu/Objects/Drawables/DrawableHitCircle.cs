@@ -28,7 +28,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             osuObject = h;
 
             Origin = Anchor.Centre;
-            Position = osuObject.Position;
+            Position = osuObject.Position + h.StackOffset;
             Scale = new Vector2(osuObject.Scale);
 
             Children = new Drawable[]

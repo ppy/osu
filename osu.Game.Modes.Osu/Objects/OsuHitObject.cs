@@ -17,6 +17,9 @@ namespace osu.Game.Modes.Osu.Objects
 
         public virtual Vector2 EndPosition => Position;
 
+        public int StackHeight { get; set; }
+        public Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
+
         public override void SetDefaultsFromBeatmap(Beatmap beatmap)
         {
             base.SetDefaultsFromBeatmap(beatmap);
