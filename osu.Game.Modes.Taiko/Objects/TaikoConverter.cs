@@ -4,16 +4,17 @@
 using System.Collections.Generic;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
     class TaikoConverter : HitObjectConverter<TaikoBaseHit>
     {
-        public override List<TaikoBaseHit> Convert(List<HitObject> input)
+        public override List<TaikoBaseHit> Convert(Beatmap beatmap)
         {
             List<TaikoBaseHit> output = new List<TaikoBaseHit>();
 
-            foreach (HitObject i in input)
+            foreach (HitObject i in beatmap.HitObjects)
             {
                 TaikoBaseHit h = i as TaikoBaseHit;
 

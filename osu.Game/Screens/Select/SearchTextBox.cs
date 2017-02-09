@@ -74,6 +74,8 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (HandlePendingText(state)) return true;
+
             if (!state.Keyboard.ControlPressed && !state.Keyboard.ShiftPressed)
             {
                 switch (args.Key)

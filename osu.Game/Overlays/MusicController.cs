@@ -23,11 +23,12 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
-    public class MusicController : OverlayContainer
+    public class MusicController : FocusedOverlayContainer
     {
         private MusicControllerBackground backgroundSprite;
         private DragBar progress;
@@ -85,6 +86,8 @@ namespace osu.Game.Overlays
             {
                 dragContainer = new Container
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Masking = true,
                     CornerRadius = 5,
                     EdgeEffect = new EdgeEffect
@@ -229,6 +232,12 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
+            if (pendingBeatmapSwitch != null)
+            {
+                pendingBeatmapSwitch();
+                pendingBeatmapSwitch = null;
+            }
+
             if (current?.TrackLoaded ?? false)
             {
 
@@ -320,43 +329,50 @@ namespace osu.Game.Overlays
             base.PerformLoad(game);
         }
 
+        Action pendingBeatmapSwitch;
+
         private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
         {
-            Task.Run(() =>
+            //we might be off-screen when this update comes in.
+            //rather than Scheduling, manually handle this to avoid possible memory contention.
+            pendingBeatmapSwitch = () =>
             {
-                if (beatmap?.Beatmap == null)
-                    //todo: we may need to display some default text here (currently in the constructor).
-                    return;
-
-                BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
-                title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
-                artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
-            });
-
-            MusicControllerBackground newBackground;
-
-            (newBackground = new MusicControllerBackground(beatmap)).Preload(game, delegate
-            {
-
-                dragContainer.Add(newBackground);
-
-                switch (direction)
+                Task.Run(() =>
                 {
-                    case TransformDirection.Next:
-                        newBackground.Position = new Vector2(400, 0);
-                        newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                        backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
-                        break;
-                    case TransformDirection.Prev:
-                        newBackground.Position = new Vector2(-400, 0);
-                        newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                        backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
-                        break;
-                }
+                    if (beatmap?.Beatmap == null)
+                        //todo: we may need to display some default text here (currently in the constructor).
+                        return;
 
-                backgroundSprite.Expire();
-                backgroundSprite = newBackground;
-            });
+                    BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
+                    title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
+                    artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
+                });
+
+                MusicControllerBackground newBackground;
+
+                (newBackground = new MusicControllerBackground(beatmap)).Preload(game, delegate
+                {
+
+                    dragContainer.Add(newBackground);
+
+                    switch (direction)
+                    {
+                        case TransformDirection.Next:
+                            newBackground.Position = new Vector2(400, 0);
+                            newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
+                            backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
+                            break;
+                        case TransformDirection.Prev:
+                            newBackground.Position = new Vector2(-400, 0);
+                            newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
+                            backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
+                            break;
+                    }
+
+                    backgroundSprite.Expire();
+                    backgroundSprite = newBackground;
+                });
+            };
         }
 
         private Func<string, string, string> unicodeString;
@@ -374,14 +390,23 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        protected override bool OnClick(InputState state) => true;
+        const float transition_length = 800;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        protected override void PopIn()
+        {
+            base.PopIn();
 
-        //placeholder for toggling
-        protected override void PopIn() => FadeIn(100);
+            FadeIn(transition_length, EasingTypes.OutQuint);
+            dragContainer.ScaleTo(1, transition_length, EasingTypes.OutElastic);
+        }
 
-        protected override void PopOut() => FadeOut(100);
+        protected override void PopOut()
+        {
+            base.PopOut();
+
+            FadeOut(transition_length, EasingTypes.OutQuint);
+            dragContainer.ScaleTo(0.9f, transition_length, EasingTypes.OutQuint);
+        }
 
         private enum TransformDirection { None, Next, Prev }
 

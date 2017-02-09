@@ -52,6 +52,8 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
 
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto"));
+
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-RegularItalic"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBold"));

@@ -17,6 +17,8 @@ namespace osu.Game.Modes.Osu.Objects
 
         public CurveTypes CurveType;
 
+        public Vector2 Offset;
+
         private List<Vector2> calculatedPath = new List<Vector2>();
         private List<double> cumulativeLength = new List<double>();
 
@@ -166,7 +168,8 @@ namespace osu.Game.Modes.Osu.Objects
         /// to 1 (end of the slider) and stores the generated path in the given list.
         /// </summary>
         /// <param name="path">The list to be filled with the computed curve.</param>
-        /// <param name="progress">Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <param name="p0">Start progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <param name="p1">End progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
         public void GetPathToProgress(List<Vector2> path, double p0, double p1)
         {
             double d0 = progressToDistance(p0);
@@ -177,12 +180,12 @@ namespace osu.Game.Modes.Osu.Objects
             int i = 0;
             for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i);
 
-            path.Add(interpolateVertices(i, d0));
+            path.Add(interpolateVertices(i, d0) + Offset);
 
             for (; i < calculatedPath.Count && cumulativeLength[i] <= d1; ++i)
-                path.Add(calculatedPath[i]);
+                path.Add(calculatedPath[i] + Offset);
 
-            path.Add(interpolateVertices(i, d1));
+            path.Add(interpolateVertices(i, d1) + Offset);
         }
 
         /// <summary>
@@ -194,7 +197,7 @@ namespace osu.Game.Modes.Osu.Objects
         public Vector2 PositionAt(double progress)
         {
             double d = progressToDistance(progress);
-            return interpolateVertices(indexOfDistance(d), d);
+            return interpolateVertices(indexOfDistance(d), d) + Offset;
         }
     }
 }

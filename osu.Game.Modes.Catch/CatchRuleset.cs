@@ -8,6 +8,7 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.Catch
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Modes.Catch
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new CatchHitRenderer { Objects = objects };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new CatchHitRenderer { Beatmap = beatmap };
 
         protected override PlayMode PlayMode => PlayMode.Catch;
 

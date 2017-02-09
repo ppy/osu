@@ -170,6 +170,8 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
+            base.PopOut();
+
             scrollContainer.MoveToX(-width, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(0, TRANSITION_LENGTH / 2);
