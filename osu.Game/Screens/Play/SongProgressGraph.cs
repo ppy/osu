@@ -72,6 +72,16 @@ namespace osu.Game.Screens.Play
         {
             calculatedValues.RemoveAll(delegate { return true; });
 
+            if (values == null)
+            {
+                for (float i = 0; i < ColumnCount; i++)
+                {
+                    calculatedValues.Add(0);
+                }
+
+                return;
+            }
+
             float step = (float)values.Count / (float)ColumnCount;
 
             for (float i = 0; i < values.Count; i += step) 

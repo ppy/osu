@@ -9,14 +9,16 @@ using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics.Colour;
+using System.Collections.Generic;
 
 namespace osu.Desktop.VisualTests
 {
     public class TestCaseSongProgress : TestCase
     {
         public override string Name => @"Song Progress";
-
         public override string Description => @"With real data";
+
+        private SongProgress progress;
 
         public override void Reset()
         {
@@ -27,12 +29,22 @@ namespace osu.Desktop.VisualTests
                 Colour = Color4.Gray,
                 RelativeSizeAxes = Axes.Both
             });
-            Add(new SongProgress
+            Add(progress = new SongProgress
             {
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
                 RelativeSizeAxes = Axes.X
             });
+
+            var random = new Random();
+
+            List<int> newValues = new List<int>();
+            for (int i = 0; i < 1000; i++)
+            {
+                newValues.Add(random.Next(1, 11));
+            }
+
+            progress.DisplayValues(newValues);
         }
     }
 }
