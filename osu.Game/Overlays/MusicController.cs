@@ -23,6 +23,7 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
@@ -229,6 +230,12 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
+            if (pendingBeatmapSwitch != null)
+            {
+                pendingBeatmapSwitch();
+                pendingBeatmapSwitch = null;
+            }
+
             if (current?.TrackLoaded ?? false)
             {
 
@@ -320,43 +327,50 @@ namespace osu.Game.Overlays
             base.PerformLoad(game);
         }
 
+        Action pendingBeatmapSwitch;
+
         private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
         {
-            Task.Run(() =>
+            //we might be off-screen when this update comes in.
+            //rather than Scheduling, manually handle this to avoid possible memory contention.
+            pendingBeatmapSwitch = () =>
             {
-                if (beatmap?.Beatmap == null)
-                    //todo: we may need to display some default text here (currently in the constructor).
-                    return;
-
-                BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
-                title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
-                artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
-            });
-
-            MusicControllerBackground newBackground;
-
-            (newBackground = new MusicControllerBackground(beatmap)).Preload(game, delegate
-            {
-
-                dragContainer.Add(newBackground);
-
-                switch (direction)
+                Task.Run(() =>
                 {
-                    case TransformDirection.Next:
-                        newBackground.Position = new Vector2(400, 0);
-                        newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                        backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
-                        break;
-                    case TransformDirection.Prev:
-                        newBackground.Position = new Vector2(-400, 0);
-                        newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                        backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
-                        break;
-                }
+                    if (beatmap?.Beatmap == null)
+                        //todo: we may need to display some default text here (currently in the constructor).
+                        return;
 
-                backgroundSprite.Expire();
-                backgroundSprite = newBackground;
-            });
+                    BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
+                    title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
+                    artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
+                });
+
+                MusicControllerBackground newBackground;
+
+                (newBackground = new MusicControllerBackground(beatmap)).Preload(game, delegate
+                {
+
+                    dragContainer.Add(newBackground);
+
+                    switch (direction)
+                    {
+                        case TransformDirection.Next:
+                            newBackground.Position = new Vector2(400, 0);
+                            newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
+                            backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
+                            break;
+                        case TransformDirection.Prev:
+                            newBackground.Position = new Vector2(-400, 0);
+                            newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
+                            backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
+                            break;
+                    }
+
+                    backgroundSprite.Expire();
+                    backgroundSprite = newBackground;
+                });
+            };
         }
 
         private Func<string, string, string> unicodeString;
