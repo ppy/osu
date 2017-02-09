@@ -91,9 +91,6 @@ namespace osu.Game.Overlays.Options.Sections.General
             private TextBox password;
             private APIAccess api;
 
-            private OsuCheckbox saveUsername;
-            private OsuCheckbox savePassword;
-
             private void performLogin()
             {
                 if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
@@ -121,12 +118,12 @@ namespace osu.Game.Overlays.Options.Sections.General
                         PlaceholderText = "Password",
                         RelativeSizeAxes = Axes.X
                     },
-                    saveUsername = new OsuCheckbox
+                    new OsuCheckbox
                     {
                         LabelText = "Remember username",
                         Bindable = config.GetBindable<bool>(OsuConfig.SaveUsername),
                     },
-                    savePassword = new OsuCheckbox
+                    new OsuCheckbox
                     {
                         LabelText = "Stay logged in",
                         Bindable = config.GetBindable<bool>(OsuConfig.SavePassword),
