@@ -119,11 +119,11 @@ namespace osu.Game.Screens.Menu
             buttonFlow.Add(buttonsTopLevel);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuGame game)
+        [BackgroundDependencyLoader(true)]
+        private void load(AudioManager audio, OsuGame game = null)
         {
             sampleOsuClick = audio.Sample.Get(@"Menu/menuhit");
-            toolbar = game.Toolbar;
+            toolbar = game?.Toolbar;
         }
 
         protected override void LoadComplete()
