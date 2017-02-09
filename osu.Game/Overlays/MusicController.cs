@@ -374,10 +374,6 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        protected override bool OnClick(InputState state) => true;
-
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
-
         //placeholder for toggling
         protected override void PopIn() => FadeIn(100);
 
