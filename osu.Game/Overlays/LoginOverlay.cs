@@ -72,6 +72,8 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
+            base.PopOut();
+
             optionsSection.Bounding = false;
             FadeOut(transition_time);
         }
