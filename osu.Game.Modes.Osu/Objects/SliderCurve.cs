@@ -17,6 +17,8 @@ namespace osu.Game.Modes.Osu.Objects
 
         public CurveTypes CurveType;
 
+        public Vector2 Offset;
+
         private List<Vector2> calculatedPath = new List<Vector2>();
         private List<double> cumulativeLength = new List<double>();
 
@@ -177,12 +179,12 @@ namespace osu.Game.Modes.Osu.Objects
             int i = 0;
             for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i);
 
-            path.Add(interpolateVertices(i, d0));
+            path.Add(interpolateVertices(i, d0) + Offset);
 
             for (; i < calculatedPath.Count && cumulativeLength[i] <= d1; ++i)
-                path.Add(calculatedPath[i]);
+                path.Add(calculatedPath[i] + Offset);
 
-            path.Add(interpolateVertices(i, d1));
+            path.Add(interpolateVertices(i, d1) + Offset);
         }
 
         /// <summary>
@@ -194,7 +196,7 @@ namespace osu.Game.Modes.Osu.Objects
         public Vector2 PositionAt(double progress)
         {
             double d = progressToDistance(progress);
-            return interpolateVertices(indexOfDistance(d), d);
+            return interpolateVertices(indexOfDistance(d), d) + Offset;
         }
     }
 }

@@ -31,7 +31,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             {
                 body = new SliderBody(s)
                 {
-                    Position = s.Position + s.StackOffset,
+                    Position = s.StackedPosition,
                     PathWidth = s.Scale * 64,
                 },
                 bouncer1 = new SliderBouncer(s, false)
@@ -41,7 +41,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 },
                 bouncer2 = new SliderBouncer(s, true)
                 {
-                    Position = s.Position + s.StackOffset,
+                    Position = s.StackedPosition,
                     Scale = new Vector2(s.Scale),
                 },
                 ball = new SliderBall(s)
@@ -51,7 +51,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 initialCircle = new DrawableHitCircle(new HitCircle
                 {
                     StartTime = s.StartTime,
-                    Position = s.Position + s.StackOffset,
+                    Position = s.StackedPosition,
                     Scale = s.Scale,
                     Colour = s.Colour,
                     Sample = s.Sample,
@@ -89,11 +89,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             if (repeat % 2 == 1)
                 progress = 1 - progress;
 
-            bouncer2.Position = slider.Curve.PositionAt(body.SnakedEnd ?? 0) + slider.StackOffset;
+            bouncer2.Position = slider.Curve.PositionAt(body.SnakedEnd ?? 0);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (initialCircle.Judgement?.Result != HitResult.Hit)
-                initialCircle.Position = slider.Curve.PositionAt(progress) + slider.StackOffset;
+                initialCircle.Position = slider.Curve.PositionAt(progress);
 
             components.ForEach(c => c.UpdateProgress(progress, repeat));
         }
