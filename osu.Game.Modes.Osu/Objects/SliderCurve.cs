@@ -168,7 +168,8 @@ namespace osu.Game.Modes.Osu.Objects
         /// to 1 (end of the slider) and stores the generated path in the given list.
         /// </summary>
         /// <param name="path">The list to be filled with the computed curve.</param>
-        /// <param name="progress">Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <param name="p0">Start progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <param name="p1">End progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
         public void GetPathToProgress(List<Vector2> path, double p0, double p1)
         {
             double d0 = progressToDistance(p0);
