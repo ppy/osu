@@ -2,15 +2,15 @@
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
+using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.Samples;
-using OpenTK;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Modes.Objects.Drawables
@@ -39,7 +39,8 @@ namespace osu.Game.Modes.Objects.Drawables
 
             set
             {
-                if (state == value) return;
+                if (state == value)
+                    return;
                 state = value;
 
                 UpdateState(state);
@@ -51,20 +52,35 @@ namespace osu.Game.Modes.Objects.Drawables
             }
         }
 
-        AudioSample sample;
+        private List<AudioSample> samples = new List<AudioSample>();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            string hitType = (HitObject.Sample.Type == SampleType.None ? SampleType.Normal : HitObject.Sample.Type).ToString().ToLower();
-            string sampleSet = HitObject.Sample.Set.ToString().ToLower();
+            // TODO: Use HitObject.Sample.Bank to load custom sample overrides,
+            //       Use HitObject.Sample.File to load extra samples,
+            //       Check options to make sure the user wants custom sample overrides,
+            //       Check beatmap settings and enabled mods to make sure samples are playing at the correct speed
+            // NOTE: Sample overrides without a prefix apply to both Soft and Normal sets
 
-            sample = audio.Sample.Get($@"Gameplay/{sampleSet}-hit{hitType}");
+            foreach (SampleType type in Enum.GetValues(typeof(SampleType)))
+            {
+                if (type == SampleType.None)
+                    continue;
+                if (HitObject.Sample.Type.HasFlag(type))
+                {
+                    if (type == SampleType.Normal)
+                        samples.Add(audio.Sample.Get($@"Gameplay/{HitObject.Sample.Set.ToString().ToLower()}-hitnormal"));
+                    else
+                        samples.Add(audio.Sample.Get($@"Gameplay/{HitObject.Sample.AdditionSet.ToString().ToLower()}-hit{type.ToString().ToLower()}"));
+                }
+            }
         }
 
         protected void PlaySample()
         {
-            sample?.Play();
+            for (int i = 0; i < samples.Count; i++)
+                samples[i].Play();
         }
 
         protected override void LoadComplete()
@@ -152,6 +168,6 @@ namespace osu.Game.Modes.Objects.Drawables
         [Description(@"Miss")]
         Miss,
         [Description(@"Hit")]
-        Hit,
+        Hit
     }
 }
