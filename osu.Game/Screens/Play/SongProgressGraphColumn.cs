@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Play
             {
                 if (value == filled) return;
                 filled = value;
+
+                fillActive();
             }
         }
 
@@ -47,15 +49,17 @@ namespace osu.Game.Screens.Play
                 if (value == state) return;
                 state = value;
 
-                fillActive(value == ColumnState.Lit ? lit_colour : dimmed_colour);
+                fillActive();
             }
         }
 
-        private void fillActive(Color4 color)
+        private void fillActive()
         {
+            Color4 colour = State == ColumnState.Lit ? lit_colour : dimmed_colour;
+
             for (int i = 0; i < drawableRows.Count; i++)
             {
-                drawableRows[i].Colour = i <= Filled ? color : empty_colour;
+                drawableRows[i].Colour = i <= Filled ? colour : empty_colour;
             }
         }
 
