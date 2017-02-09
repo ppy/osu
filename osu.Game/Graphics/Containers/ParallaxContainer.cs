@@ -45,7 +45,8 @@ namespace osu.Game.Graphics.Containers
         {
             base.Update();
 
-            content.MoveTo((ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2) * ParallaxAmount, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
+            Vector2 offset = input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2;
+            content.MoveTo(offset * ParallaxAmount, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
             content.Scale = new Vector2(1 + ParallaxAmount);
 
             firstUpdate = false;
