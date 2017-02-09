@@ -443,11 +443,41 @@ namespace osu.Game.Overlays
 
         private class RollingContainer : Container
         {
+            private Bindable<float> size;
+
             public RollingContainer()
             {
+                size = new Bindable<float>(Size.X);                
+            }
 
+            protected override void LoadComplete()
+            {
+                size.ValueChanged += rolling;
+                base.LoadComplete();
+            }
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                size = new Bindable<float>(Size.X);
+            }
+
+            private void rolling(object sender = null, EventArgs e = null)
+            {
+                if (Size.X > 400)
+                {
+                    MoveToX(-(Size.X / 2 + 200), 1000);
+                    Hide();
+                    MoveToX(Size.X / 2 + 200);
+                    Show();
+                    Loop();
+                }
+                else
+                {
+                    MoveToX(0);
+                }
             }
         }
-
     }
 }
