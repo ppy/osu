@@ -137,6 +137,7 @@ namespace osu.Game.Database
                             beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
                         }
                     }
+                    beatmapSet.StoryboardFile = reader.ReadStoryboard();
                 }
 
                 Import(new[] { beatmapSet });
@@ -169,7 +170,7 @@ namespace osu.Game.Database
             return Query<BeatmapSetInfo>().FirstOrDefault(s => s.OnlineBeatmapSetID == id);
         }
 
-        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
+        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null, bool withStoryboard = false)
         {
             var beatmapSetInfo = Query<BeatmapSetInfo>().FirstOrDefault(s => s.ID == beatmapInfo.BeatmapSetInfoID);
 
@@ -182,7 +183,7 @@ namespace osu.Game.Database
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapSetInfo.Metadata;
 
-            var working = new WorkingBeatmap(beatmapInfo, beatmapSetInfo, this);
+            var working = new WorkingBeatmap(beatmapInfo, beatmapSetInfo, this, withStoryboard);
 
             previous?.TransferTo(working);
 

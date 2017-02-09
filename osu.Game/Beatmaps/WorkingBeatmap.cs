@@ -18,6 +18,8 @@ namespace osu.Game.Beatmaps
         public readonly BeatmapSetInfo BeatmapSetInfo;
         private readonly BeatmapDatabase database;
 
+        public readonly bool WithStoryboard;
+
         private ArchiveReader getReader() => database?.GetReader(BeatmapSetInfo);
 
         private Texture background;
@@ -58,8 +60,18 @@ namespace osu.Game.Beatmaps
                     try
                     {
                         using (var reader = getReader())
-                        using (var stream = new StreamReader(reader.GetStream(BeatmapInfo.Path)))
-                            beatmap = BeatmapDecoder.GetDecoder(stream)?.Decode(stream);
+                        {
+                            BeatmapDecoder decoder;
+                            using (var stream = new StreamReader(reader.GetStream(BeatmapInfo.Path)))
+                            {
+                                decoder = BeatmapDecoder.GetDecoder(stream);
+                                beatmap = decoder?.Decode(stream);
+                            }
+
+                            if (WithStoryboard && beatmap != null && BeatmapSetInfo.StoryboardFile != null)
+                                using (var stream = new StreamReader(reader.GetStream(BeatmapSetInfo.StoryboardFile)))
+                                    decoder?.Decode(stream, beatmap);
+                        }
                     }
                     catch { }
 
@@ -103,11 +115,12 @@ namespace osu.Game.Beatmaps
             this.beatmap = beatmap;
         }
 
-        public WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, BeatmapDatabase database)
+        public WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, BeatmapDatabase database, bool withStoryboard = false)
         {
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapSetInfo;
             this.database = database;
+            this.WithStoryboard = withStoryboard;
         }
 
         private bool isDisposed;

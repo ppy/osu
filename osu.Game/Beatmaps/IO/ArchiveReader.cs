@@ -44,6 +44,10 @@ namespace osu.Game.Beatmaps.IO
         /// </summary>
         public abstract string[] ReadBeatmaps();
         /// <summary>
+        /// Gets the storyboard file name.
+        /// </summary>
+        public abstract string ReadStoryboard();
+        /// <summary>
         /// Opens a stream for reading a specific file from this archive.
         /// </summary>
         public abstract Stream GetStream(string name);
