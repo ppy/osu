@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework.Allocation;
@@ -22,9 +22,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 
         public CirclePiece()
         {
-            Size = new Vector2(144);
+            Size = new Vector2(128);
             Masking = true;
-            CornerRadius = DrawSize.X / 2;
+            CornerRadius = Size.X / 2;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -47,7 +47,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            disc.Texture = textures.Get(@"Play/osu/disc@2x");
+            disc.Texture = textures.Get(@"Play/osu/disc");
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)

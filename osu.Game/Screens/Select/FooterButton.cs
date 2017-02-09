@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
 using OpenTK.Graphics;
@@ -97,13 +97,18 @@ namespace osu.Game.Screens.Select
             HoverLost?.Invoke();
             light.ScaleTo(new Vector2(1, 1), Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
             light.FadeColour(DeselectedColour, Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
-            box.FadeOut(Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             box.FadeTo(0.3f, Footer.TRANSITION_LENGTH * 2, EasingTypes.OutQuint);
             return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            box.FadeOut(Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
+            return base.OnMouseUp(state, args);
         }
 
         protected override bool OnClick(InputState state)

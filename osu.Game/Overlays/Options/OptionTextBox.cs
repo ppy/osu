@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework.Configuration;
@@ -26,16 +26,16 @@ namespace osu.Game.Overlays.Options
                 }
             }
         }
-        
-        protected override string InternalText
+
+        public OptionTextBox()
         {
-            get { return base.InternalText; }
-            set
-            {
-                base.InternalText = value;
-                if (bindable != null)
-                    bindable.Value = value;
-            }
+            OnChange += onChange;
+        }
+
+        private void onChange(TextBox sender, bool newText)
+        {
+            if (bindable != null)
+                bindable.Value = Text;
         }
 
         private void bindableValueChanged(object sender, EventArgs e)

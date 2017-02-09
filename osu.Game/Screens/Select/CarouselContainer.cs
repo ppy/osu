@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
 using osu.Framework.Caching;
@@ -30,13 +30,13 @@ namespace osu.Game.Screens.Select
         public BeatmapPanel SelectedPanel { get; private set; }
 
         private List<float> yPositions = new List<float>();
-        private CarouselLifetimeList<Panel> Lifetime;
+        private CarouselLifetimeList<Panel> lifetime;
 
         public CarouselContainer()
         {
             DistanceDecayJump = 0.01;
 
-            Add(scrollableContent = new Container<Panel>(Lifetime = new CarouselLifetimeList<Panel>(DepthComparer))
+            Add(scrollableContent = new Container<Panel>(lifetime = new CarouselLifetimeList<Panel>(DepthComparer))
             {
                 RelativeSizeAxes = Axes.X,
             });
@@ -187,9 +187,9 @@ namespace osu.Game.Screens.Select
         private static float offsetX(float dist, float halfHeight)
         {
             // The radius of the circle the carousel moves on.
-            const float CIRCLE_RADIUS = 3;
-            double discriminant = Math.Max(0, CIRCLE_RADIUS * CIRCLE_RADIUS - dist * dist);
-            float x = (CIRCLE_RADIUS - (float)Math.Sqrt(discriminant)) * halfHeight;
+            const float circle_radius = 3;
+            double discriminant = Math.Max(0, circle_radius * circle_radius - dist * dist);
+            float x = (circle_radius - (float)Math.Sqrt(discriminant)) * halfHeight;
 
             return 125 + x;
         }
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Select
             float drawHeight = DrawHeight;
             float halfHeight = drawHeight / 2;
 
-            foreach (Panel p in Lifetime.AliveItems)
+            foreach (Panel p in lifetime.AliveItems)
             {
                 float panelPosY = p.Position.Y;
                 p.IsOnScreen = panelPosY >= Current - p.DrawHeight && panelPosY <= Current + drawHeight;
@@ -240,12 +240,12 @@ namespace osu.Game.Screens.Select
             int lastIndex = yPositions.BinarySearch(Current + drawHeight);
             if (lastIndex < 0) lastIndex = ~lastIndex;
 
-            Lifetime.StartIndex = firstIndex;
-            Lifetime.EndIndex = lastIndex;
+            lifetime.StartIndex = firstIndex;
+            lifetime.EndIndex = lastIndex;
 
             for (int i = firstIndex; i < lastIndex; ++i)
             {
-                Panel p = Lifetime[i];
+                Panel p = lifetime[i];
                 if (p.State != PanelSelectedState.Hidden)
                     p.IsOnScreen = true; //we don't want to update the on-screen state of hidden pannels as they have incorrect (stacked) y values.
                 updatePanel(p, halfHeight);

@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework.Configuration;
@@ -23,6 +23,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game
 {
@@ -168,6 +169,9 @@ namespace osu.Game
             {
                 switch (args.Key)
                 {
+                    case Key.T:
+                        Toolbar.ToggleVisibility();
+                        return true;
                     case Key.O:
                         options.ToggleVisibility();
                         return true;
@@ -221,6 +225,14 @@ namespace osu.Game
             }
 
             return base.OnExiting();
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (modeStack.ChildGameMode != null)
+                modeStack.ChildGameMode.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
         }
 
         private void modeAdded(GameMode newMode)

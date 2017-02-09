@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics;
@@ -68,6 +71,9 @@ namespace osu.Game.Overlays.Pause
 
         protected override void PopIn() => FadeIn(transition_duration, EasingTypes.In);
         protected override void PopOut() => FadeOut(transition_duration, EasingTypes.In);
+
+        // Don't let mouse down events through the overlay or people can click circles while paused.
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {

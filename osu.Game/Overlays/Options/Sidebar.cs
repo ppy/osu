@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using OpenTK;
@@ -11,13 +11,15 @@ using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Toolbar;
 
 namespace osu.Game.Overlays.Options
 {
     public class Sidebar : Container
     {
         private FlowContainer content;
-        internal const int default_width = 60, expanded_width = 200;
+        internal const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
+        internal const int EXPANDED_WIDTH = 200;
         protected override Container<Drawable> Content => content;
 
         public Sidebar()
@@ -54,7 +56,7 @@ namespace osu.Game.Overlays.Options
             expandEvent = Scheduler.AddDelayed(() =>
             {
                 expandEvent = null;
-                ResizeTo(new Vector2(expanded_width, Height), 150, EasingTypes.OutQuad);
+                ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 150, EasingTypes.OutQuad);
             }, 750);
             return true;
         }
@@ -62,7 +64,7 @@ namespace osu.Game.Overlays.Options
         protected override void OnHoverLost(InputState state)
         {
             expandEvent?.Cancel();
-            ResizeTo(new Vector2(default_width, Height), 150, EasingTypes.OutQuad);
+            ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 150, EasingTypes.OutQuad);
             base.OnHoverLost(state);
         }
 

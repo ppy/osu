@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Toolbar
 {
     class ToolbarUserArea : Container
     {
-        private LoginOverlay loginOverlay;
+        public LoginOverlay LoginOverlay;
         private ToolbarUserButton button;
 
         public override RectangleF BoundingBox => button.BoundingBox;
@@ -25,9 +25,9 @@ namespace osu.Game.Overlays.Toolbar
             Children = new Drawable[] {
                 button = new ToolbarUserButton
                 {
-                    Action = toggle,
+                    Action = () => LoginOverlay.ToggleVisibility(),
                 },
-                loginOverlay = new LoginOverlay
+                LoginOverlay = new LoginOverlay
                 {
                     BypassAutoSizeAxes = Axes.Both,
                     Position = new Vector2(0, 1),
@@ -36,11 +36,6 @@ namespace osu.Game.Overlays.Toolbar
                     Origin = Anchor.TopRight,
                 }
             };
-        }
-
-        private void toggle()
-        {
-            loginOverlay.ToggleVisibility();
         }
     }
 }

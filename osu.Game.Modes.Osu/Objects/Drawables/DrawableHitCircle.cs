@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.ComponentModel;
@@ -105,7 +105,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             //sane defaults
             ring.Alpha = circle.Alpha = number.Alpha = glow.Alpha = 1;
             ApproachCircle.Alpha = 0;
-            ApproachCircle.Scale = new Vector2(2);
+            ApproachCircle.Scale = new Vector2(4);
             explode.Alpha = 0;
         }
 
@@ -114,7 +114,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             base.UpdatePreemptState();
 
             ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT));
-            ApproachCircle.ScaleTo(0.6f, TIME_PREEMPT);
+            ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
         }
 
         protected override void UpdateState(ArmedState state)

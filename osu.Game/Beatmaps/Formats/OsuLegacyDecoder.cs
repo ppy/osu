@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
@@ -179,14 +179,14 @@ namespace osu.Game.Beatmaps.Formats
                 return; // TODO
             string[] split = val.Split(',');
             EventType type;
-            int _type;
-            if (!int.TryParse(split[0], out _type))
+            int intType;
+            if (!int.TryParse(split[0], out intType))
             {
                 if (!Enum.TryParse(split[0], out type))
                     throw new InvalidDataException($@"Unknown event type {split[0]}");
             }
             else
-                type = (EventType)_type;
+                type = (EventType)intType;
             // TODO: Parse and store the rest of the event
             if (type == EventType.Background)
                 beatmap.BeatmapInfo.Metadata.BackgroundFile = split[2].Trim('"');
@@ -200,7 +200,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (split.Length > 2)
             {
-                int kiai_flags = split.Length > 7 ? Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : 0;
+                int kiaiFlags = split.Length > 7 ? Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : 0;
                 double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
                 cp = new ControlPoint
                 {
