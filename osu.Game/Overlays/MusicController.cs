@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) transition_length7-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -85,6 +85,8 @@ namespace osu.Game.Overlays
             {
                 dragContainer = new Container
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Masking = true,
                     CornerRadius = 5,
                     EdgeEffect = new EdgeEffect
@@ -374,10 +376,19 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        //placeholder for toggling
-        protected override void PopIn() => FadeIn(100);
+        const float transition_length = 800;
 
-        protected override void PopOut() => FadeOut(100);
+        protected override void PopIn()
+        {
+            FadeIn(transition_length, EasingTypes.OutQuint);
+            dragContainer.ScaleTo(1, transition_length, EasingTypes.OutElastic);
+        }
+
+        protected override void PopOut()
+        {
+            FadeOut(transition_length, EasingTypes.OutQuint);
+            dragContainer.ScaleTo(0.9f, transition_length, EasingTypes.OutQuint);
+        }
 
         private enum TransformDirection { None, Next, Prev }
 
