@@ -28,7 +28,7 @@ namespace osu.Game.Modes
 
         public abstract ScoreProcessor CreateScoreProcessor(int hitObjectCount);
 
-        public abstract HitRenderer CreateHitRendererWith(List<HitObject> objects);
+        public abstract HitRenderer CreateHitRendererWith(Beatmap beatmap);
 
         public abstract HitObjectParser CreateHitObjectParser();
 
