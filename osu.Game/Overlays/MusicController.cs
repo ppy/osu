@@ -27,7 +27,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
-    public class MusicController : OverlayContainer
+    public class MusicController : FocusedOverlayContainer
     {
         private MusicControllerBackground backgroundSprite;
         private DragBar progress;
@@ -380,12 +380,16 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
+            base.PopIn();
+
             FadeIn(transition_length, EasingTypes.OutQuint);
             dragContainer.ScaleTo(1, transition_length, EasingTypes.OutElastic);
         }
 
         protected override void PopOut()
         {
+            base.PopOut();
+
             FadeOut(transition_length, EasingTypes.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, EasingTypes.OutQuint);
         }
