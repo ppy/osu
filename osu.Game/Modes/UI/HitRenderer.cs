@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.UI
 {
@@ -37,7 +38,7 @@ namespace osu.Game.Modes.UI
     {
         private List<T> objects;
 
-        public List<HitObject> Objects
+        public Beatmap Beatmap
         {
             set
             {
@@ -51,7 +52,7 @@ namespace osu.Game.Modes.UI
 
         protected abstract HitObjectConverter<T> Converter { get; }
 
-        protected virtual List<T> Convert(List<HitObject> objects) => Converter.Convert(objects);
+        protected virtual List<T> Convert(Beatmap beatmap) => Converter.Convert(beatmap);
 
         public HitRenderer()
         {

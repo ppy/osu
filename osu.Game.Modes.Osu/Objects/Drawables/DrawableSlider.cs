@@ -31,7 +31,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             {
                 body = new SliderBody(s)
                 {
-                    Position = s.Position,
+                    Position = s.StackedPosition,
                     PathWidth = s.Scale * 64,
                 },
                 bouncer1 = new SliderBouncer(s, false)
@@ -41,7 +41,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 },
                 bouncer2 = new SliderBouncer(s, true)
                 {
-                    Position = s.Position,
+                    Position = s.StackedPosition,
                     Scale = new Vector2(s.Scale),
                 },
                 ball = new SliderBall(s)
@@ -51,7 +51,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 initialCircle = new DrawableHitCircle(new HitCircle
                 {
                     StartTime = s.StartTime,
-                    Position = s.Position,
+                    Position = s.StackedPosition,
                     Scale = s.Scale,
                     Colour = s.Colour,
                     Sample = s.Sample,

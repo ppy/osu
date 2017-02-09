@@ -58,28 +58,28 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 new OsuHitRenderer
                 {
-                    Objects = beatmap.HitObjects,
+                    Beatmap = beatmap,
                     Scale = new Vector2(0.5f),
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft
                 },
                 new TaikoHitRenderer
                 {
-                    Objects = beatmap.HitObjects,
+                    Beatmap = beatmap,
                     Scale = new Vector2(0.5f),
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight
                 },
                 new CatchHitRenderer
                 {
-                    Objects = beatmap.HitObjects,
+                    Beatmap = beatmap,
                     Scale = new Vector2(0.5f),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft
                 },
                 new ManiaHitRenderer
                 {
-                    Objects = beatmap.HitObjects,
+                    Beatmap = beatmap,
                     Scale = new Vector2(0.5f),
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight
