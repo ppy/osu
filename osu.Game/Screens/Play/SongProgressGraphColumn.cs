@@ -59,7 +59,14 @@ namespace osu.Game.Screens.Play
 
             for (int i = 0; i < drawableRows.Count; i++)
             {
-                drawableRows[i].Colour = i <= Filled ? colour : empty_colour;
+                if (Filled == 0) // i <= Filled doesn't work for zero fill
+                {
+                    drawableRows[i].Colour = empty_colour;
+                }
+                else
+                {
+                    drawableRows[i].Colour = i <= Filled ? colour : empty_colour;
+                }
             }
         }
 

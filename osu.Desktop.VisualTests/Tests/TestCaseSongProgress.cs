@@ -41,7 +41,7 @@ namespace osu.Desktop.VisualTests
             List<int> newValues = new List<int>();
             for (int i = 0; i < 1000; i++)
             {
-                newValues.Add(random.Next(1, 11));
+                newValues.Add(random.Next(0, 11));
             }
 
             progress.DisplayValues(newValues);

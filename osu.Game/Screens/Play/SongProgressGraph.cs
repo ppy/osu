@@ -70,6 +70,9 @@ namespace osu.Game.Screens.Play
 
         private void recalculateValues()
         {
+            // Resizes values to fit the amount of columns and stores it in calculatedValues
+            // Defaults to all zeros if values is null
+
             calculatedValues.RemoveAll(delegate { return true; });
 
             if (values == null)
