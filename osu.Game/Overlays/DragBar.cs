@@ -11,7 +11,8 @@ namespace osu.Game.Overlays
 {
     public class DragBar : Container
     {
-        private Box fill;
+        protected Container fillContainer;
+        protected Box fill;
 
         public Action<float> SeekRequested;
         private bool isDragging;
@@ -24,7 +25,7 @@ namespace osu.Game.Overlays
             {
                 enabled = value;
                 if (!enabled)
-                    fill.Width = 0;
+                    fillContainer.Width = 0;
             }
         }
 
@@ -34,12 +35,19 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                fill = new Box()
+                fillContainer = new Container
                 {
-                    Origin = Anchor.CentreLeft,
-                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0
+                    Width = 0,
+                    Children = new Drawable[]
+                    {
+                        fill = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }
+                    }
                 }
             };
         }
@@ -48,7 +56,7 @@ namespace osu.Game.Overlays
         {
             if (isDragging || !IsEnabled) return;
 
-            fill.Width = position;
+            fillContainer.Width = position;
         }
 
         private void seek(InputState state)
@@ -56,7 +64,7 @@ namespace osu.Game.Overlays
             if (!IsEnabled) return;
             float seekLocation = state.Mouse.Position.X / DrawWidth;
             SeekRequested?.Invoke(seekLocation);
-            fill.Width = seekLocation;
+            fillContainer.Width = seekLocation;
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)

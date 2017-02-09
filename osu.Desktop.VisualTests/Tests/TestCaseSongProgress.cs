@@ -22,11 +22,6 @@ namespace osu.Desktop.VisualTests
         {
             base.Reset();
 
-            Add(new Box
-            {
-                ColourInfo = ColourInfo.GradientVertical(Color4.WhiteSmoke, Color4.Gray),
-                RelativeSizeAxes = Framework.Graphics.Axes.Both,
-            });
             Add(new SongProgress
             {
                 Anchor = Anchor.BottomCentre,

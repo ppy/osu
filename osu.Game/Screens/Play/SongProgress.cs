@@ -16,9 +16,8 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgress : Container
     {
-        private const int graph_height = 34;
-        private const int handle_height = 25;
-        private const int handle_width = 14;
+        public static readonly int BAR_HEIGHT = 5;
+        public static readonly int GRAPH_HEIGHT = 34;
         public static readonly Color4 FILL_COLOUR = new Color4(221, 255, 255, 255);
         public static readonly Color4 GLOW_COLOUR = new Color4(221, 255, 255, 150);
 
@@ -40,15 +39,20 @@ namespace osu.Game.Screens.Play
             {
                 float currentProgress = (float)(current.Track.CurrentTime / current.Track.Length);
 
+                progress.IsEnabled = true;
                 progress.UpdatePosition(currentProgress);
                 graph.Progress = (int)(graph.ColumnCount * currentProgress);
+            }
+            else
+            {
+                progress.IsEnabled = false;
             }
         }
 
         public SongProgress()
         {
             RelativeSizeAxes = Axes.X;
-            Height = SongProgressBar.BAR_HEIGHT + graph_height + handle_height;
+            Height = BAR_HEIGHT + GRAPH_HEIGHT + SongProgressBar.HANDLE_SIZE.Y;
 
             Children = new Drawable[]
             {
@@ -57,56 +61,22 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
-                    Height = graph_height,
+                    Height = GRAPH_HEIGHT,
                     Margin = new MarginPadding
                     {
-                        Bottom = SongProgressBar.BAR_HEIGHT
+                        Bottom = BAR_HEIGHT
                     }
                 },
                 progress = new SongProgressBar
                 {
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
-                    IsEnabled = true,
                     SeekRequested = delegate (float position)
                     {
-                        Framework.Logging.Logger.Log($@"Seeked to {position}");
+                        current?.Track?.Seek(current.Track.Length * position);
+                        current?.Track?.Start();
                     }
                 }
-
-                //handle = new Container
-                //        {
-                //            Origin = Anchor.BottomLeft,
-                //            Anchor = Anchor.BottomLeft,
-                //            Width = 2,
-                //            Height = bar_height + graph_height,
-                //            Position = new Vector2(2, 0),
-                //            Children = new Drawable[]
-                //            {
-                //                new Box
-                //                {
-                //                    RelativeSizeAxes = Axes.Both,
-                //                    Colour = Color4.White
-                //                },
-                //                new Container
-                //                {
-                //                    Origin = Anchor.BottomCentre,
-                //                    Anchor = Anchor.TopCentre,
-                //                    Width = handle_width,
-                //                    Height = handle_height,
-                //                    CornerRadius = 5,
-                //                    Masking = true,
-                //                    Children = new Drawable[]
-                //                    {
-                //                        new Box
-                //                        {
-                //                            RelativeSizeAxes = Axes.Both,
-                //                            Colour = Color4.White
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //        }
             };
         }
     }
