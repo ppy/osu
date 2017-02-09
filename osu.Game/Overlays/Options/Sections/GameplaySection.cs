@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Options.Sections
         {
             base.Children = new Drawable[]
             {
-                new Gameplay.GeneralOptions(),
+                new GeneralOptions(),
                 new SongSelectOptions(),
             };
         }

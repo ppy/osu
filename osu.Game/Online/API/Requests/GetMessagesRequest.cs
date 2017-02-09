@@ -15,7 +15,7 @@ namespace osu.Game.Online.API.Requests
         public GetMessagesRequest(List<Channel> channels, long? sinceId)
         {
             this.channels = channels;
-            this.since = sinceId;
+            since = sinceId;
         }
 
         protected override WebRequest CreateWebRequest()

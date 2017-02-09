@@ -20,13 +20,13 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (args.Button == this.Button) IsLit = true;
+            if (args.Button == Button) IsLit = true;
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            if (args.Button == this.Button) IsLit = false;
+            if (args.Button == Button) IsLit = false;
             return base.OnMouseUp(state, args);
         }
     }
