@@ -13,12 +13,17 @@ namespace osu.Game.Modes.Osu.Objects
     {
         public Vector2 Position { get; set; }
 
-        public float Scale { get; set; } = 1;
+        public Vector2 StackedPosition => Position + StackOffset;
 
         public virtual Vector2 EndPosition => Position;
 
-        public int StackHeight { get; set; }
+        public Vector2 StackedEndPosition => EndPosition + StackOffset;
+
+        public virtual int StackHeight { get; set; }
+
         public Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
+
+        public float Scale { get; set; } = 1;
 
         public override void SetDefaultsFromBeatmap(Beatmap beatmap)
         {

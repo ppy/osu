@@ -12,6 +12,18 @@ namespace osu.Game.Modes.Osu.Objects
 
         public override Vector2 EndPosition => RepeatCount % 2 == 0 ? Position : Curve.PositionAt(1);
 
+        private int stackHeight;
+        public override int StackHeight
+        {
+            get { return stackHeight; }
+            set
+            {
+                stackHeight = value;
+                if (Curve != null)
+                    Curve.Offset = StackOffset;
+            }
+        }
+
         public double Velocity;
 
         public override void SetDefaultsFromBeatmap(Beatmap beatmap)

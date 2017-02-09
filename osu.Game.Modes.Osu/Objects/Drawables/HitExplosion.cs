@@ -26,7 +26,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             Direction = FlowDirection.VerticalOnly;
             Spacing = new Vector2(0, 2);
-            Position = (h?.EndPosition ?? Vector2.Zero) + judgement.PositionOffset;
+            Position = (h?.StackedEndPosition ?? Vector2.Zero) + judgement.PositionOffset;
 
             Children = new Drawable[]
             {
