@@ -26,7 +26,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.Music
 {
     public class MusicController : FocusedOverlayContainer
     {
@@ -46,6 +46,11 @@ namespace osu.Game.Overlays
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
         private BaseGame game;
+        private PlaylistController playlistController;
+
+        public BeatmapDatabase Beatmaps => playlistController.Beatmaps;
+        public List<BeatmapSetInfo> PlayList => playlistController.PlayList;
+        public int PlayListIndex => playlistController.PlayListIndex;
 
         private Container dragContainer;
 
@@ -61,7 +66,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnDrag(InputState state)
         {
-            Vector2 change = (state.Mouse.Position - state.Mouse.PositionMouseDown.Value);
+            Vector2 change = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
 
             // Diminish the drag distance as we go further to simulate "rubber band" feeling.
             change *= (float)Math.Pow(change.Length, 0.7f) / change.Length;
@@ -77,8 +82,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, OsuConfigManager config, BeatmapDatabase beatmaps, AudioManager audio,
-            TextureStore textures, OsuColour colours)
+        private void load(OsuGameBase osuGame, OsuConfigManager config, OsuColour colours, PlaylistController playlistController)
         {
             unicodeString = config.GetUnicodeString;
 
@@ -185,7 +189,21 @@ namespace osu.Game.Overlays
                             AutoSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.BottomRight,
-                            Position = new Vector2(20, -30),
+                            Position = new Vector2(-20, -30),
+                            Action = () =>
+                                {
+                                    switch (this.playlistController.State)
+                                    {
+                                        case Visibility.Hidden:
+                                            this.playlistController.State=Visibility.Visible;
+                                            break;
+                                        case Visibility.Visible:
+                                            this.playlistController.State=Visibility.Hidden;
+                                            break;
+                                        default:
+                                            throw new ArgumentOutOfRangeException();
+                                    }
+                                },
                             Children = new Drawable[]
                             {
                                 listButton = new TextAwesome
@@ -208,14 +226,15 @@ namespace osu.Game.Overlays
                     }
                 }
             };
-        
-            this.beatmaps = beatmaps;
+
             trackManager = osuGame.Audio.Track;
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
             preferUnicode.ValueChanged += preferUnicode_changed;
 
-            beatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
-            playList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
+            this.playlistController = playlistController;
+
+            beatmapSource = new Bindable<WorkingBeatmap>();
+            beatmapSource.Weld(playlistController.BeatmapSource);
 
             backgroundSprite = new MusicControllerBackground();
             dragContainer.Add(backgroundSprite);
@@ -255,12 +274,16 @@ namespace osu.Game.Overlays
 
         private void workingChanged(object sender = null, EventArgs e = null)
         {
-            progress.IsEnabled = (beatmapSource.Value != null);
+            progress.IsEnabled = beatmapSource.Value != null;
             if (beatmapSource.Value == current) return;
             bool audioEquals = current?.BeatmapInfo.AudioEquals(beatmapSource.Value.BeatmapInfo) ?? false;
             current = beatmapSource.Value;
-            updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Next);
-            appendToHistory(current.BeatmapInfo);
+            if (!audioEquals)
+            {
+                updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Next);
+                appendToHistory(current.BeatmapInfo);
+                play(playHistory[playHistoryIndex], true);
+            }
         }
 
         private void appendToHistory(BeatmapInfo beatmap)
@@ -287,22 +310,24 @@ namespace osu.Game.Overlays
                 play(playHistory[++playHistoryIndex], true);
             else
             {
-                if (playList.Count == 0) return;
-                if (current != null && playList.Count == 1) return;
+                var playListCount = PlayList.Count;
+                if (playListCount == 0) return;
+                if (current != null && playListCount == 1) return;
                 //shuffle
                 BeatmapInfo nextToPlay;
                 do
                 {
-                    int j = RNG.Next(playListIndex, playList.Count);
-                    if (j != playListIndex)
+                    int j = RNG.Next(PlayListIndex, playListCount);
+                    if (j != PlayListIndex)
                     {
-                        BeatmapSetInfo temp = playList[playListIndex];
-                        playList[playListIndex] = playList[j];
-                        playList[j] = temp;
+                        BeatmapSetInfo temp = PlayList[PlayListIndex];
+                        PlayList[PlayListIndex] = PlayList[j];
+                        PlayList[j] = temp;
                     }
 
-                    nextToPlay = playList[playListIndex++].Beatmaps[0];
-                    if (playListIndex == playList.Count) playListIndex = 0;
+                    nextToPlay = PlayListIndex == playListCount - 1 ?
+                        PlayList[0].Beatmaps[0] :
+                        PlayList[MathHelper.Clamp(PlayListIndex + 1, PlayListIndex, playListCount - 1)].Beatmaps[0];
                 }
                 while (nextToPlay.AudioEquals(current?.BeatmapInfo));
 
@@ -313,7 +338,7 @@ namespace osu.Game.Overlays
 
         private void play(BeatmapInfo info, bool isNext)
         {
-            current = beatmaps.GetWorkingBeatmap(info, current);
+            current = Beatmaps.GetWorkingBeatmap(info, current);
             Task.Run(() =>
             {
                 trackManager.SetExclusive(current.Track);
@@ -406,6 +431,7 @@ namespace osu.Game.Overlays
 
             FadeOut(transition_length, EasingTypes.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, EasingTypes.OutQuint);
+            playlistController.State = Visibility.Hidden;
         }
 
         private enum TransformDirection { None, Next, Prev }

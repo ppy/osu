@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Music;
 
 namespace osu.Game.Overlays.Toolbar
 {

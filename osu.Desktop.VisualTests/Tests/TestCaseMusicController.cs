@@ -5,6 +5,7 @@ using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Music;
 
 namespace osu.Desktop.VisualTests.Tests
 {

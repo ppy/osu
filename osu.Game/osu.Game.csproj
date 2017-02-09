@@ -81,7 +81,7 @@
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
     <Compile Include="Overlays\LoginOverlay.cs" />
-    <Compile Include="Overlays\MusicController.cs" />
+    <Compile Include="Overlays\Music\MusicController.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\Formats\ConstructableBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\WorkingBeatmap.cs" />
@@ -100,6 +100,10 @@
     <Compile Include="Beatmaps\Timing\SampleChange.cs" />
     <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
+    <Compile Include="Overlays\Music\Playlist.cs" />
+    <Compile Include="Overlays\Music\PlaylistController.cs" />
+    <Compile Include="Overlays\Music\PlaylistItem.cs" />
+    <Compile Include="Overlays\Music\SelectionState.cs" />
     <Compile Include="Overlays\Options\OptionDropDown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropDownHeader.cs" />
