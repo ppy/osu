@@ -11,6 +11,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Overlays;
+using System.Collections.Generic;
+using System;
 
 namespace osu.Game.Screens.Play
 {
@@ -49,6 +51,11 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        public void DisplayValues(List<int> values)
+        {
+            graph.Values = values;
+        }
+
         public SongProgress()
         {
             RelativeSizeAxes = Axes.X;
@@ -78,6 +85,17 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
+
+            // TODO: Remove
+            var random = new Random();
+
+            List<int> newValues = new List<int>();
+            for (int i = 0; i < 1000; i++)
+            {
+                newValues.Add(random.Next(1, 11));
+            }
+
+            DisplayValues(newValues);
         }
     }
 }

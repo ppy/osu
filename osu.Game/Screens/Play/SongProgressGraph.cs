@@ -2,11 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics;
+using System;
 
 namespace osu.Game.Screens.Play
 {
@@ -34,6 +32,22 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        private List<int> calculatedValues = new List<int>(); // values but adjusted to fit the amount of columns
+        private List<int> values;
+        public List<int> Values
+        {
+            get
+            {
+                return values;
+            }
+            set
+            {
+                if (value == values) return;
+                values = value;
+                recreateGraph();
+            }
+        }
+
         private void redrawProgress()
         {
             for (int i = 0; i < columns.Count; i++)
@@ -44,25 +58,46 @@ namespace osu.Game.Screens.Play
             ForceRedraw();
         }
 
+        private void redrawFilled()
+        {
+            for (int i = 0; i < ColumnCount; i++)
+            {
+                columns[i].Filled = calculatedValues[i];
+            }
+
+            ForceRedraw();
+        }
+
+        private void recalculateValues()
+        {
+            calculatedValues.RemoveAll(delegate { return true; });
+
+            float step = (float)values.Count / (float)ColumnCount;
+
+            for (float i = 0; i < values.Count; i += step) 
+            {
+                calculatedValues.Add(values[(int)i]);
+            }
+        }
+
         private void recreateGraph()
         {
             RemoveAll(delegate { return true; }, true);
             columns.RemoveAll(delegate { return true; });
 
-            // Random filled values used for testing for now
-            var random = new Random();
-            for (int column = 0; column < DrawWidth; column += 3)
+            for (int x = 0; x < DrawWidth; x += 3)
             {
                 columns.Add(new SongProgressGraphColumn
                 {
-                    Position = new Vector2(column + 1, 0),
-                    Filled = random.Next(1, 11),
+                    Position = new Vector2(x + 1, 0),
                     State = ColumnState.Dimmed
                 });
 
                 Add(columns[columns.Count - 1]);
             }
 
+            recalculateValues();
+            redrawFilled();
             redrawProgress();
         }
 
