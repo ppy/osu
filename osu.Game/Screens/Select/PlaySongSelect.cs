@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Linq;
@@ -11,15 +11,12 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Game.Screens.Play;
 using osu.Framework;
 using osu.Framework.Audio.Sample;
@@ -29,8 +26,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
-using osu.Game.Graphics;
 using System.Collections.Generic;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Select
@@ -45,46 +42,17 @@ namespace osu.Game.Screens.Select
         private TrackManager trackManager;
 
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
-        private static readonly Vector2 wedged_container_start_position = new Vector2(0, 50);
         private BeatmapInfoWedge beatmapInfoWedge;
 
-        private static readonly Vector2 BACKGROUND_BLUR = new Vector2(20);
+        private static readonly Vector2 background_blur = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
 
         private AudioSample sampleChangeDifficulty;
         private AudioSample sampleChangeBeatmap;
-        
+
         private List<BeatmapGroup> beatmapGroups;
 
         private Footer footer;
-
-        class WedgeBackground : Container
-        {
-            public WedgeBackground()
-            {
-                Children = new[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(1, 0.5f),
-                        Colour = Color4.Black.Opacity(0.5f),
-                        Shear = new Vector2(0.15f, 0),
-                        EdgeSmoothness = new Vector2(2, 0),
-                    },
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        RelativePositionAxes = Axes.Y,
-                        Size = new Vector2(1, -0.5f),
-                        Position = new Vector2(0, 1),
-                        Colour = Color4.Black.Opacity(0.5f),
-                        Shear = new Vector2(-0.15f, 0),
-                        EdgeSmoothness = new Vector2(2, 0),
-                    },
-                };
-            }
-        }
 
         Player player;
         FilterControl filter;
@@ -116,45 +84,53 @@ namespace osu.Game.Screens.Select
         private void load(BeatmapDatabase beatmaps, AudioManager audio, BaseGame game,
             OsuGame osuGame, OsuColour colours)
         {
-            const float carouselWidth = 640;
-            const float bottomToolHeight = 50;
+            const float carousel_width = 640;
+            const float filter_height = 100;
+
             beatmapGroups = new List<BeatmapGroup>();
             Children = new Drawable[]
             {
                 new ParallaxContainer
                 {
+                    Padding = new MarginPadding { Top = filter_height },
                     ParallaxAmount = 0.005f,
                     RelativeSizeAxes = Axes.Both,
-                    Children = new []
+                    Children = new[]
                     {
                         new WedgeBackground
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = carouselWidth * 0.76f },
+                            Padding = new MarginPadding
+                            {
+                                Right = carousel_width * 0.76f
+                            },
                         },
                     }
                 },
                 carousel = new CarouselContainer
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(carouselWidth, 1),
+                    Size = new Vector2(carousel_width, 1),
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                 },
                 filter = new FilterControl
                 {
-                    Position = wedged_container_start_position,
                     RelativeSizeAxes = Axes.X,
+                    Height = filter_height,
                     FilterChanged = filterChanged,
                     Exit = Exit,
                 },
                 beatmapInfoWedge = new BeatmapInfoWedge
                 {
                     Alpha = 0,
-                    Position = wedged_container_start_position,
                     Size = wedged_container_size,
                     RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding { Top = 20, Right = 20, },
+                    Margin = new MarginPadding
+                    {
+                        Top = 20,
+                        Right = 20,
+                    },
                 },
                 footer = new Footer()
                 {
@@ -236,9 +212,9 @@ namespace osu.Game.Screens.Select
 
             Content.FadeInFromZero(250);
 
-            beatmapInfoWedge.MoveToX(wedged_container_start_position.X - 50);
-            beatmapInfoWedge.MoveToX(wedged_container_start_position.X, 800, EasingTypes.OutQuint);
-            
+            beatmapInfoWedge.MoveToX(-50);
+            beatmapInfoWedge.MoveToX(0, 800, EasingTypes.OutQuint);
+
             filter.Activate();
         }
 
@@ -262,19 +238,19 @@ namespace osu.Game.Screens.Select
             Content.ScaleTo(1.1f, 250, EasingTypes.InSine);
 
             Content.FadeOut(250);
-            
+
             filter.Deactivate();
             base.OnSuspending(next);
         }
 
         protected override bool OnExiting(GameMode next)
         {
-            beatmapInfoWedge.MoveTo(wedged_container_start_position + new Vector2(-100, 50), 800, EasingTypes.InQuint);
+            beatmapInfoWedge.MoveToX(-100, 800, EasingTypes.InQuint);
             beatmapInfoWedge.RotateTo(10, 800, EasingTypes.InQuint);
 
             Content.FadeOut(100);
 
-            filter.Deactivate();            
+            filter.Deactivate();
             return base.OnExiting(next);
         }
 
@@ -299,7 +275,7 @@ namespace osu.Game.Screens.Select
             if (backgroundModeBeatmap != null)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurTo(BACKGROUND_BLUR, 1000);
+                backgroundModeBeatmap.BlurTo(background_blur, 1000);
             }
 
             if (beatmap != null)

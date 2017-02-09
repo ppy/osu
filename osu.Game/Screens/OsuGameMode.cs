@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework.Allocation;
@@ -23,8 +23,6 @@ namespace osu.Game.Screens
         internal virtual bool ShowOverlays => true;
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
-
-        protected float ToolbarPadding => ShowOverlays ? (Game as OsuGame)?.Toolbar.DrawHeight ?? 0 : 0;
 
         private bool boundToBeatmap;
         private Bindable<WorkingBeatmap> beatmap;

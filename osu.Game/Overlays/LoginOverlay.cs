@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    class LoginOverlay : OverlayContainer
+    class LoginOverlay : FocusedOverlayContainer
     {
         private LoginOptions optionsSection;
 
@@ -64,6 +64,8 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
+            base.PopIn();
+
             optionsSection.Bounding = true;
             FadeIn(transition_time, EasingTypes.OutQuint);
         }

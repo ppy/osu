@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using OpenTK;
@@ -54,10 +54,10 @@ namespace osu.Game.Screens.Select
 
         public Footer()
         {
-            const float bottomToolHeight = 50;
+            const float bottom_tool_height = 50;
 
             RelativeSizeAxes = Axes.X;
-            Height = bottomToolHeight;
+            Height = bottom_tool_height;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]

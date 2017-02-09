@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Options.Sections
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            content.Spacing = new Vector2(0, 5);
+            FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
                 new OptionLabel { Text = "TODO: Skin preview textures" },

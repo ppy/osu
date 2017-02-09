@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
@@ -32,7 +32,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 body = new SliderBody(s)
                 {
                     Position = s.Position,
-                    PathWidth = s.Scale * 72,
+                    PathWidth = s.Scale * 64,
                 },
                 bouncer1 = new SliderBouncer(s, false)
                 {

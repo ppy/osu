@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Options.Sections.General
     {
         private bool bounding = true;
 
-        protected override string Header => "Sign In";
+        protected override string Header => "Account";
 
         public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
 
@@ -112,11 +112,13 @@ namespace osu.Game.Overlays.Options.Sections.General
                 {
                     username = new OsuTextBox
                     {
+                        PlaceholderText = "Username",
                         RelativeSizeAxes = Axes.X,
                         Text = api?.Username ?? string.Empty
                     },
                     password = new OsuPasswordTextBox
                     {
+                        PlaceholderText = "Password",
                         RelativeSizeAxes = Axes.X
                     },
                     saveUsername = new OsuCheckbox

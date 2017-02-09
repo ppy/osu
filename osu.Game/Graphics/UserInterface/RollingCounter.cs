@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -60,7 +60,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected T count;
+        private T count;
 
         /// <summary>
         /// Actual value of counter.
@@ -88,7 +88,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public abstract void Increment(T amount);
 
-        protected float textSize;
+        private float textSize;
 
         public float TextSize
         {

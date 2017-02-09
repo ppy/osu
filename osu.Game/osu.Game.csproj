@@ -69,6 +69,7 @@
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
     <Compile Include="Graphics\UserInterface\Nub.cs" />
+    <Compile Include="Graphics\UserInterface\OsuPasswordTextBox.cs" />
     <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
@@ -188,6 +189,7 @@
     <Compile Include="Overlays\Toolbar\ToolbarModeSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
+    <Compile Include="Screens\Select\WedgeBackground.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />

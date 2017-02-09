@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
@@ -13,7 +13,7 @@ namespace osu.Desktop.VisualTests.Tests
         public override string Name => @"Music Controller";
         public override string Description => @"Tests music controller ui.";
 
-        protected MusicController mc;
+        private MusicController mc;
 
         public TestCaseMusicController()
         {

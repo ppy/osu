@@ -1,20 +1,16 @@
-//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.GameModes;
 using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Graphics.Containers;
-using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
 using osu.Game.Screens.Direct;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multiplayer;
-using osu.Game.Screens.Play;
 using OpenTK;
 using osu.Game.Screens.Select;
 
@@ -25,7 +21,7 @@ namespace osu.Game.Screens.Menu
         private ButtonSystem buttons;
         public override string Name => @"Main Menu";
 
-        internal override bool ShowOverlays => true;
+        internal override bool ShowOverlays => buttons.State != MenuState.Initial;
 
         private BackgroundMode background;
 
@@ -42,7 +38,7 @@ namespace osu.Game.Screens.Menu
                     ParallaxAmount = 0.01f,
                     Children = new Drawable[]
                     {
-                        buttons = new ButtonSystem()
+                        buttons = new ButtonSystem
                         {
                             OnChart = delegate { Push(new ChartListing()); },
                             OnDirect = delegate { Push(new OnlineListing()); },
@@ -63,11 +59,12 @@ namespace osu.Game.Screens.Menu
             background.Preload(game);
 
             buttons.OnSettings = game.ToggleOptions;
+
         }
 
-        protected override void LoadComplete()
+        protected override void OnEntering(GameMode last)
         {
-            base.LoadComplete();
+            base.OnEntering(last);
             buttons.FadeInFromZero(500);
         }
 

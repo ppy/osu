@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Diagnostics;
 using System.Linq;
@@ -23,13 +23,13 @@ using osu.Game.Overlays.Options.Sections;
 
 namespace osu.Game.Overlays
 {
-    public class OptionsOverlay : OverlayContainer
+    public class OptionsOverlay : FocusedOverlayContainer
     {
         internal const float CONTENT_MARGINS = 10;
 
         public const float TRANSITION_LENGTH = 600;
 
-        public const float SIDEBAR_WIDTH = Sidebar.default_width;
+        public const float SIDEBAR_WIDTH = Sidebar.DEFAULT_WIDTH;
 
         private const float width = 400;
         
@@ -159,22 +159,10 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            switch (args.Key)
-            {
-                case Key.Escape:
-                    if (State == Visibility.Hidden) return false;
-                    Hide();
-                    return true;
-            }
-            return base.OnKeyDown(state, args);
-        }
-
         protected override void PopIn()
         {
+            base.PopIn();
+
             scrollContainer.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(1, TRANSITION_LENGTH / 2);

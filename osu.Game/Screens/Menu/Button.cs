@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework;
@@ -27,6 +27,8 @@ namespace osu.Game.Screens.Menu
     {
         private Container iconText;
         private Container box;
+        private Box boxColourLayer;
+        private Box boxHoverLayer;
         private Color4 colour;
         private TextAwesome icon;
         private string internalName;
@@ -55,7 +57,7 @@ namespace osu.Game.Screens.Menu
             AutoSizeAxes = Axes.Both;
             Alpha = 0;
 
-            Vector2 boxSize = new Vector2(ButtonSystem.button_width + Math.Abs(extraWidth), ButtonSystem.button_area_height);
+            Vector2 boxSize = new Vector2(ButtonSystem.BUTTON_WIDTH + Math.Abs(extraWidth), ButtonSystem.BUTTON_AREA_HEIGHT);
 
             Children = new Drawable[]
             {
@@ -72,16 +74,24 @@ namespace osu.Game.Screens.Menu
                     },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = colour,
                     Scale = new Vector2(0, 1),
                     Size = boxSize,
-                    Shear = new Vector2(ButtonSystem.wedge_width / boxSize.Y, 0),
-                    Children = new Drawable[]
+                    Shear = new Vector2(ButtonSystem.WEDGE_WIDTH / boxSize.Y, 0),
+                    Children = new []
                     {
-                        new Box
+                        boxColourLayer = new Box
                         {
                             EdgeSmoothness = new Vector2(1.5f, 0),
                             RelativeSizeAxes = Axes.Both,
+                            Colour = colour,
+                        },
+                        boxHoverLayer = new Box
+                        {
+                            EdgeSmoothness = new Vector2(1.5f, 0),
+                            RelativeSizeAxes = Axes.Both,
+                            BlendingMode = BlendingMode.Additive,
+                            Colour = Color4.White,
+                            Alpha = 0,
                         },
                     }
                 },
@@ -229,13 +239,25 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
+            boxHoverLayer.FadeTo(0.1f, 1000, EasingTypes.OutQuint);
+            return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            boxHoverLayer.FadeTo(0, 1000, EasingTypes.OutQuint);
+            return base.OnMouseUp(state, args);
+        }
+
+        protected override bool OnClick(InputState state)
+        {
             trigger();
             return true;
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            base.OnKeyDown(state, args);
+            if (args.Repeat) return false;
 
             if (triggerKey == args.Key && triggerKey != Key.Unknown)
             {
@@ -250,9 +272,11 @@ namespace osu.Game.Screens.Menu
         {
             sampleClick.Play();
 
-            box.FlashColour(Color4.White, 500, EasingTypes.OutExpo);
-
             clickAction?.Invoke();
+
+            boxHoverLayer.ClearTransformations();
+            boxHoverLayer.Alpha = 0.9f;
+            boxHoverLayer.FadeOut(800, EasingTypes.OutExpo);
         }
 
         public override bool HandleInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
