@@ -40,8 +40,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
         {
             base.LoadComplete();
 
-            DelayReset();
-
             Delay(StartTime);
             FadeIn(DrawableOsuHitObject.TIME_FADEIN);
             ScaleTo(1.5f);
