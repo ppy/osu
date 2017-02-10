@@ -106,6 +106,8 @@ namespace osu.Game.Overlays.Notifications
 
         public void Complete()
         {
+            Debug.Assert(state != ProgressNotificationState.Completed);
+
             state = ProgressNotificationState.Completed;
 
             NotificationContent.MoveToY(-DrawSize.Y / 2, 200, EasingTypes.OutQuint);
