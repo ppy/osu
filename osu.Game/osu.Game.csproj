@@ -100,6 +100,13 @@
     <Compile Include="Beatmaps\Timing\SampleChange.cs" />
     <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
+    <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
+    <Compile Include="Overlays\Notifications\Notification.cs" />
+    <Compile Include="Overlays\NotificationManager.cs" />
+    <Compile Include="Overlays\Notifications\NotificationSection.cs" />
+    <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
+    <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
+    <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
     <Compile Include="Overlays\Options\OptionDropDown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropDownHeader.cs" />
@@ -107,6 +114,7 @@
     <Compile Include="Graphics\UserInterface\OsuDropDownMenuItem.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarHomeButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarMusicButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarNotificationButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarSettingsButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarOverlayToggleButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarUserArea.cs" />
