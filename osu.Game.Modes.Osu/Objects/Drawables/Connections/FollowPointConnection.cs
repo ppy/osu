@@ -12,7 +12,14 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class FollowPointConnection : HitObjectConnection
     {
+        /// <summary>
+        /// Determines how much space there is between points.
+        /// </summary>
         public int PointDistance = 32;
+
+        /// <summary>
+        /// Follow points to the next hitobject start appearing for this many milliseconds before an hitobject's end time.
+        /// </summary>
         public int PreEmpt = 800;
 
         public override void AddConnections(IEnumerable<DrawableHitObject> drawableHitObjects, int startIndex = 0, int endIndex = -1)

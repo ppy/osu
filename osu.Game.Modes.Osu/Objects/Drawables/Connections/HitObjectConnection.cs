@@ -9,6 +9,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
 {
     public abstract class HitObjectConnection : Container
     {
+        /// <summary>
+        /// Create drawables inside this container, connecting hitobjects visually, for example with follow points.
+        /// </summary>
+        /// <param name="drawableHitObjects">The drawables hit objects to create connections for</param>
+        /// <param name="startIndex">Start index into the drawableHitObjects enumeration.</param>
+        /// <param name="endIndex">End index into the drawableHitObjects enumeration. Use -1 to draw connections until the end.</param>
         public abstract void AddConnections(IEnumerable<DrawableHitObject> drawableHitObjects, int startIndex = 0, int endIndex = -1);
     }
 }
