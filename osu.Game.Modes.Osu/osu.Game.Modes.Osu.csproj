@@ -47,6 +47,7 @@
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
     <Compile Include="Objects\Drawables\DrawableSlider.cs" />
+    <Compile Include="Objects\Drawables\FollowPoint.cs" />
     <Compile Include="Objects\Drawables\Pieces\ExplodePiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\FlashPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
