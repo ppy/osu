@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// osu! logo and its attachments (pulsing, visualiser etc.)
     /// </summary>
-    public partial class OsuLogo : Container
+    public class OsuLogo : Container
     {
         public Color4 OsuPink = OsuColour.FromHex(@"e967a1");
 
@@ -32,7 +32,6 @@ namespace osu.Game.Screens.Menu
         private CircularContainer logoContainer;
         private Container logoBounceContainer;
         private Container logoHoverContainer;
-        private MenuVisualisation vis;
 
         private AudioSample sampleClick;
 
@@ -154,7 +153,7 @@ namespace osu.Game.Screens.Menu
                                         }
                                     }
                                 },
-                                vis = new MenuVisualisation
+                                new MenuVisualisation
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
