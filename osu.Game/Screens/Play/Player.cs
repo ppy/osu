@@ -240,7 +240,7 @@ namespace osu.Game.Screens.Play
             Content.Delay(250);
             Content.FadeIn(250);
 
-            Delay(500);
+            Delay(750);
             Schedule(() =>
             {
                 sourceClock.Start();
