@@ -100,13 +100,12 @@
     <Reference Include="OpenTK">
       <HintPath>$(SolutionDir)\packages\ppy.OpenTK.2.0.50727.1339\lib\net45\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\osu.licenseheader">
       <Link>osu.licenseheader</Link>
     </None>
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="OpenTK.dll.config" />
   </ItemGroup>
@@ -172,6 +171,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Benchmark.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Tests\TestCaseChatDisplay.cs" />
     <Compile Include="Tests\TestCaseGamefield.cs" />
