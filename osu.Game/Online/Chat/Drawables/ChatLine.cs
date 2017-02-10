@@ -20,7 +20,7 @@ namespace osu.Game.Online.Chat.Drawables
 
         public ChatLine(Message message)
         {
-            this.Message = message;
+            Message = message;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

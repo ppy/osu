@@ -67,6 +67,11 @@ namespace osu.Game.Graphics.Cursor
                         Masking = true,
                         BorderThickness = Size.X / 6,
                         BorderColour = Color4.White,
+                        EdgeEffect = new EdgeEffect {
+                            Type = EdgeEffectType.Shadow,
+                            Colour = Color4.Pink.Opacity(0.5f),
+                            Radius = 5,
+                        },
                         Children = new Drawable[]
                         {
                             new Box
