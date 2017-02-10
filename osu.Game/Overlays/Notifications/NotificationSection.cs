@@ -45,7 +45,6 @@ namespace osu.Game.Overlays.Notifications
 
         private string title;
 
-
         public string Title
         {
             get { return title; }
