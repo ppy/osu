@@ -237,11 +237,10 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            Delay(250, true);
+            Content.Delay(250);
             Content.FadeIn(250);
 
-            Delay(500, true);
-
+            Delay(500);
             Schedule(() =>
             {
                 sourceClock.Start();
