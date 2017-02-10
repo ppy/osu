@@ -105,8 +105,8 @@ namespace osu.Game.Beatmaps
 
         public WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, BeatmapDatabase database)
         {
-            this.BeatmapInfo = beatmapInfo;
-            this.BeatmapSetInfo = beatmapSetInfo;
+            BeatmapInfo = beatmapInfo;
+            BeatmapSetInfo = beatmapSetInfo;
             this.database = database;
         }
 
