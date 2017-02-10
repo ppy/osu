@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 
-namespace osu.Game.Modes.Osu.Objects.Drawables
+namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
 {
     public class FollowPoint : Container
     {
