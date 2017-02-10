@@ -24,11 +24,6 @@ namespace osu.Desktop.VisualTests
         {
             base.Reset();
 
-            Add(new Box
-            {
-                Colour = Color4.Gray,
-                RelativeSizeAxes = Axes.Both
-            });
             Add(progress = new SongProgress
             {
                 Anchor = Anchor.BottomCentre,
@@ -36,6 +31,14 @@ namespace osu.Desktop.VisualTests
                 RelativeSizeAxes = Axes.X
             });
 
+            AddButton("Toggle Bar", progress.ToggleVisibility);
+            AddButton("New Values", displayNewValues);
+
+            displayNewValues();
+        }
+
+        private void displayNewValues()
+        {
             var random = new Random();
 
             List<int> newValues = new List<int>();
