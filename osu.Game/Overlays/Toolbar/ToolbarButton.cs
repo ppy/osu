@@ -56,6 +56,8 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
+        protected virtual Anchor TooltipAnchor => Anchor.TopLeft;
+
         public Action Action;
         protected TextAwesome DrawableIcon;
         protected SpriteText DrawableText;
@@ -107,19 +109,24 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Direction = FlowDirection.VerticalOnly,
                     RelativeSizeAxes = Axes.Both, //stops us being considered in parent's autosize
-                    Anchor = Anchor.BottomLeft,
-                    Position = new Vector2(5, 5),
+                    Anchor = (TooltipAnchor & Anchor.x0) > 0 ? Anchor.BottomLeft : Anchor.BottomRight,
+                    Origin = TooltipAnchor,
+                    Position = new Vector2((TooltipAnchor & Anchor.x0) > 0 ? 5 : -5, 5),
                     Alpha = 0,
                     Children = new[]
                     {
                         tooltip1 = new OsuSpriteText
                         {
+                            Anchor = TooltipAnchor,
+                            Origin = TooltipAnchor,
                             Shadow = true,
                             TextSize = 22,
                             Font = @"Exo2.0-Bold",
                         },
                         tooltip2 = new OsuSpriteText
                         {
+                            Anchor = TooltipAnchor,
+                            Origin = TooltipAnchor,
                             Shadow = true,
                             TextSize = 16
                         }

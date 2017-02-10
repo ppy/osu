@@ -9,7 +9,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.Sprites
 {
-    class OsuSpriteText : SpriteText
+    public class OsuSpriteText : SpriteText
     {
         public const float FONT_SIZE = 16;
 

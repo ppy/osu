@@ -13,7 +13,7 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    class Nub : CircularContainer, IStateful<CheckBoxState>
+    public class Nub : CircularContainer, IStateful<CheckBoxState>
     {
         public const float COLLAPSED_SIZE = 20;
         public const float EXPANDED_SIZE = 40;

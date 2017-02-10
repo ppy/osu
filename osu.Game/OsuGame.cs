@@ -35,6 +35,8 @@ namespace osu.Game
 
         private MusicController musicController;
 
+        private NotificationManager notificationManager;
+
         private MainMenu mainMenu => modeStack?.ChildGameMode as MainMenu;
         private Intro intro => modeStack as Intro;
 
@@ -117,8 +119,16 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }).Preload(this, overlayContent.Add);
 
+            (notificationManager = new NotificationManager
+            {
+                Depth = -2,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+            }).Preload(this, overlayContent.Add);
+
             Dependencies.Cache(options);
             Dependencies.Cache(musicController);
+            Dependencies.Cache(notificationManager);
 
             (Toolbar = new Toolbar
             {
