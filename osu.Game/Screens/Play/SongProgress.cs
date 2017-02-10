@@ -13,15 +13,17 @@ using osu.Framework.Graphics.Primitives;
 using osu.Game.Overlays;
 using System.Collections.Generic;
 using System;
+using osu.Framework.Graphics.Transformations;
 
 namespace osu.Game.Screens.Play
 {
-    public class SongProgress : Container
+    public class SongProgress : OverlayContainer
     {
         public static readonly int BAR_HEIGHT = 5;
         public static readonly int GRAPH_HEIGHT = 34;
         public static readonly Color4 FILL_COLOUR = new Color4(221, 255, 255, 255);
         public static readonly Color4 GLOW_COLOUR = new Color4(221, 255, 255, 150);
+        private float progress_transition_duration = 100;
 
         private SongProgressBar progress;
         private SongProgressGraph graph;
@@ -54,6 +56,18 @@ namespace osu.Game.Screens.Play
         public void DisplayValues(List<int> values)
         {
             graph.Values = values;
+        }
+
+        protected override void PopIn()
+        {
+            progress.FadeTo(1f, progress_transition_duration, EasingTypes.In);
+            MoveTo(Vector2.Zero, progress_transition_duration, EasingTypes.In);
+        }
+
+        protected override void PopOut()
+        {
+            progress.FadeTo(0f, progress_transition_duration, EasingTypes.In);
+            MoveTo(new Vector2(0f, BAR_HEIGHT), progress_transition_duration, EasingTypes.In);
         }
 
         public SongProgress()
