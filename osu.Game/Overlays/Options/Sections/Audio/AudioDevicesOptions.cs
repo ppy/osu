@@ -14,6 +14,7 @@ namespace osu.Game.Overlays.Options.Sections.Audio
         protected override string Header => "Devices";
 
         private AudioManager audio;
+        private OptionDropDown<string> dropdown;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -21,21 +22,40 @@ namespace osu.Game.Overlays.Options.Sections.Audio
             this.audio = audio;
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            audio.OnNewDevice -= onDeviceChanged;
+            audio.OnLostDevice -= onDeviceChanged;
+        }
+
+        private void updateItems()
+        {
+            var deviceItems = new List<KeyValuePair<string, string>>();
+            deviceItems.Add(new KeyValuePair<string, string>("Default", string.Empty));
+            deviceItems.AddRange(audio.AudioDeviceNames.Select(d => new KeyValuePair<string, string>(d, d)));
+            dropdown.Items = deviceItems;
+        }
+
+        private void onDeviceChanged(string name) => updateItems();
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            var deviceItems = new List<KeyValuePair<string, string>>();
-            deviceItems.Add(new KeyValuePair<string, string>("Default", string.Empty));
-            deviceItems.AddRange(audio.GetDeviceNames().Select(d => new KeyValuePair<string, string>(d, d)));
             Children = new Drawable[]
             {
-                new OptionDropDown<string>()
+                dropdown = new OptionDropDown<string>()
                 {
-                    Items = deviceItems,
                     Bindable = audio.AudioDevice
                 },
             };
+
+            updateItems();
+
+            audio.OnNewDevice += onDeviceChanged;
+            audio.OnLostDevice += onDeviceChanged;
         }
     }
 }
