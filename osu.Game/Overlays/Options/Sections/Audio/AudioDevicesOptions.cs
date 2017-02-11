@@ -35,6 +35,11 @@ namespace osu.Game.Overlays.Options.Sections.Audio
             var deviceItems = new List<KeyValuePair<string, string>>();
             deviceItems.Add(new KeyValuePair<string, string>("Default", string.Empty));
             deviceItems.AddRange(audio.AudioDeviceNames.Select(d => new KeyValuePair<string, string>(d, d)));
+
+            var preferredDeviceName = audio.AudioDevice.Value;
+            if (!deviceItems.Any(kv => kv.Value == preferredDeviceName))
+                deviceItems.Add(new KeyValuePair<string, string>(preferredDeviceName, preferredDeviceName));
+
             dropdown.Items = deviceItems;
         }
 
