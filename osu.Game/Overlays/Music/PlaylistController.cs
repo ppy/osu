@@ -1,15 +1,14 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -19,7 +18,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistController : OverlayContainer
+    public class PlaylistController : Container
     {
         public BeatmapDatabase Beatmaps { get; private set; }
         public List<BeatmapSetInfo> PlayList { get; private set; }
@@ -29,67 +28,55 @@ namespace osu.Game.Overlays.Music
 
         private Playlist playlistView;
         private SearchTextBox searchTextBox;
-        private Container dragContainer;
 
-        public PlaylistController()
+        public PlaylistController(OsuGameBase osuGame, BeatmapDatabase beatmaps)
         {
             Width = 400;
             Height = 450;
-            Margin = new MarginPadding(10);
+            Masking = true;
+            CornerRadius = 5;
+            EdgeEffect = new EdgeEffect
+            {
+                Type = EdgeEffectType.Shadow,
+                Colour = Color4.Black.Opacity(40),
+                Radius = 5,
+            };
 
             Children = new Drawable[]
             {
-                dragContainer = new Container
+                new Box
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Masking = true,
-                    CornerRadius = 5,
-                    EdgeEffect = new EdgeEffect
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Black.Opacity(40),
-                        Radius = 5,
-                    },
                     RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.FromHex("333333"),
+                    Depth = float.MaxValue
+                },
+                new FlowContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FlowDirection.VerticalOnly,
+                    Padding = new MarginPadding(15),
+                    Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
-                        new Box
+                        searchTextBox = new SearchTextBox
                         {
-                            RelativeSizeAxes=Axes.Both,
-                            Colour = OsuColour.FromHex("333333"),
-                            Depth = float.MaxValue
+                            RelativeSizeAxes = Axes.X,
+                            Height = 40,
                         },
-                        new FlowContainer
+                        new SpriteText
                         {
-                            RelativeSizeAxes=Axes.Both,
-                            Direction = FlowDirection.VerticalOnly,
-                            Padding = new MarginPadding(15),
-                            Spacing = new Vector2(0,5),
-                            Children = new Drawable[]
-                            {
-                                searchTextBox = new SearchTextBox
-                                {
-                                RelativeSizeAxes=Axes.X,
-                                Height = 40,
-                                },
-                                new SpriteText {Text = "TODO: Collections" },
-                                playlistView = new Playlist()
-                            }
-                        }
+                            Text = "TODO: Collections"
+                        },
+                        playlistView = new Playlist()
                     }
                 }
             };
-            searchTextBox.OnChange += (TextBox sender, bool newText) =>
+            searchTextBox.OnChange += (sender, newText) =>
             {
                 if (newText)
                     playlistView.Filter(searchTextBox.Text);
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, BeatmapDatabase beatmaps)
-        {
             Beatmaps = beatmaps;
             playlistView.Items = PlayList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
             BeatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
@@ -111,28 +98,5 @@ namespace osu.Game.Overlays.Music
         }
 
         private void workingChanged(object sender, EventArgs e) => playlistView.SelectedItem = BeatmapSource.Value.BeatmapSetInfo;
-
-        protected override void PopIn() => FadeIn(100);
-
-        protected override void PopOut() => FadeOut(100);
-
-        protected override bool OnDragStart(InputState state) => true;
-
-        protected override bool OnDrag(InputState state)
-        {
-            Vector2 change = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
-
-            // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-            change *= (float)Math.Pow(change.Length, 0.7f) / change.Length;
-
-            dragContainer.MoveTo(change);
-            return base.OnDrag(state);
-        }
-
-        protected override bool OnDragEnd(InputState state)
-        {
-            dragContainer.MoveTo(Vector2.Zero, 800, EasingTypes.OutElastic);
-            return base.OnDragEnd(state);
-        }
     }
 }

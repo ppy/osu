@@ -34,7 +34,6 @@ namespace osu.Game
 
         private ChatOverlay chat;
 
-        private PlaylistController playlistController;
         private MusicController musicController;
 
         private MainMenu mainMenu => modeStack?.ChildGameMode as MainMenu;
@@ -111,25 +110,15 @@ namespace osu.Game
             //overlay elements
             (chat = new ChatOverlay { Depth = 0 }).Preload(this, overlayContent.Add);
             (options = new OptionsOverlay { Depth = -1 }).Preload(this, overlayContent.Add);
-            musicController = new MusicController()
+            (musicController = new MusicController()
             {
                 Depth = -2,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            };
-            playlistController = new PlaylistController()
-            {
-                Depth = -2,
-                Position = new Vector2(0, Toolbar.HEIGHT + musicController.Height + 10),
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            };
-            playlistController.Preload(this, overlayContent.Add)
-                .ContinueWith(t => musicController.Preload(this, overlayContent.Add));
+            }).Preload(this, overlayContent.Add);
 
             Dependencies.Cache(options);
-            Dependencies.Cache(playlistController);
             Dependencies.Cache(musicController);
 
             (Toolbar = new Toolbar
@@ -209,7 +198,6 @@ namespace osu.Game
             if ((newMode as OsuGameMode)?.ShowOverlays != true)
             {
                 Toolbar.State = Visibility.Hidden;
-                playlistController.State = Visibility.Hidden;
                 musicController.State = Visibility.Hidden;
                 chat.State = Visibility.Hidden;
             }

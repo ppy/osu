@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -8,7 +11,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Music
 {
-    public class Playlist : Container
+    public class Playlist : ScrollContainer
     {
         private FlowContainer<PlaylistItem> playlistFlow;
         private List<BeatmapSetInfo> items;
@@ -39,9 +42,9 @@ namespace osu.Game.Overlays.Music
                 selectedItem = value;
                 foreach (var playlistItem in playlistFlow.Children)
                 {
-                    playlistItem.State = playlistItem.BeatmapSetInfo.Beatmaps[0].AudioEquals(selectedItem.Beatmaps[0]) ?
-                        SelectionState.Selected :
-                        SelectionState.NotSelected;
+                    playlistItem.State = playlistItem.BeatmapSetInfo.Beatmaps[0].AudioEquals(selectedItem.Beatmaps[0])
+                        ? SelectionState.Selected
+                        : SelectionState.NotSelected;
                 }
                 SelectionChanged?.Invoke();
             }
@@ -49,20 +52,13 @@ namespace osu.Game.Overlays.Music
 
         public Playlist()
         {
-            RelativeSizeAxes = Axes.Both;
             Children = new[]
             {
-                new ScrollContainer
+                playlistFlow = new FlowContainer<PlaylistItem>
                 {
-                    Children =new []
-                    {
-                        playlistFlow = new FlowContainer<PlaylistItem>
-                        {
-                            Direction=FlowDirection.VerticalOnly,
-                            AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(0,10)
-                        }
-                    }
+                    Direction = FlowDirection.VerticalOnly,
+                    AutoSizeAxes = Axes.Both,
+                    Spacing = new Vector2(0, 10)
                 }
             };
         }
@@ -75,10 +71,10 @@ namespace osu.Game.Overlays.Music
             {
                 var metadata = playlistItem.BeatmapSetInfo.Metadata;
                 var match = string.IsNullOrEmpty(text)
-                    || (metadata.Artist ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (metadata.ArtistUnicode ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (metadata.Title ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (metadata.TitleUnicode ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1;
+                            || (metadata.Artist ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1
+                            || (metadata.ArtistUnicode ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1
+                            || (metadata.Title ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1
+                            || (metadata.TitleUnicode ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1;
                 if (match)
                     playlistItem.Show();
                 else

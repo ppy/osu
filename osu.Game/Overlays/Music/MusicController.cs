@@ -1,17 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
 
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
@@ -21,8 +20,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
@@ -44,21 +44,15 @@ namespace osu.Game.Overlays.Music
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
         private BaseGame game;
-        private PlaylistController playlistController;
 
         public BeatmapDatabase Beatmaps => playlistController.Beatmaps;
         public List<BeatmapSetInfo> PlayList => playlistController.PlayList;
         public int PlayListIndex => playlistController.PlayListIndex;
 
         private Container dragContainer;
-
-        public MusicController()
-        {
-            Width = 400;
-            Height = 130;
-
-            Margin = new MarginPadding(10);
-        }
+        private FlowContainer<Container> flowContainer;
+        private Container playerContainer;
+        private PlaylistController playlistController;
 
         protected override bool OnDragStart(InputState state) => true;
 
@@ -80,146 +74,157 @@ namespace osu.Game.Overlays.Music
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, OsuConfigManager config, OsuColour colours, PlaylistController playlistController)
+        private void load(OsuGameBase osuGame, OsuConfigManager config, OsuColour colours, BeatmapDatabase beatmaps)
         {
             unicodeString = config.GetUnicodeString;
 
+            Margin = new MarginPadding(10);
+            AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
                 dragContainer = new Container
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Masking = true,
-                    CornerRadius = 5,
-                    EdgeEffect = new EdgeEffect
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Black.Opacity(40),
-                        Radius = 5,
-                    },
-                    RelativeSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        title = new OsuSpriteText
-                        {
-                            Origin = Anchor.BottomCentre,
-                            Anchor = Anchor.TopCentre,
-                            Position = new Vector2(0, 40),
-                            TextSize = 25,
-                            Colour = Color4.White,
-                            Text = @"Nothing to play",
-                            Font = @"Exo2.0-MediumItalic"
-                        },
-                        artist = new OsuSpriteText
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Position = new Vector2(0, 45),
-                            TextSize = 15,
-                            Colour = Color4.White,
-                            Text = @"Nothing to play",
-                            Font = @"Exo2.0-BoldItalic"
-                        },
-                        new ClickableContainer
+                        flowContainer = new FlowContainer<Container>
                         {
                             AutoSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.BottomCentre,
-                            Position = new Vector2(0, -30),
-                            Action = () =>
+                            Spacing = new Vector2(0, 10),
+                            Direction = FlowDirection.VerticalOnly,
+                            Children = new[]
                             {
-                                if (current?.Track == null) return;
-                                if (current.Track.IsRunning)
-                                    current.Track.Stop();
-                                else
-                                    current.Track.Start();
-                            },
-                            Children = new Drawable[]
-                            {
-                                playButton = new TextAwesome
+                                playerContainer = new Container
                                 {
-                                    TextSize = 30,
-                                    Icon = FontAwesome.fa_play_circle_o,
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre
-                                }
-                            }
-                        },
-                        new ClickableContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.BottomCentre,
-                            Position = new Vector2(-30, -30),
-                            Action = prev,
-                            Children = new Drawable[]
-                            {
-                                new TextAwesome
-                                {
-                                    TextSize = 15,
-                                    Icon = FontAwesome.fa_step_backward,
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre
-                                }
-                            }
-                        },
-                        new ClickableContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.BottomCentre,
-                            Position = new Vector2(30, -30),
-                            Action = next,
-                            Children = new Drawable[]
-                            {
-                                new TextAwesome
-                                {
-                                    TextSize = 15,
-                                    Icon = FontAwesome.fa_step_forward,
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre
-                                }
-                            }
-                        },
-                        new ClickableContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.BottomRight,
-                            Position = new Vector2(-20, -30),
-                            Action = () =>
-                                {
-                                    switch (this.playlistController.State)
+                                    Width = 400,
+                                    Height = 130,
+                                    Masking = true,
+                                    CornerRadius = 5,
+                                    EdgeEffect = new EdgeEffect
                                     {
-                                        case Visibility.Hidden:
-                                            this.playlistController.State=Visibility.Visible;
-                                            break;
-                                        case Visibility.Visible:
-                                            this.playlistController.State=Visibility.Hidden;
-                                            break;
-                                        default:
-                                            throw new ArgumentOutOfRangeException();
+                                        Type = EdgeEffectType.Shadow,
+                                        Colour = Color4.Black.Opacity(40),
+                                        Radius = 5,
+                                    },
+                                    Children = new Drawable[]
+                                    {
+                                        title = new OsuSpriteText
+                                        {
+                                            Origin = Anchor.BottomCentre,
+                                            Anchor = Anchor.TopCentre,
+                                            Position = new Vector2(0, 40),
+                                            TextSize = 25,
+                                            Colour = Color4.White,
+                                            Text = @"Nothing to play",
+                                            Font = @"Exo2.0-MediumItalic"
+                                        },
+                                        artist = new OsuSpriteText
+                                        {
+                                            Origin = Anchor.TopCentre,
+                                            Anchor = Anchor.TopCentre,
+                                            Position = new Vector2(0, 45),
+                                            TextSize = 15,
+                                            Colour = Color4.White,
+                                            Text = @"Nothing to play",
+                                            Font = @"Exo2.0-BoldItalic"
+                                        },
+                                        new ClickableContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Origin = Anchor.Centre,
+                                            Anchor = Anchor.BottomCentre,
+                                            Position = new Vector2(0, -30),
+                                            Action = () =>
+                                            {
+                                                if (current?.Track == null) return;
+                                                if (current.Track.IsRunning)
+                                                    current.Track.Stop();
+                                                else
+                                                    current.Track.Start();
+                                            },
+                                            Children = new Drawable[]
+                                            {
+                                                playButton = new TextAwesome
+                                                {
+                                                    TextSize = 30,
+                                                    Icon = FontAwesome.fa_play_circle_o,
+                                                    Origin = Anchor.Centre,
+                                                    Anchor = Anchor.Centre
+                                                }
+                                            }
+                                        },
+                                        new ClickableContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Origin = Anchor.Centre,
+                                            Anchor = Anchor.BottomCentre,
+                                            Position = new Vector2(-30, -30),
+                                            Action = prev,
+                                            Children = new Drawable[]
+                                            {
+                                                new TextAwesome
+                                                {
+                                                    TextSize = 15,
+                                                    Icon = FontAwesome.fa_step_backward,
+                                                    Origin = Anchor.Centre,
+                                                    Anchor = Anchor.Centre
+                                                }
+                                            }
+                                        },
+                                        new ClickableContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Origin = Anchor.Centre,
+                                            Anchor = Anchor.BottomCentre,
+                                            Position = new Vector2(30, -30),
+                                            Action = next,
+                                            Children = new Drawable[]
+                                            {
+                                                new TextAwesome
+                                                {
+                                                    TextSize = 15,
+                                                    Icon = FontAwesome.fa_step_forward,
+                                                    Origin = Anchor.Centre,
+                                                    Anchor = Anchor.Centre
+                                                }
+                                            }
+                                        },
+                                        new ClickableContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Origin = Anchor.Centre,
+                                            Anchor = Anchor.BottomRight,
+                                            Position = new Vector2(-20, -30),
+                                            Action = () =>
+                                            {
+                                                if (!playlistController.IsPresent)
+                                                    playlistController.FadeIn(transition_length, EasingTypes.OutQuint);
+                                                else
+                                                    playlistController.FadeOut(transition_length, EasingTypes.OutQuint);
+                                            },
+                                            Children = new Drawable[]
+                                            {
+                                                listButton = new TextAwesome
+                                                {
+                                                    TextSize = 15,
+                                                    Icon = FontAwesome.fa_bars,
+                                                    Origin = Anchor.Centre,
+                                                    Anchor = Anchor.Centre
+                                                }
+                                            }
+                                        },
+                                        progress = new DragBar
+                                        {
+                                            Origin = Anchor.BottomCentre,
+                                            Anchor = Anchor.BottomCentre,
+                                            Height = 10,
+                                            Colour = colours.Yellow,
+                                            SeekRequested = seek
+                                        }
                                     }
                                 },
-                            Children = new Drawable[]
-                            {
-                                listButton = new TextAwesome
-                                {
-                                    TextSize = 15,
-                                    Icon = FontAwesome.fa_bars,
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre
-                                }
+                                playlistController = new PlaylistController(osuGame, beatmaps)
                             }
-                        },
-                        progress = new DragBar
-                        {
-                            Origin = Anchor.BottomCentre,
-                            Anchor = Anchor.BottomCentre,
-                            Height = 10,
-                            Colour = colours.Yellow,
-                            SeekRequested = seek
                         }
                     }
                 }
@@ -229,13 +234,10 @@ namespace osu.Game.Overlays.Music
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
             preferUnicode.ValueChanged += preferUnicode_changed;
 
-            this.playlistController = playlistController;
-
             beatmapSource = new Bindable<WorkingBeatmap>();
             beatmapSource.Weld(playlistController.BeatmapSource);
 
-            backgroundSprite = new MusicControllerBackground();
-            dragContainer.Add(backgroundSprite);
+            playerContainer.Add(backgroundSprite = new MusicControllerBackground());
         }
 
         protected override void LoadComplete()
@@ -257,7 +259,6 @@ namespace osu.Game.Overlays.Music
 
             if (current?.TrackLoaded ?? false)
             {
-
                 progress.UpdatePosition((float)(current.Track.CurrentTime / current.Track.Length));
                 playButton.Icon = current.Track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
@@ -323,11 +324,10 @@ namespace osu.Game.Overlays.Music
                         PlayList[j] = temp;
                     }
 
-                    nextToPlay = PlayListIndex == playListCount - 1 ?
-                        PlayList[0].Beatmaps[0] :
-                        PlayList[MathHelper.Clamp(PlayListIndex + 1, PlayListIndex, playListCount - 1)].Beatmaps[0];
-                }
-                while (nextToPlay.AudioEquals(current?.BeatmapInfo));
+                    nextToPlay = PlayListIndex == playListCount - 1
+                        ? PlayList[0].Beatmaps[0]
+                        : PlayList[MathHelper.Clamp(PlayListIndex + 1, PlayListIndex, playListCount - 1)].Beatmaps[0];
+                } while (nextToPlay.AudioEquals(current?.BeatmapInfo));
 
                 play(nextToPlay, true);
                 appendToHistory(nextToPlay);
@@ -375,8 +375,7 @@ namespace osu.Game.Overlays.Music
 
                 (newBackground = new MusicControllerBackground(beatmap)).Preload(game, delegate
                 {
-
-                    dragContainer.Add(newBackground);
+                    playerContainer.Add(newBackground);
 
                     switch (direction)
                     {
@@ -413,7 +412,7 @@ namespace osu.Game.Overlays.Music
             base.Dispose(isDisposing);
         }
 
-        const float transition_length = 800;
+        private const float transition_length = 800;
 
         protected override void PopIn()
         {
@@ -429,10 +428,14 @@ namespace osu.Game.Overlays.Music
 
             FadeOut(transition_length, EasingTypes.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, EasingTypes.OutQuint);
-            playlistController.State = Visibility.Hidden;
         }
 
-        private enum TransformDirection { None, Next, Prev }
+        private enum TransformDirection
+        {
+            None,
+            Next,
+            Prev
+        }
 
         private class MusicControllerBackground : BufferedContainer
         {
