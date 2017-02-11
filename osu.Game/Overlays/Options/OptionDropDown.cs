@@ -71,7 +71,14 @@ namespace osu.Game.Overlays.Options
             {
                 items = value;
                 if(dropdown != null)
+                {
                     dropdown.Items = value;
+
+                    // We need to refresh the dropdown because our items changed,
+                    // thus its selected value may be outdated.
+                    if (bindable != null)
+                        dropdown.SelectedValue = bindable.Value;
+                }
             }
         }
 
