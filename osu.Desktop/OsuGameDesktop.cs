@@ -11,6 +11,9 @@ using System.Windows.Forms;
 using osu.Framework.Platform;
 using osu.Framework.Desktop.Platform;
 using osu.Game.Database;
+using osu.Desktop.Overlays;
+using System.Reflection;
+using System.Drawing;
 
 namespace osu.Desktop
 {
@@ -22,12 +25,22 @@ namespace osu.Desktop
 
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            (new VersionManager()).Preload(this, Add);
+        }
+
         public override void SetHost(BasicGameHost host)
         {
             base.SetHost(host);
             var desktopWindow = host.Window as DesktopGameWindow;
             if (desktopWindow != null)
             {
+                desktopWindow.Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+                desktopWindow.Title = @"osu!lazer";
+
                 desktopWindow.DragEnter += dragEnter;
                 desktopWindow.DragDrop += dragDrop;
             }
