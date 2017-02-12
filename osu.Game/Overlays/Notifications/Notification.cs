@@ -53,8 +53,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        public Notification()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

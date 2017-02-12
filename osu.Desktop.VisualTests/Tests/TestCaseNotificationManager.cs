@@ -88,13 +88,13 @@ namespace osu.Desktop.VisualTests.Tests
                 if (n.Progress < 1)
                     n.Progress += (float)(Time.Elapsed / 2000) * RNG.NextSingle();
                 else
-                    n.Complete();
+                    n.State = ProgressNotificationState.Completed;
             }
         }
 
         private void sendProgress2()
         {
-            var n = new ProgressNotification(@"Downloading Haitai...");
+            var n = new ProgressNotification { Text = @"Downloading Haitai..." };
             manager.Post(n);
             progressingNotifications.Add(n);
         }
@@ -103,19 +103,19 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void sendProgress1()
         {
-            var n = new ProgressNotification(@"Uploading to BSS...");
+            var n = new ProgressNotification { Text = @"Uploading to BSS..." };
             manager.Post(n);
             progressingNotifications.Add(n);
         }
 
         private void sendNotification2()
         {
-            manager.Post(new SimpleNotification(@"You are amazing"));
+            manager.Post(new SimpleNotification { Text = @"You are amazing" });
         }
 
         private void sendNotification1()
         {
-            manager.Post(new SimpleNotification(@"Welcome to osu!. Enjoy your stay!"));
+            manager.Post(new SimpleNotification { Text = @"Welcome to osu!. Enjoy your stay!" });
         }
     }
 }
