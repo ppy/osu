@@ -13,7 +13,6 @@ using osu.Game.Modes.Catch;
 using osu.Game.Modes.Mania;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Taiko;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -38,7 +37,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (HeadlessGameHost host = new HeadlessGameHost())
             {
                 var osu = loadOsu(host);
-                osu.Dependencies.Get<BeatmapDatabase>().Import(osz_path);
+                osu.Dependencies.Get<BeatmapDatabase>().Import(prepareOszFileForTest());
                 ensureLoaded(osu);
             }
         }
@@ -55,7 +54,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 var osu = loadOsu(host);
 
                 var importer = new BeatmapImporter(client);
-                if (!importer.Import(osz_path).Wait(1000))
+                if (!importer.Import(prepareOszFileForTest()).Wait(1000))
                     Assert.Fail(@"IPC took too long to send");
 
                 ensureLoaded(osu, 10000);
@@ -120,6 +119,16 @@ namespace osu.Game.Tests.Beatmaps.IO
             var beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetBeatmap(set.Beatmaps.First(b => b.Mode == PlayMode.Osu));
 
             Assert.IsTrue(beatmap.HitObjects.Count > 0);
+        }
+
+        /// <summary>
+        /// Creates a copy of the original .osz file
+        /// </summary>
+        /// <returns>Path to the created copy</returns>
+        private string prepareOszFileForTest()
+        {
+            var original = new FileInfo(osz_path);
+            return original.CopyTo(Path.GetFileName(original.FullName), true).FullName;
         }
     }
 }

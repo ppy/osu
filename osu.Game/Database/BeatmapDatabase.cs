@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -139,7 +138,17 @@ namespace osu.Game.Database
                     }
                 }
 
-                Import(new[] { beatmapSet });
+                try
+                {
+                    Import(beatmapSet);
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    File.Delete(p);
+                }
             }
         }
 
@@ -148,12 +157,15 @@ namespace osu.Game.Database
             connection.BeginTransaction();
 
             foreach (var s in beatmapSets)
-            {
-                connection.InsertWithChildren(s, true);
-                BeatmapSetAdded?.Invoke(s);
-            }
+                Import(s);
 
             connection.Commit();
+        }
+
+        public void Import(BeatmapSetInfo beatmapSet)
+        {
+            connection.InsertWithChildren(beatmapSet, true);
+            BeatmapSetAdded?.Invoke(beatmapSet);
         }
 
         public ArchiveReader GetReader(BeatmapSetInfo beatmapSet)
