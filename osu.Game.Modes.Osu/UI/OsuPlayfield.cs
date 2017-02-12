@@ -73,9 +73,9 @@ namespace osu.Game.Modes.Osu.UI
 
         public override void PostProcess()
         {
-            connectionLayer.AddConnections(HitObjects.Children
+            connectionLayer.HitObjects = HitObjects.Children
                 .Select(d => (OsuHitObject)d.HitObject)
-                .OrderBy(h => h.StartTime));
+                .OrderBy(h => h.StartTime);
         }
 
         private void judgement(DrawableHitObject h, JudgementInfo j)

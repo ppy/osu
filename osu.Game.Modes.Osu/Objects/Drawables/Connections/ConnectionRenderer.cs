@@ -7,13 +7,15 @@ using System.Collections.Generic;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
 {
+    /// <summary>
+    /// Connects hit objects visually, for example with follow points.
+    /// </summary>
     public abstract class ConnectionRenderer<T> : Container
         where T : HitObject
     {
         /// <summary>
-        /// Create drawables inside this container, connecting hit objects visually, for example with follow points.
+        /// Hit objects to create connections for
         /// </summary>
-        /// <param name="hitObjects">Hit objects to create connections for</param>
-        public abstract void AddConnections(IEnumerable<T> hitObjects);
+        public abstract IEnumerable<T> HitObjects { get; set; }
     }
 }
