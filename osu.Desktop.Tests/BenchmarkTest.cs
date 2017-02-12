@@ -1,36 +1,31 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using osu.Framework.Desktop;
+using NUnit.Framework;
+using osu.Desktop.VisualTests;
 using osu.Framework.Desktop.Platform;
-using osu.Framework.Platform;
 using osu.Game.Modes;
 using osu.Game.Modes.Catch;
 using osu.Game.Modes.Mania;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Taiko;
 
-namespace osu.Desktop.VisualTests
+namespace osu.Desktop.Tests
 {
-    public static class Program
+    [TestFixture]
+    public class BenchmarkTest
     {
-        [STAThread]
-        public static void Main(string[] args)
+        [Test]
+        public void TestBenchmark()
         {
-            bool benchmark = args.Length > 0 && args[0] == @"-benchmark";
-
-            using (BasicGameHost host = Host.GetSuitableHost(@"osu"))
+            using (var host = new HeadlessGameHost())
             {
                 Ruleset.Register(new OsuRuleset());
                 Ruleset.Register(new TaikoRuleset());
                 Ruleset.Register(new ManiaRuleset());
                 Ruleset.Register(new CatchRuleset());
 
-                if (benchmark)
-                    host.Add(new Benchmark());
-                else
-                    host.Add(new VisualTestGame());
+                host.Add(new Benchmark());
                 host.Run();
             }
         }

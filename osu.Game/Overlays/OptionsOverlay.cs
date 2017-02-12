@@ -90,7 +90,7 @@ namespace osu.Game.Overlays
                                 {
                                     Text = "settings",
                                     TextSize = 40,
-                                    Margin = new MarginPadding { Left = CONTENT_MARGINS, Top = 30 },
+                                    Margin = new MarginPadding { Left = CONTENT_MARGINS, Top = Toolbar.Toolbar.TOOLTIP_HEIGHT },
                                 },
                                 new OsuSpriteText
                                 {
