@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps
                 {
                     if (background != null) return background;
 
-                    if (BeatmapInfo.Metadata?.BackgroundFile == null) return null;
+                    if (BeatmapInfo?.Metadata?.BackgroundFile == null) return null;
 
                     try
                     {
