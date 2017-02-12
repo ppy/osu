@@ -22,16 +22,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         /// </summary>
         public int PreEmpt = 800;
 
-        public override void AddConnections(IEnumerable<DrawableHitObject> drawableHitObjects, int startIndex = 0, int endIndex = -1)
+        public override void AddConnections(IEnumerable<DrawableHitObject> drawableHitObjects)
         {
             var hitObjects = new List<OsuHitObject>(drawableHitObjects
                 .Select(d => (OsuHitObject)d.HitObject)
                 .OrderBy(h => h.StartTime));
 
-            if (endIndex < 0)
-                endIndex = hitObjects.Count - 1;
-
-            for (int i = startIndex + 1; i <= endIndex; i++)
+            for (int i = 1; i <= hitObjects.Count - 1; i++)
             {
                 var prevHitObject = hitObjects[i - 1];
                 var currHitObject = hitObjects[i];
