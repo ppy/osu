@@ -2,36 +2,47 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Framework.Allocation;
+using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
 {
     public class FollowPoint : Container
     {
-        private Sprite followPoint;
-
         public double StartTime;
         public double EndTime;
         public Vector2 EndPosition;
+
+        const float width = 8;
 
         public FollowPoint()
         {
             Origin = Anchor.Centre;
             Alpha = 0;
 
+            Masking = true;
+            AutoSizeAxes = Axes.Both;
+            CornerRadius = width / 2;
+            EdgeEffect = new EdgeEffect
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = Color4.White.Opacity(0.2f),
+                Radius = 4,
+            };
+            
             Children = new Drawable[]
             {
-                followPoint = new Sprite
+                new Box
                 {
-                    Size = new Vector2(12f),
-                    Origin = Anchor.Centre,
+                    Size = new Vector2(width),
                     BlendingMode = BlendingMode.Additive,
-                    Alpha = 0.5f
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Alpha = 0.5f,
                 },
             };
         }
@@ -51,12 +62,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
 
             Delay(DrawableOsuHitObject.TIME_FADEIN);
             Expire(true);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            followPoint.Texture = textures.Get(@"Play/osu/ring-glow");
         }
     }
 }
