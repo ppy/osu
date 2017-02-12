@@ -1,12 +1,13 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using OpenTK;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
-using OpenTK;
-using osu.Framework.Input;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -22,6 +23,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         SliderBall ball;
 
         SliderBouncer bouncer1, bouncer2;
+        SliderTicksRenderer ticks;
 
         public DrawableSlider(Slider s) : base(s)
         {
@@ -33,6 +35,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 {
                     Position = s.StackedPosition,
                     PathWidth = s.Scale * 64,
+                },
+                ticks = new SliderTicksRenderer
+                {
+                    Position = s.StackedPosition,
+                    StartTime = s.StartTime,
+                    RepeatDuration = s.Curve.Length / s.Velocity,
+                    Ticks = s.Ticks,
                 },
                 bouncer1 = new SliderBouncer(s, false)
                 {
@@ -96,6 +105,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 initialCircle.Position = slider.Curve.PositionAt(progress);
 
             components.ForEach(c => c.UpdateProgress(progress, repeat));
+            ticks.ShouldHit = ball.Tracking;
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -105,8 +115,22 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             if (!userTriggered && Time.Current >= HitObject.EndTime)
             {
-                j.Score = sc.Score;
-                j.Result = sc.Result;
+                var ticksCount = ticks.Children.Count() + 1;
+                var ticksHit = ticks.Children.Count(t => t.Judgement.Result == HitResult.Hit);
+                if (sc.Result == HitResult.Hit)
+                    ticksHit++;
+
+                var hitFraction = (double)ticksHit / ticksCount;
+                if (hitFraction == 1 && sc.Score == OsuScoreResult.Hit300)
+                    j.Score = OsuScoreResult.Hit300;
+                else if (hitFraction >= 0.5 && sc.Score >= OsuScoreResult.Hit100)
+                    j.Score = OsuScoreResult.Hit100;
+                else if (hitFraction > 0)
+                    j.Score = OsuScoreResult.Hit50;
+                else
+                    j.Score = OsuScoreResult.Miss;
+
+                j.Result = j.Score != OsuScoreResult.Miss ? HitResult.Hit : HitResult.Miss;
             }
         }
 
