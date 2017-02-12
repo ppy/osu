@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("osu!lazer")]
-[assembly: AssemblyDescription("click the circles. to the beat.")]
+[assembly: AssemblyTitle("osu.Desktop.Deploy")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("ppy Pty Ltd")]
-[assembly: AssemblyProduct("osu!lazer")]
-[assembly: AssemblyCopyright("ppy Pty Ltd 2007-2017")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("osu.Desktop.Deploy")]
+[assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,17 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("55e28cb2-7b6c-4595-8dcc-9871d8aad7e9")]
+[assembly: Guid("baea2f74-0315-4667-84e0-acac0b4bf785")]
 
-[assembly: AssemblyVersion("2017.212.0")]
-[assembly: AssemblyFileVersion("2017.212.0")]
+// Version information for an assembly consists of the following four values:
+//
+//      Major Version
+//      Minor Version 
+//      Build Number
+//      Revision
+//
+// You can specify all the values or you can default the Build and Revision Numbers 
+// by using the '*' as shown below:
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
