@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
+using Ionic.Zip;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
@@ -99,16 +100,23 @@ namespace osu.Game.Database
                     connection.Table<BeatmapSetInfo>().Count(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID) != 0)
                     return; // TODO: Update this beatmap instead
 
-                if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
+                if (File.Exists(path))
                 {
-                    using (var md5 = MD5.Create())
                     using (var input = storage.GetStream(path))
                     {
-                        hash = BitConverter.ToString(md5.ComputeHash(input)).Replace("-", "").ToLowerInvariant();
+                        path = saveBeatmapFromStream(input, out hash);
+                    }
+                }
+                else if (Directory.Exists(path))
+                {
+                    using (var input = new MemoryStream())
+                    {
+                        ZipFile zip = new ZipFile();
+                        zip.AddDirectory(path);
+                        zip.Save(input);
                         input.Seek(0, SeekOrigin.Begin);
-                        path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
-                        using (var output = storage.GetStream(path, FileAccess.Write))
-                            input.CopyTo(output);
+
+                        path = saveBeatmapFromStream(input, out hash);
                     }
                 }
                 var beatmapSet = new BeatmapSetInfo
@@ -140,6 +148,19 @@ namespace osu.Game.Database
                 }
 
                 Import(new[] { beatmapSet });
+            }
+        }
+
+        private string saveBeatmapFromStream(Stream stream, out string hash)
+        {
+            using (var md5 = MD5.Create())
+            {
+                hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
+                stream.Seek(0, SeekOrigin.Begin);
+                string newPath = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
+                using (var output = storage.GetStream(newPath, FileAccess.Write))
+                    stream.CopyTo(output);
+                return newPath;
             }
         }
 

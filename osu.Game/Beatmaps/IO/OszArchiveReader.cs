@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps.IO
             {
                 using (var stream = storage.GetStream(path))
                     return ZipFile.IsZipFile(stream, false);
-            });
+            }, ArchiveStorageMethod.File);
             OsuLegacyDecoder.Register();
         }
 
@@ -34,6 +34,7 @@ namespace osu.Game.Beatmaps.IO
             archive = ZipFile.Read(archiveStream);
             beatmaps = archive.Entries.Where(e => e.FileName.EndsWith(@".osu"))
                 .Select(e => e.FileName).ToArray();
+
             if (beatmaps.Length == 0)
                 throw new FileNotFoundException(@"This directory contains no beatmaps");
             using (var stream = new StreamReader(GetStream(beatmaps[0])))
