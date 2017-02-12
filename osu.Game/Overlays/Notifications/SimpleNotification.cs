@@ -12,14 +12,31 @@ namespace osu.Game.Overlays.Notifications
     public class SimpleNotification : Notification
     {
         private string text;
-
-        public SimpleNotification(string text)
+        public string Text
         {
-            this.text = text;
+            get { return text; }
+            set
+            {
+                text = value;
+                textDrawable.Text = text;
+            }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private FontAwesome icon = FontAwesome.fa_info_circle;
+        public FontAwesome Icon
+        {
+            get { return icon; }
+            set
+            {
+                icon = value;
+                iconDrawable.Icon = icon;
+            }
+        }
+
+        private SpriteText textDrawable;
+        private TextAwesome iconDrawable;
+
+        public SimpleNotification()
         {
             IconContent.Add(new Drawable[]
             {
@@ -28,14 +45,14 @@ namespace osu.Game.Overlays.Notifications
                     RelativeSizeAxes = Axes.Both,
                     ColourInfo = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.5f))
                 },
-                new TextAwesome
+                iconDrawable = new TextAwesome
                 {
                     Anchor = Anchor.Centre,
-                    Icon = FontAwesome.fa_info_circle,
+                    Icon = icon ,
                 }
             });
 
-            Content.Add(new SpriteText
+            Content.Add(textDrawable = new SpriteText
             {
                 TextSize = 16,
                 Colour = OsuColour.Gray(128),
@@ -43,7 +60,11 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.X,
                 Text = text
             });
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
             Light.Colour = colours.Green;
         }
 

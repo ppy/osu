@@ -83,64 +83,66 @@ namespace osu.Game.Database
             connection.DeleteAll<BeatmapInfo>();
         }
 
-        public void Import(params string[] paths)
+        public void Import(IEnumerable<string> paths)
         {
             foreach (string p in paths)
+                Import(p);
+        }
+
+        public void Import(string path)
+        {
+            string hash = null;
+
+            BeatmapMetadata metadata;
+
+            using (var reader = ArchiveReader.GetReader(storage, path))
+                metadata = reader.ReadMetadata();
+
+            if (metadata.OnlineBeatmapSetID.HasValue &&
+                connection.Table<BeatmapSetInfo>().Count(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID) != 0)
+                return; // TODO: Update this beatmap instead
+
+            if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
             {
-                var path = p;
-                string hash = null;
-
-                BeatmapMetadata metadata;
-
-                using (var reader = ArchiveReader.GetReader(storage, path))
-                    metadata = reader.ReadMetadata();
-
-                if (metadata.OnlineBeatmapSetID.HasValue &&
-                    connection.Table<BeatmapSetInfo>().Count(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID) != 0)
-                    return; // TODO: Update this beatmap instead
-
-                if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
+                using (var md5 = MD5.Create())
+                using (var input = storage.GetStream(path))
                 {
-                    using (var md5 = MD5.Create())
-                    using (var input = storage.GetStream(path))
-                    {
-                        hash = BitConverter.ToString(md5.ComputeHash(input)).Replace("-", "").ToLowerInvariant();
-                        input.Seek(0, SeekOrigin.Begin);
-                        path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
-                        using (var output = storage.GetStream(path, FileAccess.Write))
-                            input.CopyTo(output);
-                    }
+                    hash = BitConverter.ToString(md5.ComputeHash(input)).Replace("-", "").ToLowerInvariant();
+                    input.Seek(0, SeekOrigin.Begin);
+                    path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
+                    using (var output = storage.GetStream(path, FileAccess.Write))
+                        input.CopyTo(output);
                 }
-                var beatmapSet = new BeatmapSetInfo
-                {
-                    OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
-                    Beatmaps = new List<BeatmapInfo>(),
-                    Path = path,
-                    Hash = hash,
-                    Metadata = metadata
-                };
-
-                using (var reader = ArchiveReader.GetReader(storage, path))
-                {
-                    string[] mapNames = reader.ReadBeatmaps();
-                    foreach (var name in mapNames)
-                    {
-                        using (var stream = new StreamReader(reader.GetStream(name)))
-                        {
-                            var decoder = BeatmapDecoder.GetDecoder(stream);
-                            Beatmap beatmap = decoder.Decode(stream);
-                            beatmap.BeatmapInfo.Path = name;
-
-                            // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
-                            beatmap.BeatmapInfo.Metadata = null;
-
-                            beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
-                        }
-                    }
-                }
-
-                Import(new[] { beatmapSet });
             }
+            var beatmapSet = new BeatmapSetInfo
+            {
+                OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
+                Beatmaps = new List<BeatmapInfo>(),
+                Path = path,
+                Hash = hash,
+                Metadata = metadata
+            };
+
+            using (var reader = ArchiveReader.GetReader(storage, path))
+            {
+                string[] mapNames = reader.ReadBeatmaps();
+                foreach (var name in mapNames)
+                {
+                    using (var stream = new StreamReader(reader.GetStream(name)))
+                    {
+                        var decoder = BeatmapDecoder.GetDecoder(stream);
+                        Beatmap beatmap = decoder.Decode(stream);
+                        beatmap.BeatmapInfo.Path = name;
+
+                        // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
+                        beatmap.BeatmapInfo.Metadata = null;
+
+                        beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
+                    }
+                }
+            }
+
+            Import(new[] { beatmapSet });
         }
 
         public void Import(IEnumerable<BeatmapSetInfo> beatmapSets)
