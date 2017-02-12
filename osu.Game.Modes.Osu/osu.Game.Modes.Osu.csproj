@@ -44,8 +44,8 @@
     <Compile Include="Objects\BezierApproximator.cs" />
     <Compile Include="Objects\CircularArcApproximator.cs" />
     <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
-    <Compile Include="Objects\Drawables\Connections\HitObjectConnection.cs" />
-    <Compile Include="Objects\Drawables\Connections\FollowPointConnection.cs" />
+    <Compile Include="Objects\Drawables\Connections\ConnectionRenderer.cs" />
+    <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
     <Compile Include="Objects\Drawables\DrawableSlider.cs" />

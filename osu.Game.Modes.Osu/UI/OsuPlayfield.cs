@@ -9,6 +9,7 @@ using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Connections;
 using osu.Game.Modes.UI;
+using System.Linq;
 
 namespace osu.Game.Modes.Osu.UI
 {
@@ -16,7 +17,7 @@ namespace osu.Game.Modes.Osu.UI
     {
         private Container approachCircles;
         private Container judgementLayer;
-        private HitObjectConnection hitObjectConnection;
+        private ConnectionRenderer<OsuHitObject> connectionLayer;
 
         public override Vector2 Size
         {
@@ -38,15 +39,15 @@ namespace osu.Game.Modes.Osu.UI
 
             Add(new Drawable[]
             {
-                hitObjectConnection = new FollowPointConnection
+                connectionLayer = new FollowPointRenderer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Depth = 1,
+                    Depth = 2,
                 },
                 judgementLayer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Depth = 0,
+                    Depth = 1,
                 },
                 approachCircles = new Container
                 {
@@ -72,7 +73,9 @@ namespace osu.Game.Modes.Osu.UI
 
         public override void PostProcess()
         {
-            hitObjectConnection.AddConnections(HitObjects.Children);
+            connectionLayer.AddConnections(HitObjects.Children
+                .Select(d => (OsuHitObject)d.HitObject)
+                .OrderBy(h => h.StartTime));
         }
 
         private void judgement(DrawableHitObject h, JudgementInfo j)

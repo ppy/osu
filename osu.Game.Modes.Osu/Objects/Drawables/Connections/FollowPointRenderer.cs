@@ -2,15 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Connections;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class FollowPointConnection : HitObjectConnection
+    public class FollowPointRenderer : ConnectionRenderer<OsuHitObject>
     {
         /// <summary>
         /// Determines how much space there is between points.
@@ -22,18 +20,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         /// </summary>
         public int PreEmpt = 800;
 
-        public override void AddConnections(IEnumerable<DrawableHitObject> drawableHitObjects)
+        public override void AddConnections(IEnumerable<OsuHitObject> hitObjects)
         {
-            var hitObjects = new List<OsuHitObject>(drawableHitObjects
-                .Select(d => (OsuHitObject)d.HitObject)
-                .OrderBy(h => h.StartTime));
-
-            for (int i = 1; i <= hitObjects.Count - 1; i++)
+            OsuHitObject prevHitObject = null;
+            foreach (var currHitObject in hitObjects)
             {
-                var prevHitObject = hitObjects[i - 1];
-                var currHitObject = hitObjects[i];
-
-                if (!currHitObject.NewCombo && !(prevHitObject is Spinner) && !(currHitObject is Spinner))
+                if (prevHitObject != null && !currHitObject.NewCombo && !(prevHitObject is Spinner) && !(currHitObject is Spinner))
                 {
                     Vector2 startPosition = prevHitObject.EndPosition;
                     Vector2 endPosition = currHitObject.Position;
@@ -63,6 +55,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                         });
                     }
                 }
+                prevHitObject = currHitObject;
             }
         }
     }
