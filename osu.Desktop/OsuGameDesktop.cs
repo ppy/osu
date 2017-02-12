@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using osu.Framework.Platform;
 using osu.Framework.Desktop.Platform;
 using osu.Game.Database;
+using osu.Desktop.Overlays;
 
 namespace osu.Desktop
 {
@@ -20,6 +21,13 @@ namespace osu.Desktop
             : base(args)
         {
 
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            (new VersionManager()).Preload(this, Add);
         }
 
         public override void SetHost(BasicGameHost host)
