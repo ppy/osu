@@ -24,6 +24,7 @@ using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
 using osu.Framework.Graphics.Primitives;
+using System.Collections.Generic;
 
 namespace osu.Game
 {
@@ -67,14 +68,17 @@ namespace osu.Game
             }
 
             if (args?.Length > 0)
-                ImportBeatmaps(args);
+            {
+                var paths = args.Where(a => !a.StartsWith(@"-"));
+                ImportBeatmaps(paths);
+            }
 
             Dependencies.Cache(this);
 
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
         }
 
-        public void ImportBeatmaps(params string[] paths)
+        public void ImportBeatmaps(IEnumerable<string> paths)
         {
             Schedule(delegate { Dependencies.Get<BeatmapDatabase>().Import(paths); });
         }
