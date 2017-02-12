@@ -16,27 +16,21 @@ namespace osu.Game.Overlays.Notifications
 {
     public class ProgressNotification : Notification, IHasCompletionTarget
     {
-        private string text;
         public string Text
         {
-            get { return text; }
+            get { return textDrawable.Text; }
             set
             {
-                text = value;
-                if (IsLoaded)
-                    textDrawable.Text = text;
+                textDrawable.Text = value;
             }
         }
 
-        private float progress;
         public float Progress
         {
-            get { return progress; }
+            get { return progressBar.Progress; }
             set
             {
-                progress = value;
-                if (IsLoaded)
-                    progressBar.Progress = progress;
+                progressBar.Progress = value;
             }
         }
 
@@ -46,7 +40,6 @@ namespace osu.Game.Overlays.Notifications
 
             //we may have received changes before we were displayed.
             State = state;
-            Progress = progress;
         }
 
         public virtual ProgressNotificationState State
@@ -105,6 +98,7 @@ namespace osu.Game.Overlays.Notifications
 
         protected virtual void Completed()
         {
+            Expire();
             CompletionTarget?.Invoke(CreateCompletionNotification());
         }
 
@@ -117,13 +111,8 @@ namespace osu.Game.Overlays.Notifications
 
         private SpriteText textDrawable;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        public ProgressNotification()
         {
-            colourQueued = colours.YellowDark;
-            colourActive = colours.Blue;
-            colourCancelled = colours.Red;
-
             IconContent.Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
@@ -135,7 +124,6 @@ namespace osu.Game.Overlays.Notifications
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
-                Text = text
             });
 
             NotificationContent.Add(progressBar = new ProgressBar
@@ -146,6 +134,14 @@ namespace osu.Game.Overlays.Notifications
             });
 
             State = ProgressNotificationState.Queued;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            colourQueued = colours.YellowDark;
+            colourActive = colours.Blue;
+            colourCancelled = colours.Red;
         }
 
         public override void Close()
