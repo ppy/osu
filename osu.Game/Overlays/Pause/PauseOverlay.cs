@@ -114,6 +114,24 @@ namespace osu.Game.Overlays.Pause
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FlowDirection.VerticalOnly,
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            Children = new Drawable[]
+                            {
+                                new TextAwesome
+                                {
+                                    Icon = FontAwesome.fa_circle_thin,
+                                    Colour = Color4.White,
+                                    TextSize = 100,
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                }
+                            }
+                        },
+                        new FlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FlowDirection.VerticalOnly,
                             Spacing = new Vector2(0f, 20f),
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
