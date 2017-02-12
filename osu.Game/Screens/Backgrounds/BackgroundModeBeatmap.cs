@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Backgrounds
             [BackgroundDependencyLoader]
             private void load()
             {
-                Sprite.Texture = beatmap.Background;
+                Sprite.Texture = beatmap?.Background;
             }
         }
     }
