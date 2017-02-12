@@ -18,8 +18,7 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 text = value;
-                if (IsLoaded)
-                    textDrawable.Text = text;
+                textDrawable.Text = text;
             }
         }
 
@@ -30,17 +29,14 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 icon = value;
-                if (IsLoaded)
-                    iconDrawable.Icon = icon;
+                iconDrawable.Icon = icon;
             }
         }
-
 
         private SpriteText textDrawable;
         private TextAwesome iconDrawable;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        public SimpleNotification()
         {
             IconContent.Add(new Drawable[]
             {
@@ -64,7 +60,11 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.X,
                 Text = text
             });
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
             Light.Colour = colours.Green;
         }
 
