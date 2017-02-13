@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Options
         {
             Items = new KeyValuePair<string, T>[0];
 
-            Direction = FlowDirection.VerticalOnly;
+            Direction = FlowDirections.Vertical;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
