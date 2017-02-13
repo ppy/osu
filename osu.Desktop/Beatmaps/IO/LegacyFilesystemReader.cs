@@ -20,32 +20,20 @@ namespace osu.Desktop.Beatmaps.IO
         public static void Register() => AddReader<LegacyFilesystemReader>((storage, path) => Directory.Exists(path));
 
         private string basePath { get; set; }
-        private string[] beatmaps { get; set; }
-        private string storyboard { get; set; }
         private Beatmap firstMap { get; set; }
 
         public LegacyFilesystemReader(string path)
         {
             basePath = path;
-            beatmaps = Directory.GetFiles(basePath, @"*.osu").Select(f => Path.GetFileName(f)).ToArray();
-            if (beatmaps.Length == 0)
+            BeatmapFilenames = Directory.GetFiles(basePath, @"*.osu").Select(f => Path.GetFileName(f)).ToArray();
+            if (BeatmapFilenames.Length == 0)
                 throw new FileNotFoundException(@"This directory contains no beatmaps");
-            storyboard = Directory.GetFiles(basePath, @"*.osb").Select(f => Path.GetFileName(f)).FirstOrDefault();
-            using (var stream = new StreamReader(GetStream(beatmaps[0])))
+            StoryboardFilename = Directory.GetFiles(basePath, @"*.osb").Select(f => Path.GetFileName(f)).FirstOrDefault();
+            using (var stream = new StreamReader(GetStream(BeatmapFilenames[0])))
             {
                 var decoder = BeatmapDecoder.GetDecoder(stream);
                 firstMap = decoder.Decode(stream);
             }
-        }
-
-        public override string[] ReadBeatmaps()
-        {
-            return beatmaps;
-        }
-
-        public override string ReadStoryboard()
-        {
-            return storyboard;
         }
 
         public override Stream GetStream(string name)

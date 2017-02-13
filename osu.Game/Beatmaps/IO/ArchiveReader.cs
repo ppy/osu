@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps.IO
         }
 
         private static List<Reader> readers { get; } = new List<Reader>();
-    
+
         public static ArchiveReader GetReader(BasicStorage storage, string path)
         {
             foreach (var reader in readers)
@@ -29,24 +29,27 @@ namespace osu.Game.Beatmaps.IO
             }
             throw new IOException(@"Unknown file format");
         }
-        
+
         protected static void AddReader<T>(Func<BasicStorage, string, bool> test) where T : ArchiveReader
         {
             readers.Add(new Reader { Test = test, Type = typeof(T) });
         }
-    
+
         /// <summary>
         /// Reads the beatmap metadata from this archive.
         /// </summary>
         public abstract BeatmapMetadata ReadMetadata();
+
         /// <summary>
         /// Gets a list of beatmap file names.
         /// </summary>
-        public abstract string[] ReadBeatmaps();
+        public string[] BeatmapFilenames { get; protected set; }
+
         /// <summary>
-        /// Gets the storyboard file name.
+        /// The storyboard filename. Null if no storyboard is present.
         /// </summary>
-        public abstract string ReadStoryboard();
+        public string StoryboardFilename { get; protected set; }
+
         /// <summary>
         /// Opens a stream for reading a specific file from this archive.
         /// </summary>
