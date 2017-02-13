@@ -14,6 +14,8 @@ namespace osu.Desktop.Overlays
         private UpdateManager updateManager;
         private NotificationManager notification;
 
+        protected override bool HideOnEscape => false;
+
         [BackgroundDependencyLoader]
         private void load(NotificationManager notification)
         {
