@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Menu
                         new OsuSpriteText
                         {
                             Shadow = true,
-                            Direction = FlowDirection.HorizontalOnly,
+                            Direction = FlowDirections.Horizontal,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             TextSize = 16,
