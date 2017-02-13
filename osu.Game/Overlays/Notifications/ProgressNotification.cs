@@ -16,50 +16,91 @@ namespace osu.Game.Overlays.Notifications
 {
     public class ProgressNotification : Notification, IHasCompletionTarget
     {
-        private string text;
-
-        private float progress;
-        public float Progress
+        public string Text
         {
-            get { return progress; }
+            get { return textDrawable.Text; }
             set
             {
-                Debug.Assert(state == ProgressNotificationState.Active);
-                progress = value;
-                progressBar.Progress = progress;
+                textDrawable.Text = value;
             }
         }
 
-        public ProgressNotificationState State
+        public float Progress
+        {
+            get { return progressBar.Progress; }
+            set
+            {
+                progressBar.Progress = value;
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            //we may have received changes before we were displayed.
+            State = state;
+        }
+
+        public virtual ProgressNotificationState State
         {
             get { return state; }
             set
             {
+                bool stateChanged = state != value;
                 state = value;
-                switch (state)
+
+                if (IsLoaded)
                 {
-                    case ProgressNotificationState.Queued:
-                        Light.Colour = colourQueued;
-                        Light.Pulsate = false;
-                        progressBar.Active = false;
-                        break;
-                    case ProgressNotificationState.Active:
-                        Light.Colour = colourActive;
-                        Light.Pulsate = true;
-                        progressBar.Active = true;
-                        break;
-                    case ProgressNotificationState.Cancelled:
-                        Light.Colour = colourCancelled;
-                        Light.Pulsate = false;
-                        progressBar.Active = false;
-                        break;
+                    switch (state)
+                    {
+                        case ProgressNotificationState.Queued:
+                            Light.Colour = colourQueued;
+                            Light.Pulsate = false;
+                            progressBar.Active = false;
+                            break;
+                        case ProgressNotificationState.Active:
+                            Light.Colour = colourActive;
+                            Light.Pulsate = true;
+                            progressBar.Active = true;
+                            break;
+                        case ProgressNotificationState.Cancelled:
+                            Light.Colour = colourCancelled;
+                            Light.Pulsate = false;
+                            progressBar.Active = false;
+                            break;
+                    }
+                }
+
+                if (stateChanged)
+                {
+                    switch (state)
+                    {
+                        case ProgressNotificationState.Completed:
+                            NotificationContent.MoveToY(-DrawSize.Y / 2, 200, EasingTypes.OutQuint);
+                            FadeTo(0.01f, 200); //don't completely fade out or our scheduled task won't run.
+
+                            Delay(100);
+                            Schedule(Completed);
+                            break;
+                    }
                 }
             }
         }
 
         private ProgressNotificationState state;
 
-        public Action Completed;
+        protected virtual Notification CreateCompletionNotification() => new ProgressCompletionNotification(this)
+        {
+            Activated = CompletionClickAction,
+            Text = $"Task \"{Text}\" has completed!"
+        };
+
+        protected virtual void Completed()
+        {
+            Expire();
+            CompletionTarget?.Invoke(CreateCompletionNotification());
+        }
 
         public override bool DisplayOnTop => false;
 
@@ -68,30 +109,21 @@ namespace osu.Game.Overlays.Notifications
         private Color4 colourActive;
         private Color4 colourCancelled;
 
-        public ProgressNotification(string text)
-        {
-            this.text = text;
-        }
+        private SpriteText textDrawable;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        public ProgressNotification()
         {
-            colourQueued = colours.YellowDark;
-            colourActive = colours.Blue;
-            colourCancelled = colours.Red;
-
             IconContent.Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
             });
 
-            Content.Add(new SpriteText
+            Content.Add(textDrawable = new SpriteText
             {
                 TextSize = 16,
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
-                Text = text
             });
 
             NotificationContent.Add(progressBar = new ProgressBar
@@ -104,21 +136,12 @@ namespace osu.Game.Overlays.Notifications
             State = ProgressNotificationState.Queued;
         }
 
-        public void Complete()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            Debug.Assert(state != ProgressNotificationState.Completed);
-
-            state = ProgressNotificationState.Completed;
-
-            NotificationContent.MoveToY(-DrawSize.Y / 2, 200, EasingTypes.OutQuint);
-            FadeTo(0.01f, 200); //don't completely fade out or our scheduled task won't run.
-
-            Delay(100);
-            Schedule(() =>
-            {
-                CompletionTarget?.Invoke(new ProgressCompletionNotification(this));
-                base.Close();
-            });
+            colourQueued = colours.YellowDark;
+            colourActive = colours.Blue;
+            colourCancelled = colours.Red;
         }
 
         public override void Close()
@@ -135,7 +158,15 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
+        /// <summary>
+        /// The function to post completion notifications back to.
+        /// </summary>
         public Action<Notification> CompletionTarget { get; set; }
+
+        /// <summary>
+        /// An action to complete when the completion notification is clicked.
+        /// </summary>
+        public Func<bool> CompletionClickAction;
 
         class ProgressBar : Container
         {
@@ -175,7 +206,7 @@ namespace osu.Game.Overlays.Notifications
             {
                 colourActive = colours.Blue;
                 Colour = colourInactive = OsuColour.Gray(0.5f);
-                
+
                 Height = 5;
 
                 Children = new[]

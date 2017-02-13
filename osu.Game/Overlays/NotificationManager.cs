@@ -45,7 +45,7 @@ namespace osu.Game.Overlays
                     {
                         sections = new FlowContainer<NotificationSection>
                         {
-                            Direction = FlowDirection.VerticalOnly,
+                            Direction = FlowDirections.Vertical,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                             Children = new []
@@ -73,6 +73,8 @@ namespace osu.Game.Overlays
 
         public void Post(Notification notification)
         {
+            State = Visibility.Visible;
+
             ++runningDepth;
             notification.Depth = notification.DisplayOnTop ? runningDepth : -runningDepth;
 
