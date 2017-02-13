@@ -49,6 +49,7 @@
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
     <Compile Include="Objects\Drawables\DrawableSlider.cs" />
+    <Compile Include="Objects\Drawables\DrawableSpinner.cs" />
     <Compile Include="Objects\Drawables\Pieces\ExplodePiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\FlashPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
@@ -56,6 +57,12 @@
     <Compile Include="Objects\Drawables\Pieces\NumberPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBouncer.cs" />
+    <Compile Include="Objects\Drawables\Pieces\SpinnerBottom.cs" />
+    <Compile Include="Objects\Drawables\Pieces\SpinnerProgressSegment.cs" />
+    <Compile Include="Objects\Drawables\Pieces\SpinnerTrigger.cs" />
+    <Compile Include="Objects\Drawables\Pieces\SpinnerFollow.cs" />
+    <Compile Include="Objects\Drawables\Pieces\SpinnerMiddle.cs" />
+    <Compile Include="Objects\Drawables\Pieces\SpinnerProgress.cs" />
     <Compile Include="Objects\Drawables\Pieces\Triangles.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBall.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
