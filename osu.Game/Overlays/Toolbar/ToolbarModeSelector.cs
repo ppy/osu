@@ -31,8 +31,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             RelativeSizeAxes = Axes.Y;
 
-            float length = Enum.GetValues(typeof(PlayMode)).Length * ToolbarButton.WIDTH + padding*2;
-            float lineLength = (padding * 2 + ToolbarButton.WIDTH) / length;
+            float lineLength = (padding * 2 + ToolbarButton.WIDTH) / (Enum.GetValues(typeof(PlayMode)).Length * ToolbarButton.WIDTH + padding * 2);
 
 
             Children = new Drawable[]
