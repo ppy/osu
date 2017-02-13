@@ -6,6 +6,10 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using Squirrel;
 using System.Reflection;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Game.Graphics;
+using OpenTK;
 
 namespace osu.Desktop.Overlays
 {
@@ -16,20 +20,63 @@ namespace osu.Desktop.Overlays
 
         protected override bool HideOnEscape => false;
 
+        public override bool HandleInput => false;
+
         [BackgroundDependencyLoader]
-        private void load(NotificationManager notification)
+        private void load(NotificationManager notification, OsuColour colours, TextureStore textures)
         {
             this.notification = notification;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
+            Alpha = 0;
 
             var asm = Assembly.GetEntryAssembly().GetName();
-            Add(new OsuSpriteText
+            Children = new Drawable[]
             {
-                Text = $@"osu!lazer v{asm.Version}"
-            });
+                new FlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FlowDirections.Vertical,
+                    Children = new Drawable[]
+                    {
+                        new FlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FlowDirections.Horizontal,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Spacing = new Vector2(5),
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Font = @"Exo2.0-Bold",
+                                    Text = $@"osu!lazer"
+                                },
+                                new OsuSpriteText
+                                {
+                                    Text = $@"{asm.Version}"
+                                },
+                            }
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            TextSize = 12,
+                            Colour = colours.Yellow,
+                            Font = @"Venera",
+                            Text = $@"Development Build"
+                        },
+                        new Sprite
+                        {
+                            Texture = textures.Get(@"Menu/dev-build-footer"),
+                        },
+                    }
+                }
+            };
 
             updateChecker();
         }
@@ -77,6 +124,7 @@ namespace osu.Desktop.Overlays
 
         protected override void PopIn()
         {
+            FadeIn(1000);
         }
 
         protected override void PopOut()
