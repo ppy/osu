@@ -47,6 +47,10 @@ namespace osu.Desktop.Overlays
         private async void updateChecker()
         {
             updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true);
+
+            if (!updateManager.IsInstalledApp)
+                return;
+
             var info = await updateManager.CheckForUpdate();
             if (info.ReleasesToApply.Count > 0)
             {

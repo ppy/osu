@@ -71,7 +71,7 @@ namespace osu.Desktop.VisualTests.Tests
             Add(flow = new FlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Direction = FlowDirection.VerticalOnly
+                Direction = FlowDirections.Vertical
             });
 
             SpriteText loading;
