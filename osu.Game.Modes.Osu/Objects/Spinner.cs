@@ -5,5 +5,8 @@ namespace osu.Game.Modes.Osu.Objects
 {
     public class Spinner : OsuHitObject
     {
+        public double EndPoint;
+
+        public override double EndTime => EndPoint;
     }
 }
