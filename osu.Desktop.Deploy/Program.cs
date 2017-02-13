@@ -53,15 +53,19 @@ namespace osu.Desktop.Deploy
         private static string nupkgFilename(string ver) => $"{PackageName}.{ver}.nupkg";
         private static string nupkgDistroFilename(string ver) => $"{PackageName}-{ver}-full.nupkg";
 
+        private static Stopwatch sw = new Stopwatch();
+
         private static string codeSigningPassword;
 
         public static void Main(string[] args)
         {
+            displayHeader();
+
             findSolutionPath();
 
             if (!Directory.Exists(ReleasesFolder))
             {
-                Console.WriteLine("WARNING: No files found in the release directory. Make sure you want this.");
+                write("WARNING: No release directory found. Make sure you want this!", ConsoleColor.Yellow);
                 Directory.CreateDirectory(ReleasesFolder);
             }
 
@@ -77,28 +81,28 @@ namespace osu.Desktop.Deploy
 
             string version = $"{verBase}{increment}";
 
+            Console.ForegroundColor = ConsoleColor.White;
             Console.Write($"Ready to deploy {version}: ");
             Console.ReadLine();
+
+            sw.Start();
 
             if (!string.IsNullOrEmpty(CodeSigningCertificate))
             {
                 Console.Write("Enter code signing password: ");
-                var fg = Console.ForegroundColor;
-                Console.ForegroundColor = Console.BackgroundColor;
-                codeSigningPassword = Console.ReadLine();
-                Console.ForegroundColor = fg;
+                codeSigningPassword = readLineMasked();
             }
 
-            Console.WriteLine("Restoring NuGet packages...");
+            write("Restoring NuGet packages...");
             runCommand(nuget_path, "restore " + solutionPath);
 
-            Console.WriteLine("Updating AssemblyInfo...");
+            write("Updating AssemblyInfo...");
             updateAssemblyInfo(version);
 
-            Console.WriteLine("Running build process...");
+            write("Running build process...");
             runCommand(msbuild_path, $"/v:quiet /m /t:{TargetName.Replace('.', '_')} /p:OutputPath={stagingPath};Configuration=Release {SolutionName}.sln");
 
-            Console.WriteLine("Creating NuGet deployment package...");
+            write("Creating NuGet deployment package...");
             runCommand(nuget_path, $"pack {NuSpecName} -Version {version} -Properties Configuration=Deploy -OutputDirectory {stagingPath} -BasePath {stagingPath}");
 
             //prune once before checking for files so we can avoid erroring on files which aren't even needed for this build.
@@ -106,7 +110,7 @@ namespace osu.Desktop.Deploy
 
             checkReleaseFiles();
 
-            Console.WriteLine("Releasifying package...");
+            write("Running squirrel build...");
             runCommand(squirrel_path, $"--releasify {stagingPath}\\{nupkgFilename(version)} --setupIcon {iconPath} --icon {iconPath} {codeSigningCmd} --no-msi");
 
             //prune again to clean up before upload.
@@ -118,8 +122,18 @@ namespace osu.Desktop.Deploy
 
             uploadBuild(version);
 
-            Console.WriteLine("Done!");
+            write("Done!", ConsoleColor.White);
             Console.ReadLine();
+        }
+
+        private static void displayHeader()
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine();
+            Console.WriteLine("  Please note that OSU! and PPY are registered trademarks and as such covered by trademark law.");
+            Console.WriteLine("  Do not distribute builds of this project publicly that make use of these.");
+            Console.ResetColor();
+            Console.WriteLine();
         }
 
         /// <summary>
@@ -140,7 +154,7 @@ namespace osu.Desktop.Deploy
 
         private static void pruneReleases()
         {
-            Console.WriteLine("Pruning RELEASES...");
+            write("Pruning RELEASES...");
 
             var releaseLines = getReleaseLines().ToList();
 
@@ -149,7 +163,7 @@ namespace osu.Desktop.Deploy
             //remove any FULL releases (except most recent)
             foreach (var l in fulls)
             {
-                Console.WriteLine($"- Removing old release {l.Filename}");
+                write($"- Removing old release {l.Filename}", ConsoleColor.Yellow);
                 File.Delete(Path.Combine(ReleasesFolder, l.Filename));
                 releaseLines.Remove(l);
             }
@@ -160,7 +174,7 @@ namespace osu.Desktop.Deploy
             {
                 foreach (var l in deltas.Take(deltas.Count() - keep_delta_count))
                 {
-                    Console.WriteLine($"- Removing old delta {l.Filename}");
+                    write($"- Removing old delta {l.Filename}", ConsoleColor.Yellow);
                     File.Delete(Path.Combine(ReleasesFolder, l.Filename));
                     releaseLines.Remove(l);
                 }
@@ -176,9 +190,9 @@ namespace osu.Desktop.Deploy
             if (string.IsNullOrEmpty(GitHubAccessToken) || string.IsNullOrEmpty(codeSigningCertPath))
                 return;
 
-            Console.WriteLine("Publishing to GitHub...");
+            write("Publishing to GitHub...");
 
-            Console.WriteLine($"- Creating release {version}...");
+            write($"- Creating release {version}...", ConsoleColor.Yellow);
             var req = new JsonWebRequest<GitHubRelease>($"{GitHubApiEndpoint}")
             {
                 Method = HttpMethod.POST
@@ -192,9 +206,9 @@ namespace osu.Desktop.Deploy
             req.AuthenticatedBlockingPerform();
 
             var assetUploadUrl = req.ResponseObject.UploadUrl.Replace("{?name,label}", "?name={0}");
-            foreach (var a in Directory.GetFiles(ReleasesFolder))
+            foreach (var a in Directory.GetFiles(ReleasesFolder).Reverse()) //reverse to upload RELEASES first.
             {
-                Console.WriteLine($"- Adding asset {a}...");
+                write($"- Adding asset {a}...", ConsoleColor.Yellow);
                 var upload = new WebRequest(assetUploadUrl, Path.GetFileName(a))
                 {
                     Method = HttpMethod.POST,
@@ -212,7 +226,7 @@ namespace osu.Desktop.Deploy
 
         private static void checkGitHubReleases()
         {
-            Console.WriteLine("Checking GitHub releases...");
+            write("Checking GitHub releases...");
             var req = new JsonWebRequest<List<GitHubRelease>>($"{GitHubApiEndpoint}");
             req.AuthenticatedBlockingPerform();
 
@@ -238,13 +252,13 @@ namespace osu.Desktop.Deploy
             //if we don't have a RELEASES asset then the previous release likely wasn't a Squirrel one.
             if (releaseAsset == null) return;
 
-            Console.WriteLine($"Last GitHub release was {lastRelease.Name}.");
+            write($"Last GitHub release was {lastRelease.Name}.");
 
             bool requireDownload = false;
 
             if (!File.Exists(Path.Combine(ReleasesFolder, nupkgDistroFilename(lastRelease.Name))))
             {
-                Console.WriteLine($"! Last verion's package not found locally.");
+                write("Last verion's package not found locally.", ConsoleColor.Red);
                 requireDownload = true;
             }
             else
@@ -253,19 +267,19 @@ namespace osu.Desktop.Deploy
                 lastReleases.AuthenticatedBlockingPerform();
                 if (File.ReadAllText(Path.Combine(ReleasesFolder, "RELEASES")) != lastReleases.ResponseString)
                 {
-                    Console.WriteLine("! Server's RELEASES differed from ours.");
+                    write("Server's RELEASES differed from ours.", ConsoleColor.Red);
                     requireDownload = true;
                 }
             }
 
             if (!requireDownload) return;
 
-            Console.WriteLine("Refreshing local releases directory...");
+            write("Refreshing local releases directory...");
             refreshDirectory(ReleasesFolder);
 
             foreach (var a in assets)
             {
-                Console.WriteLine($"- Downloading {a.Name}...");
+                write($"- Downloading {a.Name}...", ConsoleColor.Yellow);
                 new FileWebRequest(Path.Combine(ReleasesFolder, a.Name), $"{GitHubApiEndpoint}/assets/{a.Id}").AuthenticatedBlockingPerform();
             }
         }
@@ -328,18 +342,39 @@ namespace osu.Desktop.Deploy
             string output = p.StandardOutput.ReadToEnd();
             if (p.ExitCode == 0) return true;
 
-            Console.WriteLine(output);
+            write(output);
             error($"Command {command} {args} failed!");
             return false;
         }
 
-        private static void error(string p)
+        private static string readLineMasked()
+        {
+            var fg = Console.ForegroundColor;
+            Console.ForegroundColor = Console.BackgroundColor;
+            var ret = Console.ReadLine();
+            Console.ForegroundColor = fg;
+
+            return ret;
+        }
+
+        private static void error(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("ERROR: " + p);
+            Console.WriteLine($"FATAL ERROR: {message}");
 
             Console.ReadLine();
             Environment.Exit(-1);
+        }
+
+        private static void write(string message, ConsoleColor col = ConsoleColor.Gray)
+        {
+            if (sw.ElapsedMilliseconds > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write(sw.ElapsedMilliseconds.ToString().PadRight(8));
+            }
+            Console.ForegroundColor = col;
+            Console.WriteLine(message);
         }
 
         public static void AuthenticatedBlockingPerform(this WebRequest r)
