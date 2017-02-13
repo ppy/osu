@@ -42,7 +42,7 @@ namespace osu.Game.Online.Chat.Drawables
                     {
                         flow = new FlowContainer
                         {
-                            Direction = FlowDirection.VerticalOnly,
+                            Direction = FlowDirections.Vertical,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Spacing = new Vector2(1, 1)

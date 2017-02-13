@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     "Soleily - Renatus (MMzz) [Muzukashii].osu",
                     "Soleily - Renatus (MMzz) [Oni].osu"
                 };
-                var maps = reader.ReadBeatmaps();
+                var maps = reader.BeatmapFilenames;
                 foreach (var map in expected)
                     Assert.Contains(map, maps);
             }

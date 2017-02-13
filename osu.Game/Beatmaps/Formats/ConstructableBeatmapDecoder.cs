@@ -12,7 +12,7 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class ConstructableBeatmapDecoder : BeatmapDecoder
     {
-        protected override Beatmap ParseFile(TextReader stream)
+        protected override void ParseFile(TextReader stream, Beatmap beatmap)
         {
             throw new NotImplementedException();
         }

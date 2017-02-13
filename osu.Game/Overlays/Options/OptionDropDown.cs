@@ -71,7 +71,14 @@ namespace osu.Game.Overlays.Options
             {
                 items = value;
                 if(dropdown != null)
+                {
                     dropdown.Items = value;
+
+                    // We need to refresh the dropdown because our items changed,
+                    // thus its selected value may be outdated.
+                    if (bindable != null)
+                        dropdown.SelectedValue = bindable.Value;
+                }
             }
         }
 
@@ -79,7 +86,7 @@ namespace osu.Game.Overlays.Options
         {
             Items = new KeyValuePair<string, T>[0];
 
-            Direction = FlowDirection.VerticalOnly;
+            Direction = FlowDirections.Vertical;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
