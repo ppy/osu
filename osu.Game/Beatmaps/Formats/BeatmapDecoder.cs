@@ -7,6 +7,8 @@ using System.IO;
 using osu.Game.Modes.Objects;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
+using osu.Game.Beatmaps.Timing;
+using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -34,6 +36,11 @@ namespace osu.Game.Beatmaps.Formats
             return b;
         }
 
+        public virtual void Decode(TextReader stream, Beatmap beatmap)
+        {
+            ParseFile(stream, beatmap);
+        }
+
         public virtual Beatmap Process(Beatmap beatmap)
         {
             ApplyColours(beatmap);
@@ -41,7 +48,23 @@ namespace osu.Game.Beatmaps.Formats
             return beatmap;
         }
 
-        protected abstract Beatmap ParseFile(TextReader stream);
+        protected virtual Beatmap ParseFile(TextReader stream)
+        {
+            var beatmap = new Beatmap
+            {
+                HitObjects = new List<HitObject>(),
+                ControlPoints = new List<ControlPoint>(),
+                ComboColors = new List<Color4>(),
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Metadata = new BeatmapMetadata(),
+                    BaseDifficulty = new BaseDifficulty(),
+                },
+            };
+            ParseFile(stream, beatmap);
+            return beatmap;
+        }
+        protected abstract void ParseFile(TextReader stream, Beatmap beatmap);
 
         public virtual void ApplyColours(Beatmap b)
         {

@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Select
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Direction = FlowDirection.VerticalOnly,
+                        Direction = FlowDirections.Vertical,
                         Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Select
                             new FlowContainer
                             {
                                 Margin = new MarginPadding { Top = 10 },
-                                Direction = FlowDirection.HorizontalOnly,
+                                Direction = FlowDirections.Horizontal,
                                 AutoSizeAxes = Axes.Both,
                                 Children = new []
                                 {

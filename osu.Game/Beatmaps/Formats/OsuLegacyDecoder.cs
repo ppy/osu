@@ -233,20 +233,8 @@ namespace osu.Game.Beatmaps.Formats
             });
         }
 
-        protected override Beatmap ParseFile(TextReader stream)
+        protected override void ParseFile(TextReader stream, Beatmap beatmap)
         {
-            var beatmap = new Beatmap
-            {
-                HitObjects = new List<HitObject>(),
-                ControlPoints = new List<ControlPoint>(),
-                ComboColors = new List<Color4>(),
-                BeatmapInfo = new BeatmapInfo
-                {
-                    Metadata = new BeatmapMetadata(),
-                    BaseDifficulty = new BaseDifficulty(),
-                },
-            };
-
             HitObjectParser parser = null;
 
             var section = Section.None;
@@ -309,8 +297,6 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                 }
             }
-
-            return beatmap;
         }
     }
 }

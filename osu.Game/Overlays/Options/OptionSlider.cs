@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Options
 
         public OptionSlider()
         {
-            Direction = FlowDirection.VerticalOnly;
+            Direction = FlowDirections.Vertical;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = 5 };

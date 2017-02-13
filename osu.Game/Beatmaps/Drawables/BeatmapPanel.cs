@@ -77,7 +77,7 @@ namespace osu.Game.Beatmaps.Drawables
                 new FlowContainer
                 {
                     Padding = new MarginPadding(5),
-                    Direction = FlowDirection.HorizontalOnly,
+                    Direction = FlowDirections.Horizontal,
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -93,13 +93,13 @@ namespace osu.Game.Beatmaps.Drawables
                         {
                             Padding = new MarginPadding { Left = 5 },
                             Spacing = new Vector2(0, 5),
-                            Direction = FlowDirection.VerticalOnly,
+                            Direction = FlowDirections.Vertical,
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
                                 new FlowContainer
                                 {
-                                    Direction = FlowDirection.HorizontalOnly,
+                                    Direction = FlowDirections.Horizontal,
                                     AutoSizeAxes = Axes.Both,
                                     Spacing = new Vector2(4, 0),
                                     Children = new[]
