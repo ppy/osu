@@ -57,7 +57,7 @@ namespace osu.Desktop.Overlays
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = $@"{asm.Version}"
+                                    Text = $@"{asm.Version.Major}.{asm.Version.Minor}.{asm.Version.Build}"
                                 },
                             }
                         },
