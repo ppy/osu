@@ -1,43 +1,62 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
+
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
 namespace osu.Desktop.Deploy
 {
-    class Program
+    internal static class Program
     {
-        static string NUGET_PATH = @"packages\NuGet.CommandLine.3.5.0\tools\NuGet.exe";
-        static string SQUIRREL_PATH = @"packages\squirrel.windows.1.5.2\tools\Squirrel.exe";
-        static string MSBUILD_PATH = @"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe";
+        private const string nuget_path = @"packages\NuGet.CommandLine.3.5.0\tools\NuGet.exe";
+        private const string squirrel_path = @"packages\squirrel.windows.1.5.2\tools\Squirrel.exe";
+        private const string msbuild_path = @"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe";
 
-        static string STAGING_FOLDER = "Staging";
-        static string PROJECT_NAME = "osu.Desktop";
+        public static string StagingFolder = "Staging";
+        public static string ReleasesFolder = "Releases";
 
-        static string CODE_SIGNING_CMD => $"/a /f {CODE_SIGNING_CERT} /p {codeSigningPassword} /t http://timestamp.comodoca.com/authenticode";
-        static string IconPath => Path.Combine(SolutionPath, PROJECT_NAME, "lazer.ico");
+        public static string ProjectName = "osu.Desktop";
+        public static string CodeSigningCert => Path.Combine(homeDir, "deanherbert.pfx");
 
-        static internal string HomeDir { get { return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile); } }
-        static internal string CODE_SIGNING_CERT => Path.Combine(HomeDir, "deanherbert.pfx");
+        private static string codeSigningCmd => $"/a /f {CodeSigningCert} /p {codeSigningPassword} /t http://timestamp.comodoca.com/authenticode";
 
-        static string SolutionPath => Environment.CurrentDirectory;
-        static string StagingPath => Path.Combine(SolutionPath, STAGING_FOLDER);
+        private static string homeDir => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-        static string codeSigningPassword;
+        private static string solutionPath => Environment.CurrentDirectory;
+        private static string stagingPath => Path.Combine(solutionPath, StagingFolder);
+        private static string iconPath => Path.Combine(solutionPath, ProjectName, "lazer.ico");
 
-        static void Main(string[] args)
+        private static string codeSigningPassword;
+
+        public static void Main(string[] args)
         {
-            FindSolutionPath();
+            findSolutionPath();
 
-            if (Directory.Exists(STAGING_FOLDER))
-                Directory.Delete(STAGING_FOLDER, true);
-            Directory.CreateDirectory(STAGING_FOLDER);
+            if (Directory.Exists(StagingFolder))
+                Directory.Delete(StagingFolder, true);
+            Directory.CreateDirectory(StagingFolder);
 
             string verBase = DateTime.Now.ToString("yyyy.Md.");
 
             int increment = 0;
 
-            while (Directory.GetFiles("Releases", $"*{verBase}{increment}*").Count() > 0)
+            if (!Directory.Exists(ReleasesFolder))
+            {
+                Console.WriteLine("WARNING: No files found in the release directory. Make sure you want this.");
+                Directory.CreateDirectory(ReleasesFolder);
+            }
+            else
+            {
+                Console.WriteLine("Existing releases:");
+                foreach (var l in File.ReadAllLines(Path.Combine(ReleasesFolder, "RELEASES")))
+                    Console.WriteLine(l);
+                Console.WriteLine();
+            }
+
+            //increment build number until we have a unique one.
+            while (Directory.GetFiles(ReleasesFolder, $"*{verBase}{increment}*").Any())
                 increment++;
 
             string ver = $"{verBase}{increment}";
@@ -51,19 +70,20 @@ namespace osu.Desktop.Deploy
             codeSigningPassword = Console.ReadLine();
 
             Console.WriteLine("Restoring NuGet packages...");
-            RunCommand(NUGET_PATH, "restore " + SolutionPath);
+            runCommand(nuget_path, "restore " + solutionPath);
 
             Console.WriteLine("Running build process...");
-            RunCommand(MSBUILD_PATH, $"/v:quiet /m /t:Client\\{PROJECT_NAME.Replace('.', '_')} /p:OutputPath={StagingPath};Configuration=Release osu.sln");
+            runCommand(msbuild_path, $"/v:quiet /m /t:Client\\{ProjectName.Replace('.', '_')} /p:OutputPath={stagingPath};Configuration=Release osu.sln");
 
             Console.WriteLine("Creating NuGet deployment package...");
-            RunCommand(NUGET_PATH, $"pack osu.Desktop\\osu.nuspec -Version {ver} -Properties Configuration=Deploy -OutputDirectory {StagingPath} -BasePath {StagingPath}");
+            runCommand(nuget_path, $"pack osu.Desktop\\osu.nuspec -Version {ver} -Properties Configuration=Deploy -OutputDirectory {stagingPath} -BasePath {stagingPath}");
 
             Console.WriteLine("Releasifying package...");
-            RunCommand(SQUIRREL_PATH, $"--releasify {StagingPath}\\osulazer.{ver}.nupkg --setupIcon {IconPath} --icon {IconPath} -n \"{CODE_SIGNING_CMD}\" --no-msi");
+            runCommand(squirrel_path, $"--releasify {stagingPath}\\osulazer.{ver}.nupkg --setupIcon {iconPath} --icon {iconPath} -n \"{codeSigningCmd}\" --no-msi");
 
-            File.Copy("Releases\\Setup.exe", "Releases\\install.exe", true);
-            File.Delete("Releases\\Setup.exe");
+            //rename setup to install.
+            File.Copy(Path.Combine(ReleasesFolder, "Setup.exe"), Path.Combine(ReleasesFolder, "install.exe"), true);
+            File.Delete(Path.Combine(ReleasesFolder, "Setup.exe"));
 
             Console.WriteLine("Done!");
 
@@ -73,7 +93,7 @@ namespace osu.Desktop.Deploy
         /// <summary>
         /// Find the base path of the osu! solution (git checkout location)
         /// </summary>
-        private static void FindSolutionPath()
+        private static void findSolutionPath()
         {
             string path = Path.GetDirectoryName(Environment.CommandLine.Replace("\"", "").Trim());
 
@@ -87,32 +107,27 @@ namespace osu.Desktop.Deploy
             Environment.CurrentDirectory = path;
         }
 
-        private static bool RunCommand(string command, string args)
+        private static bool runCommand(string command, string args)
         {
-            var psi = new ProcessStartInfo(command, args);
-            if (psi != null)
+            var psi = new ProcessStartInfo(command, args)
             {
-                psi.WorkingDirectory = SolutionPath;
-                psi.CreateNoWindow = true;
-                psi.RedirectStandardOutput = true;
-                psi.UseShellExecute = false;
-                psi.WindowStyle = ProcessWindowStyle.Hidden;
-                Process p = Process.Start(psi);
-                string output = p.StandardOutput.ReadToEnd();
-                if (p.ExitCode != 0)
-                {
-                    Console.WriteLine(output);
-                    Error($"Command {command} {args} failed!");
-                    return false;
-                }
+                WorkingDirectory = solutionPath,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
 
-                return true;
-            }
+            Process p = Process.Start(psi);
+            string output = p.StandardOutput.ReadToEnd();
+            if (p.ExitCode == 0) return true;
 
+            Console.WriteLine(output);
+            error($"Command {command} {args} failed!");
             return false;
         }
 
-        private static void Error(string p)
+        private static void error(string p)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("ERROR: " + p);
