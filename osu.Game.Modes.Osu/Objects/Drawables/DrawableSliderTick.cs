@@ -20,6 +20,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 
         public bool ShouldHit;
 
+        public override bool RemoveWhenNotAlive => false;
+
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
             this.sliderTick = sliderTick;
