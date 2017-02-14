@@ -83,6 +83,7 @@ namespace osu.Game.Modes.UI
 
                 Playfield.Add(drawableObject);
             }
+            Playfield.PostProcess();
         }
 
         private void onJudgement(DrawableHitObject o, JudgementInfo j) => TriggerOnJudgement(j);
