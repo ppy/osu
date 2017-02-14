@@ -31,9 +31,6 @@ namespace osu.Game.Overlays.Toolbar
         {
             RelativeSizeAxes = Axes.Y;
 
-            float lineLength = padding * 2 + ToolbarButton.WIDTH;
-
-
             Children = new Drawable[]
             {
                 new OpaqueBackground(),
@@ -48,7 +45,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 modeButtonLine = new Container
                 {
-                    Size = new Vector2(lineLength, 3),
+                    Size = new Vector2(padding * 2 + ToolbarButton.WIDTH, 3),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
                     Masking = true,
