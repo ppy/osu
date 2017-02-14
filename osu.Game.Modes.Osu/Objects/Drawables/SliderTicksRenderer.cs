@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
+using osu.Framework.Caching;
 using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
 
@@ -8,6 +10,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
     public class SliderTicksRenderer : Container<DrawableSliderTick>
     {
+        private Cached drawableTicks = new Cached();
+
         private double startTime;
         public double StartTime
         {
@@ -15,7 +19,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             set
             {
                 startTime = value;
-                update();
+                drawableTicks.Invalidate();
             }
         }
 
@@ -26,7 +30,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             set
             {
                 repeatDuration = value;
-                update();
+                drawableTicks.Invalidate();
             }
         }
 
@@ -37,7 +41,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             set
             {
                 ticks = value;
-                update();
+                drawableTicks.Invalidate();
             }
         }
 
@@ -50,25 +54,43 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             }
         }
 
-        private void update()
+        protected override void Update()
         {
-            Clear();
-            if (ticks == null || repeatDuration == 0)
+            base.Update();
+            updateDrawableTicks();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            updateDrawableTicks();
+        }
+
+        private void updateDrawableTicks()
+        {
+            if (drawableTicks.EnsureValid())
                 return;
 
-            foreach (var tick in ticks)
+            drawableTicks.Refresh(delegate
             {
-                var repeatStartTime = startTime + tick.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? DrawableOsuHitObject.TIME_FADEIN : DrawableOsuHitObject.TIME_FADEIN / 2);
-                var fadeOutTime = repeatStartTime + repeatDuration;
+                Clear();
+                if (ticks == null || repeatDuration == 0)
+                    return;
 
-                Add(new DrawableSliderTick(tick)
+                foreach (var tick in ticks)
                 {
-                    FadeInTime = fadeInTime,
-                    FadeOutTime = fadeOutTime,
-                    Position = tick.Position,
-                });
-            }
+                    var repeatStartTime = startTime + tick.RepeatIndex * repeatDuration;
+                    var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? DrawableOsuHitObject.TIME_FADEIN : DrawableOsuHitObject.TIME_FADEIN / 2);
+                    var fadeOutTime = repeatStartTime + repeatDuration;
+
+                    Add(new DrawableSliderTick(tick)
+                    {
+                        FadeInTime = fadeInTime,
+                        FadeOutTime = fadeOutTime,
+                        Position = tick.Position,
+                    });
+                }
+            });
         }
     }
 }
