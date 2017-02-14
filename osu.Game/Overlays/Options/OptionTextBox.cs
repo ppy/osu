@@ -24,6 +24,9 @@ namespace osu.Game.Overlays.Options
                     base.Text = bindable.Value;
                     bindable.ValueChanged += bindableValueChanged;
                 }
+
+                if (bindable?.Disabled ?? true)
+                    Alpha = 0.3f;
             }
         }
 

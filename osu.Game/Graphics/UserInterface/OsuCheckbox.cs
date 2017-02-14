@@ -39,6 +39,9 @@ namespace osu.Game.Graphics.UserInterface
                         State = bindable.Value ? CheckBoxState.Checked : CheckBoxState.Unchecked;
                     bindable.ValueChanged += bindableValueChanged;
                 }
+
+                if (bindable?.Disabled ?? true)
+                    Alpha = 0.3f;
             }
         }
 
@@ -123,20 +126,20 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnChecked()
         {
-            if (bindable != null)
-                bindable.Value = true;
-
             sampleChecked?.Play();
             nub.State = CheckBoxState.Checked;
+
+            if (bindable != null)
+                bindable.Value = true;
         }
 
         protected override void OnUnchecked()
         {
-            if (bindable != null)
-                bindable.Value = false;
-
             sampleUnchecked?.Play();
             nub.State = CheckBoxState.Unchecked;
+
+            if (bindable != null)
+                bindable.Value = false;
         }
     }
 }
