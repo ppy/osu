@@ -11,7 +11,7 @@ using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class DrawableHitCircle : DrawableOsuHitObject
+    public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
         private HitCircle osuObject;
 
@@ -156,5 +156,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     break;
             }
         }
+
+        public Drawable ProxiedLayer => ApproachCircle;
     }
 }
