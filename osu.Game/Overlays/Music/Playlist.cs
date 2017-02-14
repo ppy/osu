@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Database;
 using OpenTK;
 
 namespace osu.Game.Overlays.Music
 {
-    public class Playlist : ScrollContainer
+    public class Playlist : Container
     {
         private FlowContainer<PlaylistItem> playlistFlow;
         private List<BeatmapSetInfo> items;
@@ -43,8 +44,8 @@ namespace osu.Game.Overlays.Music
                 foreach (var playlistItem in playlistFlow.Children)
                 {
                     playlistItem.State = playlistItem.BeatmapSetInfo.Beatmaps[0].AudioEquals(selectedItem.Beatmaps[0])
-                        ? SelectionState.Selected
-                        : SelectionState.NotSelected;
+                        ? DropDownMenuItemState.Selected
+                        : DropDownMenuItemState.NotSelected;
                 }
                 SelectionChanged?.Invoke();
             }
@@ -54,11 +55,17 @@ namespace osu.Game.Overlays.Music
         {
             Children = new[]
             {
-                playlistFlow = new FlowContainer<PlaylistItem>
+                new ScrollContainer
                 {
-                    Direction = FlowDirection.VerticalOnly,
-                    AutoSizeAxes = Axes.Both,
-                    Spacing = new Vector2(0, 10)
+                    Children = new Drawable[]
+                    {
+                        playlistFlow = new FlowContainer<PlaylistItem>
+                        {
+                            Direction = FlowDirection.VerticalOnly,
+                            AutoSizeAxes = Axes.Both,
+                            Spacing = new Vector2(0, 10)
+                        }
+                    }
                 }
             };
         }

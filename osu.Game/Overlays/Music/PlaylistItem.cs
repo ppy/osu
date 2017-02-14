@@ -8,6 +8,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -17,16 +18,16 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistItem : ClickableContainer, IStateful<SelectionState>
+    public class PlaylistItem : ClickableContainer, IStateful<DropDownMenuItemState>
     {
         private SpriteText artist, title;
-        private SelectionState _state;
+        private DropDownMenuItemState _state;
         private Func<string, string, string> unicodeString;
         private Bindable<bool> preferUnicode;
 
         public BeatmapSetInfo BeatmapSetInfo { get; }
 
-        public SelectionState State
+        public DropDownMenuItemState State
         {
             get { return _state; }
 
@@ -35,10 +36,10 @@ namespace osu.Game.Overlays.Music
                 _state = value;
                 switch (value)
                 {
-                    case SelectionState.Selected:
+                    case DropDownMenuItemState.Selected:
                         selected();
                         break;
-                    case SelectionState.NotSelected:
+                    case DropDownMenuItemState.NotSelected:
                         deselected();
                         break;
                 }

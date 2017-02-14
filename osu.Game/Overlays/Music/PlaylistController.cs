@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -29,9 +30,9 @@ namespace osu.Game.Overlays.Music
         private Playlist playlistView;
         private SearchTextBox searchTextBox;
 
-        public PlaylistController(OsuGameBase osuGame, BeatmapDatabase beatmaps)
+        public PlaylistController()
         {
-            Width = 400;
+            RelativeSizeAxes = Axes.X;
             Height = 450;
             Masking = true;
             CornerRadius = 5;
@@ -67,7 +68,11 @@ namespace osu.Game.Overlays.Music
                         {
                             Text = "TODO: Collections"
                         },
-                        playlistView = new Playlist()
+                        playlistView = new Playlist
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 340,
+                        }
                     }
                 }
             };
@@ -76,11 +81,6 @@ namespace osu.Game.Overlays.Music
                 if (newText)
                     playlistView.Filter(searchTextBox.Text);
             };
-
-            Beatmaps = beatmaps;
-            playlistView.Items = PlayList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
-            BeatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
-            playlistView.SelectionChanged += PlaylistView_SelectionChanged;
         }
 
         private void PlaylistView_SelectionChanged()
@@ -89,6 +89,15 @@ namespace osu.Game.Overlays.Music
             var differentBeatmapSet = BeatmapSource.Value == null || !BeatmapSource.Value.BeatmapInfo.AudioEquals(newSelection.Beatmaps[0]);
             if (differentBeatmapSet)
                 BeatmapSource.Value = Beatmaps.GetWorkingBeatmap(newSelection.Beatmaps[0]);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase osuGame, BeatmapDatabase beatmaps)
+        {
+            Beatmaps = beatmaps;
+            playlistView.Items = PlayList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
+            BeatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
+            playlistView.SelectionChanged += PlaylistView_SelectionChanged;
         }
 
         protected override void LoadComplete()

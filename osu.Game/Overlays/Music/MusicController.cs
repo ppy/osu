@@ -33,16 +33,13 @@ namespace osu.Game.Overlays.Music
         private TextAwesome playButton, listButton;
         private SpriteText title, artist;
 
-        private List<BeatmapSetInfo> playList;
         private List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
-        private int playListIndex;
         private int playHistoryIndex = -1;
 
         private TrackManager trackManager;
         private Bindable<WorkingBeatmap> beatmapSource;
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap current;
-        private BeatmapDatabase beatmaps;
         private BaseGame game;
 
         public BeatmapDatabase Beatmaps => playlistController.Beatmaps;
@@ -50,7 +47,6 @@ namespace osu.Game.Overlays.Music
         public int PlayListIndex => playlistController.PlayListIndex;
 
         private Container dragContainer;
-        private FlowContainer<Container> flowContainer;
         private Container playerContainer;
         private PlaylistController playlistController;
 
@@ -74,7 +70,7 @@ namespace osu.Game.Overlays.Music
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, OsuConfigManager config, OsuColour colours, BeatmapDatabase beatmaps)
+        private void load(OsuGameBase osuGame, OsuConfigManager config, OsuColour colours)
         {
             unicodeString = config.GetUnicodeString;
 
@@ -87,7 +83,7 @@ namespace osu.Game.Overlays.Music
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        flowContainer = new FlowContainer<Container>
+                        new FlowContainer<Container>
                         {
                             AutoSizeAxes = Axes.Both,
                             Spacing = new Vector2(0, 10),
@@ -223,7 +219,7 @@ namespace osu.Game.Overlays.Music
                                         }
                                     }
                                 },
-                                playlistController = new PlaylistController(osuGame, beatmaps)
+                                playlistController = new PlaylistController()
                             }
                         }
                     }
@@ -279,7 +275,7 @@ namespace osu.Game.Overlays.Music
             current = beatmapSource.Value;
             if (!audioEquals)
             {
-                updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Next);
+                updateDisplay(current, TransformDirection.Next);
                 appendToHistory(current.BeatmapInfo);
                 play(playHistory[playHistoryIndex], true);
             }

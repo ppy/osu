@@ -103,7 +103,6 @@
     <Compile Include="Overlays\Music\Playlist.cs" />
     <Compile Include="Overlays\Music\PlaylistController.cs" />
     <Compile Include="Overlays\Music\PlaylistItem.cs" />
-    <Compile Include="Overlays\Music\SelectionState.cs" />
     <Compile Include="Overlays\Options\OptionDropDown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropDownHeader.cs" />
