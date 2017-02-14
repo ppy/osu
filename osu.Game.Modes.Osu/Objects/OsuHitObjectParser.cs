@@ -26,7 +26,10 @@ namespace osu.Game.Modes.Osu.Objects
             switch (type)
             {
                 case HitObjectType.Circle:
-                    result = new HitCircle();
+                    result = new HitCircle
+                    {
+                        Position = new Vector2(int.Parse(split[0]), int.Parse(split[1]))
+                    };
                     break;
                 case HitObjectType.Slider:
                     CurveTypes curveType = CurveTypes.Catmull;
@@ -82,18 +85,22 @@ namespace osu.Game.Modes.Osu.Objects
                         ControlPoints = points,
                         Length = length,
                         CurveType = curveType,
-                        RepeatCount = repeatCount
+                        RepeatCount = repeatCount,
+                        Position = new Vector2(int.Parse(split[0]), int.Parse(split[1]))
                     };
                     break;
                 case HitObjectType.Spinner:
-                    result = new Spinner();
+                    result = new Spinner
+                    {
+                        Length = Convert.ToDouble(split[5], CultureInfo.InvariantCulture) - Convert.ToDouble(split[2], CultureInfo.InvariantCulture),
+                        Position = new Vector2(512, 384) / 2,
+                    };
                     break;
                 default:
                     //throw new InvalidOperationException($@"Unknown hit object type {type}");
                     return null;
             }
-            result.Position = new Vector2(int.Parse(split[0]), int.Parse(split[1]));
-            result.StartTime = double.Parse(split[2]);
+            result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
             result.Sample = new HitSampleInfo
             {
                 Type = (SampleType)int.Parse(split[4]),
