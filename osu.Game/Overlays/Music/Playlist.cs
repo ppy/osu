@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using OpenTK;
 
@@ -75,18 +76,7 @@ namespace osu.Game.Overlays.Music
         public void Filter(string text)
         {
             foreach (var playlistItem in playlistFlow.Children)
-            {
-                var metadata = playlistItem.BeatmapSetInfo.Metadata;
-                var match = string.IsNullOrEmpty(text)
-                            || (metadata.Artist ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1
-                            || (metadata.ArtistUnicode ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1
-                            || (metadata.Title ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1
-                            || (metadata.TitleUnicode ?? "").IndexOf(text, StringComparison.InvariantCultureIgnoreCase) != -1;
-                if (match)
-                    playlistItem.Show();
-                else
-                    playlistItem.Hide();
-            }
+                BeatmapFilter.Filter(playlistItem.BeatmapSetInfo.Metadata, text, playlistItem.Show, playlistItem.Hide);
             playlistFlow.Invalidate();
         }
     }

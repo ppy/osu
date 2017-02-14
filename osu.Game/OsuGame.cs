@@ -22,7 +22,6 @@ using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using OpenTK;
-using System.Linq;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Overlays.Music;
 

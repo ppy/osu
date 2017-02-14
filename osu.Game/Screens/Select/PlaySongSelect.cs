@@ -1,34 +1,33 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.GameModes;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Transformations;
+using osu.Framework.Input;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
-using OpenTK;
 using osu.Game.Screens.Play;
-using osu.Framework;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Graphics.Transformations;
-using osu.Game.Beatmaps.Drawables;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Framework.Input;
+using OpenTK;
 using OpenTK.Input;
-using System.Collections.Generic;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Select
 {
@@ -82,7 +81,7 @@ namespace osu.Game.Screens.Select
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapDatabase beatmaps, AudioManager audio, BaseGame game,
-            OsuGame osuGame, OsuColour colours)
+                          OsuGame osuGame, OsuColour colours)
         {
             const float carousel_width = 640;
             const float filter_height = 100;
@@ -92,7 +91,10 @@ namespace osu.Game.Screens.Select
             {
                 new ParallaxContainer
                 {
-                    Padding = new MarginPadding { Top = filter_height },
+                    Padding = new MarginPadding
+                    {
+                        Top = filter_height
+                    },
                     ParallaxAmount = 0.005f,
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
@@ -176,22 +178,17 @@ namespace osu.Game.Screens.Select
                 BeatmapGroup newSelection = null;
                 foreach (var beatmapGroup in carousel)
                 {
-                    var set = beatmapGroup.BeatmapSet;
-                    bool match = string.IsNullOrEmpty(search)
-                        || (set.Metadata.Artist ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
-                        || (set.Metadata.ArtistUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
-                        || (set.Metadata.Title ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
-                        || (set.Metadata.TitleUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1;
-                    if (match)
-                    {
-                        beatmapGroup.State = BeatmapGroupState.Collapsed;
-                        if (newSelection == null || beatmapGroup.BeatmapSet.OnlineBeatmapSetID == Beatmap.BeatmapSetInfo.OnlineBeatmapSetID)
-                            newSelection = beatmapGroup;
-                    }
-                    else
-                    {
-                        beatmapGroup.State = BeatmapGroupState.Hidden;
-                    }
+                    BeatmapFilter.Filter(
+                        beatmapGroup.BeatmapSet.Metadata,
+                        search,
+                        () =>
+                        {
+                            beatmapGroup.State = BeatmapGroupState.Collapsed;
+                            if (newSelection == null || beatmapGroup.BeatmapSet.OnlineBeatmapSetID == Beatmap.BeatmapSetInfo.OnlineBeatmapSetID)
+                                newSelection = beatmapGroup;
+                        },
+                        () => beatmapGroup.State = BeatmapGroupState.Hidden
+                    );
                 }
                 if (newSelection != null)
                     carousel.SelectBeatmap(newSelection.BeatmapSet.Beatmaps[0], false);
