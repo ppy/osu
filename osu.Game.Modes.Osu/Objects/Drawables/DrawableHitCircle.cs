@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.ComponentModel;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Modes.Objects.Drawables;
@@ -13,7 +12,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
-        private HitCircle osuObject;
+        private OsuHitObject osuObject;
 
         public ApproachCircle ApproachCircle;
         private CirclePiece circle;
@@ -23,11 +22,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private NumberPiece number;
         private GlowPiece glow;
 
-        public DrawableHitCircle(HitCircle h) : base(h)
+        public DrawableHitCircle(OsuHitObject h) : base(h)
         {
+            Origin = Anchor.Centre;
+
             osuObject = h;
 
-            Origin = Anchor.Centre;
             Position = osuObject.StackedPosition;
             Scale = new Vector2(osuObject.Scale);
 

@@ -4,6 +4,7 @@
 using System.ComponentModel;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
