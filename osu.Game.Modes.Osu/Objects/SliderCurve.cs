@@ -15,7 +15,7 @@ namespace osu.Game.Modes.Osu.Objects
 
         public List<Vector2> ControlPoints;
 
-        public CurveTypes CurveType;
+        public CurveTypes CurveType = CurveTypes.PerfectCurve;
 
         public Vector2 Offset;
 

@@ -30,7 +30,7 @@ namespace osu.Game.Modes.Osu.Objects
                     break;
                 case HitObjectType.Slider:
                     CurveTypes curveType = CurveTypes.Catmull;
-                    int repeatCount = 0;
+                    int repeatCount;
                     double length = 0;
                     List<Vector2> points = new List<Vector2>();
 

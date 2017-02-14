@@ -51,7 +51,7 @@ namespace osu.Game.Modes.Osu.Objects
             Velocity = 100 / beatmap.BeatLengthAt(StartTime, true) * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
         }
 
-        public int RepeatCount;
+        public int RepeatCount = 1;
 
         internal readonly SliderCurve Curve = new SliderCurve();
     }
