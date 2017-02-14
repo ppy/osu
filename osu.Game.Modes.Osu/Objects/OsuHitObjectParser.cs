@@ -18,17 +18,17 @@ namespace osu.Game.Modes.Osu.Objects
         public override HitObject Parse(string text)
         {
             string[] split = text.Split(',');
-            var type = (OsuHitObject.HitObjectType)int.Parse(split[3]);
-            bool combo = type.HasFlag(OsuHitObject.HitObjectType.NewCombo);
-            type &= (OsuHitObject.HitObjectType)0xF;
-            type &= ~OsuHitObject.HitObjectType.NewCombo;
+            var type = (HitObjectType)int.Parse(split[3]);
+            bool combo = type.HasFlag(HitObjectType.NewCombo);
+            type &= (HitObjectType)0xF;
+            type &= ~HitObjectType.NewCombo;
             OsuHitObject result;
             switch (type)
             {
-                case OsuHitObject.HitObjectType.Circle:
+                case HitObjectType.Circle:
                     result = new HitCircle();
                     break;
-                case OsuHitObject.HitObjectType.Slider:
+                case HitObjectType.Slider:
                     Slider s = new Slider();
 
                     CurveTypes curveType = CurveTypes.Catmull;
@@ -92,7 +92,7 @@ namespace osu.Game.Modes.Osu.Objects
 
                     result = s;
                     break;
-                case OsuHitObject.HitObjectType.Spinner:
+                case HitObjectType.Spinner:
                     result = new Spinner();
                     break;
                 default:
