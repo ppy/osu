@@ -32,10 +32,15 @@ namespace osu.Game.Graphics.UserInterface
             Font = @"Exo2.0-Bold",
         };
 
+        public override bool HandleInput => Action != null;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Colour = colours.BlueDark;
+            if (Action == null)
+                Colour = OsuColour.Gray(0.5f);
+
+            BackgroundColour = colours.BlueDark;
 
             Content.Masking = true;
             Content.CornerRadius = 5;

@@ -17,6 +17,7 @@ namespace osu.Game.Overlays.Toolbar
     public class Toolbar : OverlayContainer
     {
         public const float HEIGHT = 40;
+        public const float TOOLTIP_HEIGHT = 30;
 
         public Action OnHome;
         public Action<PlayMode> OnPlayModeChange;
@@ -42,7 +43,7 @@ namespace osu.Game.Overlays.Toolbar
                 new ToolbarBackground(),
                 new FlowContainer
                 {
-                    Direction = FlowDirection.HorizontalOnly,
+                    Direction = FlowDirections.Horizontal,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
@@ -62,7 +63,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Direction = FlowDirection.HorizontalOnly,
+                    Direction = FlowDirections.Horizontal,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
@@ -73,10 +74,7 @@ namespace osu.Game.Overlays.Toolbar
                             Icon = FontAwesome.fa_search
                         },
                         userArea = new ToolbarUserArea(),
-                        new ToolbarButton
-                        {
-                            Icon = FontAwesome.fa_bars
-                        },
+                        new ToolbarNotificationButton(),
                     }
                 }
             };

@@ -82,7 +82,7 @@ namespace osu.Game.Overlays
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Direction = FlowDirection.VerticalOnly,
+                            Direction = FlowDirections.Vertical,
 
                             Children = new Drawable[]
                             {
@@ -90,7 +90,7 @@ namespace osu.Game.Overlays
                                 {
                                     Text = "settings",
                                     TextSize = 40,
-                                    Margin = new MarginPadding { Left = CONTENT_MARGINS, Top = 30 },
+                                    Margin = new MarginPadding { Left = CONTENT_MARGINS, Top = Toolbar.Toolbar.TOOLTIP_HEIGHT },
                                 },
                                 new OsuSpriteText
                                 {
@@ -103,7 +103,7 @@ namespace osu.Game.Overlays
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                    Direction = FlowDirection.VerticalOnly,
+                                    Direction = FlowDirections.Vertical,
                                     Children = sections,
                                 }
                             }
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays
 
                 foreach (OptionsSection section in sections)
                 {
-                    float distance = Math.Abs(scrollContainer.GetChildYInContent(section) - currentScroll);
+                    float distance = Math.Abs(scrollContainer.GetChildPosInContent(section) - currentScroll);
                     if (distance < bestDistance)
                     {
                         bestDistance = distance;

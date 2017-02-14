@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Options.Sections.General
             private void load(APIAccess api, OsuConfigManager config)
             {
                 this.api = api;
-                Direction = FlowDirection.VerticalOnly;
+                Direction = FlowDirections.Vertical;
                 AutoSizeAxes = Axes.Y;
                 RelativeSizeAxes = Axes.X;
                 Spacing = new Vector2(0, 5);

@@ -20,6 +20,8 @@ namespace osu.Game.Graphics.Backgrounds
 
         public Background(string textureName = @"")
         {
+            CacheDrawnFrameBuffer = true;
+
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
             Depth = float.MaxValue;

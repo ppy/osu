@@ -10,8 +10,8 @@ using osu.Framework.Desktop.Platform;
 using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
-using SQLiteNetExtensions.Extensions;
 using osu.Framework.Allocation;
+using osu.Game.Screens.Backgrounds;
 
 namespace osu.Desktop.VisualTests
 {
@@ -20,6 +20,8 @@ namespace osu.Desktop.VisualTests
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            (new BackgroundModeDefault() { Depth = 10 }).Preload(this, AddInternal);
 
             // Have to construct this here, rather than in the constructor, because
             // we depend on some dependencies to be loaded within OsuGameBase.load().

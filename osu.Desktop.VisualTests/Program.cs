@@ -18,6 +18,8 @@ namespace osu.Desktop.VisualTests
         [STAThread]
         public static void Main(string[] args)
         {
+            bool benchmark = args.Length > 0 && args[0] == @"-benchmark";
+
             using (BasicGameHost host = Host.GetSuitableHost(@"osu"))
             {
                 Ruleset.Register(new OsuRuleset());
@@ -25,7 +27,10 @@ namespace osu.Desktop.VisualTests
                 Ruleset.Register(new ManiaRuleset());
                 Ruleset.Register(new CatchRuleset());
 
-                host.Add(new VisualTestGame());
+                if (benchmark)
+                    host.Add(new Benchmark());
+                else
+                    host.Add(new VisualTestGame());
                 host.Run();
             }
         }
