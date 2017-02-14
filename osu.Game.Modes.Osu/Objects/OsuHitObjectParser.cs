@@ -29,8 +29,6 @@ namespace osu.Game.Modes.Osu.Objects
                     result = new HitCircle();
                     break;
                 case HitObjectType.Slider:
-                    Slider s = new Slider();
-
                     CurveTypes curveType = CurveTypes.Catmull;
                     int repeatCount = 0;
                     double length = 0;
@@ -79,18 +77,13 @@ namespace osu.Game.Modes.Osu.Objects
                     if (split.Length > 7)
                         length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
 
-                    s.RepeatCount = repeatCount;
-
-                    s.Curve = new SliderCurve
+                    result = new Slider
                     {
                         ControlPoints = points,
                         Length = length,
-                        CurveType = curveType
+                        CurveType = curveType,
+                        RepeatCount = repeatCount
                     };
-
-                    s.Curve.Calculate();
-
-                    result = s;
                     break;
                 case HitObjectType.Spinner:
                     result = new Spinner();
@@ -101,7 +94,8 @@ namespace osu.Game.Modes.Osu.Objects
             }
             result.Position = new Vector2(int.Parse(split[0]), int.Parse(split[1]));
             result.StartTime = double.Parse(split[2]);
-            result.Sample = new HitSampleInfo {
+            result.Sample = new HitSampleInfo
+            {
                 Type = (SampleType)int.Parse(split[4]),
                 Set = SampleSet.Soft,
             };
