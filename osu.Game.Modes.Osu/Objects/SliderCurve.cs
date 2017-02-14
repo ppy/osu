@@ -172,6 +172,9 @@ namespace osu.Game.Modes.Osu.Objects
         /// <param name="p1">End progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
         public void GetPathToProgress(List<Vector2> path, double p0, double p1)
         {
+            if (calculatedPath.Count == 0 && ControlPoints.Count > 0)
+                Calculate();
+
             double d0 = progressToDistance(p0);
             double d1 = progressToDistance(p1);
 
@@ -196,6 +199,9 @@ namespace osu.Game.Modes.Osu.Objects
         /// <returns></returns>
         public Vector2 PositionAt(double progress)
         {
+            if (calculatedPath.Count == 0 && ControlPoints.Count > 0)
+                Calculate();
+
             double d = progressToDistance(progress);
             return interpolateVertices(indexOfDistance(d), d) + Offset;
         }
