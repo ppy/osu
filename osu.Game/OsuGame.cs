@@ -23,6 +23,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using OpenTK;
 using osu.Framework.Graphics.Primitives;
+using System.Collections.Generic;
 using osu.Game.Overlays.Music;
 
 namespace osu.Game
@@ -34,6 +35,8 @@ namespace osu.Game
         private ChatOverlay chat;
 
         private MusicController musicController;
+
+        private NotificationManager notificationManager;
 
         private MainMenu mainMenu => modeStack?.ChildGameMode as MainMenu;
         private Intro intro => modeStack as Intro;
@@ -65,14 +68,17 @@ namespace osu.Game
             }
 
             if (args?.Length > 0)
-                ImportBeatmaps(args);
+            {
+                var paths = args.Where(a => !a.StartsWith(@"-"));
+                ImportBeatmaps(paths);
+            }
 
             Dependencies.Cache(this);
 
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
         }
 
-        public void ImportBeatmaps(params string[] paths)
+        public void ImportBeatmaps(IEnumerable<string> paths)
         {
             Schedule(delegate { Dependencies.Get<BeatmapDatabase>().Import(paths); });
         }
@@ -117,8 +123,16 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }).Preload(this, overlayContent.Add);
 
+            (notificationManager = new NotificationManager
+            {
+                Depth = -2,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+            }).Preload(this, overlayContent.Add);
+
             Dependencies.Cache(options);
             Dependencies.Cache(musicController);
+            Dependencies.Cache(notificationManager);
 
             (Toolbar = new Toolbar
             {

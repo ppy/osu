@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -104,6 +106,13 @@
     <Compile Include="Overlays\Music\Playlist.cs" />
     <Compile Include="Overlays\Music\PlaylistController.cs" />
     <Compile Include="Overlays\Music\PlaylistItem.cs" />
+    <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
+    <Compile Include="Overlays\Notifications\Notification.cs" />
+    <Compile Include="Overlays\NotificationManager.cs" />
+    <Compile Include="Overlays\Notifications\NotificationSection.cs" />
+    <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
+    <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
+    <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
     <Compile Include="Overlays\Options\OptionDropDown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropDownHeader.cs" />
@@ -111,6 +120,7 @@
     <Compile Include="Graphics\UserInterface\OsuDropDownMenuItem.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarHomeButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarMusicButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarNotificationButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarSettingsButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarOverlayToggleButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarUserArea.cs" />
