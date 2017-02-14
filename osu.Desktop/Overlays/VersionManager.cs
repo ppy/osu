@@ -1,4 +1,7 @@
-﻿using osu.Framework.Allocation;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -6,6 +9,10 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using Squirrel;
 using System.Reflection;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Game.Graphics;
+using OpenTK;
 
 namespace osu.Desktop.Overlays
 {
@@ -14,20 +21,65 @@ namespace osu.Desktop.Overlays
         private UpdateManager updateManager;
         private NotificationManager notification;
 
+        protected override bool HideOnEscape => false;
+
+        public override bool HandleInput => false;
+
         [BackgroundDependencyLoader]
-        private void load(NotificationManager notification)
+        private void load(NotificationManager notification, OsuColour colours, TextureStore textures)
         {
             this.notification = notification;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
+            Alpha = 0;
 
             var asm = Assembly.GetEntryAssembly().GetName();
-            Add(new OsuSpriteText
+            Children = new Drawable[]
             {
-                Text = $@"osu!lazer v{asm.Version}"
-            });
+                new FlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FlowDirections.Vertical,
+                    Children = new Drawable[]
+                    {
+                        new FlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FlowDirections.Horizontal,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Spacing = new Vector2(5),
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Font = @"Exo2.0-Bold",
+                                    Text = $@"osu!lazer"
+                                },
+                                new OsuSpriteText
+                                {
+                                    Text = $@"{asm.Version.Major}.{asm.Version.Minor}.{asm.Version.Build}"
+                                },
+                            }
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            TextSize = 12,
+                            Colour = colours.Yellow,
+                            Font = @"Venera",
+                            Text = $@"Development Build"
+                        },
+                        new Sprite
+                        {
+                            Texture = textures.Get(@"Menu/dev-build-footer"),
+                        },
+                    }
+                }
+            };
 
             updateChecker();
         }
@@ -75,6 +127,7 @@ namespace osu.Desktop.Overlays
 
         protected override void PopIn()
         {
+            FadeIn(1000);
         }
 
         protected override void PopOut()
