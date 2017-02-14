@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,7 +17,7 @@ namespace osu.Game.Overlays.Options
     {
         private SliderBar<T> slider;
         private SpriteText text;
-    
+
         public string LabelText
         {
             get { return text.Text; }
@@ -26,16 +27,21 @@ namespace osu.Game.Overlays.Options
                 text.Alpha = string.IsNullOrEmpty(value) ? 0 : 1;
             }
         }
-        
+
         public BindableNumber<T> Bindable
         {
             get { return slider.Bindable; }
-            set { slider.Bindable = value; }
+            set
+            {
+                slider.Bindable = value;
+                if (value?.Disabled ?? true)
+                    Alpha = 0.3f;
+            }
         }
 
         public OptionSlider()
         {
-            Direction = FlowDirection.VerticalOnly;
+            Direction = FlowDirections.Vertical;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = 5 };

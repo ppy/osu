@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Play
             try
             {
                 if (Beatmap == null)
-                    Beatmap = beatmaps.GetWorkingBeatmap(BeatmapInfo);
+                    Beatmap = beatmaps.GetWorkingBeatmap(BeatmapInfo, withStoryboard: true);
             }
             catch
             {
@@ -237,11 +237,10 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            Delay(250, true);
+            Content.Delay(250);
             Content.FadeIn(250);
 
-            Delay(500, true);
-
+            Delay(750);
             Schedule(() =>
             {
                 sourceClock.Start();

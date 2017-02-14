@@ -126,7 +126,7 @@ namespace osu.Game.Screens
                 },
                 childModeButtons = new FlowContainer
                 {
-                    Direction = FlowDirection.VerticalOnly,
+                    Direction = FlowDirections.Vertical,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Both,
@@ -145,7 +145,7 @@ namespace osu.Game.Screens
                         Size = new Vector2(1, 40),
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
-                        Colour = getColourFor(t),
+                        BackgroundColour = getColourFor(t),
                         Action = delegate
                         {
                             Push(Activator.CreateInstance(t) as GameMode);

@@ -27,6 +27,8 @@ namespace osu.Game.Database
         public string Hash { get; set; }
 
         public string Path { get; set; }
+
+        public string StoryboardFile { get; set; }
     }
 }
 
