@@ -49,7 +49,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                         return true;
                     },
                 },
-                number = new NumberPiece(),
+                number = new NumberPiece()
+                {
+                    Text = h is Spinner ? "S" : (HitObject.ComboIndex + 1).ToString(),
+                },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),
                 explode = new ExplodePiece
@@ -124,6 +127,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             base.UpdateState(state);
 
             ApproachCircle.FadeOut();
+
+            glow.Delay(osuObject.Duration);
             glow.FadeOut(400);
 
             switch (state)
