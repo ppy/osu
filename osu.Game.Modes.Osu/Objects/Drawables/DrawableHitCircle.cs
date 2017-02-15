@@ -124,6 +124,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             base.UpdateState(state);
 
             ApproachCircle.FadeOut();
+
+            glow.Delay(osuObject.Duration);
             glow.FadeOut(400);
 
             switch (state)
