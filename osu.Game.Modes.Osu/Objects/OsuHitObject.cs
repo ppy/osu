@@ -31,19 +31,19 @@ namespace osu.Game.Modes.Osu.Objects
 
             Scale = (1.0f - 0.7f * (beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5) / 5) / 2;
         }
+    }
 
-        [Flags]
-        internal enum HitObjectType
-        {
-            Circle = 1,
-            Slider = 2,
-            NewCombo = 4,
-            CircleNewCombo = 5,
-            SliderNewCombo = 6,
-            Spinner = 8,
-            ColourHax = 122,
-            Hold = 128,
-            ManiaLong = 128,
-        }
+    [Flags]
+    public enum HitObjectType
+    {
+        Circle = 1,
+        Slider = 2,
+        NewCombo = 4,
+        CircleNewCombo = 5,
+        SliderNewCombo = 6,
+        Spinner = 8,
+        ColourHax = 122,
+        Hold = 128,
+        ManiaLong = 128,
     }
 }
