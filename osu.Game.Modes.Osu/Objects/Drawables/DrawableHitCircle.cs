@@ -49,7 +49,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                         return true;
                     },
                 },
-                number = new NumberPiece(),
+                number = new NumberPiece()
+                {
+                    Text = h is Spinner ? "S" : (HitObject.ComboIndex + 1).ToString(),
+                },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),
                 explode = new ExplodePiece
