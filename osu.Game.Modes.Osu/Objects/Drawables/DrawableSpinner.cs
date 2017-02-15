@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.MathUtils;
 using osu.Game.Modes.Objects.Drawables;
@@ -18,8 +19,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         private SpinnerDisc disc;
         private SpinnerBackground background;
+        private Container circleContainer;
         private DrawableHitCircle circle;
-        private NumberPiece number;
 
         public DrawableSpinner(Spinner s) : base(s)
         {
@@ -47,15 +48,22 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Origin = Anchor.Centre,
                     DiscColour = s.Colour
                 },
-                circle = new DrawableHitCircle(s)
+                circleContainer = new Container
                 {
-                    Interactive = false,
-                    Position = Vector2.Zero,
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new []
+                    {
+                        circle = new DrawableHitCircle(s)
+                        {
+                            Interactive = false,
+                            Position = Vector2.Zero,
+                            Anchor = Anchor.Centre,
+                        }
+                    }
                 }
             };
-
-            circle.ApproachCircle.Colour = Color4.Transparent;
 
             background.Scale = scaleToCircle;
             disc.Scale = scaleToCircle;
@@ -70,6 +78,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             var j = Judgement as OsuJudgementInfo;
 
             disc.ScaleTo(Interpolation.ValueAt(Math.Sqrt(Progress), scaleToCircle, Vector2.One, 0, 1), 100);
+
+            if (Progress >= 1)
+                disc.Complete = true;
 
             if (!userTriggered && Time.Current >= HitObject.EndTime)
             {
@@ -91,7 +102,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 else
                 {
                     j.Score = OsuScoreResult.Miss;
-                    j.Result = HitResult.Miss;
+                    if (Time.Current >= HitObject.EndTime)
+                        j.Result = HitResult.Miss;
                 }
             }
         }
@@ -109,6 +121,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             base.UpdatePreemptState();
 
             FadeIn(200);
+            circleContainer.ScaleTo(1, 400, EasingTypes.OutElastic);
 
             background.Delay(TIME_PREEMPT - 100);
             background.FadeIn(200);
@@ -120,12 +133,14 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+            if (!IsLoaded) return;
+
             base.UpdateState(state);
 
             Delay(HitObject.Duration, true);
 
             FadeOut(160);
-            
+
             switch (state)
             {
                 case ArmedState.Hit:
