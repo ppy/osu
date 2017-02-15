@@ -41,12 +41,11 @@ namespace osu.Game.Overlays.Toolbar
                     Direction = FlowDirections.Horizontal,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding { Left = 10, Right = 10 },
+                    Padding = new MarginPadding { Left = padding, Right = padding },
                 },
                 modeButtonLine = new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(0.3f, 3),
+                    Size = new Vector2(padding * 2 + ToolbarButton.WIDTH, 3),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
                     Masking = true,
