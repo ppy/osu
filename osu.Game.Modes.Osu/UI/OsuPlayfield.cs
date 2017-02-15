@@ -60,10 +60,10 @@ namespace osu.Game.Modes.Osu.UI
         public override void Add(DrawableHitObject h)
         {
             h.Depth = (float)h.HitObject.StartTime;
-            DrawableHitCircle c = h as DrawableHitCircle;
+            IDrawableHitObjectWithProxiedApproach c = h as IDrawableHitObjectWithProxiedApproach;
             if (c != null)
             {
-                approachCircles.Add(c.ApproachCircle.CreateProxy());
+                approachCircles.Add(c.ProxiedLayer.CreateProxy());
             }
 
             h.OnJudgement += judgement;

@@ -19,6 +19,10 @@ namespace osu.Game.Modes.Objects.Drawables
     {
         public event Action<DrawableHitObject, JudgementInfo> OnJudgement;
 
+        public override bool HandleInput => Interactive;
+
+        public bool Interactive = true;
+
         public Container<DrawableHitObject> ChildObjects;
 
         public JudgementInfo Judgement;

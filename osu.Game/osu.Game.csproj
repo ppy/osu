@@ -75,7 +75,9 @@
     <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
+    <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
+    <Compile Include="Modes\Objects\NullHitObjectParser.cs" />
     <Compile Include="Modes\Score.cs" />
     <Compile Include="Modes\ScoreProcesssor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />

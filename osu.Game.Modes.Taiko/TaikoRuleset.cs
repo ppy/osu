@@ -25,6 +25,6 @@ namespace osu.Game.Modes.Taiko
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => null;
 
-        public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
+        public override HitObjectParser CreateHitObjectParser() => new NullHitObjectParser();
     }
 }
