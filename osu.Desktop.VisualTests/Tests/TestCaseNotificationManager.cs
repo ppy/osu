@@ -26,8 +26,6 @@ namespace osu.Desktop.VisualTests.Tests
 
             progressingNotifications.Clear();
 
-            AddInternal(new BackgroundModeDefault() { Depth = 10 });
-
             Content.Add(manager = new NotificationManager
             {
                 Anchor = Anchor.TopRight,
