@@ -25,6 +25,7 @@ using OpenTK;
 using osu.Framework.Graphics.Primitives;
 using System.Collections.Generic;
 using osu.Game.Overlays.Music;
+using System.Linq;
 
 namespace osu.Game
 {

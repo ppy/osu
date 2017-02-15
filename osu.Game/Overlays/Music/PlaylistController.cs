@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.Music
         public List<BeatmapSetInfo> PlayList { get; private set; }
         public int PlayListIndex => PlayList.IndexOf(PlayList.Single(pi => pi.Hash == BeatmapSource.Value?.BeatmapSetInfo.Hash));
 
+        public List<int> AvailablePlaylistIndexes => playlistView.AvailableIndexes;
+
         public Bindable<WorkingBeatmap> BeatmapSource { get; private set; }
 
         private Playlist playlistView;
@@ -54,7 +56,7 @@ namespace osu.Game.Overlays.Music
                 new FlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Direction = FlowDirection.VerticalOnly,
+                    Direction = FlowDirections.Vertical,
                     Padding = new MarginPadding(15),
                     Spacing = new Vector2(0, 5),
                     Children = new Drawable[]

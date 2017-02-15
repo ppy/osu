@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -36,6 +37,8 @@ namespace osu.Game.Overlays.Music
             }
         }
 
+        public List<int> AvailableIndexes => playlistFlow.Children.Where(i => i.Alpha == 1).Select(i => i.BeatmapSetInfo).Select(i => Items.IndexOf(i)).ToList();
+
         public BeatmapSetInfo SelectedItem
         {
             get { return selectedItem; }
@@ -62,7 +65,7 @@ namespace osu.Game.Overlays.Music
                     {
                         playlistFlow = new FlowContainer<PlaylistItem>
                         {
-                            Direction = FlowDirection.VerticalOnly,
+                            Direction = FlowDirections.Vertical,
                             AutoSizeAxes = Axes.Both,
                             Spacing = new Vector2(0, 10)
                         }

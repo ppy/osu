@@ -23,6 +23,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using System.Linq;
+using OpenTK.Graphics.OpenGL;
 
 namespace osu.Game.Overlays.Music
 {
@@ -87,7 +89,7 @@ namespace osu.Game.Overlays.Music
                         {
                             AutoSizeAxes = Axes.Both,
                             Spacing = new Vector2(0, 10),
-                            Direction = FlowDirection.VerticalOnly,
+                            Direction = FlowDirections.Vertical,
                             Children = new[]
                             {
                                 playerContainer = new Container
@@ -306,23 +308,22 @@ namespace osu.Game.Overlays.Music
             else
             {
                 var playListCount = PlayList.Count;
+                var availableIndexes = playlistController.AvailablePlaylistIndexes;
                 if (playListCount == 0) return;
                 if (current != null && playListCount == 1) return;
-                //shuffle
+                if (availableIndexes.Count == 1) return;
                 BeatmapInfo nextToPlay;
                 do
                 {
-                    int j = RNG.Next(PlayListIndex, playListCount);
-                    if (j != PlayListIndex)
-                    {
-                        BeatmapSetInfo temp = PlayList[PlayListIndex];
-                        PlayList[PlayListIndex] = PlayList[j];
-                        PlayList[j] = temp;
-                    }
+                    var minAvailableIndex = 0;
+                    if (availableIndexes.Contains(PlayListIndex))
+                        minAvailableIndex = availableIndexes.IndexOf(PlayListIndex);
+                    var playlistFiltered = availableIndexes.Count != playListCount;
+                    var j = availableIndexes[RNG.Next(minAvailableIndex, availableIndexes.Count)];
 
-                    nextToPlay = PlayListIndex == playListCount - 1
-                        ? PlayList[0].Beatmaps[0]
-                        : PlayList[MathHelper.Clamp(PlayListIndex + 1, PlayListIndex, playListCount - 1)].Beatmaps[0];
+                    nextToPlay = PlayListIndex == availableIndexes.Last()
+                        ? nextToPlay = PlayList[availableIndexes.First()].Beatmaps[0]
+                        : nextToPlay = PlayList[MathHelper.Clamp(minAvailableIndex, j, availableIndexes.Last())].Beatmaps[0];
                 } while (nextToPlay.AudioEquals(current?.BeatmapInfo));
 
                 play(nextToPlay, true);

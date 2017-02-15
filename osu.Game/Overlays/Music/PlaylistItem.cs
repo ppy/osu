@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Music
             {
                 new FlowContainer<SpriteText>
                 {
-                    Direction = FlowDirection.HorizontalOnly,
+                    Direction = FlowDirections.Horizontal,
                     Spacing = new Vector2(5, 0),
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
