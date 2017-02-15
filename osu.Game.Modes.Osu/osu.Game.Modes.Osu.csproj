@@ -47,7 +47,7 @@
     <Compile Include="Objects\CircularArcApproximator.cs" />
     <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
     <Compile Include="Objects\Drawables\Connections\ConnectionRenderer.cs" />
-    <Compile Include="Objects\Drawables\SliderTicksRenderer.cs" />
+    <Compile Include="Objects\Drawables\SliderTicksLayer.cs" />
     <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerBackground.cs" />
