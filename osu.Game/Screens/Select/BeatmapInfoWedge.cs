@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Select
                 {
                     Name = "Length",
                     Icon = FontAwesome.fa_clock_o,
-                    Content = TimeSpan.FromMilliseconds(beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
+                    Content = beatmap.Beatmap.HitObjects.Count == 0 ? "-" : TimeSpan.FromMilliseconds(beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
                 }));
 
                 labels.Add(new InfoLabel(new BeatmapStatistic
