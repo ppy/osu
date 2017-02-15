@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -118,7 +119,7 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.Both,
             });
 
-            Content.Add(textDrawable = new SpriteText
+            Content.Add(textDrawable = new OsuSpriteText
             {
                 TextSize = 16,
                 Colour = OsuColour.Gray(128),
