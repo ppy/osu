@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using OpenTK;
 
@@ -19,9 +20,26 @@ namespace osu.Game.Modes.Osu.Objects
             set
             {
                 stackHeight = value;
-                if (Curve != null)
-                    Curve.Offset = StackOffset;
+                Curve.Offset = StackOffset;
             }
+        }
+
+        public List<Vector2> ControlPoints
+        {
+            get { return Curve.ControlPoints; }
+            set { Curve.ControlPoints = value; }
+        }
+
+        public double Length
+        {
+            get { return Curve.Length; }
+            set { Curve.Length = value; }
+        }
+
+        public CurveTypes CurveType
+        {
+            get { return Curve.CurveType; }
+            set { Curve.CurveType = value; }
         }
 
         public double Velocity;
@@ -33,9 +51,9 @@ namespace osu.Game.Modes.Osu.Objects
             Velocity = 100 / beatmap.BeatLengthAt(StartTime, true) * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
         }
 
-        public int RepeatCount;
+        public int RepeatCount = 1;
 
-        public SliderCurve Curve;
+        internal readonly SliderCurve Curve = new SliderCurve();
     }
 
     public enum CurveTypes
