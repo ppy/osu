@@ -15,8 +15,14 @@ namespace osu.Game.Modes.Osu.Objects
         {
             List<OsuHitObject> output = new List<OsuHitObject>();
 
+            int combo = 0;
             foreach (HitObject h in beatmap.HitObjects)
+            {
+                if (h.NewCombo) combo = 0;
+
+                h.ComboIndex = combo++;
                 output.Add(h as OsuHitObject);
+            }
 
             UpdateStacking(output, beatmap.BeatmapInfo?.StackLeniency ?? 0.7f);
 
