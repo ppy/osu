@@ -78,7 +78,6 @@ namespace osu.Game.Screens.Backgrounds
             public BeatmapBackground(WorkingBeatmap beatmap)
             {
                 this.beatmap = beatmap;
-                CacheDrawnFrameBuffer = true;
             }
 
             [BackgroundDependencyLoader]

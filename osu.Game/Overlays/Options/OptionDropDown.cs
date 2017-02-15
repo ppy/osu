@@ -34,29 +34,32 @@ namespace osu.Game.Overlays.Options
             set
             {
                 if (bindable != null)
-                    bindable.ValueChanged -= Bindable_ValueChanged;
+                    bindable.ValueChanged -= bindable_ValueChanged;
                 bindable = value;
-                bindable.ValueChanged += Bindable_ValueChanged;
-                Bindable_ValueChanged(null, null);
+                bindable.ValueChanged += bindable_ValueChanged;
+                bindable_ValueChanged(null, null);
+
+                if (bindable?.Disabled ?? true)
+                    Alpha = 0.3f;
             }
         }
 
         private Bindable<T> bindable;
 
-        void Bindable_ValueChanged(object sender, EventArgs e)
+        void bindable_ValueChanged(object sender, EventArgs e)
         {
             dropdown.SelectedValue = bindable.Value;
         }
 
-        void Dropdown_ValueChanged(object sender, EventArgs e)
+        void dropdown_ValueChanged(object sender, EventArgs e)
         {
             bindable.Value = dropdown.SelectedValue;
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            bindable.ValueChanged -= Bindable_ValueChanged;
-            dropdown.ValueChanged -= Dropdown_ValueChanged;
+            bindable.ValueChanged -= bindable_ValueChanged;
+            dropdown.ValueChanged -= dropdown_ValueChanged;
             base.Dispose(isDisposing);
         }
 
@@ -101,7 +104,7 @@ namespace osu.Game.Overlays.Options
                     Items = this.Items,
                 }
             };
-            dropdown.ValueChanged += Dropdown_ValueChanged;
+            dropdown.ValueChanged += dropdown_ValueChanged;
         }
     }
 }

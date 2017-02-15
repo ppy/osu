@@ -3,7 +3,6 @@
 
 using OpenTK;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using System.Collections.Generic;
@@ -11,7 +10,7 @@ using System.Linq;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    class DrawableSlider : DrawableOsuHitObject
+    public class DrawableSlider : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
         private Slider slider;
 
@@ -157,6 +156,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             FadeOut(800);
         }
+
+        public Drawable ProxiedLayer => initialCircle.ApproachCircle;
     }
 
     internal interface ISliderProgress

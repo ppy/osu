@@ -23,6 +23,7 @@ using System.Linq;
 using osu.Game.Beatmaps;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Play
 {
@@ -75,9 +76,14 @@ namespace osu.Game.Screens.Play
             {
                 if (Beatmap == null)
                     Beatmap = beatmaps.GetWorkingBeatmap(BeatmapInfo, withStoryboard: true);
+
+                if ((Beatmap?.Beatmap?.HitObjects.Count ?? 0) == 0)
+                    throw new Exception("No valid objects were found!");
             }
-            catch
+            catch (Exception e)
             {
+                Logger.Log($"Could not load this beatmap sucessfully ({e})!", LoggingTarget.Runtime, LogLevel.Error);
+
                 //couldn't load, hard abort!
                 Exit();
                 return;
@@ -117,7 +123,8 @@ namespace osu.Game.Screens.Play
             pauseOverlay = new PauseOverlay
             {
                 Depth = -1,
-                OnResume = delegate {
+                OnResume = delegate
+                {
                     Delay(400);
                     Schedule(Resume);
                 },
@@ -277,9 +284,9 @@ namespace osu.Game.Screens.Play
         protected override void OnEntering(GameMode last)
         {
             base.OnEntering(last);
-            
+
             (Background as BackgroundModeBeatmap)?.BlurTo(Vector2.Zero, 1000);
-            Background?.FadeTo((100f- dimLevel)/100, 1000);
+            Background?.FadeTo((100f - dimLevel) / 100, 1000);
 
             Content.Alpha = 0;
             dimLevel.ValueChanged += dimChanged;
@@ -287,6 +294,8 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(GameMode next)
         {
+            if (pauseOverlay == null) return false;
+
             if (pauseOverlay.State != Visibility.Visible && !canPause) return true;
 
             if (!IsPaused && sourceClock.IsRunning) // For if the user presses escape quickly when entering the map

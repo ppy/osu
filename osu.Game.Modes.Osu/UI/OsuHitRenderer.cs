@@ -21,7 +21,8 @@ namespace osu.Game.Modes.Osu.UI
                 return new DrawableHitCircle(h as HitCircle);
             if (h is Slider)
                 return new DrawableSlider(h as Slider);
-
+            if (h is Spinner)
+                return new DrawableSpinner(h as Spinner);
             return null;
         }
     }
