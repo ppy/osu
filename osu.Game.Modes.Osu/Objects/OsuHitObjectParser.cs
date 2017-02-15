@@ -97,8 +97,7 @@ namespace osu.Game.Modes.Osu.Objects
                     };
                     break;
                 default:
-                    //throw new InvalidOperationException($@"Unknown hit object type {type}");
-                    return null;
+                    throw new InvalidOperationException($@"Unknown hit object type {type}");
             }
             result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
             result.Sample = new HitSampleInfo
