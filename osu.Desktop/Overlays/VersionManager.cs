@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Desktop.Overlays
 {
@@ -35,7 +37,18 @@ namespace osu.Desktop.Overlays
             Origin = Anchor.BottomCentre;
             Alpha = 0;
 
+            bool isDebug = false;
+            Debug.Assert(isDebug = true);
+
             var asm = Assembly.GetEntryAssembly().GetName();
+            string version;
+            if (asm.Version.Major == 0)
+            {
+                version = @"local " + (isDebug ? @"debug" : @"release");
+            }
+            else
+                version = $@"{asm.Version.Major}.{asm.Version.Minor}.{asm.Version.Build}";
+
             Children = new Drawable[]
             {
                 new FlowContainer
@@ -60,7 +73,8 @@ namespace osu.Desktop.Overlays
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = $@"{asm.Version.Major}.{asm.Version.Minor}.{asm.Version.Build}"
+                                    Colour = isDebug ? colours.Red : Color4.White,
+                                    Text = version
                                 },
                             }
                         },

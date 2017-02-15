@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.ComponentModel;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Modes.Objects.Drawables;
@@ -11,9 +10,9 @@ using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class DrawableHitCircle : DrawableOsuHitObject
+    public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
-        private HitCircle osuObject;
+        private OsuHitObject osuObject;
 
         public ApproachCircle ApproachCircle;
         private CirclePiece circle;
@@ -23,11 +22,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private NumberPiece number;
         private GlowPiece glow;
 
-        public DrawableHitCircle(HitCircle h) : base(h)
+        public DrawableHitCircle(OsuHitObject h) : base(h)
         {
+            Origin = Anchor.Centre;
+
             osuObject = h;
 
-            Origin = Anchor.Centre;
             Position = osuObject.StackedPosition;
             Scale = new Vector2(osuObject.Scale);
 
@@ -49,7 +49,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                         return true;
                     },
                 },
-                number = new NumberPiece(),
+                number = new NumberPiece()
+                {
+                    Text = h is Spinner ? "S" : (HitObject.ComboIndex + 1).ToString(),
+                },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),
                 explode = new ExplodePiece
@@ -124,6 +127,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             base.UpdateState(state);
 
             ApproachCircle.FadeOut();
+
+            glow.Delay(osuObject.Duration);
             glow.FadeOut(400);
 
             switch (state)
@@ -156,5 +161,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     break;
             }
         }
+
+        public Drawable ProxiedLayer => ApproachCircle;
     }
 }

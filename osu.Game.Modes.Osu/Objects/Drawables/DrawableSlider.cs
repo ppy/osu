@@ -6,11 +6,10 @@ using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
-using osu.Framework.Input;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    class DrawableSlider : DrawableOsuHitObject
+    public class DrawableSlider : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
         private Slider slider;
 
@@ -50,8 +49,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 },
                 initialCircle = new DrawableHitCircle(new HitCircle
                 {
+                    //todo: avoid creating this temporary HitCircle.
                     StartTime = s.StartTime,
                     Position = s.StackedPosition,
+                    ComboIndex = s.ComboIndex,
                     Scale = s.Scale,
                     Colour = s.Colour,
                     Sample = s.Sample,
@@ -133,6 +134,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             FadeOut(800);
         }
+
+        public Drawable ProxiedLayer => initialCircle.ApproachCircle;
     }
 
     internal interface ISliderProgress

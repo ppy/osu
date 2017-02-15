@@ -122,6 +122,9 @@ namespace osu.Desktop.Deploy
 
             uploadBuild(version);
 
+            //reset assemblyinfo.
+            updateAssemblyInfo("0.0.0");
+
             write("Done!", ConsoleColor.White);
             Console.ReadLine();
         }

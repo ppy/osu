@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;
 using System.Threading.Tasks;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Pause
 {
@@ -39,14 +40,14 @@ namespace osu.Game.Overlays.Pause
 
                     retryCounterContainer.Children = new Drawable[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = "You've retried ",
                             Shadow = true,
                             ShadowColour = new Color4(0, 0, 0, 0.25f),
                             TextSize = 18
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = String.Format("{0:n0}", value),
                             Font = @"Exo2.0-Bold",
@@ -54,7 +55,7 @@ namespace osu.Game.Overlays.Pause
                             ShadowColour = new Color4(0, 0, 0, 0.25f),
                             TextSize = 18
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = $" time{((value == 1) ? "" : "s")} in this session",
                             Shadow = true,
@@ -119,7 +120,7 @@ namespace osu.Game.Overlays.Pause
                             Anchor = Anchor.TopCentre,
                             Children = new Drawable[]
                             {
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Text = @"paused",
                                     Font = @"Exo2.0-Medium",
@@ -131,7 +132,7 @@ namespace osu.Game.Overlays.Pause
                                     Shadow = true,
                                     ShadowColour = new Color4(0, 0, 0, 0.25f)
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Text = @"you're not going to do what i think you're going to do, are ya?",
                                     Origin = Anchor.TopCentre,
