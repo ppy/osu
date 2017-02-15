@@ -62,7 +62,7 @@
     <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBouncer.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerDisc.cs" />
-    <Compile Include="Objects\Drawables\Pieces\Triangles.cs" />
+    <Compile Include="Objects\Drawables\Pieces\TrianglesPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBall.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
     <Compile Include="Objects\OsuHitObjectParser.cs" />
