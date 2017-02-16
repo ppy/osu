@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Modes;
@@ -27,6 +28,7 @@ namespace osu.Game
             {
                 new ModButton
                 {
+                    ToggleKey = Key.Q,
                     Mods = new Mod[]
                     {
                         new ModEasy(),
@@ -34,6 +36,7 @@ namespace osu.Game
                 },
                 new ModButton
                 {
+                    ToggleKey = Key.W,
                     Mods = new Mod[]
                     {
                         new ModNoFail(),
@@ -41,6 +44,7 @@ namespace osu.Game
                 },
                 new ModButton
                 {
+                    ToggleKey = Key.E,
                     Mods = new Mod[]
                     {
                         new ModHalfTime(),

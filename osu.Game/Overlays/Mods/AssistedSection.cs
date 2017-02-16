@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Modes;
@@ -98,6 +99,7 @@ namespace osu.Game
                     {
                         relaxButton = new ModButton
                         {
+                            ToggleKey = Key.Z,
                             Mods = new Mod[]
                             {
                                 new ModRelax(),
@@ -105,6 +107,7 @@ namespace osu.Game
                         },
                         autopilotButton = new ModButton
                         {
+                            ToggleKey = Key.X,
                             Mods = new Mod[]
                             {
                                 new ModAutopilot(),
@@ -112,6 +115,7 @@ namespace osu.Game
                         },
                         targetPracticeButton = new ModButton
                         {
+                            ToggleKey = Key.C,
                             Mods = new Mod[]
                             {
                                 new ModTarget(),
@@ -119,6 +123,7 @@ namespace osu.Game
                         },
                         spunOutButton = new ModButton
                         {
+                            ToggleKey = Key.V,
                             Mods = new Mod[]
                             {
                                 new ModSpunOut(),
@@ -126,6 +131,7 @@ namespace osu.Game
                         },
                         autoplayCinemaButton = new ModButton
                         {
+                            ToggleKey = Key.B,
                             Mods = new Mod[]
                             {
                                 new ModAutoplay(),
@@ -141,6 +147,7 @@ namespace osu.Game
                     {
                         relaxButton = new ModButton
                         {
+                            ToggleKey = Key.Z,
                             Mods = new Mod[]
                             {
                                 new ModRelax(),
@@ -148,6 +155,7 @@ namespace osu.Game
                         },
                         autoplayCinemaButton = new ModButton
                         {
+                            ToggleKey = Key.X,
                             Mods = new Mod[]
                             {
                                 new ModAutoplay(),
@@ -162,6 +170,7 @@ namespace osu.Game
                     {
                         keyButton = new ModButton
                         {
+                            ToggleKey = Key.Z,
                             Mods = new Mod[]
                             {
                                 new ModKey4(),
@@ -177,6 +186,7 @@ namespace osu.Game
                         },
                         coopButton = new ModButton
                         {
+                            ToggleKey = Key.X,
                             Mods = new Mod[]
                             {
                                 new ModKeyCoop(),
@@ -184,6 +194,7 @@ namespace osu.Game
                         },
                         randomButton = new ModButton
                         {
+                            ToggleKey = Key.C,
                             Mods = new Mod[]
                             {
                                 new ModRandom(),
@@ -191,6 +202,7 @@ namespace osu.Game
                         },
                         autoplayCinemaButton = new ModButton
                         {
+                            ToggleKey = Key.V,
                             Mods = new Mod[]
                             {
                                 new ModAutoplay(),

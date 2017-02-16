@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.Mods
         private AudioSample sampleOn, sampleOff;
 
         public Action<Mod> Action; // Passed the selected mod or null if none
+        public Key ToggleKey;
 
         private int _selectedMod = -1;
         private int selectedMod
@@ -214,6 +215,17 @@ namespace osu.Game.Overlays.Mods
                     },
                 });
             }
+        }
+
+        protected override bool OnKeyDown(Framework.Input.InputState state, KeyDownEventArgs args)
+        {
+            if (args.Key == ToggleKey)
+            {
+                SelectNext();
+                return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
 
         public ModButton()
