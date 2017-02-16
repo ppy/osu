@@ -71,6 +71,8 @@ namespace osu.Game.Modes.Osu.Objects
         {
             get
             {
+                if (TickDistance == 0) yield break;
+
                 var length = Curve.Length;
                 var tickDistance = Math.Min(TickDistance, length);
                 var repeatDuration = length / Velocity;
