@@ -53,6 +53,10 @@ namespace osu.Game.Modes.Osu
                         score += 300;
                         maxScore += 300;
                         break;
+                    case OsuScoreResult.SliderTick:
+                        score += 10;
+                        maxScore += 10;
+                        break;
                 }
             }
 

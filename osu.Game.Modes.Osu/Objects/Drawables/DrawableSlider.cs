@@ -7,6 +7,7 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -18,11 +19,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         private List<ISliderProgress> components = new List<ISliderProgress>();
 
+        private Container<DrawableSliderTick> ticks;
+
         SliderBody body;
         SliderBall ball;
 
         SliderBouncer bouncer1, bouncer2;
-        SliderTicksRenderer ticks;
 
         public DrawableSlider(Slider s) : base(s)
         {
@@ -35,13 +37,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Position = s.StackedPosition,
                     PathWidth = s.Scale * 64,
                 },
-                ticks = new SliderTicksRenderer
-                {
-                    Position = s.StackedPosition,
-                    StartTime = s.StartTime,
-                    RepeatDuration = s.Curve.Length / s.Velocity,
-                    Ticks = s.Ticks,
-                },
+                ticks = new Container<DrawableSliderTick>(),
                 bouncer1 = new SliderBouncer(s, false)
                 {
                     Position = s.Curve.PositionAt(1),
@@ -72,6 +68,26 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             components.Add(ball);
             components.Add(bouncer1);
             components.Add(bouncer2);
+
+            AddNested(initialCircle);
+
+            var repeatDuration = s.Curve.Length / s.Velocity;
+            foreach (var tick in s.Ticks)
+            {
+                var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
+                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? TIME_FADEIN : TIME_FADEIN / 2);
+                var fadeOutTime = repeatStartTime + repeatDuration;
+
+                var drawableTick = new DrawableSliderTick(tick)
+                {
+                    FadeInTime = fadeInTime,
+                    FadeOutTime = fadeOutTime,
+                    Position = tick.Position,
+                };
+
+                ticks.Add(drawableTick);
+                AddNested(drawableTick);
+            }
         }
 
         // Since the DrawableSlider itself is just a container without a size we need to
@@ -105,8 +121,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             if (initialCircle.Judgement?.Result != HitResult.Hit)
                 initialCircle.Position = slider.Curve.PositionAt(progress);
 
-            components.ForEach(c => c.UpdateProgress(progress, repeat));
-            ticks.ShouldHit = ball.Tracking;
+            foreach (var c in components) c.UpdateProgress(progress, repeat);
+            foreach (var t in ticks.Children) t.Tracking = ball.Tracking;
         }
 
         protected override void CheckJudgement(bool userTriggered)

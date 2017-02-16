@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using osu.Framework;
@@ -22,8 +23,6 @@ namespace osu.Game.Modes.Objects.Drawables
         public override bool HandleInput => Interactive;
 
         public bool Interactive = true;
-
-        public Container<DrawableHitObject> ChildObjects;
 
         public JudgementInfo Judgement;
 
@@ -85,6 +84,19 @@ namespace osu.Game.Modes.Objects.Drawables
             Expire(true);
         }
 
+        private List<DrawableHitObject> nestedHitObjects;
+
+        protected IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects;
+
+        protected void AddNested(DrawableHitObject h)
+        {
+            if (nestedHitObjects == null)
+                nestedHitObjects = new List<DrawableHitObject>();
+
+            h.OnJudgement += (d, j) => { OnJudgement?.Invoke(d, j); } ;
+            nestedHitObjects.Add(h);
+        }
+
         /// <summary>
         /// Process a hit of this hitobject. Carries out judgement.
         /// </summary>
@@ -119,7 +131,11 @@ namespace osu.Game.Modes.Objects.Drawables
 
         protected virtual void CheckJudgement(bool userTriggered)
         {
-            //todo: consider making abstract.
+            if (NestedHitObjects != null)
+            {
+                foreach (var d in NestedHitObjects)
+                    d.CheckJudgement(userTriggered);
+            }
         }
 
         protected override void UpdateAfterChildren()
