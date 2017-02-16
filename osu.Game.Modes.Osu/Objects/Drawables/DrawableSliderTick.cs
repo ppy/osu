@@ -2,9 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
@@ -47,6 +51,22 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 }
             };
         }
+
+        private AudioSample sample;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            string sampleSet = (HitObject.Sample?.Set ?? SampleSet.Normal).ToString().ToLower();
+
+            sample = audio.Sample.Get($@"Gameplay/{sampleSet}-slidertick");
+        }
+
+        protected override void PlaySample()
+        {
+            sample?.Play();
+        }
+
 
         protected override void CheckJudgement(bool userTriggered)
         {
