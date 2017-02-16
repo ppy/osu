@@ -75,6 +75,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Length = 400,
                         Position = new Vector2(-200, 0),
                         Velocity = 1,
+                        TickDistance = 100,
                     }));
                     break;
                 case HitObjectType.Spinner:
