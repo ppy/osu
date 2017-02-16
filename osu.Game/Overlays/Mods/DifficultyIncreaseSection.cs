@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Modes;
@@ -29,6 +30,7 @@ namespace osu.Game
             {
                 new ModButton
                 {
+                    ToggleKey = Key.A,
                     Mods = new Mod[]
                     {
                         new ModHardRock(),
@@ -36,6 +38,7 @@ namespace osu.Game
                 },
                 new ModButton
                 {
+                    ToggleKey = Key.S,
                     Mods = new Mod[]
                     {
                         new ModSuddenDeath(),
@@ -44,6 +47,7 @@ namespace osu.Game
                 },
                 new ModButton
                 {
+                    ToggleKey = Key.D,
                     Mods = new Mod[]
                     {
                         new ModDoubleTime(),
@@ -52,6 +56,7 @@ namespace osu.Game
                 },
                 new ModButton
                 {
+                    ToggleKey = Key.F,
                     Mods = new Mod[]
                     {
                         new ModHidden(),
@@ -59,6 +64,7 @@ namespace osu.Game
                 },
                 new ModButton
                 {
+                    ToggleKey = Key.G,
                     Mods = new Mod[]
                     {
                         new ModFlashlight(),
