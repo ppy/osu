@@ -36,24 +36,8 @@ namespace osu.Game.Modes.Osu
 
             foreach (OsuJudgementInfo j in Judgements)
             {
-                switch (j.Score)
-                {
-                    case OsuScoreResult.Miss:
-                        maxScore += 300;
-                        break;
-                    case OsuScoreResult.Hit50:
-                        score += 50;
-                        maxScore += 300;
-                        break;
-                    case OsuScoreResult.Hit100:
-                        score += 100;
-                        maxScore += 300;
-                        break;
-                    case OsuScoreResult.Hit300:
-                        score += 300;
-                        maxScore += 300;
-                        break;
-                }
+                score += j.ScoreValue;
+                maxScore += j.MaxScoreValue;
             }
 
             TotalScore.Value = score;
