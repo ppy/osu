@@ -195,10 +195,11 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-
             logoBounceContainer.ScaleTo(1f, 500, EasingTypes.OutElastic);
             return true;
         }
+
+        protected override bool OnDragStart(InputState state) => true;
 
         protected override bool OnClick(InputState state)
         {

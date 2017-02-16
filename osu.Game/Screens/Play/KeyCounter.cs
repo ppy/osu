@@ -89,6 +89,8 @@ namespace osu.Game.Screens.Play
                         new OsuSpriteText
                         {
                             Text = Name,
+                            Font = @"Venera",
+                            TextSize = 12,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Both,
