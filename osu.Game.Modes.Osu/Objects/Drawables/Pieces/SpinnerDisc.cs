@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Framework.Logging;
+using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -25,6 +27,14 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         {
             get { return Disc.Colour; }
             set { Disc.Colour = value; }
+        }
+
+        Color4 completeColour;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            completeColour = colours.YellowLight.Opacity(0.8f);
         }
 
         class SpinnerBorder : Container
@@ -120,6 +130,22 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             }
         }
 
+        bool complete;
+        public bool Complete
+        {
+            get { return complete; }
+            set
+            {
+                if (value == complete) return;
+
+                complete = value;
+
+                Disc.FadeColour(completeColour, 200);
+
+                updateCompleteTick();
+            }
+        }
+
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             Tracking = true;
@@ -145,6 +171,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         private float currentRotation;
         public float RotationAbsolute;
 
+        private int completeTick;
+
+        private bool updateCompleteTick() => completeTick != (completeTick = (int)(RotationAbsolute / 720));
+
         protected override void Update()
         {
             base.Update();
@@ -161,6 +191,14 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                 RotationAbsolute += Math.Abs(thisAngle - lastAngle);
             }
             lastAngle = thisAngle;
+
+            if (Complete && updateCompleteTick())
+            {
+                Disc.Flush(flushType: typeof(TransformAlpha));
+                Disc.FadeTo(0.75f, 30, EasingTypes.OutExpo);
+                Disc.Delay(30);
+                Disc.FadeTo(0.5f, 250, EasingTypes.OutQuint);
+            }
 
             RotateTo(currentRotation, 100, EasingTypes.OutExpo);
         }

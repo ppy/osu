@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
@@ -30,7 +31,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             Children = new Drawable[]
             {
-                line1 = new SpriteText
+                line1 = new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -38,7 +39,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Font = @"Venera",
                     TextSize = 16,
                 },
-                line2 = new SpriteText
+                line2 = new OsuSpriteText
                 {
                     Text = judgement.Combo.GetDescription(),
                     Font = @"Venera",

@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
 {
@@ -127,7 +128,7 @@ namespace osu.Game.Screens.Select
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    text = new SpriteText
+                    text = new OsuSpriteText
                     {
                         Margin = new MarginPadding(5),
                         TextSize = 14,
@@ -213,7 +214,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.TopRight,
                         Children = new Drawable[]
                         {
-                            sortLabel = new SpriteText
+                            sortLabel = new OsuSpriteText
                             {
                                 Font = @"Exo2.0-Bold",
                                 Text = "Sort results by",

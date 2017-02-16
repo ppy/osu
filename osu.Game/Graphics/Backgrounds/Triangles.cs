@@ -2,12 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Graphics;
@@ -22,6 +20,21 @@ namespace osu.Game.Graphics.Backgrounds
         public Color4 ColourLight = Color4.White;
         public Color4 ColourDark = Color4.Black;
 
+        /// <summary>
+        /// Whether we want to expire triangles as they exit our draw area completely.
+        /// </summary>
+        protected virtual bool ExpireOffScreenTriangles => true;
+
+        /// <summary>
+        /// Whether we should create new triangles as others expire.
+        /// </summary>
+        protected virtual bool CreateNewTriangles => true;
+
+        /// <summary>
+        /// The amount of triangles we want compared to the default distribution.
+        /// </summary>
+        protected virtual float SpawnRatio => 1;
+
         private float triangleScale = 1;
 
         public float TriangleScale
@@ -29,9 +42,11 @@ namespace osu.Game.Graphics.Backgrounds
             get { return triangleScale; }
             set
             {
+                float change = value / triangleScale;
                 triangleScale = value;
 
-                Children.ForEach(t => t.ScaleTo(triangleScale));
+                if (change != 1)
+                    Children.ForEach(t => t.Scale *= change);
             }
         }
 
@@ -42,20 +57,20 @@ namespace osu.Game.Graphics.Backgrounds
                 addTriangle(true);
         }
 
-        private int aimTriangleCount => (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale));
+        private int aimTriangleCount => (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
 
         protected override void Update()
         {
             base.Update();
 
-            foreach (Drawable d in Children)
+            foreach (var t in Children)
             {
-                d.Position -= new Vector2(0, (float)(d.Scale.X * (50 / DrawHeight) * (Time.Elapsed / 950)) / triangleScale);
-                if (d.DrawPosition.Y + d.DrawSize.Y * d.Scale.Y < 0)
-                    d.Expire();
+                t.Position -= new Vector2(0, (float)(t.Scale.X * (50 / DrawHeight) * (Time.Elapsed / 950)) / triangleScale);
+                if (ExpireOffScreenTriangles && t.DrawPosition.Y + t.DrawSize.Y * t.Scale.Y < 0)
+                    t.Expire();
             }
 
-            while (Children.Count() < aimTriangleCount)
+            while (CreateNewTriangles && Children.Count() < aimTriangleCount)
                 addTriangle(false);
         }
 
@@ -77,8 +92,8 @@ namespace osu.Game.Graphics.Backgrounds
                 RelativePositionAxes = Axes.Both,
                 Scale = new Vector2(scale),
                 EdgeSmoothness = new Vector2(1),
-                // Scaling height by 0.866 results in equiangular triangles (== 60° and equal side length)
                 Colour = GetTriangleShade(),
+                // Scaling height by 0.866 results in equiangular triangles (== 60° and equal side length)
                 Size = new Vector2(size, 0.866f * size),
                 Depth = scale,
             };
@@ -89,8 +104,8 @@ namespace osu.Game.Graphics.Backgrounds
         private void addTriangle(bool randomY)
         {
             var sprite = CreateTriangle();
-            var triangleHeight = sprite.DrawHeight / DrawHeight;
-            sprite.Position = new Vector2(RNG.NextSingle(), randomY ? (RNG.NextSingle() * (1 + triangleHeight) - triangleHeight) : 1);
+            float triangleHeight = (sprite.DrawHeight / DrawHeight);
+            sprite.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() * (1 + triangleHeight) - triangleHeight : 1);
             Add(sprite);
         }
     }
