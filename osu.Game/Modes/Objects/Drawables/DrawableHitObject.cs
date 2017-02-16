@@ -66,7 +66,7 @@ namespace osu.Game.Modes.Objects.Drawables
             sample = audio.Sample.Get($@"Gameplay/{sampleSet}-hit{hitType}");
         }
 
-        protected void PlaySample()
+        protected virtual void PlaySample()
         {
             sample?.Play();
         }
