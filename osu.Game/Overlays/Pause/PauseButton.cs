@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Audio.Sample;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Pause
 {
@@ -224,7 +225,7 @@ namespace osu.Game.Overlays.Pause
                         }
                     }
                 },
-                spriteText = new SpriteText
+                spriteText = new OsuSpriteText
                 {
                     Text = Text,
                     Anchor = Anchor.Centre,

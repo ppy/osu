@@ -1,11 +1,13 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using OpenTK;
 using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
-using OpenTK;
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -16,6 +18,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private DrawableHitCircle initialCircle;
 
         private List<ISliderProgress> components = new List<ISliderProgress>();
+
+        private Container<DrawableSliderTick> ticks;
 
         SliderBody body;
         SliderBall ball;
@@ -33,6 +37,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Position = s.StackedPosition,
                     PathWidth = s.Scale * 64,
                 },
+                ticks = new Container<DrawableSliderTick>(),
                 bouncer1 = new SliderBouncer(s, false)
                 {
                     Position = s.Curve.PositionAt(1),
@@ -49,8 +54,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 },
                 initialCircle = new DrawableHitCircle(new HitCircle
                 {
+                    //todo: avoid creating this temporary HitCircle.
                     StartTime = s.StartTime,
                     Position = s.StackedPosition,
+                    ComboIndex = s.ComboIndex,
                     Scale = s.Scale,
                     Colour = s.Colour,
                     Sample = s.Sample,
@@ -61,6 +68,26 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             components.Add(ball);
             components.Add(bouncer1);
             components.Add(bouncer2);
+
+            AddNested(initialCircle);
+
+            var repeatDuration = s.Curve.Length / s.Velocity;
+            foreach (var tick in s.Ticks)
+            {
+                var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
+                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? TIME_FADEIN : TIME_FADEIN / 2);
+                var fadeOutTime = repeatStartTime + repeatDuration;
+
+                var drawableTick = new DrawableSliderTick(tick)
+                {
+                    FadeInTime = fadeInTime,
+                    FadeOutTime = fadeOutTime,
+                    Position = tick.Position,
+                };
+
+                ticks.Add(drawableTick);
+                AddNested(drawableTick);
+            }
         }
 
         // Since the DrawableSlider itself is just a container without a size we need to
@@ -94,7 +121,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             if (initialCircle.Judgement?.Result != HitResult.Hit)
                 initialCircle.Position = slider.Curve.PositionAt(progress);
 
-            components.ForEach(c => c.UpdateProgress(progress, repeat));
+            foreach (var c in components) c.UpdateProgress(progress, repeat);
+            foreach (var t in ticks.Children) t.Tracking = ball.Tracking;
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -104,8 +132,22 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             if (!userTriggered && Time.Current >= HitObject.EndTime)
             {
-                j.Score = sc.Score;
-                j.Result = sc.Result;
+                var ticksCount = ticks.Children.Count() + 1;
+                var ticksHit = ticks.Children.Count(t => t.Judgement.Result == HitResult.Hit);
+                if (sc.Result == HitResult.Hit)
+                    ticksHit++;
+
+                var hitFraction = (double)ticksHit / ticksCount;
+                if (hitFraction == 1 && sc.Score == OsuScoreResult.Hit300)
+                    j.Score = OsuScoreResult.Hit300;
+                else if (hitFraction >= 0.5 && sc.Score >= OsuScoreResult.Hit100)
+                    j.Score = OsuScoreResult.Hit100;
+                else if (hitFraction > 0)
+                    j.Score = OsuScoreResult.Hit50;
+                else
+                    j.Score = OsuScoreResult.Miss;
+
+                j.Result = j.Score != OsuScoreResult.Miss ? HitResult.Hit : HitResult.Miss;
             }
         }
 
