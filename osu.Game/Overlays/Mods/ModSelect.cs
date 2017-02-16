@@ -31,6 +31,9 @@ namespace osu.Game.Overlays.Mods
 
         private readonly float content_width = 0.8f;
 
+        private Color4 low_multiplier_colour;
+        private Color4 high_multiplier_colour;
+
         private OsuSpriteText rankedLabel, multiplierLabel;
         private FlowContainer rankedMultiplerContainer;
 
@@ -141,6 +144,9 @@ namespace osu.Game.Overlays.Mods
             waves[1].Colour = colours.Blue;
             waves[2].Colour = colours.BlueDark;
             waves[3].Colour = colours.BlueDarker;
+
+            low_multiplier_colour = colours.Red;
+            high_multiplier_colour = colours.Green;
         }
 
         private void modButtonPressed(Mod[] sectionSelectedMods)
@@ -208,6 +214,18 @@ namespace osu.Game.Overlays.Mods
             // 1.20x
             multiplierLabel.Text = string.Format("{0:N2}x", multiplier);
             rankedLabel.Text = $"{ranked ? @"Ranked" : @"Unranked"}, Score Multiplier: ";
+            if (multiplier > 1.0)
+            {
+                multiplierLabel.FadeColour(high_multiplier_colour, 200);
+            }
+            else if (multiplier < 1.0)
+            {
+                multiplierLabel.FadeColour(low_multiplier_colour, 200);
+            }
+            else
+            {
+                multiplierLabel.FadeColour(Color4.White, 200);
+            }
         }
 
         private void refreshSelectedMods()
