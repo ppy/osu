@@ -81,12 +81,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     FadeOut();
                     break;
                 case ArmedState.Miss:
-                    FadeTo(0.6f);
-                    Delay(FadeOutTime - sliderTick.StartTime);
-                    FadeOut();
+                    FadeOut(160);
+                    FadeColour(Color4.Red, 80);
                     break;
                 case ArmedState.Hit:
-                    FadeOut();
+                    FadeOut(120, EasingTypes.OutQuint);
+                    ScaleTo(Scale * 1.5f, 120, EasingTypes.OutQuint);
                     break;
             }
         }
