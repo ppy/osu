@@ -58,8 +58,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 },
                 initialCircle = new DrawableHitCircle(new HitCircle
                 {
+                    //todo: avoid creating this temporary HitCircle.
                     StartTime = s.StartTime,
                     Position = s.StackedPosition,
+                    ComboIndex = s.ComboIndex,
                     Scale = s.Scale,
                     Colour = s.Colour,
                     Sample = s.Sample,
