@@ -26,6 +26,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         public override bool RemoveWhenNotAlive => false;
 
+        public override JudgementInfo CreateJudgementInfo() => new OsuJudgementInfo { MaxScore = OsuScoreResult.SliderTick };
+
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
             this.sliderTick = sliderTick;
