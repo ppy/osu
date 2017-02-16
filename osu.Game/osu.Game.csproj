@@ -272,6 +272,14 @@
     <Compile Include="Overlays\Pause\ResumeButton.cs" />
     <Compile Include="Overlays\Pause\RetryButton.cs" />
     <Compile Include="Overlays\Pause\QuitButton.cs" />
+    <Compile Include="Overlays\Mods\ModSelector.cs" />
+    <Compile Include="Modes\Mod.cs" />
+    <Compile Include="Overlays\Mods\ModButton.cs" />
+    <Compile Include="Modes\UI\ModIcon.cs" />
+    <Compile Include="Overlays\Mods\ModSection.cs" />
+    <Compile Include="Overlays\Mods\DifficultyReductionSection.cs" />
+    <Compile Include="Overlays\Mods\DifficultyIncreaseSection.cs" />
+    <Compile Include="Overlays\Mods\AssistedSection.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -292,6 +300,9 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Overlays\Mods\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

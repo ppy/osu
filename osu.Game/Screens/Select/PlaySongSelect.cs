@@ -29,6 +29,7 @@ using OpenTK.Input;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
+using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Screens.Select
 {
@@ -43,6 +44,8 @@ namespace osu.Game.Screens.Select
 
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
         private BeatmapInfoWedge beatmapInfoWedge;
+
+        private ModSelector modSelect;
 
         private static readonly Vector2 background_blur = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
@@ -132,6 +135,12 @@ namespace osu.Game.Screens.Select
                         Right = 20,
                     },
                 },
+                modSelect = new ModSelector
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomCentre,
+                },
                 footer = new Footer()
                 {
                     OnBack = Exit,
@@ -139,7 +148,7 @@ namespace osu.Game.Screens.Select
                 }
             };
 
-            footer.AddButton(@"mods", colours.Yellow, null);
+            footer.AddButton(@"mods", colours.Yellow, modSelect.ToggleVisibility);
             footer.AddButton(@"random", colours.Green, carousel.SelectRandom);
             footer.AddButton(@"options", colours.Blue, null);
 
@@ -245,6 +254,12 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnExiting(GameMode next)
         {
+            if (modSelect.State == Visibility.Visible)
+            {
+                modSelect.Hide();
+                return true;
+            }
+
             beatmapInfoWedge.MoveToX(-100, 800, EasingTypes.InQuint);
             beatmapInfoWedge.RotateTo(10, 800, EasingTypes.InQuint);
 
