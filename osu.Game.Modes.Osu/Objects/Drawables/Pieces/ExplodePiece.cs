@@ -21,10 +21,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                new Triangles
+                new TrianglesPiece
                 {
                     BlendingMode = BlendingMode.Additive,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.1f,
                 }
             };
         }

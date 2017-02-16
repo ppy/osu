@@ -24,6 +24,8 @@ namespace osu.Game.Modes.Objects
 
         public HitSampleInfo Sample;
 
+        public int ComboIndex;
+
         public virtual void SetDefaultsFromBeatmap(Beatmap beatmap) { }
     }
 }
