@@ -25,6 +25,8 @@ namespace osu.Game.Screens.Select
 
         private const float padding = 80;
 
+        public override bool Contains(Vector2 screenSpacePos) => true;
+
         public Action OnBack;
         public Action OnStart;
 
