@@ -96,7 +96,7 @@ namespace osu.Game.Modes.Osu.Objects
                         {
                             RepeatIndex = repeat,
                             StartTime = repeatStartTime + timeProgress * repeatDuration,
-                            Position = Curve.PositionAt(distanceProgress) - StackedPosition,
+                            Position = Curve.PositionAt(distanceProgress),
                             StackHeight = StackHeight,
                             Scale = Scale,
                             Colour = Colour,

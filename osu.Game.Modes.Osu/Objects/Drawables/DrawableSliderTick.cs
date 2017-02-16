@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         public double FadeInTime;
         public double FadeOutTime;
 
-        public bool ShouldHit;
+        public bool Tracking;
 
         public override bool RemoveWhenNotAlive => false;
 
@@ -35,7 +35,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             Masking = true;
             CornerRadius = Size.X / 2;
 
-            Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             BorderThickness = 2;
@@ -70,8 +69,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void CheckJudgement(bool userTriggered)
         {
+            var j = Judgement as OsuJudgementInfo;
+
             if (Judgement.TimeOffset >= 0)
-                Judgement.Result = ShouldHit ? HitResult.Hit : HitResult.Miss;
+            {
+                j.Result = Tracking ? HitResult.Hit : HitResult.Miss;
+                j.Score = Tracking ? OsuScoreResult.SliderTick : OsuScoreResult.Miss;
+            }
         }
         
         protected override void UpdatePreemptState()

@@ -37,7 +37,7 @@ namespace osu.Desktop.VisualTests.Tests
             playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
         }
 
-        HitObjectType mode = HitObjectType.Spinner;
+        HitObjectType mode = HitObjectType.Slider;
 
         BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
         private Container playfieldContainer;
