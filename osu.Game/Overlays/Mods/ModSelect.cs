@@ -20,7 +20,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSelector : OverlayContainer
+    public class ModSelect : OverlayContainer
     {
         private readonly int waves_duration = 1000;
         private readonly int move_up_duration = 1500;
@@ -34,6 +34,8 @@ namespace osu.Game.Overlays.Mods
         private OsuSpriteText rankedLabel, multiplierLabel;
         private FlowContainer rankedMultiplerContainer;
 
+        private FlowContainer modSectionsContainer;
+
         private DifficultyReductionSection difficultyReductionSection;
         private DifficultyIncreaseSection difficultyIncreaseSection;
         private AssistedSection assistedSection;
@@ -43,7 +45,45 @@ namespace osu.Game.Overlays.Mods
 
         public Bindable<Mod[]> SelectedMods = new Bindable<Mod[]>();
 
-        // TODO: Add the fancy wave transition (https://streamable.com/qk4u)
+        private PlayMode modMode;
+        public PlayMode ModMode
+        {
+            get
+            {
+                return modMode;
+            }
+            set
+            {
+                if (value == modMode) return;
+                modMode = value;
+
+                modSectionsContainer.Children = new Drawable[]
+                {
+                    difficultyReductionSection = new DifficultyReductionSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Action = modButtonPressed,
+                    },
+                    difficultyIncreaseSection = new DifficultyIncreaseSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Action = modButtonPressed,
+                    },
+                    assistedSection = new AssistedSection(value)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Action = modButtonPressed,
+                    },
+                };
+            }
+        }
+
         protected override void PopIn()
         {
             FadeIn(move_up_duration, EasingTypes.OutQuint);
@@ -56,7 +96,7 @@ namespace osu.Game.Overlays.Mods
                 rankedMultiplerContainer.MoveToX(0, ranked_multiplier_duration, EasingTypes.OutQuint);
                 rankedMultiplerContainer.FadeIn(ranked_multiplier_duration, EasingTypes.OutQuint);
 
-                ModSection[] sections = new ModSection[] { difficultyReductionSection, difficultyIncreaseSection, assistedSection };
+                ModSection[] sections = { difficultyReductionSection, difficultyIncreaseSection, assistedSection };
                 for (int i = 0; i < sections.Length; i++)
                 {
                     sections[i].ButtonsContainer.TransformSpacingTo(new Vector2(50f, 0f), button_duration, EasingTypes.OutQuint);
@@ -80,7 +120,7 @@ namespace osu.Game.Overlays.Mods
             rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, move_out_duration, EasingTypes.InSine);
             rankedMultiplerContainer.FadeOut(move_out_duration, EasingTypes.InSine);
 
-            ModSection[] sections = new ModSection[] { difficultyReductionSection, difficultyIncreaseSection, assistedSection };
+            ModSection[] sections = { difficultyReductionSection, difficultyIncreaseSection, assistedSection };
             for (int i = 0; i < sections.Length; i++)
             {
                 sections[i].ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), move_out_duration, EasingTypes.InSine);
@@ -119,32 +159,32 @@ namespace osu.Game.Overlays.Mods
             {
                 if (sectionMod.Name == Modes.Mods.HardRock)
                 {
-                    difficultyReductionSection.EasyButton.Deselect();
+                    difficultyReductionSection.EasyButton?.Deselect();
                 }
                 else if (sectionMod.Name == Modes.Mods.Easy)
                 {
-                    difficultyIncreaseSection.HardRockButton.Deselect();
+                    difficultyIncreaseSection.HardRockButton?.Deselect();
                 }
 
                 if (sectionMod.Name == Modes.Mods.SuddenDeath || sectionMod.Name == Modes.Mods.Perfect)
                 {
-                    difficultyReductionSection.NoFailButton.Deselect();
-                    assistedSection.RelaxButton.Deselect();
-                    assistedSection.AutopilotButton.Deselect();
-                    assistedSection.AutoplayCinemaButton.Deselect();
+                    difficultyReductionSection.NoFailButton?.Deselect();
+                    assistedSection.RelaxButton?.Deselect();
+                    assistedSection.AutopilotButton?.Deselect();
+                    assistedSection.AutoplayCinemaButton?.Deselect();
                 }
-                else if (sectionMod.Name == Modes.Mods.NoFail || sectionMod.Name == Modes.Mods.Relax || sectionMod.Name == Modes.Mods.Relax2 || sectionMod.Name == Modes.Mods.Autoplay || sectionMod.Name == Modes.Mods.Cinema)
+                else if (sectionMod.Name == Modes.Mods.NoFail || sectionMod.Name == Modes.Mods.Relax || sectionMod.Name == Modes.Mods.Autopilot || sectionMod.Name == Modes.Mods.Autoplay || sectionMod.Name == Modes.Mods.Cinema)
                 {
-                    difficultyIncreaseSection.SuddenDeathButton.Deselect();
+                    difficultyIncreaseSection.SuddenDeathButton?.Deselect();
                 }
 
                 if (sectionMod.Name == Modes.Mods.DoubleTime || sectionMod.Name == Modes.Mods.Nightcore)
                 {
-                    difficultyReductionSection.HalfTimeButton.Deselect();
+                    difficultyReductionSection.HalfTimeButton?.Deselect();
                 }
                 else if (sectionMod.Name == Modes.Mods.HalfTime)
                 {
-                    difficultyIncreaseSection.DoubleTimeNightcoreButton.Deselect();
+                    difficultyIncreaseSection.DoubleTimeNightcoreButton?.Deselect();
                 }
             }
 
@@ -155,12 +195,11 @@ namespace osu.Game.Overlays.Mods
 
             foreach (Mod mod in SelectedMods.Value)
             {
-                // TODO: Make this take the actual current mode
-                multiplier *= mod.ScoreMultiplier(PlayMode.Osu);
+                multiplier *= mod.ScoreMultiplier(ModMode);
 
                 if (ranked)
                 {
-                    ranked = mod.Ranked(PlayMode.Osu);
+                    ranked = mod.Ranked(ModMode);
                 }
             }
 
@@ -193,7 +232,7 @@ namespace osu.Game.Overlays.Mods
             SelectedMods.Value = selectedMods.ToArray();
         }
 
-        public ModSelector()
+        public ModSelect()
         {
             Children = new Drawable[]
             {
@@ -353,7 +392,7 @@ namespace osu.Game.Overlays.Mods
                                 },
                             },
                         },
-                        new FlowContainer
+                        modSectionsContainer = new FlowContainer
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
@@ -381,7 +420,7 @@ namespace osu.Game.Overlays.Mods
                                     Anchor = Anchor.TopCentre,
                                     Action = modButtonPressed,
                                 },
-                                assistedSection = new AssistedSection
+                                assistedSection = new AssistedSection(PlayMode.Osu)
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,

@@ -29,7 +29,6 @@ using OpenTK.Input;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
-using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Screens.Select
 {
@@ -45,7 +44,7 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
         private BeatmapInfoWedge beatmapInfoWedge;
 
-        private ModSelector modSelect;
+        private Overlays.Mods.ModSelect modSelect;
 
         private static readonly Vector2 background_blur = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
@@ -135,7 +134,7 @@ namespace osu.Game.Screens.Select
                         Right = 20,
                     },
                 },
-                modSelect = new ModSelector
+                modSelect = new Overlays.Mods.ModSelect
                 {
                     RelativeSizeAxes = Axes.Both,
                     Origin = Anchor.BottomCentre,
@@ -156,6 +155,11 @@ namespace osu.Game.Screens.Select
             {
                 playMode = osuGame.PlayMode;
                 playMode.ValueChanged += playMode_ValueChanged;
+                modSelect.ModMode = playMode;
+            }
+            else
+            {
+                modSelect.ModMode = PlayMode.Osu;
             }
 
             if (database == null)

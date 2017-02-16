@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Modes;
@@ -9,11 +10,76 @@ namespace osu.Game
 {
     public class AssistedSection : ModSection
     {
-        public ModButton RelaxButton => Buttons[0];
-        public ModButton AutopilotButton => Buttons[1];
-        public ModButton TargetPracticeButton => Buttons[2];
-        public ModButton SpunOutButton => Buttons[3];
-        public ModButton AutoplayCinemaButton => Buttons[4];
+        private ModButton relaxButton;
+        public ModButton RelaxButton
+        {
+            get
+            {                return relaxButton;
+            }
+        }
+
+        private ModButton autopilotButton;
+        public ModButton AutopilotButton
+        {
+            get
+            {
+                return autopilotButton;
+            }
+        }
+
+        private ModButton targetPracticeButton;
+        public ModButton TargetPracticeButton
+        {
+            get
+            {
+                return targetPracticeButton;
+            }
+        }
+
+        private ModButton spunOutButton;
+        public ModButton SpunOutButton
+        {
+            get
+            {
+                return spunOutButton;
+            }
+        }
+
+        private ModButton autoplayCinemaButton;
+        public ModButton AutoplayCinemaButton
+        {
+            get
+            {
+                return autoplayCinemaButton;
+            }
+        }
+
+        private ModButton keyButton;
+        public ModButton KeyButton
+        {
+            get
+            {
+                return keyButton;
+            }
+        }
+
+        private ModButton coopButton;
+        public ModButton CoopButton
+        {
+            get
+            {
+                return coopButton;
+            }
+        }
+
+        private ModButton randomButton;
+        public ModButton RandomButton
+        {
+            get
+            {
+                return randomButton;
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -21,48 +87,122 @@ namespace osu.Game
             Colour = colours.Blue;
         }
 
-        public AssistedSection()
+        public AssistedSection(PlayMode mode)
         {
             Header = @"Assisted";
-            Buttons = new ModButton[]
+
+            switch (mode)
             {
-                new ModButton
-                {
-                    Mods = new Mod[]
+                case PlayMode.Osu:
+                    Buttons = new ModButton[]
                     {
-                        new ModRelax(),
-                    },
-                },
-                new ModButton
-                {
-                    Mods = new Mod[]
+                        relaxButton = new ModButton
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModRelax(),
+                            },
+                        },
+                        autopilotButton = new ModButton
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModAutopilot(),
+                            },
+                        },
+                        targetPracticeButton = new ModButton
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModTarget(),
+                            },
+                        },
+                        spunOutButton = new ModButton
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModSpunOut(),
+                            },
+                        },
+                        autoplayCinemaButton = new ModButton
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModAutoplay(),
+                                new ModCinema(),
+                            },
+                        },
+                    };
+                    break;
+
+                case PlayMode.Taiko:
+                case PlayMode.Catch:
+                    Buttons = new ModButton[]
                     {
-                        new ModRelax2(),
-                    },
-                },
-                new ModButton
-                {
-                    Mods = new Mod[]
+                        relaxButton = new ModButton
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModRelax(),
+                            },
+                        },
+                        autoplayCinemaButton = new ModButton
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModAutoplay(),
+                                new ModCinema(),
+                            },
+                        },
+                    };
+                    break;
+
+                case PlayMode.Mania:
+                    Buttons = new ModButton[]
                     {
-                        new ModTarget(),
-                    },
-                },
-                new ModButton
-                {
-                    Mods = new Mod[]
-                    {
-                        new ModSpunOut(),
-                    },
-                },
-                new ModButton
-                {
-                    Mods = new Mod[]
-                    {
-                        new ModAutoplay(),
-                        new ModCinema(),
-                    },
-                },
-            };
+                        keyButton = new ModButton
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModKey4(),
+                                new ModKey5(),
+                                new ModKey6(),
+                                new ModKey7(),
+                                new ModKey8(),
+                                new ModKey9(),
+                                new ModKey1(),
+                                new ModKey2(),
+                                new ModKey3(),
+                            },
+                        },
+                        coopButton = new ModButton
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModKeyCoop(),
+                            },
+                        },
+                        randomButton = new ModButton
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModRandom(),
+                            },
+                        },
+                        autoplayCinemaButton = new ModButton
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModAutoplay(),
+                                new ModCinema(),
+                            },
+                        },
+                    };
+                    break;
+
+                default:
+                    throw new NotSupportedException();
+            }
         }
     }
 }
