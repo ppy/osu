@@ -16,7 +16,7 @@ namespace osu.Game.Modes.Vitaru.Objects.Characters
         //Combo Color will collor enemy clothes + Bullet center, Bullet outline should be opposite color
         public bool NewCombo { get; set; }
         public int StartTime { get; set; }
-        private DrawableEnemy enemy;
+        private DrawableEnemy enemyDrawable;
         public static bool shoot = false;
         int a = 0;
         public Vector2 enemyPosition = new Vector2(0, -160);
@@ -26,7 +26,7 @@ namespace osu.Game.Modes.Vitaru.Objects.Characters
         {
             Children = new[]
             {
-                enemy = new DrawableEnemy()
+                enemyDrawable = new DrawableEnemy()
                 {
                     Origin = Anchor.Centre,
                 },
@@ -37,7 +37,7 @@ namespace osu.Game.Modes.Vitaru.Objects.Characters
             {
                 Alpha = 1,
                 hitboxWidth = 24,
-                hitboxColor = Color4.Cyan,
+                hitboxColor = Color4.Yellow,
             });
         }
         protected override void Update()
@@ -54,14 +54,15 @@ namespace osu.Game.Modes.Vitaru.Objects.Characters
         }
         private void enemyShoot()
         {
-            a = (a + 37);
+            a = (a + 31);
             Bullet b;
             parent.Add(b = new Bullet(Team)
             {
                 Depth = 1,
                 Anchor = Anchor.Centre,
                 bulletAngle = a,
-                bulletSpeed = 0.15f,
+                bulletSpeed = 0.2f,
+                bulletColor = Color4.Red,
             });
             b.MoveTo(ToSpaceOfOtherDrawable(new Vector2(0, 0), b));
         }

@@ -12,19 +12,20 @@ namespace osu.Game.Modes.Vitaru.Objects
 {
     public class Hitbox : Container
     {
-        private DrawableHitbox hitbox;
-        internal Color4 hitboxColor { get; set; }
-        public int health { get; private set; }
-        public float hitboxWidth { get; set; }
+        private DrawableHitbox hitboxSprite;
+        public Color4 hitboxColor { get; set; } = Color4.Cyan;
+        public int health { get; set; } = 100;
+        public float hitboxWidth { get; set; } = 16;
 
 
         public Hitbox()
         {
             Children = new[]
             {
-                hitbox = new DrawableHitbox(this)
+                hitboxSprite = new DrawableHitbox(this)
                 {
                     Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
                 },
             };
             Hide();
@@ -32,7 +33,7 @@ namespace osu.Game.Modes.Vitaru.Objects
 
         internal float GetRadius()
         {
-          return (hitboxWidth * 0.5f);
+          return (hitboxWidth * 0.75f);
         }
     }
 }

@@ -14,14 +14,14 @@ namespace osu.Game.Modes.Vitaru.Objects.Projectiles
     public class Bullet : Projectile
     {
         public int bulletDamage { get; set; } = 20;
-        public float bulletSpeed { get; set; }
-        public Color4 bulletColor { get; set; } = Color4.Red;
-        public float bulletWidth { get; set; } = 16;
-        public float bulletAngle { get; set; }
+        public float bulletSpeed { get; set; } = 1;
+        public Color4 bulletColor { get; set; } = Color4.Blue;
+        public float bulletWidth { get; set; } = 12;
+        public float bulletAngle { get; set; } = 0;
         public Vector2 bulletVelocity;
 
-        public static int bulletsLoaded = 0;
-        public static int bulletCapHit = 0;
+        public static int bulletsLoaded;
+        public static int bulletCapHit;
 
         private DrawableBullet bulletSprite;
 
@@ -58,13 +58,13 @@ namespace osu.Game.Modes.Vitaru.Objects.Projectiles
         }
         public Vector2 getBulletVelocity()
         {
-            bulletVelocity.Y = bulletSpeed * (-1 * ((float)Math.Cos(bulletAngle * (3.1415f / 180))));
-            bulletVelocity.X = bulletSpeed * ((float)Math.Sin(bulletAngle * (3.1415f / 180)));
+            bulletVelocity.Y = bulletSpeed * (-1 * ((float)Math.Cos(bulletAngle * (Math.PI / 180))));
+            bulletVelocity.X = bulletSpeed * ((float)Math.Sin(bulletAngle * (Math.PI / 180)));
             return bulletVelocity;
         }
         internal float getBulletRadius()
         {
-            return (bulletWidth * 0.5f);
+            return (bulletWidth * 0.75f);
         }
         internal void deleteBullet()
         {

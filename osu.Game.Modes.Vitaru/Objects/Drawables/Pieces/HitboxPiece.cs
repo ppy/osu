@@ -23,7 +23,7 @@ namespace osu.Game.Modes.Vitaru.Objects.Drawables.Pieces
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    BorderThickness = 3,
+                    BorderThickness = hitbox.hitboxWidth / 4,
                     Depth = 1,
                     BorderColour = hitbox.hitboxColor,
                     Alpha = 1f,
@@ -51,7 +51,7 @@ namespace osu.Game.Modes.Vitaru.Objects.Drawables.Pieces
                         {
                             Type = EdgeEffectType.Shadow,
                             Colour = (hitbox.hitboxColor).Opacity(0.4f),
-                            Radius = 2f,
+                            Radius = hitbox.hitboxWidth / 8,
                         }
                 }
             };

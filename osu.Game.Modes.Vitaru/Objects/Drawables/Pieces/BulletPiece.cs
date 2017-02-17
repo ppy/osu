@@ -4,13 +4,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Modes.Vitaru.Objects.Characters;
 using osu.Game.Modes.Vitaru.Objects.Projectiles;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Vitaru.Objects.Drawables.Pieces
 {
@@ -18,6 +12,7 @@ namespace osu.Game.Modes.Vitaru.Objects.Drawables.Pieces
     {
         private CircularContainer bulletContainer;
         private object bullet;
+
         public BulletPiece(Bullet bullet)
         {
             this.bullet = bullet;
@@ -29,7 +24,7 @@ namespace osu.Game.Modes.Vitaru.Objects.Drawables.Pieces
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    BorderThickness = 3,
+                    BorderThickness = bullet.bulletWidth / 4,
                     Depth = 1,
                     BorderColour = bullet.bulletColor,
                     Alpha = 1f,
@@ -57,7 +52,7 @@ namespace osu.Game.Modes.Vitaru.Objects.Drawables.Pieces
                         {
                             Type = EdgeEffectType.Shadow,
                             Colour = (bullet.bulletColor).Opacity(0.75f),
-                            Radius = 2f,
+                            Radius = bullet.bulletWidth / 8,
                         }
                 }
             };
