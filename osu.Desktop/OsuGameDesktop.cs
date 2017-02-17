@@ -19,19 +19,21 @@ namespace osu.Desktop
 {
     class OsuGameDesktop : OsuGame
     {
+        private VersionManager versionManager;
+
+        public override bool IsDeployedBuild => versionManager.IsDeployedBuild;
+
         public OsuGameDesktop(string[] args = null)
             : base(args)
         {
-
+            versionManager = new VersionManager();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            VersionManager versionManager;
-            (versionManager = new VersionManager()).Preload(this, Add);
-            Dependencies.Cache(versionManager);
+            versionManager.Preload(this, Add);
         }
 
         public override void SetHost(BasicGameHost host)

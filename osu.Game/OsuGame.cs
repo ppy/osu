@@ -31,6 +31,8 @@ namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
+        public virtual bool IsDeployedBuild => false;
+
         public Toolbar Toolbar;
 
         private ChatOverlay chat;
@@ -39,8 +41,16 @@ namespace osu.Game
 
         private NotificationManager notificationManager;
 
-        private MainMenu mainMenu => screenStack?.ChildGameScreen as MainMenu;
-        private Intro intro => screenStack as Intro;
+        private Intro intro
+        {
+            get
+            {
+                Screen s = screenStack;
+                while (s != null && !(s is Intro))
+                    s = s.ChildScreen;
+                return s as Intro;
+            }
+        }
 
         private OsuScreen screenStack;
 
@@ -106,7 +116,7 @@ namespace osu.Game
                 }
             });
 
-            (screenStack = new Intro()).Preload(this, d =>
+            (screenStack = new Loader()).Preload(this, d =>
             {
                 screenStack.ModePushed += screenAdded;
                 screenStack.Exited += screenRemoved;
@@ -148,7 +158,7 @@ namespace osu.Game
             (Toolbar = new Toolbar
             {
                 Depth = -3,
-                OnHome = delegate { mainMenu?.MakeCurrent(); },
+                OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
                 OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
             }).Preload(this, t =>
             {
@@ -226,7 +236,8 @@ namespace osu.Game
                 Toolbar.State = Visibility.Visible;
             }
 
-            Cursor.FadeIn(100);
+            if (newScreen is MainMenu)
+                Cursor.FadeIn(100);
 
             ModeChanged?.Invoke(newScreen);
 
@@ -249,8 +260,8 @@ namespace osu.Game
         {
             base.UpdateAfterChildren();
 
-            if (screenStack.ChildScreen != null)
-                screenStack.ChildScreen.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
+            if (intro?.ChildScreen != null)
+                intro.ChildScreen.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
         }
 
         private void screenAdded(Screen newScreen)

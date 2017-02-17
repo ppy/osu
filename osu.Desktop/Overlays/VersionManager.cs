@@ -25,7 +25,7 @@ namespace osu.Desktop.Overlays
 
         AssemblyName assembly = Assembly.GetEntryAssembly().GetName();
 
-        public bool IsReleaseBuild => assembly.Version.Major > 0;
+        public bool IsDeployedBuild => assembly.Version.Major > 0;
 
         protected override bool HideOnEscape => false;
 
@@ -45,7 +45,7 @@ namespace osu.Desktop.Overlays
             Debug.Assert(isDebug = true);
 
             string version;
-            if (!IsReleaseBuild)
+            if (!IsDeployedBuild)
             {
                 version = @"local " + (isDebug ? @"debug" : @"release");
             }
