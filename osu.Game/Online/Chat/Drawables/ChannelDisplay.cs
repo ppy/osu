@@ -38,6 +38,7 @@ namespace osu.Game.Online.Chat.Drawables
                 },
                 new ScrollContainer
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
                         flow = new FlowContainer
