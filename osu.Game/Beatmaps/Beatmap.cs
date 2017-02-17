@@ -39,6 +39,7 @@ namespace osu.Game.Beatmaps
 
             ControlPoint timingPoint = null;
             foreach (var controlPoint in ControlPoints)
+            {
                 if (controlPoint.Time <= time)
                 {
                     if (controlPoint.TimingChange)
@@ -48,7 +49,15 @@ namespace osu.Game.Beatmaps
                     }
                     else overridePoint = controlPoint;
                 }
-                else break;
+                else if (timingPoint == null && controlPoint.TimingChange)
+                {
+                    timingPoint = controlPoint;
+                }
+                else
+                {
+                    break;
+                }
+            }
 
             return timingPoint;
         }
