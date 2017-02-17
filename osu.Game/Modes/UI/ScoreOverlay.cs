@@ -27,9 +27,9 @@ namespace osu.Game.Modes.UI
         protected abstract ScoreCounter CreateScoreCounter();
         protected virtual HealthDisplay CreateHealthDisplay() => new HealthDisplay
         {
-            Size = new Vector2(0.5f, 20),
+            Size = new Vector2(1, 5),
             RelativeSizeAxes = Axes.X,
-            Padding = new MarginPadding(5)
+            Margin = new MarginPadding { Top = 20 }
         };
 
         public virtual void OnHit(HitObject h)

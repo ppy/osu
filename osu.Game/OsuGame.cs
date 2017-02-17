@@ -25,6 +25,7 @@ using OpenTK;
 using System.Linq;
 using osu.Framework.Graphics.Primitives;
 using System.Collections.Generic;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game
 {
@@ -129,6 +130,16 @@ namespace osu.Game
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }).Preload(this, overlayContent.Add);
+
+            Logger.NewEntry += entry =>
+            {
+                if (entry.Level < LogLevel.Important) return;
+
+                notificationManager.Post(new SimpleNotification
+                {
+                    Text = $@"{entry.Level}: {entry.Message}"
+                });
+            };
 
             Dependencies.Cache(options);
             Dependencies.Cache(musicController);

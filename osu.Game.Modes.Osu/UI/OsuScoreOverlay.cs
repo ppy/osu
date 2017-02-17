@@ -15,17 +15,19 @@ namespace osu.Game.Modes.Osu.UI
     {
         protected override ScoreCounter CreateScoreCounter() => new ScoreCounter()
         {
-            Anchor = Anchor.TopRight,
-            Origin = Anchor.TopRight,
-            TextSize = 60,
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
+            TextSize = 40,
+            Position = new Vector2(0, 30),
             Margin = new MarginPadding { Right = 5 },
         };
 
         protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter()
         {
-            Anchor = Anchor.TopRight,
-            Origin = Anchor.TopRight,
-            Position = new Vector2(0, 55),
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
+            Position = new Vector2(0, 65),
+            TextSize = 20,
             Margin = new MarginPadding { Right = 5 },
         };
 

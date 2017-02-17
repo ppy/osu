@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -52,7 +53,7 @@ namespace osu.Game.Overlays.Notifications
                 }
             });
 
-            Content.Add(textDrawable = new SpriteText
+            Content.Add(textDrawable = new OsuSpriteText
             {
                 TextSize = 16,
                 Colour = OsuColour.Gray(128),
