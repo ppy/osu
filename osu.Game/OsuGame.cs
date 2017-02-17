@@ -235,17 +235,14 @@ namespace osu.Game
             ModeChanged?.Invoke(newMode);
 
             if (newMode == null)
-                Host.Exit();
+                Exit();
         }
 
         protected override bool OnExiting()
         {
             if (!intro.DidLoadMenu || intro.ChildGameMode != null)
             {
-                Scheduler.Add(delegate
-                {
-                    intro.MakeCurrent();
-                });
+                Scheduler.Add(intro.MakeCurrent);
                 return true;
             }
 

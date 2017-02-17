@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Menu
         protected override bool OnExiting(GameMode next)
         {
             buttons.State = MenuState.Exit;
-            Content.FadeOut(ButtonSystem.EXIT_DELAY);
+            Content.FadeOut(3000);
             return base.OnExiting(next);
         }
     }
