@@ -250,9 +250,9 @@ namespace osu.Game.Screens.Select
         
         public enum SortMode
         {
-            Arist,
+            Artist,
             BPM,
-            Creator,
+            Author,
             DateAdded,
             Difficulty,
             Length,
@@ -263,9 +263,9 @@ namespace osu.Game.Screens.Select
         public enum GroupMode
         {
             NoGrouping,
-            Arist,
+            Artist,
             BPM,
-            Creator,
+            Author,
             DateAdded,
             Difficulty,
             Length,

@@ -184,6 +184,44 @@ namespace osu.Game.Screens.Select
             ScrollTo(selectedY, animated);
         }
 
+        public void Sort(FilterControl.SortMode mode) {
+            switch (mode) { 
+                case FilterControl.SortMode.Artist:
+                    groups.Sort((x, y) =>
+                    {
+                        return string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist);
+                    });
+                    break;
+                case FilterControl.SortMode.Title:
+                    groups.Sort((x, y) =>
+                    {
+                        return string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title);
+                    });
+                    break;
+                case FilterControl.SortMode.Author:
+                    groups.Sort((x, y) =>
+                    {
+                        return string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author);
+                    });
+                    break;
+                case FilterControl.SortMode.Difficulty:
+                    groups.Sort((x, y) =>
+                    {
+                        if (x.BeatmapSet.Beatmaps.First().BaseDifficulty.OverallDifficulty >
+                            y.BeatmapSet.Beatmaps.First().BaseDifficulty.OverallDifficulty)
+                            return 1;
+                        else if (Equals(x.BeatmapSet.Beatmaps.First().BaseDifficulty.OverallDifficulty,
+                                                  y.BeatmapSet.Beatmaps.First().BaseDifficulty.OverallDifficulty))
+                            return 0;
+                        else
+                            return -1;
+                    });
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         private static float offsetX(float dist, float halfHeight)
         {
             // The radius of the circle the carousel moves on.
