@@ -36,7 +36,7 @@ namespace osu.Game.Modes.Vitaru.Objects.Characters
             Add(hitbox = new Hitbox()
             {
                 Alpha = 1,
-                hitboxWidth = 20,
+                hitboxWidth = 24,
                 hitboxColor = Color4.Cyan,
             });
         }
@@ -54,14 +54,14 @@ namespace osu.Game.Modes.Vitaru.Objects.Characters
         }
         private void enemyShoot()
         {
-            a = (a + 31);
+            a = (a + 37);
             Bullet b;
             parent.Add(b = new Bullet(Team)
             {
                 Depth = 1,
                 Anchor = Anchor.Centre,
                 bulletAngle = a,
-                bulletSpeed = 0.2f,
+                bulletSpeed = 0.15f,
             });
             b.MoveTo(ToSpaceOfOtherDrawable(new Vector2(0, 0), b));
         }

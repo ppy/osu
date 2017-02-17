@@ -15,7 +15,7 @@ namespace osu.Game.Modes.Vitaru.Objects.Projectiles
     {
         public int bulletDamage { get; set; } = 20;
         public float bulletSpeed { get; set; }
-        public Color4 bulletColor { get; set; } = Color4.Blue;
+        public Color4 bulletColor { get; set; } = Color4.Red;
         public float bulletWidth { get; set; } = 16;
         public float bulletAngle { get; set; }
         public Vector2 bulletVelocity;
@@ -50,7 +50,7 @@ namespace osu.Game.Modes.Vitaru.Objects.Projectiles
                 deleteBullet();
             }
 
-            if (Clock.ElapsedFrameTime > 40)
+            if (Clock.ElapsedFrameTime > 50)
             {
                 bulletCapHit++;
                 deleteBullet();
