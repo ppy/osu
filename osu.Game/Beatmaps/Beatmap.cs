@@ -39,6 +39,7 @@ namespace osu.Game.Beatmaps
 
             ControlPoint timingPoint = null;
             foreach (var controlPoint in ControlPoints)
+            {
                 // Some beatmaps have the first timingPoint (accidentally) start after the first HitObject(s).
                 // This null check makes it so that the first ControlPoint that makes a timing change is used as
                 // the timingPoint for those HitObject(s).
