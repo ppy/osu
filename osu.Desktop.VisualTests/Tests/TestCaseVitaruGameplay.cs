@@ -105,6 +105,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 Anchor = Anchor.Centre,
                 OnDeath = NewPlayer,
+                Shooting = true,
             };
             Add(player);
         }
