@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.GameModes;
-using osu.Framework.GameModes.Testing;
+using osu.Framework.Screens;
+using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Graphics.Containers;
@@ -16,20 +16,20 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.Menu
 {
-    public class MainMenu : OsuGameMode
+    public class MainMenu : OsuScreen
     {
         private ButtonSystem buttons;
         public override string Name => @"Main Menu";
 
         internal override bool ShowOverlays => buttons.State != MenuState.Initial;
 
-        private BackgroundMode background;
+        private BackgroundScreen background;
 
-        protected override BackgroundMode CreateBackground() => background;
+        protected override BackgroundScreen CreateBackground() => background;
 
         public MainMenu()
         {
-            background = new BackgroundModeDefault();
+            background = new BackgroundScreenDefault();
 
             Children = new Drawable[]
             {
@@ -62,13 +62,13 @@ namespace osu.Game.Screens.Menu
 
         }
 
-        protected override void OnEntering(GameMode last)
+        protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
         }
 
-        protected override void OnSuspending(GameMode next)
+        protected override void OnSuspending(Screen next)
         {
             base.OnSuspending(next);
 
@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Menu
             Content.MoveTo(new Vector2(-800, 0), length, EasingTypes.InSine);
         }
 
-        protected override void OnResuming(GameMode last)
+        protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
 
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Menu
             Content.MoveTo(new Vector2(0, 0), length, EasingTypes.OutQuint);
         }
 
-        protected override bool OnExiting(GameMode next)
+        protected override bool OnExiting(Screen next)
         {
             buttons.State = MenuState.Exit;
             Content.FadeOut(3000);
