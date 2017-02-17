@@ -14,6 +14,8 @@ namespace osu.Game.Modes
         [Description(@"osu!catch")]
         Catch = 2,
         [Description(@"osu!mania")]
-        Mania = 3
+        Mania = 3,
+        [Description(@"osu!vitaru")]
+        Vitaru = 3
     }
 }
