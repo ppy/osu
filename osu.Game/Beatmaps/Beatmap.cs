@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps
 
             ControlPoint timingPoint = null;
             foreach (var controlPoint in ControlPoints)
-                if (controlPoint.Time <= time)
+                if (controlPoint.Time <= time || timingPoint == null)
                 {
                     if (controlPoint.TimingChange)
                     {

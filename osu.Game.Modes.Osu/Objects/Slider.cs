@@ -59,7 +59,7 @@ namespace osu.Game.Modes.Osu.Objects
             var velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
             var baseVelocity = 100 * baseDifficulty.SliderMultiplier;
 
-            Velocity = baseVelocity / (timingPoint.BeatLength * velocityAdjustment);
+            Velocity = baseVelocity / ((timingPoint?.BeatLength ?? 500) * velocityAdjustment);
             TickDistance = baseVelocity / (baseDifficulty.SliderTickRate * velocityAdjustment);
         }
 
