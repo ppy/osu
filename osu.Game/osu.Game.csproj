@@ -131,7 +131,9 @@
     <Compile Include="Screens\Charts\ChartInfo.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
     <Compile Include="Screens\GameScreenWhiteBox.cs" />
+    <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
+    <Compile Include="Screens\Menu\Disclaimer.cs" />
     <Compile Include="Screens\Menu\FlowContainerWithOrigin.cs" />
     <Compile Include="Screens\Menu\Intro.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />

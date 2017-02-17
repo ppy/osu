@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Menu
         private AudioSample seeya;
         private AudioTrack bgm;
 
-        internal override bool ShowOverlays => (ParentScreen as OsuScreen)?.ShowOverlays ?? false;
+        internal override bool ShowOverlays => false;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenEmpty();
 
