@@ -109,10 +109,13 @@ namespace osu.Game.Screens.Menu
 
         protected override void OnResuming(GameMode last)
         {
+            if (!(last is MainMenu))
+                Content.FadeIn(300);
+
             //we also handle the exit transition.
             seeya.Play();
 
-            double fadeOutTime = (last.LifetimeEnd - Time.Current) + 100;
+            double fadeOutTime = 2000;
 
             Scheduler.AddDelayed(Exit, fadeOutTime);
 
