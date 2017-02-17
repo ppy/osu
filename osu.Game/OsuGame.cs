@@ -214,10 +214,6 @@ namespace osu.Game
 
         private void modeChanged(GameMode newMode)
         {
-            // - Ability to change window size
-            // - Ability to adjust music playback
-            // - Frame limiter changes
-
             //central game mode change logic.
             if ((newMode as OsuGameMode)?.ShowOverlays != true)
             {
