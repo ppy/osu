@@ -29,7 +29,9 @@ namespace osu.Desktop
         {
             base.LoadComplete();
 
-            (new VersionManager()).Preload(this, Add);
+            VersionManager versionManager;
+            (versionManager = new VersionManager()).Preload(this, Add);
+            Dependencies.Cache(versionManager);
         }
 
         public override void SetHost(BasicGameHost host)
