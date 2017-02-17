@@ -26,26 +26,31 @@ namespace osu.Game.Beatmaps
             return 60000 / BeatLengthAt(time);
         }
 
-        public double BeatLengthAt(double time, bool applyMultipliers = false)
+        public double BeatLengthAt(double time)
         {
-            int point = 0;
-            int samplePoint = 0;
+            ControlPoint overridePoint;
+            ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
+            return timingPoint.BeatLength;
+        }
 
-            for (int i = 0; i < ControlPoints.Count; i++)
-                if (ControlPoints[i].Time <= time)
+        public ControlPoint TimingPointAt(double time, out ControlPoint overridePoint)
+        {
+            overridePoint = null;
+
+            ControlPoint timingPoint = null;
+            foreach (var controlPoint in ControlPoints)
+                if (controlPoint.Time <= time)
                 {
-                    if (ControlPoints[i].TimingChange)
-                        point = i;
-                    else
-                        samplePoint = i;
+                    if (controlPoint.TimingChange)
+                    {
+                        timingPoint = controlPoint;
+                        overridePoint = null;
+                    }
+                    else overridePoint = controlPoint;
                 }
+                else break;
 
-            double mult = 1;
-
-            if (applyMultipliers && samplePoint > point)
-                mult = ControlPoints[samplePoint].VelocityAdjustment;
-
-            return ControlPoints[point].BeatLength * mult;
+            return timingPoint;
         }
     }
 }

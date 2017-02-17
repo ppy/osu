@@ -14,9 +14,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
     public class CirclePiece : Container
     {
-
         private Sprite disc;
-        private Triangles triangles;
+
 
         public Func<bool> Hit;
 
@@ -36,10 +35,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
-                triangles = new Triangles
+                new TrianglesPiece
                 {
+                    RelativeSizeAxes = Axes.Both,
                     BlendingMode = BlendingMode.Additive,
-                    RelativeSizeAxes = Axes.Both
+                    Alpha = 0.5f,
                 }
             };
         }
