@@ -71,7 +71,7 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new Box
             {
                 RelativeSizeAxes = Framework.Graphics.Axes.Both,
-                Colour = Color4.Gray,
+                Colour = Color4.Black,
             });
 
             Add(new Player
