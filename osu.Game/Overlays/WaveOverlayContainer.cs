@@ -17,7 +17,7 @@ namespace osu.Game.Overlays
         private readonly float second_wave_position = 0;
         private readonly float third_wave_position = 70;
         private readonly float fourth_wave_position = 100;
-        private readonly float container_position = -150;
+        private readonly float waves_container_position = -150;
         private float[] wave_positions
         {
             get
@@ -26,15 +26,15 @@ namespace osu.Game.Overlays
             }
         }
 
-        private readonly float first_wave_duration = 700;
-        private readonly float second_wave_duration = 800;
-        private readonly float third_wave_duration = 900;
-        private readonly float fourth_wave_duration = 1000;
-        private readonly float container_wait = 300;
-        private readonly float container_duration = 500;
-        private readonly float content_duration = 800;
-        internal readonly float close_duration = 500;
-        private readonly float content_transition_wait = 150; // 100
+        private readonly float first_wave_duration = 600;
+        private readonly float second_wave_duration = 700;
+        private readonly float third_wave_duration = 800;
+        private readonly float fourth_wave_duration = 900;
+        private readonly float container_wait = 200;
+        private readonly float waves_container_duration = 400;
+        private readonly float content_duration = 700;
+        private readonly float content_transition_wait = 100;
+        internal readonly float content_exit_duration = 600;
         private float [] wave_durations
         {
             get
@@ -121,11 +121,13 @@ namespace osu.Game.Overlays
             }
         }
 
+        // TODO: Remove when framework updated
+        public override bool HandleInput => State == Visibility.Visible;
+
         protected override void PopIn()
         {
             base.Show();
 
-            FadeIn();
             for (int i = 0; i < waves.Length; i++)
             {
                 waves[i].MoveToY(wave_positions[i], wave_durations[i], EasingTypes.OutQuint);
@@ -137,7 +139,7 @@ namespace osu.Game.Overlays
             {
                 if (State == Visibility.Visible)
                 {
-                    wavesContainer.MoveToY(container_position, container_duration, EasingTypes.None);
+                    wavesContainer.MoveToY(waves_container_position, waves_container_duration, EasingTypes.None);
                     contentContainer.FadeIn(content_duration, EasingTypes.OutQuint);
                     contentContainer.MoveToY(0, content_duration, EasingTypes.OutQuint);
 
@@ -151,21 +153,26 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            FadeIn();
-            foreach (Container wave in waves)
-            {
-                wave.MoveToY(DrawHeight, close_duration, EasingTypes.InSine);
-            }
-            wavesContainer.MoveToY(0, close_duration, EasingTypes.InSine);
+            base.Hide();
 
-            contentContainer.MoveToY(DrawHeight, close_duration, EasingTypes.InSine);
-            contentContainer.FadeOut(close_duration, EasingTypes.InSine);
-
+            contentContainer.FadeOut(content_exit_duration, EasingTypes.InSine);
+            contentContainer.MoveToY(DrawHeight, content_exit_duration, EasingTypes.InSine);
             TransitionOut();
 
+            for (int i = 0; i < waves.Length; i++)
+            {
+                waves[i].MoveToY(DrawHeight, second_wave_duration, EasingTypes.InSine);
+            }
+
             DelayReset();
-            Delay(close_duration);
-            Schedule(() => { if (State == Visibility.Hidden) FadeOut(); });
+            Delay(container_wait);
+            Schedule(() =>
+            {
+                if (State == Visibility.Hidden)
+                {
+                    wavesContainer.MoveToY(0, waves_container_duration, EasingTypes.None);
+                }
+            });
         }
 
         protected abstract void TransitionOut();
