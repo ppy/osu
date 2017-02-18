@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework;
-using osu.Framework.Screens.Testing;
+using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using OpenTK;

@@ -13,7 +13,7 @@ namespace osu.Game.Modes.Osu.UI
 {
     public class OsuScoreOverlay : ScoreOverlay
     {
-        protected override ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
+        protected override ScoreCounter CreateScoreCounter() => new ScoreCounter()
         {
             Anchor = Anchor.TopCentre,
             Origin = Anchor.TopCentre,

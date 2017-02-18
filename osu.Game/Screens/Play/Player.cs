@@ -12,7 +12,7 @@ using osu.Game.Modes;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
-using osu.Framework.Screens;
+using osu.Framework.GameModes;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
@@ -27,11 +27,11 @@ using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Play
 {
-    public class Player : OsuScreen
+    public class Player : OsuGameMode
     {
         public bool Autoplay;
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
+        protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
 
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            Track track = Beatmap.Track;
+            AudioTrack track = Beatmap.Track;
 
             if (track != null)
             {
@@ -281,18 +281,18 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        protected override void OnEntering(Screen last)
+        protected override void OnEntering(GameMode last)
         {
             base.OnEntering(last);
 
-            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1000);
+            (Background as BackgroundModeBeatmap)?.BlurTo(Vector2.Zero, 1000);
             Background?.FadeTo((100f - dimLevel) / 100, 1000);
 
             Content.Alpha = 0;
             dimLevel.ValueChanged += dimChanged;
         }
 
-        protected override bool OnExiting(Screen next)
+        protected override bool OnExiting(GameMode next)
         {
             if (pauseOverlay == null) return false;
 
