@@ -54,7 +54,6 @@ namespace osu.Game.Overlays.Mods
                 iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
                 for (int i = 0; i < icons.Length; i++)
                 {
-                    // TODO: Find out how to fade between colours here (FadeColour makes the colours look different)
                     if (Selected && i == icons.Length - 1) icons[i].Colour = SelectedColour;
                     else icons[i].Colour = Colour;
                 }

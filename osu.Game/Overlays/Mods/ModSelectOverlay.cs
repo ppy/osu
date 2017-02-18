@@ -23,8 +23,8 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
-        private readonly int button_duration = 800; // 1000
-        private readonly int ranked_multiplier_duration = 800; // 1000
+        private readonly int button_duration = 700;
+        private readonly int ranked_multiplier_duration = 700;
         private readonly float content_width = 0.8f;
 
         private Color4 low_multiplier_colour;
@@ -124,14 +124,14 @@ namespace osu.Game.Overlays.Mods
 
         protected override void TransitionOut()
         {
-            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, close_duration, EasingTypes.InSine);
-            rankedMultiplerContainer.FadeOut(close_duration, EasingTypes.InSine);
+            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, content_exit_duration, EasingTypes.InSine);
+            rankedMultiplerContainer.FadeOut(content_exit_duration, EasingTypes.InSine);
 
             foreach (ModSection section in sections)
             {
-                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), close_duration, EasingTypes.InSine);
-                section.ButtonsContainer.MoveToX(100f, close_duration, EasingTypes.InSine);
-                section.ButtonsContainer.FadeTo(0.01f, close_duration, EasingTypes.InSine); // TODO: Fix this so 0.01 opacity isn't used
+                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), content_exit_duration, EasingTypes.InSine);
+                section.ButtonsContainer.MoveToX(100f, content_exit_duration, EasingTypes.InSine);
+                section.ButtonsContainer.FadeTo(0.01f, content_exit_duration, EasingTypes.InSine); // TODO: Fix this so 0.01 opacity isn't used
             }
         }
 
@@ -252,8 +252,8 @@ namespace osu.Game.Overlays.Mods
 
             Height = 548; // TODO: Remove when autosize works
             //AutoSizeAxes = Axes.Y;
-            //Content.RelativeSizeAxes = Axes.X;
-            //Content.AutoSizeAxes = Axes.Y;
+            Content.RelativeSizeAxes = Axes.X;
+            Content.AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
                 new Container
