@@ -4,7 +4,7 @@
 using System; 
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Platform;
-using osu.Framework.GameModes.Testing;
+using osu.Framework.Screens.Testing;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Select;

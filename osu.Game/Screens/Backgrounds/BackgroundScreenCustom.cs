@@ -5,19 +5,19 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundModeCustom : BackgroundMode
+    public class BackgroundScreenCustom : BackgroundScreen
     {
         private readonly string textureName;
 
-        public BackgroundModeCustom(string textureName)
+        public BackgroundScreenCustom(string textureName)
         {
             this.textureName = textureName;
             Add(new Background(textureName));
         }
 
-        public override bool Equals(BackgroundMode other)
+        public override bool Equals(BackgroundScreen other)
         {
-            return base.Equals(other) && textureName == ((BackgroundModeCustom)other).textureName;
+            return base.Equals(other) && textureName == ((BackgroundScreenCustom)other).textureName;
         }
     }
 }
