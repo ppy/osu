@@ -21,6 +21,7 @@ namespace osu.Game
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
+            SelectedColour = colours.YellowLight;
         }
 
         public DifficultyIncreaseSection()

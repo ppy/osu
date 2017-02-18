@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
@@ -15,20 +14,14 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
-using System;
 using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSelect : OverlayContainer
+    public class ModSelectOverlay : WaveOverlayContainer
     {
-        private readonly int waves_duration = 1000;
-        private readonly int move_up_duration = 1500;
-        private readonly int move_up_delay = 200;
-        private readonly int move_out_duration = 500;
-        private readonly int button_duration = 1500;
-        private readonly int ranked_multiplier_duration = 2000;
-
+        private readonly int button_duration = 800; // 1000
+        private readonly int ranked_multiplier_duration = 800; // 1000
         private readonly float content_width = 0.8f;
 
         private Color4 low_multiplier_colour;
@@ -42,9 +35,13 @@ namespace osu.Game.Overlays.Mods
         private DifficultyReductionSection difficultyReductionSection;
         private DifficultyIncreaseSection difficultyIncreaseSection;
         private AssistedSection assistedSection;
-
-        private Container contentContainer;
-        private Container[] waves;
+        private ModSection[] sections
+        {
+            get
+            {
+                return new ModSection[] { difficultyReductionSection, difficultyIncreaseSection, assistedSection };
+            }
+        }
 
         public Bindable<Mod[]> SelectedMods = new Bindable<Mod[]>();
 
@@ -87,64 +84,35 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        protected override void PopIn()
+        protected override void TransitionIn()
         {
-            FadeIn(move_up_duration, EasingTypes.OutQuint);
+            rankedMultiplerContainer.MoveToX(0, ranked_multiplier_duration, EasingTypes.OutQuint);
+            rankedMultiplerContainer.FadeIn(ranked_multiplier_duration, EasingTypes.OutQuint);
 
-            Delay(move_up_delay);
-            Schedule(() =>
+            foreach (ModSection section in sections)
             {
-                contentContainer.MoveToY(0, move_up_duration, EasingTypes.OutQuint);
-
-                rankedMultiplerContainer.MoveToX(0, ranked_multiplier_duration, EasingTypes.OutQuint);
-                rankedMultiplerContainer.FadeIn(ranked_multiplier_duration, EasingTypes.OutQuint);
-
-                ModSection[] sections = { difficultyReductionSection, difficultyIncreaseSection, assistedSection };
-                for (int i = 0; i < sections.Length; i++)
-                {
-                    sections[i].ButtonsContainer.TransformSpacingTo(new Vector2(50f, 0f), button_duration, EasingTypes.OutQuint);
-                    sections[i].ButtonsContainer.MoveToX(0, button_duration, EasingTypes.OutQuint);
-                    sections[i].FadeIn(button_duration, EasingTypes.OutQuint);
-                }
-            });
-
-            for (int i = 0; i < waves.Length; i++)
-            {
-                waves[i].MoveToY(-200, waves_duration + ((i + 1) * 500), EasingTypes.OutQuint);
+                section.ButtonsContainer.TransformSpacingTo(new Vector2(50f, 0f), button_duration, EasingTypes.OutQuint);
+                section.ButtonsContainer.MoveToX(0, button_duration, EasingTypes.OutQuint);
+                section.ButtonsContainer.FadeIn(button_duration, EasingTypes.OutQuint);
             }
         }
 
-        protected override void PopOut()
+        protected override void TransitionOut()
         {
-            FadeOut(move_out_duration, EasingTypes.InSine);
+            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, close_duration, EasingTypes.InSine);
+            rankedMultiplerContainer.FadeOut(close_duration, EasingTypes.InSine);
 
-            contentContainer.MoveToY(DrawHeight, move_out_duration, EasingTypes.InSine);
-
-            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, move_out_duration, EasingTypes.InSine);
-            rankedMultiplerContainer.FadeOut(move_out_duration, EasingTypes.InSine);
-
-            ModSection[] sections = { difficultyReductionSection, difficultyIncreaseSection, assistedSection };
-            for (int i = 0; i < sections.Length; i++)
+            foreach (ModSection section in sections)
             {
-                sections[i].ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), move_out_duration, EasingTypes.InSine);
-                sections[i].ButtonsContainer.MoveToX(100f, move_out_duration, EasingTypes.InSine);
-                sections[i].FadeIn(move_out_duration, EasingTypes.InSine);
-            }
-
-            for (int i = 0; i < waves.Length; i++)
-            {
-                waves[i].MoveToY(DrawHeight + 200);
+                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), close_duration, EasingTypes.InSine);
+                section.ButtonsContainer.MoveToX(100f, close_duration, EasingTypes.InSine);
+                section.ButtonsContainer.FadeTo(0.01f, close_duration, EasingTypes.InSine); // TODO: Fix this so 0.01 opacity isn't used
             }
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            waves[0].Colour = colours.BlueLight;
-            waves[1].Colour = colours.Blue;
-            waves[2].Colour = colours.BlueDark;
-            waves[3].Colour = colours.BlueDarker;
-
             low_multiplier_colour = colours.Red;
             high_multiplier_colour = colours.Green;
         }
@@ -250,111 +218,50 @@ namespace osu.Game.Overlays.Mods
             SelectedMods.Value = selectedMods.ToArray();
         }
 
-        public ModSelect()
+        public ModSelectOverlay()
         {
+            FirstWaveColour = OsuColour.FromHex(@"19b0e2");
+            SecondWaveColour = OsuColour.FromHex(@"2280a2");
+            ThirdWaveColour = OsuColour.FromHex(@"005774");
+            FourthWaveColour = OsuColour.FromHex(@"003a4e");
+
+            Height = 548; // TODO: Remove when autosize works
+            //AutoSizeAxes = Axes.Y;
+            //Content.RelativeSizeAxes = Axes.X;
+            //Content.AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
                     Masking = true,
-                    Children = waves = new Container[]
+                    Children = new Drawable[]
                     {
-                        new Container
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Width = 1.5f,
-                            Position = new Vector2(0f),
-                            Rotation = -10f,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                            },
+                            Colour = new Color4(36, 50, 68, 255)
                         },
-                        new Container
+                        new Triangles
                         {
+                            TriangleScale = 5,
                             RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            Width = 1.5f,
-                            Position = new Vector2(0f, 50f),
-                            Rotation = 8f,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                            },
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Width = 1.5f,
-                            Position = new Vector2(0f, 150f),
-                            Rotation = -5f,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                            },
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            Width = 1.5f,
-                            Position = new Vector2(0f, 300f),
-                            Rotation = 2f,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                            },
+                            ColourLight = new Color4(53, 66, 82, 255),
+                            ColourDark = new Color4(41, 54, 70, 255),
                         },
                     },
                 },
-                contentContainer = new Container
+                new FlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Direction = FlowDirections.Vertical,
+                    Spacing = new Vector2(0f, 10f),
                     Children = new Drawable[]
                     {
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = new Color4(36, 50, 68, 255)
-                                },
-                                new Triangles
-                                {
-                                    TriangleScale = 5,
-                                    RelativeSizeAxes = Axes.Both,
-                                    ColourLight = new Color4(53, 66, 82, 255),
-                                    ColourDark = new Color4(41, 54, 70, 255),
-                                },
-                            }
-                        },
+                        // Header
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
@@ -410,6 +317,7 @@ namespace osu.Game.Overlays.Mods
                                 },
                             },
                         },
+                        // Body
                         modSectionsContainer = new FlowContainer
                         {
                             Origin = Anchor.TopCentre,
@@ -418,10 +326,6 @@ namespace osu.Game.Overlays.Mods
                             AutoSizeAxes = Axes.Y,
                             Spacing = new Vector2(0f, 10f),
                             Width = content_width,
-                            Margin = new MarginPadding
-                            {
-                                Top = 100,
-                            },
                             Children = new Drawable[]
                             {
                                 difficultyReductionSection = new DifficultyReductionSection
@@ -447,16 +351,13 @@ namespace osu.Game.Overlays.Mods
                                 },
                             },
                         },
+                        // Footer
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 70,
-                            Origin = Anchor.BottomCentre,
-                            Anchor = Anchor.BottomCentre,
-                            Margin = new MarginPadding
-                            {
-                                Bottom = 50,
-                            },
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
                             Children = new Drawable[]
                             {
                                 new Box

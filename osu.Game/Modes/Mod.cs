@@ -215,7 +215,7 @@ namespace osu.Game.Modes
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_autopilot;
         public override string Description(PlayMode mode) => @"Automatic cursor movement - just follow the rhythm.";
         public override double ScoreMultiplier(PlayMode mode) => 0;
-        public override bool Ranked(PlayMode mode) => mode == PlayMode.Osu;
+        public override bool Ranked(PlayMode mode) => false;
     }
 
     public class ModPerfect : ModSuddenDeath

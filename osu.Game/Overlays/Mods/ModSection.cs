@@ -102,6 +102,25 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        private Color4 selectedColour = Color4.White;
+        public Color4 SelectedColour
+        {
+            get
+            {
+                return selectedColour;
+            }
+            set
+            {
+                if (value == selectedColour) return;
+                selectedColour = value;
+
+                foreach (ModButton button in buttons)
+                {
+                    button.SelectedColour = value;
+                }
+            }
+        }
+
         private void buttonPressed(Mod mod)
         {
             Action?.Invoke(SelectedMods);

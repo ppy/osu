@@ -5,24 +5,28 @@ using osu.Framework.Graphics;
 using osu.Game.Overlays.Mods;
 using osu.Framework.GameModes.Testing;
 using osu.Game.Modes;
+using osu.Game.Graphics;
+using osu.Framework.Allocation;
+using osu.Game.Overlays;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseModSelect : TestCase
+    class TestCaseModSelectOverlay : TestCase
     {
         public override string Name => @"Mod Select";
 
         public override string Description => @"Tests the mod select overlay";
 
-        private ModSelect modSelect;
+        private ModSelectOverlay modSelect;
+        private WaveOverlayContainer wave;
 
         public override void Reset()
         {
             base.Reset();
 
-            Add(modSelect = new ModSelect
+            Add(modSelect = new ModSelectOverlay
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.BottomCentre,
                 ModMode = PlayMode.Osu,

@@ -86,6 +86,7 @@ namespace osu.Game
         private void load(OsuColour colours)
         {
             Colour = colours.Blue;
+            SelectedColour = colours.BlueLight;
         }
 
         public AssistedSection(PlayMode mode)
