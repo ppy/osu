@@ -8,12 +8,12 @@ using osu.Game.Screens.Edit;
 
 namespace osu.Game.Screens.Select
 {
-    class EditSongSelect : GameModeWhiteBox
+    class EditSongSelect : ScreenWhiteBox
     {
         protected override IEnumerable<Type> PossibleChildren => new[] {
                 typeof(Editor)
         };
 
-        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
     }
 }

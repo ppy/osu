@@ -3,7 +3,7 @@
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundModeEmpty : BackgroundMode
+    public class BackgroundScreenEmpty : BackgroundScreen
     {
 
     }
