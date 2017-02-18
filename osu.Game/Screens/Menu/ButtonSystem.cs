@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Menu
         public Action OnChart;
         public Action OnTest;
 
-        private AudioSample sampleOsuClick;
+        private SampleChannel sampleOsuClick;
 
         private Toolbar toolbar;
 
