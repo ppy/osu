@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Input;
 
 namespace osu.Game.Screens.Menu
 {
@@ -113,7 +114,20 @@ namespace osu.Game.Screens.Menu
 
             Delay(250);
 
-            Schedule(() => Push(intro));
+            if(!alreadyExited)
+                Schedule(delegate { if(!alreadyExited) Push(intro); });
+        }
+
+        private bool alreadyExited = false;
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (!alreadyExited)
+            {
+                Content.FadeOut();
+                Push(intro);
+                alreadyExited = true;
+            }
+            return base.OnKeyDown(state, args);
         }
     }
 }
