@@ -8,12 +8,26 @@ using OpenTK;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.Containers
 {
     class ParallaxContainer : Container
     {
-        public float ParallaxAmount = 0.02f;
+        public float ParallaxAmount
+        {
+            get
+            {
+                return defaultParallaxAmount;
+            }
+
+            set
+            {
+                defaultParallaxAmount = value;
+            }
+        }
+        private float parallaxAmount;
+        private float defaultParallaxAmount = 0.02f;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
@@ -34,9 +48,15 @@ namespace osu.Game.Graphics.Containers
         protected override Container<Drawable> Content => content;
 
         [BackgroundDependencyLoader]
-        private void load(UserInputManager input)
+        private void load(UserInputManager input, OsuConfigManager config)
         {
             this.input = input;
+
+            config.GetBindable<bool>(OsuConfig.MenuParallax).ValueChanged += delegate
+            {
+                parallaxAmount = config.GetBindable<bool>(OsuConfig.MenuParallax) ? defaultParallaxAmount : 0;
+            };
+            parallaxAmount = config.GetBindable<bool>(OsuConfig.MenuParallax) ? defaultParallaxAmount : 0;
         }
 
         bool firstUpdate = true;
@@ -46,8 +66,8 @@ namespace osu.Game.Graphics.Containers
             base.Update();
 
             Vector2 offset = input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2;
-            content.MoveTo(offset * ParallaxAmount, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
-            content.Scale = new Vector2(1 + ParallaxAmount);
+            content.MoveTo(offset * parallaxAmount, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
+            content.Scale = new Vector2(1 + parallaxAmount);
 
             firstUpdate = false;
         }
