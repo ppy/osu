@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps
                 else break;
             }
 
-            return timingPoint;
+            return timingPoint ?? ControlPoint.Default;
         }
     }
 }
