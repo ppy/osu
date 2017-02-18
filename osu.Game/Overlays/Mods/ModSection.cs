@@ -121,6 +121,14 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        public void DeselectAll()
+        {
+            foreach (ModButton button in buttons)
+            {
+                button.Deselect();
+            }
+        }
+
         private void buttonPressed(Mod mod)
         {
             Action?.Invoke(SelectedMods);
