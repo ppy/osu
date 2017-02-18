@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.GameModes.Testing;
+using osu.Framework.Screens.Testing;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -71,7 +71,7 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new Box
             {
                 RelativeSizeAxes = Framework.Graphics.Axes.Both,
-                Colour = Color4.Gray,
+                Colour = Color4.Black,
             });
 
             Add(new Player
