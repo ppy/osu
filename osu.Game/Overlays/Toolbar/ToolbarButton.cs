@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Toolbar
         private SpriteText tooltip1;
         private SpriteText tooltip2;
         protected FlowContainer Flow;
-        private AudioSample sampleClick;
+        private SampleChannel sampleClick;
 
         public ToolbarButton()
         {

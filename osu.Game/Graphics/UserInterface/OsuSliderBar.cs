@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuSliderBar<U> : SliderBar<U> where U : struct
     {
-        private AudioSample sample;
+        private SampleChannel sample;
         private double lastSampleTime;
 
         private Nub nub;

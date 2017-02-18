@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Menu
         private readonly float extraWidth;
         private Key triggerKey;
         private string text;
-        private AudioSample sampleClick;
+        private SampleChannel sampleClick;
 
         public override bool Contains(Vector2 screenSpacePos)
         {
