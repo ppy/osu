@@ -16,7 +16,7 @@ namespace osu.Desktop.VisualTests.Tests
         private BeatmapDatabase db, oldDb;
         private TestStorage storage;
         private Random rnd = new Random();
-        private PlaySongSelect SongSelect;
+        private PlaySongSelect songSelect;
 
         public override string Name => @"Song Select";
         public override string Description => @"with fake data";
@@ -44,11 +44,11 @@ namespace osu.Desktop.VisualTests.Tests
                 db.Import(sets);
             }
 
-            Add(SongSelect = new PlaySongSelect());
-            OnArtist = () => { SongSelect.Filter.Sort = FilterControl.SortMode.Artist; };
-            OnTitle = () => { SongSelect.Filter.Sort = FilterControl.SortMode.Title; };
-            OnAuthor = () => { SongSelect.Filter.Sort = FilterControl.SortMode.Author; };
-            OnDifficulty = () => { SongSelect.Filter.Sort = FilterControl.SortMode.Difficulty; };
+            Add(songSelect = new PlaySongSelect());
+            OnArtist = () => { songSelect.Filter.Sort = FilterControl.SortMode.Artist; };
+            OnTitle = () => { songSelect.Filter.Sort = FilterControl.SortMode.Title; };
+            OnAuthor = () => { songSelect.Filter.Sort = FilterControl.SortMode.Author; };
+            OnDifficulty = () => { songSelect.Filter.Sort = FilterControl.SortMode.Difficulty; };
 
             AddButton(@"Sort by Artist", OnArtist);
             AddButton(@"Sort by Title", OnTitle);
