@@ -15,7 +15,24 @@ namespace osu.Game.Graphics.Containers
     class ParallaxContainer : Container
     {
         public float ParallaxAmount = 0.02f;
-        public bool ParallaxEnabled = true;
+
+        private bool parallaxEnabled = true;
+        public bool ParallaxEnabled
+        {
+            get
+            {
+                return parallaxEnabled;
+            }
+            set
+            {
+                parallaxEnabled = value;
+                if (!parallaxEnabled)
+                {
+                    content.MoveTo(Vector2.Zero, 1000, EasingTypes.OutQuint);
+                    content.Scale = Vector2.One;
+                }
+            }
+        }
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
@@ -43,11 +60,6 @@ namespace osu.Game.Graphics.Containers
             config.GetBindable<bool>(OsuConfig.MenuParallax).ValueChanged += delegate
             {
                 ParallaxEnabled = config.GetBindable<bool>(OsuConfig.MenuParallax);
-                if (!ParallaxEnabled)
-                {
-                    content.MoveTo(Vector2.Zero, 1000, EasingTypes.OutQuint);
-                    content.Scale = Vector2.One;
-                }
             };
         }
 
