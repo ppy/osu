@@ -57,10 +57,10 @@ namespace osu.Game.Modes.Osu.Objects
             ControlPoint overridePoint;
             ControlPoint timingPoint = beatmap.TimingPointAt(StartTime, out overridePoint);
             var velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
-            var baseVelocity = 100 * baseDifficulty.SliderMultiplier;
+            var baseVelocity = 100 * baseDifficulty.SliderMultiplier / velocityAdjustment;
 
-            Velocity = baseVelocity / (timingPoint.BeatLength * velocityAdjustment);
-            TickDistance = baseVelocity / (baseDifficulty.SliderTickRate * velocityAdjustment);
+            Velocity = baseVelocity / timingPoint.BeatLength;
+            TickDistance = baseVelocity / baseDifficulty.SliderTickRate;
         }
 
         public int RepeatCount = 1;

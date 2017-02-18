@@ -83,9 +83,9 @@ namespace osu.Game.Beatmaps
         }
 
         private ArchiveReader trackReader;
-        private AudioTrack track;
+        private Track track;
         private object trackLock = new object();
-        public AudioTrack Track
+        public Track Track
         {
             get
             {
@@ -99,7 +99,7 @@ namespace osu.Game.Beatmaps
                         trackReader = getReader();
                         var trackData = trackReader?.GetStream(BeatmapInfo.Metadata.AudioFile);
                         if (trackData != null)
-                            track = new AudioTrackBass(trackData);
+                            track = new TrackBass(trackData);
                     }
                     catch { }
 
