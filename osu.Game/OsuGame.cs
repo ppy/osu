@@ -216,7 +216,7 @@ namespace osu.Game
             return base.OnKeyDown(state, args);
         }
 
-        public Action<Screen> ModeChanged;
+        public event Action<Screen> ModeChanged;
 
         private Container mainContent;
 
@@ -247,6 +247,10 @@ namespace osu.Game
 
         protected override bool OnExiting()
         {
+            if (screenStack.ChildScreen == null) return false;
+
+            if (intro == null) return true;
+
             if (!intro.DidLoadMenu || intro.ChildScreen != null)
             {
                 Scheduler.Add(intro.MakeCurrent);

@@ -14,6 +14,7 @@ using osu.Game.Database;
 using osu.Desktop.Overlays;
 using System.Reflection;
 using System.Drawing;
+using osu.Game.Screens.Menu;
 
 namespace osu.Desktop
 {
@@ -26,14 +27,19 @@ namespace osu.Desktop
         public OsuGameDesktop(string[] args = null)
             : base(args)
         {
-            versionManager = new VersionManager();
+            versionManager = new VersionManager { Depth = int.MinValue };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            versionManager.Preload(this, Add);
+            versionManager.Preload(this);
+            ModeChanged += m =>
+            {
+                if (!versionManager.IsAlive && m is Intro)
+                    Add(versionManager);
+            };
         }
 
         public override void SetHost(BasicGameHost host)

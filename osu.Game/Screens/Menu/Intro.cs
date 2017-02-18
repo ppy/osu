@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    class Intro : OsuScreen
+    public class Intro : OsuScreen
     {
         private OsuLogo logo;
 
