@@ -97,6 +97,13 @@ namespace osu.Game.Overlays.Mods
             base.OnFocusLost(state);
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            low_multiplier_colour = colours.Red;
+            high_multiplier_colour = colours.Green;
+        }
+
         protected override void PopIn()
         {
             base.PopIn();
@@ -135,11 +142,15 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        public void DeselectAll()
         {
-            low_multiplier_colour = colours.Red;
-            high_multiplier_colour = colours.Green;
+            foreach (ModSection section in sections)
+            {
+                foreach (ModButton button in section.Buttons)
+                {
+                    button.Deselect();
+                }
+            }
         }
 
         private void modButtonPressed(Mod[] sectionSelectedMods)
@@ -205,6 +216,7 @@ namespace osu.Game.Overlays.Mods
             // 1.00x
             // 1.05x
             // 1.20x
+
             multiplierLabel.Text = string.Format("{0:N2}x", multiplier);
             rankedLabel.Text = $"{ranked ? @"Ranked" : @"Unranked"}, Score Multiplier: ";
             if (multiplier > 1.0)
