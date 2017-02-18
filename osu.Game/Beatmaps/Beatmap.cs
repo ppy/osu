@@ -39,7 +39,11 @@ namespace osu.Game.Beatmaps
 
             ControlPoint timingPoint = null;
             foreach (var controlPoint in ControlPoints)
-                if (controlPoint.Time <= time)
+            {
+                // Some beatmaps have the first timingPoint (accidentally) start after the first HitObject(s).
+                // This null check makes it so that the first ControlPoint that makes a timing change is used as
+                // the timingPoint for those HitObject(s).
+                if (controlPoint.Time <= time || timingPoint == null)
                 {
                     if (controlPoint.TimingChange)
                     {
@@ -49,8 +53,9 @@ namespace osu.Game.Beatmaps
                     else overridePoint = controlPoint;
                 }
                 else break;
+            }
 
-            return timingPoint;
+            return timingPoint ?? ControlPoint.Default;
         }
     }
 }
