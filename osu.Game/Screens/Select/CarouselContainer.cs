@@ -188,26 +188,18 @@ namespace osu.Game.Screens.Select
         public void Sort(FilterControl.SortMode mode) {
             switch (mode) { 
                 case FilterControl.SortMode.Artist:
-                    groups.Sort((x, y) =>
-                    {
-                        return string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist);
-                    });
+                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist));
                     break;
                 case FilterControl.SortMode.Title:
-                    groups.Sort((x, y) =>
-                    {
-                        return string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title);
-                    });
+                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title));
                     break;
                 case FilterControl.SortMode.Author:
-                    groups.Sort((x, y) =>
-                    {
-                        return string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author);
-                    });
+                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author));
                     break;
                 case FilterControl.SortMode.Difficulty:
                     groups.Sort((x, y) =>
                     {
+                        // TODO: replace with star rating once implemented
                         if (x.BeatmapSet.Beatmaps.First().BaseDifficulty.OverallDifficulty >
                             y.BeatmapSet.Beatmaps.First().BaseDifficulty.OverallDifficulty)
                             return 1;
