@@ -25,8 +25,11 @@ namespace osu.Game.Screens.Select
         public SortMode Sort { 
             get { return sort; } 
             set {
-                sort = value;
-                FilterChanged?.Invoke();
+                if (sort != value)
+                {
+                    sort = value;
+                    FilterChanged?.Invoke();
+                }
             } 
         }
 

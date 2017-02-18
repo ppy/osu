@@ -43,19 +43,19 @@ namespace osu.Desktop.VisualTests.Tests
 
                 db.Import(sets);
             }
-            OnArtist = () => SongSelect.Filter.Sort = FilterControl.SortMode.Artist;
-            OnTitle = () => SongSelect.Filter.Sort = FilterControl.SortMode.Title;
-            OnAuthor = () => SongSelect.Filter.Sort = FilterControl.SortMode.Author;
-            OnDifficulty = () => SongSelect.Filter.Sort = FilterControl.SortMode.Difficulty;
+            OnArtist = () => { SongSelect.Filter.Sort = FilterControl.SortMode.Artist; };
+            OnTitle = () => { SongSelect.Filter.Sort = FilterControl.SortMode.Title; };
+            OnAuthor = () => { SongSelect.Filter.Sort = FilterControl.SortMode.Author; };
+            OnDifficulty = () => { SongSelect.Filter.Sort = FilterControl.SortMode.Difficulty; };
 
             AddButton(@"Sort by Artist", OnArtist);
-            AddButton(@"Sort by Artist", OnTitle);
-            AddButton(@"Sort by Artist", OnAuthor);
-            AddButton(@"Sort by Artist", OnDifficulty);
+            AddButton(@"Sort by Title", OnTitle);
+            AddButton(@"Sort by Author", OnAuthor);
+            AddButton(@"Sort by Difficulty", OnDifficulty);
 
-            Add(new PlaySongSelect());
+            Add(SongSelect);
         }
-        
+
         protected override void Dispose(bool isDisposing)
         {
             if (oldDb != null)
