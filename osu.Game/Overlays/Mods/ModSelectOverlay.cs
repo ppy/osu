@@ -15,6 +15,9 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 using osu.Framework.Allocation;
+using osu.Framework.Input;
+using OpenTK.Input;
+using System.Linq;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -82,6 +85,28 @@ namespace osu.Game.Overlays.Mods
                     },
                 };
             }
+        }
+
+        public override bool RequestingFocus => State == Visibility.Visible;
+
+        protected override bool OnFocus(InputState state) => true;
+        protected override void OnFocusLost(InputState state)
+        {
+            if (state.Keyboard.Keys.Contains(Key.Escape))
+                Hide();
+            base.OnFocusLost(state);
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+            Schedule(TriggerFocusContention);
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+            TriggerFocusLost();
         }
 
         protected override void TransitionIn()
