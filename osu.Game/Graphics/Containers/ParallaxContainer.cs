@@ -14,20 +14,8 @@ namespace osu.Game.Graphics.Containers
 {
     class ParallaxContainer : Container
     {
-        public float ParallaxAmount
-        {
-            get
-            {
-                return defaultParallaxAmount;
-            }
-
-            set
-            {
-                defaultParallaxAmount = value;
-            }
-        }
-        private float parallaxAmount;
-        private float defaultParallaxAmount = 0.02f;
+        public float ParallaxAmount = 0.02f;
+        public bool ParallaxEnabled = true;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
@@ -54,9 +42,13 @@ namespace osu.Game.Graphics.Containers
 
             config.GetBindable<bool>(OsuConfig.MenuParallax).ValueChanged += delegate
             {
-                parallaxAmount = config.GetBindable<bool>(OsuConfig.MenuParallax) ? defaultParallaxAmount : 0;
+                ParallaxEnabled = config.GetBindable<bool>(OsuConfig.MenuParallax);
+                if (!ParallaxEnabled)
+                {
+                    content.MoveTo(Vector2.Zero, 1000, EasingTypes.OutQuint);
+                    content.Scale = Vector2.One;
+                }
             };
-            parallaxAmount = config.GetBindable<bool>(OsuConfig.MenuParallax) ? defaultParallaxAmount : 0;
         }
 
         bool firstUpdate = true;
@@ -65,9 +57,11 @@ namespace osu.Game.Graphics.Containers
         {
             base.Update();
 
-            Vector2 offset = input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2;
-            content.MoveTo(offset * parallaxAmount, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
-            content.Scale = new Vector2(1 + parallaxAmount);
+            if (ParallaxEnabled) { 
+                Vector2 offset = input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2;
+                content.MoveTo(offset * ParallaxAmount, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
+                content.Scale = new Vector2(1 + ParallaxAmount);
+            }
 
             firstUpdate = false;
         }
