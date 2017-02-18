@@ -56,7 +56,15 @@ namespace osu.Game.Screens.Select
 
         private FilterControl filter;
         public FilterControl Filter {
-            get; private set;
+            get {
+                return filter;
+            } 
+            private set {
+                if (filter != value) {
+                    filter = value;
+                    filterChanged();
+                }
+            }
         }
 
         Player player;

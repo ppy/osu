@@ -16,7 +16,7 @@ namespace osu.Desktop.VisualTests.Tests
         private BeatmapDatabase db, oldDb;
         private TestStorage storage;
         private Random rnd = new Random();
-        private PlaySongSelect SongSelect = new PlaySongSelect();
+        private PlaySongSelect SongSelect;
 
         public override string Name => @"Song Select";
         public override string Description => @"with fake data";
@@ -43,6 +43,8 @@ namespace osu.Desktop.VisualTests.Tests
 
                 db.Import(sets);
             }
+
+            Add(SongSelect = new PlaySongSelect());
             OnArtist = () => { SongSelect.Filter.Sort = FilterControl.SortMode.Artist; };
             OnTitle = () => { SongSelect.Filter.Sort = FilterControl.SortMode.Title; };
             OnAuthor = () => { SongSelect.Filter.Sort = FilterControl.SortMode.Author; };
@@ -52,8 +54,6 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton(@"Sort by Title", OnTitle);
             AddButton(@"Sort by Author", OnAuthor);
             AddButton(@"Sort by Difficulty", OnDifficulty);
-
-            Add(SongSelect);
         }
 
         protected override void Dispose(bool isDisposing)
