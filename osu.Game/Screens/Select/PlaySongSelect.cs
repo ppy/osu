@@ -54,8 +54,12 @@ namespace osu.Game.Screens.Select
 
         private Footer footer;
 
+        private FilterControl filter;
+        public FilterControl Filter {
+            get; private set;
+        }
+
         Player player;
-        FilterControl filter;
 
         private void start()
         {

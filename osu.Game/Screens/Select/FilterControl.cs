@@ -21,7 +21,15 @@ namespace osu.Game.Screens.Select
         public Action FilterChanged;
 
         public string Search => searchTextBox.Text;
-        public SortMode Sort { get; private set; } = SortMode.Title;
+        private SortMode sort = SortMode.Title;
+        public SortMode Sort { 
+            get { return sort; } 
+            set {
+                sort = value;
+                FilterChanged?.Invoke();
+            } 
+        }
+
         public Action Exit;
 
         private SearchTextBox searchTextBox;

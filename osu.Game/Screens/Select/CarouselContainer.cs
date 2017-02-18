@@ -199,13 +199,12 @@ namespace osu.Game.Screens.Select
                 case FilterControl.SortMode.Difficulty:
                     groups.Sort((x, y) =>
                     {
-                        // TODO: replace with star rating once implemented
+                        /*TODO: replace with star rating once implemented
+                        * Assumes BeatmapSets not to be grouped - or to be by difficulty,
+                        * otherwise this sorting makes little sense - or does it? */
                         if (x.BeatmapSet.Beatmaps.First().BaseDifficulty.OverallDifficulty >
                             y.BeatmapSet.Beatmaps.First().BaseDifficulty.OverallDifficulty)
                             return 1;
-                        else if (Equals(x.BeatmapSet.Beatmaps.First().BaseDifficulty.OverallDifficulty,
-                                                  y.BeatmapSet.Beatmaps.First().BaseDifficulty.OverallDifficulty))
-                            return 0;
                         else
                             return -1;
                     });

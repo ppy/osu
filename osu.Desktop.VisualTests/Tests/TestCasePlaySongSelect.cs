@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System; 
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Platform;
 using osu.Framework.GameModes.Testing;
@@ -14,9 +15,16 @@ namespace osu.Desktop.VisualTests.Tests
     {
         private BeatmapDatabase db, oldDb;
         private TestStorage storage;
+        private Random rnd = new Random();
+        private PlaySongSelect SongSelect = new PlaySongSelect();
 
         public override string Name => @"Song Select";
         public override string Description => @"with fake data";
+
+        public Action OnArtist;
+        public Action OnTitle;
+        public Action OnAuthor;
+        public Action OnDifficulty;
 
         public override void Reset()
         {
@@ -35,6 +43,16 @@ namespace osu.Desktop.VisualTests.Tests
 
                 db.Import(sets);
             }
+            OnArtist = () => SongSelect.Filter.Sort = FilterControl.SortMode.Artist;
+            OnTitle = () => SongSelect.Filter.Sort = FilterControl.SortMode.Title;
+            OnAuthor = () => SongSelect.Filter.Sort = FilterControl.SortMode.Author;
+            OnDifficulty = () => SongSelect.Filter.Sort = FilterControl.SortMode.Difficulty;
+
+            AddButton(@"Sort by Artist", OnArtist);
+            AddButton(@"Sort by Artist", OnTitle);
+            AddButton(@"Sort by Artist", OnAuthor);
+            AddButton(@"Sort by Artist", OnDifficulty);
+
             Add(new PlaySongSelect());
         }
         
@@ -59,9 +77,10 @@ namespace osu.Desktop.VisualTests.Tests
                 Metadata = new BeatmapMetadata
                 {
                     OnlineBeatmapSetID = 1234 + i,
-                    Artist = "MONACA",
-                    Title = "Black Song",
-                    Author = "Some Guy",
+                    // Create random metadata, then we can check if sorting works based on these
+                    Artist = "MONACA " + rnd.Next(0, 9),
+                    Title = "Black Song " + rnd.Next(0, 9),
+                    Author = "Some Guy " + rnd.Next(0, 9),
                 },
                 Beatmaps = new List<BeatmapInfo>(new[]
                 {
