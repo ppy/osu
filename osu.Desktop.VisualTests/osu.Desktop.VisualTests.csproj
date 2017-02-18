@@ -191,7 +191,7 @@
     <Compile Include="Platform\TestStorage.cs" />
     <Compile Include="Tests\TestCaseOptions.cs" />
     <Compile Include="Tests\TestCasePauseOverlay.cs" />
-    <Compile Include="Tests\TestCaseModSelect.cs" />
+    <Compile Include="Tests\TestCaseModSelectOverlay.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

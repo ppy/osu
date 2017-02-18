@@ -52,6 +52,12 @@ namespace osu.Game.Overlays.Mods
 
                 iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
                 iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
+                for (int i = 0; i < icons.Length; i++)
+                {
+                    // TODO: Find out how to fade between colours here (FadeColour makes the colours look different)
+                    if (Selected && i == icons.Length - 1) icons[i].Colour = SelectedColour;
+                    else icons[i].Colour = Colour;
+                }
 
                 displaySelectedMod();
             }
@@ -74,12 +80,27 @@ namespace osu.Game.Overlays.Mods
             }
             set
             {
+                if (value == backgroundColour) return;
                 backgroundColour = value;
-
                 foreach (ModIcon icon in icons)
                 {
                     icon.Colour = value;
                 }
+            }
+        }
+
+        private Color4 selectedColour;
+        public Color4 SelectedColour
+        {
+            get
+            {
+                return selectedColour;
+            }
+            set
+            {
+                if (value == selectedColour) return;
+                selectedColour = value;
+                if (Selected) icons[0].Colour = value;
             }
         }
 
@@ -92,6 +113,7 @@ namespace osu.Game.Overlays.Mods
             }
             set
             {
+                if (mods == value) return;
                 mods = value;
                 createIcons();
                 if (value.Length > 0)

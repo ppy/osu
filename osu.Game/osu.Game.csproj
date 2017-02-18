@@ -272,7 +272,7 @@
     <Compile Include="Overlays\Pause\ResumeButton.cs" />
     <Compile Include="Overlays\Pause\RetryButton.cs" />
     <Compile Include="Overlays\Pause\QuitButton.cs" />
-    <Compile Include="Overlays\Mods\ModSelect.cs" />
+    <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
     <Compile Include="Modes\Mod.cs" />
     <Compile Include="Overlays\Mods\ModButton.cs" />
     <Compile Include="Modes\UI\ModIcon.cs" />
@@ -280,6 +280,7 @@
     <Compile Include="Overlays\Mods\DifficultyReductionSection.cs" />
     <Compile Include="Overlays\Mods\DifficultyIncreaseSection.cs" />
     <Compile Include="Overlays\Mods\AssistedSection.cs" />
+    <Compile Include="Overlays\WaveOverlayContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
