@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Pause
             }
         }
 
-        public AudioSample SampleClick, SampleHover;
+        public SampleChannel SampleClick, SampleHover;
 
         private Container backgroundContainer, colourContainer, glowContainer;
         private Box leftGlow, centerGlow, rightGlow;
