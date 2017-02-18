@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
-using osu.Framework.Screens;
+using osu.Framework.GameModes;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
@@ -32,11 +32,11 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Select
 {
-    public class PlaySongSelect : OsuScreen
+    public class PlaySongSelect : OsuGameMode
     {
         private Bindable<PlayMode> playMode;
         private BeatmapDatabase database;
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
+        protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
 
         private CarouselContainer carousel;
         private TrackManager trackManager;
@@ -47,8 +47,8 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 background_blur = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
 
-        private SampleChannel sampleChangeDifficulty;
-        private SampleChannel sampleChangeBeatmap;
+        private AudioSample sampleChangeDifficulty;
+        private AudioSample sampleChangeBeatmap;
 
         private List<BeatmapGroup> beatmapGroups;
 
@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Select
             Schedule(() => addBeatmapSet(s, Game, true));
         }
 
-        protected override void OnEntering(Screen last)
+        protected override void OnEntering(GameMode last)
         {
             base.OnEntering(last);
             ensurePlayingSelected();
@@ -218,7 +218,7 @@ namespace osu.Game.Screens.Select
             filter.Activate();
         }
 
-        protected override void OnResuming(Screen last)
+        protected override void OnResuming(GameMode last)
         {
             player = null;
 
@@ -233,7 +233,7 @@ namespace osu.Game.Screens.Select
             filter.Activate();
         }
 
-        protected override void OnSuspending(Screen next)
+        protected override void OnSuspending(GameMode next)
         {
             Content.ScaleTo(1.1f, 250, EasingTypes.InSine);
 
@@ -243,7 +243,7 @@ namespace osu.Game.Screens.Select
             base.OnSuspending(next);
         }
 
-        protected override bool OnExiting(Screen next)
+        protected override bool OnExiting(GameMode next)
         {
             beatmapInfoWedge.MoveToX(-100, 800, EasingTypes.InQuint);
             beatmapInfoWedge.RotateTo(10, 800, EasingTypes.InQuint);
@@ -271,7 +271,7 @@ namespace osu.Game.Screens.Select
 
         private void changeBackground(WorkingBeatmap beatmap)
         {
-            var backgroundModeBeatmap = Background as BackgroundScreenBeatmap;
+            var backgroundModeBeatmap = Background as BackgroundModeBeatmap;
             if (backgroundModeBeatmap != null)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
@@ -317,7 +317,7 @@ namespace osu.Game.Screens.Select
 
         private void ensurePlayingSelected(bool preview = false)
         {
-            Track track = Beatmap?.Track;
+            AudioTrack track = Beatmap?.Track;
 
             if (track != null)
             {

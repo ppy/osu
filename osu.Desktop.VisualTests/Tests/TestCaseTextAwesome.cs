@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Screens.Testing;
+using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;

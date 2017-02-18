@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Screens.Testing;
+using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Menu;
