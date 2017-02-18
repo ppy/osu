@@ -137,7 +137,7 @@ namespace osu.Game.Modes
             switch (mode)
             {
                 case PlayMode.Osu:
-                    return "You don't need to click. \nGive your clicking/tapping finger a break from the heat of things.";
+                    return "You don't need to click.\nGive your clicking/tapping finger a break from the heat of things.";
                     
                 case PlayMode.Taiko:
                     return @"Relax! You will no longer get dizzyfied by ninja-like spinners, demanding drumrolls or unexpected katu's.";
