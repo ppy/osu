@@ -32,8 +32,6 @@ namespace osu.Game.Screens.Menu
         public Action OnChart;
         public Action OnTest;
 
-        private SampleChannel sampleOsuClick;
-
         private Toolbar toolbar;
 
         private FlowContainerWithOrigin buttonFlow;
@@ -122,7 +120,6 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuGame game = null)
         {
-            sampleOsuClick = audio.Sample.Get(@"Menu/menuhit");
             toolbar = game?.Toolbar;
         }
 
@@ -181,7 +178,6 @@ namespace osu.Game.Screens.Menu
             switch (state)
             {
                 case MenuState.Initial:
-                    sampleOsuClick.Play();
                     State = MenuState.TopLevel;
                     return;
                 case MenuState.TopLevel:
