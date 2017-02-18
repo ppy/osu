@@ -59,7 +59,6 @@ namespace osu.Game.Screens.Menu
             background.Preload(game);
 
             buttons.OnSettings = game.ToggleOptions;
-
         }
 
         protected override void OnEntering(Screen last)
