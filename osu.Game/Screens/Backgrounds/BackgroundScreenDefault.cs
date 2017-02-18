@@ -7,7 +7,7 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundModeDefault : BackgroundMode
+    public class BackgroundScreenDefault : BackgroundScreen
     {
         [BackgroundDependencyLoader]
         private void load(BaseGame game)

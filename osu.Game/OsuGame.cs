@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Configuration;
-using osu.Framework.GameModes;
+using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -31,6 +31,8 @@ namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
+        public virtual bool IsDeployedBuild => false;
+
         public Toolbar Toolbar;
 
         private ChatOverlay chat;
@@ -39,10 +41,18 @@ namespace osu.Game
 
         private NotificationManager notificationManager;
 
-        private MainMenu mainMenu => modeStack?.ChildGameMode as MainMenu;
-        private Intro intro => modeStack as Intro;
+        private Intro intro
+        {
+            get
+            {
+                Screen s = screenStack;
+                while (s != null && !(s is Intro))
+                    s = s.ChildScreen;
+                return s as Intro;
+            }
+        }
 
-        private OsuGameMode modeStack;
+        private OsuScreen screenStack;
 
         private VolumeControl volume;
 
@@ -106,11 +116,11 @@ namespace osu.Game
                 }
             });
 
-            (modeStack = new Intro()).Preload(this, d =>
+            (screenStack = new Loader()).Preload(this, d =>
             {
-                modeStack.ModePushed += modeAdded;
-                modeStack.Exited += modeRemoved;
-                mainContent.Add(modeStack);
+                screenStack.ModePushed += screenAdded;
+                screenStack.Exited += screenRemoved;
+                mainContent.Add(screenStack);
             });
 
             //overlay elements
@@ -148,7 +158,7 @@ namespace osu.Game
             (Toolbar = new Toolbar
             {
                 Depth = -3,
-                OnHome = delegate { mainMenu?.MakeCurrent(); },
+                OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
                 OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
             }).Preload(this, t =>
             {
@@ -206,20 +216,16 @@ namespace osu.Game
             return base.OnKeyDown(state, args);
         }
 
-        public Action<GameMode> ModeChanged;
+        public event Action<Screen> ModeChanged;
 
         private Container mainContent;
 
         private Container overlayContent;
 
-        private void modeChanged(GameMode newMode)
+        private void modeChanged(Screen newScreen)
         {
-            // - Ability to change window size
-            // - Ability to adjust music playback
-            // - Frame limiter changes
-
             //central game mode change logic.
-            if ((newMode as OsuGameMode)?.ShowOverlays != true)
+            if ((newScreen as OsuScreen)?.ShowOverlays != true)
             {
                 Toolbar.State = Visibility.Hidden;
                 musicController.State = Visibility.Hidden;
@@ -230,22 +236,24 @@ namespace osu.Game
                 Toolbar.State = Visibility.Visible;
             }
 
-            Cursor.FadeIn(100);
+            if (newScreen is MainMenu)
+                Cursor.FadeIn(100);
 
-            ModeChanged?.Invoke(newMode);
+            ModeChanged?.Invoke(newScreen);
 
-            if (newMode == null)
-                Host.Exit();
+            if (newScreen == null)
+                Exit();
         }
 
         protected override bool OnExiting()
         {
-            if (!intro.DidLoadMenu || intro.ChildGameMode != null)
+            if (screenStack.ChildScreen == null) return false;
+
+            if (intro == null) return true;
+
+            if (!intro.DidLoadMenu || intro.ChildScreen != null)
             {
-                Scheduler.Add(delegate
-                {
-                    intro.MakeCurrent();
-                });
+                Scheduler.Add(intro.MakeCurrent);
                 return true;
             }
 
@@ -256,21 +264,21 @@ namespace osu.Game
         {
             base.UpdateAfterChildren();
 
-            if (modeStack.ChildGameMode != null)
-                modeStack.ChildGameMode.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
+            if (intro?.ChildScreen != null)
+                intro.ChildScreen.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
         }
 
-        private void modeAdded(GameMode newMode)
+        private void screenAdded(Screen newScreen)
         {
-            newMode.ModePushed += modeAdded;
-            newMode.Exited += modeRemoved;
+            newScreen.ModePushed += screenAdded;
+            newScreen.Exited += screenRemoved;
 
-            modeChanged(newMode);
+            modeChanged(newScreen);
         }
 
-        private void modeRemoved(GameMode newMode)
+        private void screenRemoved(Screen newScreen)
         {
-            modeChanged(newMode);
+            modeChanged(newScreen);
         }
     }
 }

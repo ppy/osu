@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Menu
         private Container logoBounceContainer;
         private Container logoHoverContainer;
 
-        private AudioSample sampleClick;
+        private SampleChannel sampleClick;
 
         private Container colourAndTriangles;
 
