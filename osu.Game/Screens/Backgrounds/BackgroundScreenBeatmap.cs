@@ -9,7 +9,7 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundModeBeatmap : BackgroundMode
+    public class BackgroundScreenBeatmap : BackgroundScreen
     {
         private Background background;
 
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Backgrounds
             }
         }
 
-        public BackgroundModeBeatmap(WorkingBeatmap beatmap)
+        public BackgroundScreenBeatmap(WorkingBeatmap beatmap)
         {
             Beatmap = beatmap;
         }
@@ -66,9 +66,9 @@ namespace osu.Game.Screens.Backgrounds
             blurTarget = sigma;
         }
 
-        public override bool Equals(BackgroundMode other)
+        public override bool Equals(BackgroundScreen other)
         {
-            return base.Equals(other) && beatmap == ((BackgroundModeBeatmap)other).Beatmap;
+            return base.Equals(other) && beatmap == ((BackgroundScreenBeatmap)other).Beatmap;
         }
 
         class BeatmapBackground : Background

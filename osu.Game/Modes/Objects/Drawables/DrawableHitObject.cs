@@ -54,7 +54,7 @@ namespace osu.Game.Modes.Objects.Drawables
             }
         }
 
-        AudioSample sample;
+        SampleChannel sample;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
