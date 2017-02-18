@@ -7,32 +7,22 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Modes
 {
-    public class Mod
+    public abstract class Mod
     {
-        public virtual Mods Name
-        {
-            get;
-        }
+        public abstract Mods Name { get; }
+        public abstract FontAwesome Icon { get; }
+        public virtual string Description(PlayMode mode) => @"";
+        public abstract double ScoreMultiplier(PlayMode mode);
+        public abstract bool Ranked(PlayMode mode);
+    }
 
-        public virtual FontAwesome Icon
-        {
-            get;
-        }
-
-        public virtual string Description(PlayMode mode)
-        {
-            return @"";
-        }
-
-        public virtual double ScoreMultiplier(PlayMode mode)
-        {
-            return 1;
-        }
-
-        public virtual bool Ranked(PlayMode mode)
-        {
-            return true;
-        }
+    public abstract class KeyMod : Mod
+    {
+        public abstract int KeyCount { get; }
+        public override FontAwesome Icon => FontAwesome.fa_close; // TODO: Add proper key icons
+        public override string Description(PlayMode mode) => @"";
+        public override double ScoreMultiplier(PlayMode mode) => 1; // TODO: Implement the mania key mod score multiplier
+        public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
     }
 
     public class ModNoFail : Mod
@@ -225,44 +215,34 @@ namespace osu.Game.Modes
         public override string Description(PlayMode mode) => @"SS or quit.";
     }
 
-    public class ModKey4 : Mod
+    public class ModKey4 : KeyMod
     {
+        public override int KeyCount => 4;
         public override Mods Name => Mods.Key4;
-        public override FontAwesome Icon => FontAwesome.fa_close;
-        public override double ScoreMultiplier(PlayMode mode) => 1;
-        public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
     }
 
-    public class ModKey5 : Mod
+    public class ModKey5 : KeyMod
     {
+        public override int KeyCount => 5;
         public override Mods Name => Mods.Key5;
-        public override FontAwesome Icon => FontAwesome.fa_close;
-        public override double ScoreMultiplier(PlayMode mode) => 1;
-        public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
     }
 
-    public class ModKey6 : Mod
+    public class ModKey6 : KeyMod
     {
+        public override int KeyCount => 6;
         public override Mods Name => Mods.Key6;
-        public override FontAwesome Icon => FontAwesome.fa_close;
-        public override double ScoreMultiplier(PlayMode mode) => 1;
-        public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
     }
 
-    public class ModKey7 : Mod
+    public class ModKey7 : KeyMod
     {
+        public override int KeyCount => 7;
         public override Mods Name => Mods.Key7;
-        public override FontAwesome Icon => FontAwesome.fa_close;
-        public override double ScoreMultiplier(PlayMode mode) => 1;
-        public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
     }
 
-    public class ModKey8 : Mod
+    public class ModKey8 : KeyMod
     {
+        public override int KeyCount => 8;
         public override Mods Name => Mods.Key8;
-        public override FontAwesome Icon => FontAwesome.fa_close;
-        public override double ScoreMultiplier(PlayMode mode) => 1;
-        public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
     }
 
     public class ModFadeIn : Mod
@@ -298,12 +278,10 @@ namespace osu.Game.Modes
         public override bool Ranked(PlayMode mode) => mode == PlayMode.Osu;
     }
 
-    public class ModKey9 : Mod
+    public class ModKey9 : KeyMod
     {
+        public override int KeyCount => 9;
         public override Mods Name => Mods.Key9;
-        public override FontAwesome Icon => FontAwesome.fa_close;
-        public override double ScoreMultiplier(PlayMode mode) => 1;
-        public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
     }
 
     public class ModKeyCoop : Mod
@@ -315,28 +293,22 @@ namespace osu.Game.Modes
         public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
     }
 
-    public class ModKey1 : Mod
+    public class ModKey1 : KeyMod
     {
+        public override int KeyCount => 1;
         public override Mods Name => Mods.Key1;
-        public override FontAwesome Icon => FontAwesome.fa_close;
-        public override double ScoreMultiplier(PlayMode mode) => 1;
-        public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
     }
 
-    public class ModKey3 : Mod
+    public class ModKey3 : KeyMod
     {
+        public override int KeyCount => 3;
         public override Mods Name => Mods.Key3;
-        public override FontAwesome Icon => FontAwesome.fa_close;
-        public override double ScoreMultiplier(PlayMode mode) => 1;
-        public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
     }
 
-    public class ModKey2 : Mod
+    public class ModKey2 : KeyMod
     {
+        public override int KeyCount => 2;
         public override Mods Name => Mods.Key2;
-        public override FontAwesome Icon => FontAwesome.fa_close;
-        public override double ScoreMultiplier(PlayMode mode) => 1;
-        public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
     }
 
 
