@@ -24,9 +24,9 @@ namespace osu.Game.Screens.Menu
         internal bool DidLoadMenu;
 
         MainMenu mainMenu;
-        private AudioSample welcome;
-        private AudioSample seeya;
-        private AudioTrack bgm;
+        private SampleChannel welcome;
+        private SampleChannel seeya;
+        private Track bgm;
 
         internal override bool ShowOverlays => false;
 

@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            AudioTrack track = Beatmap.Track;
+            Track track = Beatmap.Track;
 
             if (track != null)
             {

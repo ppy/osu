@@ -47,8 +47,8 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 background_blur = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
 
-        private AudioSample sampleChangeDifficulty;
-        private AudioSample sampleChangeBeatmap;
+        private SampleChannel sampleChangeDifficulty;
+        private SampleChannel sampleChangeBeatmap;
 
         private List<BeatmapGroup> beatmapGroups;
 
@@ -317,7 +317,7 @@ namespace osu.Game.Screens.Select
 
         private void ensurePlayingSelected(bool preview = false)
         {
-            AudioTrack track = Beatmap?.Track;
+            Track track = Beatmap?.Track;
 
             if (track != null)
             {
