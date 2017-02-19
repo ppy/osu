@@ -11,8 +11,8 @@ namespace osu.Game.Modes.Osu
 {
     public class OsuDifficultyCalculator : DifficultyCalculator<OsuHitObject>
     {
-        private const double STAR_SCALING_FACTOR = 0.0675;
-        private const double EXTREME_SCALING_FACTOR = 0.5;
+        private const double star_scaling_factor = 0.0675;
+        private const double extreme_scaling_factor = 0.5;
 
         protected override PlayMode PlayMode => PlayMode.Osu;
 
@@ -63,8 +63,8 @@ namespace osu.Game.Modes.Osu
 
             // The following is a proposal to forge a star rating from 0 to 5. It consists of taking the square root of the difficulty, since by simply scaling the easier
             // 5-star maps would end up with one star.
-            double speedStars = Math.Sqrt(speedDifficulty) * STAR_SCALING_FACTOR;
-            double aimStars = Math.Sqrt(aimDifficulty) * STAR_SCALING_FACTOR;
+            double speedStars = Math.Sqrt(speedDifficulty) * star_scaling_factor;
+            double aimStars = Math.Sqrt(aimDifficulty) * star_scaling_factor;
 
             if (categoryDifficulty != null)
             {
@@ -86,7 +86,7 @@ namespace osu.Game.Modes.Osu
 
             // Again, from own observations and from the general opinion of the community a map with high speed and low aim (or vice versa) difficulty is harder,
             // than a map with mediocre difficulty in both. Therefore we can not just add both difficulties together, but will introduce a scaling that favors extremes.
-            double starRating = speedStars + aimStars + Math.Abs(speedStars - aimStars) * EXTREME_SCALING_FACTOR;
+            double starRating = speedStars + aimStars + Math.Abs(speedStars - aimStars) * extreme_scaling_factor;
             // Another approach to this would be taking Speed and Aim separately to a chosen power, which again would be equivalent. This would be more convenient if
             // the hit window size is to be considered as well.
 
