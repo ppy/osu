@@ -9,6 +9,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Configuration;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -16,7 +17,7 @@ namespace osu.Game.Graphics.Containers
     {
         public float ParallaxAmount = 0.02f;
 
-        private bool parallaxEnabled = true;
+        private Bindable<bool> parallaxEnabled;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
@@ -40,14 +41,13 @@ namespace osu.Game.Graphics.Containers
         private void load(UserInputManager input, OsuConfigManager config)
         {
             this.input = input;
-
-            config.GetBindable<bool>(OsuConfig.MenuParallax).ValueChanged += delegate
+            parallaxEnabled = config.GetBindable<bool>(OsuConfig.MenuParallax);
+            parallaxEnabled.ValueChanged += delegate
             {
-                parallaxEnabled = config.GetBindable<bool>(OsuConfig.MenuParallax);
                 if (!parallaxEnabled)
                 {
                     content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
-                    content.Scale = Vector2.One;
+                    content.Scale = new Vector2(1 + ParallaxAmount);
                 }
             };
         }
