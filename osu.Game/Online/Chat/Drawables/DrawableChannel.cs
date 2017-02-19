@@ -21,8 +21,8 @@ namespace osu.Game.Online.Chat.Drawables
         public DrawableChannel(Channel channel)
         {
             this.channel = channel;
-            newMessages(channel.Messages);
-            channel.NewMessagesArrived += newMessages;
+            newMessagesArrived(channel.Messages);
+            channel.NewMessagesArrived += newMessagesArrived;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -56,16 +56,16 @@ namespace osu.Game.Online.Chat.Drawables
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            channel.NewMessagesArrived -= newMessages;
+            channel.NewMessagesArrived -= newMessagesArrived;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            newMessages(channel.Messages);
+            newMessagesArrived(channel.Messages);
         }
 
-        private void newMessages(IEnumerable<Message> newMessages)
+        private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
             if (!IsLoaded) return;
 
