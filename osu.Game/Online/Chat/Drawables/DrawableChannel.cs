@@ -13,12 +13,12 @@ using OpenTK;
 
 namespace osu.Game.Online.Chat.Drawables
 {
-    public class ChannelDisplay : Container
+    public class DrawableChannel : Container
     {
         private readonly Channel channel;
         private FlowContainer flow;
 
-        public ChannelDisplay(Channel channel)
+        public DrawableChannel(Channel channel)
         {
             this.channel = channel;
             newMessages(channel.Messages);

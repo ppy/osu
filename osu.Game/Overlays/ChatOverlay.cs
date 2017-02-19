@@ -24,7 +24,7 @@ namespace osu.Game.Overlays
 {
     public class ChatOverlay : OverlayContainer, IOnlineComponent
     {
-        private ChannelDisplay channelDisplay;
+        private DrawableChannel channelDisplay;
 
         private ScheduledDelegate messageRequest;
 
@@ -69,7 +69,7 @@ namespace osu.Game.Overlays
 
         private void addChannel(Channel channel)
         {
-            Add(channelDisplay = new ChannelDisplay(channel));
+            Add(channelDisplay = new DrawableChannel(channel));
             careChannels.Add(channel);
         }
 
