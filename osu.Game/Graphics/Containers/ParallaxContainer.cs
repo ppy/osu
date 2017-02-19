@@ -17,22 +17,6 @@ namespace osu.Game.Graphics.Containers
         public float ParallaxAmount = 0.02f;
 
         private bool parallaxEnabled = true;
-        public bool ParallaxEnabled
-        {
-            get
-            {
-                return parallaxEnabled;
-            }
-            set
-            {
-                parallaxEnabled = value;
-                if (!parallaxEnabled)
-                {
-                    content.MoveTo(Vector2.Zero, 1000, EasingTypes.OutQuint);
-                    content.Scale = Vector2.One;
-                }
-            }
-        }
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
@@ -59,7 +43,12 @@ namespace osu.Game.Graphics.Containers
 
             config.GetBindable<bool>(OsuConfig.MenuParallax).ValueChanged += delegate
             {
-                ParallaxEnabled = config.GetBindable<bool>(OsuConfig.MenuParallax);
+                parallaxEnabled = config.GetBindable<bool>(OsuConfig.MenuParallax);
+                if (!parallaxEnabled)
+                {
+                    content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
+                    content.Scale = Vector2.One;
+                }
             };
         }
 
@@ -69,7 +58,7 @@ namespace osu.Game.Graphics.Containers
         {
             base.Update();
 
-            if (ParallaxEnabled) { 
+            if (parallaxEnabled) { 
                 Vector2 offset = input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2;
                 content.MoveTo(offset * ParallaxAmount, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
                 content.Scale = new Vector2(1 + ParallaxAmount);
