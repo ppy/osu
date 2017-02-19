@@ -40,6 +40,8 @@ namespace osu.Game.Modes.Osu
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => new OsuScoreProcessor(hitObjectCount);
 
+        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
+
         protected override PlayMode PlayMode => PlayMode.Osu;
     }
 }

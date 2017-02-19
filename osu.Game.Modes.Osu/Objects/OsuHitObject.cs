@@ -25,6 +25,8 @@ namespace osu.Game.Modes.Osu.Objects
 
         public float Scale { get; set; } = 1;
 
+        public abstract HitObjectType Type { get; }
+
         public override void SetDefaultsFromBeatmap(Beatmap beatmap)
         {
             base.SetDefaultsFromBeatmap(beatmap);
@@ -36,14 +38,12 @@ namespace osu.Game.Modes.Osu.Objects
     [Flags]
     public enum HitObjectType
     {
-        Circle = 1,
-        Slider = 2,
-        NewCombo = 4,
-        CircleNewCombo = 5,
-        SliderNewCombo = 6,
-        Spinner = 8,
+        Circle = 1 << 0,
+        Slider = 1 << 1,
+        NewCombo = 1 << 2,
+        Spinner = 1 << 3,
         ColourHax = 122,
-        Hold = 128,
-        ManiaLong = 128,
+        Hold = 1 << 7,
+        SliderTick = 1 << 8,
     }
 }
