@@ -19,6 +19,10 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Chat.Drawables;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Select;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
@@ -31,6 +35,8 @@ namespace osu.Game.Overlays
         private Container content;
 
         protected override Container<Drawable> Content => content;
+
+        private FocusedTextBox inputTextBox;
 
         private APIAccess api;
 
@@ -52,8 +58,36 @@ namespace osu.Game.Overlays
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Bottom = 50 },
+                },
+                new Container
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 50,
+                    Padding = new MarginPadding(5),
+                    Children = new Drawable[]
+                    {
+                        inputTextBox = new FocusedTextBox
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            PlaceholderText = "type your message",
+                            Exit = () => State = Visibility.Hidden,
+                            OnCommit = postMessage,
+                            HoldFocus = true,
+                        }
+                    }
                 }
             });
+        }
+
+        private void postMessage(TextBox sender, bool newText)
+        {
+            var postText = sender.Text;
+            //todo: do something with postText.
+
+            sender.Text = string.Empty;
         }
 
         [BackgroundDependencyLoader]
