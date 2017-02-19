@@ -47,9 +47,11 @@ namespace osu.Game.Modes.Osu.Objects
 
         internal int MaxCombo = 1;
 
-        private Vector2 normalizedStartPosition;
-        private Vector2 normalizedEndPosition;
+        private float scalingFactor;
         private float lazySliderLength;
+
+        private Vector2 startPosition;
+        private Vector2 endPosition;
 
         internal OsuHitObjectDifficulty(OsuHitObject baseHitObject)
         {
@@ -61,16 +63,15 @@ namespace osu.Game.Modes.Osu.Objects
                 MaxCombo += slider.Ticks.Count();
 
             // We will scale everything by this factor, so we can assume a uniform CircleSize among beatmaps.
-            float scalingFactor = (52.0f / circleRadius);
+            scalingFactor = (52.0f / circleRadius);
             if (circleRadius < 30)
             {
                 float smallCircleBonus = Math.Min(30.0f - circleRadius, 5.0f) / 50.0f;
                 scalingFactor *= 1.0f + smallCircleBonus;
             }
 
-            normalizedStartPosition = BaseHitObject.StackedPosition * scalingFactor;
-
             lazySliderLength = 0;
+            startPosition = baseHitObject.StackedPosition;
 
             // Calculate approximation of lazy movement on the slider
             if (slider != null)
@@ -78,7 +79,7 @@ namespace osu.Game.Modes.Osu.Objects
                 float sliderFollowCircleRadius = circleRadius * 3; // Not sure if this is correct, but here we do not need 100% exact values. This comes pretty darn close in my tests.
 
                 // For simplifying this step we use actual osu! coordinates and simply scale the length, that we obtain by the ScalingFactor later
-                Vector2 cursorPos = baseHitObject.StackedPosition;
+                Vector2 cursorPos = startPosition;
 
                 Action<Vector2> addSliderVertex = delegate (Vector2 pos)
                 {
@@ -103,11 +104,11 @@ namespace osu.Game.Modes.Osu.Objects
                 addSliderVertex(baseHitObject.StackedEndPosition);
 
                 lazySliderLength *= scalingFactor;
-                normalizedEndPosition = cursorPos * scalingFactor;
+                endPosition = cursorPos;
             }
             // We have a normal HitCircle or a spinner
             else
-                normalizedEndPosition = normalizedStartPosition;
+                endPosition = startPosition;
         }
 
         internal void CalculateStrains(OsuHitObjectDifficulty previousHitObject, double timeRate)
@@ -194,7 +195,7 @@ namespace osu.Game.Modes.Osu.Objects
         internal double DistanceTo(OsuHitObjectDifficulty other)
         {
             // Scale the distance by circle size.
-            return (normalizedStartPosition - other.normalizedEndPosition).Length;
+            return (startPosition - other.endPosition).Length * scalingFactor;
         }
     }
 }
