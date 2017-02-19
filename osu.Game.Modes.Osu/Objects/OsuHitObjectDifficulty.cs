@@ -26,8 +26,8 @@ namespace osu.Game.Modes.Osu.Objects
         ///  Of course the border can not be defined clearly, therefore the algorithm has a smooth transition between those values.
         ///  They also are based on tweaking and general feedback.
         /// </remarks>
-        private const double STREAM_SPACING_TRESHOLD = 110,
-                             SINGLE_SPACING_TRESHOLD = 125;
+        private const double stream_spacing_threshold = 110,
+                             single_spacing_threshold = 125;
 
         /// <summary>
         /// Scaling values for weightings to keep aim and speed difficulty in balance.
@@ -35,12 +35,12 @@ namespace osu.Game.Modes.Osu.Objects
         /// <remarks>
         /// Found from testing a very large map pool (containing all ranked maps) and keeping the average values the same.
         /// </remarks>
-        private static readonly double[] SPACING_WEIGHT_SCALING = { 1400, 26.25 };
+        private static readonly double[] spacing_weight_scaling = { 1400, 26.25 };
 
         /// <summary>
         /// Almost the normed diameter of a circle (104 osu pixel). That is -after- position transforming.
         /// </summary>
-        private const double ALMOST_DIAMETER = 90;
+        private const double almost_diameter = 90;
 
         internal OsuHitObject BaseHitObject;
         internal double[] Strains = { 1, 1 };
@@ -122,14 +122,14 @@ namespace osu.Game.Modes.Osu.Objects
             switch (type)
             {
                 case OsuDifficultyCalculator.DifficultyType.Speed:
-                    if (distance > SINGLE_SPACING_TRESHOLD)
+                    if (distance > single_spacing_threshold)
                         return 2.5;
-                    else if (distance > STREAM_SPACING_TRESHOLD)
-                        return 1.6 + 0.9 * (distance - STREAM_SPACING_TRESHOLD) / (SINGLE_SPACING_TRESHOLD - STREAM_SPACING_TRESHOLD);
-                    else if (distance > ALMOST_DIAMETER)
-                        return 1.2 + 0.4 * (distance - ALMOST_DIAMETER) / (STREAM_SPACING_TRESHOLD - ALMOST_DIAMETER);
-                    else if (distance > ALMOST_DIAMETER / 2)
-                        return 0.95 + 0.25 * (distance - (ALMOST_DIAMETER / 2)) / (ALMOST_DIAMETER / 2);
+                    else if (distance > stream_spacing_threshold)
+                        return 1.6 + 0.9 * (distance - stream_spacing_threshold) / (single_spacing_threshold - stream_spacing_threshold);
+                    else if (distance > almost_diameter)
+                        return 1.2 + 0.4 * (distance - almost_diameter) / (stream_spacing_threshold - almost_diameter);
+                    else if (distance > almost_diameter / 2)
+                        return 0.95 + 0.25 * (distance - (almost_diameter / 2)) / (almost_diameter / 2);
                     else
                         return 0.95;
 
@@ -162,7 +162,7 @@ namespace osu.Game.Modes.Osu.Objects
                         addition =
                             spacingWeight(previousHitObject.lazySliderLength +
                                           DistanceTo(previousHitObject), type) *
-                            SPACING_WEIGHT_SCALING[(int)type];
+                            spacing_weight_scaling[(int)type];
 
                         break;
                     case OsuDifficultyCalculator.DifficultyType.Aim:
@@ -174,14 +174,14 @@ namespace osu.Game.Modes.Osu.Objects
                                 spacingWeight(previousHitObject.lazySliderLength, type) +
                                 spacingWeight(DistanceTo(previousHitObject), type)
                             ) *
-                            SPACING_WEIGHT_SCALING[(int)type];
+                            spacing_weight_scaling[(int)type];
 
                         break;
                 }
             }
             else if (BaseHitObject.Type == HitObjectType.Circle)
             {
-                addition = spacingWeight(DistanceTo(previousHitObject), type) * SPACING_WEIGHT_SCALING[(int)type];
+                addition = spacingWeight(DistanceTo(previousHitObject), type) * spacing_weight_scaling[(int)type];
             }
 
             // Scale addition by the time, that elapsed. Filter out HitObjects that are too close to be played anyway to avoid crazy values by division through close to zero.
