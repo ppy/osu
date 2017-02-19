@@ -17,6 +17,7 @@ namespace osu.Game.Online.Chat.Drawables
     {
         private readonly Channel channel;
         private FlowContainer flow;
+        private ScrollContainer scroll;
 
         public DrawableChannel(Channel channel)
         {
@@ -36,7 +37,7 @@ namespace osu.Game.Online.Chat.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
-                new ScrollContainer
+                scroll = new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -77,6 +78,8 @@ namespace osu.Game.Online.Chat.Drawables
 
             while (flow.Children.Count() > Channel.MAX_HISTORY)
                 flow.Remove(flow.Children.First());
+
+            scroll.ScrollTo(flow.DrawHeight, false);
         }
     }
 }
