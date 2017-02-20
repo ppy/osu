@@ -337,11 +337,13 @@ namespace osu.Game.Screens.Select
                 if (b.Metadata == null) b.Metadata = beatmapSet.Metadata;
             });
 
+            foreach (var b in beatmapSet.Beatmaps)
+                b.ComputeDifficulty(database);
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.StarDifficulty).ToList();
 
             var beatmap = new WorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault(), beatmapSet, database);
 
-            var group = new BeatmapGroup(beatmap, beatmapSet)
+            var group = new BeatmapGroup(beatmap)
             {
                 SelectionChanged = selectionChanged,
                 StartRequested = b => start()
