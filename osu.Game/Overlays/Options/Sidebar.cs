@@ -74,7 +74,6 @@ namespace osu.Game.Overlays.Options
             {
                 Content.Anchor = Anchor.CentreLeft;
                 Content.Origin = Anchor.CentreLeft;
-                RelativeSizeAxes = Axes.Both;
             }
         }
     }

@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
-using osu.Framework.Screens;
+using osu.Framework.GameModes;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Graphics.Containers;
@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    public class Intro : OsuScreen
+    class Intro : OsuGameMode
     {
         private OsuLogo logo;
 
@@ -24,13 +24,13 @@ namespace osu.Game.Screens.Menu
         internal bool DidLoadMenu;
 
         MainMenu mainMenu;
-        private SampleChannel welcome;
-        private SampleChannel seeya;
-        private Track bgm;
+        private AudioSample welcome;
+        private AudioSample seeya;
+        private AudioTrack bgm;
 
-        internal override bool ShowOverlays => false;
+        internal override bool ShowOverlays => (ParentGameMode as OsuGameMode)?.ShowOverlays ?? false;
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenEmpty();
+        protected override BackgroundMode CreateBackground() => new BackgroundModeEmpty();
 
         public Intro()
         {
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Menu
             bgm.Looping = true;
         }
 
-        protected override void OnEntering(Screen last)
+        protected override void OnEntering(GameMode last)
         {
             base.OnEntering(last);
 
@@ -77,7 +77,8 @@ namespace osu.Game.Screens.Menu
                 {
                     bgm.Start();
 
-                    (mainMenu = new MainMenu()).Preload(Game);
+                    mainMenu = new MainMenu();
+                    mainMenu.Preload(Game);
 
                     Scheduler.AddDelayed(delegate
                     {
@@ -94,27 +95,24 @@ namespace osu.Game.Screens.Menu
             logo.FadeIn(20000, EasingTypes.OutQuint);
         }
 
-        protected override void OnSuspending(Screen next)
+        protected override void OnSuspending(GameMode next)
         {
             Content.FadeOut(300);
             base.OnSuspending(next);
         }
 
-        protected override bool OnExiting(Screen next)
+        protected override bool OnExiting(GameMode next)
         {
             //cancel exiting if we haven't loaded the menu yet.
             return !DidLoadMenu;
         }
 
-        protected override void OnResuming(Screen last)
+        protected override void OnResuming(GameMode last)
         {
-            if (!(last is MainMenu))
-                Content.FadeIn(300);
-
             //we also handle the exit transition.
             seeya.Play();
 
-            double fadeOutTime = 2000;
+            double fadeOutTime = (last.LifetimeEnd - Time.Current) + 100;
 
             Scheduler.AddDelayed(Exit, fadeOutTime);
 

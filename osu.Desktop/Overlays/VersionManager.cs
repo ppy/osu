@@ -24,10 +24,6 @@ namespace osu.Desktop.Overlays
         private UpdateManager updateManager;
         private NotificationManager notification;
 
-        AssemblyName assembly = Assembly.GetEntryAssembly().GetName();
-
-        public bool IsDeployedBuild => assembly.Version.Major > 0;
-
         protected override bool HideOnEscape => false;
 
         public override bool HandleInput => false;
@@ -45,13 +41,14 @@ namespace osu.Desktop.Overlays
             bool isDebug = false;
             Debug.Assert(isDebug = true);
 
+            var asm = Assembly.GetEntryAssembly().GetName();
             string version;
-            if (!IsDeployedBuild)
+            if (asm.Version.Major == 0)
             {
                 version = @"local " + (isDebug ? @"debug" : @"release");
             }
             else
-                version = $@"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}";
+                version = $@"{asm.Version.Major}.{asm.Version.Minor}.{asm.Version.Build}";
 
             Children = new Drawable[]
             {

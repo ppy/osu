@@ -5,7 +5,7 @@ using System;
 using System.Threading;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Screens;
+using osu.Framework.GameModes;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
@@ -13,9 +13,9 @@ using OpenTK;
 
 namespace osu.Game.Screens
 {
-    public abstract class BackgroundScreen : Screen, IEquatable<BackgroundScreen>
+    public abstract class BackgroundMode : GameMode, IEquatable<BackgroundMode>
     {
-        public virtual bool Equals(BackgroundScreen other)
+        public virtual bool Equals(BackgroundMode other)
         {
             return other?.GetType() == GetType();
         }
@@ -37,21 +37,21 @@ namespace osu.Game.Screens
             this.game = game;
         }
 
-        public override bool Push(Screen screen)
+        public override bool Push(GameMode mode)
         {
             // When trying to push a non-loaded GameMode, load it asynchronously and re-invoke Push
             // once it's done.
-            if (screen.LoadState == LoadState.NotLoaded)
+            if (mode.LoadState == LoadState.NotLoaded)
             {
-                screen.Preload(game, d => Push((BackgroundScreen)d));
+                mode.Preload(game, d => Push((BackgroundMode)d));
                 return true;
             }
 
             // Make sure the in-progress loading is complete before pushing the GameMode.
-            while (screen.LoadState < LoadState.Loaded)
+            while (mode.LoadState < LoadState.Loaded)
                 Thread.Sleep(1);
 
-            base.Push(screen);
+            base.Push(mode);
 
             return true;
         }
@@ -62,7 +62,7 @@ namespace osu.Game.Screens
             Content.Scale = new Vector2(1 + (x_movement_amount / DrawSize.X) * 2);
         }
 
-        protected override void OnEntering(Screen last)
+        protected override void OnEntering(GameMode last)
         {
             Content.FadeOut();
             Content.MoveToX(x_movement_amount);
@@ -73,13 +73,13 @@ namespace osu.Game.Screens
             base.OnEntering(last);
         }
 
-        protected override void OnSuspending(Screen next)
+        protected override void OnSuspending(GameMode next)
         {
             Content.MoveToX(-x_movement_amount, transition_length, EasingTypes.InOutQuart);
             base.OnSuspending(next);
         }
 
-        protected override bool OnExiting(Screen next)
+        protected override bool OnExiting(GameMode next)
         {
             Content.FadeOut(transition_length, EasingTypes.OutExpo);
             Content.MoveToX(x_movement_amount, transition_length, EasingTypes.OutExpo);
@@ -87,7 +87,7 @@ namespace osu.Game.Screens
             return base.OnExiting(next);
         }
 
-        protected override void OnResuming(Screen last)
+        protected override void OnResuming(GameMode last)
         {
             Content.MoveToX(0, transition_length, EasingTypes.OutExpo);
             base.OnResuming(last);
