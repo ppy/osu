@@ -13,6 +13,11 @@ namespace osu.Game.Input
 
         public override bool HandleInput => true;
 
+        public GlobalHotkeys()
+        {
+            RelativeSizeAxes = Axes.Both;
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             return Handler(state, args);
