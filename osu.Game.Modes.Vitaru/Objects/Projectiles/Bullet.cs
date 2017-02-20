@@ -62,10 +62,6 @@ namespace osu.Game.Modes.Vitaru.Objects.Projectiles
             bulletVelocity.X = bulletSpeed * ((float)Math.Sin(bulletAngle * (Math.PI / 180)));
             return bulletVelocity;
         }
-        internal float getBulletRadius()
-        {
-            return (bulletWidth * 0.75f);
-        }
         internal void deleteBullet()
         {
             bulletsLoaded--;
