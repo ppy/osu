@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,10 +21,12 @@ using osu.Game.Online.Chat.Drawables;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
+using OpenTK.Graphics;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OverlayContainer, IOnlineComponent
+    public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent
     {
         private DrawableChannel channelDisplay;
 
@@ -50,7 +53,8 @@ namespace osu.Game.Overlays
                 {
                     Depth = float.MaxValue,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.1f).Opacity(0.4f),
+                    Colour = Color4.Black,
+                    Alpha = 0.9f,
                 },
                 content = new Container
                 {
@@ -62,13 +66,14 @@ namespace osu.Game.Overlays
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
-                    Height = 50,
+                    Height = 40,
                     Padding = new MarginPadding(5),
                     Children = new Drawable[]
                     {
                         inputTextBox = new FocusedTextBox
                         {
-                            RelativeSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Both,
+                            Height = 1,
                             PlaceholderText = "type your message",
                             Exit = () => State = Visibility.Hidden,
                             OnCommit = postMessage,
@@ -77,6 +82,13 @@ namespace osu.Game.Overlays
                     }
                 }
             });
+        }
+
+        protected override bool OnFocus(InputState state)
+        {
+            //this is necessary as inputTextBox is masked away and therefore can't get focus :(
+            inputTextBox.TriggerFocus();
+            return false;
         }
 
         private void postMessage(TextBox sender, bool newText)
