@@ -70,10 +70,10 @@ namespace osu.Game.Modes.Vitaru.Objects.Characters
                     {
                         Vector2 bulletPos = bullet.ToSpaceOfOtherDrawable(Vector2.Zero, this);
                         float distance = (float)Math.Sqrt(Math.Pow(bulletPos.X, 2) + Math.Pow(bulletPos.Y, 2));
-                        float minDist = hitbox.hitboxWidth + bullet.bulletWidth;
+                        float minDist = hitbox.HitboxWidth + bullet.BulletWidth;
                         if (distance < minDist)
                         {
-                            bullet.deleteBullet();
+                            bullet.Dispose();
                             if (TakeDamage(bullet.bulletDamage))
                                 break;
                         }

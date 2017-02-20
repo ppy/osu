@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
-using osu.Framework.GameModes;
+using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Graphics.Containers;
@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    class Intro : OsuGameMode
+    class Intro : OsuScreen
     {
         private OsuLogo logo;
 
@@ -24,11 +24,11 @@ namespace osu.Game.Screens.Menu
         internal bool DidLoadMenu;
 
         MainMenu mainMenu;
-        private AudioSample welcome;
-        private AudioSample seeya;
-        private AudioTrack bgm;
+        private SampleChannel welcome;
+        private SampleChannel seeya;
+        private Track bgm;
 
-        internal override bool ShowOverlays => (ParentGameMode as OsuGameMode)?.ShowOverlays ?? false;
+        internal override bool ShowOverlays => (ParentScreen as OsuScreen)?.ShowOverlays ?? false;
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeEmpty();
 
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Menu
             bgm.Looping = true;
         }
 
-        protected override void OnEntering(GameMode last)
+        protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
 
@@ -95,19 +95,19 @@ namespace osu.Game.Screens.Menu
             logo.FadeIn(20000, EasingTypes.OutQuint);
         }
 
-        protected override void OnSuspending(GameMode next)
+        protected override void OnSuspending(Screen next)
         {
             Content.FadeOut(300);
             base.OnSuspending(next);
         }
 
-        protected override bool OnExiting(GameMode next)
+        protected override bool OnExiting(Screen next)
         {
             //cancel exiting if we haven't loaded the menu yet.
             return !DidLoadMenu;
         }
 
-        protected override void OnResuming(GameMode last)
+        protected override void OnResuming(Screen last)
         {
             //we also handle the exit transition.
             seeya.Play();

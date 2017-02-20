@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CatchDifficultyCalculator.cs" />
     <Compile Include="Objects\CatchBaseHit.cs" />
     <Compile Include="Objects\CatchConverter.cs" />
     <Compile Include="Objects\Drawable\DrawableFruit.cs" />

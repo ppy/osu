@@ -1,4 +1,4 @@
-﻿using osu.Framework.GameModes.Testing;
+﻿using osu.Framework.Screens.Testing;
 using osu.Game.Modes.Vitaru.Objects.Characters;
 using System;
 using System.Collections.Generic;

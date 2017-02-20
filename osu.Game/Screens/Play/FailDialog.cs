@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.GameModes;
+using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    class FailDialog : OsuGameMode
+    class FailDialog : OsuScreen
     {
         protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
 
@@ -31,13 +31,13 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        protected override void OnEntering(GameMode last)
+        protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
             Background.Schedule(() => (Background as BackgroundModeBeatmap)?.BlurTo(background_blur, 1000));
         }
 
-        protected override bool OnExiting(GameMode next)
+        protected override bool OnExiting(Screen next)
         {
             Background.Schedule(() => Background.FadeColour(Color4.White, 500));
             return base.OnExiting(next);
