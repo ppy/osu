@@ -8,6 +8,7 @@ using osu.Game.Modes;
 using osu.Game.Screens.Play;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Database
 {
@@ -73,7 +74,23 @@ namespace osu.Game.Database
         // Metadata
         public string Version { get; set; }
 
-        public float StarDifficulty => BaseDifficulty?.OverallDifficulty ?? 5; //todo: implement properly
+        //todo: background threaded computation of this
+        private float starDifficulty = -1;
+        public float StarDifficulty
+        {
+            get
+            {
+                return (starDifficulty < 0) ? (BaseDifficulty?.OverallDifficulty ?? 5) : starDifficulty;
+            }
+            
+            set { starDifficulty = value; }
+        }
+
+        internal void ComputeDifficulty(BeatmapDatabase database)
+        {
+            WorkingBeatmap wb = new WorkingBeatmap(this, BeatmapSet, database);
+            StarDifficulty = (float)Ruleset.GetRuleset(Mode).CreateDifficultyCalculator(wb.Beatmap).GetDifficulty();
+        }
 
         public bool Equals(BeatmapInfo other)
         {

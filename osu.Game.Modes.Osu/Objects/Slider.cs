@@ -110,6 +110,8 @@ namespace osu.Game.Modes.Osu.Objects
                 }
             }
         }
+
+        public override HitObjectType Type => HitObjectType.Slider;
     }
 
     public enum CurveTypes
