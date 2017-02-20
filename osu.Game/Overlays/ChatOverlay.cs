@@ -23,7 +23,7 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OverlayContainer, IOnlineComponent
+    public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent
     {
         private DrawableChannel channelDisplay;
 
@@ -138,6 +138,8 @@ namespace osu.Game.Overlays
         {
             MoveToY(0, transition_length, EasingTypes.OutQuint);
             FadeIn(transition_length, EasingTypes.OutQuint);
+
+            inputTextBox.Schedule(TriggerFocusContention);
         }
 
         protected override void PopOut()

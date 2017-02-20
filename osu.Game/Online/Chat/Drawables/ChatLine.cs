@@ -14,7 +14,7 @@ namespace osu.Game.Online.Chat.Drawables
     {
         public readonly Message Message;
 
-        const float padding = 250;
+        const float padding = 200;
         const float text_size = 20;
 
         public ChatLine(Message message)
@@ -37,7 +37,7 @@ namespace osu.Game.Online.Chat.Drawables
                         {
                             Text = $@"{Message.Timestamp.LocalDateTime:hh:mm:ss}",
                             FixedWidth = true,
-                            TextSize = text_size,
+                            TextSize = text_size * 0.75f,
                             Colour = Color4.Gray
                         },
                         new OsuSpriteText

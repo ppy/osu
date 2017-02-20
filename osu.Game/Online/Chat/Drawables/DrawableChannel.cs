@@ -4,10 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 
@@ -35,7 +33,7 @@ namespace osu.Game.Online.Chat.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
-                scroll = new ScrollContainer
+                scroll = new ChannelScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -73,8 +71,11 @@ namespace osu.Game.Online.Chat.Drawables
 
             while (flow.Children.Count() > Channel.MAX_HISTORY)
                 flow.Remove(flow.Children.First());
-
-            scroll.ScrollTo(flow.DrawHeight, false);
         }
+    }
+
+    class ChannelScrollContainer : ScrollContainer
+    {
+
     }
 }
