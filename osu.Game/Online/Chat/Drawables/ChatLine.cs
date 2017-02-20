@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
@@ -25,6 +24,8 @@ namespace osu.Game.Online.Chat.Drawables
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            Padding = new MarginPadding { Left = 15, Right = 15 };
+
             Children = new Drawable[]
             {
                 new Container
@@ -34,13 +35,15 @@ namespace osu.Game.Online.Chat.Drawables
                     {
                         new OsuSpriteText
                         {
-                            Text = Message.Timestamp.LocalDateTime.ToLongTimeString(),
-                            TextSize = text_size,
+                            Text = $@"{Message.Timestamp.LocalDateTime:hh:mm:ss}",
+                            FixedWidth = true,
+                            TextSize = text_size * 0.75f,
                             Colour = Color4.Gray
                         },
                         new OsuSpriteText
                         {
-                            Text = Message.User.Name,
+                            Font = @"Exo2.0-BoldItalic",
+                            Text = $@"{Message.User.Name}:",
                             TextSize = text_size,
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
@@ -51,7 +54,7 @@ namespace osu.Game.Online.Chat.Drawables
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = padding + 10 },
+                    Padding = new MarginPadding { Left = padding + 15 },
                     Children = new Drawable[]
                     {
                         new OsuSpriteText

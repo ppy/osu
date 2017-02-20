@@ -4,25 +4,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 
 namespace osu.Game.Online.Chat.Drawables
 {
-    public class ChannelDisplay : Container
+    public class DrawableChannel : Container
     {
         private readonly Channel channel;
         private FlowContainer flow;
+        private ScrollContainer scroll;
 
-        public ChannelDisplay(Channel channel)
+        public DrawableChannel(Channel channel)
         {
             this.channel = channel;
-            newMessages(channel.Messages);
-            channel.NewMessagesArrived += newMessages;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -36,7 +33,7 @@ namespace osu.Game.Online.Chat.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
-                new ScrollContainer
+                scroll = new ChannelScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -51,21 +48,18 @@ namespace osu.Game.Online.Chat.Drawables
                     }
                 }
             };
+
+            channel.NewMessagesArrived += newMessagesArrived;
+            newMessagesArrived(channel.Messages);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            channel.NewMessagesArrived -= newMessages;
+            channel.NewMessagesArrived -= newMessagesArrived;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            newMessages(channel.Messages);
-        }
-
-        private void newMessages(IEnumerable<Message> newMessages)
+        private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
             if (!IsLoaded) return;
 
@@ -78,5 +72,10 @@ namespace osu.Game.Online.Chat.Drawables
             while (flow.Children.Count() > Channel.MAX_HISTORY)
                 flow.Remove(flow.Children.First());
         }
+    }
+
+    class ChannelScrollContainer : ScrollContainer
+    {
+
     }
 }

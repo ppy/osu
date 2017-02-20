@@ -70,6 +70,7 @@
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
+    <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
     <Compile Include="Graphics\UserInterface\Nub.cs" />
     <Compile Include="Graphics\UserInterface\OsuPasswordTextBox.cs" />
     <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
@@ -189,7 +190,7 @@
     <Compile Include="Online\API\SecurePassword.cs" />
     <Compile Include="Online\API\Requests\ListChannels.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
-    <Compile Include="Online\Chat\Drawables\ChannelDisplay.cs" />
+    <Compile Include="Online\Chat\Drawables\DrawableChannel.cs" />
     <Compile Include="Online\Chat\Drawables\ChatLine.cs" />
     <Compile Include="Online\Chat\Message.cs" />
     <Compile Include="Online\User.cs" />
