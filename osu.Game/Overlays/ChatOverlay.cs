@@ -82,7 +82,20 @@ namespace osu.Game.Overlays
         private void postMessage(TextBox sender, bool newText)
         {
             var postText = sender.Text;
-            //todo: do something with postText.
+
+            if (!string.IsNullOrEmpty(postText))
+            {
+                //todo: actually send to server
+                careChannels.FirstOrDefault()?.AddNewMessages(new[]
+                            {
+                                new Message
+                                {
+                                    User = api.LocalUser.Value,
+                                    Timestamp = DateTimeOffset.Now,
+                                    Content = postText
+                                }
+                            });
+            }
 
             sender.Text = string.Empty;
         }
