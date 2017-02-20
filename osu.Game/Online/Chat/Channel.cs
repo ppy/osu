@@ -3,12 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using Newtonsoft.Json;
-using osu.Framework.Configuration;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Online.Chat
 {
@@ -37,9 +32,9 @@ namespace osu.Game.Online.Chat
         {
         }
 
-        public event Action<Message[]> NewMessagesArrived;
+        public event Action<IEnumerable<Message>> NewMessagesArrived;
 
-        public void AddNewMessages(params Message[] messages)
+        public void AddNewMessages(IEnumerable<Message> messages)
         {
             Messages.AddRange(messages);
             purgeOldMessages();
