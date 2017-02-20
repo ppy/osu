@@ -12,7 +12,7 @@ using osu.Game.Modes;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
-using osu.Framework.GameModes;
+using osu.Framework.Screens;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
@@ -27,7 +27,7 @@ using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Play
 {
-    public class Player : OsuGameMode
+    public class Player : OsuScreen
     {
         public bool Autoplay;
 
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            AudioTrack track = Beatmap.Track;
+            Track track = Beatmap.Track;
 
             if (track != null)
             {
@@ -281,7 +281,7 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        protected override void OnEntering(GameMode last)
+        protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
 
@@ -292,7 +292,7 @@ namespace osu.Game.Screens.Play
             dimLevel.ValueChanged += dimChanged;
         }
 
-        protected override bool OnExiting(GameMode next)
+        protected override bool OnExiting(Screen next)
         {
             if (pauseOverlay == null) return false;
 
