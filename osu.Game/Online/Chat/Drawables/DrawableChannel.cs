@@ -52,7 +52,14 @@ namespace osu.Game.Online.Chat.Drawables
             };
 
             channel.NewMessagesArrived += newMessagesArrived;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             newMessagesArrived(channel.Messages);
+            scrollToEnd();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -67,14 +74,25 @@ namespace osu.Game.Online.Chat.Drawables
 
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
+            if (scroll.IsScrolledToEnd || !flow.Children.Any())
+                scrollToEnd();
+
             //up to last Channel.MAX_HISTORY messages
             foreach (Message m in displayMessages)
-                flow.Add(new ChatLine(m));
+            {
+                var d = new ChatLine(m);
+                flow.Add(d);
+            }
 
-            while (flow.Children.Count() > Channel.MAX_HISTORY)
-                flow.Remove(flow.Children.First());
-
-            scroll.ScrollTo(flow.DrawHeight, false);
+            while (flow.Children.Count(c => c.LifetimeEnd == double.MaxValue) > Channel.MAX_HISTORY)
+            {
+                var d = flow.Children.First(c => c.LifetimeEnd == double.MaxValue);
+                if (!scroll.IsScrolledToEnd)
+                    scroll.OffsetScrollPosition(-d.DrawHeight);
+                d.Expire();
+            }
         }
+
+        private void scrollToEnd() => Scheduler.AddDelayed(() => scroll.ScrollToEnd(), 50);
     }
 }
