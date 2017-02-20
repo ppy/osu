@@ -30,7 +30,7 @@ namespace osu.Game.Online.Chat
 
         //internal bool Joined;
 
-        public const int MAX_HISTORY = 100;
+        public const int MAX_HISTORY = 300;
 
         [JsonConstructor]
         public Channel()
