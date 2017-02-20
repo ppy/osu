@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Platform;
 using osu.Framework.Screens.Testing;
+using osu.Framework.MathUtils;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Select;
@@ -15,7 +16,6 @@ namespace osu.Desktop.VisualTests.Tests
     {
         private BeatmapDatabase db, oldDb;
         private TestStorage storage;
-        private Random rnd = new Random();
         private PlaySongSelect songSelect;
 
         public override string Name => @"Song Select";
@@ -78,9 +78,9 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     OnlineBeatmapSetID = 1234 + i,
                     // Create random metadata, then we can check if sorting works based on these
-                    Artist = "MONACA " + rnd.Next(0, 9),
-                    Title = "Black Song " + rnd.Next(0, 9),
-                    Author = "Some Guy " + rnd.Next(0, 9),
+                    Artist = "MONACA " + RNG.Next(0, 9),
+                    Title = "Black Song " + RNG.Next(0, 9),
+                    Author = "Some Guy " + RNG.Next(0, 9),
                 },
                 Beatmaps = new List<BeatmapInfo>(new[]
                 {
