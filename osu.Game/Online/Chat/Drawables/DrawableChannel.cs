@@ -75,7 +75,7 @@ namespace osu.Game.Online.Chat.Drawables
 
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
-            if (scroll.IsScrolledToEnd || !flow.Children.Any())
+            if (scroll.IsScrolledToEnd(10) || !flow.Children.Any())
                 scrollToEnd();
 
             //up to last Channel.MAX_HISTORY messages
@@ -88,7 +88,7 @@ namespace osu.Game.Online.Chat.Drawables
             while (flow.Children.Count(c => c.LifetimeEnd == double.MaxValue) > Channel.MAX_HISTORY)
             {
                 var d = flow.Children.First(c => c.LifetimeEnd == double.MaxValue);
-                if (!scroll.IsScrolledToEnd)
+                if (!scroll.IsScrolledToEnd(10))
                     scroll.OffsetScrollPosition(-d.DrawHeight);
                 d.Expire();
             }
