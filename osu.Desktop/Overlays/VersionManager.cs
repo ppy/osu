@@ -119,33 +119,35 @@ namespace osu.Desktop.Overlays
             try
             {
                 updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true);
-            }
-            catch(HttpRequestException)
-            {
-                //check again every 30 minutes.
-                Scheduler.AddDelayed(updateChecker, 60000 * 30);
-                return;
-            }
-
-            if (!updateManager.IsInstalledApp)
-                return;
-
-            var info = await updateManager.CheckForUpdate();
-            if (info.ReleasesToApply.Count > 0)
-            {
-                ProgressNotification n = new UpdateProgressNotification
+                var info = await updateManager.CheckForUpdate();
+                if (info.ReleasesToApply.Count > 0)
                 {
-                    Text = @"Downloading update..."
-                };
-                Schedule(() => notification.Post(n));
-                Schedule(() => n.State = ProgressNotificationState.Active);
-                await updateManager.DownloadReleases(info.ReleasesToApply, (int p) => Schedule(() => n.Progress = p / 100f));
-                Schedule(() => n.Text = @"Installing update...");
-                await updateManager.ApplyReleases(info, (int p) => Schedule(() => n.Progress = p / 100f));
-                Schedule(() => n.State = ProgressNotificationState.Completed);
+                    ProgressNotification n = new UpdateProgressNotification
+                    {
+                        Text = @"Downloading update..."
+                    };
+                    Schedule(() =>
+                    {
+                        notification.Post(n);
+                        n.State = ProgressNotificationState.Active;
+                    });
+                    await updateManager.DownloadReleases(info.ReleasesToApply, p => Schedule(() => n.Progress = p / 100f));
+                    Schedule(() =>
+                    {
+                        n.Progress = 0;
+                        n.Text = @"Installing update...";
+                    });
 
+                    await updateManager.ApplyReleases(info, p => Schedule(() => n.Progress = p / 100f));
+                    Schedule(() => n.State = ProgressNotificationState.Completed);
+                }
+                else
+                {
+                    //check again every 30 minutes.
+                    Scheduler.AddDelayed(updateChecker, 60000 * 30);
+                }
             }
-            else
+            catch (HttpRequestException)
             {
                 //check again every 30 minutes.
                 Scheduler.AddDelayed(updateChecker, 60000 * 30);
