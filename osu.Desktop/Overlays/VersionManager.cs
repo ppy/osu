@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using System.Net.Http;
 
 namespace osu.Desktop.Overlays
 {
@@ -115,7 +116,16 @@ namespace osu.Desktop.Overlays
 
         private async void updateChecker()
         {
-            updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true);
+            try
+            {
+                updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true);
+            }
+            catch(HttpRequestException)
+            {
+                //check again every 30 minutes.
+                Scheduler.AddDelayed(updateChecker, 60000 * 30);
+                return;
+            }
 
             if (!updateManager.IsInstalledApp)
                 return;
