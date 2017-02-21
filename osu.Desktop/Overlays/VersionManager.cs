@@ -1,9 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -15,13 +18,15 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using System.Net.Http;
+using osu.Framework.Logging;
 
 namespace osu.Desktop.Overlays
 {
     public class VersionManager : OverlayContainer
     {
         private UpdateManager updateManager;
-        private NotificationManager notification;
+        private NotificationManager notificationManager;
 
         AssemblyName assembly = Assembly.GetEntryAssembly().GetName();
 
@@ -34,7 +39,7 @@ namespace osu.Desktop.Overlays
         [BackgroundDependencyLoader]
         private void load(NotificationManager notification, OsuColour colours, TextureStore textures)
         {
-            this.notification = notification;
+            this.notificationManager = notification;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
@@ -113,32 +118,71 @@ namespace osu.Desktop.Overlays
             updateManager?.Dispose();
         }
 
-        private async void updateChecker()
+        private async void updateChecker(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
-            updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true);
+            //should we schedule a retry on completion of this check?
+            bool scheduleRetry = true;
 
-            if (!updateManager.IsInstalledApp)
-                return;
-
-            var info = await updateManager.CheckForUpdate();
-            if (info.ReleasesToApply.Count > 0)
+            try
             {
-                ProgressNotification n = new UpdateProgressNotification
+                if (updateManager == null) updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true);
+
+                var info = await updateManager.CheckForUpdate(!useDeltaPatching);
+                if (info.ReleasesToApply.Count == 0)
+                    //no updates available. bail and retry later.
+                    return;
+
+                if (notification == null)
                 {
-                    Text = @"Downloading update..."
-                };
-                Schedule(() => notification.Post(n));
-                Schedule(() => n.State = ProgressNotificationState.Active);
-                await updateManager.DownloadReleases(info.ReleasesToApply, (int p) => Schedule(() => n.Progress = p / 100f));
-                Schedule(() => n.Text = @"Installing update...");
-                await updateManager.ApplyReleases(info, (int p) => Schedule(() => n.Progress = p / 100f));
-                Schedule(() => n.State = ProgressNotificationState.Completed);
+                    notification = new UpdateProgressNotification { State = ProgressNotificationState.Active };
+                    Schedule(() => notificationManager.Post(notification));
+                }
 
+                Schedule(() =>
+                {
+                    notification.Progress = 0;
+                    notification.Text = @"Downloading update...";
+                });
+
+                try
+                {
+                    await updateManager.DownloadReleases(info.ReleasesToApply, p => Schedule(() => notification.Progress = p / 100f));
+
+                    Schedule(() =>
+                    {
+                        notification.Progress = 0;
+                        notification.Text = @"Installing update...";
+                    });
+
+                    await updateManager.ApplyReleases(info, p => Schedule(() => notification.Progress = p / 100f));
+
+                    Schedule(() => notification.State = ProgressNotificationState.Completed);
+                }
+                catch (Exception)
+                {
+                    if (useDeltaPatching)
+                    {
+                        //could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
+                        //try again without deltas.
+                        updateChecker(false, notification);
+                        scheduleRetry = false;
+                    }
+                }
             }
-            else
+            catch (HttpRequestException)
             {
-                //check again every 30 minutes.
-                Scheduler.AddDelayed(updateChecker, 60000 * 30);
+                //likely have no internet connection.
+                //we'll ignore this and retry later.
+            }
+            finally
+            {
+                if (scheduleRetry)
+                {
+                    //check again in 30 minutes.
+                    Scheduler.AddDelayed(() => updateChecker(), 60000 * 30);
+                    if (notification != null)
+                        notification.State = ProgressNotificationState.Cancelled;
+                }
             }
         }
 
@@ -162,6 +206,25 @@ namespace osu.Desktop.Overlays
                     return true;
                 }
             };
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                IconContent.Add(new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        ColourInfo = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
+                    },
+                    new TextAwesome
+                    {
+                        Anchor = Anchor.Centre,
+                        Icon = FontAwesome.fa_upload,
+                        Colour = Color4.White,
+                    }
+                });
+            }
         }
     }
 }
