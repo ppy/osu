@@ -37,19 +37,21 @@ namespace osu.Game.Overlays.Notifications
         private SpriteText textDrawable;
         private TextAwesome iconDrawable;
 
+        protected Box IconBackgound;
+
         public SimpleNotification()
         {
             IconContent.Add(new Drawable[]
             {
-                new Box
+                IconBackgound = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ColourInfo = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.5f))
+                    ColourInfo = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.6f))
                 },
                 iconDrawable = new TextAwesome
                 {
                     Anchor = Anchor.Centre,
-                    Icon = icon ,
+                    Icon = icon,
                 }
             });
 
