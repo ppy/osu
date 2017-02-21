@@ -21,11 +21,6 @@ namespace osu.Desktop.VisualTests.Tests
         public override string Name => @"Song Select";
         public override string Description => @"with fake data";
 
-        public Action OnArtist;
-        public Action OnTitle;
-        public Action OnAuthor;
-        public Action OnDifficulty;
-
         public override void Reset()
         {
             base.Reset();
@@ -45,15 +40,11 @@ namespace osu.Desktop.VisualTests.Tests
             }
 
             Add(songSelect = new PlaySongSelect());
-            OnArtist = () => { songSelect.Filter.Sort = FilterControl.SortMode.Artist; };
-            OnTitle = () => { songSelect.Filter.Sort = FilterControl.SortMode.Title; };
-            OnAuthor = () => { songSelect.Filter.Sort = FilterControl.SortMode.Author; };
-            OnDifficulty = () => { songSelect.Filter.Sort = FilterControl.SortMode.Difficulty; };
 
-            AddButton(@"Sort by Artist", OnArtist);
-            AddButton(@"Sort by Title", OnTitle);
-            AddButton(@"Sort by Author", OnAuthor);
-            AddButton(@"Sort by Difficulty", OnDifficulty);
+            AddButton(@"Sort by Artist", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Artist; });
+            AddButton(@"Sort by Title", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Title; });
+            AddButton(@"Sort by Author", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Author; });
+            AddButton(@"Sort by Difficulty", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Difficulty; });
         }
 
         protected override void Dispose(bool isDisposing)
