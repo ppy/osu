@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.ComponentModel;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -23,7 +24,7 @@ namespace osu.Desktop.Overlays
     public class VersionManager : OverlayContainer
     {
         private UpdateManager updateManager;
-        private NotificationManager notification;
+        private NotificationManager notificationManager;
 
         AssemblyName assembly = Assembly.GetEntryAssembly().GetName();
 
@@ -36,7 +37,7 @@ namespace osu.Desktop.Overlays
         [BackgroundDependencyLoader]
         private void load(NotificationManager notification, OsuColour colours, TextureStore textures)
         {
-            this.notification = notification;
+            this.notificationManager = notification;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
@@ -115,43 +116,59 @@ namespace osu.Desktop.Overlays
             updateManager?.Dispose();
         }
 
-        private async void updateChecker()
+        private async void updateChecker(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
             try
             {
-                updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true);
-                var info = await updateManager.CheckForUpdate();
+                if (updateManager == null) updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true);
+
+                var info = await updateManager.CheckForUpdate(!useDeltaPatching);
                 if (info.ReleasesToApply.Count > 0)
                 {
-                    ProgressNotification n = new UpdateProgressNotification
+                    if (notification == null)
                     {
-                        Text = @"Downloading update..."
-                    };
+                        notification = new UpdateProgressNotification { State = ProgressNotificationState.Active };
+                        Schedule(() => notificationManager.Post(notification));
+                    }
+
                     Schedule(() =>
                     {
-                        notification.Post(n);
-                        n.State = ProgressNotificationState.Active;
-                    });
-                    await updateManager.DownloadReleases(info.ReleasesToApply, p => Schedule(() => n.Progress = p / 100f));
-                    Schedule(() =>
-                    {
-                        n.Progress = 0;
-                        n.Text = @"Installing update...";
+                        notification.Progress = 0;
+                        notification.Text = @"Downloading update...";
                     });
 
-                    await updateManager.ApplyReleases(info, p => Schedule(() => n.Progress = p / 100f));
-                    Schedule(() => n.State = ProgressNotificationState.Completed);
+                    await updateManager.DownloadReleases(info.ReleasesToApply, p => Schedule(() => notification.Progress = p / 100f));
+
+                    Schedule(() =>
+                    {
+                        notification.Progress = 0;
+                        notification.Text = @"Installing update...";
+                    });
+
+                    try
+                    {
+                        await updateManager.ApplyReleases(info, p => Schedule(() => notification.Progress = p / 100f));
+                    }
+                    catch (Win32Exception)
+                    {
+                        //could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
+                        //try again without deltas.
+                        updateChecker(false, notification);
+                        return;
+                    }
+
+                    Schedule(() => notification.State = ProgressNotificationState.Completed);
                 }
                 else
                 {
                     //check again every 30 minutes.
-                    Scheduler.AddDelayed(updateChecker, 60000 * 30);
+                    Scheduler.AddDelayed(() => updateChecker(), 60000 * 30);
                 }
             }
             catch (HttpRequestException)
             {
                 //check again every 30 minutes.
-                Scheduler.AddDelayed(updateChecker, 60000 * 30);
+                Scheduler.AddDelayed(() => updateChecker(), 60000 * 30);
             }
         }
 
