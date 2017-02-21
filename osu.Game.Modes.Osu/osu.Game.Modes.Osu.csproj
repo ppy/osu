@@ -66,11 +66,9 @@
     <Compile Include="Objects\Drawables\Pieces\TrianglesPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBall.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
-    <Compile Include="Objects\OsuHitObjectDifficulty.cs" />
     <Compile Include="Objects\OsuHitObjectParser.cs" />
     <Compile Include="Objects\SliderCurve.cs" />
     <Compile Include="Objects\SliderTick.cs" />
-    <Compile Include="OsuDifficultyCalculator.cs" />
     <Compile Include="OsuScore.cs" />
     <Compile Include="OsuScoreProcessor.cs" />
     <Compile Include="UI\OsuComboCounter.cs" />

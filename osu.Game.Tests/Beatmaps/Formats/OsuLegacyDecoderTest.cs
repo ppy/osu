@@ -1,15 +1,18 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.IO;
 using NUnit.Framework;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Osu.Objects;
+using osu.Game.Screens.Play;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Beatmaps.Formats

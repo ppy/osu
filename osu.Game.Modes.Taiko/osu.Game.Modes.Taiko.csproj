@@ -47,7 +47,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TaikoDifficultyCalculator.cs" />
     <Compile Include="Objects\Drawable\DrawableTaikoHit.cs" />
     <Compile Include="Objects\TaikoBaseHit.cs" />
     <Compile Include="Objects\TaikoConverter.cs" />

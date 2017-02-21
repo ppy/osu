@@ -1,7 +1,7 @@
 ﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
 //Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Screens.Testing;
+using osu.Framework.GameModes.Testing;
 using osu.Game.Modes.Vitaru.Objects.Characters;
 using System;
 using System.Collections.Generic;
@@ -15,8 +15,6 @@ using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects;
 using osu.Framework.Timing;
-using osu.Framework.MathUtils;
-using osu.Game.Modes.Vitaru.Objects.Projectiles;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -89,12 +87,13 @@ namespace osu.Desktop.VisualTests.Tests
         {
             kills++;
             combo++;
-            Add(enemy = new Enemy(this)
+            enemy = new Enemy(this)
             {
                 Anchor = Anchor.TopCentre,
-                enemyPosition = new Vector2(RNG.Next(-200,200), RNG.Next(50 , 200)),
+                enemyPosition = new Vector2(new Random().Next(-200, 200), new Random() .Next(50 , 200)),
                 OnDeath = NewEnemy,
-            });
+            };
+            Add(enemy);
         }
     }
 }

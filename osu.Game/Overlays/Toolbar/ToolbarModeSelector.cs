@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Toolbar
                     Mode = m,
                     Action = delegate
                     {
-                        SetScreen(localMode);
+                        SetGameMode(localMode);
                         OnPlayModeChange?.Invoke(localMode);
                     }
                 });
@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Toolbar
             Size = new Vector2(modeButtons.DrawSize.X, 1);
         }
 
-        public void SetScreen(PlayMode mode)
+        public void SetGameMode(PlayMode mode)
         {
             foreach (ToolbarModeButton m in modeButtons.Children.Cast<ToolbarModeButton>())
             {

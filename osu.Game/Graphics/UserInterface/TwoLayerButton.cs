@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
-        public SampleChannel ActivationSound;
+        public AudioSample ActivationSound;
         private SpriteText text;
 
         public Color4 HoverColour;

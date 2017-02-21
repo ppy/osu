@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Screens.Testing;
+using osu.Framework.GameModes.Testing;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;

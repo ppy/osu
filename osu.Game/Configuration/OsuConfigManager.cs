@@ -31,7 +31,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.SnakingInSliders, true);
             Set(OsuConfig.SnakingOutSliders, false);
 
-            Set(OsuConfig.MenuParallax, true);
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
@@ -144,6 +143,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.DetectPerformanceIssues, true).Disabled = true;
             Set(OsuConfig.MenuMusic, true).Disabled = true;
             Set(OsuConfig.MenuVoice, true).Disabled = true;
+            Set(OsuConfig.MenuParallax, true).Disabled = true;
             Set(OsuConfig.RawInput, false).Disabled = true;
             Set(OsuConfig.AbsoluteToOsuWindow, Get<bool>(OsuConfig.RawInput)).Disabled = true;
             Set(OsuConfig.ShowMenuTips, true).Disabled = true;

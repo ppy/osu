@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Screens;
+using osu.Framework.GameModes;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Ranking
 {
-    class Results : OsuScreen
+    class Results : OsuGameMode
     {
         protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
 
@@ -22,13 +22,13 @@ namespace osu.Game.Screens.Ranking
 
         ScoreDisplay scoreDisplay;
 
-        protected override void OnEntering(Screen last)
+        protected override void OnEntering(GameMode last)
         {
             base.OnEntering(last);
             Background.Schedule(() => (Background as BackgroundModeBeatmap)?.BlurTo(background_blur, 1000));
         }
 
-        protected override bool OnExiting(Screen next)
+        protected override bool OnExiting(GameMode next)
         {
             Background.Schedule(() => Background.FadeColour(Color4.White, 500));
             return base.OnExiting(next);

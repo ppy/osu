@@ -30,11 +30,6 @@ namespace osu.Game.Modes.Vitaru
             throw new NotImplementedException();
         }
 
-        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap)
-        {
-            throw new NotImplementedException();
-        }
-
         public override FontAwesome Icon => FontAwesome.fa_osu_vitaru_o;
 
         protected override PlayMode PlayMode => PlayMode.Vitaru;

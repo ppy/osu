@@ -108,7 +108,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             }
         }
 
-        private Vector2 scaleToCircle => (circle.Scale * circle.DrawWidth / DrawWidth) * 0.95f;
+        private Vector2 scaleToCircle => new Vector2(circle.Scale * circle.DrawWidth / DrawWidth) * 0.95f;
 
         private float spinsPerMinuteNeeded = 100 + (5 * 15); //TODO: read per-map OD and place it on the 5
 

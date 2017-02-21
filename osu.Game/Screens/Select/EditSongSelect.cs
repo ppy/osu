@@ -8,7 +8,7 @@ using osu.Game.Screens.Edit;
 
 namespace osu.Game.Screens.Select
 {
-    class EditSongSelect : ScreenWhiteBox
+    class EditSongSelect : GameModeWhiteBox
     {
         protected override IEnumerable<Type> PossibleChildren => new[] {
                 typeof(Editor)

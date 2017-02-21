@@ -68,6 +68,7 @@ namespace osu.Game.Beatmaps
                                 beatmap = decoder?.Decode(stream);
                             }
 
+
                             if (WithStoryboard && beatmap != null && BeatmapSetInfo.StoryboardFile != null)
                                 using (var stream = new StreamReader(reader.GetStream(BeatmapSetInfo.StoryboardFile)))
                                     decoder?.Decode(stream, beatmap);
@@ -82,9 +83,9 @@ namespace osu.Game.Beatmaps
         }
 
         private ArchiveReader trackReader;
-        private Track track;
+        private AudioTrack track;
         private object trackLock = new object();
-        public Track Track
+        public AudioTrack Track
         {
             get
             {
@@ -98,7 +99,7 @@ namespace osu.Game.Beatmaps
                         trackReader = getReader();
                         var trackData = trackReader?.GetStream(BeatmapInfo.Metadata.AudioFile);
                         if (trackData != null)
-                            track = new TrackBass(trackData);
+                            track = new AudioTrackBass(trackData);
                     }
                     catch { }
 
