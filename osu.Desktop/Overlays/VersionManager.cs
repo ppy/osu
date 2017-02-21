@@ -4,6 +4,7 @@
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -174,6 +175,25 @@ namespace osu.Desktop.Overlays
                     return true;
                 }
             };
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                IconContent.Add(new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        ColourInfo = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
+                    },
+                    new TextAwesome
+                    {
+                        Anchor = Anchor.Centre,
+                        Icon = FontAwesome.fa_upload,
+                        Colour = Color4.White,
+                    }
+                });
+            }
         }
     }
 }
