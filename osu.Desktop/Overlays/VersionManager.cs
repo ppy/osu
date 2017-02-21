@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -18,6 +19,7 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using System.Net.Http;
+using osu.Framework.Logging;
 
 namespace osu.Desktop.Overlays
 {
@@ -118,25 +120,32 @@ namespace osu.Desktop.Overlays
 
         private async void updateChecker(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
+            //should we schedule a retry on completion of this check?
+            bool scheduleRetry = true;
+
             try
             {
                 if (updateManager == null) updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true);
 
                 var info = await updateManager.CheckForUpdate(!useDeltaPatching);
-                if (info.ReleasesToApply.Count > 0)
+                if (info.ReleasesToApply.Count == 0)
+                    //no updates available. bail and retry later.
+                    return;
+
+                if (notification == null)
                 {
-                    if (notification == null)
-                    {
-                        notification = new UpdateProgressNotification { State = ProgressNotificationState.Active };
-                        Schedule(() => notificationManager.Post(notification));
-                    }
+                    notification = new UpdateProgressNotification { State = ProgressNotificationState.Active };
+                    Schedule(() => notificationManager.Post(notification));
+                }
 
-                    Schedule(() =>
-                    {
-                        notification.Progress = 0;
-                        notification.Text = @"Downloading update...";
-                    });
+                Schedule(() =>
+                {
+                    notification.Progress = 0;
+                    notification.Text = @"Downloading update...";
+                });
 
+                try
+                {
                     await updateManager.DownloadReleases(info.ReleasesToApply, p => Schedule(() => notification.Progress = p / 100f));
 
                     Schedule(() =>
@@ -145,30 +154,35 @@ namespace osu.Desktop.Overlays
                         notification.Text = @"Installing update...";
                     });
 
-                    try
-                    {
-                        await updateManager.ApplyReleases(info, p => Schedule(() => notification.Progress = p / 100f));
-                    }
-                    catch (Win32Exception)
+                    await updateManager.ApplyReleases(info, p => Schedule(() => notification.Progress = p / 100f));
+
+                    Schedule(() => notification.State = ProgressNotificationState.Completed);
+                }
+                catch (Exception)
+                {
+                    if (useDeltaPatching)
                     {
                         //could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
                         //try again without deltas.
                         updateChecker(false, notification);
-                        return;
+                        scheduleRetry = false;
                     }
-
-                    Schedule(() => notification.State = ProgressNotificationState.Completed);
-                }
-                else
-                {
-                    //check again every 30 minutes.
-                    Scheduler.AddDelayed(() => updateChecker(), 60000 * 30);
                 }
             }
             catch (HttpRequestException)
             {
-                //check again every 30 minutes.
-                Scheduler.AddDelayed(() => updateChecker(), 60000 * 30);
+                //likely have no internet connection.
+                //we'll ignore this and retry later.
+            }
+            finally
+            {
+                if (scheduleRetry)
+                {
+                    //check again in 30 minutes.
+                    Scheduler.AddDelayed(() => updateChecker(), 60000 * 30);
+                    if (notification != null)
+                        notification.State = ProgressNotificationState.Cancelled;
+                }
             }
         }
 
