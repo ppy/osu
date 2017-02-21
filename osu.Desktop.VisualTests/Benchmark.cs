@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Desktop.Platform;
-using osu.Framework.Screens.Testing;
+using osu.Framework.GameModes.Testing;
 using osu.Game;
 using osu.Game.Modes;
 using osu.Game.Modes.Catch;

@@ -47,7 +47,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ManiaDifficultyCalculator.cs" />
     <Compile Include="Objects\Drawable\DrawableNote.cs" />
     <Compile Include="Objects\HoldNote.cs" />
     <Compile Include="Objects\ManiaBaseHit.cs" />

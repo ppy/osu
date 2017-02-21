@@ -60,7 +60,7 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
-        public BeatmapGroup(WorkingBeatmap beatmap)
+        public BeatmapGroup(WorkingBeatmap beatmap, BeatmapSetInfo set = null)
         {
             Header = new BeatmapSetHeader(beatmap)
             {
@@ -68,7 +68,6 @@ namespace osu.Game.Beatmaps.Drawables
                 RelativeSizeAxes = Axes.X,
             };
 
-            BeatmapSet = beatmap.BeatmapSetInfo;
             BeatmapPanels = beatmap.BeatmapSetInfo.Beatmaps.Select(b => new BeatmapPanel(b)
             {
                 Alpha = 0,
@@ -77,6 +76,7 @@ namespace osu.Game.Beatmaps.Drawables
                 RelativeSizeAxes = Axes.X,
             }).ToList();
 
+            BeatmapSet = set;
             Header.AddDifficultyIcons(BeatmapPanels);
         }
 

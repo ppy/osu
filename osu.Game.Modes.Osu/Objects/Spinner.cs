@@ -10,7 +10,5 @@ namespace osu.Game.Modes.Osu.Objects
         public double Length;
 
         public override double EndTime => StartTime + Length;
-
-        public override HitObjectType Type => HitObjectType.Spinner;
     }
 }

@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
-        public void SetScreen(PlayMode mode) => modeSelector.SetScreen(mode);
+        public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
 
         protected override void PopIn()
         {

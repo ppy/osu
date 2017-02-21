@@ -32,8 +32,6 @@ namespace osu.Game.Modes
 
         public abstract HitObjectParser CreateHitObjectParser();
 
-        public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap);
-
         public static void Register(Ruleset ruleset) => availableRulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
 
         protected abstract PlayMode PlayMode { get; }

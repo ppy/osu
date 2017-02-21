@@ -9,7 +9,7 @@ using osu.Game.Overlays.Pause;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Screens.Testing;
+using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Desktop.VisualTests.Tests
