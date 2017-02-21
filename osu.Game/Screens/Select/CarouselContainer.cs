@@ -202,8 +202,8 @@ namespace osu.Game.Screens.Select
                         /*TODO: replace with star rating once implemented
                         * Assumes BeatmapSets not to be grouped - or to be by difficulty,
                         * otherwise this sorting makes little sense - or does it? */
-                        if (x.BeatmapSet.Beatmaps.First().BaseDifficulty.OverallDifficulty >
-                            y.BeatmapSet.Beatmaps.First().BaseDifficulty.OverallDifficulty)
+                        if (x.BeatmapSet.Beatmaps.First().StarDifficulty >
+                            y.BeatmapSet.Beatmaps.First().StarDifficulty)
                             return 1;
                         else
                             return -1;
