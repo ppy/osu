@@ -23,9 +23,9 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
-        private readonly int button_duration = 700;
-        private readonly int ranked_multiplier_duration = 700;
-        private readonly float content_width = 0.8f;
+        private const int button_duration = 700;
+        private const int ranked_multiplier_duration = 700;
+        private const float content_width = 0.8f;
 
         private Color4 low_multiplier_colour;
         private Color4 high_multiplier_colour;
