@@ -38,7 +38,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            if (beatmap?.Track == null)
+            //if (beatmap?.Track == null)
             {
                 var objects = new List<HitObject>();
 
@@ -60,7 +60,16 @@ namespace osu.Desktop.VisualTests.Tests
 
                 Beatmap b = new Beatmap
                 {
-                    HitObjects = objects
+                    HitObjects = objects,
+                    BeatmapInfo = new BeatmapInfo
+                    {
+                        Metadata = new BeatmapMetadata
+                        {
+                            Artist = @"Unknown",
+                            Title = @"Sample Beatmap",
+                            Author = @"peppy",
+                        }
+                    }
                 };
 
                 decoder.Process(b);
