@@ -138,7 +138,7 @@ namespace osu.Game.Overlays.Mods
             {
                 section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), content_exit_duration, EasingTypes.InSine);
                 section.ButtonsContainer.MoveToX(100f, content_exit_duration, EasingTypes.InSine);
-                section.ButtonsContainer.FadeTo(0.01f, content_exit_duration, EasingTypes.InSine); // TODO: Fix this so 0.01 opacity isn't used
+                section.ButtonsContainer.FadeTo(0f, content_exit_duration, EasingTypes.InSine); // TODO: Maybe fix this as when items are fully transparent the mod section resizes to 0 height
             }
         }
 
@@ -153,52 +153,17 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private void modButtonPressed(Mod[] sectionSelectedMods)
+        private void modButtonPressed(Mod selectedMod)
         {
-            // 
-            // Inverse mod deselection
-            // 
-            // Hard Rock is the inverse of Easy
-            // Sudden Death / Perfect is the inverse of No Fail, Relax, AutoPilot, and Auto
-            // Double Time is the inverse of Half Time
-            // 
-            // TODO: Probably make a better way for inverse mod handling
-            // 
-
-            foreach (Mod sectionMod in sectionSelectedMods)
+            // TODO: Find out why selectedMod is occasionally null when spamming mod buttons
+            if (selectedMod != null)
             {
-                if (sectionMod.Name == Modes.Mods.HardRock)
+                foreach (Modes.Mods disableMod in selectedMod.DisablesMods(ModMode))
                 {
-                    difficultyReductionSection.EasyButton?.Deselect();
+                    DeselectMod(disableMod);
                 }
-                else if (sectionMod.Name == Modes.Mods.Easy)
-                {
-                    difficultyIncreaseSection.HardRockButton?.Deselect();
-                }
-
-                if (sectionMod.Name == Modes.Mods.SuddenDeath || sectionMod.Name == Modes.Mods.Perfect)
-                {
-                    difficultyReductionSection.NoFailButton?.Deselect();
-                    assistedSection.RelaxButton?.Deselect();
-                    assistedSection.AutopilotButton?.Deselect();
-                    assistedSection.AutoplayCinemaButton?.Deselect();
-                }
-                else if (sectionMod.Name == Modes.Mods.NoFail || sectionMod.Name == Modes.Mods.Relax || sectionMod.Name == Modes.Mods.Autopilot || sectionMod.Name == Modes.Mods.Autoplay || sectionMod.Name == Modes.Mods.Cinema)
-                {
-                    difficultyIncreaseSection.SuddenDeathButton?.Deselect();
-                }
-
-                if (sectionMod.Name == Modes.Mods.DoubleTime || sectionMod.Name == Modes.Mods.Nightcore)
-                {
-                    difficultyReductionSection.HalfTimeButton?.Deselect();
-                }
-                else if (sectionMod.Name == Modes.Mods.HalfTime)
-                {
-                    difficultyIncreaseSection.DoubleTimeNightcoreButton?.Deselect();
-                }
+                refreshSelectedMods();
             }
-
-            refreshSelectedMods();
 
             double multiplier = 1;
             bool ranked = true;
@@ -233,6 +198,24 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        public void DeselectMod(Modes.Mods modName)
+        {
+            foreach (ModSection section in sections)
+            {
+                foreach (ModButton button in section.Buttons)
+                {
+                    foreach (Mod mod in button.Mods)
+                    {
+                        if (mod.Name == modName)
+                        {
+                            button.Deselect();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
         private void refreshSelectedMods()
         {
             List<Mod> selectedMods = new List<Mod>();
@@ -262,7 +245,7 @@ namespace osu.Game.Overlays.Mods
             ThirdWaveColour = OsuColour.FromHex(@"005774");
             FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
-            Height = 548; // TODO: Remove when autosize works
+            Height = 510; // TODO: Remove when autosize works
             //AutoSizeAxes = Axes.Y;
             Content.RelativeSizeAxes = Axes.X;
             Content.AutoSizeAxes = Axes.Y;
@@ -302,7 +285,7 @@ namespace osu.Game.Overlays.Mods
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 90,
+                            Height = 82,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Children = new Drawable[]
