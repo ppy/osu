@@ -138,7 +138,7 @@ namespace osu.Game.Overlays.Mods
             {
                 section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), content_exit_duration, EasingTypes.InSine);
                 section.ButtonsContainer.MoveToX(100f, content_exit_duration, EasingTypes.InSine);
-                section.ButtonsContainer.FadeTo(0f, content_exit_duration, EasingTypes.InSine); // TODO: Maybe fix this as when items are fully transparent the mod section resizes to 0 height
+                section.ButtonsContainer.FadeOut(content_exit_duration, EasingTypes.InSine);
             }
         }
 
@@ -155,7 +155,6 @@ namespace osu.Game.Overlays.Mods
 
         private void modButtonPressed(Mod selectedMod)
         {
-            // TODO: Find out why selectedMod is occasionally null when spamming mod buttons
             if (selectedMod != null)
             {
                 foreach (Modes.Mods disableMod in selectedMod.DisablesMods(ModMode))
@@ -220,19 +219,12 @@ namespace osu.Game.Overlays.Mods
         {
             List<Mod> selectedMods = new List<Mod>();
 
-            foreach (Mod mod in difficultyReductionSection.SelectedMods)
+            foreach (ModSection section in sections)
             {
-                selectedMods.Add(mod);
-            }
-
-            foreach (Mod mod in difficultyIncreaseSection.SelectedMods)
-            {
-                selectedMods.Add(mod);
-            }
-
-            foreach (Mod mod in assistedSection.SelectedMods)
-            {
-                selectedMods.Add(mod);
+                foreach (Mod mod in section.SelectedMods)
+                {
+                    selectedMods.Add(mod);
+                }
             }
 
             SelectedMods.Value = selectedMods.ToArray();
@@ -245,8 +237,7 @@ namespace osu.Game.Overlays.Mods
             ThirdWaveColour = OsuColour.FromHex(@"005774");
             FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
-            Height = 510; // TODO: Remove when autosize works
-            //AutoSizeAxes = Axes.Y;
+            Height = 510;
             Content.RelativeSizeAxes = Axes.X;
             Content.AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
