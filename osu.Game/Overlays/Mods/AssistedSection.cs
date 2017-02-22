@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Modes;
 using osu.Game.Overlays.Mods;
+
 namespace osu.Game
 {
     public class AssistedSection : ModSection
