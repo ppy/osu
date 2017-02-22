@@ -103,7 +103,8 @@ namespace osu.Desktop.Overlays
                 }
             };
 
-            updateChecker();
+            if (IsDeployedBuild)
+                updateChecker();
         }
 
         protected override void LoadComplete()
