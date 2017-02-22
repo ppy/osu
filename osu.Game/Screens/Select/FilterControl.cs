@@ -47,18 +47,19 @@ namespace osu.Game.Screens.Select
                     Direction = FlowDirections.Vertical,
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SearchTextBox { RelativeSizeAxes = Axes.X },
+                        searchTextBox = new SearchTextBox {
+                            RelativeSizeAxes = Axes.X,
+                            OnChange = (TextBox sender, bool newText) =>
+                            {
+                                if (newText)
+                                    FilterChanged?.Invoke();
+                            },
+                            Exit = () => Exit?.Invoke(),
+                        },
                         new GroupSortTabs()
                     }
                 }
             };
-
-            searchTextBox.OnChange += (TextBox sender, bool newText) =>
-            {
-                if (newText)
-                    FilterChanged?.Invoke();
-            };
-            searchTextBox.Exit = () => Exit?.Invoke();
         }
 
         public void Deactivate()

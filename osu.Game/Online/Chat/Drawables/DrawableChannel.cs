@@ -4,25 +4,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.MathUtils;
+using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 
 namespace osu.Game.Online.Chat.Drawables
 {
-    public class ChannelDisplay : Container
+    public class DrawableChannel : Container
     {
         private readonly Channel channel;
         private FlowContainer flow;
+        private ScrollContainer scroll;
 
-        public ChannelDisplay(Channel channel)
+        public DrawableChannel(Channel channel)
         {
             this.channel = channel;
-            newMessages(channel.Messages);
-            channel.NewMessagesArrived += newMessages;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -36,7 +36,7 @@ namespace osu.Game.Online.Chat.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
-                new ScrollContainer
+                scroll = new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -46,37 +46,54 @@ namespace osu.Game.Online.Chat.Drawables
                             Direction = FlowDirections.Vertical,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Spacing = new Vector2(1, 1)
+                            Padding = new MarginPadding { Left = 20, Right = 20 }
                         }
                     }
                 }
             };
+
+            channel.NewMessagesArrived += newMessagesArrived;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            newMessagesArrived(channel.Messages);
+            scrollToEnd();
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            channel.NewMessagesArrived -= newMessages;
+            channel.NewMessagesArrived -= newMessagesArrived;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            newMessages(channel.Messages);
-        }
-
-        private void newMessages(IEnumerable<Message> newMessages)
+        private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
             if (!IsLoaded) return;
 
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
+            if (scroll.IsScrolledToEnd(10) || !flow.Children.Any())
+                scrollToEnd();
+
             //up to last Channel.MAX_HISTORY messages
             foreach (Message m in displayMessages)
-                flow.Add(new ChatLine(m));
+            {
+                var d = new ChatLine(m);
+                flow.Add(d);
+            }
 
-            while (flow.Children.Count() > Channel.MAX_HISTORY)
-                flow.Remove(flow.Children.First());
+            while (flow.Children.Count(c => c.LifetimeEnd == double.MaxValue) > Channel.MAX_HISTORY)
+            {
+                var d = flow.Children.First(c => c.LifetimeEnd == double.MaxValue);
+                if (!scroll.IsScrolledToEnd(10))
+                    scroll.OffsetScrollPosition(-d.DrawHeight);
+                d.Expire();
+            }
         }
+
+        private void scrollToEnd() => Scheduler.AddDelayed(() => scroll.ScrollToEnd(), 50);
     }
 }
