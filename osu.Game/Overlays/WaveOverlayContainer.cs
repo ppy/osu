@@ -18,7 +18,7 @@ namespace osu.Game.Overlays
         private const float third_wave_position = 70;
         private const float fourth_wave_position = 100;
         private const float waves_container_position = -150;
-        private float[] wave_positions
+        private float[] wavePositions
         {
             get
             {
@@ -34,8 +34,8 @@ namespace osu.Game.Overlays
         private const float waves_container_duration = 400;
         private const float content_duration = 700;
         private const float content_transition_wait = 100;
-        internal const float content_exit_duration = 600;
-        private float [] wave_durations
+        internal const float CONTENT_EXIT_DURATION = 600;
+        private float [] waveDurations
         {
             get
             {
@@ -130,7 +130,7 @@ namespace osu.Game.Overlays
 
             for (int i = 0; i < waves.Length; i++)
             {
-                waves[i].MoveToY(wave_positions[i], wave_durations[i], EasingTypes.OutQuint);
+                waves[i].MoveToY(wave_positions[i], waveDurations[i], EasingTypes.OutQuint);
             }
 
             DelayReset();
@@ -155,8 +155,8 @@ namespace osu.Game.Overlays
         {
             base.Hide();
 
-            contentContainer.FadeOut(content_exit_duration, EasingTypes.InSine);
-            contentContainer.MoveToY(DrawHeight, content_exit_duration, EasingTypes.InSine);
+            contentContainer.FadeOut(CONTENT_EXIT_DURATION, EasingTypes.InSine);
+            contentContainer.MoveToY(DrawHeight, CONTENT_EXIT_DURATION, EasingTypes.InSine);
             TransitionOut();
 
             for (int i = 0; i < waves.Length; i++)

@@ -27,8 +27,7 @@ namespace osu.Game.Overlays.Mods
         private const int ranked_multiplier_duration = 700;
         private const float content_width = 0.8f;
 
-        private Color4 low_multiplier_colour;
-        private Color4 high_multiplier_colour;
+        private Color4 lowMultiplierColour, highMultiplierColour;
 
         private OsuSpriteText rankedLabel, multiplierLabel;
         private FlowContainer rankedMultiplerContainer;
@@ -100,7 +99,7 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            low_multiplier_colour = colours.Red;
+            lowMultiplierColour = colours.Red;
             high_multiplier_colour = colours.Green;
         }
 
@@ -131,14 +130,14 @@ namespace osu.Game.Overlays.Mods
 
         protected override void TransitionOut()
         {
-            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, content_exit_duration, EasingTypes.InSine);
-            rankedMultiplerContainer.FadeOut(content_exit_duration, EasingTypes.InSine);
+            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, CONTENT_EXIT_DURATION, EasingTypes.InSine);
+            rankedMultiplerContainer.FadeOut(CONTENT_EXIT_DURATION, EasingTypes.InSine);
 
             foreach (ModSection section in sections)
             {
-                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), content_exit_duration, EasingTypes.InSine);
-                section.ButtonsContainer.MoveToX(100f, content_exit_duration, EasingTypes.InSine);
-                section.ButtonsContainer.FadeOut(content_exit_duration, EasingTypes.InSine);
+                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), CONTENT_EXIT_DURATION, EasingTypes.InSine);
+                section.ButtonsContainer.MoveToX(100f, CONTENT_EXIT_DURATION, EasingTypes.InSine);
+                section.ButtonsContainer.FadeOut(CONTENT_EXIT_DURATION, EasingTypes.InSine);
             }
         }
 
@@ -190,7 +189,7 @@ namespace osu.Game.Overlays.Mods
             }
             else if (multiplier < 1.0)
             {
-                multiplierLabel.FadeColour(low_multiplier_colour, 200);
+                multiplierLabel.FadeColour(lowMultiplierColour, 200);
             }
             else
             {
