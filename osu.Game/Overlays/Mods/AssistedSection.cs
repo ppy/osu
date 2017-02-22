@@ -15,7 +15,8 @@ namespace osu.Game
         public ModButton RelaxButton
         {
             get
-            {                return relaxButton;
+            {
+                return relaxButton;
             }
         }
 
