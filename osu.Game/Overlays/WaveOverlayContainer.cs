@@ -13,11 +13,11 @@ namespace osu.Game.Overlays
 {
     public abstract class WaveOverlayContainer : OverlayContainer
     {
-        private readonly float first_wave_position = -130;
-        private readonly float second_wave_position = 0;
-        private readonly float third_wave_position = 70;
-        private readonly float fourth_wave_position = 100;
-        private readonly float waves_container_position = -150;
+        private const float first_wave_position = -130;
+        private const float second_wave_position = 0;
+        private const float third_wave_position = 70;
+        private const float fourth_wave_position = 100;
+        private const float waves_container_position = -150;
         private float[] wave_positions
         {
             get
@@ -26,15 +26,15 @@ namespace osu.Game.Overlays
             }
         }
 
-        private readonly float first_wave_duration = 600;
-        private readonly float second_wave_duration = 700;
-        private readonly float third_wave_duration = 800;
-        private readonly float fourth_wave_duration = 900;
-        private readonly float container_wait = 200;
-        private readonly float waves_container_duration = 400;
-        private readonly float content_duration = 700;
-        private readonly float content_transition_wait = 100;
-        internal readonly float content_exit_duration = 600;
+        private const float first_wave_duration = 600;
+        private const float second_wave_duration = 700;
+        private const float third_wave_duration = 800;
+        private const float fourth_wave_duration = 900;
+        private const float container_wait = 200;
+        private const float waves_container_duration = 400;
+        private const float content_duration = 700;
+        private const float content_transition_wait = 100;
+        internal const float content_exit_duration = 600;
         private float [] wave_durations
         {
             get
@@ -43,10 +43,10 @@ namespace osu.Game.Overlays
             }
         }
 
-        private readonly float first_wave_rotation = 13;
-        private readonly float second_wave_rotation = -7;
-        private readonly float third_wave_rotation = 4;
-        private readonly float fourth_wave_rotation = -2;
+        private const float first_wave_rotation = 13;
+        private const float second_wave_rotation = -7;
+        private const float third_wave_rotation = 4;
+        private const float fourth_wave_rotation = -2;
 
         private Container firstWave, secondWave, thirdWave, fourthWave, wavesContainer;
         private readonly Container[] waves;
