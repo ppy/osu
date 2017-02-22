@@ -2,14 +2,21 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;using OpenTK.Graphics;
-using OpenTK.Input;using osu.Framework.Allocation;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions;using osu.Framework.Graphics;using osu.Framework.Graphics.Containers;using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;using osu.Game.Graphics.Sprites;
+using osu.Framework.Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transformations;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 using osu.Game.Modes.UI;
+
 namespace osu.Game.Overlays.Mods
 {
     public class ModButton : FlowContainer
