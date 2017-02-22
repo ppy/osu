@@ -182,7 +182,8 @@ namespace osu.Game.Overlays.Mods
             // 1.20x
 
             multiplierLabel.Text = string.Format("{0:N2}x", multiplier);
-            rankedLabel.Text = $"{ranked ? @"Ranked" : @"Unranked"}, Score Multiplier: ";
+            string rankedString = ranked ? "Ranked" : "Unranked";
+            rankedLabel.Text = $@"{rankedString}, Score Multiplier: ";
             if (multiplier > 1.0)
             {
                 multiplierLabel.FadeColour(high_multiplier_colour, 200);
