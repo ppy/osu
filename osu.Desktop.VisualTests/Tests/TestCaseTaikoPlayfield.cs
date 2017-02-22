@@ -2,12 +2,12 @@
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Allocation;
-using osu.Framework.GameModes.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Screens.Testing;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Modes.Taiko.UI.Drums;
 using osu.Game.Screens;
@@ -31,7 +31,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            Add(new BackgroundModeCustom(@"Backgrounds/bg1"));
+            Add(new BackgroundScreenCustom(@"Backgrounds/bg1"));
 
             Add(new[]
             {
