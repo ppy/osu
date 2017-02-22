@@ -28,6 +28,8 @@ namespace osu.Game.Overlays
 {
     public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent
     {
+        const float textbox_height = 40;
+
         private DrawableChannel channelDisplay;
 
         private ScheduledDelegate messageRequest;
@@ -59,14 +61,14 @@ namespace osu.Game.Overlays
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Bottom = 50 },
+                    Padding = new MarginPadding { Top = 5, Bottom = textbox_height + 5 },
                 },
                 new Container
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
-                    Height = 40,
+                    Height = textbox_height,
                     Padding = new MarginPadding(5),
                     Children = new Drawable[]
                     {
