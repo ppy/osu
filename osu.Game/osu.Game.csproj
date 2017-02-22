@@ -66,10 +66,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
+    <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
+    <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
     <Compile Include="Graphics\UserInterface\Nub.cs" />
     <Compile Include="Graphics\UserInterface\OsuPasswordTextBox.cs" />
     <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
@@ -123,15 +125,17 @@
     <Compile Include="Overlays\Toolbar\ToolbarOverlayToggleButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarUserArea.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarUserButton.cs" />
-    <Compile Include="Screens\BackgroundMode.cs" />
-    <Compile Include="Screens\Backgrounds\BackgroundModeBeatmap.cs" />
-    <Compile Include="Screens\Backgrounds\BackgroundModeCustom.cs" />
-    <Compile Include="Screens\Backgrounds\BackgroundModeDefault.cs" />
-    <Compile Include="Screens\Backgrounds\BackgroundModeEmpty.cs" />
+    <Compile Include="Screens\BackgroundScreen.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundScreenBeatmap.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundScreenCustom.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundScreenDefault.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundScreenEmpty.cs" />
     <Compile Include="Screens\Charts\ChartInfo.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
-    <Compile Include="Screens\GameModeWhiteBox.cs" />
+    <Compile Include="Screens\GameScreenWhiteBox.cs" />
+    <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
+    <Compile Include="Screens\Menu\Disclaimer.cs" />
     <Compile Include="Screens\Menu\FlowContainerWithOrigin.cs" />
     <Compile Include="Screens\Menu\Intro.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />
@@ -146,7 +150,7 @@
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Screens\Select\CarouselContainer.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
-    <Compile Include="Screens\OsuGameMode.cs" />
+    <Compile Include="Screens\OsuGameScreen.cs" />
     <Compile Include="Screens\Play\ModSelect.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
@@ -187,7 +191,7 @@
     <Compile Include="Online\API\SecurePassword.cs" />
     <Compile Include="Online\API\Requests\ListChannels.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
-    <Compile Include="Online\Chat\Drawables\ChannelDisplay.cs" />
+    <Compile Include="Online\Chat\Drawables\DrawableChannel.cs" />
     <Compile Include="Online\Chat\Drawables\ChatLine.cs" />
     <Compile Include="Online\Chat\Message.cs" />
     <Compile Include="Online\User.cs" />

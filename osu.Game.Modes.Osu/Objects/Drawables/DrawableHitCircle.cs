@@ -84,18 +84,18 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             double hitOffset = Math.Abs(Judgement.TimeOffset);
 
+            OsuJudgementInfo osuJudgement = Judgement as OsuJudgementInfo;
+
             if (hitOffset < hit50)
             {
                 Judgement.Result = HitResult.Hit;
 
-                OsuJudgementInfo osuInfo = Judgement as OsuJudgementInfo;
-
                 if (hitOffset < hit300)
-                    osuInfo.Score = OsuScoreResult.Hit300;
+                    osuJudgement.Score = OsuScoreResult.Hit300;
                 else if (hitOffset < hit100)
-                    osuInfo.Score = OsuScoreResult.Hit100;
+                    osuJudgement.Score = OsuScoreResult.Hit100;
                 else if (hitOffset < hit50)
-                    osuInfo.Score = OsuScoreResult.Hit50;
+                    osuJudgement.Score = OsuScoreResult.Hit50;
             }
             else
                 Judgement.Result = HitResult.Miss;

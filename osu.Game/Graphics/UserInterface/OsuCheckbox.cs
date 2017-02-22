@@ -71,8 +71,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private Nub nub;
         private SpriteText labelSpriteText;
-        private AudioSample sampleChecked;
-        private AudioSample sampleUnchecked;
+        private SampleChannel sampleChecked;
+        private SampleChannel sampleUnchecked;
 
         public OsuCheckbox()
         {

@@ -14,22 +14,32 @@ using osu.Game.Database;
 using osu.Desktop.Overlays;
 using System.Reflection;
 using System.Drawing;
+using osu.Game.Screens.Menu;
 
 namespace osu.Desktop
 {
     class OsuGameDesktop : OsuGame
     {
+        private VersionManager versionManager;
+
+        public override bool IsDeployedBuild => versionManager.IsDeployedBuild;
+
         public OsuGameDesktop(string[] args = null)
             : base(args)
         {
-
+            versionManager = new VersionManager { Depth = int.MinValue };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            (new VersionManager()).Preload(this, Add);
+            versionManager.Preload(this);
+            ModeChanged += m =>
+            {
+                if (!versionManager.IsAlive && m is Intro)
+                    Add(versionManager);
+            };
         }
 
         public override void SetHost(BasicGameHost host)

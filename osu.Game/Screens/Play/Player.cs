@@ -12,7 +12,7 @@ using osu.Game.Modes;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
-using osu.Framework.GameModes;
+using osu.Framework.Screens;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
@@ -27,11 +27,11 @@ using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Play
 {
-    public class Player : OsuGameMode
+    public class Player : OsuScreen
     {
         public bool Autoplay;
 
-        protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
 
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            AudioTrack track = Beatmap.Track;
+            Track track = Beatmap.Track;
 
             if (track != null)
             {
@@ -240,21 +240,6 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Content.Delay(250);
-            Content.FadeIn(250);
-
-            Delay(750);
-            Schedule(() =>
-            {
-                sourceClock.Start();
-                initializeSkipButton();
-            });
-        }
-
         private void onPass()
         {
             Delay(1000);
@@ -281,18 +266,34 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        protected override void OnEntering(GameMode last)
+        protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
 
-            (Background as BackgroundModeBeatmap)?.BlurTo(Vector2.Zero, 1000);
+            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1000);
             Background?.FadeTo((100f - dimLevel) / 100, 1000);
 
             Content.Alpha = 0;
             dimLevel.ValueChanged += dimChanged;
+
+            Content.Delay(250);
+            Content.FadeIn(250);
+
+            Delay(750);
+            Schedule(() =>
+            {
+                sourceClock.Start();
+                initializeSkipButton();
+            });
         }
 
-        protected override bool OnExiting(GameMode next)
+        protected override void OnSuspending(Screen next)
+        {
+            Content.FadeOut(350);
+            base.OnSuspending(next);
+        }
+
+        protected override bool OnExiting(Screen next)
         {
             if (pauseOverlay == null) return false;
 

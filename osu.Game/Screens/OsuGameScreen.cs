@@ -4,21 +4,21 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.GameModes;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuGameMode : GameMode
+    public abstract class OsuScreen : Screen
     {
-        internal BackgroundMode Background { get; private set; }
+        internal BackgroundScreen Background { get; private set; }
 
         /// <summary>
         /// Override to create a BackgroundMode for the current GameMode.
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
-        protected virtual BackgroundMode CreateBackground() => null;
+        protected virtual BackgroundScreen CreateBackground() => null;
 
         internal virtual bool ShowOverlays => true;
 
@@ -73,15 +73,15 @@ namespace osu.Game.Screens
                 beatmap = game?.Beatmap;
         }
 
-        public override bool Push(GameMode mode)
+        public override bool Push(Screen screen)
         {
-            OsuGameMode nextOsu = mode as OsuGameMode;
+            OsuScreen nextOsu = screen as OsuScreen;
             if (nextOsu != null)
             {
                 nextOsu.beatmap = beatmap;
             }
 
-            return base.Push(mode);
+            return base.Push(screen);
         }
 
         protected virtual void OnBeatmapChanged(WorkingBeatmap beatmap)
@@ -89,11 +89,11 @@ namespace osu.Game.Screens
 
         }
 
-        protected override void OnEntering(GameMode last)
+        protected override void OnEntering(Screen last)
         {
-            OsuGameMode lastOsu = last as OsuGameMode;
+            OsuScreen lastOsu = last as OsuScreen;
 
-            BackgroundMode bg = CreateBackground();
+            BackgroundScreen bg = CreateBackground();
 
             if (lastOsu?.Background != null)
             {
@@ -120,9 +120,9 @@ namespace osu.Game.Screens
             base.OnEntering(last);
         }
 
-        protected override bool OnExiting(GameMode next)
+        protected override bool OnExiting(Screen next)
         {
-            OsuGameMode nextOsu = next as OsuGameMode;
+            OsuScreen nextOsu = next as OsuScreen;
 
             if (Background != null && !Background.Equals(nextOsu?.Background))
             {
