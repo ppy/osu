@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables;
@@ -11,6 +11,7 @@ namespace osu.Game.Modes.Osu
         public OsuScoreProcessor(int hitObjectCount)
             : base(hitObjectCount)
         {
+            Health.Value = 1;
         }
 
         protected override void UpdateCalculations(JudgementInfo judgement)
@@ -35,24 +36,8 @@ namespace osu.Game.Modes.Osu
 
             foreach (OsuJudgementInfo j in Judgements)
             {
-                switch (j.Score)
-                {
-                    case OsuScoreResult.Miss:
-                        maxScore += 300;
-                        break;
-                    case OsuScoreResult.Hit50:
-                        score += 50;
-                        maxScore += 300;
-                        break;
-                    case OsuScoreResult.Hit100:
-                        score += 100;
-                        maxScore += 300;
-                        break;
-                    case OsuScoreResult.Hit300:
-                        score += 300;
-                        maxScore += 300;
-                        break;
-                }
+                score += j.ScoreValue;
+                maxScore += j.MaxScoreValue;
             }
 
             TotalScore.Value = score;

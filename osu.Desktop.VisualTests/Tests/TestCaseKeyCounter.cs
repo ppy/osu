@@ -1,7 +1,7 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.GameModes.Testing;
+using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK.Input;
@@ -13,6 +13,7 @@ using OpenTK.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
+using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {

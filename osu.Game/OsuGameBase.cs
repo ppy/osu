@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -22,7 +22,7 @@ namespace osu.Game
 {
     public class OsuGameBase : BaseGame, IOnlineComponent
     {
-        internal OsuConfigManager Config;
+        protected OsuConfigManager LocalConfig;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -40,17 +40,19 @@ namespace osu.Game
         private void load()
         {
             Dependencies.Cache(this);
-            Dependencies.Cache(Config);
+            Dependencies.Cache(LocalConfig);
             Dependencies.Cache(new BeatmapDatabase(Host.Storage, Host));
             Dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 0.01f }, true);
+            Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 }, true);
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
+
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto"));
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-RegularItalic"));
@@ -69,9 +71,8 @@ namespace osu.Game
 
             Dependencies.Cache(API = new APIAccess
             {
-                Username = Config.Get<string>(OsuConfig.Username),
-                Password = Config.Get<string>(OsuConfig.Password),
-                Token = Config.Get<string>(OsuConfig.Token)
+                Username = LocalConfig.Get<string>(OsuConfig.Username),
+                Token = LocalConfig.Get<string>(OsuConfig.Token)
             });
 
             API.Register(this);
@@ -82,8 +83,7 @@ namespace osu.Game
             switch (state)
             {
                 case APIState.Online:
-                    Config.Set(OsuConfig.Username, Config.Get<bool>(OsuConfig.SaveUsername) ? API.Username : string.Empty);
-                    Config.Set(OsuConfig.Password, Config.Get<bool>(OsuConfig.SavePassword) ? API.Password : string.Empty);
+                    LocalConfig.Set(OsuConfig.Username, LocalConfig.Get<bool>(OsuConfig.SaveUsername) ? API.Username : string.Empty);
                     break;
             }
         }
@@ -103,8 +103,8 @@ namespace osu.Game
 
         public override void SetHost(BasicGameHost host)
         {
-            if (Config == null)
-                Config = new OsuConfigManager(host.Storage);
+            if (LocalConfig == null)
+                LocalConfig = new OsuConfigManager(host.Storage);
             base.SetHost(host);
         }
 
@@ -117,10 +117,10 @@ namespace osu.Game
         protected override void Dispose(bool isDisposing)
         {
             //refresh token may have changed.
-            if (Config != null && API != null)
+            if (LocalConfig != null && API != null)
             {
-                Config.Set(OsuConfig.Token, API.Token);
-                Config.Save();
+                LocalConfig.Set(OsuConfig.Token, LocalConfig.Get<bool>(OsuConfig.SavePassword) ? API.Token : string.Empty);
+                LocalConfig.Save();
             }
 
             base.Dispose(isDisposing);

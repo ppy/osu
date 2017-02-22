@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
@@ -30,6 +30,22 @@ namespace osu.Game.Modes
 
         public readonly BindableInt Combo = new BindableInt();
 
+        /// <summary>
+        /// Are we allowed to fail?
+        /// </summary>
+        protected bool CanFail => true;
+
+        protected bool HasFailed { get; private set; }
+
+        /// <summary>
+        /// Called when we reach a failing health of zero.
+        /// </summary>
+        public event Action Failed;
+
+        /// <summary>
+        /// Keeps track of the highest combo ever achieved in this play.
+        /// This is handled automatically by ScoreProcessor.
+        /// </summary>
         public readonly BindableInt HighestCombo = new BindableInt();
 
         public readonly List<JudgementInfo> Judgements;
@@ -51,6 +67,11 @@ namespace osu.Game.Modes
             UpdateCalculations(judgement);
 
             judgement.ComboAtHit = (ulong)Combo.Value;
+            if (Health.Value == Health.MinValue && !HasFailed)
+            {
+                HasFailed = true;
+                Failed?.Invoke();
+            }
         }
 
         /// <summary>

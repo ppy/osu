@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -64,16 +66,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
+    <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
+    <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
+    <Compile Include="Graphics\UserInterface\Nub.cs" />
+    <Compile Include="Graphics\UserInterface\OsuPasswordTextBox.cs" />
+    <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
+    <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
+    <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
+    <Compile Include="Modes\Objects\NullHitObjectParser.cs" />
     <Compile Include="Modes\Score.cs" />
     <Compile Include="Modes\ScoreProcesssor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />
     <Compile Include="Online\API\IOnlineComponent.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
+    <Compile Include="Overlays\LoginOverlay.cs" />
     <Compile Include="Overlays\MusicController.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\Formats\ConstructableBeatmapDecoder.cs" />
@@ -93,20 +105,36 @@
     <Compile Include="Beatmaps\Timing\SampleChange.cs" />
     <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
+    <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
+    <Compile Include="Overlays\Notifications\Notification.cs" />
+    <Compile Include="Overlays\NotificationManager.cs" />
+    <Compile Include="Overlays\Notifications\NotificationSection.cs" />
+    <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
+    <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
+    <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
+    <Compile Include="Overlays\Options\OptionDropDown.cs" />
+    <Compile Include="Overlays\Options\OptionLabel.cs" />
+    <Compile Include="Graphics\UserInterface\OsuDropDownHeader.cs" />
+    <Compile Include="Graphics\UserInterface\OsuDropDownMenu.cs" />
+    <Compile Include="Graphics\UserInterface\OsuDropDownMenuItem.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarHomeButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarMusicButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarNotificationButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarSettingsButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarOverlayToggleButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarUserArea.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarUserButton.cs" />
-    <Compile Include="Screens\BackgroundMode.cs" />
-    <Compile Include="Screens\Backgrounds\BackgroundModeBeatmap.cs" />
-    <Compile Include="Screens\Backgrounds\BackgroundModeCustom.cs" />
-    <Compile Include="Screens\Backgrounds\BackgroundModeDefault.cs" />
-    <Compile Include="Screens\Backgrounds\BackgroundModeEmpty.cs" />
+    <Compile Include="Screens\BackgroundScreen.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundScreenBeatmap.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundScreenCustom.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundScreenDefault.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundScreenEmpty.cs" />
     <Compile Include="Screens\Charts\ChartInfo.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
-    <Compile Include="Screens\GameModeWhiteBox.cs" />
+    <Compile Include="Screens\GameScreenWhiteBox.cs" />
+    <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
+    <Compile Include="Screens\Menu\Disclaimer.cs" />
     <Compile Include="Screens\Menu\FlowContainerWithOrigin.cs" />
     <Compile Include="Screens\Menu\Intro.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />
@@ -116,9 +144,12 @@
     <Compile Include="Screens\Multiplayer\Lobby.cs" />
     <Compile Include="Screens\Multiplayer\Match.cs" />
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
+    <Compile Include="Screens\Play\FailDialog.cs" />
+    <Compile Include="Screens\Play\PlayerInputManager.cs" />
+    <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Screens\Select\CarouselContainer.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
-    <Compile Include="Screens\OsuGameMode.cs" />
+    <Compile Include="Screens\OsuGameScreen.cs" />
     <Compile Include="Screens\Play\ModSelect.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
@@ -143,10 +174,10 @@
     <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\TextAwesome.cs" />
-    <Compile Include="Graphics\UserInterface\KeyCounter.cs" />
-    <Compile Include="Graphics\UserInterface\KeyCounterKeyboard.cs" />
-    <Compile Include="Graphics\UserInterface\KeyCounterCollection.cs" />
-    <Compile Include="Graphics\UserInterface\KeyCounterMouse.cs" />
+    <Compile Include="Screens\Play\KeyCounter.cs" />
+    <Compile Include="Screens\Play\KeyCounterKeyboard.cs" />
+    <Compile Include="Screens\Play\KeyCounterCollection.cs" />
+    <Compile Include="Screens\Play\KeyCounterMouse.cs" />
     <Compile Include="Graphics\UserInterface\PercentageCounter.cs" />
     <Compile Include="Graphics\UserInterface\ScoreCounter.cs" />
     <Compile Include="Graphics\UserInterface\StarCounter.cs" />
@@ -173,6 +204,7 @@
     <Compile Include="Overlays\Toolbar\ToolbarModeSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
+    <Compile Include="Screens\Select\WedgeBackground.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
@@ -187,52 +219,62 @@
     <Compile Include="Database\BeatmapInfo.cs" />
     <Compile Include="Database\BaseDifficulty.cs" />
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />
-    <Compile Include="Overlays\Options\MaintenanceSection.cs" />
+    <Compile Include="Overlays\Options\Sections\MaintenanceSection.cs" />
     <Compile Include="Overlays\Options\OptionsSection.cs" />
     <Compile Include="Overlays\Options\OptionsSubsection.cs" />
     <Compile Include="Graphics\UserInterface\LoadingAnimation.cs" />
-    <Compile Include="Overlays\Options\OptionsSidebar.cs" />
-    <Compile Include="Overlays\Options\General\GeneralSection.cs" />
-    <Compile Include="Overlays\Options\General\LoginOptions.cs" />
-    <Compile Include="Overlays\Options\General\UpdateOptions.cs" />
-    <Compile Include="Overlays\Options\General\LanguageOptions.cs" />
-    <Compile Include="Overlays\Options\Graphics\GraphicsSection.cs" />
-    <Compile Include="Overlays\Options\Graphics\RendererOptions.cs" />
-    <Compile Include="Overlays\Options\Graphics\LayoutOptions.cs" />
-    <Compile Include="Overlays\Options\Graphics\DetailOptions.cs" />
-    <Compile Include="Overlays\Options\Graphics\MainMenuOptions.cs" />
-    <Compile Include="Overlays\Options\Graphics\SongSelectGraphicsOptions.cs" />
-    <Compile Include="Overlays\Options\Gameplay\GameplaySection.cs" />
-    <Compile Include="Overlays\Options\Gameplay\GeneralGameplayOptions.cs" />
-    <Compile Include="Overlays\Options\Gameplay\SongSelectGameplayOptions.cs" />
-    <Compile Include="Overlays\Options\Audio\AudioSection.cs" />
-    <Compile Include="Overlays\Options\Audio\AudioDevicesOptions.cs" />
-    <Compile Include="Overlays\Options\Audio\VolumeOptions.cs" />
-    <Compile Include="Overlays\Options\Audio\OffsetAdjustmentOptions.cs" />
-    <Compile Include="Overlays\Options\Input\InputSection.cs" />
-    <Compile Include="Overlays\Options\Input\MouseOptions.cs" />
-    <Compile Include="Overlays\Options\Input\KeyboardOptions.cs" />
-    <Compile Include="Overlays\Options\Input\OtherInputOptions.cs" />
-    <Compile Include="Overlays\Options\Online\OnlineSection.cs" />
-    <Compile Include="Overlays\Options\Online\OnlineIntegrationOptions.cs" />
-    <Compile Include="Overlays\Options\Online\InGameChatOptions.cs" />
-    <Compile Include="Overlays\Options\EditorSection.cs" />
-    <Compile Include="Overlays\Options\SkinSection.cs" />
-    <Compile Include="Overlays\Options\Online\PrivacyOptions.cs" />
-    <Compile Include="Overlays\Options\Online\NotificationsOptions.cs" />
-    <Compile Include="Overlays\Options\CheckBoxOption.cs" />
+    <Compile Include="Overlays\Options\Sidebar.cs" />
+    <Compile Include="Overlays\Options\Sections\GeneralSection.cs" />
+    <Compile Include="Overlays\Options\Sections\General\LoginOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\General\UpdateOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\General\LanguageOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\GraphicsSection.cs" />
+    <Compile Include="Overlays\Options\Sections\Graphics\RendererOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\Graphics\LayoutOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\Graphics\DetailOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\Graphics\MainMenuOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\Graphics\SongSelectGraphicsOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\GameplaySection.cs" />
+    <Compile Include="Overlays\Options\Sections\Gameplay\GeneralOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\Gameplay\SongSelectOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\AudioSection.cs" />
+    <Compile Include="Overlays\Options\Sections\Audio\AudioDevicesOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\Audio\VolumeOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\Audio\OffsetOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\InputSection.cs" />
+    <Compile Include="Overlays\Options\Sections\Input\MouseOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\Input\KeyboardOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\Input\OtherInputOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\OnlineSection.cs" />
+    <Compile Include="Overlays\Options\Sections\Online\IntegrationOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\Online\InGameChatOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\EditorSection.cs" />
+    <Compile Include="Overlays\Options\Sections\SkinSection.cs" />
+    <Compile Include="Overlays\Options\Sections\Online\PrivacyOptions.cs" />
+    <Compile Include="Overlays\Options\Sections\Online\NotificationsOptions.cs" />
+    <Compile Include="Graphics\UserInterface\OsuCheckbox.cs" />
     <Compile Include="Overlays\Options\SidebarButton.cs" />
-    <Compile Include="Overlays\Options\TextBoxOption.cs" />
-    <Compile Include="Overlays\Options\SliderOption.cs" />
+    <Compile Include="Overlays\Options\OptionTextBox.cs" />
+    <Compile Include="Overlays\Options\OptionSlider.cs" />
     <Compile Include="Configuration\ProgressBarType.cs" />
-    <Compile Include="Overlays\Options\DropdownOption.cs" />
+    <Compile Include="Overlays\Options\OptionEnumDropDown.cs" />
     <Compile Include="Configuration\RankingType.cs" />
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ReleaseStream.cs" />
     <Compile Include="Configuration\ScreenshotFormat.cs" />
-    <Compile Include="Configuration\FrameSync.cs" />
     <Compile Include="Configuration\ConfineMouseMode.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
+    <Compile Include="Screens\Select\FilterControl.cs" />
+    <Compile Include="Screens\Select\SearchTextBox.cs" />
+    <Compile Include="Screens\Select\FooterButton.cs" />
+    <Compile Include="Screens\Select\Footer.cs" />
+    <Compile Include="Overlays\Pause\PauseButton.cs" />
+    <Compile Include="Overlays\Pause\PauseOverlay.cs" />
+    <Compile Include="Overlays\Pause\PauseProgressBar.cs" />
+    <Compile Include="Overlays\Pause\PauseProgressGraph.cs" />
+    <Compile Include="Overlays\Pause\ResumeButton.cs" />
+    <Compile Include="Overlays\Pause\RetryButton.cs" />
+    <Compile Include="Overlays\Pause\QuitButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

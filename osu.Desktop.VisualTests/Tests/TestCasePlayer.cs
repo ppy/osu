@@ -1,9 +1,9 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.GameModes.Testing;
+using osu.Framework.Screens.Testing;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -29,19 +29,17 @@ namespace osu.Desktop.VisualTests.Tests
         [BackgroundDependencyLoader]
         private void load(BeatmapDatabase db)
         {
-            beatmap = db.GetWorkingBeatmap(db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault());
+            var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault();
+            if (beatmapInfo != null)
+                beatmap = db.GetWorkingBeatmap(beatmapInfo);
         }
 
         public override void Reset()
         {
             base.Reset();
 
-            //ensure we are at offset 0
-            Clock = new FramedClock();
-
-            if (beatmap == null)
+            if (beatmap?.Track == null)
             {
-
                 var objects = new List<HitObject>();
 
                 int time = 1500;
@@ -73,7 +71,7 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new Box
             {
                 RelativeSizeAxes = Framework.Graphics.Axes.Both,
-                Colour = Color4.Gray,
+                Colour = Color4.Black,
             });
 
             Add(new Player

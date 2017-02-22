@@ -1,7 +1,8 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using osu.Framework;
@@ -19,7 +20,9 @@ namespace osu.Game.Modes.Objects.Drawables
     {
         public event Action<DrawableHitObject, JudgementInfo> OnJudgement;
 
-        public Container<DrawableHitObject> ChildObjects;
+        public override bool HandleInput => Interactive;
+
+        public bool Interactive = true;
 
         public JudgementInfo Judgement;
 
@@ -43,26 +46,26 @@ namespace osu.Game.Modes.Objects.Drawables
                 state = value;
 
                 UpdateState(state);
-
-                Expire();
+                if (IsLoaded)
+                    Expire();
 
                 if (State == ArmedState.Hit)
                     PlaySample();
             }
         }
 
-        AudioSample sample;
+        SampleChannel sample;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            string hitType = (HitObject.Sample.Type == SampleType.None ? SampleType.Normal : HitObject.Sample.Type).ToString().ToLower();
-            string sampleSet = HitObject.Sample.Set.ToString().ToLower();
+            string hitType = ((HitObject.Sample?.Type ?? SampleType.None) == SampleType.None ? SampleType.Normal : HitObject.Sample.Type).ToString().ToLower();
+            string sampleSet = (HitObject.Sample?.Set ?? SampleSet.Normal).ToString().ToLower();
 
             sample = audio.Sample.Get($@"Gameplay/{sampleSet}-hit{hitType}");
         }
 
-        protected void PlaySample()
+        protected virtual void PlaySample()
         {
             sample?.Play();
         }
@@ -79,6 +82,19 @@ namespace osu.Game.Modes.Objects.Drawables
             UpdateState(State);
 
             Expire(true);
+        }
+
+        private List<DrawableHitObject> nestedHitObjects;
+
+        protected IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects;
+
+        protected void AddNested(DrawableHitObject h)
+        {
+            if (nestedHitObjects == null)
+                nestedHitObjects = new List<DrawableHitObject>();
+
+            h.OnJudgement += (d, j) => { OnJudgement?.Invoke(d, j); } ;
+            nestedHitObjects.Add(h);
         }
 
         /// <summary>
@@ -115,7 +131,11 @@ namespace osu.Game.Modes.Objects.Drawables
 
         protected virtual void CheckJudgement(bool userTriggered)
         {
-            //todo: consider making abstract.
+            if (NestedHitObjects != null)
+            {
+                foreach (var d in NestedHitObjects)
+                    d.CheckJudgement(userTriggered);
+            }
         }
 
         protected override void UpdateAfterChildren()

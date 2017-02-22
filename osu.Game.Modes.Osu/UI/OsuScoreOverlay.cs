@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -7,25 +7,27 @@ using osu.Game.Modes.UI;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Graphics.Primitives;
-using System;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.Osu.UI
 {
     public class OsuScoreOverlay : ScoreOverlay
     {
-        protected override ScoreCounter CreateScoreCounter() => new ScoreCounter()
+        protected override ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
         {
-            Anchor = Anchor.TopRight,
-            Origin = Anchor.TopRight,
-            TextSize = 60,
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
+            TextSize = 40,
+            Position = new Vector2(0, 30),
             Margin = new MarginPadding { Right = 5 },
         };
 
         protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter()
         {
-            Anchor = Anchor.TopRight,
-            Origin = Anchor.TopRight,
-            Position = new Vector2(0, 55),
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
+            Position = new Vector2(0, 65),
+            TextSize = 20,
             Margin = new MarginPadding { Right = 5 },
         };
 
@@ -35,14 +37,7 @@ namespace osu.Game.Modes.Osu.UI
             Origin = Anchor.BottomLeft,
         };
 
-        protected override HealthDisplay CreateHealthDisplay() => new HealthDisplay()
-        {
-            Size = new Vector2(0.5f, 20),
-            RelativeSizeAxes = Axes.X,
-            Padding = new MarginPadding(5)
-        };
-
-    protected override KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
+        protected override KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
         {
             IsCounting = true,
             FadeTime = 50,

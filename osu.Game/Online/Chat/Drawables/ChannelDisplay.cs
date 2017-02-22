@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 
 namespace osu.Game.Online.Chat.Drawables
@@ -27,7 +28,7 @@ namespace osu.Game.Online.Chat.Drawables
 
             Children = new Drawable[]
             {
-                new SpriteText
+                new OsuSpriteText
                 {
                     Text = channel.Name,
                     TextSize = 50,
@@ -37,11 +38,12 @@ namespace osu.Game.Online.Chat.Drawables
                 },
                 new ScrollContainer
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
                         flow = new FlowContainer
                         {
-                            Direction = FlowDirection.VerticalOnly,
+                            Direction = FlowDirections.Vertical,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Spacing = new Vector2(1, 1)

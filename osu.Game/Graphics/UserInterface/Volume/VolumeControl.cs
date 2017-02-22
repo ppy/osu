@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework;
@@ -18,6 +18,8 @@ namespace osu.Game.Graphics.UserInterface.Volume
     internal class VolumeControl : OverlayContainer
     {
         private VolumeMeter volumeMeterMaster;
+
+        protected override bool HideOnEscape => false;
 
         private void volumeChanged(object sender, EventArgs e)
         {
@@ -70,7 +72,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         public void Adjust(InputState state)
         {
-            if (!IsVisible)
+            if (State == Visibility.Hidden)
             {
                 Show();
                 return;

@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
 using OpenTK;
@@ -15,7 +15,9 @@ namespace osu.Game.Modes.Osu.Objects
 
         public List<Vector2> ControlPoints;
 
-        public CurveTypes CurveType;
+        public CurveTypes CurveType = CurveTypes.PerfectCurve;
+
+        public Vector2 Offset;
 
         private List<Vector2> calculatedPath = new List<Vector2>();
         private List<double> cumulativeLength = new List<double>();
@@ -166,9 +168,13 @@ namespace osu.Game.Modes.Osu.Objects
         /// to 1 (end of the slider) and stores the generated path in the given list.
         /// </summary>
         /// <param name="path">The list to be filled with the computed curve.</param>
-        /// <param name="progress">Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <param name="p0">Start progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <param name="p1">End progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
         public void GetPathToProgress(List<Vector2> path, double p0, double p1)
         {
+            if (calculatedPath.Count == 0 && ControlPoints.Count > 0)
+                Calculate();
+
             double d0 = progressToDistance(p0);
             double d1 = progressToDistance(p1);
 
@@ -177,12 +183,12 @@ namespace osu.Game.Modes.Osu.Objects
             int i = 0;
             for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i);
 
-            path.Add(interpolateVertices(i, d0));
+            path.Add(interpolateVertices(i, d0) + Offset);
 
             for (; i < calculatedPath.Count && cumulativeLength[i] <= d1; ++i)
-                path.Add(calculatedPath[i]);
+                path.Add(calculatedPath[i] + Offset);
 
-            path.Add(interpolateVertices(i, d1));
+            path.Add(interpolateVertices(i, d1) + Offset);
         }
 
         /// <summary>
@@ -193,8 +199,11 @@ namespace osu.Game.Modes.Osu.Objects
         /// <returns></returns>
         public Vector2 PositionAt(double progress)
         {
+            if (calculatedPath.Count == 0 && ControlPoints.Count > 0)
+                Calculate();
+
             double d = progressToDistance(progress);
-            return interpolateVertices(indexOfDistance(d), d);
+            return interpolateVertices(indexOfDistance(d), d) + Offset;
         }
     }
 }

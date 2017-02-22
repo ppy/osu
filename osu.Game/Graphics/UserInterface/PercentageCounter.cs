@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework;
 using osu.Framework.Graphics;
@@ -20,8 +20,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override Type TransformType => typeof(TransformAccuracy);
 
-        protected override double RollingDuration => 150;
-        protected override bool IsRollingProportional => true;
+        protected override double RollingDuration => 750;
 
         private float epsilon => 1e-10f;
 
@@ -32,6 +31,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public PercentageCounter()
         {
+            DisplayedCountSpriteText.FixedWidth = true;
             Count = 1.0f;
         }
 

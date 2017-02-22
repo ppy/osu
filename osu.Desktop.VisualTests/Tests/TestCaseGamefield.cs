@@ -1,8 +1,8 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Framework.GameModes.Testing;
+using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
@@ -58,28 +58,28 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 new OsuHitRenderer
                 {
-                    Objects = beatmap.HitObjects,
+                    Beatmap = beatmap,
                     Scale = new Vector2(0.5f),
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft
                 },
                 new TaikoHitRenderer
                 {
-                    Objects = beatmap.HitObjects,
+                    Beatmap = beatmap,
                     Scale = new Vector2(0.5f),
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight
                 },
                 new CatchHitRenderer
                 {
-                    Objects = beatmap.HitObjects,
+                    Beatmap = beatmap,
                     Scale = new Vector2(0.5f),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft
                 },
                 new ManiaHitRenderer
                 {
-                    Objects = beatmap.HitObjects,
+                    Beatmap = beatmap,
                     Scale = new Vector2(0.5f),
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight

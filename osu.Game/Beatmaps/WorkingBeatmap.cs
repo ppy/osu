@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.IO;
@@ -18,7 +18,9 @@ namespace osu.Game.Beatmaps
         public readonly BeatmapSetInfo BeatmapSetInfo;
         private readonly BeatmapDatabase database;
 
-        private ArchiveReader GetReader() => database?.GetReader(BeatmapSetInfo);
+        public readonly bool WithStoryboard;
+
+        private ArchiveReader getReader() => database?.GetReader(BeatmapSetInfo);
 
         private Texture background;
         private object backgroundLock = new object();
@@ -30,9 +32,11 @@ namespace osu.Game.Beatmaps
                 {
                     if (background != null) return background;
 
+                    if (BeatmapInfo?.Metadata?.BackgroundFile == null) return null;
+
                     try
                     {
-                        using (var reader = GetReader())
+                        using (var reader = getReader())
                             background = new TextureStore(new RawTextureLoaderStore(reader), false).Get(BeatmapInfo.Metadata.BackgroundFile);
                     }
                     catch { }
@@ -55,9 +59,19 @@ namespace osu.Game.Beatmaps
 
                     try
                     {
-                        using (var reader = GetReader())
-                        using (var stream = new StreamReader(reader.GetStream(BeatmapInfo.Path)))
-                            beatmap = BeatmapDecoder.GetDecoder(stream)?.Decode(stream);
+                        using (var reader = getReader())
+                        {
+                            BeatmapDecoder decoder;
+                            using (var stream = new StreamReader(reader.GetStream(BeatmapInfo.Path)))
+                            {
+                                decoder = BeatmapDecoder.GetDecoder(stream);
+                                beatmap = decoder?.Decode(stream);
+                            }
+
+                            if (WithStoryboard && beatmap != null && BeatmapSetInfo.StoryboardFile != null)
+                                using (var stream = new StreamReader(reader.GetStream(BeatmapSetInfo.StoryboardFile)))
+                                    decoder?.Decode(stream, beatmap);
+                        }
                     }
                     catch { }
 
@@ -68,9 +82,9 @@ namespace osu.Game.Beatmaps
         }
 
         private ArchiveReader trackReader;
-        private AudioTrack track;
+        private Track track;
         private object trackLock = new object();
-        public AudioTrack Track
+        public Track Track
         {
             get
             {
@@ -81,10 +95,10 @@ namespace osu.Game.Beatmaps
                     try
                     {
                         //store a reference to the reader as we may continue accessing the stream in the background.
-                        trackReader = GetReader();
+                        trackReader = getReader();
                         var trackData = trackReader?.GetStream(BeatmapInfo.Metadata.AudioFile);
                         if (trackData != null)
-                            track = new AudioTrackBass(trackData);
+                            track = new TrackBass(trackData);
                     }
                     catch { }
 
@@ -101,11 +115,12 @@ namespace osu.Game.Beatmaps
             this.beatmap = beatmap;
         }
 
-        public WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, BeatmapDatabase database)
+        public WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, BeatmapDatabase database, bool withStoryboard = false)
         {
-            this.BeatmapInfo = beatmapInfo;
-            this.BeatmapSetInfo = beatmapSetInfo;
+            BeatmapInfo = beatmapInfo;
+            BeatmapSetInfo = beatmapSetInfo;
             this.database = database;
+            this.WithStoryboard = withStoryboard;
         }
 
         private bool isDisposed;

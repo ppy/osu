@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework;
 using osu.Framework.Graphics;
@@ -55,6 +55,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             switch (state)
             {
+                case PanelSelectedState.Hidden:
                 case PanelSelectedState.NotSelected:
                     Deselected();
                     break;
@@ -62,6 +63,11 @@ namespace osu.Game.Beatmaps.Drawables
                     Selected();
                     break;
             }
+
+            if (state == PanelSelectedState.Hidden)
+                FadeOut(300, EasingTypes.OutQuint);
+            else
+                FadeIn(250);
         }
 
         private PanelSelectedState state = PanelSelectedState.NotSelected;
@@ -112,6 +118,7 @@ namespace osu.Game.Beatmaps.Drawables
 
     enum PanelSelectedState
     {
+        Hidden,
         NotSelected,
         Selected
     }

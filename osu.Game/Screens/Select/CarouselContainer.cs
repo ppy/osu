@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
 using osu.Framework.Caching;
@@ -16,10 +16,12 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Framework.Timing;
 using osu.Framework.Input;
 using OpenTK.Input;
+using System.Collections;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Screens.Select
 {
-    class CarouselContainer : ScrollContainer
+    class CarouselContainer : ScrollContainer, IEnumerable<BeatmapGroup>
     {
         private Container<Panel> scrollableContent;
         private List<BeatmapGroup> groups = new List<BeatmapGroup>();
@@ -28,13 +30,13 @@ namespace osu.Game.Screens.Select
         public BeatmapPanel SelectedPanel { get; private set; }
 
         private List<float> yPositions = new List<float>();
-        private CarouselLifetimeList<Panel> Lifetime;
+        private CarouselLifetimeList<Panel> lifetime;
 
         public CarouselContainer()
         {
             DistanceDecayJump = 0.01;
 
-            Add(scrollableContent = new Container<Panel>(Lifetime = new CarouselLifetimeList<Panel>(DepthComparer))
+            Add(scrollableContent = new Container<Panel>(lifetime = new CarouselLifetimeList<Panel>(DepthComparer))
             {
                 RelativeSizeAxes = Axes.X,
             });
@@ -95,10 +97,10 @@ namespace osu.Game.Screens.Select
             computeYPositions();
         }
 
-        private void movePanel(Panel panel, bool advance, ref float currentY)
+        private void movePanel(Panel panel, bool advance, bool animated, ref float currentY)
         {
             yPositions.Add(currentY);
-            panel.MoveToY(currentY, 750, EasingTypes.OutExpo);
+            panel.MoveToY(currentY, animated && (panel.IsOnScreen || panel.State != PanelSelectedState.Hidden) ? 750 : 0, EasingTypes.OutExpo);
 
             if (advance)
                 currentY += panel.DrawHeight + 5;
@@ -108,7 +110,7 @@ namespace osu.Game.Screens.Select
         /// Computes the target Y positions for every panel in the carousel.
         /// </summary>
         /// <returns>The Y position of the currently selected panel.</returns>
-        private float computeYPositions()
+        private float computeYPositions(bool animated = true)
         {
             yPositions.Clear();
 
@@ -117,7 +119,7 @@ namespace osu.Game.Screens.Select
 
             foreach (BeatmapGroup group in groups)
             {
-                movePanel(group.Header, true, ref currentY);
+                movePanel(group.Header, group.State != BeatmapGroupState.Hidden, animated, ref currentY);
 
                 if (group.State == BeatmapGroupState.Expanded)
                 {
@@ -135,7 +137,7 @@ namespace osu.Game.Screens.Select
                         if (panel.Alpha == 0)
                             panel.MoveToY(headerY);
 
-                        movePanel(panel, true, ref currentY);
+                        movePanel(panel, true, animated, ref currentY);
                     }
                 }
                 else
@@ -145,7 +147,7 @@ namespace osu.Game.Screens.Select
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
                     {
                         panel.MoveToX(0, 500, EasingTypes.OutExpo);
-                        movePanel(panel, false, ref currentY);
+                        movePanel(panel, false, animated, ref currentY);
                     }
                 }
             }
@@ -156,38 +158,38 @@ namespace osu.Game.Screens.Select
             return selectedY;
         }
 
-        public void SelectBeatmap(BeatmapInfo beatmap)
+        public void SelectBeatmap(BeatmapInfo beatmap, bool animated = true)
         {
             foreach (BeatmapGroup group in groups)
             {
                 var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
                 if (panel != null)
                 {
-                    SelectGroup(group, panel);
+                    SelectGroup(group, panel, animated);
                     return;
                 }
             }
         }
 
-        public void SelectGroup(BeatmapGroup group, BeatmapPanel panel)
+        public void SelectGroup(BeatmapGroup group, BeatmapPanel panel, bool animated = true)
         {
-            if (SelectedGroup != null && SelectedGroup != group)
+            if (SelectedGroup != null && SelectedGroup != group && SelectedGroup.State != BeatmapGroupState.Hidden)
                 SelectedGroup.State = BeatmapGroupState.Collapsed;
 
             SelectedGroup = group;
             panel.State = PanelSelectedState.Selected;
             SelectedPanel = panel;
 
-            float selectedY = computeYPositions();
-            ScrollTo(selectedY);
+            float selectedY = computeYPositions(animated);
+            ScrollTo(selectedY, animated);
         }
 
         private static float offsetX(float dist, float halfHeight)
         {
             // The radius of the circle the carousel moves on.
-            const float CIRCLE_RADIUS = 4;
-            double discriminant = Math.Max(0, CIRCLE_RADIUS * CIRCLE_RADIUS - dist * dist);
-            float x = (CIRCLE_RADIUS - (float)Math.Sqrt(discriminant)) * halfHeight;
+            const float circle_radius = 3;
+            double discriminant = Math.Max(0, circle_radius * circle_radius - dist * dist);
+            float x = (circle_radius - (float)Math.Sqrt(discriminant)) * halfHeight;
 
             return 125 + x;
         }
@@ -200,7 +202,9 @@ namespace osu.Game.Screens.Select
         /// <param name="halfHeight">Half the draw height of the carousel container.</param>
         private void updatePanel(Panel p, float halfHeight)
         {
-            float panelDrawY = p.Position.Y - Current + p.DrawHeight / 2;
+            var height = p.IsPresent ? p.DrawHeight : 0;
+
+            float panelDrawY = p.Position.Y - Current + height / 2;
             float dist = Math.Abs(1f - panelDrawY / halfHeight);
 
             // Setting the origin position serves as an additive position on top of potential
@@ -222,7 +226,7 @@ namespace osu.Game.Screens.Select
             float drawHeight = DrawHeight;
             float halfHeight = drawHeight / 2;
 
-            foreach (Panel p in Lifetime.AliveItems)
+            foreach (Panel p in lifetime.AliveItems)
             {
                 float panelPosY = p.Position.Y;
                 p.IsOnScreen = panelPosY >= Current - p.DrawHeight && panelPosY <= Current + drawHeight;
@@ -236,13 +240,14 @@ namespace osu.Game.Screens.Select
             int lastIndex = yPositions.BinarySearch(Current + drawHeight);
             if (lastIndex < 0) lastIndex = ~lastIndex;
 
-            Lifetime.StartIndex = firstIndex;
-            Lifetime.EndIndex = lastIndex;
+            lifetime.StartIndex = firstIndex;
+            lifetime.EndIndex = lastIndex;
 
             for (int i = firstIndex; i < lastIndex; ++i)
             {
-                Panel p = Lifetime[i];
-                p.IsOnScreen = true;
+                Panel p = lifetime[i];
+                if (p.State != PanelSelectedState.Hidden)
+                    p.IsOnScreen = true; //we don't want to update the on-screen state of hidden pannels as they have incorrect (stacked) y values.
                 updatePanel(p, halfHeight);
             }
         }
@@ -270,23 +275,50 @@ namespace osu.Game.Screens.Select
                     break;
             }
 
-            if (direction != 0)
+            if (direction == 0)
+                return base.OnKeyDown(state, args);
+
+            if (!skipDifficulties)
             {
-                int index = SelectedGroup.BeatmapPanels.IndexOf(SelectedPanel) + direction;
+                int i = SelectedGroup.BeatmapPanels.IndexOf(SelectedPanel) + direction;
 
-                if (!skipDifficulties && index >= 0 && index < SelectedGroup.BeatmapPanels.Count)
-                    //changing difficulty panel, not set.
-                    SelectGroup(SelectedGroup, SelectedGroup.BeatmapPanels[index]);
-                else
+                if (i >= 0 && i < SelectedGroup.BeatmapPanels.Count)
                 {
-                    index = (groups.IndexOf(SelectedGroup) + direction + groups.Count) % groups.Count;
-                    SelectBeatmap(groups[index].BeatmapPanels.First().Beatmap);
+                    //changing difficulty panel, not set.
+                    SelectGroup(SelectedGroup, SelectedGroup.BeatmapPanels[i]);
+                    return true;
                 }
-
-                return true;
             }
 
-            return base.OnKeyDown(state, args);
+            int startIndex = groups.IndexOf(SelectedGroup);
+            int index = startIndex;
+
+            do
+            {
+                index = (index + direction + groups.Count) % groups.Count;
+                if (groups[index].State != BeatmapGroupState.Hidden)
+                {
+                    SelectBeatmap(groups[index].BeatmapPanels.First().Beatmap);
+                    return true;
+                }
+            } while (index != startIndex);
+
+            return true;
         }
+
+        public void SelectRandom()
+        {
+            if (groups.Count < 1)
+                return;
+            BeatmapGroup group = groups[RNG.Next(groups.Count)];
+            BeatmapPanel panel = group?.BeatmapPanels.First();
+            if (panel == null)
+                return;
+            SelectGroup(group, panel);
+        }
+
+        public IEnumerator<BeatmapGroup> GetEnumerator() => groups.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

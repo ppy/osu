@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.IO;
@@ -25,27 +25,23 @@ namespace osu.Game.Beatmaps.IO
 
         private Stream archiveStream;
         private ZipFile archive;
-        private string[] beatmaps;
         private Beatmap firstMap;
-    
+
         public OszArchiveReader(Stream archiveStream)
         {
             this.archiveStream = archiveStream;
             archive = ZipFile.Read(archiveStream);
-            beatmaps = archive.Entries.Where(e => e.FileName.EndsWith(@".osu"))
+            BeatmapFilenames = archive.Entries.Where(e => e.FileName.EndsWith(@".osu"))
                 .Select(e => e.FileName).ToArray();
-            if (beatmaps.Length == 0)
+            if (BeatmapFilenames.Length == 0)
                 throw new FileNotFoundException(@"This directory contains no beatmaps");
-            using (var stream = new StreamReader(GetStream(beatmaps[0])))
+            StoryboardFilename = archive.Entries.Where(e => e.FileName.EndsWith(@".osb"))
+                .Select(e => e.FileName).FirstOrDefault();
+            using (var stream = new StreamReader(GetStream(BeatmapFilenames[0])))
             {
                 var decoder = BeatmapDecoder.GetDecoder(stream);
                 firstMap = decoder.Decode(stream);
             }
-        }
-
-        public override string[] ReadBeatmaps()
-        {
-            return beatmaps;
         }
 
         public override Stream GetStream(string name)

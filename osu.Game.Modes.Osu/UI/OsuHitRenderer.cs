@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
@@ -21,7 +21,8 @@ namespace osu.Game.Modes.Osu.UI
                 return new DrawableHitCircle(h as HitCircle);
             if (h is Slider)
                 return new DrawableSlider(h as Slider);
-
+            if (h is Spinner)
+                return new DrawableSpinner(h as Spinner);
             return null;
         }
     }

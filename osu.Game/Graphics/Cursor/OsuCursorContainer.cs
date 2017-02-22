@@ -1,8 +1,10 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -10,6 +12,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
+using osu.Game.Configuration;
+using System;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -38,22 +42,87 @@ namespace osu.Game.Graphics.Cursor
 
         class OsuCursor : Container
         {
+            private Container cursorContainer;
+            private BindableDouble cursorScale;
+
             public OsuCursor()
             {
                 Origin = Anchor.Centre;
-                AutoSizeAxes = Axes.Both;
+                Size = new Vector2(42);
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(TextureStore textures, OsuConfigManager config)
             {
+                cursorScale = (BindableDouble)config.GetBindable<double>(OsuConfig.CursorSize);
+
                 Children = new Drawable[]
                 {
-                    new Sprite
+                    cursorContainer = new CircularContainer
                     {
-                        Texture = textures.Get(@"Cursor/cursor")
-                    }
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Scale = new Vector2((float)cursorScale),
+                        Masking = true,
+                        BorderThickness = Size.X / 6,
+                        BorderColour = Color4.White,
+                        EdgeEffect = new EdgeEffect {
+                            Type = EdgeEffectType.Shadow,
+                            Colour = Color4.Pink.Opacity(0.5f),
+                            Radius = 5,
+                        },
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                AlwaysPresent = true,
+                            },
+                            new CircularContainer
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Masking = true,
+                                BorderThickness = Size.X / 3,
+                                BorderColour = Color4.White.Opacity(0.5f),
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0,
+                                        AlwaysPresent = true,
+                                    },
+                                },
+                            },
+                            new CircularContainer
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Scale = new Vector2(0.1f),
+                                Masking = true,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.White,
+                                    },
+                                },
+                            },
+                        }
+                    },
                 };
+                cursorScale.ValueChanged += scaleChanged;
+            }
+
+            private void scaleChanged(object sender, EventArgs e)
+            {
+                cursorContainer.Scale = new Vector2((float)cursorScale);
             }
         }
     }

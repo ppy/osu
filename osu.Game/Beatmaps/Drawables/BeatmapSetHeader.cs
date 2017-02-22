@@ -1,7 +1,8 @@
-//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -11,6 +12,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -23,6 +25,7 @@ namespace osu.Game.Beatmaps.Drawables
         private OsuConfigManager config;
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap beatmap;
+        private FlowContainer difficultyIcons;
 
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
@@ -36,19 +39,19 @@ namespace osu.Game.Beatmaps.Drawables
                 },
                 new FlowContainer
                 {
-                    Direction = FlowDirection.VerticalOnly,
+                    Direction = FlowDirections.Vertical,
                     Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        title = new SpriteText
+                        title = new OsuSpriteText
                         {
                             Font = @"Exo2.0-BoldItalic",
                             Text = beatmap.BeatmapSetInfo.Metadata.Title,
                             TextSize = 22,
                             Shadow = true,
                         },
-                        artist = new SpriteText
+                        artist = new OsuSpriteText
                         {
                             Margin = new MarginPadding { Top = -1 },
                             Font = @"Exo2.0-SemiBoldItalic",
@@ -56,25 +59,14 @@ namespace osu.Game.Beatmaps.Drawables
                             TextSize = 17,
                             Shadow = true,
                         },
-                        new FlowContainer
+                        difficultyIcons = new FlowContainer
                         {
                             Margin = new MarginPadding { Top = 5 },
                             AutoSizeAxes = Axes.Both,
-                            Children = new[]
-                            {
-                                new DifficultyIcon(FontAwesome.fa_dot_circle_o, new Color4(159, 198, 0, 255)),
-                                new DifficultyIcon(FontAwesome.fa_dot_circle_o, new Color4(246, 101, 166, 255)),
-                            }
                         }
                     }
                 }
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            FadeInFromZero(250);
         }
 
         protected override void Selected()
@@ -121,7 +113,7 @@ namespace osu.Game.Beatmaps.Drawables
                     new FlowContainer
                     {
                         Depth = -1,
-                        Direction = FlowDirection.HorizontalOnly,
+                        Direction = FlowDirections.Horizontal,
                         RelativeSizeAxes = Axes.Both,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),
@@ -176,6 +168,12 @@ namespace osu.Game.Beatmaps.Drawables
                     ForceRedraw();
                 });
             }
+        }
+
+        public void AddDifficultyIcons(IEnumerable<BeatmapPanel> panels)
+        {
+            foreach (var p in panels)
+                difficultyIcons.Add(new DifficultyIcon(p.Beatmap));
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL.Textures;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Configuration;
 using OpenTK;
@@ -89,7 +89,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             var bytes = upload.Data;
 
             const float aa_portion = 0.02f;
-            const float border_portion = 0.18f;
+            const float border_portion = 0.128f;
             const float gradient_portion = 1 - border_portion;
 
             const float opacity_at_centre = 0.3f;

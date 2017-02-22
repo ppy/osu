@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,7 +11,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
     {
         public ExplodePiece()
         {
-            Size = new Vector2(144);
+            Size = new Vector2(128);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -21,10 +21,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                new Triangles
+                new TrianglesPiece
                 {
                     BlendingMode = BlendingMode.Additive,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.2f,
                 }
             };
         }

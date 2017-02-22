@@ -1,9 +1,11 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +14,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
@@ -21,13 +24,16 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// osu! logo and its attachments (pulsing, visualiser etc.)
     /// </summary>
-    public partial class OsuLogo : Container
+    public class OsuLogo : Container
     {
+        public Color4 OsuPink = OsuColour.FromHex(@"e967a1");
+
         private Sprite logo;
         private CircularContainer logoContainer;
         private Container logoBounceContainer;
         private Container logoHoverContainer;
-        private MenuVisualisation vis;
+
+        private SampleChannel sampleClick;
 
         private Container colourAndTriangles;
 
@@ -62,6 +68,7 @@ namespace osu.Game.Screens.Menu
         }
 
         public bool Interactive = true;
+        private Box flashLayer;
 
         public OsuLogo()
         {
@@ -104,22 +111,30 @@ namespace osu.Game.Screens.Menu
                                                         new Box
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
-                                                            Colour = new Color4(233, 103, 161, 255),
+                                                            Colour = OsuPink,
                                                         },
-                                                        new OsuLogoTriangles
+                                                        new Triangles
                                                         {
+                                                            TriangleScale = 4,
+                                                            ColourLight = OsuColour.FromHex(@"ff7db7"),
+                                                            ColourDark = OsuColour.FromHex(@"de5b95"),
                                                             RelativeSizeAxes = Axes.Both,
                                                         },
                                                     }
                                                 },
-
+                                                flashLayer = new Box
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    BlendingMode = BlendingMode.Additive,
+                                                    Colour = Color4.White,
+                                                    Alpha = 0,
+                                                },
                                             },
                                         },
                                         logo = new Sprite
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Scale = new Vector2(0.5f),
                                         },
                                     }
                                 },
@@ -134,12 +149,11 @@ namespace osu.Game.Screens.Menu
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             BlendingMode = BlendingMode.Additive,
-                                            Scale = new Vector2(0.5f),
                                             Alpha = 0.15f
                                         }
                                     }
                                 },
-                                vis = new MenuVisualisation
+                                new MenuVisualisation
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -155,10 +169,11 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(TextureStore textures, AudioManager audio)
         {
-            logo.Texture = textures.Get(@"Menu/logo@2x");
-            ripple.Texture = textures.Get(@"Menu/logo@2x");
+            sampleClick = audio.Sample.Get(@"Menu/menuhit");
+            logo.Texture = textures.Get(@"Menu/logo");
+            ripple.Texture = textures.Get(@"Menu/logo");
         }
 
         protected override void LoadComplete()
@@ -180,14 +195,21 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-
             logoBounceContainer.ScaleTo(1f, 500, EasingTypes.OutElastic);
             return true;
         }
 
+        protected override bool OnDragStart(InputState state) => true;
+
         protected override bool OnClick(InputState state)
         {
             if (!Interactive) return false;
+
+            sampleClick.Play();
+
+            flashLayer.ClearTransformations();
+            flashLayer.Alpha = 0.4f;
+            flashLayer.FadeOut(1500, EasingTypes.OutExpo);
 
             Action?.Invoke();
             return true;
@@ -203,32 +225,6 @@ namespace osu.Game.Screens.Menu
         protected override void OnHoverLost(InputState state)
         {
             logoHoverContainer.ScaleTo(1, 500, EasingTypes.OutElastic);
-        }
-
-        class OsuLogoTriangles : Triangles
-        {
-            public OsuLogoTriangles()
-            {
-                TriangleScale = 4;
-                Alpha = 1;
-            }
-
-            protected override Triangle CreateTriangle()
-            {
-                var triangle = base.CreateTriangle();
-                triangle.Alpha = 1;
-                triangle.Colour = getTriangleShade();
-                return triangle;
-            }
-
-            private Color4 getTriangleShade()
-            {
-                float val = RNG.NextSingle();
-                return Interpolation.ValueAt(val,
-                    new Color4(222, 91, 149, 255),
-                    new Color4(255, 125, 183, 255),
-                    0, 1);
-            }
         }
     }
 }

@@ -1,10 +1,11 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Online.Chat.Drawables
 
         public ChatLine(Message message)
         {
-            this.Message = message;
+            Message = message;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -31,13 +32,13 @@ namespace osu.Game.Online.Chat.Drawables
                     Size = new Vector2(padding, text_size),
                     Children = new Drawable[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = Message.Timestamp.LocalDateTime.ToLongTimeString(),
                             TextSize = text_size,
                             Colour = Color4.Gray
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = Message.User.Name,
                             TextSize = text_size,
@@ -53,7 +54,7 @@ namespace osu.Game.Online.Chat.Drawables
                     Padding = new MarginPadding { Left = padding + 10 },
                     Children = new Drawable[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = Message.Content,
                             TextSize = text_size,

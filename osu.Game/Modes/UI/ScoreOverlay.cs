@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework.Graphics;
@@ -8,6 +8,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Modes.Objects;
 using OpenTK;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.UI
 {
@@ -24,7 +25,12 @@ namespace osu.Game.Modes.UI
         protected abstract ComboCounter CreateComboCounter();
         protected abstract PercentageCounter CreateAccuracyCounter();
         protected abstract ScoreCounter CreateScoreCounter();
-        protected abstract HealthDisplay CreateHealthDisplay();
+        protected virtual HealthDisplay CreateHealthDisplay() => new HealthDisplay
+        {
+            Size = new Vector2(1, 5),
+            RelativeSizeAxes = Axes.X,
+            Margin = new MarginPadding { Top = 20 }
+        };
 
         public virtual void OnHit(HitObject h)
         {
@@ -58,7 +64,7 @@ namespace osu.Game.Modes.UI
             processor.TotalScore.ValueChanged += delegate { ScoreCounter?.Set((ulong)processor.TotalScore.Value); };
             processor.Accuracy.ValueChanged += delegate { AccuracyCounter?.Set((float)processor.Accuracy.Value); };
             processor.Combo.ValueChanged += delegate { ComboCounter?.Set((ulong)processor.Combo.Value); };
-            processor.Health.ValueChanged += delegate { HealthDisplay?.Set(processor.Health.Value); };
+            HealthDisplay?.Current.Weld(processor.Health);
         }
     }
 }

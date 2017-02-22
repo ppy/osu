@@ -1,20 +1,21 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 namespace osu.Game.Beatmaps.Timing
 {
     public class ControlPoint
     {
+        public static ControlPoint Default = new ControlPoint
+        {
+            BeatLength = 500,
+            TimingChange = true,
+        };
+
         public double Time;
         public double BeatLength;
         public double VelocityAdjustment;
         public bool TimingChange;
+        
     }
 
     internal enum TimeSignatures

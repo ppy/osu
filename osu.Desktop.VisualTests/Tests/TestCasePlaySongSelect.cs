@@ -1,9 +1,9 @@
-//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Platform;
-using osu.Framework.GameModes.Testing;
+using osu.Framework.Screens.Testing;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Select;
@@ -41,7 +41,11 @@ namespace osu.Desktop.VisualTests.Tests
         protected override void Dispose(bool isDisposing)
         {
             if (oldDb != null)
+            {
                 Dependencies.Cache(oldDb, true);
+                db = null;
+            }
+
             base.Dispose(isDisposing);
         }
 

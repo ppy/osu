@@ -1,7 +1,8 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Allocation;
 using OpenTK;
@@ -14,7 +15,13 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps.Drawables;
+using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.MathUtils;
 using osu.Game.Graphics;
+using osu.Game.Beatmaps.Timing;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Modes;
 
 namespace osu.Game.Screens.Select
 {
@@ -24,7 +31,7 @@ namespace osu.Game.Screens.Select
 
         private Container beatmapInfoContainer;
 
-        private BaseGame game;
+        private OsuGameBase game;
 
         public BeatmapInfoWedge()
         {
@@ -42,7 +49,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(BaseGame game)
+        private void load(OsuGameBase game)
         {
             this.game = game;
         }
@@ -58,6 +65,28 @@ namespace osu.Game.Screens.Select
 
             BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
+
+            List<InfoLabel> labels = new List<InfoLabel>();
+
+            if (beatmap.Beatmap != null)
+            {
+                labels.Add(new InfoLabel(new BeatmapStatistic
+                {
+                    Name = "Length",
+                    Icon = FontAwesome.fa_clock_o,
+                    Content = beatmap.Beatmap.HitObjects.Count == 0 ? "-" : TimeSpan.FromMilliseconds(beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
+                }));
+
+                labels.Add(new InfoLabel(new BeatmapStatistic
+                {
+                    Name = "BPM",
+                    Icon = FontAwesome.fa_circle,
+                    Content = getBPMRange(beatmap.Beatmap),
+                }));
+
+                //get statistics fromt he current ruleset.
+                Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).GetBeatmapStatistics(beatmap).ForEach(s => labels.Add(new InfoLabel(s)));
+            }
 
             (beatmapInfoContainer = new BufferedContainer
             {
@@ -98,19 +127,19 @@ namespace osu.Game.Screens.Select
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Direction = FlowDirection.VerticalOnly,
-                        Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 40 },
+                        Direction = FlowDirections.Vertical,
+                        Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
-                        Children = new[]
+                        Children = new Drawable[]
                         {
-                            new SpriteText
+                            new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
                                 Text = beatmapSetInfo.Metadata.Artist + " -- " + beatmapSetInfo.Metadata.Title,
                                 TextSize = 28,
                                 Shadow = true,
                             },
-                            new SpriteText
+                            new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
                                 Text = beatmapInfo.Version,
@@ -120,18 +149,18 @@ namespace osu.Game.Screens.Select
                             new FlowContainer
                             {
                                 Margin = new MarginPadding { Top = 10 },
-                                Direction = FlowDirection.HorizontalOnly,
+                                Direction = FlowDirections.Horizontal,
                                 AutoSizeAxes = Axes.Both,
                                 Children = new []
                                 {
-                                    new SpriteText
+                                    new OsuSpriteText
                                     {
                                         Font = @"Exo2.0-Medium",
                                         Text = "mapped by ",
                                         TextSize = 15,
                                         Shadow = true,
                                     },
-                                    new SpriteText
+                                    new OsuSpriteText
                                     {
                                         Font = @"Exo2.0-Bold",
                                         Text = beatmapSetInfo.Metadata.Author,
@@ -139,11 +168,18 @@ namespace osu.Game.Screens.Select
                                         Shadow = true,
                                     },
                                 }
-                            }
+                            },
+                            new FlowContainer
+                            {
+                                Margin = new MarginPadding { Top = 20 },
+                                Spacing = new Vector2(40,0),
+                                AutoSizeAxes = Axes.Both,
+                                Children = labels
+                            },
                         }
-                    }
+                    },
                 }
-            }).Preload(game, delegate(Drawable d)
+            }).Preload(game, delegate (Drawable d)
             {
                 FadeIn(250);
 
@@ -152,6 +188,48 @@ namespace osu.Game.Screens.Select
 
                 Add(d);
             });
+        }
+
+        private string getBPMRange(Beatmap beatmap)
+        {
+            double bpmMax = beatmap.BPMMaximum; 
+            double bpmMin = beatmap.BPMMinimum;
+
+            if (Precision.AlmostEquals(bpmMin, bpmMax)) return Math.Round(bpmMin) + "bpm";
+
+            return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "bpm (mostly " + Math.Round(beatmap.BPMMode) + "bpm)";
+        }
+
+        public class InfoLabel : Container
+        {
+            public InfoLabel(BeatmapStatistic statistic)
+            {
+                AutoSizeAxes = Axes.Both;
+                Children = new Drawable[]
+                {
+                    new TextAwesome
+                    {
+                        Icon = FontAwesome.fa_square,
+                        Colour = new Color4(68, 17, 136, 255),
+                        Rotation = 45
+                    },
+                    new TextAwesome
+                    {
+                        Icon = statistic.Icon,
+                        Colour = new Color4(255, 221, 85, 255),
+                        Scale = new Vector2(0.8f)
+                    },
+                    new OsuSpriteText
+                    {
+                        Margin = new MarginPadding { Left = 13 },
+                        Font = @"Exo2.0-Bold",
+                        Colour = new Color4(255, 221, 85, 255),
+                        Text = statistic.Content,
+                        TextSize = 17,
+                        Origin = Anchor.CentreLeft
+                    },
+                };
+            }
         }
     }
 }
