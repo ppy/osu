@@ -61,7 +61,7 @@ namespace osu.Game.Online.Chat.Drawables
             return username_colours[message.UserId % username_colours.Length];
         }
 
-        const float padding = 200;
+        const float padding = 220;
         const float text_size = 20;
 
         public ChatLine(Message message)
