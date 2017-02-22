@@ -121,9 +121,6 @@ namespace osu.Game.Overlays
             }
         }
 
-        // TODO: Remove when framework updated
-        public override bool HandleInput => State == Visibility.Visible;
-
         protected override void PopIn()
         {
             base.Show();
