@@ -47,19 +47,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Objects\Drawables\HitCircle.cs" />
-    <Compile Include="Objects\Drawables\HitCircleFinisher.cs" />
+    <Compile Include="Objects\Drawables\DrawableSpinner.cs" />
+    <Compile Include="Objects\Drawables\DrawableTaikoHitObject.cs" />
+    <Compile Include="Objects\Drawables\DrawableHitCircle.cs" />
+    <Compile Include="Objects\Drawables\DrawableHitCircleFinisher.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
+    <Compile Include="Objects\Drawables\DrawableDrumRoll.cs" />
     <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\HitCirclePiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\TrianglesPiece.cs" />
+    <Compile Include="Objects\DrumRoll.cs" />
+    <Compile Include="Objects\HitCircle.cs" />
+    <Compile Include="Objects\Spinner.cs" />
+    <Compile Include="Objects\TaikoHitObject.cs" />
     <Compile Include="Objects\TaikoScoreResult.cs" />
     <Compile Include="Objects\TaikoJudgementInfo.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
-    <Compile Include="Objects\TaikoBaseHit.cs" />
     <Compile Include="Objects\TaikoConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TaikoHitObjectParser.cs" />
     <Compile Include="UI\Drums\TaikoDrumInner.cs" />
     <Compile Include="UI\Drums\TaikoDrumSet.cs" />
     <Compile Include="UI\TaikoComboCounter.cs" />

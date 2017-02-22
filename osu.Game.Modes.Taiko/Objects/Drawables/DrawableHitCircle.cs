@@ -9,19 +9,30 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public class HitCircleDon : HitCircle
+    public class DrawableHitCircleDon : DrawableHitCircle
     {
+        public DrawableHitCircleDon(TaikoHitObject hitObject)
+            : base(hitObject)
+        {
+        }
+
         protected override HitCirclePiece CreateBody() => new DonPiece();
     }
 
-    public class HitCircleKatsu : HitCircle
+    public class DrawableHitCircleKatsu : DrawableHitCircle
     {
+        public DrawableHitCircleKatsu(TaikoHitObject hitObject)
+            : base(hitObject)
+        {
+        }
+
         protected override HitCirclePiece CreateBody() => new KatsuPiece();
     }
 
-    public abstract class HitCircle : Container
+    public abstract class DrawableHitCircle : DrawableTaikoHitObject
     {
-        public HitCircle()
+        public DrawableHitCircle(TaikoHitObject hitObject)
+            : base(hitObject)
         {
             Size = new Vector2(128);
 

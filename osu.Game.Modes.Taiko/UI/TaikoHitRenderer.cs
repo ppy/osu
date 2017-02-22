@@ -3,17 +3,42 @@
 
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Taiko.UI
 {
-    public class TaikoHitRenderer : HitRenderer<TaikoBaseHit>
+    public class TaikoHitRenderer : HitRenderer<TaikoHitObject>
     {
-        protected override HitObjectConverter<TaikoBaseHit> Converter => new TaikoConverter();
+        protected override HitObjectConverter<TaikoHitObject> Converter => new TaikoConverter();
 
         protected override Playfield CreatePlayfield() => new TaikoPlayfield();
 
-        protected override DrawableHitObject GetVisualRepresentation(TaikoBaseHit h) => null;// new DrawableTaikoHit(h);
+        protected override DrawableHitObject GetVisualRepresentation(TaikoHitObject h)
+        {
+            if (h is HitCircle)
+            {
+                switch (h.Type)
+                {
+                    case TaikoHitType.Don:
+                        if (h.IsFinisher)
+                            return new DrawableHitCircleDonFinisher(h as HitCircle);
+                        return new DrawableHitCircleDon(h as HitCircle);
+                    case TaikoHitType.Katsu:
+                        if (h.IsFinisher)
+                            return new DrawableHitCircleKatsuFinisher(h as HitCircle);
+                        return new DrawableHitCircleKatsu(h as HitCircle);
+                }
+            }
+
+            if (h is DrumRoll)
+                return new DrawableDrumRoll(h as DrumRoll);
+
+            if (h is Spinner)
+                return new DrawableSpinner(h as Spinner);
+
+            return null;
+        }
     }
 }

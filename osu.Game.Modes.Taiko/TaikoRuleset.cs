@@ -23,7 +23,7 @@ namespace osu.Game.Modes.Taiko
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => null;
 
-        public override HitObjectParser CreateHitObjectParser() => new NullHitObjectParser();
+        public override HitObjectParser CreateHitObjectParser() => new TaikoHitObjectParser();
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new TaikoDifficultyCalculator(beatmap);
     }

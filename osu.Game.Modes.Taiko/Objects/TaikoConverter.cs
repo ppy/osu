@@ -8,26 +8,54 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    class TaikoConverter : HitObjectConverter<TaikoBaseHit>
+    class TaikoConverter : HitObjectConverter<TaikoHitObject>
     {
-        public override List<TaikoBaseHit> Convert(Beatmap beatmap)
+        public override List<TaikoHitObject> Convert(Beatmap beatmap)
         {
-            List<TaikoBaseHit> output = new List<TaikoBaseHit>();
+            List<TaikoHitObject> output = new List<TaikoHitObject>();
 
             foreach (HitObject i in beatmap.HitObjects)
             {
-                TaikoBaseHit h = i as TaikoBaseHit;
+                TaikoHitObject h = i as TaikoHitObject;
 
                 if (h == null)
                 {
                     OsuHitObject o = i as OsuHitObject;
 
-                    if (o == null) throw new HitObjectConvertException(@"Taiko", i);
+                    if (o == null)
+                        throw new HitObjectConvertException(@"Taiko", i);
 
-                    h = new TaikoBaseHit
+                    if (o is Osu.Objects.HitCircle)
                     {
-                        StartTime = o.StartTime,
-                    };
+                        h = new HitCircle()
+                        {
+                            StartTime = o.StartTime,
+                            Sample = o.Sample,
+                            NewCombo = o.NewCombo,
+                        };
+                    }
+
+                    if (o is Osu.Objects.Slider)
+                    {
+                        h = new DrumRoll()
+                        {
+                            StartTime = o.StartTime,
+                            Sample = o.Sample,
+                            NewCombo = o.NewCombo,
+                            Length = (o as Osu.Objects.Slider).Length,
+                            RepeatCount = (o as Osu.Objects.Slider).RepeatCount
+                        };
+                    }
+
+                    if (o is Osu.Objects.Spinner)
+                    {
+                        h = new Spinner()
+                        {
+                            StartTime = o.StartTime,
+                            Sample = o.Sample,
+                            Length = (o as Osu.Objects.Spinner).Length
+                        };
+                    }
                 }
 
                 output.Add(h);

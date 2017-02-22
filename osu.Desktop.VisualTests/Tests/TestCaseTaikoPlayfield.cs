@@ -90,7 +90,7 @@ namespace osu.Desktop.VisualTests.Tests
                                 {
                                     Size = new Vector2(150, 150)
                                 },
-                                new HitCircleKatsu()
+                                new DrawableHitCircleKatsu()
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -98,7 +98,7 @@ namespace osu.Desktop.VisualTests.Tests
                                     Scale = new Vector2(0.5f)
 
                                 },
-                                new HitCircleDonFinisher()
+                                new DrawableHitCircleDonFinisher()
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
