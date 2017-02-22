@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>=
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -13,11 +13,16 @@ using osu.Game.Modes;
 
 namespace osu.Game.Overlays.Mods
 {
+    class AlwaysPresentFlowContainer : FlowContainer
+    {
+        public override bool IsPresent => true;
+    }
+
     public class ModSection : Container
     {
         private OsuSpriteText headerLabel;
 
-        private FlowContainer buttonsContainer;
+        private AlwaysPresentFlowContainer buttonsContainer;
         public FlowContainer ButtonsContainer
         {
             get
@@ -148,7 +153,7 @@ namespace osu.Game.Overlays.Mods
                     Font = @"Exo2.0-Bold",
                     Text = Header,
                 },
-                buttonsContainer = new FlowContainer
+                buttonsContainer = new AlwaysPresentFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.BottomLeft,
