@@ -196,7 +196,10 @@ namespace osu.Game.Online.API
                 Logger.Log($@"Performing request {req}", LoggingTarget.Network);
                 req.Perform(this);
 
-                State = APIState.Online;
+                //we could still be in initialisation, at which point we don't want to say we're Online yet.
+                if (LocalUser.Value != null)
+                    State = APIState.Online;
+
                 failureCount = 0;
                 return true;
             }

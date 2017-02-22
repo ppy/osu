@@ -26,26 +26,36 @@ namespace osu.Game.Beatmaps
             return 60000 / BeatLengthAt(time);
         }
 
-        public double BeatLengthAt(double time, bool applyMultipliers = false)
+        public double BeatLengthAt(double time)
         {
-            int point = 0;
-            int samplePoint = 0;
+            ControlPoint overridePoint;
+            ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
+            return timingPoint.BeatLength;
+        }
 
-            for (int i = 0; i < ControlPoints.Count; i++)
-                if (ControlPoints[i].Time <= time)
+        public ControlPoint TimingPointAt(double time, out ControlPoint overridePoint)
+        {
+            overridePoint = null;
+
+            ControlPoint timingPoint = null;
+            foreach (var controlPoint in ControlPoints)
+            {
+                // Some beatmaps have the first timingPoint (accidentally) start after the first HitObject(s).
+                // This null check makes it so that the first ControlPoint that makes a timing change is used as
+                // the timingPoint for those HitObject(s).
+                if (controlPoint.Time <= time || timingPoint == null)
                 {
-                    if (ControlPoints[i].TimingChange)
-                        point = i;
-                    else
-                        samplePoint = i;
+                    if (controlPoint.TimingChange)
+                    {
+                        timingPoint = controlPoint;
+                        overridePoint = null;
+                    }
+                    else overridePoint = controlPoint;
                 }
+                else break;
+            }
 
-            double mult = 1;
-
-            if (applyMultipliers && samplePoint > point)
-                mult = ControlPoints[samplePoint].VelocityAdjustment;
-
-            return ControlPoints[point].BeatLength * mult;
+            return timingPoint ?? ControlPoint.Default;
         }
     }
 }

@@ -11,6 +11,7 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"message_id")]
         public long Id;
 
+        //todo: this should be inside sender.
         [JsonProperty(@"user_id")]
         public int UserId;
 

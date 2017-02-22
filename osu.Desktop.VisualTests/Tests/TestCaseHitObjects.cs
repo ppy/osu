@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework;
-using osu.Framework.GameModes.Testing;
+using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using OpenTK;
@@ -37,7 +37,7 @@ namespace osu.Desktop.VisualTests.Tests
             playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
         }
 
-        HitObjectType mode = HitObjectType.Spinner;
+        HitObjectType mode = HitObjectType.Slider;
 
         BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
         private Container playfieldContainer;
@@ -75,6 +75,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Length = 400,
                         Position = new Vector2(-200, 0),
                         Velocity = 1,
+                        TickDistance = 100,
                     }));
                     break;
                 case HitObjectType.Spinner:

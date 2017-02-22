@@ -25,7 +25,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                 {
                     BlendingMode = BlendingMode.Additive,
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.1f,
+                    Alpha = 0.2f,
                 }
             };
         }
