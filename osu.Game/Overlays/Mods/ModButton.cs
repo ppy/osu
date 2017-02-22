@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Mods
         }
         private SpriteText text;
         private Container iconsContainer;
-        private AudioSample sampleOn, sampleOff;
+        private SampleChannel sampleOn, sampleOff;
 
         public Action<Mod> Action; // Passed the selected mod or null if none
         public Key ToggleKey;
