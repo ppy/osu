@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Mods
         private void load(OsuColour colours)
         {
             lowMultiplierColour = colours.Red;
-            high_multiplier_colour = colours.Green;
+            highMultiplierColour = colours.Green;
         }
 
         protected override void PopIn()
@@ -185,7 +185,7 @@ namespace osu.Game.Overlays.Mods
             rankedLabel.Text = $@"{rankedString}, Score Multiplier: ";
             if (multiplier > 1.0)
             {
-                multiplierLabel.FadeColour(high_multiplier_colour, 200);
+                multiplierLabel.FadeColour(highMultiplierColour, 200);
             }
             else if (multiplier < 1.0)
             {

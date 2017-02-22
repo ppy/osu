@@ -130,7 +130,7 @@ namespace osu.Game.Overlays
 
             for (int i = 0; i < waves.Length; i++)
             {
-                waves[i].MoveToY(wave_positions[i], waveDurations[i], EasingTypes.OutQuint);
+                waves[i].MoveToY(wavePositions[i], waveDurations[i], EasingTypes.OutQuint);
             }
 
             DelayReset();
