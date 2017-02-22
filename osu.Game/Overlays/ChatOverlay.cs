@@ -208,6 +208,8 @@ namespace osu.Game.Overlays
             ListChannelsRequest req = new ListChannelsRequest();
             req.Success += delegate (List<Channel> channels)
             {
+                Debug.Assert(careChannels.Count == 0);
+
                 Scheduler.Add(delegate
                 {
                     loading.FadeOut(100);
