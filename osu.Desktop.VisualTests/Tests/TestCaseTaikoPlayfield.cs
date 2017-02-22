@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.UI.Drums;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
@@ -88,20 +90,20 @@ namespace osu.Desktop.VisualTests.Tests
                                 {
                                     Size = new Vector2(150, 150)
                                 },
-                                new TaikoHitCircle(new Color4(17, 136, 170, 255))
+                                new HitCircleKatsu()
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Size = new Vector2(50, 50),
                                     Position = new Vector2(50, 0),
+                                    Scale = new Vector2(0.5f)
 
                                 },
-                                new TaikoHitCircle(new Color4(187, 17, 119, 255))
+                                new HitCircleDonFinisher()
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Size = new Vector2(50, 50),
-                                    Position = new Vector2(100, 0)
+                                    Position = new Vector2(200, 0),
+                                    Scale = new Vector2(0.5f)
                                 }
                             }
                         },
@@ -153,61 +155,16 @@ namespace osu.Desktop.VisualTests.Tests
             }
         }
 
-        class TaikoHitCircle : CircularContainer
-        {
-            private Sprite overlay;
+        // Drawable hit objects
+        //class DrawableTaikoHitObject : DrawableHitObject
+        //{
+        //    public override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo { MaxScore = TaikoScoreResult.Hit300 }
+        //    public DrawableTaikoHitObject(TaikoHitObject hitObject)
+        //        : base(hitObject)
+        //    {
 
-            public TaikoHitCircle(Color4 innerColour)
-            {
-                Children = new Drawable[]
-                {
-                    // Background
-                    new Box()
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = innerColour,
-                    },
-                    // Triangles
-                    new Triangles()
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-
-                        RelativeSizeAxes = Axes.Both,
-
-                        Colour = new Color4(20, 43, 51, 255),
-                    },
-                    // Overlay
-                    overlay = new Sprite()
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-
-                        RelativeSizeAxes = Axes.Both,
-
-                        Scale = new Vector2(1.30f),
-
-                        BlendingMode = BlendingMode.Additive
-                    }
-                };
-
-                EdgeEffect = new EdgeEffect()
-                {
-                    Colour = innerColour,
-                    Radius = 50,
-                    Type = EdgeEffectType.Glow
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                overlay.Texture = textures.Get("Play/Taiko/taiko-hitcircle-overlay@2x");
-            }
-        }
+        //    }
+        //}
 
         class TaikoDrumArea : Container
         {
@@ -276,6 +233,14 @@ namespace osu.Desktop.VisualTests.Tests
                     }
                 };
             }
+        }
+        
+        [Flags]
+        enum HitCircleStyle
+        {
+            Don,
+            Katsu,
+            Finisher
         }
     }
 }
