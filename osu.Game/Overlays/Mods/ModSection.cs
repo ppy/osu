@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        public Action<Mod[]> Action;
+        public Action<Mod> Action;
 
         public Mod[] SelectedMods
         {
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Mods
 
         private void buttonPressed(Mod mod)
         {
-            Action?.Invoke(SelectedMods);
+            Action?.Invoke(mod);
         }
 
         public ModSection()
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Mods
                 {
                     Origin = Anchor.TopLeft,
                     Anchor = Anchor.TopLeft,
-                    Position = new Vector2(0f, 10f),
+                    Position = new Vector2(0f, 0f),
                     Font = @"Exo2.0-Bold",
                     Text = Header,
                 },
@@ -153,11 +153,10 @@ namespace osu.Game.Overlays.Mods
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                    //Direction = FlowDirections.Horizontal,
                     Spacing = new Vector2(50f, 0f),
                     Margin = new MarginPadding
                     {
-                        Top = 16,
+                        Top = 6,
                     },
                 },
             };

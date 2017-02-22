@@ -14,6 +14,7 @@ namespace osu.Game.Modes
         public virtual string Description(PlayMode mode) => @"";
         public abstract double ScoreMultiplier(PlayMode mode);
         public abstract bool Ranked(PlayMode mode);
+        public abstract Mods[] DisablesMods(PlayMode mode);
     }
 
     public abstract class KeyMod : Mod
@@ -23,6 +24,7 @@ namespace osu.Game.Modes
         public override string Description(PlayMode mode) => @"";
         public override double ScoreMultiplier(PlayMode mode) => 1; // TODO: Implement the mania key mod score multiplier
         public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] {};
     }
 
     public class ModNoFail : Mod
@@ -32,6 +34,7 @@ namespace osu.Game.Modes
         public override string Description(PlayMode mode) => @"You can't fail, no matter what.";
         public override double ScoreMultiplier(PlayMode mode) => 0.5;
         public override bool Ranked(PlayMode mode) => true;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] { Mods.Relax, Mods.Autopilot, Mods.SuddenDeath, Mods.Perfect };
     }
 
     public class ModEasy : Mod
@@ -41,6 +44,7 @@ namespace osu.Game.Modes
         public override string Description(PlayMode mode) => @"Reduces overall difficulty - larger circles, more forgiving HP drain, less accuracy required.";
         public override double ScoreMultiplier(PlayMode mode) => 0.5;
         public override bool Ranked(PlayMode mode) => true;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] { Mods.HardRock };
     }
 
     public class ModHidden : Mod
@@ -65,6 +69,7 @@ namespace osu.Game.Modes
         }
         public override double ScoreMultiplier(PlayMode mode) => mode == PlayMode.Mania ? 1.0 : 1.06;
         public override bool Ranked(PlayMode mode) => true;
+        public override Mods[] DisablesMods(PlayMode mode) => (mode == PlayMode.Mania) ? new Mods[] { Mods.Flashlight } : new Mods[] { };
     }
 
     public class ModHardRock : Mod
@@ -91,6 +96,7 @@ namespace osu.Game.Modes
             }
         }
         public override bool Ranked(PlayMode mode) => mode != PlayMode.Mania;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] { Mods.Easy };
     }
 
     public class ModSuddenDeath : Mod
@@ -100,6 +106,7 @@ namespace osu.Game.Modes
         public override string Description(PlayMode mode) => @"Miss a note and fail.";
         public override double ScoreMultiplier(PlayMode mode) => 1;
         public override bool Ranked(PlayMode mode) => true;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] { Mods.NoFail, Mods.Relax, Mods.Autopilot, Mods.Autoplay, Mods.Cinema };
     }
 
     public class ModDoubleTime : Mod
@@ -126,6 +133,7 @@ namespace osu.Game.Modes
             }
         }
         public override bool Ranked(PlayMode mode) => true;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] { Mods.HalfTime };
     }
 
     public class ModRelax : Mod
@@ -154,6 +162,7 @@ namespace osu.Game.Modes
         }
         public override double ScoreMultiplier(PlayMode mode) => 0;
         public override bool Ranked(PlayMode mode) => false;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] { Mods.Autopilot, Mods.Autoplay, Mods.Cinema, Mods.NoFail, Mods.SuddenDeath, Mods.Perfect };
     }
 
     public class ModHalfTime : Mod
@@ -163,6 +172,7 @@ namespace osu.Game.Modes
         public override string Description(PlayMode mode) => @"Less zoom";
         public override double ScoreMultiplier(PlayMode mode) => mode == PlayMode.Mania ? 0.5 : 0.3;
         public override bool Ranked(PlayMode mode) => true;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] { Mods.DoubleTime, Mods.Nightcore };
     }
 
     public class ModNightcore : ModDoubleTime
@@ -179,6 +189,7 @@ namespace osu.Game.Modes
         public override string Description(PlayMode mode) => @"Restricted view area.";
         public override double ScoreMultiplier(PlayMode mode) => mode == PlayMode.Mania ? 1.0 : 1.12;
         public override bool Ranked(PlayMode mode) => true;
+        public override Mods[] DisablesMods(PlayMode mode) => (mode == PlayMode.Mania) ? new Mods[] { Mods.Hidden } : new Mods[] {};
     }
 
     public class ModAutoplay : Mod
@@ -188,6 +199,7 @@ namespace osu.Game.Modes
         public override string Description(PlayMode mode) => @"Watch a perfect automated play through the song";
         public override double ScoreMultiplier(PlayMode mode) => 0;
         public override bool Ranked(PlayMode mode) => false;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] { Mods.Relax, Mods.Autopilot, Mods.SpunOut, Mods.SuddenDeath, Mods.Perfect };
     }
 
     public class ModSpunOut : Mod
@@ -197,6 +209,7 @@ namespace osu.Game.Modes
         public override string Description(PlayMode mode) => @"Spinners will be automatically completed";
         public override double ScoreMultiplier(PlayMode mode) => 0.9;
         public override bool Ranked(PlayMode mode) => mode == PlayMode.Osu;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] { Mods.Autoplay, Mods.Cinema, Mods.Autopilot };
     }
 
     public class ModAutopilot : Mod
@@ -206,6 +219,7 @@ namespace osu.Game.Modes
         public override string Description(PlayMode mode) => @"Automatic cursor movement - just follow the rhythm.";
         public override double ScoreMultiplier(PlayMode mode) => 0;
         public override bool Ranked(PlayMode mode) => false;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] { Mods.SpunOut, Mods.Relax, Mods.SuddenDeath, Mods.Perfect, Mods.NoFail, Mods.Autoplay, Mods.Cinema };
     }
 
     public class ModPerfect : ModSuddenDeath
@@ -251,6 +265,7 @@ namespace osu.Game.Modes
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hidden;
         public override double ScoreMultiplier(PlayMode mode) => 1;
         public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] { Mods.Flashlight };
     }
 
     public class ModRandom : Mod
@@ -260,14 +275,13 @@ namespace osu.Game.Modes
         public override string Description(PlayMode mode) => @"Shuffle around the notes!";
         public override double ScoreMultiplier(PlayMode mode) => 1;
         public override bool Ranked(PlayMode mode) => false;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] {};
     }
 
-    public class ModCinema : Mod
+    public class ModCinema : ModAutoplay
     {
         public override Mods Name => Mods.Cinema;
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_cinema;
-        public override double ScoreMultiplier(PlayMode mode) => 0;
-        public override bool Ranked(PlayMode mode) => false;
     }
 
     public class ModTarget : Mod
@@ -276,6 +290,7 @@ namespace osu.Game.Modes
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_target;
         public override double ScoreMultiplier(PlayMode mode) => 1;
         public override bool Ranked(PlayMode mode) => mode == PlayMode.Osu;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] {}; // TODO: Find out what mods target practice disables as it's not in the stable client
     }
 
     public class ModKey9 : KeyMod
@@ -291,6 +306,7 @@ namespace osu.Game.Modes
         public override string Description(PlayMode mode) => @"Double the key amount, double the fun!";
         public override double ScoreMultiplier(PlayMode mode) => 1;
         public override bool Ranked(PlayMode mode) => mode == PlayMode.Mania;
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] {};
     }
 
     public class ModKey1 : KeyMod
