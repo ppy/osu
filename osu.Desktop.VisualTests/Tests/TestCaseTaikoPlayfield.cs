@@ -10,6 +10,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Modes.Taiko.UI.Drums;
+using osu.Game.Screens;
+using osu.Game.Screens.Backgrounds;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,15 +25,13 @@ namespace osu.Desktop.VisualTests.Tests
         public override string Name => "Taiko Playfield";
         public override string Description => "The Taiko playfield.";
 
+        private SpriteText comboCounter;
+
         public override void Reset()
         {
             base.Reset();
 
-            Add(new Box
-            {
-                ColourInfo = ColourInfo.GradientVertical(Color4.Gray, Color4.WhiteSmoke),
-                RelativeSizeAxes = Framework.Graphics.Axes.Both,
-            });
+            Add(new BackgroundModeCustom(@"Backgrounds/bg1"));
 
             Add(new[]
             {
@@ -40,15 +40,37 @@ namespace osu.Desktop.VisualTests.Tests
                     Position = new Vector2(0, 100),
 
                     RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(1, 100),
+                    Size = new Vector2(1, 150),
 
                     Children = new Drawable[]
                     {
-                        // Drum area container
-                        new TaikoDrumArea()
+                        new Container()
                         {
                             RelativeSizeAxes = Axes.Both,
                             Size = new Vector2(0.25f, 1),
+
+                            Children = new Drawable[]
+                            {
+                                // Drum area container
+                                new TaikoDrumArea()
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                // Combo counter
+                                comboCounter = new SpriteText()
+                                {
+                                    Origin = Anchor.Centre,
+
+                                    RelativePositionAxes = Axes.Both,
+                                    Position = new Vector2(0.75f, 0.5f),
+
+                                    Colour = new Color4(221, 255, 255, 255),
+
+                                    Text = "8888",
+                                    Font = "Venera",
+                                    TextSize = 12,
+                                },
+                            }
                         },
                         // Track area
                         new Container()
@@ -64,18 +86,27 @@ namespace osu.Desktop.VisualTests.Tests
                                 },
                                 new TaikoHitTarget()
                                 {
-                                    Size = new Vector2(100, 100)
+                                    Size = new Vector2(150, 150)
+                                },
+                                new TaikoHitCircle(new Color4(17, 136, 170, 255))
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Size = new Vector2(50, 50),
+                                    Position = new Vector2(50, 0),
+
+                                },
+                                new TaikoHitCircle(new Color4(187, 17, 119, 255))
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Size = new Vector2(50, 50),
+                                    Position = new Vector2(100, 0)
                                 }
                             }
                         },
                     }
                 }
-            });
-
-            Add(new TaikoHitCircle(new Color4(17, 136, 170, 255))
-            {
-                Origin = Anchor.TopLeft,
-                Size = new Vector2(50, 50)
             });
         }
 
@@ -110,7 +141,7 @@ namespace osu.Desktop.VisualTests.Tests
 
                         RelativeSizeAxes = Axes.Both,
 
-                        Scale = new Vector2(0.7f),
+                        Scale = new Vector2(0.5f),
                     }
                 };
             }
@@ -165,8 +196,8 @@ namespace osu.Desktop.VisualTests.Tests
 
                 EdgeEffect = new EdgeEffect()
                 {
-                    Colour = new Color4(17, 136, 170, 191),
-                    Radius = 6,
+                    Colour = innerColour,
+                    Radius = 50,
                     Type = EdgeEffectType.Glow
                 };
             }
