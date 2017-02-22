@@ -290,7 +290,7 @@ namespace osu.Game.Modes
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_target;
         public override double ScoreMultiplier(PlayMode mode) => 1;
         public override bool Ranked(PlayMode mode) => mode == PlayMode.Osu;
-        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] {}; // TODO: Find out what mods target practice disables as it's not in the stable client
+        public override Mods[] DisablesMods(PlayMode mode) => new Mods[] {};
     }
 
     public class ModKey9 : KeyMod
