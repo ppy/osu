@@ -240,21 +240,6 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Content.Delay(250);
-            Content.FadeIn(250);
-
-            Delay(750);
-            Schedule(() =>
-            {
-                sourceClock.Start();
-                initializeSkipButton();
-            });
-        }
-
         private void onPass()
         {
             Delay(1000);
@@ -290,6 +275,22 @@ namespace osu.Game.Screens.Play
 
             Content.Alpha = 0;
             dimLevel.ValueChanged += dimChanged;
+
+            Content.Delay(250);
+            Content.FadeIn(250);
+
+            Delay(750);
+            Schedule(() =>
+            {
+                sourceClock.Start();
+                initializeSkipButton();
+            });
+        }
+
+        protected override void OnSuspending(Screen next)
+        {
+            Content.FadeOut(350);
+            base.OnSuspending(next);
         }
 
         protected override bool OnExiting(Screen next)
