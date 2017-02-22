@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,18 +18,27 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Chat.Drawables;
+using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.UserInterface;
+using OpenTK.Graphics;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OverlayContainer, IOnlineComponent
+    public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent
     {
-        private ChannelDisplay channelDisplay;
+        const float textbox_height = 40;
+
+        private DrawableChannel channelDisplay;
 
         private ScheduledDelegate messageRequest;
 
         private Container content;
 
         protected override Container<Drawable> Content => content;
+
+        private FocusedTextBox inputTextBox;
 
         private APIAccess api;
 
@@ -47,13 +55,63 @@ namespace osu.Game.Overlays
                 {
                     Depth = float.MaxValue,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.1f).Opacity(0.4f),
+                    Colour = Color4.Black,
+                    Alpha = 0.9f,
                 },
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = 5, Bottom = textbox_height + 5 },
+                },
+                new Container
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    Height = textbox_height,
+                    Padding = new MarginPadding(5),
+                    Children = new Drawable[]
+                    {
+                        inputTextBox = new FocusedTextBox
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Height = 1,
+                            PlaceholderText = "type your message",
+                            Exit = () => State = Visibility.Hidden,
+                            OnCommit = postMessage,
+                            HoldFocus = true,
+                        }
+                    }
                 }
             });
+        }
+
+        protected override bool OnFocus(InputState state)
+        {
+            //this is necessary as inputTextBox is masked away and therefore can't get focus :(
+            inputTextBox.TriggerFocus();
+            return false;
+        }
+
+        private void postMessage(TextBox sender, bool newText)
+        {
+            var postText = sender.Text;
+
+            if (!string.IsNullOrEmpty(postText))
+            {
+                //todo: actually send to server
+                careChannels.FirstOrDefault()?.AddNewMessages(new[]
+                            {
+                                new Message
+                                {
+                                    User = api.LocalUser.Value,
+                                    Timestamp = DateTimeOffset.Now,
+                                    Content = postText
+                                }
+                            });
+            }
+
+            sender.Text = string.Empty;
         }
 
         [BackgroundDependencyLoader]
@@ -69,7 +127,7 @@ namespace osu.Game.Overlays
 
         private void addChannel(Channel channel)
         {
-            Add(channelDisplay = new ChannelDisplay(channel));
+            Add(channelDisplay = new DrawableChannel(channel));
             careChannels.Add(channel);
         }
 
@@ -82,10 +140,11 @@ namespace osu.Game.Overlays
             fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
             fetchReq.Success += delegate (List<Message> messages)
             {
-                foreach (Message m in messages)
-                {
-                    careChannels.Find(c => c.Id == m.ChannelId).AddNewMessages(m);
-                }
+                var ids = messages.Select(m => m.ChannelId).Distinct();
+
+                //batch messages per channel.
+                foreach (var id in ids)
+                    careChannels.Find(c => c.Id == id)?.AddNewMessages(messages.Where(m => m.ChannelId == id));
 
                 lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
 
@@ -151,6 +210,8 @@ namespace osu.Game.Overlays
             ListChannelsRequest req = new ListChannelsRequest();
             req.Success += delegate (List<Channel> channels)
             {
+                Debug.Assert(careChannels.Count == 0);
+
                 Scheduler.Add(delegate
                 {
                     loading.FadeOut(100);
