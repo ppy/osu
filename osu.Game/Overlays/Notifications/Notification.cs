@@ -89,7 +89,6 @@ namespace osu.Game.Overlays.Notifications
                                 IconContent = new Container
                                 {
                                     Size = new Vector2(40),
-                                    Colour = Color4.DarkGray,
                                     Masking = true,
                                     CornerRadius = 5,
                                 },
