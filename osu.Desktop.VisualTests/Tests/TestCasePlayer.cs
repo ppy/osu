@@ -74,9 +74,12 @@ namespace osu.Desktop.VisualTests.Tests
                 Colour = Color4.Black,
             });
 
-            Add(new Player
+            Add(new PlayerLoader(new Player
             {
                 PreferredPlayMode = PlayMode.Osu,
+                Beatmap = beatmap
+            })
+            {
                 Beatmap = beatmap
             });
         }
