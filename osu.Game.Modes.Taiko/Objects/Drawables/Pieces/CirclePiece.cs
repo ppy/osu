@@ -10,12 +10,15 @@ using System.Threading.Tasks;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 {
     class CirclePiece : Container
     {
         private Sprite disc;
+
+        private TrianglesPiece triangles;
 
         public CirclePiece()
         {
@@ -34,13 +37,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
-                new TrianglesPiece()
+                triangles = new TrianglesPiece()
                 {
                     RelativeSizeAxes = Axes.Both,
-
-                    Colour = Color4.Black,
-                    BlendingMode = BlendingMode.Mixture,
-                    Alpha = 0.1f
+                    Alpha = 0.15f
                 }
             };
         }
@@ -49,6 +49,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         private void load(TextureStore textures)
         {
             disc.Texture = textures.Get(@"Play/Taiko/disc");
+
+            triangles.ColourDark = Colour.Linear.Darken(0.1f);
+            triangles.ColourLight = Colour.Linear.Darken(0.05f);
         }
     }
 

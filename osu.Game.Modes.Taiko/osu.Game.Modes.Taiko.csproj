@@ -53,6 +53,7 @@
     <Compile Include="Objects\Drawables\DrawableHitCircleFinisher.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
     <Compile Include="Objects\Drawables\DrawableDrumRoll.cs" />
+    <Compile Include="Objects\Drawables\Pieces\DrumRollTrianglesPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\HitCirclePiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />

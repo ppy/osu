@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 {
-    class TrianglesPiece : Triangles
+    class DrumRollTrianglesPiece : Triangles
     {
         protected override float SpawnRatio => 1f;
 
-        public TrianglesPiece()
+        public DrumRollTrianglesPiece()
         {
-            TriangleScale = 2f;
+            TriangleScale = 1.5f;
         }
 
         protected override void Update()
@@ -22,5 +22,4 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                 base.Update();
         }
     }
-
 }

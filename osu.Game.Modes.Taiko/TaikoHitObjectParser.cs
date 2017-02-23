@@ -37,7 +37,7 @@ namespace osu.Game.Modes.Taiko
                     result = new DrumRoll
                     {
                         Length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture),
-                        RepeatCount = repeatCount,
+                        RepeatCount = repeatCount
                     };
                     break;
                 case HitObjectType.Spinner:
