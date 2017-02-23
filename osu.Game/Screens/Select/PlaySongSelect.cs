@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase beatmaps, AudioManager audio, BaseGame game,
+        private void load(BeatmapDatabase beatmaps, AudioManager audio, Framework.Game game,
             OsuGame osuGame, OsuColour colours)
         {
             const float carousel_width = 640;
@@ -328,7 +328,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void addBeatmapSet(BeatmapSetInfo beatmapSet, BaseGame game, bool select = false)
+        private void addBeatmapSet(BeatmapSetInfo beatmapSet, Framework.Game game, bool select = false)
         {
             beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.ID);
             beatmapSet.Beatmaps.ForEach(b =>
@@ -368,7 +368,7 @@ namespace osu.Game.Screens.Select
             }));
         }
 
-        private void addBeatmapSets(BaseGame game, CancellationToken token)
+        private void addBeatmapSets(Framework.Game game, CancellationToken token)
         {
             foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
             {
