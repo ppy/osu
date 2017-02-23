@@ -32,18 +32,7 @@ namespace osu.Game.Overlays.Mods
         private OsuSpriteText rankedLabel, multiplierLabel;
         private FlowContainer rankedMultiplerContainer;
 
-        private FlowContainer modSectionsContainer;
-
-        private DifficultyReductionSection difficultyReductionSection;
-        private DifficultyIncreaseSection difficultyIncreaseSection;
-        private AssistedSection assistedSection;
-        private ModSection[] sections
-        {
-            get
-            {
-                return new ModSection[] { difficultyReductionSection, difficultyIncreaseSection, assistedSection };
-            }
-        }
+        private FlowContainer<ModSection> modSectionsContainer;
 
         public Bindable<Mod[]> SelectedMods = new Bindable<Mod[]>();
 
@@ -59,23 +48,23 @@ namespace osu.Game.Overlays.Mods
                 if (value == modMode) return;
                 modMode = value;
 
-                modSectionsContainer.Children = new Drawable[]
+                modSectionsContainer.Children = new ModSection[]
                 {
-                    difficultyReductionSection = new DifficultyReductionSection
+                    new DifficultyReductionSection
                     {
                         RelativeSizeAxes = Axes.X,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Action = modButtonPressed,
                     },
-                    difficultyIncreaseSection = new DifficultyIncreaseSection
+                    new DifficultyIncreaseSection
                     {
                         RelativeSizeAxes = Axes.X,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Action = modButtonPressed,
                     },
-                    assistedSection = new AssistedSection(value)
+                    new AssistedSection(value)
                     {
                         RelativeSizeAxes = Axes.X,
                         Origin = Anchor.TopCentre,
@@ -100,7 +89,7 @@ namespace osu.Game.Overlays.Mods
             rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, APPEAR_DURATION, EasingTypes.InSine);
             rankedMultiplerContainer.FadeOut(APPEAR_DURATION, EasingTypes.InSine);
 
-            foreach (ModSection section in sections)
+            foreach (ModSection section in modSectionsContainer.Children)
             {
                 section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), APPEAR_DURATION, EasingTypes.InSine);
                 section.ButtonsContainer.MoveToX(100f, APPEAR_DURATION, EasingTypes.InSine);
@@ -113,21 +102,23 @@ namespace osu.Game.Overlays.Mods
         protected override void PopIn()
         {
             base.PopIn();
+
             rankedMultiplerContainer.MoveToX(0, ranked_multiplier_duration, EasingTypes.OutQuint);
             rankedMultiplerContainer.FadeIn(ranked_multiplier_duration, EasingTypes.OutQuint);
 
-            foreach (ModSection section in sections)
+            foreach (ModSection section in modSectionsContainer.Children)
             {
                 section.ButtonsContainer.TransformSpacingTo(new Vector2(50f, 0f), button_duration, EasingTypes.OutQuint);
                 section.ButtonsContainer.MoveToX(0, button_duration, EasingTypes.OutQuint);
                 section.ButtonsContainer.FadeIn(button_duration, EasingTypes.OutQuint);
             }
+
             Schedule(TriggerFocusContention);
         }
 
         public void DeselectAll()
         {
-            foreach (ModSection section in sections)
+            foreach (ModSection section in modSectionsContainer.Children)
             {
                 foreach (ModButton button in section.Buttons)
                 {
@@ -183,7 +174,7 @@ namespace osu.Game.Overlays.Mods
 
         public void DeselectMod(Modes.Mods modName)
         {
-            foreach (ModSection section in sections)
+            foreach (ModSection section in modSectionsContainer.Children)
             {
                 foreach (ModButton button in section.Buttons)
                 {
@@ -203,7 +194,7 @@ namespace osu.Game.Overlays.Mods
         {
             List<Mod> selectedMods = new List<Mod>();
 
-            foreach (ModSection section in sections)
+            foreach (ModSection section in modSectionsContainer.Children)
             {
                 foreach (Mod mod in section.SelectedMods)
                 {
@@ -313,7 +304,7 @@ namespace osu.Game.Overlays.Mods
                             },
                         },
                         // Body
-                        modSectionsContainer = new FlowContainer
+                        modSectionsContainer = new FlowContainer<ModSection>
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
@@ -321,23 +312,23 @@ namespace osu.Game.Overlays.Mods
                             AutoSizeAxes = Axes.Y,
                             Spacing = new Vector2(0f, 10f),
                             Width = content_width,
-                            Children = new Drawable[]
+                            Children = new ModSection[]
                             {
-                                difficultyReductionSection = new DifficultyReductionSection
+                                new DifficultyReductionSection
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Action = modButtonPressed,
                                 },
-                                difficultyIncreaseSection = new DifficultyIncreaseSection
+                                new DifficultyIncreaseSection
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Action = modButtonPressed,
                                 },
-                                assistedSection = new AssistedSection(PlayMode.Osu)
+                                new AssistedSection(PlayMode.Osu)
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
