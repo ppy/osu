@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
@@ -60,7 +61,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                 },
                 circle = new CirclePiece()
                 {
-                    Colour = InternalColour
+                    Colour = InternalColour,
+
+                    EdgeEffect = new EdgeEffect()
+                    {
+                        Colour = new Color4(InternalColour.R, InternalColour.G, InternalColour.B, 0.5f),
+                        Radius = 50,
+                        Type = EdgeEffectType.Glow,
+                    }
                 },
                 ring = CreateRing()
             };

@@ -21,35 +21,27 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         {
             Size = new Vector2(128);
 
+            Masking = true;
+            CornerRadius = Size.X / 2;
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             Children = new Drawable[]
             {
-                new CircularContainer()
+                disc = new Sprite()
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-
+                    Origin = Anchor.Centre
+                },
+                new TrianglesPiece()
+                {
                     RelativeSizeAxes = Axes.Both,
 
-                    Children = new Drawable[]
-                    {
-                        disc = new Sprite()
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre
-                        },
-                        new TrianglesPiece()
-                        {
-                            RelativeSizeAxes = Axes.Both,
-
-                            Colour = Color4.Black,
-                            BlendingMode = BlendingMode.Mixture,
-                            Alpha = 0.1f
-                        },
-                    },
-                },
+                    Colour = Color4.Black,
+                    BlendingMode = BlendingMode.Mixture,
+                    Alpha = 0.1f
+                }
             };
         }
 
