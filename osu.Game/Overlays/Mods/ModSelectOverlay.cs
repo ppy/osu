@@ -86,16 +86,6 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        public override bool RequestingFocus => State == Visibility.Visible;
-
-        protected override bool OnFocus(InputState state) => true;
-        protected override void OnFocusLost(InputState state)
-        {
-            if (state.Keyboard.Keys.Contains(Key.Escape))
-                Hide();
-            base.OnFocusLost(state);
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {

@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Transformations;
 
 namespace osu.Game.Overlays
 {
-    public abstract class WaveOverlayContainer : OverlayContainer
+    public abstract class WaveOverlayContainer : FocusedOverlayContainer
     {
         protected const float APPEAR_DURATION = 800;
         protected const float DISAPPEAR_DURATION = 500;
