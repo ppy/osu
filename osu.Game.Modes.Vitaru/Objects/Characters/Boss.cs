@@ -33,8 +33,8 @@ namespace osu.Game.Modes.Vitaru.Objects.Characters
             Add(hitbox = new Hitbox()
             {
                 Alpha = 1,
-                hitboxWidth = 32,
-                hitboxColor = Color4.Green,
+                HitboxWidth = 32,
+                HitboxColor = Color4.Green,
             });
         }
         protected override void Update()

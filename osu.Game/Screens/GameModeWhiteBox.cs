@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.GameModes;
+using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens
 {
-    public class GameModeWhiteBox : OsuGameMode
+    public class ScreenWhiteBox : OsuScreen
     {
         private BackButton popButton;
 
@@ -31,11 +31,11 @@ namespace osu.Game.Screens
 
         protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg2");
 
-        protected override void OnEntering(GameMode last)
+        protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
 
-            //only show the pop button if we are entered form another gamemode.
+            //only show the pop button if we are entered form another Screen.
             if (last != null)
                 popButton.Alpha = 1;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Screens
             Content.FadeIn(transition_time, EasingTypes.OutExpo);
         }
 
-        protected override bool OnExiting(GameMode next)
+        protected override bool OnExiting(Screen next)
         {
             textContainer.MoveTo(new Vector2((DrawSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
@@ -62,7 +62,7 @@ namespace osu.Game.Screens
             return base.OnExiting(next);
         }
 
-        protected override void OnSuspending(GameMode next)
+        protected override void OnSuspending(Screen next)
         {
             base.OnSuspending(next);
 
@@ -70,7 +70,7 @@ namespace osu.Game.Screens
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
         }
 
-        protected override void OnResuming(GameMode last)
+        protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
 
@@ -78,7 +78,7 @@ namespace osu.Game.Screens
             Content.FadeIn(transition_time, EasingTypes.OutExpo);
         }
 
-        public GameModeWhiteBox()
+        public ScreenWhiteBox()
         {
             Children = new Drawable[]
             {
@@ -148,7 +148,7 @@ namespace osu.Game.Screens
                         BackgroundColour = getColourFor(t),
                         Action = delegate
                         {
-                            Push(Activator.CreateInstance(t) as GameMode);
+                            Push(Activator.CreateInstance(t) as Screen);
                         }
                     });
                 }
