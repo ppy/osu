@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using osu.Framework;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays
 
         protected override Container<Drawable> Content => contentContainer;
 
-        public Color4 FirstWaveColour
+        protected Color4 FirstWaveColour
         {
             get
             {
@@ -42,7 +41,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        public Color4 SecondWaveColour
+        protected Color4 SecondWaveColour
         {
             get
             {
@@ -55,7 +54,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        public Color4 ThirdWaveColour
+        protected Color4 ThirdWaveColour
         {
             get
             {
@@ -68,7 +67,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        public Color4 FourthWaveColour
+        protected Color4 FourthWaveColour
         {
             get
             {
@@ -81,7 +80,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        public WaveOverlayContainer()
+        protected WaveOverlayContainer()
         {
             Masking = true;
 
@@ -153,7 +152,7 @@ namespace osu.Game.Overlays
                 w.State = Visibility.Hidden;
         }
 
-        class Wave : Container, IStateful<Visibility>
+        private class Wave : Container, IStateful<Visibility>
         {
             public float FinalPosition;
 
