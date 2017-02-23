@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -66,14 +67,10 @@ namespace osu.Game.Overlays.Music
                             RelativeSizeAxes = Axes.X,
                             Height = 40,
                         },
-                        new SpriteText
-                        {
-                            Text = "TODO: Collections"
-                        },
                         playlistView = new Playlist
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 340,
+                            Height = 380,
                         }
                     }
                 }
@@ -105,9 +102,22 @@ namespace osu.Game.Overlays.Music
         protected override void LoadComplete()
         {
             BeatmapSource.ValueChanged += workingChanged;
+            FadeOut();
             base.LoadComplete();
         }
 
         private void workingChanged(object sender, EventArgs e) => playlistView.SelectedItem = BeatmapSource.Value.BeatmapSetInfo;
+
+        public void FadeIn()
+        {
+            FadeIn(800, EasingTypes.OutQuint);
+            searchTextBox.HoldFocus = true;
+        }
+
+        public void FadeOut()
+        {
+            FadeOut(800, EasingTypes.OutQuint);
+            searchTextBox.HoldFocus = false;
+        }
     }
 }

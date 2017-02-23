@@ -86,7 +86,7 @@
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
     <Compile Include="Overlays\LoginOverlay.cs" />
-    <Compile Include="Overlays\Music\MusicController.cs" />
+    <Compile Include="Overlays\MusicController.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\Formats\ConstructableBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\WorkingBeatmap.cs" />

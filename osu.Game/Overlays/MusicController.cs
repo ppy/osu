@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -21,12 +22,11 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays.Music;
 using OpenTK;
 using OpenTK.Graphics;
-using System.Linq;
-using OpenTK.Graphics.OpenGL;
 
-namespace osu.Game.Overlays.Music
+namespace osu.Game.Overlays
 {
     public class MusicController : FocusedOverlayContainer
     {
@@ -71,18 +71,26 @@ namespace osu.Game.Overlays.Music
             return base.OnDragEnd(state);
         }
 
+        public MusicController()
+        {
+            Width = 400;
+            Height = 590;
+
+            Margin = new MarginPadding(10);
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame, OsuConfigManager config, OsuColour colours)
         {
             unicodeString = config.GetUnicodeString;
 
-            Margin = new MarginPadding(10);
-            AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
                 dragContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
                         new FlowContainer<Container>
@@ -196,9 +204,9 @@ namespace osu.Game.Overlays.Music
                                             Action = () =>
                                             {
                                                 if (!playlistController.IsPresent)
-                                                    playlistController.FadeIn(transition_length, EasingTypes.OutQuint);
+                                                    playlistController.FadeIn();
                                                 else
-                                                    playlistController.FadeOut(transition_length, EasingTypes.OutQuint);
+                                                    playlistController.FadeOut();
                                             },
                                             Children = new Drawable[]
                                             {
