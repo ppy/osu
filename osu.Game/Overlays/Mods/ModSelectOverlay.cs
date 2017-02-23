@@ -107,14 +107,14 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopOut();
 
-            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, CONTENT_DURATION, EasingTypes.InSine);
-            rankedMultiplerContainer.FadeOut(CONTENT_DURATION, EasingTypes.InSine);
+            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, APPEAR_DURATION, EasingTypes.InSine);
+            rankedMultiplerContainer.FadeOut(APPEAR_DURATION, EasingTypes.InSine);
 
             foreach (ModSection section in sections)
             {
-                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), CONTENT_DURATION, EasingTypes.InSine);
-                section.ButtonsContainer.MoveToX(100f, CONTENT_DURATION, EasingTypes.InSine);
-                section.ButtonsContainer.FadeOut(CONTENT_DURATION, EasingTypes.InSine);
+                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), APPEAR_DURATION, EasingTypes.InSine);
+                section.ButtonsContainer.MoveToX(100f, APPEAR_DURATION, EasingTypes.InSine);
+                section.ButtonsContainer.FadeOut(APPEAR_DURATION, EasingTypes.InSine);
             }
 
             TriggerFocusLost();
