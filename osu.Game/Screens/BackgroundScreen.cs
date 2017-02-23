@@ -29,10 +29,10 @@ namespace osu.Game.Screens
             return false;
         }
 
-        BaseGame game;
+        Framework.Game game;
 
         [BackgroundDependencyLoader]
-        private void load(BaseGame game)
+        private void load(Framework.Game game)
         {
             this.game = game;
         }
