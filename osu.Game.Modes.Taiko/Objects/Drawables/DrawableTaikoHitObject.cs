@@ -39,24 +39,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 return;
 
             Flush();
-
-            UpdateInitialState();
-
-            Delay(HitObject.StartTime - Time.Current - TIME_PREEMPT, true);
-
-            UpdatePreemptState();
-
-            Delay(TIME_PREEMPT);
-        }
-
-        protected virtual void UpdateInitialState()
-        {
-            MoveToX(620);
-        }
-
-        protected virtual void UpdatePreemptState()
-        {
-
         }
     }
 }
