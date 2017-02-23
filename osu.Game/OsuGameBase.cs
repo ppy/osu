@@ -20,7 +20,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game
 {
-    public class OsuGameBase : BaseGame, IOnlineComponent
+    public class OsuGameBase : Framework.Game, IOnlineComponent
     {
         protected OsuConfigManager LocalConfig;
 
@@ -101,7 +101,7 @@ namespace osu.Game
             });
         }
 
-        public override void SetHost(BasicGameHost host)
+        public override void SetHost(GameHost host)
         {
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(host.Storage);

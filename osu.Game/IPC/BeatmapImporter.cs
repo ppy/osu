@@ -13,7 +13,7 @@ namespace osu.Game.IPC
         private IpcChannel<BeatmapImportMessage> channel;
         private BeatmapDatabase beatmaps;
 
-        public BeatmapImporter(BasicGameHost host,  BeatmapDatabase beatmaps = null)
+        public BeatmapImporter(GameHost host,  BeatmapDatabase beatmaps = null)
         {
             this.beatmaps = beatmaps;
 
