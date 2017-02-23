@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK.Input;
-using OpenTK;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
