@@ -27,9 +27,6 @@ namespace osu.Game.Screens.Play
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
 
-        public Action OnRetry;
-        public Action OnQuit;
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -74,7 +71,7 @@ namespace osu.Game.Screens.Play
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = @"try again",
+                                    Text = @"try again?",
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Shadow = true,
@@ -101,11 +98,7 @@ namespace osu.Game.Screens.Play
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = button_height,
-                                    Action = delegate
-                                    {
-                                        OnRetry?.Invoke();
-                                        Hide();
-                                    }
+                                    Action = retry
                                 },
                                 new QuitButton
                                 {
@@ -138,6 +131,25 @@ namespace osu.Game.Screens.Play
         {
             Background.Schedule(() => Background.FadeColour(Color4.White, 500));
             return base.OnExiting(next);
+        }
+
+        private void retry()
+        {
+            var newPlayer = new Player();
+            ValidForResume = false;
+
+            newPlayer.Preload(Game, delegate
+            {
+                if (!Push(newPlayer))
+                {
+                    // Error(?)
+                }
+            });
+        }
+
+        public FailDialog()
+        {
+            RelativeSizeAxes = Axes.Both;
         }
     }
 }
