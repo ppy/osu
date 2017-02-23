@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
-        private OsuGameBase loadOsu(BasicGameHost host)
+        private OsuGameBase loadOsu(GameHost host)
         {
             var osu = new OsuGameBase();
             host.Add(osu);

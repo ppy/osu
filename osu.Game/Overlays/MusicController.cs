@@ -45,7 +45,7 @@ namespace osu.Game.Overlays
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
-        private BaseGame game;
+        private Framework.Game game;
 
         private Container dragContainer;
 
@@ -322,7 +322,7 @@ namespace osu.Game.Overlays
             updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
-        protected override void PerformLoad(BaseGame game)
+        protected override void PerformLoad(Framework.Game game)
         {
             this.game = game;
             base.PerformLoad(game);
