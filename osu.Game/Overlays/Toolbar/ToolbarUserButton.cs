@@ -120,7 +120,6 @@ namespace osu.Game.Overlays.Toolbar
             public class OnlineSprite : Sprite
             {
                 private readonly string url;
-                private readonly int userId;
 
                 public OnlineSprite(string url)
                 {
