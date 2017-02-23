@@ -31,17 +31,16 @@ namespace osu.Game.Overlays.Pause
 
         private ResumeButton resumeButton;
 
-        //true if paused, false if failed
-        private bool type;
-        public bool Type
+        private bool paused;
+        public bool Paused
         {
             get
             {
-                return type;
+                return paused;
             }
             set
             {
-                type = value;
+                paused = value;
             }
         }
 
@@ -124,7 +123,7 @@ namespace osu.Game.Overlays.Pause
         {
             if (args.Key == Key.Escape)
             {
-                if (Type)
+                if (Paused)
                 {
                     if (State == Visibility.Hidden) return false;
                     resume();
@@ -250,7 +249,7 @@ namespace osu.Game.Overlays.Pause
                 }
             };
 
-            if (!Type)
+            if (!Paused)
             {
                 resumeButton.Hide();
                 retryCounterContainer.Hide();

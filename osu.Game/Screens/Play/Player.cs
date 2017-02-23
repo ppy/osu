@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Play
 
             pauseOverlay = new PauseOverlay
             {
-                Type = true,
+                Paused = true,
                 MainText = @"paused",
                 AdditionalText = @"you're not going to do what i think you're going to do, are ya?",
                 Depth = -1,

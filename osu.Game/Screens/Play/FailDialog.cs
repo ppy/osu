@@ -3,20 +3,11 @@
 
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Pause;
-using System;
-using osu.Framework.Input;
-using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -33,7 +24,7 @@ namespace osu.Game.Screens.Play
         {
             failOverlay = new PauseOverlay()
             {
-                Type = false,
+                Paused = false,
                 MainText = @"failed",
                 AdditionalText = @"retry?",
                 OnRetry = retry,
