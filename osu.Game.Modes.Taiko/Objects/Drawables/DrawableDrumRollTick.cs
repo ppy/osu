@@ -7,11 +7,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework.Input;
+using OpenTK.Input;
+using osu.Game.Modes.Objects.Drawables;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableDrumRollTick : DrawableTaikoHitObject
     {
+        protected virtual List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
         private DrumRollTick drumRollTick;
 
         public DrawableDrumRollTick(DrumRollTick drumRollTick)
@@ -40,6 +44,39 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     AlwaysPresent = true
                 }
             };
+        }
+
+        public override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollJudgementInfo() { MaxScore = TaikoScoreResult.Great };
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (!Keys.Contains(args.Key))
+                return false;
+
+            Keys.RemoveAll(k => k == args.Key);
+
+            UpdateJudgement(true);
+            return true;
+        }
+
+        protected override void CheckJudgement(bool userTriggered)
+        {
+            if (!userTriggered)
+            {
+                if (Judgement.TimeOffset > drumRollTick.TickDistance / 2)
+                    Judgement.Result = HitResult.Miss;
+                return;
+            }
+
+            double hitOffset = Math.Abs(Judgement.TimeOffset);
+
+            TaikoJudgementInfo taikoJudgement = Judgement as TaikoJudgementInfo;
+            
+            if (hitOffset < drumRollTick.TickDistance / 2)
+            {
+                Judgement.Result = HitResult.Hit;
+                taikoJudgement.Score = TaikoScoreResult.Great;
+            }
         }
     }
 }

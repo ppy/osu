@@ -14,5 +14,10 @@ namespace osu.Game.Modes.Taiko.Objects
         /// Determines whether the tick is filled or not.
         /// </summary>
         public bool FirstTick;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public double TickDistance;
     }
 }

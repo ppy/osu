@@ -66,6 +66,7 @@
     <Compile Include="Objects\Spinner.cs" />
     <Compile Include="Objects\TaikoFinisherJudgementInfo.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
+    <Compile Include="Objects\TaikoDrumRollJudgementInfo.cs" />
     <Compile Include="Objects\TaikoScoreResult.cs" />
     <Compile Include="Objects\TaikoJudgementInfo.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
