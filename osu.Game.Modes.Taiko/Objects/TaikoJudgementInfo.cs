@@ -19,11 +19,11 @@ namespace osu.Game.Modes.Taiko.Objects
         /// </summary>
         public TaikoScoreResult MaxScore = TaikoScoreResult.Great;
 
-        public int ScoreValue => scoreToInt(Score);
+        public virtual int ScoreValue => ScoreToInt(Score);
 
-        public int MaxScoreValue => scoreToInt(MaxScore);
+        public virtual int MaxScoreValue => ScoreToInt(MaxScore);
 
-        private int scoreToInt(TaikoScoreResult result)
+        protected virtual int ScoreToInt(TaikoScoreResult result)
         {
             switch (result)
             {

@@ -11,10 +11,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableTaikoHitObject : DrawableHitObject
     {
-        public const float TIME_PREEMPT = 600;
-
-        private float? scrollTime;
-
         public DrawableTaikoHitObject(TaikoHitObject hitObject)
             : base(hitObject)
         {

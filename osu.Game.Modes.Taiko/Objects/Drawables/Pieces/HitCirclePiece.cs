@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -8,11 +9,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 {
     class DonPiece : HitCirclePiece
     {
+        protected override List<Key> Keys { get; } = new List<Key>(new[] { Key.F, Key.J });
         protected override Color4 InternalColour => new Color4(187, 17, 119, 255);
 
         protected override RingPiece CreateRing() => new DonRingPiece();
@@ -20,6 +23,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
     class KatsuPiece : HitCirclePiece
     {
+        protected override List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.K });
         protected override Color4 InternalColour => new Color4(17, 136, 170, 255);
 
         protected override RingPiece CreateRing() => new KatsuRingPiece();
@@ -43,11 +47,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
     public abstract class HitCirclePiece : Container
     {
+        protected abstract List<Key> Keys { get; }
         protected abstract Color4 InternalColour { get; }
 
         private CirclePiece circle;
         private RingPiece ring;
         private GlowPiece glow;
+
+        public Func<bool> Hit;
 
         public HitCirclePiece()
         {
@@ -75,5 +82,15 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         }
 
         protected abstract RingPiece CreateRing();
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (!Keys.Contains(args.Key))
+                return false;
+
+            Keys.RemoveAll(k => k == args.Key);
+
+            return Hit?.Invoke() ?? false;
+        }
     }
 }
