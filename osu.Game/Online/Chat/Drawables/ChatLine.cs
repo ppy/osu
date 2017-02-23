@@ -1,10 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
@@ -14,6 +16,50 @@ namespace osu.Game.Online.Chat.Drawables
     public class ChatLine : Container
     {
         public readonly Message Message;
+
+        private static readonly Color4[] username_colours = {
+            OsuColour.FromHex("588c7e"),
+            OsuColour.FromHex("b2a367"),
+            OsuColour.FromHex("c98f65"),
+            OsuColour.FromHex("bc5151"),
+            OsuColour.FromHex("5c8bd6"),
+            OsuColour.FromHex("7f6ab7"),
+            OsuColour.FromHex("a368ad"),
+            OsuColour.FromHex("aa6880"),
+
+            OsuColour.FromHex("6fad9b"),
+            OsuColour.FromHex("f2e394"),
+            OsuColour.FromHex("f2ae72"),
+            OsuColour.FromHex("f98f8a"),
+            OsuColour.FromHex("7daef4"),
+            OsuColour.FromHex("a691f2"),
+            OsuColour.FromHex("c894d3"),
+            OsuColour.FromHex("d895b0"),
+
+            OsuColour.FromHex("53c4a1"),
+            OsuColour.FromHex("eace5c"),
+            OsuColour.FromHex("ea8c47"),
+            OsuColour.FromHex("fc4f4f"),
+            OsuColour.FromHex("3d94ea"),
+            OsuColour.FromHex("7760ea"),
+            OsuColour.FromHex("af52c6"),
+            OsuColour.FromHex("e25696"),
+
+            OsuColour.FromHex("677c66"),
+            OsuColour.FromHex("9b8732"),
+            OsuColour.FromHex("8c5129"),
+            OsuColour.FromHex("8c3030"),
+            OsuColour.FromHex("1f5d91"),
+            OsuColour.FromHex("4335a5"),
+            OsuColour.FromHex("812a96"),
+            OsuColour.FromHex("992861"),
+        };
+
+        private Color4 getUsernameColour(Message message)
+        {
+            //todo: use User instead of Message when user_id is correctly populated.
+            return username_colours[message.UserId % username_colours.Length];
+        }
 
         const float padding = 200;
         const float text_size = 20;
@@ -25,6 +71,8 @@ namespace osu.Game.Online.Chat.Drawables
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            Padding = new MarginPadding { Left = 15, Right = 15 };
+
             Children = new Drawable[]
             {
                 new Container
@@ -34,13 +82,19 @@ namespace osu.Game.Online.Chat.Drawables
                     {
                         new OsuSpriteText
                         {
-                            Text = Message.Timestamp.LocalDateTime.ToLongTimeString(),
-                            TextSize = text_size,
-                            Colour = Color4.Gray
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = @"Exo2.0-SemiBold",
+                            Text = $@"{Message.Timestamp.LocalDateTime:hh:mm:ss}",
+                            FixedWidth = true,
+                            TextSize = text_size * 0.75f,
+                            Alpha = 0.4f,
                         },
                         new OsuSpriteText
                         {
-                            Text = Message.User.Name,
+                            Font = @"Exo2.0-BoldItalic",
+                            Text = $@"{Message.User.Name}:",
+                            Colour = getUsernameColour(Message),
                             TextSize = text_size,
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
@@ -51,7 +105,7 @@ namespace osu.Game.Online.Chat.Drawables
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = padding + 10 },
+                    Padding = new MarginPadding { Left = padding + 15 },
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
