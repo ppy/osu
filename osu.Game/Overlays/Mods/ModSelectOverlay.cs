@@ -103,20 +103,26 @@ namespace osu.Game.Overlays.Mods
             highMultiplierColour = colours.Green;
         }
 
-        protected override void PopIn()
-        {
-            base.PopIn();
-            Schedule(TriggerFocusContention);
-        }
-
         protected override void PopOut()
         {
             base.PopOut();
+
+            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, CONTENT_DURATION, EasingTypes.InSine);
+            rankedMultiplerContainer.FadeOut(CONTENT_DURATION, EasingTypes.InSine);
+
+            foreach (ModSection section in sections)
+            {
+                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), CONTENT_DURATION, EasingTypes.InSine);
+                section.ButtonsContainer.MoveToX(100f, CONTENT_DURATION, EasingTypes.InSine);
+                section.ButtonsContainer.FadeOut(CONTENT_DURATION, EasingTypes.InSine);
+            }
+
             TriggerFocusLost();
         }
 
-        protected override void TransitionIn()
+        protected override void PopIn()
         {
+            base.PopIn();
             rankedMultiplerContainer.MoveToX(0, ranked_multiplier_duration, EasingTypes.OutQuint);
             rankedMultiplerContainer.FadeIn(ranked_multiplier_duration, EasingTypes.OutQuint);
 
@@ -126,19 +132,7 @@ namespace osu.Game.Overlays.Mods
                 section.ButtonsContainer.MoveToX(0, button_duration, EasingTypes.OutQuint);
                 section.ButtonsContainer.FadeIn(button_duration, EasingTypes.OutQuint);
             }
-        }
-
-        protected override void TransitionOut()
-        {
-            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, CONTENT_EXIT_DURATION, EasingTypes.InSine);
-            rankedMultiplerContainer.FadeOut(CONTENT_EXIT_DURATION, EasingTypes.InSine);
-
-            foreach (ModSection section in sections)
-            {
-                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), CONTENT_EXIT_DURATION, EasingTypes.InSine);
-                section.ButtonsContainer.MoveToX(100f, CONTENT_EXIT_DURATION, EasingTypes.InSine);
-                section.ButtonsContainer.FadeOut(CONTENT_EXIT_DURATION, EasingTypes.InSine);
-            }
+            Schedule(TriggerFocusContention);
         }
 
         public void DeselectAll()
