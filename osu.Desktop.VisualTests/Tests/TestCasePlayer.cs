@@ -60,7 +60,16 @@ namespace osu.Desktop.VisualTests.Tests
 
                 Beatmap b = new Beatmap
                 {
-                    HitObjects = objects
+                    HitObjects = objects,
+                    BeatmapInfo = new BeatmapInfo
+                    {
+                        Metadata = new BeatmapMetadata
+                        {
+                            Artist = @"Unknown",
+                            Title = @"Sample Beatmap",
+                            Author = @"peppy",
+                        }
+                    }
                 };
 
                 decoder.Process(b);
@@ -74,9 +83,12 @@ namespace osu.Desktop.VisualTests.Tests
                 Colour = Color4.Black,
             });
 
-            Add(new Player
+            Add(new PlayerLoader(new Player
             {
                 PreferredPlayMode = PlayMode.Osu,
+                Beatmap = beatmap
+            })
+            {
                 Beatmap = beatmap
             });
         }
