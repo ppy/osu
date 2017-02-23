@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
         private void load(AudioManager audio, OsuColour colours)
         {
             ActivationSound = audio.Sample.Get(@"Menu/menuhit");
-            Colour = colours.Yellow;
+            BackgroundColour = colours.Yellow;
             HoverColour = colours.YellowDark;
         }
 
