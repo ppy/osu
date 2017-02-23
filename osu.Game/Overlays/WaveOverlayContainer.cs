@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
+using osu.Framework;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -14,40 +15,14 @@ namespace osu.Game.Overlays
 {
     public abstract class WaveOverlayContainer : OverlayContainer
     {
-        private const float first_wave_position = -130;
-        private const float second_wave_position = 0;
-        private const float third_wave_position = 70;
-        private const float fourth_wave_position = 100;
-        private const float waves_container_position = -150;
-        private float[] wavePositions
-        {
-            get
-            {
-                return new float[] { first_wave_position, second_wave_position, third_wave_position, fourth_wave_position };
-            }
-        }
-
-        private const float first_wave_duration = 600;
-        private const float second_wave_duration = 700;
-        private const float third_wave_duration = 800;
-        private const float fourth_wave_duration = 900;
         private const float container_wait = 200;
         private const float waves_container_duration = 400;
         private const float content_duration = 700;
         private const float content_transition_wait = 100;
-        internal const float CONTENT_EXIT_DURATION = 600;
-        private float[] waveDurations
-        {
-            get
-            {
-                return new float[] { first_wave_duration, second_wave_duration, third_wave_duration, fourth_wave_duration };
-            }
-        }
 
-        private const float first_wave_rotation = 13;
-        private const float second_wave_rotation = -7;
-        private const float third_wave_rotation = 4;
-        private const float fourth_wave_rotation = -2;
+        internal const float CONTENT_EXIT_DURATION = 600;
+
+        private const float waves_container_position = -150;
 
         private Wave firstWave, secondWave, thirdWave, fourthWave;
 
@@ -56,76 +31,62 @@ namespace osu.Game.Overlays
         private readonly Container contentContainer;
         protected override Container<Drawable> Content => contentContainer;
 
-        private Color4 firstWaveColour;
         public Color4 FirstWaveColour
         {
             get
             {
-                return firstWaveColour;
+                return firstWave.Colour;
             }
             set
             {
-                if (firstWaveColour == value) return;
-                firstWaveColour = value;
+                if (firstWave.Colour == value) return;
                 firstWave.Colour = value;
             }
         }
 
-        private Color4 secondWaveColour;
         public Color4 SecondWaveColour
         {
             get
             {
-                return secondWaveColour;
+                return secondWave.Colour;
             }
             set
             {
-                if (secondWaveColour == value) return;
-                secondWaveColour = value;
+                if (secondWave.Colour == value) return;
                 secondWave.Colour = value;
             }
         }
 
-        private Color4 thirdWaveColour;
         public Color4 ThirdWaveColour
         {
             get
             {
-                return thirdWaveColour;
+                return thirdWave.Colour;
             }
             set
             {
-                if (thirdWaveColour == value) return;
-                thirdWaveColour = value;
+                if (thirdWave.Colour == value) return;
                 thirdWave.Colour = value;
             }
         }
 
-        private Color4 fourthWaveColour;
         public Color4 FourthWaveColour
         {
             get
             {
-                return fourthWaveColour;
+                return fourthWave.Colour;
             }
             set
             {
-                if (fourthWaveColour == value) return;
-                fourthWaveColour = value;
+                if (fourthWave.Colour == value) return;
                 fourthWave.Colour = value;
             }
         }
 
         protected override void PopIn()
         {
-            base.Show();
-
-            int i = 0;
             foreach (var w in wavesContainer.Children)
-            {
-                w.MoveToY(wavePositions[i], waveDurations[i], EasingTypes.OutQuint);
-                i++;
-            }
+                w.State = Visibility.Visible;
 
             DelayReset();
             Delay(container_wait);
@@ -133,7 +94,7 @@ namespace osu.Game.Overlays
             {
                 if (State == Visibility.Visible)
                 {
-                    wavesContainer.MoveToY(waves_container_position, waves_container_duration, EasingTypes.None);
+                    //wavesContainer.MoveToY(waves_container_position, waves_container_duration, EasingTypes.None);
                     contentContainer.FadeIn(content_duration, EasingTypes.OutQuint);
                     contentContainer.MoveToY(0, content_duration, EasingTypes.OutQuint);
 
@@ -147,24 +108,16 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            base.Hide();
-
             contentContainer.FadeOut(CONTENT_EXIT_DURATION, EasingTypes.InSine);
             contentContainer.MoveToY(DrawHeight, CONTENT_EXIT_DURATION, EasingTypes.InSine);
             TransitionOut();
 
             foreach (var w in wavesContainer.Children)
-                w.MoveToY(DrawHeight, second_wave_duration, EasingTypes.InSine);
+                w.State = Visibility.Hidden;
 
             DelayReset();
             Delay(container_wait);
-            Schedule(() =>
-            {
-                if (State == Visibility.Hidden)
-                {
-                    wavesContainer.MoveToY(0, waves_container_duration, EasingTypes.None);
-                }
-            });
+            //wavesContainer.MoveToY(0, waves_container_duration);
         }
 
         protected abstract void TransitionOut();
@@ -173,37 +126,52 @@ namespace osu.Game.Overlays
         {
             Masking = true;
 
+            const int wave_count = 4;
+
+            const float total_duration = 800;
+            const float duration_change = 0;
+
+            float appearDuration = total_duration - wave_count * duration_change;
+            float disappearDuration = total_duration;
+
             AddInternal(wavesContainer = new Container<Wave>
             {
                 RelativeSizeAxes = Axes.Both,
                 Origin = Anchor.TopCentre,
                 Anchor = Anchor.TopCentre,
-                Children = new Wave[]
+                Children = new[]
                 {
                     firstWave = new Wave
                     {
-                        Rotation = first_wave_rotation,
-                        Colour = FirstWaveColour,
+                        Rotation = 13,
+                        FinalPosition = -830,
+                        TransitionDurationAppear = (appearDuration += duration_change),
+                        TransitionDurationDisappear = (disappearDuration -= duration_change),
                     },
                     secondWave = new Wave
                     {
                         Origin = Anchor.TopRight,
                         Anchor = Anchor.TopRight,
-                        Rotation = second_wave_rotation,
-                        Colour = SecondWaveColour,
-
+                        Rotation = -7,
+                        FinalPosition = -460,
+                        TransitionDurationAppear = (appearDuration += duration_change),
+                        TransitionDurationDisappear = (disappearDuration -= duration_change),
                     },
                     thirdWave = new Wave
                     {
-                        Rotation = third_wave_rotation,
-                        Colour = ThirdWaveColour,
+                        Rotation = 4,
+                        FinalPosition = -290,
+                        TransitionDurationAppear = (appearDuration += duration_change),
+                        TransitionDurationDisappear = (disappearDuration -= duration_change),
                     },
                     fourthWave = new Wave
                     {
                         Origin = Anchor.TopRight,
                         Anchor = Anchor.TopRight,
-                        Rotation = fourth_wave_rotation,
-                        Colour = FourthWaveColour,
+                        Rotation = -2,
+                        FinalPosition = -120,
+                        TransitionDurationAppear = (appearDuration += duration_change),
+                        TransitionDurationDisappear = (disappearDuration -= duration_change),
                     },
                 },
             });
@@ -224,8 +192,12 @@ namespace osu.Game.Overlays
             });
         }
 
-        class Wave : Container
+        class Wave : Container, IStateful<Visibility>
         {
+            public float FinalPosition;
+            public float TransitionDurationAppear;
+            public float TransitionDurationDisappear;
+
             public Wave()
             {
                 RelativeSizeAxes = Axes.Both;
@@ -245,6 +217,27 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.Both,
                     },
                 };
+            }
+
+            private Visibility state;
+            public Visibility State
+            {
+                get { return state; }
+                set
+                {
+                    if (value == state) return;
+                    state = value;
+
+                    switch (value)
+                    {
+                        case Visibility.Hidden:
+                            MoveToY(DrawHeight / Height, TransitionDurationDisappear, EasingTypes.OutSine);
+                            break;
+                        case Visibility.Visible:
+                            MoveToY(FinalPosition, TransitionDurationAppear, EasingTypes.Out);
+                            break;
+                    }
+                }
             }
         }
     }
