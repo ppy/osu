@@ -33,7 +33,11 @@ namespace osu.Game.Modes.Taiko.UI
             }
 
             if (h is DrumRoll)
+            {
+                if (h.IsFinisher)
+                    return new DrawableDrumRollFinisher(h as DrumRoll);
                 return new DrawableDrumRoll(h as DrumRoll);
+            }
 
             if (h is Spinner)
                 return new DrawableSpinner(h as Spinner);

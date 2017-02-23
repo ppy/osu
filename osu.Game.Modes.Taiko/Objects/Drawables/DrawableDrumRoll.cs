@@ -14,13 +14,23 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
+    public class DrawableDrumRollFinisher : DrawableDrumRoll
+    {
+        public DrawableDrumRollFinisher(DrumRoll drumRoll)
+            : base(drumRoll)
+        {
+            Size *= new Vector2(1, 1.5f);
+        }
+
+        protected override DrumRollBodyPiece CreateBody(float length) => new DrumRollFinisherBodyPiece(length);
+    }
+
     public class DrawableDrumRoll : DrawableTaikoHitObject
     {
-        private static Color4 yellow_colour = new Color4(238, 170, 0, 255);
-
         private DrumRoll drumRoll;
 
-        private Container body;
+        private DrumRollBodyPiece body;
+        private FlowContainer<DrawableDrumRollTick> ticks;
 
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
@@ -31,41 +41,24 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             Children = new Drawable[]
             {
-                body = new Container()
+                body = CreateBody(Size.X),
+                ticks = new FlowContainer<DrawableDrumRollTick>
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Direction = FlowDirections.Horizontal
+                }
+           };
 
-                    Masking = true,
-                    BorderColour = Color4.White,
-                    BorderThickness = 8,
-                    
-                    EdgeEffect = new EdgeEffect()
-                    {
-                        Colour = new Color4(yellow_colour.R, yellow_colour.G, yellow_colour.B, 0.75f),
-                        Radius = 50,
-                        Type = EdgeEffectType.Glow,
-                    },
+            foreach (var tick in drumRoll.Ticks)
+            {
+                var newTick = new DrawableDrumRollTick(tick);
 
-                    CornerRadius = 128 / 2,
+                ticks.Add(newTick);
+                ticks.Spacing = new Vector2((float)drumRoll.TickDistance - newTick.Size.X * tick.Scale, 0);
+            }
 
-                    Children = new Drawable[]
-                    {
-                        new Box()
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = yellow_colour
-                        },
-                        new DrumRollTrianglesPiece()
-                        {
-                            RelativeSizeAxes = Axes.Both,
-
-                            ColourDark = yellow_colour.Darken(0.1f),
-                            ColourLight = yellow_colour.Darken(0.05f),
-                            Alpha = 0.75f,
-                        }
-                    }
-                }    
-            };
         }
+
+        protected virtual DrumRollBodyPiece CreateBody(float length) => new DrumRollBodyPiece(length);
     }
 }

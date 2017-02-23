@@ -106,11 +106,11 @@ namespace osu.Desktop.VisualTests.Tests
                                     Position = new Vector2(200, 0),
                                     Scale = new Vector2(0.5f)
                                 },
-                                new DrawableDrumRoll(new DrumRoll() { StartTime = 0, Length = 350 })
+                                new DrawableDrumRoll(new DrumRoll() { StartTime = 0, Length = 350, TickDistance = 50 })
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Position = new Vector2(50, 100),
+                                    Position = new Vector2(270, 0),
                                     Scale = new Vector2(0.5f)
                                 }
                             }

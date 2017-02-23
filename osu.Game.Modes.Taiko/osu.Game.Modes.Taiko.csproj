@@ -47,18 +47,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Objects\Drawables\DrawableDrumRollTick.cs" />
     <Compile Include="Objects\Drawables\DrawableSpinner.cs" />
     <Compile Include="Objects\Drawables\DrawableTaikoHitObject.cs" />
     <Compile Include="Objects\Drawables\DrawableHitCircle.cs" />
     <Compile Include="Objects\Drawables\DrawableHitCircleFinisher.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
     <Compile Include="Objects\Drawables\DrawableDrumRoll.cs" />
+    <Compile Include="Objects\Drawables\Pieces\DrumRollBodyPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\DrumRollTrianglesPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\HitCirclePiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\TrianglesPiece.cs" />
     <Compile Include="Objects\DrumRoll.cs" />
+    <Compile Include="Objects\DrumRollTick.cs" />
     <Compile Include="Objects\HitCircle.cs" />
     <Compile Include="Objects\Spinner.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
