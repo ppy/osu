@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Toolbar
 
                     newSprite.FillMode = FillMode.Fit;
 
-                    newSprite.Preload(game, s =>
+                    newSprite.LoadAsync(game, s =>
                     {
                         Sprite?.FadeOut();
                         Sprite?.Expire();

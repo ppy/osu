@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 var osu = loadOsu(host);
 
                 var importer = new BeatmapImporter(client);
-                if (!importer.Import(osz_path).Wait(1000))
+                if (!importer.ImportAsync(osz_path).Wait(1000))
                     Assert.Fail(@"IPC took too long to send");
 
                 ensureLoaded(osu, 10000);

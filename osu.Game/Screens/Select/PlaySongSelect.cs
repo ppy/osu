@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Select
                         {
                             BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
                             PreferredPlayMode = playMode.Value
-                        })).Preload(Game, l => Push(player));
+                        })).LoadAsync(Game, l => Push(player));
                     }
                 }
             };
@@ -340,7 +340,7 @@ namespace osu.Game.Screens.Select
 
             //for the time being, let's completely load the difficulty panels in the background.
             //this likely won't scale so well, but allows us to completely async the loading flow.
-            Task.WhenAll(group.BeatmapPanels.Select(panel => panel.Preload(game))).ContinueWith(task => Schedule(delegate
+            Task.WhenAll(group.BeatmapPanels.Select(panel => panel.LoadAsync(game))).ContinueWith(task => Schedule(delegate
             {
                 beatmapGroups.Add(group);
 

@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Menu
                 {
                     bgm.Start();
 
-                    (mainMenu = new MainMenu()).Preload(Game);
+                    (mainMenu = new MainMenu()).LoadAsync(Game);
 
                     Scheduler.AddDelayed(delegate
                     {
