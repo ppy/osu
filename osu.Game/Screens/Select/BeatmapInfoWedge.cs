@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Select
                         }
                     },
                 }
-            }).Preload(game, delegate (Drawable d)
+            }).LoadAsync(game, delegate (Drawable d)
             {
                 FadeIn(250);
 

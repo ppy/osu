@@ -116,7 +116,7 @@ namespace osu.Game
                 }
             });
 
-            (screenStack = new Loader()).Preload(this, d =>
+            (screenStack = new Loader()).LoadAsync(this, d =>
             {
                 screenStack.ModePushed += screenAdded;
                 screenStack.Exited += screenRemoved;
@@ -124,22 +124,22 @@ namespace osu.Game
             });
 
             //overlay elements
-            (chat = new ChatOverlay { Depth = 0 }).Preload(this, overlayContent.Add);
-            (options = new OptionsOverlay { Depth = -1 }).Preload(this, overlayContent.Add);
+            (chat = new ChatOverlay { Depth = 0 }).LoadAsync(this, overlayContent.Add);
+            (options = new OptionsOverlay { Depth = -1 }).LoadAsync(this, overlayContent.Add);
             (musicController = new MusicController()
             {
                 Depth = -2,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }).Preload(this, overlayContent.Add);
+            }).LoadAsync(this, overlayContent.Add);
 
             (notificationManager = new NotificationManager
             {
                 Depth = -2,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }).Preload(this, overlayContent.Add);
+            }).LoadAsync(this, overlayContent.Add);
 
             Logger.NewEntry += entry =>
             {
@@ -160,7 +160,7 @@ namespace osu.Game
                 Depth = -3,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
                 OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
-            }).Preload(this, t =>
+            }).LoadAsync(this, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
                 PlayMode.TriggerChange();

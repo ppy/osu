@@ -322,10 +322,10 @@ namespace osu.Game.Overlays
             updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
-        protected override void PerformLoad(Framework.Game game)
+        protected override void Load(Framework.Game game)
         {
             this.game = game;
-            base.PerformLoad(game);
+            base.Load(game);
         }
 
         Action pendingBeatmapSwitch;
@@ -349,7 +349,7 @@ namespace osu.Game.Overlays
 
                 MusicControllerBackground newBackground;
 
-                (newBackground = new MusicControllerBackground(beatmap)).Preload(game, delegate
+                (newBackground = new MusicControllerBackground(beatmap)).LoadAsync(game, delegate
                 {
 
                     dragContainer.Add(newBackground);
