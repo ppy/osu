@@ -65,7 +65,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
                     EdgeEffect = new EdgeEffect()
                     {
-                        Colour = new Color4(InternalColour.R, InternalColour.G, InternalColour.B, 0.5f),
+                        Colour = new Color4(InternalColour.R, InternalColour.G, InternalColour.B, 0.75f),
                         Radius = 50,
                         Type = EdgeEffectType.Glow,
                     }
