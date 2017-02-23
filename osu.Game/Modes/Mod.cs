@@ -9,11 +9,34 @@ namespace osu.Game.Modes
 {
     public abstract class Mod
     {
+        /// <summary>
+        /// The name of this mod.
+        /// </summary>
         public abstract Mods Name { get; }
+
+        /// <summary>
+        /// The icon of this mod.
+        /// </summary>
         public abstract FontAwesome Icon { get; }
+
+        /// <summary>
+        /// The user readable description of this mod for the given <see cref="PlayMode"/>.
+        /// </summary>
         public virtual string Description(PlayMode mode) => @"";
+
+        /// <summary>
+        /// The score multiplier of this mod for the given <see cref="PlayMode"/>
+        /// </summary>
         public abstract double ScoreMultiplier(PlayMode mode);
+
+        /// <summary>
+        /// Returns if this mod is ranked in the given <see cref="PlayMode">
+        /// </summary>
         public abstract bool Ranked(PlayMode mode);
+
+        /// <summary>
+        /// The mods this mod cannot be enabled with
+        /// </summary>
         public abstract Mods[] DisablesMods(PlayMode mode);
     }
 

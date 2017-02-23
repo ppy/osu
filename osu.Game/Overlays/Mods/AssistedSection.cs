@@ -12,77 +12,15 @@ namespace osu.Game
 {
     public class AssistedSection : ModSection
     {
-        private ModButton relaxButton;
-        public ModButton RelaxButton
-        {
-            get
-            {
-                return relaxButton;
-            }
-        }
+        public ModButton RelaxButton { get; private set; }
+        public ModButton AutopilotButton { get; private set; }
+        public ModButton TargetPracticeButton { get; private set; }
+        public ModButton SpunOutButton { get; private set; }
+        public ModButton AutoplayCinemaButton { get; private set; }
 
-        private ModButton autopilotButton;
-        public ModButton AutopilotButton
-        {
-            get
-            {
-                return autopilotButton;
-            }
-        }
-
-        private ModButton targetPracticeButton;
-        public ModButton TargetPracticeButton
-        {
-            get
-            {
-                return targetPracticeButton;
-            }
-        }
-
-        private ModButton spunOutButton;
-        public ModButton SpunOutButton
-        {
-            get
-            {
-                return spunOutButton;
-            }
-        }
-
-        private ModButton autoplayCinemaButton;
-        public ModButton AutoplayCinemaButton
-        {
-            get
-            {
-                return autoplayCinemaButton;
-            }
-        }
-
-        private ModButton keyButton;
-        public ModButton KeyButton
-        {
-            get
-            {
-                return keyButton;
-            }
-        }
-
-        private ModButton coopButton;
-        public ModButton CoopButton
-        {
-            get
-            {
-                return coopButton;
-            }
-        }
-
-        private ModButton randomButton;
-        public ModButton RandomButton
-        {
-            get
-            {
-                return randomButton;
-            }
-        }
+        public ModButton KeyButton { get; private set; }
+        public ModButton CoopButton { get; private set; }
+        public ModButton RandomButton { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -100,7 +38,7 @@ namespace osu.Game
                 case PlayMode.Osu:
                     Buttons = new ModButton[]
                     {
-                        relaxButton = new ModButton
+                        RelaxButton = new ModButton
                         {
                             ToggleKey = Key.Z,
                             Mods = new Mod[]
@@ -108,7 +46,7 @@ namespace osu.Game
                                 new ModRelax(),
                             },
                         },
-                        autopilotButton = new ModButton
+                        AutopilotButton = new ModButton
                         {
                             ToggleKey = Key.X,
                             Mods = new Mod[]
@@ -116,7 +54,7 @@ namespace osu.Game
                                 new ModAutopilot(),
                             },
                         },
-                        targetPracticeButton = new ModButton
+                        TargetPracticeButton = new ModButton
                         {
                             ToggleKey = Key.C,
                             Mods = new Mod[]
@@ -124,7 +62,7 @@ namespace osu.Game
                                 new ModTarget(),
                             },
                         },
-                        spunOutButton = new ModButton
+                        SpunOutButton = new ModButton
                         {
                             ToggleKey = Key.V,
                             Mods = new Mod[]
@@ -132,7 +70,7 @@ namespace osu.Game
                                 new ModSpunOut(),
                             },
                         },
-                        autoplayCinemaButton = new ModButton
+                        AutoplayCinemaButton = new ModButton
                         {
                             ToggleKey = Key.B,
                             Mods = new Mod[]
@@ -148,7 +86,7 @@ namespace osu.Game
                 case PlayMode.Catch:
                     Buttons = new ModButton[]
                     {
-                        relaxButton = new ModButton
+                        RelaxButton = new ModButton
                         {
                             ToggleKey = Key.Z,
                             Mods = new Mod[]
@@ -156,7 +94,7 @@ namespace osu.Game
                                 new ModRelax(),
                             },
                         },
-                        autoplayCinemaButton = new ModButton
+                        AutoplayCinemaButton = new ModButton
                         {
                             ToggleKey = Key.X,
                             Mods = new Mod[]
@@ -171,7 +109,7 @@ namespace osu.Game
                 case PlayMode.Mania:
                     Buttons = new ModButton[]
                     {
-                        keyButton = new ModButton
+                        KeyButton = new ModButton
                         {
                             ToggleKey = Key.Z,
                             Mods = new Mod[]
@@ -187,7 +125,7 @@ namespace osu.Game
                                 new ModKey3(),
                             },
                         },
-                        coopButton = new ModButton
+                        CoopButton = new ModButton
                         {
                             ToggleKey = Key.X,
                             Mods = new Mod[]
@@ -195,7 +133,7 @@ namespace osu.Game
                                 new ModKeyCoop(),
                             },
                         },
-                        randomButton = new ModButton
+                        RandomButton = new ModButton
                         {
                             ToggleKey = Key.C,
                             Mods = new Mod[]
@@ -203,7 +141,7 @@ namespace osu.Game
                                 new ModRandom(),
                             },
                         },
-                        autoplayCinemaButton = new ModButton
+                        AutoplayCinemaButton = new ModButton
                         {
                             ToggleKey = Key.V,
                             Mods = new Mod[]
