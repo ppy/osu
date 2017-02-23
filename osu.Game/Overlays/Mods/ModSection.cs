@@ -23,13 +23,7 @@ namespace osu.Game.Overlays.Mods
         private OsuSpriteText headerLabel;
 
         private AlwaysPresentFlowContainer buttonsContainer;
-        public FlowContainer ButtonsContainer
-        {
-            get
-            {
-                return buttonsContainer;
-            }
-        }
+        public FlowContainer ButtonsContainer => buttonsContainer;
 
         public Action<Mod> Action;
 

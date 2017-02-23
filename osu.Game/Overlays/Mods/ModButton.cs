@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -22,13 +23,7 @@ namespace osu.Game.Overlays.Mods
     public class ModButton : FlowContainer
     {
         private ModIcon[] icons;
-        private ModIcon displayIcon
-        {
-            get
-            {
-                return icons[icons.Length - 1];
-            }
-        }
+        private ModIcon displayIcon => icons[icons.Length - 1];
         private SpriteText text;
         private Container iconsContainer;
         private SampleChannel sampleOn, sampleOff;
@@ -69,13 +64,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        public bool Selected
-        {
-            get
-            {
-                return selectedMod != -1;
-            }
-        }
+        public bool Selected => selectedMod != -1;
 
         private Color4 backgroundColour;
         public new Color4 Colour
@@ -129,20 +118,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        public Mod SelectedMod
-        {
-            get
-            {
-                if (selectedMod >= 0)
-                {
-                    return Mods[selectedMod];
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+        public Mod SelectedMod => Mods.ElementAtOrDefault(selectedMod);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
