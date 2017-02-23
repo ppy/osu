@@ -38,7 +38,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            //if (beatmap?.Track == null)
+            if (beatmap?.Track == null)
             {
                 var objects = new List<HitObject>();
 
