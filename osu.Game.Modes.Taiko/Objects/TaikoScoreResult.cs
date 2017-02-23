@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    enum TaikoScoreResult
+    public enum TaikoScoreResult
     {
         Miss,
         Good,

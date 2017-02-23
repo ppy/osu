@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Game.Modes.Objects.Drawables;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableHitCircleDon : DrawableHitCircle
     {
-        public DrawableHitCircleDon(TaikoHitObject hitObject)
-            : base(hitObject)
+        public DrawableHitCircleDon(HitCircle hitCircle)
+            : base(hitCircle)
         {
         }
 
@@ -21,8 +22,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
     public class DrawableHitCircleKatsu : DrawableHitCircle
     {
-        public DrawableHitCircleKatsu(TaikoHitObject hitObject)
-            : base(hitObject)
+        public DrawableHitCircleKatsu(HitCircle hitCircle)
+            : base(hitCircle)
         {
         }
 
@@ -31,8 +32,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
     public abstract class DrawableHitCircle : DrawableTaikoHitObject
     {
-        public DrawableHitCircle(TaikoHitObject hitObject)
-            : base(hitObject)
+        public DrawableHitCircle(HitCircle hitCircle)
+            : base(hitCircle)
         {
             Size = new Vector2(128);
 
@@ -43,6 +44,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         }
 
         protected abstract HitCirclePiece CreateBody();
+
+        protected override void UpdateState(ArmedState state)
+        {
+            if (!IsLoaded)
+                return;
+
+            base.UpdateState(state);
+
+
+        }
 
         // Todo: Hit handling
     }

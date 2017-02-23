@@ -22,6 +22,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         public override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo { MaxScore = TaikoScoreResult.Great };
 
+        /// <summary>
+        /// Todo: Remove
+        /// </summary>
         protected override void LoadComplete()
         {
             if (Judgement == null)
@@ -36,6 +39,24 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 return;
 
             Flush();
+
+            UpdateInitialState();
+
+            Delay(HitObject.StartTime - Time.Current - TIME_PREEMPT, true);
+
+            UpdatePreemptState();
+
+            Delay(TIME_PREEMPT);
+        }
+
+        protected virtual void UpdateInitialState()
+        {
+            MoveToX(620);
+        }
+
+        protected virtual void UpdatePreemptState()
+        {
+
         }
     }
 }

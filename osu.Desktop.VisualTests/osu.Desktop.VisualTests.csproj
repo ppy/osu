@@ -177,6 +177,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Tests\TestCaseChatDisplay.cs" />
     <Compile Include="Tests\TestCaseGamefield.cs" />
+    <Compile Include="Tests\TestCaseTaikoHitObjects.cs" />
     <Compile Include="Tests\TestCaseMusicController.cs" />
     <Compile Include="Tests\TestCaseNotificationManager.cs" />
     <Compile Include="Tests\TestCasePlayer.cs" />

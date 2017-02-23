@@ -10,8 +10,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableHitCircleDonFinisher : DrawableHitCircleFinisher
     {
-        public DrawableHitCircleDonFinisher(TaikoHitObject hitObject)
-            : base(hitObject)
+        public DrawableHitCircleDonFinisher(HitCircle hitCircle)
+            : base(hitCircle)
         {
         }
 
@@ -20,8 +20,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
     public class DrawableHitCircleKatsuFinisher : DrawableHitCircleFinisher
     {
-        public DrawableHitCircleKatsuFinisher(TaikoHitObject hitObject)
-            : base(hitObject)
+        public DrawableHitCircleKatsuFinisher(HitCircle hitCircle)
+            : base(hitCircle)
         {
         }
 
@@ -30,8 +30,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
     public abstract class DrawableHitCircleFinisher : DrawableHitCircle
     {
-        public DrawableHitCircleFinisher(TaikoHitObject hitObject)
-            : base(hitObject)
+        public DrawableHitCircleFinisher(HitCircle hitCircle)
+            : base(hitCircle)
         {
             Size *= 1.5f;
         }

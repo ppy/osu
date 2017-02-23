@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    class TaikoJudgementInfo : JudgementInfo
+    public class TaikoJudgementInfo : JudgementInfo
     {
         /// <summary>
         /// The score the user achieved.
