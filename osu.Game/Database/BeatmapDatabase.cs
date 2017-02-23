@@ -22,12 +22,12 @@ namespace osu.Game.Database
     public class BeatmapDatabase
     {
         private SQLiteConnection connection { get; set; }
-        private BasicStorage storage;
+        private Storage storage;
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
 
         private BeatmapImporter ipc;
 
-        public BeatmapDatabase(BasicStorage storage, BasicGameHost importHost = null)
+        public BeatmapDatabase(Storage storage, GameHost importHost = null)
         {
             this.storage = storage;
 
