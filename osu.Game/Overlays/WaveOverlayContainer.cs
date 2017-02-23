@@ -35,7 +35,7 @@ namespace osu.Game.Overlays
         private const float content_duration = 700;
         private const float content_transition_wait = 100;
         internal const float CONTENT_EXIT_DURATION = 600;
-        private float [] waveDurations
+        private float[] waveDurations
         {
             get
             {
@@ -53,13 +53,6 @@ namespace osu.Game.Overlays
 
         private readonly Container contentContainer;
         protected override Container<Drawable> Content => contentContainer;
-
-        private EdgeEffect waveShadow = new EdgeEffect
-        {
-            Type = EdgeEffectType.Shadow,
-            Colour = Color4.Black.Opacity(50),
-            Radius = 20f,
-        };
 
         private Color4 firstWaveColour;
         public Color4 FirstWaveColour
@@ -185,77 +178,30 @@ namespace osu.Game.Overlays
                 Anchor = Anchor.TopCentre,
                 Children = new Drawable[]
                 {
-                    firstWave = new Container
+                    firstWave = new Wave
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Origin = Anchor.TopLeft,
-                        Anchor = Anchor.TopLeft,
-                        Size = new Vector2(1.5f),
                         Rotation = first_wave_rotation,
                         Colour = FirstWaveColour,
-                        Masking = true,
-                        EdgeEffect = waveShadow,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                        },
                     },
-                    secondWave = new Container
+                    secondWave = new Wave
                     {
-                        RelativeSizeAxes = Axes.Both,
                         Origin = Anchor.TopRight,
                         Anchor = Anchor.TopRight,
-                        Size = new Vector2(1.5f),
                         Rotation = second_wave_rotation,
                         Colour = SecondWaveColour,
-                        Masking = true,
-                        EdgeEffect = waveShadow,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                        },
+
                     },
-                    thirdWave = new Container
+                    thirdWave = new Wave
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Origin = Anchor.TopLeft,
-                        Anchor = Anchor.TopLeft,
-                        Size = new Vector2(1.5f),
                         Rotation = third_wave_rotation,
                         Colour = ThirdWaveColour,
-                        Masking = true,
-                        EdgeEffect = waveShadow,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                        },
                     },
-                    fourthWave = new Container
+                    fourthWave = new Wave
                     {
-                        RelativeSizeAxes = Axes.Both,
                         Origin = Anchor.TopRight,
                         Anchor = Anchor.TopRight,
-                        Size = new Vector2(1.5f),
                         Rotation = fourth_wave_rotation,
                         Colour = FourthWaveColour,
-                        Masking = true,
-                        EdgeEffect = waveShadow,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                        },
                     },
                 },
             });
@@ -275,7 +221,31 @@ namespace osu.Game.Overlays
                 },
             });
 
-            waves = new Container[] { firstWave, secondWave, thirdWave, fourthWave };
+            waves = new[] { firstWave, secondWave, thirdWave, fourthWave };
+        }
+
+        class Wave : Container
+        {
+            public Wave()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Size = new Vector2(1.5f);
+                Masking = true;
+                EdgeEffect = new EdgeEffect
+                {
+                    Type = EdgeEffectType.Shadow,
+                    Colour = Color4.Black.Opacity(50),
+                    Radius = 20f,
+                };
+
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                };
+            }
         }
     }
 }
