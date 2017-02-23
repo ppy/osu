@@ -11,6 +11,10 @@ using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Game.Graphics;
+using osu.Game.Overlays.Pause;
+using System;
 
 namespace osu.Game.Screens.Play
 {
@@ -20,14 +24,114 @@ namespace osu.Game.Screens.Play
 
         private static readonly Vector2 background_blur = new Vector2(20);
 
-        public FailDialog()
+        private const int transition_duration = 200;
+        private const int button_height = 70;
+        private const float background_alpha = 0.75f;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            Add(new OsuSpriteText
+            Children = new Drawable[]
             {
-                Text = "You failed!",
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                TextSize = 50
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black,
+                    Alpha = background_alpha,
+                },
+                new FlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FlowDirections.Vertical,
+                    Spacing = new Vector2(0f, 50f),
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Children = new Drawable[]
+                    {
+                        new FlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FlowDirections.Vertical,
+                            Spacing = new Vector2(0f, 20f),
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Text = @"failed",
+                                    Font = @"Exo2.0-Medium",
+                                    Spacing = new Vector2(5, 0),
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    TextSize = 30,
+                                    Colour = colours.Yellow,
+                                    Shadow = true,
+                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                },
+                                new OsuSpriteText
+                                {
+                                    Text = @"try again",
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Shadow = true,
+                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                }
+                            }
+                        },
+                        new FlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Masking = true,
+                            EdgeEffect = new EdgeEffect
+                            {
+                                Type = EdgeEffectType.Shadow,
+                                Colour = Color4.Black.Opacity(0.6f),
+                                Radius = 50
+                            },
+                            Children = new Drawable[]
+                            {
+                                new RetryButton
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Height = button_height,
+                                    Action = retry
+                                },
+                                new QuitButton
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Height = button_height,
+                                    Action = Exit
+                                }
+                            }
+                        }
+                    }
+                },
+                new PauseProgressBar
+                {
+                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomCentre,
+                    Width = 1f
+                }
+            };
+        }
+
+        private void retry()
+        {
+            var newPlayer = new Player();
+
+            newPlayer.Preload(Game, delegate
+            {
+                if (!Push(newPlayer))
+                {
+                    // Error(?)
+                }
             });
         }
 
