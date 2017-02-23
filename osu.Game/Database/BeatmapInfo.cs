@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes;
-using osu.Game.Screens.Play;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 using osu.Game.Beatmaps;

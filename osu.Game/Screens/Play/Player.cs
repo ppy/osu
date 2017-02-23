@@ -20,7 +20,6 @@ using osu.Game.Overlays.Pause;
 using osu.Framework.Configuration;
 using System;
 using System.Linq;
-using osu.Game.Beatmaps;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transformations;

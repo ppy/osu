@@ -4,7 +4,6 @@
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Samples;
 using OpenTK.Graphics;
-using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Objects
 {

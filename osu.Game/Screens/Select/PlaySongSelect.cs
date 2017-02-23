@@ -18,7 +18,6 @@ using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using osu.Game.Screens.Play;
-using osu.Framework;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Beatmaps.Drawables;
@@ -27,7 +26,6 @@ using osu.Game.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
 using System.Collections.Generic;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Select
