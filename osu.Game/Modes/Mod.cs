@@ -7,6 +7,9 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Modes
 {
+    /// <summary>
+    /// The base class for gameplay modifiers.
+    /// </summary>
     public abstract class Mod
     {
         /// <summary>
