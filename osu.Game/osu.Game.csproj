@@ -151,7 +151,6 @@
     <Compile Include="Screens\Select\CarouselContainer.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameScreen.cs" />
-    <Compile Include="Screens\Play\ModSelect.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Screens\Play\Player.cs" />
@@ -305,9 +304,7 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Overlays\Mods\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
