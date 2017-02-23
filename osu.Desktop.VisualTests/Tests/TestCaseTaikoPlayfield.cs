@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.UI.Drums;
 using osu.Game.Screens;
@@ -90,7 +91,7 @@ namespace osu.Desktop.VisualTests.Tests
                                 {
                                     Size = new Vector2(150, 150)
                                 },
-                                new DrawableHitCircleKatsu()
+                                new DrawableHitCircleKatsu(new HitCircle() { StartTime = 0 })
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -98,7 +99,7 @@ namespace osu.Desktop.VisualTests.Tests
                                     Scale = new Vector2(0.5f)
 
                                 },
-                                new DrawableHitCircleDonFinisher()
+                                new DrawableHitCircleDonFinisher(new HitCircle() { StartTime = 0 })
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,

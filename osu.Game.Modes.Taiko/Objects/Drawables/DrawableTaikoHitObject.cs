@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using osu.Game.Modes.Objects;
+using osu.Framework.Graphics.Transformations;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
@@ -21,15 +22,20 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         public override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo { MaxScore = TaikoScoreResult.Great };
 
+        protected override void LoadComplete()
+        {
+            if (Judgement == null)
+                Judgement = CreateJudgementInfo();
+
+            UpdateState(State);
+        }
+
         protected override void UpdateState(ArmedState state)
         {
             if (!IsLoaded)
                 return;
 
             Flush();
-
-
-            throw new NotImplementedException();
         }
     }
 }

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Modes.Taiko
 {
-    public class TaikoDifficultyCalculator : DifficultyCalculator<TaikoBaseHit>
+    public class TaikoDifficultyCalculator : DifficultyCalculator<TaikoHitObject>
     {
         protected override PlayMode PlayMode => PlayMode.Taiko;
 
@@ -17,7 +17,7 @@ namespace osu.Game.Modes.Taiko
         {
         }
 
-        protected override HitObjectConverter<TaikoBaseHit> Converter => new TaikoConverter();
+        protected override HitObjectConverter<TaikoHitObject> Converter => new TaikoConverter();
 
         protected override double ComputeDifficulty(Dictionary<String, String> categoryDifficulty)
         {
