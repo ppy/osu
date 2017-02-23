@@ -13,8 +13,6 @@ namespace osu.Game.Screens.Play
 {
     public class SkipButton : TwoLayerButton
     {
-        private readonly double skipDestination;
-
         public SkipButton()
         {
             Text = @"Skip";
