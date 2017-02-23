@@ -61,7 +61,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
                 ticks.Spacing = new Vector2((float)drumRoll.TickDistance - newTick.Size.X * tick.Scale, 0);
             }
-
         }
 
         protected virtual DrumRollBodyPiece CreateBody(float length) => new DrumRollBodyPiece(length);
@@ -69,6 +68,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         protected override void CheckJudgement(bool userTriggered)
         {
             if (userTriggered)
+                return;
+
+            if (Judgement.TimeOffset < 0)
                 return;
 
             TaikoJudgementInfo taikoJudgement = Judgement as TaikoJudgementInfo;

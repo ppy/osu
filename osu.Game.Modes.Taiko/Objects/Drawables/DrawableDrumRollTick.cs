@@ -23,6 +23,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
             this.drumRollTick = drumRollTick;
 
+            RelativePositionAxes = Axes.None;
+
             Size = new Vector2(16) * drumRollTick.Scale;
 
             Masking = true;
@@ -48,6 +50,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         public override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollJudgementInfo() { MaxScore = TaikoScoreResult.Great };
 
+        protected override void UpdateInitialState()
+        {
+        }
+
+        protected override void UpdatePreemptState()
+        {
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (!Keys.Contains(args.Key))
@@ -64,7 +74,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (Judgement.TimeOffset > drumRollTick.TickDistance / 2)
-                    Judgement.Result = HitResult.Miss;
+                    Alpha = 0;
                 return;
             }
 

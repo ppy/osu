@@ -184,6 +184,7 @@
     <Compile Include="Tests\TestCaseKeyCounter.cs" />
     <Compile Include="Tests\TestCaseMenuButtonSystem.cs" />
     <Compile Include="Tests\TestCaseScoreCounter.cs" />
+    <Compile Include="Tests\TestCaseTaikoHitObjects.cs" />
     <Compile Include="Tests\TestCaseTaikoPlayfield.cs" />
     <Compile Include="Tests\TestCaseTextAwesome.cs" />
     <Compile Include="Tests\TestCasePlaySongSelect.cs" />

@@ -59,7 +59,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
             TaikoFinisherJudgementInfo taikoJudgement = Judgement as TaikoFinisherJudgementInfo;
 
-            if (taikoJudgement.FirstHitJudgement.Result.HasValue)
+            if (!taikoJudgement.FirstHitJudgement.Result.HasValue)
             {
                 base.CheckJudgement(userTriggered);
                 return;
