@@ -241,6 +241,22 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        public void Retry()
+        {
+            var newPlayer = new Player();
+
+            newPlayer.Preload(Game, delegate
+            {
+                newPlayer.RestartCount = RestartCount + 1;
+                ValidForResume = false;
+
+                if (!Push(newPlayer))
+                {
+                    // Error(?)
+                }
+            });
+        }
+
         private void onPass()
         {
             Delay(1000);
@@ -263,7 +279,11 @@ namespace osu.Game.Screens.Play
             Schedule(delegate
             {
                 ValidForResume = false;
-                Push(new FailDialog());
+                Push(new FailDialog
+                {
+                    OnRetry = Retry,
+                    OnQuit = Exit
+                });
             });
         }
 

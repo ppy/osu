@@ -24,9 +24,11 @@ namespace osu.Game.Screens.Play
 
         private static readonly Vector2 background_blur = new Vector2(20);
 
-        private const int transition_duration = 200;
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
+
+        public Action OnRetry;
+        public Action OnQuit;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -99,7 +101,11 @@ namespace osu.Game.Screens.Play
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = button_height,
-                                    Action = retry
+                                    Action = delegate
+                                    {
+                                        OnRetry?.Invoke();
+                                        Hide();
+                                    }
                                 },
                                 new QuitButton
                                 {
@@ -120,19 +126,6 @@ namespace osu.Game.Screens.Play
                     Width = 1f
                 }
             };
-        }
-
-        private void retry()
-        {
-            var newPlayer = new Player();
-
-            newPlayer.Preload(Game, delegate
-            {
-                if (!Push(newPlayer))
-                {
-                    // Error(?)
-                }
-            });
         }
 
         protected override void OnEntering(Screen last)
