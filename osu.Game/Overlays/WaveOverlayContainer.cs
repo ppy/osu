@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -48,8 +49,9 @@ namespace osu.Game.Overlays
         private const float third_wave_rotation = 4;
         private const float fourth_wave_rotation = -2;
 
-        private Container firstWave, secondWave, thirdWave, fourthWave, wavesContainer;
-        private readonly Container[] waves;
+        private Wave firstWave, secondWave, thirdWave, fourthWave;
+
+        private Container<Wave> wavesContainer;
 
         private readonly Container contentContainer;
         protected override Container<Drawable> Content => contentContainer;
@@ -118,9 +120,11 @@ namespace osu.Game.Overlays
         {
             base.Show();
 
-            for (int i = 0; i < waves.Length; i++)
+            int i = 0;
+            foreach (var w in wavesContainer.Children)
             {
-                waves[i].MoveToY(wavePositions[i], waveDurations[i], EasingTypes.OutQuint);
+                w.MoveToY(wavePositions[i], waveDurations[i], EasingTypes.OutQuint);
+                i++;
             }
 
             DelayReset();
@@ -149,10 +153,8 @@ namespace osu.Game.Overlays
             contentContainer.MoveToY(DrawHeight, CONTENT_EXIT_DURATION, EasingTypes.InSine);
             TransitionOut();
 
-            for (int i = 0; i < waves.Length; i++)
-            {
-                waves[i].MoveToY(DrawHeight, second_wave_duration, EasingTypes.InSine);
-            }
+            foreach (var w in wavesContainer.Children)
+                w.MoveToY(DrawHeight, second_wave_duration, EasingTypes.InSine);
 
             DelayReset();
             Delay(container_wait);
@@ -171,12 +173,12 @@ namespace osu.Game.Overlays
         {
             Masking = true;
 
-            AddInternal(wavesContainer = new Container
+            AddInternal(wavesContainer = new Container<Wave>
             {
                 RelativeSizeAxes = Axes.Both,
                 Origin = Anchor.TopCentre,
                 Anchor = Anchor.TopCentre,
-                Children = new Drawable[]
+                Children = new Wave[]
                 {
                     firstWave = new Wave
                     {
@@ -220,8 +222,6 @@ namespace osu.Game.Overlays
                     },
                 },
             });
-
-            waves = new[] { firstWave, secondWave, thirdWave, fourthWave };
         }
 
         class Wave : Container
