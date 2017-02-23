@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using OpenTK;
 
 namespace osu.Game.Overlays.Music
 {

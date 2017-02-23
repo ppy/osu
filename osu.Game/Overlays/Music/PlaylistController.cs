@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -32,6 +33,7 @@ namespace osu.Game.Overlays.Music
 
         private Playlist playlistView;
         private SearchTextBox searchTextBox;
+        private ScheduledDelegate lastScheduledSearch;
 
         public PlaylistController()
         {
@@ -77,8 +79,9 @@ namespace osu.Game.Overlays.Music
             };
             searchTextBox.OnChange += (sender, newText) =>
             {
-                if (newText)
-                    playlistView.Filter(searchTextBox.Text);
+                if (!newText) return;
+                lastScheduledSearch?.Cancel();
+                lastScheduledSearch = Scheduler.AddDelayed(() => playlistView.Filter(searchTextBox.Text), TimeSpan.FromSeconds(1).TotalMilliseconds);
             };
         }
 
