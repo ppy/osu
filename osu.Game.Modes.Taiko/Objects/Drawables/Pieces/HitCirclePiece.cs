@@ -29,7 +29,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
     {
         public DonFinisherPiece()
         {
-            Scale *= new Vector2(1.6f);
+            Scale *= new Vector2(1.5f);
         }
     }
 
@@ -37,7 +37,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
     {
         public KatsuFinisherPiece()
         {
-            Scale *= new Vector2(1.6f);
+            Scale *= new Vector2(1.5f);
         }
     }
 
@@ -76,6 +76,4 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
         protected abstract RingPiece CreateRing();
     }
-
-
 }
