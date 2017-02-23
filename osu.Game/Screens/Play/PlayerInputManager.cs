@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Play
 {
     class PlayerInputManager : UserInputManager
     {
-        public PlayerInputManager(BasicGameHost host)
+        public PlayerInputManager(GameHost host)
             : base(host)
         {
         }

@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Select
 
         private FlowContainer buttons;
 
+        public OsuLogo StartButton;
+
         public void AddButton(string text, Color4 colour, Action action)
         {
             var button = new FooterButton
@@ -76,7 +78,7 @@ namespace osu.Game.Screens.Select
                     Height = 3,
                     Position = new Vector2(0, -3),
                 },
-                new OsuLogo()
+                StartButton = new OsuLogo
                 {
                     Anchor = Anchor.BottomRight,
                     Scale = new Vector2(0.4f),

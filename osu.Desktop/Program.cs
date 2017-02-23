@@ -3,14 +3,9 @@
 
 using System;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using osu.Desktop.Beatmaps.IO;
-using osu.Framework;
 using osu.Framework.Desktop;
 using osu.Framework.Desktop.Platform;
-using osu.Framework.Platform;
-using osu.Game;
 using osu.Game.IPC;
 using osu.Game.Modes;
 using osu.Game.Modes.Catch;
@@ -51,8 +46,7 @@ namespace osu.Desktop
                     Ruleset.Register(new ManiaRuleset());
                     Ruleset.Register(new CatchRuleset());
 
-                    BaseGame osu = new OsuGameDesktop(args);
-                    host.Add(osu);
+                    host.Add(new OsuGameDesktop(args));
                     host.Run();
                 }
                 return 0;

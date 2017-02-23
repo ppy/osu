@@ -111,12 +111,14 @@ namespace osu.Game.Overlays.Options.Sections.General
                     {
                         PlaceholderText = "Username",
                         RelativeSizeAxes = Axes.X,
-                        Text = api?.Username ?? string.Empty
+                        Text = api?.Username ?? string.Empty,
+                        TabbableContentContainer = this
                     },
                     password = new OsuPasswordTextBox
                     {
                         PlaceholderText = "Password",
-                        RelativeSizeAxes = Axes.X
+                        RelativeSizeAxes = Axes.X,
+                        TabbableContentContainer = this
                     },
                     new OsuCheckbox
                     {
