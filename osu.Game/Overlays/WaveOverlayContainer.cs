@@ -15,20 +15,17 @@ namespace osu.Game.Overlays
 {
     public abstract class WaveOverlayContainer : OverlayContainer
     {
-        private const float container_wait = 200;
-        private const float waves_container_duration = 400;
-        private const float content_duration = 700;
-        private const float content_transition_wait = 100;
+        protected const float CONTENT_DURATION = 800;
 
-        internal const float CONTENT_EXIT_DURATION = 600;
-
-        private const float waves_container_position = -150;
+        private const EasingTypes easing_show = EasingTypes.OutSine;
+        private const EasingTypes easing_hide = EasingTypes.InSine;
 
         private Wave firstWave, secondWave, thirdWave, fourthWave;
 
         private Container<Wave> wavesContainer;
 
         private readonly Container contentContainer;
+
         protected override Container<Drawable> Content => contentContainer;
 
         public Color4 FirstWaveColour
@@ -83,56 +80,9 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected override void PopIn()
-        {
-            foreach (var w in wavesContainer.Children)
-                w.State = Visibility.Visible;
-
-            DelayReset();
-            Delay(container_wait);
-            Schedule(() =>
-            {
-                if (State == Visibility.Visible)
-                {
-                    //wavesContainer.MoveToY(waves_container_position, waves_container_duration, EasingTypes.None);
-                    contentContainer.FadeIn(content_duration, EasingTypes.OutQuint);
-                    contentContainer.MoveToY(0, content_duration, EasingTypes.OutQuint);
-
-                    Delay(content_transition_wait);
-                    Schedule(() => { if (State == Visibility.Visible) TransitionIn(); });
-                }
-            });
-        }
-
-        protected abstract void TransitionIn();
-
-        protected override void PopOut()
-        {
-            contentContainer.FadeOut(CONTENT_EXIT_DURATION, EasingTypes.InSine);
-            contentContainer.MoveToY(DrawHeight, CONTENT_EXIT_DURATION, EasingTypes.InSine);
-            TransitionOut();
-
-            foreach (var w in wavesContainer.Children)
-                w.State = Visibility.Hidden;
-
-            DelayReset();
-            Delay(container_wait);
-            //wavesContainer.MoveToY(0, waves_container_duration);
-        }
-
-        protected abstract void TransitionOut();
-
         public WaveOverlayContainer()
         {
             Masking = true;
-
-            const int wave_count = 4;
-
-            const float total_duration = 800;
-            const float duration_change = 0;
-
-            float appearDuration = total_duration - wave_count * duration_change;
-            float disappearDuration = total_duration;
 
             AddInternal(wavesContainer = new Container<Wave>
             {
@@ -144,34 +94,26 @@ namespace osu.Game.Overlays
                     firstWave = new Wave
                     {
                         Rotation = 13,
-                        FinalPosition = -830,
-                        TransitionDurationAppear = (appearDuration += duration_change),
-                        TransitionDurationDisappear = (disappearDuration -= duration_change),
+                        FinalPosition = -930,
                     },
                     secondWave = new Wave
                     {
                         Origin = Anchor.TopRight,
                         Anchor = Anchor.TopRight,
                         Rotation = -7,
-                        FinalPosition = -460,
-                        TransitionDurationAppear = (appearDuration += duration_change),
-                        TransitionDurationDisappear = (disappearDuration -= duration_change),
+                        FinalPosition = -560,
                     },
                     thirdWave = new Wave
                     {
                         Rotation = 4,
-                        FinalPosition = -290,
-                        TransitionDurationAppear = (appearDuration += duration_change),
-                        TransitionDurationDisappear = (disappearDuration -= duration_change),
+                        FinalPosition = -390,
                     },
                     fourthWave = new Wave
                     {
                         Origin = Anchor.TopRight,
                         Anchor = Anchor.TopRight,
                         Rotation = -2,
-                        FinalPosition = -120,
-                        TransitionDurationAppear = (appearDuration += duration_change),
-                        TransitionDurationDisappear = (disappearDuration -= duration_change),
+                        FinalPosition = -220,
                     },
                 },
             });
@@ -192,11 +134,27 @@ namespace osu.Game.Overlays
             });
         }
 
+        protected override void PopIn()
+        {
+            foreach (var w in wavesContainer.Children)
+                w.State = Visibility.Visible;
+
+            contentContainer.FadeIn(CONTENT_DURATION, EasingTypes.OutQuint);
+            contentContainer.MoveToY(0, CONTENT_DURATION, EasingTypes.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            contentContainer.FadeOut(CONTENT_DURATION, easing_hide);
+            contentContainer.MoveToY(DrawHeight * 2f, CONTENT_DURATION, easing_hide);
+
+            foreach (var w in wavesContainer.Children)
+                w.State = Visibility.Hidden;
+        }
+
         class Wave : Container, IStateful<Visibility>
         {
             public float FinalPosition;
-            public float TransitionDurationAppear;
-            public float TransitionDurationDisappear;
 
             public Wave()
             {
@@ -231,10 +189,10 @@ namespace osu.Game.Overlays
                     switch (value)
                     {
                         case Visibility.Hidden:
-                            MoveToY(DrawHeight / Height, TransitionDurationDisappear, EasingTypes.OutSine);
+                            MoveToY(DrawHeight / Height, CONTENT_DURATION, easing_hide);
                             break;
                         case Visibility.Visible:
-                            MoveToY(FinalPosition, TransitionDurationAppear, EasingTypes.Out);
+                            MoveToY(FinalPosition, CONTENT_DURATION, easing_show);
                             break;
                     }
                 }

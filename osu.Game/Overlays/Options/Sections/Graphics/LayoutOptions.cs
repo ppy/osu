@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 new OsuCheckbox
                 {
                     LabelText = "Fullscreen mode",
-                    Bindable = config.GetBindable<bool>(FrameworkConfig.Fullscreen),
+                    //Bindable = config.GetBindable<bool>(FrameworkConfig.Fullscreen),
                 },
                 new OsuCheckbox
                 {
