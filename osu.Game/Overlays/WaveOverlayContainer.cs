@@ -15,7 +15,8 @@ namespace osu.Game.Overlays
 {
     public abstract class WaveOverlayContainer : OverlayContainer
     {
-        protected const float CONTENT_DURATION = 800;
+        protected const float APPEAR_DURATION = 800;
+        protected const float DISAPPEAR_DURATION = 500;
 
         private const EasingTypes easing_show = EasingTypes.OutSine;
         private const EasingTypes easing_hide = EasingTypes.InSine;
@@ -139,14 +140,14 @@ namespace osu.Game.Overlays
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Visible;
 
-            contentContainer.FadeIn(CONTENT_DURATION, EasingTypes.OutQuint);
-            contentContainer.MoveToY(0, CONTENT_DURATION, EasingTypes.OutQuint);
+            contentContainer.FadeIn(APPEAR_DURATION, EasingTypes.OutQuint);
+            contentContainer.MoveToY(0, APPEAR_DURATION, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
         {
-            contentContainer.FadeOut(CONTENT_DURATION, easing_hide);
-            contentContainer.MoveToY(DrawHeight * 2f, CONTENT_DURATION, easing_hide);
+            contentContainer.FadeOut(DISAPPEAR_DURATION, EasingTypes.In);
+            contentContainer.MoveToY(DrawHeight * 2f, DISAPPEAR_DURATION, EasingTypes.In);
 
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Hidden;
@@ -183,16 +184,15 @@ namespace osu.Game.Overlays
                 get { return state; }
                 set
                 {
-                    if (value == state) return;
                     state = value;
 
                     switch (value)
                     {
                         case Visibility.Hidden:
-                            MoveToY(DrawHeight / Height, CONTENT_DURATION, easing_hide);
+                            MoveToY(DrawHeight / Height, DISAPPEAR_DURATION, easing_hide);
                             break;
                         case Visibility.Visible:
-                            MoveToY(FinalPosition, CONTENT_DURATION, easing_show);
+                            MoveToY(FinalPosition, APPEAR_DURATION, easing_show);
                             break;
                     }
                 }
