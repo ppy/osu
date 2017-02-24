@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Mania
 
         protected override HitObjectConverter<ManiaBaseHit> Converter => new ManiaConverter(columns);
 
-        protected override double ComputeDifficulty(Dictionary<String, String> categoryDifficulty)
+        protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
         {
             return 0;
         }
