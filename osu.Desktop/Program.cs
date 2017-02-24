@@ -35,7 +35,7 @@ namespace osu.Desktop
                     foreach (var file in args)
                     {
                         Console.WriteLine(@"Importing {0}", file);
-                        if (!importer.Import(Path.GetFullPath(file)).Wait(3000))
+                        if (!importer.ImportAsync(Path.GetFullPath(file)).Wait(3000))
                             throw new TimeoutException(@"IPC took too long to send");
                     }
                 }

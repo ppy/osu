@@ -29,7 +29,7 @@ namespace osu.Desktop
         {
             base.LoadComplete();
 
-            versionManager.Preload(this);
+            versionManager.LoadAsync(this);
             ModeChanged += m =>
             {
                 if (!versionManager.IsAlive && m is Intro)
