@@ -161,7 +161,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fill,
-                }.Preload(game, (bg) =>
+                }.LoadAsync(game, (bg) =>
                 {
                     Add(bg);
                     ForceRedraw();

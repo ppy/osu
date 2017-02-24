@@ -42,7 +42,7 @@ namespace osu.Game.Screens
             // once it's done.
             if (screen.LoadState == LoadState.NotLoaded)
             {
-                screen.Preload(game, d => Push((BackgroundScreen)d));
+                screen.LoadAsync(game, d => Push((BackgroundScreen)d));
                 return true;
             }
 

@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
                 Origin = Anchor.Centre,
             });
 
-            player.Preload(Game);
+            player.LoadAsync(Game);
         }
 
         protected override void OnEntering(Screen last)
