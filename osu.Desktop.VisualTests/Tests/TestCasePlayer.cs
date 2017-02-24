@@ -4,8 +4,6 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Screens.Testing;
-using osu.Framework.MathUtils;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using OpenTK;
@@ -60,7 +58,16 @@ namespace osu.Desktop.VisualTests.Tests
 
                 Beatmap b = new Beatmap
                 {
-                    HitObjects = objects
+                    HitObjects = objects,
+                    BeatmapInfo = new BeatmapInfo
+                    {
+                        Metadata = new BeatmapMetadata
+                        {
+                            Artist = @"Unknown",
+                            Title = @"Sample Beatmap",
+                            Author = @"peppy",
+                        }
+                    }
                 };
 
                 decoder.Process(b);
@@ -74,9 +81,12 @@ namespace osu.Desktop.VisualTests.Tests
                 Colour = Color4.Black,
             });
 
-            Add(new Player
+            Add(new PlayerLoader(new Player
             {
                 PreferredPlayMode = PlayMode.Osu,
+                Beatmap = beatmap
+            })
+            {
                 Beatmap = beatmap
             });
         }

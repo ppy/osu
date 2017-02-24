@@ -38,6 +38,8 @@ namespace osu.Game.Beatmaps.Drawables
                 CornerRadius = 10,
                 BorderColour = new Color4(221, 255, 255, 255),
             });
+
+            Alpha = 0;
         }
 
         public void SetMultiplicativeAlpha(float alpha)

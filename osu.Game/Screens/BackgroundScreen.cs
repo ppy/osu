@@ -3,7 +3,6 @@
 
 using System;
 using System.Threading;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
@@ -29,10 +28,10 @@ namespace osu.Game.Screens
             return false;
         }
 
-        BaseGame game;
+        Framework.Game game;
 
         [BackgroundDependencyLoader]
-        private void load(BaseGame game)
+        private void load(Framework.Game game)
         {
             this.game = game;
         }
@@ -43,7 +42,7 @@ namespace osu.Game.Screens
             // once it's done.
             if (screen.LoadState == LoadState.NotLoaded)
             {
-                screen.Preload(game, d => Push((BackgroundScreen)d));
+                screen.LoadAsync(game, d => Push((BackgroundScreen)d));
                 return true;
             }
 
