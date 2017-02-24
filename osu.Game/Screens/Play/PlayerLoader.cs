@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Play
             Content.ScaleTo(0.7f, 150, EasingTypes.InQuint);
             FadeOut(150);
 
-            //this is required to clean up the InputManager in Player.
+            //OsuScreens are currently never finalised due to the Bindable<Beatmap> bindings.
             //can be removed once we solve that one.
             if (player != null && player.LoadState != LoadState.Alive)
                 player.Dispose();
