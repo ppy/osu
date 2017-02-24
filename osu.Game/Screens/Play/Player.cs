@@ -20,9 +20,9 @@ using osu.Game.Overlays.Pause;
 using osu.Framework.Configuration;
 using System;
 using System.Linq;
-using osu.Game.Beatmaps;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transformations;
 using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Play
@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Play
 
             var newPlayer = new Player();
 
-            newPlayer.Preload(Game, delegate
+            newPlayer.LoadAsync(Game, delegate
             {
                 newPlayer.RestartCount = RestartCount + 1;
                 ValidForResume = false;
@@ -237,21 +237,6 @@ namespace osu.Game.Screens.Play
                 {
                     // Error(?)
                 }
-            });
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Content.Delay(250);
-            Content.FadeIn(250);
-
-            Delay(750);
-            Schedule(() =>
-            {
-                sourceClock.Start();
-                initializeSkipButton();
             });
         }
 
@@ -285,11 +270,33 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
-            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1000);
-            Background?.FadeTo((100f - dimLevel) / 100, 1000);
+            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, EasingTypes.OutQuint);
+            Background?.FadeTo((100f - dimLevel) / 100, 1500, EasingTypes.OutQuint);
 
             Content.Alpha = 0;
             dimLevel.ValueChanged += dimChanged;
+
+            Content.ScaleTo(0.7f);
+
+            Content.Delay(250);
+            Content.FadeIn(250);
+
+            Content.ScaleTo(1, 750, EasingTypes.OutQuint);
+
+            Delay(750);
+            Schedule(() =>
+            {
+                sourceClock.Start();
+                initializeSkipButton();
+            });
+        }
+
+        protected override void OnSuspending(Screen next)
+        {
+            Content.FadeOut(350);
+            Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
+
+            base.OnSuspending(next);
         }
 
         protected override bool OnExiting(Screen next)

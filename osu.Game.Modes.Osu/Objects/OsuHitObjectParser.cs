@@ -4,9 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects;
 using OpenTK;

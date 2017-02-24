@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -23,7 +22,6 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
@@ -45,7 +43,7 @@ namespace osu.Game.Overlays
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
-        private BaseGame game;
+        private Framework.Game game;
 
         private Container dragContainer;
 
@@ -322,10 +320,10 @@ namespace osu.Game.Overlays
             updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
-        protected override void PerformLoad(BaseGame game)
+        protected override void Load(Framework.Game game)
         {
             this.game = game;
-            base.PerformLoad(game);
+            base.Load(game);
         }
 
         Action pendingBeatmapSwitch;
@@ -349,7 +347,7 @@ namespace osu.Game.Overlays
 
                 MusicControllerBackground newBackground;
 
-                (newBackground = new MusicControllerBackground(beatmap)).Preload(game, delegate
+                (newBackground = new MusicControllerBackground(beatmap)).LoadAsync(game, delegate
                 {
 
                     dragContainer.Add(newBackground);

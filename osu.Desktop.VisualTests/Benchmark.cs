@@ -2,20 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Desktop.Platform;
 using osu.Framework.Screens.Testing;
 using osu.Game;
-using osu.Game.Modes;
-using osu.Game.Modes.Catch;
-using osu.Game.Modes.Mania;
-using osu.Game.Modes.Osu;
-using osu.Game.Modes.Taiko;
 
 namespace osu.Desktop.VisualTests
 {
@@ -24,7 +13,7 @@ namespace osu.Desktop.VisualTests
         private double timePerTest = 200;
 
         [BackgroundDependencyLoader]
-        private void load(BaseGame game)
+        private void load(Framework.Game game)
         {
             Host.MaximumDrawHz = int.MaxValue;
             Host.MaximumUpdateHz = int.MaxValue;

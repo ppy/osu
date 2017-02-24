@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -16,7 +15,6 @@ using osu.Game.Modes.Catch;
 using osu.Game.Modes.Mania;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Taiko;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -58,14 +56,14 @@ namespace osu.Game.Tests.Beatmaps.IO
                 var osu = loadOsu(host);
 
                 var importer = new BeatmapImporter(client);
-                if (!importer.Import(osz_path).Wait(1000))
+                if (!importer.ImportAsync(osz_path).Wait(1000))
                     Assert.Fail(@"IPC took too long to send");
 
                 ensureLoaded(osu, 10000);
             }
         }
 
-        private OsuGameBase loadOsu(BasicGameHost host)
+        private OsuGameBase loadOsu(GameHost host)
         {
             var osu = new OsuGameBase();
             host.Add(osu);

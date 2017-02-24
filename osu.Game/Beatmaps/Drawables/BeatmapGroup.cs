@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
 using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Drawables

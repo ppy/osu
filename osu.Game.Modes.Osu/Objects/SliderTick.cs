@@ -1,6 +1,4 @@
-﻿using OpenTK;
-
-namespace osu.Game.Modes.Osu.Objects
+﻿namespace osu.Game.Modes.Osu.Objects
 {
     public class SliderTick : OsuHitObject
     {

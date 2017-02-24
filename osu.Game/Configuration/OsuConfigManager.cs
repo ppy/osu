@@ -189,7 +189,7 @@ namespace osu.Game.Configuration
         public string GetUnicodeString(string nonunicode, string unicode)
             => Get<bool>(OsuConfig.ShowUnicode) ? unicode ?? nonunicode : nonunicode ?? unicode;
 
-        public OsuConfigManager(BasicStorage storage) : base(storage)
+        public OsuConfigManager(Storage storage) : base(storage)
         {
         }
     }

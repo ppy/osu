@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Toolbar
 
                     newSprite.FillMode = FillMode.Fit;
 
-                    newSprite.Preload(game, s =>
+                    newSprite.LoadAsync(game, s =>
                     {
                         Sprite?.FadeOut();
                         Sprite?.Expire();
@@ -120,7 +120,6 @@ namespace osu.Game.Overlays.Toolbar
             public class OnlineSprite : Sprite
             {
                 private readonly string url;
-                private readonly int userId;
 
                 public OnlineSprite(string url)
                 {

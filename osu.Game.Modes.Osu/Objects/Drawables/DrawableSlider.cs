@@ -107,7 +107,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             if (repeat > currentRepeat)
             {
-                if (ball.Tracking)
+                if (repeat < slider.RepeatCount && ball.Tracking)
                     PlaySample();
                 currentRepeat = repeat;
             }
