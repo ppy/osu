@@ -325,11 +325,7 @@ namespace osu.Game.Screens.Select
                 if (b.Metadata == null) b.Metadata = beatmapSet.Metadata;
             });
 
-            foreach (var b in beatmapSet.Beatmaps)
-                b.ComputeDifficulty(database);
-            beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.StarDifficulty).ToList();
-
-            var group = new BeatmapGroup(database.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
+            var group = new BeatmapGroup(beatmapSet, database)
             {
                 SelectionChanged = selectionChanged,
                 StartRequested = b => footer.StartButton.TriggerClick()

@@ -158,7 +158,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddButton(@"Alter stars", delegate
             {
-                stars.Count = RNG.NextSingle() * (stars.MaxStars + 1);
+                stars.Count = RNG.NextSingle() * (stars.StarCount + 1);
                 starsLabel.Text = stars.Count.ToString("0.00");
             });
 
