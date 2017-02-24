@@ -301,11 +301,9 @@ namespace osu.Game.Overlays.Dialog
 
     class PopupDialogTriangles : Triangles
     {
-        private const float enter_duration = 500;
-        private const float exit_duration = 500;
-        private const float triangle_enter_speed = 100;
-        private const float triangle_exit_speed = 300;
+        private const float transition_duration = 500;
         private const float triangle_normal_speed = 20000;
+        private const float triangle_moving_speed = 100;
         private float triangleMoveSpeed;
 
         private Color4[] colours;
@@ -340,15 +338,15 @@ namespace osu.Game.Overlays.Dialog
 
         public void SlideIn()
         {
-            triangleMoveSpeed = triangle_enter_speed;
-            TransformFloatTo(spawnRatio, 1f, enter_duration, EasingTypes.None, new TransformFloatSpawnRatio());
-            TransformFloatTo(triangleMoveSpeed, triangle_normal_speed, enter_duration, EasingTypes.InExpo, new TransformFloatSpeed());
+            triangleMoveSpeed = triangle_moving_speed;
+            TransformFloatTo(spawnRatio, 1f, transition_duration, EasingTypes.None, new TransformFloatSpawnRatio());
+            TransformFloatTo(triangleMoveSpeed, triangle_normal_speed, transition_duration, EasingTypes.InExpo, new TransformFloatSpeed());
         }
 
         public void SlideOut()
         {
-            TransformFloatTo(spawnRatio, 0f, exit_duration, EasingTypes.None, new TransformFloatSpawnRatio());
-            TransformFloatTo(triangleMoveSpeed, triangle_exit_speed, exit_duration, EasingTypes.OutExpo, new TransformFloatSpeed());
+            TransformFloatTo(spawnRatio, 0f, transition_duration, EasingTypes.None, new TransformFloatSpawnRatio());
+            TransformFloatTo(triangleMoveSpeed, triangle_moving_speed, transition_duration, EasingTypes.OutExpo, new TransformFloatSpeed());
         }
 
         class TransformFloatSpeed : TransformFloat
