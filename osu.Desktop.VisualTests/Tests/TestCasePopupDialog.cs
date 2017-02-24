@@ -1,0 +1,85 @@
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Framework.Graphics;
+using osu.Framework.Screens.Testing;
+using osu.Game.Graphics;
+using osu.Game.Overlays.Dialog;
+
+namespace osu.Desktop.VisualTests.Tests
+{
+    public class TestCasePopupDialog : TestCase
+    {
+        public override string Name => @"Popup Dialog";
+
+        public override string Description => @"With various dialogs";
+
+        public override void Reset()
+        {
+            base.Reset();
+
+            var firstDialog = new PopupDialog
+            {
+                RelativeSizeAxes = Axes.Both,
+                Icon = FontAwesome.fa_trash_o,
+                ContextText = @"DELETE BEATMAP",
+                HeaderText = @"Confirm deletion of",
+                BodyText = @"Ayase Rie - Yuima-ru*World TVver.",
+                Buttons = new PopupDialogButton[]
+                    {
+                        new PopupDialogOKButton
+                        {
+                            Title = @"I never want to see this again.",
+                            Action = () => System.Console.WriteLine(@"OK"),
+                        },
+                        new PopupDialogCancelButton
+                        {
+                            Title = @"Firetruck, I still want quick ranks!",
+                            Action = () => System.Console.WriteLine(@"Cancel"),
+                        },
+                    },
+            };
+            var secondDialog = new PopupDialog
+            {
+                RelativeSizeAxes = Axes.Both,
+                Icon = FontAwesome.fa_gear,
+                ContextText = @"BEATMAP OPTIONS",
+                HeaderText = @"What do you want to do with",
+                BodyText = "Camellia as \"Bang Riot\" - Blastix Riotz",
+                Buttons = new PopupDialogButton[]
+                {
+                    new PopupDialogOKButton
+                    {
+                        Title = @"Manage collections",
+                    },
+                    new PopupDialogOKButton
+                    {
+                        Title = @"Delete...",
+                    },
+                    new PopupDialogOKButton
+                    {
+                        Title = @"Remove from unplayed",
+                    },
+                    new PopupDialogOKButton
+                    {
+                        Title = @"Clear local scores",
+                    },
+                    new PopupDialogOKButton
+                    {
+                        Title = @"Edit",
+                    },
+                    new PopupDialogCancelButton
+                    {
+                        Title = @"Cancel",
+                    },
+                },
+            };
+
+            Add(firstDialog);
+            Add(secondDialog);
+
+            AddButton("dialog #1", firstDialog.ToggleVisibility);
+            AddButton("dialog #2", secondDialog.ToggleVisibility);
+        }
+    }
+}
