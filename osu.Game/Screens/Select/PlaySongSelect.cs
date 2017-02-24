@@ -138,8 +138,8 @@ namespace osu.Game.Screens.Select
             if (database == null)
                 database = beatmaps;
 
-            database.BeatmapSetAdded += onDatabaseOnBeatmapSetAdded;
-            database.BeatmapSetRemoved += onDatabaseOnBeatmapSetRemoved;
+            database.BeatmapSetAdded += onBeatmapSetAdded;
+            database.BeatmapSetRemoved += onBeatmapSetRemoved;
 
             trackManager = audio.Track;
 
@@ -185,15 +185,9 @@ namespace osu.Game.Screens.Select
             }, 250);
         }
 
-        private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)
-        {
-            Schedule(() => addBeatmapSet(s, Game, true));
-        }
+        private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => addBeatmapSet(s, Game, true));
 
-        private void onDatabaseOnBeatmapSetRemoved(BeatmapSetInfo s)
-        {
-            Schedule(() => removeBeatmapSet(s));
-        }
+        private void onBeatmapSetRemoved(BeatmapSetInfo s) => Schedule(() => removeBeatmapSet(s));
 
         protected override void OnEntering(Screen last)
         {
@@ -252,8 +246,8 @@ namespace osu.Game.Screens.Select
             if (playMode != null)
                 playMode.ValueChanged -= playMode_ValueChanged;
 
-            database.BeatmapSetAdded -= onDatabaseOnBeatmapSetAdded;
-            database.BeatmapSetRemoved -= onDatabaseOnBeatmapSetRemoved;
+            database.BeatmapSetAdded -= onBeatmapSetAdded;
+            database.BeatmapSetRemoved -= onBeatmapSetRemoved;
 
             initialAddSetsTask.Cancel();
         }
