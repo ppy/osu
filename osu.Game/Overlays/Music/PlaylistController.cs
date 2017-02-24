@@ -35,6 +35,9 @@ namespace osu.Game.Overlays.Music
         private SearchTextBox searchTextBox;
         private ScheduledDelegate lastScheduledSearch;
 
+        private bool handleInput;
+        public override bool HandleInput => handleInput;
+
         public PlaylistController()
         {
             RelativeSizeAxes = Axes.X;
@@ -105,7 +108,6 @@ namespace osu.Game.Overlays.Music
         protected override void LoadComplete()
         {
             BeatmapSource.ValueChanged += workingChanged;
-            FadeOut();
             base.LoadComplete();
         }
 
@@ -114,12 +116,14 @@ namespace osu.Game.Overlays.Music
         public void FadeIn()
         {
             FadeIn(800, EasingTypes.OutQuint);
+            handleInput = true;
             searchTextBox.HoldFocus = true;
         }
 
         public void FadeOut()
         {
             FadeOut(800, EasingTypes.OutQuint);
+            handleInput = false;
             searchTextBox.HoldFocus = false;
         }
     }
