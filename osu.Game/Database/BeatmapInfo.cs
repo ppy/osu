@@ -87,8 +87,7 @@ namespace osu.Game.Database
 
         internal void ComputeDifficulty(BeatmapDatabase database)
         {
-            WorkingBeatmap wb = new WorkingBeatmap(this, BeatmapSet, database);
-            StarDifficulty = (float)Ruleset.GetRuleset(Mode).CreateDifficultyCalculator(wb.Beatmap).GetDifficulty();
+            StarDifficulty = (float)Ruleset.GetRuleset(Mode).CreateDifficultyCalculator(database.GetWorkingBeatmap(this).Beatmap).GetDifficulty();
         }
 
         public bool Equals(BeatmapInfo other)
