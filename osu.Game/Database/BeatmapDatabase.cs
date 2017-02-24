@@ -119,10 +119,6 @@ namespace osu.Game.Database
             using (var reader = ArchiveReader.GetReader(storage, path))
                 metadata = reader.ReadMetadata();
 
-            if (metadata.OnlineBeatmapSetID.HasValue &&
-                connection.Table<BeatmapSetInfo>().Count(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID) != 0)
-                return; // TODO: Update this beatmap instead
-
             if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
             {
                 using (var md5 = MD5.Create())
@@ -131,10 +127,26 @@ namespace osu.Game.Database
                     hash = BitConverter.ToString(md5.ComputeHash(input)).Replace("-", "").ToLowerInvariant();
                     input.Seek(0, SeekOrigin.Begin);
                     path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
-                    using (var output = storage.GetStream(path, FileAccess.Write))
-                        input.CopyTo(output);
+                    if (!storage.Exists(path))
+                        using (var output = storage.GetStream(path, FileAccess.Write))
+                            input.CopyTo(output);
                 }
             }
+
+            var existing = connection.Table<BeatmapSetInfo>().FirstOrDefault(b => b.Hash == hash);
+
+            if (existing != null)
+            {
+                if (existing.DeletePending)
+                {
+                    existing.DeletePending = false;
+                    Update(existing, false);
+                    BeatmapSetAdded?.Invoke(existing);
+                }
+
+                return;
+            }
+
             var beatmapSet = new BeatmapSetInfo
             {
                 OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
