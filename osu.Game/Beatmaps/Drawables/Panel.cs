@@ -50,10 +50,10 @@ namespace osu.Game.Beatmaps.Drawables
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            applyState();
+            ApplyState();
         }
 
-        private void applyState()
+        protected virtual void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
         {
             switch (state)
             {
@@ -81,9 +81,10 @@ namespace osu.Game.Beatmaps.Drawables
             set
             {
                 if (state == value) return;
-                state = value;
 
-                applyState();
+                var last = state;
+                state = value;
+                ApplyState(last);
             }
         }
 
