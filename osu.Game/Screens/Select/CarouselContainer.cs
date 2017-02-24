@@ -95,6 +95,15 @@ namespace osu.Game.Screens.Select
             computeYPositions();
         }
 
+        public void RemoveGroup(BeatmapGroup group)
+        {
+            groups.Remove(group);
+            scrollableContent.Remove(group.Header);
+            scrollableContent.Remove(group.BeatmapPanels);
+
+            computeYPositions();
+        }
+
         private void movePanel(Panel panel, bool advance, bool animated, ref float currentY)
         {
             yPositions.Add(currentY);
@@ -276,6 +285,12 @@ namespace osu.Game.Screens.Select
             if (direction == 0)
                 return base.OnKeyDown(state, args);
 
+            SelectNext(direction, skipDifficulties);
+            return true;
+        }
+
+        public void SelectNext(int direction = 1, bool skipDifficulties = true)
+        {
             if (!skipDifficulties)
             {
                 int i = SelectedGroup.BeatmapPanels.IndexOf(SelectedPanel) + direction;
@@ -284,7 +299,7 @@ namespace osu.Game.Screens.Select
                 {
                     //changing difficulty panel, not set.
                     SelectGroup(SelectedGroup, SelectedGroup.BeatmapPanels[i]);
-                    return true;
+                    return;
                 }
             }
 
@@ -297,11 +312,9 @@ namespace osu.Game.Screens.Select
                 if (groups[index].State != BeatmapGroupState.Hidden)
                 {
                     SelectBeatmap(groups[index].BeatmapPanels.First().Beatmap);
-                    return true;
+                    return;
                 }
             } while (index != startIndex);
-
-            return true;
         }
 
         public void SelectRandom()

@@ -138,7 +138,8 @@ namespace osu.Game.Screens.Select
             if (database == null)
                 database = beatmaps;
 
-            database.BeatmapSetAdded += onDatabaseOnBeatmapSetAdded;
+            database.BeatmapSetAdded += onBeatmapSetAdded;
+            database.BeatmapSetRemoved += onBeatmapSetRemoved;
 
             trackManager = audio.Track;
 
@@ -184,10 +185,9 @@ namespace osu.Game.Screens.Select
             }, 250);
         }
 
-        private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)
-        {
-            Schedule(() => addBeatmapSet(s, Game, true));
-        }
+        private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => addBeatmapSet(s, Game, true));
+
+        private void onBeatmapSetRemoved(BeatmapSetInfo s) => Schedule(() => removeBeatmapSet(s));
 
         protected override void OnEntering(Screen last)
         {
@@ -246,7 +246,8 @@ namespace osu.Game.Screens.Select
             if (playMode != null)
                 playMode.ValueChanged -= playMode_ValueChanged;
 
-            database.BeatmapSetAdded -= onDatabaseOnBeatmapSetAdded;
+            database.BeatmapSetAdded -= onBeatmapSetAdded;
+            database.BeatmapSetRemoved -= onBeatmapSetRemoved;
 
             initialAddSetsTask.Cancel();
         }
@@ -278,7 +279,7 @@ namespace osu.Game.Screens.Select
 
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
-            carousel.SelectBeatmap(beatmap.BeatmapInfo);
+            carousel.SelectBeatmap(beatmap?.BeatmapInfo);
         }
 
         /// <summary>
@@ -328,9 +329,7 @@ namespace osu.Game.Screens.Select
                 b.ComputeDifficulty(database);
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.StarDifficulty).ToList();
 
-            var beatmap = new WorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault(), beatmapSet, database);
-
-            var group = new BeatmapGroup(beatmap)
+            var group = new BeatmapGroup(database.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
             {
                 SelectionChanged = selectionChanged,
                 StartRequested = b => footer.StartButton.TriggerClick()
@@ -355,9 +354,24 @@ namespace osu.Game.Screens.Select
             }));
         }
 
+        private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
+        {
+            var group = beatmapGroups.Find(b => b.BeatmapSet.ID == beatmapSet.ID);
+            if (group == null) return;
+
+            if (carousel.SelectedGroup == group)
+                carousel.SelectNext();
+
+            beatmapGroups.Remove(group);
+            carousel.RemoveGroup(group);
+
+            if (beatmapGroups.Count == 0)
+                Beatmap = null;
+        }
+
         private void addBeatmapSets(Framework.Game game, CancellationToken token)
         {
-            foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
+            foreach (var beatmapSet in database.Query<BeatmapSetInfo>().Where(b => !b.DeletePending))
             {
                 if (token.IsCancellationRequested) return;
                 addBeatmapSet(beatmapSet, game);
@@ -370,6 +384,13 @@ namespace osu.Game.Screens.Select
             {
                 case Key.Enter:
                     footer.StartButton.TriggerClick();
+                    return true;
+                case Key.Delete:
+                    if (Beatmap != null)
+                    {
+                        Beatmap.Dispose();
+                        database.Delete(Beatmap.BeatmapSetInfo);
+                    }
                     return true;
             }
 

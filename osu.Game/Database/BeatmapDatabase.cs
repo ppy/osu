@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
@@ -22,6 +23,7 @@ namespace osu.Game.Database
         private SQLiteConnection connection { get; set; }
         private Storage storage;
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
+        public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
         private BeatmapImporter ipc;
 
@@ -37,14 +39,35 @@ namespace osu.Game.Database
                 try
                 {
                     connection = prepareConnection();
+                    deletePending();
                 }
-                catch
+                catch (Exception e)
                 {
-                    Console.WriteLine(@"Failed to initialise the beatmap database! Trying again with a clean database...");
+                    Logger.Error(e, @"Failed to initialise the beatmap database! Trying again with a clean database...");
                     storage.DeleteDatabase(@"beatmaps");
                     connection = prepareConnection();
                 }
             }
+        }
+
+        private void deletePending()
+        {
+            foreach (var b in Query<BeatmapSetInfo>().Where(b => b.DeletePending))
+            {
+                try
+                {
+                    storage.Delete(b.Path);
+                    connection.Delete(b);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $@"Could not delete beatmap {b.ToString()}");
+                }
+            }
+
+            //this is required because sqlite migrations don't work, initially inserting nulls into this field.
+            //see https://github.com/praeclarum/sqlite-net/issues/326
+            connection.Query<BeatmapSetInfo>("UPDATE BeatmapSetInfo SET DeletePending = 0 WHERE DeletePending IS NULL");
         }
 
         private SQLiteConnection prepareConnection()
@@ -157,6 +180,14 @@ namespace osu.Game.Database
             connection.Commit();
         }
 
+        public void Delete(BeatmapSetInfo beatmapSet)
+        {
+            beatmapSet.DeletePending = true;
+            Update(beatmapSet, false);
+
+            BeatmapSetRemoved?.Invoke(beatmapSet);
+        }
+
         public ArchiveReader GetReader(BeatmapSetInfo beatmapSet)
         {
             if (string.IsNullOrEmpty(beatmapSet.Path))
@@ -183,17 +214,11 @@ namespace osu.Game.Database
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapSetInfo.Metadata;
 
-            var working = new WorkingBeatmap(beatmapInfo, beatmapSetInfo, this, withStoryboard);
+            WorkingBeatmap working = new DatabaseWorkingBeatmap(this, beatmapInfo, beatmapSetInfo, withStoryboard);
 
             previous?.TransferTo(working);
 
             return working;
-        }
-
-        public Beatmap GetBeatmap(BeatmapInfo beatmapInfo)
-        {
-            using (WorkingBeatmap data = GetWorkingBeatmap(beatmapInfo))
-                return data.Beatmap;
         }
 
         public TableQuery<T> Query<T>() where T : class
@@ -236,6 +261,21 @@ namespace osu.Game.Database
                 connection.UpdateWithChildren(record);
             else
                 connection.Update(record);
+        }
+
+        public bool Exists(BeatmapSetInfo beatmapSet) => storage.Exists(beatmapSet.Path);
+
+        private class DatabaseWorkingBeatmap : WorkingBeatmap
+        {
+            private readonly BeatmapDatabase database;
+
+            public DatabaseWorkingBeatmap(BeatmapDatabase database, BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, bool withStoryboard = false)
+                : base(beatmapInfo, beatmapSetInfo, withStoryboard)
+            {
+                this.database = database;
+            }
+
+            protected override ArchiveReader GetReader() => database?.GetReader(BeatmapSetInfo);
         }
     }
 }

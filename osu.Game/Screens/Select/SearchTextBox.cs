@@ -49,6 +49,15 @@ namespace osu.Game.Screens.Select
                 }
             }
 
+            if (state.Keyboard.ShiftPressed)
+            {
+                switch (args.Key)
+                {
+                    case Key.Delete:
+                        return false;
+                }
+            }
+
             return base.OnKeyDown(state, args);
         }
     }
