@@ -19,7 +19,7 @@ namespace osu.Game.Modes.Catch
 
         protected override HitObjectConverter<CatchBaseHit> Converter => new CatchConverter();
 
-        protected override double ComputeDifficulty(Dictionary<String, String> categoryDifficulty)
+        protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
         {
             return 0;
         }
