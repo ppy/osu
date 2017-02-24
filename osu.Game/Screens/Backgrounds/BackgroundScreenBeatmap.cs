@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Backgrounds
                     else
                         newBackground = new BeatmapBackground(beatmap);
 
-                    newBackground.Preload(Game, delegate
+                    newBackground.LoadAsync(Game, delegate
                     {
                         float newDepth = 0;
                         if (background != null)
