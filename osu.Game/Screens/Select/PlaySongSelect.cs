@@ -328,9 +328,7 @@ namespace osu.Game.Screens.Select
                 b.ComputeDifficulty(database);
             beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.StarDifficulty).ToList();
 
-            var beatmap = new WorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault(), beatmapSet, database);
-
-            var group = new BeatmapGroup(beatmap)
+            var group = new BeatmapGroup(database.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
             {
                 SelectionChanged = selectionChanged,
                 StartRequested = b => footer.StartButton.TriggerClick()

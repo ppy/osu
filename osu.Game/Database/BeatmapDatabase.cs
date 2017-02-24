@@ -183,17 +183,11 @@ namespace osu.Game.Database
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapSetInfo.Metadata;
 
-            var working = new WorkingBeatmap(beatmapInfo, beatmapSetInfo, this, withStoryboard);
+            WorkingBeatmap working = new DatabaseWorkingBeatmap(this, beatmapInfo, beatmapSetInfo, withStoryboard);
 
             previous?.TransferTo(working);
 
             return working;
-        }
-
-        public Beatmap GetBeatmap(BeatmapInfo beatmapInfo)
-        {
-            using (WorkingBeatmap data = GetWorkingBeatmap(beatmapInfo))
-                return data.Beatmap;
         }
 
         public TableQuery<T> Query<T>() where T : class
@@ -236,6 +230,21 @@ namespace osu.Game.Database
                 connection.UpdateWithChildren(record);
             else
                 connection.Update(record);
+        }
+
+        public bool Exists(BeatmapSetInfo beatmapSet) => storage.Exists(beatmapSet.Path);
+
+        private class DatabaseWorkingBeatmap : WorkingBeatmap
+        {
+            private readonly BeatmapDatabase database;
+
+            public DatabaseWorkingBeatmap(BeatmapDatabase database, BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, bool withStoryboard = false)
+                : base(beatmapInfo, beatmapSetInfo, withStoryboard)
+            {
+                this.database = database;
+            }
+
+            protected override ArchiveReader GetReader() => database?.GetReader(BeatmapSetInfo);
         }
     }
 }
