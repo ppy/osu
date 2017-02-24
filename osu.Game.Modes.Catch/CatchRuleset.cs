@@ -7,7 +7,6 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
 using osu.Game.Beatmaps;
-using System;
 
 namespace osu.Game.Modes.Catch
 {

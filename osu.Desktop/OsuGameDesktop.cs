@@ -2,15 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using osu.Framework.Platform;
 using osu.Framework.Desktop.Platform;
-using osu.Game.Database;
 using osu.Desktop.Overlays;
 using System.Reflection;
 using System.Drawing;
