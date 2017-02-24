@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace osu.Game.Database
         private SQLiteConnection connection { get; set; }
         private Storage storage;
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
+        public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
         private BeatmapImporter ipc;
 
@@ -155,6 +157,13 @@ namespace osu.Game.Database
             }
 
             connection.Commit();
+        }
+
+        public void Delete(BeatmapSetInfo beatmapSet)
+        {
+            storage.Delete(beatmapSet.Path);
+            connection.Delete(beatmapSet);
+            BeatmapSetRemoved?.Invoke(beatmapSet);
         }
 
         public ArchiveReader GetReader(BeatmapSetInfo beatmapSet)
