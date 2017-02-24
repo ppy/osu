@@ -222,6 +222,12 @@ namespace osu.Game.Screens.Play
             if (IsPaused) Pause(); else Resume();
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            playerInputManager?.Dispose();
+        }
+
         public void Restart()
         {
             sourceClock.Stop(); // If the clock is running and Restart is called the game will lag until relaunch
@@ -312,6 +318,9 @@ namespace osu.Game.Screens.Play
             }
             else
             {
+                FadeOut(250);
+                Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
+
                 dimLevel.ValueChanged -= dimChanged;
                 Background?.FadeTo(1f, 200);
                 return base.OnExiting(next);
