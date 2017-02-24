@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {

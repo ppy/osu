@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Input;
-using osu.Framework.Logging;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
