@@ -301,10 +301,19 @@ namespace osu.Game.Overlays.Dialog
 
     class PopupDialogTriangles : Triangles
     {
+        private const float enter_duration = 500;
+        private const float exit_duration = 500;
+        private const float triangle_enter_speed = 100;
+        private const float triangle_exit_speed = 300;
+        private const float triangle_normal_speed = 20000;
+        private float triangleMoveSpeed;
+
         private Color4[] colours;
 
         protected override float SpawnRatio => spawnRatio;
         private float spawnRatio = 0f;
+
+        protected override Color4 GetTriangleShade() => colours[RNG.Next(0, colours.Length - 1)];
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
@@ -322,32 +331,24 @@ namespace osu.Game.Overlays.Dialog
             };
         }
 
-        protected override Color4 GetTriangleShade() => colours[RNG.Next(0, colours.Length - 1)];
-
-        private const float triangle_moving_speed = 300;
-        private const float triangle_normal_speed = 20000;
-        private float triangleMoveSpeed;
-
         protected override void Update()
         {
             base.Update();
             foreach (Drawable d in Children)
-            {
                 d.Position -= new Vector2(0, (float)(d.Scale.X * (Time.Elapsed / triangleMoveSpeed)));
-            }
         }
 
         public void SlideIn()
         {
-            triangleMoveSpeed = triangle_moving_speed;
-            TransformFloatTo(spawnRatio, 1f, 600, EasingTypes.None, new TransformFloatSpawnRatio());
-            TransformFloatTo(triangleMoveSpeed, triangle_normal_speed, 600, EasingTypes.InQuint, new TransformFloatSpeed());
+            triangleMoveSpeed = triangle_enter_speed;
+            TransformFloatTo(spawnRatio, 1f, enter_duration, EasingTypes.None, new TransformFloatSpawnRatio());
+            TransformFloatTo(triangleMoveSpeed, triangle_normal_speed, enter_duration, EasingTypes.InExpo, new TransformFloatSpeed());
         }
 
         public void SlideOut()
         {
-            TransformFloatTo(spawnRatio, 0f, 500, EasingTypes.None, new TransformFloatSpawnRatio());
-            TransformFloatTo(triangleMoveSpeed, triangle_moving_speed, 500, EasingTypes.OutExpo, new TransformFloatSpeed());
+            TransformFloatTo(spawnRatio, 0f, exit_duration, EasingTypes.None, new TransformFloatSpawnRatio());
+            TransformFloatTo(triangleMoveSpeed, triangle_exit_speed, exit_duration, EasingTypes.OutExpo, new TransformFloatSpeed());
         }
 
         class TransformFloatSpeed : TransformFloat
