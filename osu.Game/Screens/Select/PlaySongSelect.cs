@@ -377,7 +377,7 @@ namespace osu.Game.Screens.Select
 
         private void addBeatmapSets(Framework.Game game, CancellationToken token)
         {
-            foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
+            foreach (var beatmapSet in database.Query<BeatmapSetInfo>().Where(b => !b.DeletePending))
             {
                 if (token.IsCancellationRequested) return;
                 addBeatmapSet(beatmapSet, game);

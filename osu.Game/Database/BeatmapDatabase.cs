@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
@@ -39,14 +40,35 @@ namespace osu.Game.Database
                 try
                 {
                     connection = prepareConnection();
+                    deletePending();
                 }
-                catch
+                catch (Exception e)
                 {
-                    Console.WriteLine(@"Failed to initialise the beatmap database! Trying again with a clean database...");
+                    Logger.Error(e, @"Failed to initialise the beatmap database! Trying again with a clean database...");
                     storage.DeleteDatabase(@"beatmaps");
                     connection = prepareConnection();
                 }
             }
+        }
+
+        private void deletePending()
+        {
+            foreach (var b in Query<BeatmapSetInfo>().Where(b => b.DeletePending))
+            {
+                try
+                {
+                    storage.Delete(b.Path);
+                    connection.Delete(b);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $@"Could not delete beatmap {b.ToString()}");
+                }
+            }
+
+            //this is required because sqlite migrations don't work, initially inserting nulls into this field.
+            //see https://github.com/praeclarum/sqlite-net/issues/326
+            connection.Query<BeatmapSetInfo>("UPDATE BeatmapSetInfo SET DeletePending = 0 WHERE DeletePending IS NULL");
         }
 
         private SQLiteConnection prepareConnection()
@@ -161,8 +183,9 @@ namespace osu.Game.Database
 
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            storage.Delete(beatmapSet.Path);
-            connection.Delete(beatmapSet);
+            beatmapSet.DeletePending = true;
+            Update(beatmapSet, false);
+
             BeatmapSetRemoved?.Invoke(beatmapSet);
         }
 
