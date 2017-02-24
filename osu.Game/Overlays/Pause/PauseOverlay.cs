@@ -29,6 +29,47 @@ namespace osu.Game.Overlays.Pause
         public Action OnRetry;
         public Action OnQuit;
 
+        private ResumeButton resumeButton;
+
+        private bool paused;
+        public bool Paused
+        {
+            get
+            {
+                return paused;
+            }
+            set
+            {
+                paused = value;
+            }
+        }
+
+        private string mainText;
+        public string MainText
+        {
+            get
+            {
+                return mainText;
+            }
+            set
+            {
+                mainText = value;
+            }
+        }
+
+        private string additionalText;
+        public string AdditionalText
+        {
+            get
+            {
+                return additionalText;
+            }
+            set
+            {
+                additionalText = value;
+            }
+        }
+
         public int Retries
         {
             set
@@ -82,9 +123,12 @@ namespace osu.Game.Overlays.Pause
         {
             if (args.Key == Key.Escape)
             {
-                if (State == Visibility.Hidden) return false;
-                resume();
-                return true;
+                if (Paused)
+                {
+                    if (State == Visibility.Hidden) return false;
+                    resume();
+                    return true;
+                }
             }
 
             return base.OnKeyDown(state, args);
@@ -122,7 +166,7 @@ namespace osu.Game.Overlays.Pause
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = @"paused",
+                                    Text = MainText,
                                     Font = @"Exo2.0-Medium",
                                     Spacing = new Vector2(5, 0),
                                     Origin = Anchor.TopCentre,
@@ -134,7 +178,7 @@ namespace osu.Game.Overlays.Pause
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = @"you're not going to do what i think you're going to do, are ya?",
+                                    Text = AdditionalText,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Shadow = true,
@@ -155,7 +199,7 @@ namespace osu.Game.Overlays.Pause
                             },
                             Children = new Drawable[]
                             {
-                                new ResumeButton
+                                resumeButton = new ResumeButton
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
@@ -204,6 +248,12 @@ namespace osu.Game.Overlays.Pause
                     Width = 1f
                 }
             };
+
+            if (!Paused)
+            {
+                resumeButton.Hide();
+                retryCounterContainer.Hide();
+            }
 
             Retries = 0;
         }

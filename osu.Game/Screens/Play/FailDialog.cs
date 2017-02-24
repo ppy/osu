@@ -3,14 +3,11 @@
 
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Game.Overlays.Pause;
 
 namespace osu.Game.Screens.Play
 {
@@ -20,15 +17,24 @@ namespace osu.Game.Screens.Play
 
         private static readonly Vector2 background_blur = new Vector2(20);
 
-        public FailDialog()
+        private PauseOverlay failOverlay;
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            Add(new OsuSpriteText
+            failOverlay = new PauseOverlay()
             {
-                Text = "You failed!",
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                TextSize = 50
-            });
+                Paused = false,
+                MainText = @"failed",
+                AdditionalText = @"retry?",
+                OnRetry = retry,
+                OnQuit = Exit
+            };
+            Children = new Drawable[]
+            {
+                failOverlay
+            };
+            failOverlay.ToggleVisibility();
         }
 
         protected override void OnEntering(Screen last)
@@ -41,6 +47,25 @@ namespace osu.Game.Screens.Play
         {
             Background.Schedule(() => Background.FadeColour(Color4.White, 500));
             return base.OnExiting(next);
+        }
+
+        private void retry()
+        {
+            var newPlayer = new Player();
+            ValidForResume = false;
+
+            newPlayer.Preload(Game, delegate
+            {
+                if (!Push(newPlayer))
+                {
+                    // Error(?)
+                }
+            });
+        }
+
+        public FailDialog()
+        {
+            RelativeSizeAxes = Axes.Both;
         }
     }
 }
