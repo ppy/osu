@@ -206,20 +206,20 @@ namespace osu.Game.Screens.Select
                 case FilterControl.SortMode.Difficulty:
                     groups.Sort((x, y) =>
                     {
-                        float x_average=0, y_average=0;
+                        float xAverage=0, yAverage=0;
                         int counter=0;
                         foreach (BeatmapInfo set in x.BeatmapSet.Beatmaps) {
-                            x_average += set.StarDifficulty;
+                            xAverage += set.StarDifficulty;
                             counter++;
                         }
-                        x_average /= counter;
+                        xAverage /= counter;
                         counter = 0;
                         foreach (BeatmapInfo set in y.BeatmapSet.Beatmaps) {
-                            y_average += set.StarDifficulty;
+                            yAverage += set.StarDifficulty;
                             counter++;
                         }
-                        y_average /= counter;
-                        if (x_average > y_average)
+                        yAverage /= counter;
+                        if (xAverage > yAverage)
                             return 1;
                         else
                             return -1;
