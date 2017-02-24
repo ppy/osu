@@ -15,7 +15,6 @@ using osu.Framework.Timing;
 using osu.Framework.Input;
 using OpenTK.Input;
 using System.Collections;
-using System.Diagnostics;
 using osu.Framework.MathUtils;
 
 namespace osu.Game.Screens.Select
