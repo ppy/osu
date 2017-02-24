@@ -254,14 +254,16 @@ namespace osu.Game.Overlays
         {
             progress.IsEnabled = (beatmapSource.Value != null);
             if (beatmapSource.Value == current) return;
-            bool audioEquals = current?.BeatmapInfo.AudioEquals(beatmapSource.Value.BeatmapInfo) ?? false;
+            bool audioEquals = current?.BeatmapInfo?.AudioEquals(beatmapSource?.Value?.BeatmapInfo) ?? false;
             current = beatmapSource.Value;
             updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Next);
-            appendToHistory(current.BeatmapInfo);
+            appendToHistory(current?.BeatmapInfo);
         }
 
         private void appendToHistory(BeatmapInfo beatmap)
         {
+            if (beatmap == null) return;
+
             if (playHistoryIndex >= 0)
             {
                 if (beatmap.AudioEquals(playHistory[playHistoryIndex]))

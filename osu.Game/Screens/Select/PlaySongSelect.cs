@@ -139,6 +139,7 @@ namespace osu.Game.Screens.Select
                 database = beatmaps;
 
             database.BeatmapSetAdded += onDatabaseOnBeatmapSetAdded;
+            database.BeatmapSetRemoved += onDatabaseOnBeatmapSetRemoved;
 
             trackManager = audio.Track;
 
@@ -187,6 +188,11 @@ namespace osu.Game.Screens.Select
         private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)
         {
             Schedule(() => addBeatmapSet(s, Game, true));
+        }
+
+        private void onDatabaseOnBeatmapSetRemoved(BeatmapSetInfo s)
+        {
+            Schedule(() => removeBeatmapSet(s));
         }
 
         protected override void OnEntering(Screen last)
@@ -247,6 +253,7 @@ namespace osu.Game.Screens.Select
                 playMode.ValueChanged -= playMode_ValueChanged;
 
             database.BeatmapSetAdded -= onDatabaseOnBeatmapSetAdded;
+            database.BeatmapSetRemoved -= onDatabaseOnBeatmapSetRemoved;
 
             initialAddSetsTask.Cancel();
         }
@@ -278,7 +285,7 @@ namespace osu.Game.Screens.Select
 
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
-            carousel.SelectBeatmap(beatmap.BeatmapInfo);
+            carousel.SelectBeatmap(beatmap?.BeatmapInfo);
         }
 
         /// <summary>
@@ -353,6 +360,21 @@ namespace osu.Game.Screens.Select
             }));
         }
 
+        private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
+        {
+            var group = beatmapGroups.Find(b => b.BeatmapSet.ID == beatmapSet.ID);
+            if (group == null) return;
+
+            if (carousel.SelectedGroup == group)
+                carousel.SelectNext();
+
+            beatmapGroups.Remove(group);
+            carousel.RemoveGroup(group);
+
+            if (beatmapGroups.Count == 0)
+                Beatmap = null;
+        }
+
         private void addBeatmapSets(Framework.Game game, CancellationToken token)
         {
             foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
@@ -368,6 +390,13 @@ namespace osu.Game.Screens.Select
             {
                 case Key.Enter:
                     footer.StartButton.TriggerClick();
+                    return true;
+                case Key.Delete:
+                    if (Beatmap != null)
+                    {
+                        Beatmap.Dispose();
+                        database.Delete(Beatmap.BeatmapSetInfo);
+                    }
                     return true;
             }
 
