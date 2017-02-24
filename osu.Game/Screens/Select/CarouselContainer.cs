@@ -206,11 +206,20 @@ namespace osu.Game.Screens.Select
                 case FilterControl.SortMode.Difficulty:
                     groups.Sort((x, y) =>
                     {
-                        /*TODO: replace with star rating once implemented
-                        * Assumes BeatmapSets not to be grouped - or to be by difficulty,
-                        * otherwise this sorting makes little sense - or does it? */
-                        if (x.BeatmapSet.Beatmaps.First().StarDifficulty >
-                            y.BeatmapSet.Beatmaps.First().StarDifficulty)
+                        float x_average=0, y_average=0;
+                        int counter=0;
+                        foreach (BeatmapInfo set in x.BeatmapSet.Beatmaps) {
+                            x_average += set.StarDifficulty;
+                            counter++;
+                        }
+                        x_average /= counter;
+                        counter = 0;
+                        foreach (BeatmapInfo set in y.BeatmapSet.Beatmaps) {
+                            y_average += set.StarDifficulty;
+                            counter++;
+                        }
+                        y_average /= counter;
+                        if (x_average > y_average)
                             return 1;
                         else
                             return -1;
