@@ -222,12 +222,6 @@ namespace osu.Game.Screens.Play
             if (IsPaused) Pause(); else Resume();
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            playerInputManager?.Dispose();
-        }
-
         public void Restart()
         {
             sourceClock.Stop(); // If the clock is running and Restart is called the game will lag until relaunch
