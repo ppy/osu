@@ -84,16 +84,16 @@ namespace osu.Game.Tests.Beatmaps.IO
             Action waitAction = () =>
             {
                 while ((resultSets = osu.Dependencies.Get<BeatmapDatabase>()
-                    .Query<BeatmapSetInfo>().Where(s => s.OnlineBeatmapSetID == 241526)).Count() != 1)
-                    Thread.Sleep(1);
+                    .Query<BeatmapSetInfo>().Where(s => s.OnlineBeatmapSetID == 241526)).Count() == 0)
+                    Thread.Sleep(50);
             };
 
             Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout),
-                @"BeatmapSet did not import to the database");
+                $@"BeatmapSet did not import to the database in allocated time.");
 
             //ensure we were stored to beatmap database backing...
 
-            Assert.IsTrue(resultSets.Count() == 1);
+            Assert.IsTrue(resultSets.Count() == 1, $@"Incorrect result count found ({resultSets.Count()} but should be 1).");
 
             IEnumerable<BeatmapInfo> resultBeatmaps = null;
 
