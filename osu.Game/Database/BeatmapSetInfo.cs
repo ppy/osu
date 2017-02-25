@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 
