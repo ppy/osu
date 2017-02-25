@@ -4,7 +4,7 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
