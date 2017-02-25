@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 if (!importer.ImportAsync(osz_path).Wait(1000))
                     Assert.Fail(@"IPC took too long to send");
 
-                ensureLoaded(osu, 10000);
+                ensureLoaded(osu);
             }
         }
 
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             return osu;
         }
 
-        private void ensureLoaded(OsuGameBase osu, int timeout = 100)
+        private void ensureLoaded(OsuGameBase osu, int timeout = 10000)
         {
             IEnumerable<BeatmapSetInfo> resultSets = null;
 
