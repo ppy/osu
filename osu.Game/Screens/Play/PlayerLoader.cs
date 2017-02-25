@@ -80,6 +80,8 @@ namespace osu.Game.Screens.Play
 
             Schedule(() =>
             {
+                if (!IsCurrentScreen) return;
+
                 if (!Push(player))
                     Exit();
             });
