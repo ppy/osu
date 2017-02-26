@@ -18,8 +18,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         public DrawableTaikoHitObject(TaikoHitObject hitObject)
             : base(hitObject)
         {
-            Anchor = Anchor.CentreLeft;
-            Origin = Anchor.CentreLeft;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
 
             RelativePositionAxes = Axes.X;
         }
