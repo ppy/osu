@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Play
                         AutoSizeAxes = Axes.Both,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
-                        Direction = FlowDirections.Vertical,
+                        FlowStrategy = FlowStrategies.GetVerticalFlow(),
                         Children = new Drawable[]
                         {
                             new OsuSpriteText

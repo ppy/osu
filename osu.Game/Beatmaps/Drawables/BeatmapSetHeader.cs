@@ -38,7 +38,7 @@ namespace osu.Game.Beatmaps.Drawables
                 },
                 new FlowContainer
                 {
-                    Direction = FlowDirections.Vertical,
+                    FlowStrategy = FlowStrategies.GetVerticalFlow(),
                     Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
@@ -112,7 +112,7 @@ namespace osu.Game.Beatmaps.Drawables
                     new FlowContainer
                     {
                         Depth = -1,
-                        Direction = FlowDirections.Horizontal,
+                        FlowStrategy = FlowStrategies.GetHorizontalFlow(),
                         RelativeSizeAxes = Axes.Both,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),

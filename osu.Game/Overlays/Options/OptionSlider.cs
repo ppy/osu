@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Options
 
         public OptionSlider()
         {
-            Direction = FlowDirections.Vertical;
+            FlowStrategy = FlowStrategies.GetFillFlow();
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = 5 };

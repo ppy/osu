@@ -21,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 new FlowContainer
                 {
-                    Direction = FlowDirections.Horizontal,
+                    FlowStrategy = FlowStrategies.GetHorizontalFlow(),
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]

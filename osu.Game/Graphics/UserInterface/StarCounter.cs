@@ -73,8 +73,7 @@ namespace osu.Game.Graphics.UserInterface
                 stars = new FlowContainer<Star>
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FlowDirections.Horizontal,
-                    Spacing = new Vector2(star_spacing),
+                    FlowStrategy = FlowStrategies.GetHorizontalFlow(new Vector2(star_spacing)),
                 }
             };
 

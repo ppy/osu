@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Margin = new MarginPadding { Left = 10, Right = 10, Top = 30, Bottom = 30 },
-                    Spacing = new Vector2(15, 0),
+                    FlowStrategy = FlowStrategies.GetFillFlow(new Vector2(15, 0)),
                     Children = new Drawable[]
                     {
                         volumeMeterMaster = new VolumeMeter("Master"),

@@ -84,19 +84,18 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 Flow = new FlowContainer
                 {
-                    Direction = FlowDirections.Horizontal,
+                    FlowStrategy = FlowStrategies.GetHorizontalFlow(new Vector2(5)),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding { Left = Toolbar.HEIGHT / 2, Right = Toolbar.HEIGHT / 2 },
-                    Spacing = new Vector2(5),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         DrawableIcon = new TextAwesome
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                         },
                         DrawableText = new OsuSpriteText
                         {
@@ -107,7 +106,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 tooltipContainer = new FlowContainer
                 {
-                    Direction = FlowDirections.Vertical,
+                    FlowStrategy = FlowStrategies.GetVerticalFlow(),
                     RelativeSizeAxes = Axes.Both, //stops us being considered in parent's autosize
                     Anchor = (TooltipAnchor & Anchor.x0) > 0 ? Anchor.BottomLeft : Anchor.BottomRight,
                     Origin = TooltipAnchor,

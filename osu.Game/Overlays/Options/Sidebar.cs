@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Options
                             Anchor = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Direction = FlowDirections.Vertical
+                            FlowStrategy = FlowStrategies.GetVerticalFlow(),
                         }
                     }
                 },
