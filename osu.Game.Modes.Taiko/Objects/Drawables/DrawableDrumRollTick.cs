@@ -90,5 +90,27 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 taikoJudgement.Score = TaikoScoreResult.Great;
             }
         }
+
+        protected override void UpdateState(ArmedState state)
+        {
+            if (!IsLoaded)
+                return;
+
+            base.UpdateState(state);
+
+            switch (State)
+            {
+                case ArmedState.Idle:
+                    break;
+                case ArmedState.Miss:
+                    break;
+                case ArmedState.Hit:
+                    const double flash_in = 100;
+
+                    ScaleTo(1.5f, flash_in);
+                    FadeOut(flash_in);
+                    break;
+            }
+        }
     }
 }
