@@ -299,7 +299,6 @@ namespace osu.Game
             Screen scr = screenStack;
             while (scr.ChildScreen != null)
                 scr = scr.ChildScreen;
-            System.Diagnostics.Debug.WriteLine(scr.GetType());
             if (scr is Player)
                 playing.Value = false;
 
