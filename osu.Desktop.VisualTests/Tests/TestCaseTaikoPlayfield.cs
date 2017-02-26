@@ -38,91 +38,118 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(new[]
             {
-                new FlowContainer()
-                {
-                    Position = new Vector2(0, 100),
-
-                    RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(1, 150),
-
-                    Children = new Drawable[]
-                    {
-                        new Container()
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.25f, 1),
-
-                            Children = new Drawable[]
-                            {
-                                // Drum area container
-                                new TaikoDrumArea()
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                // Combo counter
-                                comboCounter = new SpriteText()
-                                {
-                                    Origin = Anchor.Centre,
-
-                                    RelativePositionAxes = Axes.Both,
-                                    Position = new Vector2(0.75f, 0.5f),
-
-                                    Colour = new Color4(221, 255, 255, 255),
-
-                                    Text = "8888",
-                                    Font = "Venera",
-                                    TextSize = 12,
-                                },
-                            }
-                        },
-                        // Track area
-                        new Container()
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.75f, 1),
-
-                            Children = new Drawable[]
-                            {
-                                new TaikoTrackArea()
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                new TaikoHitTarget()
-                                {
-                                    Size = new Vector2(150, 150)
-                                },
-                                new DrawableHitCircleKatsu(new HitCircle() { StartTime = 0 })
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Position = new Vector2(50, 0),
-                                    Scale = new Vector2(0.5f)
-
-                                },
-                                new DrawableHitCircleDonFinisher(new HitCircle() { StartTime = 0 })
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Position = new Vector2(200, 0),
-                                    Scale = new Vector2(0.5f)
-                                },
-                                new DrawableDrumRoll(new DrumRoll() { StartTime = 0, Length = 350, TickDistance = 50 })
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Position = new Vector2(270, 0),
-                                    Scale = new Vector2(0.5f)
-                                }
-                            }
-                        },
-                    }
-                }
+                new TaikoPlayField2()
             });
         }
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
+        }
+
+        class DrumSet : Container
+        {
+            public DrumSet()
+            {
+                Size = new Vector2(202);
+
+                Children = new Drawable[]
+                {
+
+                };
+            }
+        }
+
+        class HitTarget : Container
+        {
+
+        }
+
+        class TaikoPlayField2 : Container
+        {
+            public TaikoPlayField2()
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                Children = new Drawable[]
+                {
+                    // Base field
+                    new FlowContainer()
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Size = new Vector2(1, 212),
+
+                        Children = new Drawable[]
+                        {
+                            // Left area
+                            new Container()
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(0.25f, 1),
+
+                                Masking = true,
+
+                                Children = new Drawable[]
+                                {
+                                    // Background
+                                    new Box()
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = new Color4(17, 17, 17, 255)
+                                    },
+                                    new DrumSet()
+                                    {
+                                        RelativePositionAxes = Axes.Both,
+                                        Position = new Vector2(0.65f, 0.5f)
+                                    }
+                                },
+
+                                BorderColour = Color4.Black,
+                                BorderThickness = 1,
+
+                                Depth = 2f
+                            },
+                            // Right area
+                            new Container()
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(0.75f, 1),
+
+                                Masking = true,
+
+                                Children = new Drawable[]
+                                {
+                                    // Background
+                                    new Box()
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = new Color4(0, 0, 0, 127)
+                                    },
+                                    new HitTarget()
+                                    {
+                                        RelativePositionAxes = Axes.Both,
+                                        Position = new Vector2(0.15f, 0.5f)
+                                    },
+                                    // Barlines
+                                    new Container()
+                                    {
+                                        RelativeSizeAxes = Axes.Both
+                                    },
+                                    // Notes
+                                    new Container()
+                                    {
+                                        RelativeSizeAxes = Axes.Both
+                                    }
+                                },
+
+                                BorderColour = new Color4(17, 17, 17, 255),
+                                BorderThickness = 2
+                            }
+                        }
+                    },
+                };
+            }
+
         }
 
         class TaikoHitTarget : Container
