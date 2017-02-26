@@ -4,15 +4,15 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
     public class SkipButton : TwoLayerButton
     {
-        private readonly double skipDestination;
-
         public SkipButton()
         {
             Text = @"Skip";
@@ -25,8 +25,22 @@ namespace osu.Game.Screens.Play
         private void load(AudioManager audio, OsuColour colours)
         {
             ActivationSound = audio.Sample.Get(@"Menu/menuhit");
-            Colour = colours.Yellow;
+            BackgroundColour = colours.Yellow;
             HoverColour = colours.YellowDark;
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat) return false;
+
+            switch (args.Key)
+            {
+                case Key.Space:
+                    TriggerClick();
+                    return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
     }
 }

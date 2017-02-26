@@ -18,16 +18,14 @@ using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using osu.Game.Screens.Play;
-using osu.Framework;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
 using System.Collections.Generic;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Select
@@ -54,34 +52,12 @@ namespace osu.Game.Screens.Select
 
         private Footer footer;
 
-        Player player;
+        OsuScreen player;
+
         FilterControl filter;
 
-        private void start()
-        {
-            if (player != null || Beatmap == null)
-                return;
-
-            //in the future we may want to move this logic to a PlayerLoader gamemode or similar, so we can rely on the SongSelect transition
-            //and provide a better loading experience (at the moment song select is still accepting input during preload).
-            player = new Player
-            {
-                BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
-                PreferredPlayMode = playMode.Value
-            };
-
-            player.Preload(Game, delegate
-            {
-                if (!Push(player))
-                {
-                    player = null;
-                    //error occured?
-                }
-            });
-        }
-
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase beatmaps, AudioManager audio, BaseGame game,
+        private void load(BeatmapDatabase beatmaps, AudioManager audio, Framework.Game game,
             OsuGame osuGame, OsuColour colours)
         {
             const float carousel_width = 640;
@@ -132,10 +108,20 @@ namespace osu.Game.Screens.Select
                         Right = 20,
                     },
                 },
-                footer = new Footer()
+                footer = new Footer
                 {
                     OnBack = Exit,
-                    OnStart = start,
+                    OnStart = () =>
+                    {
+                        if (player != null || Beatmap == null)
+                            return;
+
+                        (player = new PlayerLoader(new Player
+                        {
+                            BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
+                            PreferredPlayMode = playMode.Value
+                        })).LoadAsync(Game, l => Push(player));
+                    }
                 }
             };
 
@@ -152,7 +138,8 @@ namespace osu.Game.Screens.Select
             if (database == null)
                 database = beatmaps;
 
-            database.BeatmapSetAdded += onDatabaseOnBeatmapSetAdded;
+            database.BeatmapSetAdded += onBeatmapSetAdded;
+            database.BeatmapSetRemoved += onBeatmapSetRemoved;
 
             trackManager = audio.Track;
 
@@ -198,10 +185,9 @@ namespace osu.Game.Screens.Select
             }, 250);
         }
 
-        private void onDatabaseOnBeatmapSetAdded(BeatmapSetInfo s)
-        {
-            Schedule(() => addBeatmapSet(s, Game, true));
-        }
+        private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => addBeatmapSet(s, Game, true));
+
+        private void onBeatmapSetRemoved(BeatmapSetInfo s) => Schedule(() => removeBeatmapSet(s));
 
         protected override void OnEntering(Screen last)
         {
@@ -260,7 +246,8 @@ namespace osu.Game.Screens.Select
             if (playMode != null)
                 playMode.ValueChanged -= playMode_ValueChanged;
 
-            database.BeatmapSetAdded -= onDatabaseOnBeatmapSetAdded;
+            database.BeatmapSetAdded -= onBeatmapSetAdded;
+            database.BeatmapSetRemoved -= onBeatmapSetRemoved;
 
             initialAddSetsTask.Cancel();
         }
@@ -276,6 +263,7 @@ namespace osu.Game.Screens.Select
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
                 backgroundModeBeatmap.BlurTo(background_blur, 1000);
+                backgroundModeBeatmap.FadeTo(1, 250);
             }
 
             if (beatmap != null)
@@ -291,7 +279,7 @@ namespace osu.Game.Screens.Select
 
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
-            carousel.SelectBeatmap(beatmap.BeatmapInfo);
+            carousel.SelectBeatmap(beatmap?.BeatmapInfo);
         }
 
         /// <summary>
@@ -328,7 +316,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void addBeatmapSet(BeatmapSetInfo beatmapSet, BaseGame game, bool select = false)
+        private void addBeatmapSet(BeatmapSetInfo beatmapSet, Framework.Game game, bool select = false)
         {
             beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.ID);
             beatmapSet.Beatmaps.ForEach(b =>
@@ -337,21 +325,15 @@ namespace osu.Game.Screens.Select
                 if (b.Metadata == null) b.Metadata = beatmapSet.Metadata;
             });
 
-            foreach (var b in beatmapSet.Beatmaps)
-                b.ComputeDifficulty(database);
-            beatmapSet.Beatmaps = beatmapSet.Beatmaps.OrderBy(b => b.StarDifficulty).ToList();
-
-            var beatmap = new WorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault(), beatmapSet, database);
-
-            var group = new BeatmapGroup(beatmap)
+            var group = new BeatmapGroup(beatmapSet, database)
             {
                 SelectionChanged = selectionChanged,
-                StartRequested = b => start()
+                StartRequested = b => footer.StartButton.TriggerClick()
             };
 
             //for the time being, let's completely load the difficulty panels in the background.
             //this likely won't scale so well, but allows us to completely async the loading flow.
-            Task.WhenAll(group.BeatmapPanels.Select(panel => panel.Preload(game))).ContinueWith(task => Schedule(delegate
+            Task.WhenAll(group.BeatmapPanels.Select(panel => panel.LoadAsync(game))).ContinueWith(task => Schedule(delegate
             {
                 beatmapGroups.Add(group);
 
@@ -368,9 +350,24 @@ namespace osu.Game.Screens.Select
             }));
         }
 
-        private void addBeatmapSets(BaseGame game, CancellationToken token)
+        private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            foreach (var beatmapSet in database.Query<BeatmapSetInfo>())
+            var group = beatmapGroups.Find(b => b.BeatmapSet.ID == beatmapSet.ID);
+            if (group == null) return;
+
+            if (carousel.SelectedGroup == group)
+                carousel.SelectNext();
+
+            beatmapGroups.Remove(group);
+            carousel.RemoveGroup(group);
+
+            if (beatmapGroups.Count == 0)
+                Beatmap = null;
+        }
+
+        private void addBeatmapSets(Framework.Game game, CancellationToken token)
+        {
+            foreach (var beatmapSet in database.Query<BeatmapSetInfo>().Where(b => !b.DeletePending))
             {
                 if (token.IsCancellationRequested) return;
                 addBeatmapSet(beatmapSet, game);
@@ -382,7 +379,14 @@ namespace osu.Game.Screens.Select
             switch (args.Key)
             {
                 case Key.Enter:
-                    start();
+                    footer.StartButton.TriggerClick();
+                    return true;
+                case Key.Delete:
+                    if (Beatmap != null)
+                    {
+                        Beatmap.Dispose();
+                        database.Delete(Beatmap.BeatmapSetInfo);
+                    }
                     return true;
             }
 

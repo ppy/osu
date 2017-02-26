@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -15,7 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -23,7 +22,6 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
@@ -45,7 +43,7 @@ namespace osu.Game.Overlays
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
-        private BaseGame game;
+        private Framework.Game game;
 
         private Container dragContainer;
 
@@ -80,6 +78,8 @@ namespace osu.Game.Overlays
         private void load(OsuGameBase osuGame, OsuConfigManager config, BeatmapDatabase beatmaps, AudioManager audio,
             TextureStore textures, OsuColour colours)
         {
+            game = osuGame;
+
             unicodeString = config.GetUnicodeString;
 
             Children = new Drawable[]
@@ -256,14 +256,16 @@ namespace osu.Game.Overlays
         {
             progress.IsEnabled = (beatmapSource.Value != null);
             if (beatmapSource.Value == current) return;
-            bool audioEquals = current?.BeatmapInfo.AudioEquals(beatmapSource.Value.BeatmapInfo) ?? false;
+            bool audioEquals = current?.BeatmapInfo?.AudioEquals(beatmapSource?.Value?.BeatmapInfo) ?? false;
             current = beatmapSource.Value;
             updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Next);
-            appendToHistory(current.BeatmapInfo);
+            appendToHistory(current?.BeatmapInfo);
         }
 
         private void appendToHistory(BeatmapInfo beatmap)
         {
+            if (beatmap == null) return;
+
             if (playHistoryIndex >= 0)
             {
                 if (beatmap.AudioEquals(playHistory[playHistoryIndex]))
@@ -322,12 +324,6 @@ namespace osu.Game.Overlays
             updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
-        protected override void PerformLoad(BaseGame game)
-        {
-            this.game = game;
-            base.PerformLoad(game);
-        }
-
         Action pendingBeatmapSwitch;
 
         private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
@@ -349,7 +345,7 @@ namespace osu.Game.Overlays
 
                 MusicControllerBackground newBackground;
 
-                (newBackground = new MusicControllerBackground(beatmap)).Preload(game, delegate
+                (newBackground = new MusicControllerBackground(beatmap)).LoadAsync(game, delegate
                 {
 
                     dragContainer.Add(newBackground);

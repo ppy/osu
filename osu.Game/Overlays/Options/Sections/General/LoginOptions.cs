@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
@@ -111,12 +110,14 @@ namespace osu.Game.Overlays.Options.Sections.General
                     {
                         PlaceholderText = "Username",
                         RelativeSizeAxes = Axes.X,
-                        Text = api?.Username ?? string.Empty
+                        Text = api?.Username ?? string.Empty,
+                        TabbableContentContainer = this
                     },
                     password = new OsuPasswordTextBox
                     {
                         PlaceholderText = "Password",
-                        RelativeSizeAxes = Axes.X
+                        RelativeSizeAxes = Axes.X,
+                        TabbableContentContainer = this
                     },
                     new OsuCheckbox
                     {

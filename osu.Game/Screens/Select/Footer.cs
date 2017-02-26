@@ -7,7 +7,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Select
         public Action OnStart;
 
         private FlowContainer buttons;
+
+        public OsuLogo StartButton;
 
         public void AddButton(string text, Color4 colour, Action action)
         {
@@ -76,7 +78,7 @@ namespace osu.Game.Screens.Select
                     Height = 3,
                     Position = new Vector2(0, -3),
                 },
-                new OsuLogo()
+                StartButton = new OsuLogo
                 {
                     Anchor = Anchor.BottomRight,
                     Scale = new Vector2(0.4f),

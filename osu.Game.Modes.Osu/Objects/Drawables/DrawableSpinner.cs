@@ -4,7 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
@@ -120,12 +120,15 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            FadeIn(200);
             circleContainer.ScaleTo(1, 400, EasingTypes.OutElastic);
 
-            background.Delay(TIME_PREEMPT - 100);
+            background.Delay(TIME_PREEMPT - 500);
+
+            background.ScaleTo(scaleToCircle * 1.2f, 400, EasingTypes.OutQuint);
             background.FadeIn(200);
-            background.ScaleTo(1, 200, EasingTypes.OutQuint);
+
+            background.Delay(400);
+            background.ScaleTo(1, 250, EasingTypes.OutQuint);
 
             disc.Delay(TIME_PREEMPT - 50);
             disc.FadeIn(200);

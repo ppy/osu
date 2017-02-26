@@ -7,6 +7,7 @@ using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Modes.Objects;
+using osu.Game.Modes;
 
 namespace osu.Game.Beatmaps
 {
@@ -57,5 +58,7 @@ namespace osu.Game.Beatmaps
 
             return timingPoint ?? ControlPoint.Default;
         }
+
+        public double CalculateStarDifficulty() => Ruleset.GetRuleset(BeatmapInfo.Mode).CreateDifficultyCalculator(this).Calculate();
     }
 }
