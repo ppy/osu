@@ -46,6 +46,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     AlwaysPresent = true
                 }
             };
+
+            AlwaysPresent = true;
         }
 
         public override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollJudgementInfo() { MaxScore = TaikoScoreResult.Great };
@@ -74,7 +76,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (Judgement.TimeOffset > drumRollTick.TickDistance / 2)
-                    Alpha = 0;
+                    Judgement.Result = HitResult.Miss;
                 return;
             }
 

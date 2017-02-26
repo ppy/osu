@@ -31,7 +31,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         private DrumRoll drumRoll;
 
         private DrumRollBodyPiece body;
-        private FlowContainer<DrawableDrumRollTick> ticks;
+        private Container<DrawableDrumRollTick> ticks;
 
         private List<DrawableDrumRollTick> allTicks = new List<DrawableDrumRollTick>();
 
@@ -45,21 +45,24 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             Children = new Drawable[]
             {
                 body = CreateBody(Size.X),
-                ticks = new FlowContainer<DrawableDrumRollTick>
+                ticks = new Container<DrawableDrumRollTick>
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Direction = FlowDirections.Horizontal
                 }
            };
 
+            float posX = 0;
             foreach (var tick in drumRoll.Ticks)
             {
-                var newTick = new DrawableDrumRollTick(tick);
+                var newTick = new DrawableDrumRollTick(tick)
+                {
+                    Position = new Vector2(posX, 0)
+                };
 
                 ticks.Add(newTick);
                 allTicks.Add(newTick);
 
-                ticks.Spacing = new Vector2((float)drumRoll.TickDistance - newTick.Size.X * tick.Scale, 0);
+                posX += (float)drumRoll.TickDistance;
             }
         }
 
