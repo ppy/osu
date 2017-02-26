@@ -1,11 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,7 +9,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Backgrounds;
@@ -57,7 +51,7 @@ namespace osu.Game.Screens.Play
                 Origin = Anchor.Centre,
             });
 
-            player.Preload(Game);
+            player.LoadAsync(Game);
         }
 
         protected override void OnEntering(Screen last)
@@ -86,6 +80,8 @@ namespace osu.Game.Screens.Play
 
             Schedule(() =>
             {
+                if (!IsCurrentScreen) return;
+
                 if (!Push(player))
                     Exit();
             });
@@ -95,6 +91,12 @@ namespace osu.Game.Screens.Play
         {
             Content.ScaleTo(0.7f, 150, EasingTypes.InQuint);
             FadeOut(150);
+
+            //OsuScreens are currently never finalised due to the Bindable<Beatmap> bindings.
+            //can be removed once we solve that one.
+            if (player != null && player.LoadState != LoadState.Alive)
+                player.Dispose();
+
             return base.OnExiting(next);
         }
 

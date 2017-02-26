@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Desktop;
-using osu.Framework.Desktop.Platform;
 using osu.Framework.Platform;
 using osu.Game.Modes;
 using osu.Game.Modes.Catch;

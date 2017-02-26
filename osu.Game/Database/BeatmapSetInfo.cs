@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 
@@ -23,6 +23,8 @@ namespace osu.Game.Database
 
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<BeatmapInfo> Beatmaps { get; set; }
+
+        public bool DeletePending { get; set; }
 
         public string Hash { get; set; }
 

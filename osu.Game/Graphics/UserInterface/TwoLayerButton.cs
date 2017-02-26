@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.UserInterface
         private Container c1;
         private Container c2;
 
-        public Color4 Colour
+        public Color4 BackgroundColour
         {
             set
             {

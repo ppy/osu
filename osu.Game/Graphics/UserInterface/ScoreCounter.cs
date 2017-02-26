@@ -4,12 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.MathUtils;
-using osu.Framework.Timing;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Graphics.UserInterface
 {

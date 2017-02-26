@@ -4,12 +4,11 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Screens.Testing;
-using osu.Framework.MathUtils;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using OpenTK;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
@@ -74,7 +73,7 @@ namespace osu.Desktop.VisualTests.Tests
 
                 decoder.Process(b);
 
-                beatmap = new WorkingBeatmap(b);
+                beatmap = new TestWorkingBeatmap(b);
             }
 
             Add(new Box
@@ -91,6 +90,17 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 Beatmap = beatmap
             });
+        }
+
+        class TestWorkingBeatmap : WorkingBeatmap
+        {
+            public TestWorkingBeatmap(Beatmap beatmap)
+                : base(beatmap.BeatmapInfo, beatmap.BeatmapInfo.BeatmapSet)
+            {
+                Beatmap = beatmap;
+            }
+
+            protected override ArchiveReader GetReader() => null;
         }
     }
 }

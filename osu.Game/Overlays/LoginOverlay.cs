@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Options.Sections.General;
-using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays

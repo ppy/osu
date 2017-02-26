@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options

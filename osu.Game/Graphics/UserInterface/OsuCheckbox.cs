@@ -2,21 +2,16 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
-using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
