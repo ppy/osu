@@ -55,6 +55,7 @@ namespace osu.Game.Overlays
                 new EditorSection(),
                 new OnlineSection(),
                 new MaintenanceSection(),
+                new DebugSection(),
             };
             Children = new Drawable[]
             {
