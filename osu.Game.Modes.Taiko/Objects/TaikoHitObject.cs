@@ -12,6 +12,7 @@ namespace osu.Game.Modes.Taiko.Objects
     public class TaikoHitObject : HitObject
     {
         public float Scale { get; set; } = 1;
+        public float ScrollSpeed { get; set; } 
 
         public TaikoHitType Type => ((Sample?.Type ?? SampleType.None) & (~SampleType.Finish & ~SampleType.Normal)) == 0 ? TaikoHitType.Don : TaikoHitType.Katsu;
         public bool IsFinisher => ((Sample?.Type ?? SampleType.None) & SampleType.Finish) > 0;
@@ -21,6 +22,7 @@ namespace osu.Game.Modes.Taiko.Objects
             base.SetDefaultsFromBeatmap(beatmap);
 
             Scale = 1f - 0.7f * -3f / 5 / 2;
+            ScrollSpeed = 640 / (float)beatmap.SliderVelocityAt(StartTime);
         }
     }
 

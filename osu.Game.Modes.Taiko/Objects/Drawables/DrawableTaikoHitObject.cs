@@ -18,6 +18,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         public DrawableTaikoHitObject(TaikoHitObject hitObject)
             : base(hitObject)
         {
+            Anchor = Anchor.CentreLeft;
+            Origin = Anchor.CentreLeft;
+
             RelativePositionAxes = Axes.X;
         }
 
@@ -43,7 +46,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             UpdateInitialState();
 
-            Delay(HitObject.StartTime - Time.Current - TIME_PREEMPT + Judgement.TimeOffset, true);
+            Delay(HitObject.StartTime - Time.Current - TIME_PREEMPT, true);
 
             UpdatePreemptState();
 
@@ -52,12 +55,49 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         protected virtual void UpdateInitialState()
         {
-            MoveToX(1.1f);
+            MoveToX(1.0f);
         }
 
         protected virtual void UpdatePreemptState()
         {
-            MoveToX(0, TIME_PREEMPT);
+            MoveConstantSpeed(new Vector2(-1f, 0), 100000);
+        }
+
+        public void MoveConstantSpeed(Vector2 speed, double duration)
+        {
+            UpdateTransformsOfType(typeof(TransformMoveConstantSpeedPosition));
+            TransformVectorTo(Position, new Vector2(), duration, EasingTypes.None, new TransformMoveConstantSpeedPosition() { Speed = speed });
+        }
+
+        class TransformMoveConstantSpeedPosition : TransformVector
+        {
+            /// <summary>
+            /// Speed in <see cref="Position"/> units per second.
+            /// </summary>
+            public Vector2 Speed;
+
+            /// <summary>
+            /// Value of the offset.
+            /// </summary>
+            protected override Vector2 CurrentValue
+            {
+                get
+                {
+                    double time = Time?.Current ?? 0;
+
+                    if (time < StartTime)
+                        return Vector2.Zero;
+
+                    double seconds = (Math.Min(EndTime, time) - StartTime) / 1000;
+                    return Speed * (float)seconds;
+                }
+            }
+
+            public override void Apply(Drawable d)
+            {
+                base.Apply(d);
+                d.Position = StartValue + CurrentValue;
+            }
         }
     }
 }

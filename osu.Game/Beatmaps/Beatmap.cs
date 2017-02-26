@@ -57,5 +57,15 @@ namespace osu.Game.Beatmaps
 
             return timingPoint ?? ControlPoint.Default;
         }
+
+        public double SliderVelocityAt(double time)
+        {
+            double scoringDistance = 100 * BeatmapInfo.BaseDifficulty.SliderMultiplier;
+            double beatLength = BeatLengthAt(time);
+
+            if (beatLength > 0)
+                return scoringDistance * 1000 / beatLength;
+            return scoringDistance;
+        }
     }
 }
