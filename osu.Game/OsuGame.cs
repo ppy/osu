@@ -296,7 +296,11 @@ namespace osu.Game
 
         private void screenRemoved(Screen newScreen)
         {
-            if (newScreen is PlaySongSelect)
+            Screen scr = screenStack;
+            while (scr.ChildScreen != null)
+                scr = scr.ChildScreen;
+            System.Diagnostics.Debug.WriteLine(scr.GetType());
+            if (scr is Player)
                 playing.Value = false;
 
             modeChanged(newScreen);
