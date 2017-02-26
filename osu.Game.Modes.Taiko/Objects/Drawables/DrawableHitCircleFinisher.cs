@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Game.Modes.Objects.Drawables;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
@@ -20,6 +21,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         }
 
         protected override HitCirclePiece CreateBody() => new DonFinisherPiece();
+
+        protected override ExplodePiece CreateExplode() => new FinisherExplodePiece()
+        {
+            Colour = new Color4(187, 17, 119, 255)
+        };
+
+        protected override FlashPiece CreateFlash() => new FinisherFlashPiece();
     }
 
     public class DrawableHitCircleKatsuFinisher : DrawableHitCircleFinisher
@@ -30,6 +38,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         }
 
         protected override HitCirclePiece CreateBody() => new KatsuFinisherPiece();
+
+        protected override ExplodePiece CreateExplode() => new FinisherExplodePiece()
+        {
+            Colour = new Color4(17, 136, 170, 255),
+        };
+
+        protected override FlashPiece CreateFlash() => new FinisherFlashPiece();
     }
 
     public abstract class DrawableHitCircleFinisher : DrawableHitCircle

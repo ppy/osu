@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace osu.Game.Modes.Taiko
+namespace osu.Game.Modes.Taiko.Objects
 {
     public class TaikoHitObjectParser : HitObjectParser
     {
@@ -26,7 +26,7 @@ namespace osu.Game.Modes.Taiko
             switch (type)
             {
                 case HitObjectType.Circle:
-                    result = new Objects.HitCircle();
+                    result = new HitCircle();
                     break;
                 case HitObjectType.Slider:
                     int repeatCount = repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
@@ -41,7 +41,7 @@ namespace osu.Game.Modes.Taiko
                     };
                     break;
                 case HitObjectType.Spinner:
-                    result = new Objects.Spinner
+                    result = new Spinner
                     {
                         Length = Convert.ToDouble(split[5], CultureInfo.InvariantCulture) - Convert.ToDouble(split[2], CultureInfo.InvariantCulture),
                     };

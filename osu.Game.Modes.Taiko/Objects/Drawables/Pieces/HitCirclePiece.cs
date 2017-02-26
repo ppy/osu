@@ -60,6 +60,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         {
             Size = new Vector2(128);
 
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
             Children = new Drawable[]
             {
                 glow = new GlowPiece()

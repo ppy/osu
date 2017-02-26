@@ -8,6 +8,7 @@ using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.Taiko.UI;
 using osu.Game.Modes.UI;
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Taiko.Objects;
 
 namespace osu.Game.Modes.Taiko
 {
