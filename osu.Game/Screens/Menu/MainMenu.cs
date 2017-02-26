@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(OsuGame game)
         {
-            background.Preload(game);
+            background.LoadAsync(game);
 
             buttons.OnSettings = game.ToggleOptions;
         }

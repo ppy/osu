@@ -13,8 +13,6 @@ namespace osu.Game.Screens.Play
 {
     public class SkipButton : TwoLayerButton
     {
-        private readonly double skipDestination;
-
         public SkipButton()
         {
             Text = @"Skip";
@@ -27,7 +25,7 @@ namespace osu.Game.Screens.Play
         private void load(AudioManager audio, OsuColour colours)
         {
             ActivationSound = audio.Sample.Get(@"Menu/menuhit");
-            Colour = colours.Yellow;
+            BackgroundColour = colours.Yellow;
             HoverColour = colours.YellowDark;
         }
 

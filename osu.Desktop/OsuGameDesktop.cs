@@ -2,15 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using osu.Framework.Platform;
 using osu.Framework.Desktop.Platform;
-using osu.Game.Database;
 using osu.Desktop.Overlays;
 using System.Reflection;
 using System.Drawing;
@@ -34,7 +29,7 @@ namespace osu.Desktop
         {
             base.LoadComplete();
 
-            versionManager.Preload(this);
+            versionManager.LoadAsync(this);
             ModeChanged += m =>
             {
                 if (!versionManager.IsAlive && m is Intro)
@@ -61,7 +56,7 @@ namespace osu.Desktop
             // this method will only be executed if e.Effect in dragEnter gets set to something other that None.
             var dropData = e.Data.GetData(DataFormats.FileDrop) as object[];
             var filePaths = dropData.Select(f => f.ToString()).ToArray();
-            ImportBeatmaps(filePaths);
+            ImportBeatmapsAsync(filePaths);
         }
 
         private void dragEnter(DragEventArgs e)

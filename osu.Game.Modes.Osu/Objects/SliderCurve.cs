@@ -29,26 +29,21 @@ namespace osu.Game.Modes.Osu.Objects
                 case CurveTypes.Linear:
                     return subControlPoints;
                 case CurveTypes.PerfectCurve:
-                    // If we have a different amount than 3 control points, use bezier for perfect curves.
-                    if (ControlPoints.Count != 3)
-                        return new BezierApproximator(subControlPoints).CreateBezier();
-                    else
-                    {
-                        Debug.Assert(subControlPoints.Count == 3);
+                    //we can only use CircularArc iff we have exactly three control points and no dissection.
+                    if (ControlPoints.Count != 3 || subControlPoints.Count != 3)
+                        break;
 
-                        // Here we have exactly 3 control points. Attempt to fit a circular arc.
-                        List<Vector2> subpath = new CircularArcApproximator(subControlPoints[0], subControlPoints[1], subControlPoints[2]).CreateArc();
+                    // Here we have exactly 3 control points. Attempt to fit a circular arc.
+                    List<Vector2> subpath = new CircularArcApproximator(subControlPoints[0], subControlPoints[1], subControlPoints[2]).CreateArc();
 
-                        if (subpath.Count == 0)
-                            // For some reason a circular arc could not be fit to the 3 given points. Fall back
-                            // to a numerically stable bezier approximation.
-                            subpath = new BezierApproximator(subControlPoints).CreateBezier();
+                    // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
+                    if (subpath.Count == 0)
+                        break;
 
-                        return subpath;
-                    }
-                default:
-                    return new BezierApproximator(subControlPoints).CreateBezier();
+                    return subpath;
             }
+
+            return new BezierApproximator(subControlPoints).CreateBezier();
         }
 
         private void calculatePath()
@@ -181,7 +176,7 @@ namespace osu.Game.Modes.Osu.Objects
             path.Clear();
 
             int i = 0;
-            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i);
+            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i) ;
 
             path.Add(interpolateVertices(i, d0) + Offset);
 
