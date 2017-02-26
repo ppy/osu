@@ -21,42 +21,42 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                 new OptionSlider<int>
                 {
                     LabelText = "Background dim",
-                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.DimLevel)
+                    Bindable = (BindableInt)config.GetWeldedBindable<int>(OsuConfig.DimLevel)
                 },
                 new OptionEnumDropDown<ProgressBarType>
                 {
                     LabelText = "Progress display",
-                    Bindable = config.GetBindable<ProgressBarType>(OsuConfig.ProgressBarType)
+                    Bindable = config.GetWeldedBindable<ProgressBarType>(OsuConfig.ProgressBarType)
                 },
                 new OptionEnumDropDown<ScoreMeterType>
                 {
                     LabelText = "Score meter type",
-                    Bindable = config.GetBindable<ScoreMeterType>(OsuConfig.ScoreMeter)
+                    Bindable = config.GetWeldedBindable<ScoreMeterType>(OsuConfig.ScoreMeter)
                 },
                 new OptionSlider<double>
                 {
                     LabelText = "Score meter size",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.ScoreMeterScale)
+                    Bindable = (BindableDouble)config.GetWeldedBindable<double>(OsuConfig.ScoreMeterScale)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Always show key overlay",
-                    Bindable = config.GetBindable<bool>(OsuConfig.KeyOverlay)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.KeyOverlay)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Show approach circle on first \"Hidden\" object",
-                    Bindable = config.GetBindable<bool>(OsuConfig.HiddenShowFirstApproach)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.HiddenShowFirstApproach)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Scale osu!mania scroll speed with BPM",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ManiaSpeedBPMScale)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.ManiaSpeedBPMScale)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Remember osu!mania scroll speed per beatmap",
-                    Bindable = config.GetBindable<bool>(OsuConfig.UsePerBeatmapManiaSpeed)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.UsePerBeatmapManiaSpeed)
                 },
             };
         }

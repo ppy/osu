@@ -20,32 +20,32 @@ namespace osu.Game.Overlays.Options.Sections.Online
                 new OsuCheckbox
                 {
                     LabelText = "Enable chat ticker",
-                    Bindable = config.GetBindable<bool>(OsuConfig.Ticker)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.Ticker)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Show a notification popup when someone says your name",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ChatHighlightName)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.ChatHighlightName)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Show chat message notifications",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ChatMessageNotification)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.ChatMessageNotification)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Play a sound when someone says your name",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ChatAudibleHighlight)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.ChatAudibleHighlight)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Show notification popups instantly during gameplay",
-                    Bindable = config.GetBindable<bool>(OsuConfig.PopupDuringGameplay)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.PopupDuringGameplay)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Show notification popups when friends change status",
-                    Bindable = config.GetBindable<bool>(OsuConfig.NotifyFriends)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.NotifyFriends)
                 },
             };
         }

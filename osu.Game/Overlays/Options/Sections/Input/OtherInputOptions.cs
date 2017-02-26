@@ -20,12 +20,12 @@ namespace osu.Game.Overlays.Options.Sections.Input
                 new OsuCheckbox
                 {
                     LabelText = "OS TabletPC support",
-                    Bindable = config.GetBindable<bool>(OsuConfig.Tablet)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.Tablet)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Wiimote/TaTaCon Drum Support",
-                    Bindable = config.GetBindable<bool>(OsuConfig.Wiimote)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.Wiimote)
                 },
             };
         }

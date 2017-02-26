@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Options.Sections.Audio
                 new OptionSlider<int>
                 {
                     LabelText = "Universal Offset",
-                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.Offset)
+                    Bindable = (BindableInt)config.GetWeldedBindable<int>(OsuConfig.Offset)
                 },
                 new OsuButton
                 {
