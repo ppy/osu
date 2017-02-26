@@ -181,15 +181,18 @@ namespace osu.Game.Database
 
         public void Import(IEnumerable<BeatmapSetInfo> beatmapSets)
         {
-            connection.BeginTransaction();
-
-            foreach (var s in beatmapSets)
+            lock (connection)
             {
-                connection.InsertWithChildren(s, true);
-                BeatmapSetAdded?.Invoke(s);
-            }
+                connection.BeginTransaction();
 
-            connection.Commit();
+                foreach (var s in beatmapSets)
+                {
+                    connection.InsertWithChildren(s, true);
+                    BeatmapSetAdded?.Invoke(s);
+                }
+
+                connection.Commit();
+            }
         }
 
         public void Delete(BeatmapSetInfo beatmapSet)
