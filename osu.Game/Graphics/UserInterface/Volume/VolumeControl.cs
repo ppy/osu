@@ -21,6 +21,16 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         protected override bool HideOnEscape => false;
 
+        public Bindable<bool> DisableWheel
+        {
+            set
+            {
+                volumeMeterMaster.WheelDisabled = value;
+                volumeMeterEffect.WheelDisabled = value;
+                volumeMeterMusic.WheelDisabled = value;
+            }
+        }
+
         private void volumeChanged(object sender, EventArgs e)
         {
             Show();
@@ -59,6 +69,8 @@ namespace osu.Game.Graphics.UserInterface.Volume
             volumeMeterMaster.Bindable.ValueChanged += volumeChanged;
             volumeMeterEffect.Bindable.ValueChanged += volumeChanged;
             volumeMeterMusic.Bindable.ValueChanged += volumeChanged;
+
+
         }
 
         protected override void Dispose(bool isDisposing)

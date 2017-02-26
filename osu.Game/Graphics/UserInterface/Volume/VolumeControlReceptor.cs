@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK.Input;
 using OpenTK;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
@@ -14,9 +15,12 @@ namespace osu.Game.Graphics.UserInterface.Volume
     {
         public Action<InputState> ActionRequested;
 
+        public Bindable<bool> DisableWheel;
+
         protected override bool OnWheel(InputState state)
         {
-            ActionRequested?.Invoke(state);
+            if(DisableWheel?.Value == false)
+                ActionRequested?.Invoke(state);
             return true;
         }
 

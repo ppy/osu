@@ -26,6 +26,8 @@ using System.Linq;
 using osu.Framework.Graphics.Primitives;
 using System.Collections.Generic;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
 
 namespace osu.Game
 {
@@ -87,7 +89,10 @@ namespace osu.Game
             Dependencies.Cache(this);
 
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
+
+            wheelDisabled = LocalConfig.GetBindable<bool>(OsuConfig.MouseDisableWheel);
         }
+        
 
         public void ImportBeatmaps(IEnumerable<string> paths)
         {
@@ -102,13 +107,17 @@ namespace osu.Game
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ActionRequested = delegate(InputState state) { volume.Adjust(state); }
+                    ActionRequested = delegate(InputState state) { volume.Adjust(state); },
+                    DisableWheel = playing,
                 },
                 mainContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                volume = new VolumeControl(),
+                volume = new VolumeControl()
+                {
+                    DisableWheel = playing,
+                },
                 overlayContent = new Container{ RelativeSizeAxes = Axes.Both },
                 new GlobalHotkeys //exists because UserInputManager is at a level below us.
                 {
@@ -268,16 +277,27 @@ namespace osu.Game
                 intro.ChildScreen.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
         }
 
+        //TODO: better name
+        private Bindable<bool> playing = new Bindable<bool>();
+
+        private Bindable<bool> wheelDisabled;
+
         private void screenAdded(Screen newScreen)
         {
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
+            
+            if (newScreen is Player && wheelDisabled)
+                playing.Value = true;
 
             modeChanged(newScreen);
         }
 
         private void screenRemoved(Screen newScreen)
         {
+            if (newScreen is PlaySongSelect)
+                playing.Value = false;
+
             modeChanged(newScreen);
         }
     }
