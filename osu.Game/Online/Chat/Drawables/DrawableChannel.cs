@@ -41,7 +41,7 @@ namespace osu.Game.Online.Chat.Drawables
                     {
                         flow = new FlowContainer
                         {
-                            Direction = FlowDirections.Vertical,
+                            FlowStrategy = FlowStrategies.GetVerticalFlow(),
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding { Left = 20, Right = 20 }

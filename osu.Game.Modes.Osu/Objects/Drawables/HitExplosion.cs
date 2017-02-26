@@ -25,8 +25,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             AutoSizeAxes = Axes.Both;
             Origin = Anchor.Centre;
 
-            Direction = FlowDirections.Vertical;
-            Spacing = new Vector2(0, 2);
+            FlowStrategy = FlowStrategies.GetVerticalFlow(new Vector2(0, 2));
             Position = (h?.StackedEndPosition ?? Vector2.Zero) + judgement.PositionOffset;
 
             Children = new Drawable[]

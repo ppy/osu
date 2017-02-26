@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Ranking
                 new FlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FlowDirections.Vertical,
+                    FlowStrategy = FlowStrategies.GetVerticalFlow(),
                     Children = new Drawable[]
                     {
                         new OsuSpriteText

@@ -61,8 +61,7 @@ namespace osu.Game.Overlays.Options
                         FlowContent = new FlowContainer
                         {
                             Margin = new MarginPadding { Top = header_size + header_margin },
-                            Direction = FlowDirections.Vertical,
-                            Spacing = new Vector2(0, 30),
+                            FlowStrategy = FlowStrategies.GetVerticalFlow(new Vector2(0, 30)),
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                         },
