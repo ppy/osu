@@ -46,8 +46,7 @@ namespace osu.Desktop
                     Ruleset.Register(new ManiaRuleset());
                     Ruleset.Register(new CatchRuleset());
 
-                    host.Add(new OsuGameDesktop(args));
-                    host.Run();
+                    host.Run(new OsuGameDesktop(args));
                 }
                 return 0;
             }
