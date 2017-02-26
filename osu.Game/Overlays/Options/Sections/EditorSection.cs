@@ -24,32 +24,32 @@ namespace osu.Game.Overlays.Options.Sections
                 new OsuCheckbox
                 {
                     LabelText = "Background video",
-                    Bindable = config.GetBindable<bool>(OsuConfig.VideoEditor)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.VideoEditor)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Always use default skin",
-                    Bindable = config.GetBindable<bool>(OsuConfig.EditorDefaultSkin)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.EditorDefaultSkin)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Snaking sliders",
-                    Bindable = config.GetBindable<bool>(OsuConfig.EditorSnakingSliders)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.EditorSnakingSliders)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Hit animations",
-                    Bindable = config.GetBindable<bool>(OsuConfig.EditorHitAnimations)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.EditorHitAnimations)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Follow points",
-                    Bindable = config.GetBindable<bool>(OsuConfig.EditorFollowPoints)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.EditorFollowPoints)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Stacking",
-                    Bindable = config.GetBindable<bool>(OsuConfig.EditorStacking)
+                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.EditorStacking)
                 },
             };
         }

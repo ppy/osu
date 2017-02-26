@@ -79,7 +79,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             this.config = config;
 
-            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
+            preferUnicode = config.GetWeldedBindable<bool>(OsuConfig.ShowUnicode);
             preferUnicode.ValueChanged += preferUnicode_changed;
             preferUnicode_changed(preferUnicode, null);
         }

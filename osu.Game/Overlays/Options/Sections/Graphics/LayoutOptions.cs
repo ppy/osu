@@ -21,22 +21,22 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 new OptionEnumDropDown<WindowMode>
                 {
                     LabelText = "Screen mode",
-                    Bindable = config.GetBindable<WindowMode>(FrameworkConfig.WindowMode),
+                    Bindable = config.GetWeldedBindable<WindowMode>(FrameworkConfig.WindowMode),
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Letterboxing",
-                    Bindable = config.GetBindable<bool>(FrameworkConfig.Letterboxing),
+                    Bindable = config.GetWeldedBindable<bool>(FrameworkConfig.Letterboxing),
                 },
                 new OptionSlider<int>
                 {
                     LabelText = "Horizontal position",
-                    Bindable = (BindableInt)config.GetBindable<int>(FrameworkConfig.LetterboxPositionX)
+                    Bindable = (BindableInt)config.GetWeldedBindable<int>(FrameworkConfig.LetterboxPositionX)
                 },
                 new OptionSlider<int>
                 {
                     LabelText = "Vertical position",
-                    Bindable = (BindableInt)config.GetBindable<int>(FrameworkConfig.LetterboxPositionY)
+                    Bindable = (BindableInt)config.GetWeldedBindable<int>(FrameworkConfig.LetterboxPositionY)
                 },
             };
         }

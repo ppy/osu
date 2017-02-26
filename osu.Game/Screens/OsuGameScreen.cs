@@ -24,41 +24,18 @@ namespace osu.Game.Screens
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        private bool boundToBeatmap;
-        private Bindable<WorkingBeatmap> beatmap;
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         public WorkingBeatmap Beatmap
         {
             get
             {
-                bindBeatmap();
                 return beatmap.Value;
             }
             set
             {
-                bindBeatmap();
                 beatmap.Value = value;
             }
-        }
-
-        private void bindBeatmap()
-        {
-            if (beatmap == null)
-                beatmap = new Bindable<WorkingBeatmap>();
-
-            if (!boundToBeatmap)
-            {
-                beatmap.ValueChanged += beatmap_ValueChanged;
-                boundToBeatmap = true;
-            }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            if (boundToBeatmap)
-                beatmap.ValueChanged -= beatmap_ValueChanged;
-
-            base.Dispose(isDisposing);
         }
 
         private void beatmap_ValueChanged(object sender, EventArgs e)
@@ -69,19 +46,8 @@ namespace osu.Game.Screens
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGameBase game)
         {
-            if (beatmap == null)
-                beatmap = game?.Beatmap;
-        }
-
-        public override bool Push(Screen screen)
-        {
-            OsuScreen nextOsu = screen as OsuScreen;
-            if (nextOsu != null)
-            {
-                nextOsu.beatmap = beatmap;
-            }
-
-            return base.Push(screen);
+            beatmap.Weld(game?.Beatmap);
+            beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
         protected virtual void OnBeatmapChanged(WorkingBeatmap beatmap)

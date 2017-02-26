@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Options.Sections.General
                 new OptionEnumDropDown<ReleaseStream>
                 {
                     LabelText = "Release stream",
-                    Bindable = config.GetBindable<ReleaseStream>(OsuConfig.ReleaseStream),
+                    Bindable = config.GetWeldedBindable<ReleaseStream>(OsuConfig.ReleaseStream),
                 },
                 new OptionLabel { Text = "Your osu! is up to date" }, // TODO: map this to reality
                 new OsuButton

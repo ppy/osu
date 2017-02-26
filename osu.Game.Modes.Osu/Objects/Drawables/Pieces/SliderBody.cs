@@ -79,8 +79,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            snakingIn = config.GetBindable<bool>(OsuConfig.SnakingInSliders);
-            snakingOut = config.GetBindable<bool>(OsuConfig.SnakingOutSliders);
+            snakingIn = config.GetWeldedBindable<bool>(OsuConfig.SnakingInSliders);
+            snakingOut = config.GetWeldedBindable<bool>(OsuConfig.SnakingOutSliders);
 
             int textureWidth = (int)PathWidth * 2;
 
