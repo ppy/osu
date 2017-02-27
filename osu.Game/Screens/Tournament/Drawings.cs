@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Tournament
         private ScrollingTeamContainer teamsContainer;
         private GroupsContainer groupsContainer;
 
+        private DrawingsConfigManager drawingsConfig;
+
         public Drawings()
         {
         }
@@ -35,6 +37,8 @@ namespace osu.Game.Screens.Tournament
         [BackgroundDependencyLoader]
         private void load(Framework.Game game)
         {
+            drawingsConfig = new DrawingsConfigManager(Game.Host.Storage);
+
             Container visualiserContainer;
             SpriteText st;
 
@@ -67,7 +71,7 @@ namespace osu.Game.Screens.Tournament
                                     Colour = new Color4(255, 204, 34, 255)
                                 },
                                 // Groups
-                                groupsContainer = new GroupsContainer(8)
+                                groupsContainer = new GroupsContainer(drawingsConfig.Get<int>(DrawingsConfig.Groups), drawingsConfig.Get<int>(DrawingsConfig.TeamsPerGroup))
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
