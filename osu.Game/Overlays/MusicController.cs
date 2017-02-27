@@ -14,7 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -78,6 +78,8 @@ namespace osu.Game.Overlays
         private void load(OsuGameBase osuGame, OsuConfigManager config, BeatmapDatabase beatmaps, AudioManager audio,
             TextureStore textures, OsuColour colours)
         {
+            game = osuGame;
+
             unicodeString = config.GetUnicodeString;
 
             Children = new Drawable[]
@@ -320,12 +322,6 @@ namespace osu.Game.Overlays
                 beatmapSource.Value = current;
             });
             updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
-        }
-
-        protected override void Load(Framework.Game game)
-        {
-            this.game = game;
-            base.Load(game);
         }
 
         Action pendingBeatmapSwitch;
