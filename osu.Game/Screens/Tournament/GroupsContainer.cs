@@ -68,6 +68,11 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
+        public bool ContainsTeam(string fullName)
+        {
+            return allGroups.Any(g => g.ContainsTeam(fullName));
+        }
+
         public bool RemoveTeam(Team team)
         {
             for (int i = 0; i < allGroups.Count; i++)

@@ -21,8 +21,10 @@ namespace osu.Game.Screens.Tournament
 {
     public class ScrollingTeamContainer : Container
     {
-        public Action<ScrollingTeam> OnSelected;
-        public List<Team> AvailableTeams;
+        public event Action OnScrollStarted;
+        public event Action<ScrollingTeam> OnSelected;
+
+        private readonly List<Team> availableTeams = new List<Team>();
 
         private Container tracker;
 
@@ -35,14 +37,54 @@ namespace osu.Game.Screens.Tournament
 
         private double lastTime;
 
+        private ScheduledDelegate idleDelegate;
+
+        public ScrollingTeamContainer()
+        {
+            AutoSizeAxes = Axes.Y;
+
+            Children = new Drawable[]
+            {
+                tracker = new Container()
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+
+                    AutoSizeAxes = Axes.Both,
+
+                    Masking = true,
+                    CornerRadius = 10f,
+                    Alpha = 0,
+
+                    Children = new[]
+                    {
+                        new Box()
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.BottomCentre,
+                            Size = new Vector2(2, 55),
+
+                            ColourInfo = ColourInfo.GradientVertical(Color4.Transparent, Color4.White)
+                        },
+                        new Box()
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.TopCentre,
+                            Size = new Vector2(2, 55),
+
+                            ColourInfo = ColourInfo.GradientVertical(Color4.White, Color4.Transparent)
+                        }
+                    }
+                }
+            };
+        }
+
         private ScrollState _scrollState;
         private ScrollState scrollState
         {
             get { return _scrollState; }
             set
             {
-                if (_scrollState == value)
-                    return;
                 _scrollState = value;
 
                 switch (value)
@@ -52,7 +94,9 @@ namespace osu.Game.Screens.Tournament
 
                         resetSelected();
 
-                        speedTo(600f, 200);
+                        OnScrollStarted?.Invoke();
+
+                        speedTo(1000f, 200);
                         tracker.FadeOut(100);
                         break;
                     case ScrollState.Stopping:
@@ -60,7 +104,6 @@ namespace osu.Game.Screens.Tournament
                         tracker.FadeIn(200);
 
                         Delay(2300).Schedule(() => scrollState = ScrollState.Stopped);
-                        DelayReset();
                         break;
                     case ScrollState.Stopped:
                         // Find closest to center
@@ -85,13 +128,19 @@ namespace osu.Game.Screens.Tournament
 
                         offset += DrawWidth / 2f - (closest.Position.X + closest.DrawWidth / 2f);
 
-                        (closest as ScrollingTeam).Selected = true;
-                        OnSelected?.Invoke(closest as ScrollingTeam);
+                        ScrollingTeam st = closest as ScrollingTeam;
+
+                        availableTeams.RemoveAll(at => at == st.Team);
+
+                        st.Selected = true;
+                        OnSelected?.Invoke(st);
 
                         idleDelegate = Delay(10000).Schedule(() => scrollState = ScrollState.Idle);
                         break;
                     case ScrollState.Idle:
                         resetSelected();
+
+                        OnScrollStarted?.Invoke();
 
                         speedTo(40f, 200);
                         tracker.FadeOut(100);
@@ -100,111 +149,22 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        private ScheduledDelegate idleDelegate;
-
-        public ScrollingTeamContainer()
+        public void AddTeam(Team team)
         {
-            Masking = true;
-            Clock = new FramedClock();
+            if (availableTeams.Contains(team))
+                return;
 
-            AutoSizeAxes = Axes.Y;
+            availableTeams.Add(team);
 
-            Children = new Drawable[]
-            {
-                tracker = new Container()
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-
-                    Masking = true,
-                    CornerRadius = 10f,
-
-                    AutoSizeAxes = Axes.Both,
-
-                    Children = new[]
-                    {
-                        new Box()
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.BottomCentre,
-                            Size = new Vector2(2, 100),
-
-                            ColourInfo = ColourInfo.GradientVertical(Color4.Transparent, Color4.White)
-                        },
-                        new Box()
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.TopCentre,
-                            Size = new Vector2(2, 100),
-
-                            ColourInfo = ColourInfo.GradientVertical(Color4.White, Color4.Transparent)
-                        }
-                    }
-                }
-            };
-
+            RemoveAll(c => c is ScrollingTeam);
             scrollState = ScrollState.Idle;
         }
 
-        protected override void UpdateAfterChildren()
+        public void ClearTeams()
         {
-            base.Update();
-
-            if ((AvailableTeams?.Count ?? 0) == 0)
-                return;
-
-            timeOffset -= (float)(Time.Current - lastTime) / 1000 * speed;
-            lastTime = Time.Current;
-
-            // Fill more than required to account for transformation + scrolling speed
-            while (Children.Count(c => c is ScrollingTeam) < DrawWidth * 2 / ScrollingTeam.WIDTH)
-                addFlags();
-
-            float pos = leftPos;
-
-            foreach (var c in Children)
-            {
-                if (!(c is ScrollingTeam))
-                    continue;
-
-                if (c.Position.X + c.DrawWidth < 0)
-                {
-                    c.ClearTransforms();
-                    c.Expire();
-                    expiredCount++;
-                }
-                else
-                    c.MoveToX(pos, 100);
-
-                pos += ScrollingTeam.WIDTH;
-            }
-        }
-
-        private void addFlags()
-        {
-            for (int i = 0; i < AvailableTeams.Count; i++)
-            {
-                Add(new ScrollingTeam(AvailableTeams[i])
-                {
-                    X = leftPos + DrawWidth
-                });
-            }
-        }
-
-        private void resetSelected()
-        {
-            foreach (var c in Children)
-            {
-                ScrollingTeam st = c as ScrollingTeam;
-                if (st == null)
-                    continue;
-
-                if (st.Selected)
-                    st.Selected = false;
-
-                RemoveTeam(st.Team);
-                AvailableTeams.Remove(st.Team);
-            }
+            availableTeams.Clear();
+            RemoveAll(c => c is ScrollingTeam);
+            scrollState = ScrollState.Idle;
         }
 
         public void RemoveTeam(Team team)
@@ -232,6 +192,76 @@ namespace osu.Game.Screens.Tournament
         public void StopScrolling()
         {
             scrollState = ScrollState.Stopping;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            scrollState = ScrollState.Idle;
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.Update();
+
+            timeOffset -= (float)(Time.Current - lastTime) / 1000 * speed;
+            lastTime = Time.Current;
+
+            if (availableTeams.Count > 0)
+            {
+                // Fill more than required to account for transformation + scrolling speed
+                while (Children.Count(c => c is ScrollingTeam) < DrawWidth * 2 / ScrollingTeam.WIDTH)
+                    addFlags();
+            }
+
+            float pos = leftPos;
+
+            foreach (var c in Children)
+            {
+                if (!(c is ScrollingTeam))
+                    continue;
+
+                if (c.Position.X + c.DrawWidth < 0)
+                {
+                    c.ClearTransforms();
+                    c.Expire();
+                    expiredCount++;
+                }
+                else
+                {
+                    c.MoveToX(pos, 100);
+                    c.FadeTo(1.0f - Math.Abs(pos - DrawWidth / 2f) / (DrawWidth / 2.5f), 100);
+                }
+
+                pos += ScrollingTeam.WIDTH;
+            }
+        }
+
+        private void addFlags()
+        {
+            for (int i = 0; i < availableTeams.Count; i++)
+            {
+                Add(new ScrollingTeam(availableTeams[i])
+                {
+                    X = leftPos + DrawWidth
+                });
+            }
+        }
+
+        private void resetSelected()
+        {
+            foreach (var c in Children)
+            {
+                ScrollingTeam st = c as ScrollingTeam;
+                if (st == null)
+                    continue;
+
+                if (st.Selected)
+                {
+                    st.Selected = false;
+                    RemoveTeam(st.Team);
+                }
+            }
         }
 
         private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None)
@@ -294,6 +324,8 @@ namespace osu.Game.Screens.Tournament
                 Size = new Vector2(WIDTH, HEIGHT);
                 Masking = true;
                 CornerRadius = 8f;
+
+                Alpha = 0;
 
                 Children = new Drawable[]
                 {

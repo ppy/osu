@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Timing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,8 @@ namespace osu.Game.Screens.Tournament
 
         private FlowContainer<GroupTeam> topTeams;
         private FlowContainer<GroupTeam> bottomTeams;
+
+        private List<GroupTeam> allTeams = new List<GroupTeam>();
 
         private int topTeamsCount;
         private int bottomTeamsCount;
@@ -95,20 +98,31 @@ namespace osu.Game.Screens.Tournament
 
         public void AddTeam(Team team)
         {
+
+            GroupTeam gt = new GroupTeam(team);
             if (topTeamsCount < 4)
             {
-                topTeams.Add(new GroupTeam(team));
+                topTeams.Add(gt);
+                allTeams.Add(gt);
                 topTeamsCount++;
             }
             else if (bottomTeamsCount < 4)
             {
-                bottomTeams.Add(new GroupTeam(team));
+                bottomTeams.Add(gt);
+                allTeams.Add(gt);
                 bottomTeamsCount++;
             }
         }
 
+        public bool ContainsTeam(string fullName)
+        {
+            return allTeams.Any(t => t.Team.FullName == fullName);
+        }
+
         public bool RemoveTeam(Team team)
         {
+            allTeams.RemoveAll(gt => gt.Team == team);
+
             if (topTeams.RemoveAll(gt => gt.Team == team) > 0)
             {
                 topTeamsCount--;
@@ -125,6 +139,7 @@ namespace osu.Game.Screens.Tournament
 
         public void ClearTeams()
         {
+            allTeams.Clear();
             topTeams.Clear();
             bottomTeams.Clear();
 
@@ -132,10 +147,11 @@ namespace osu.Game.Screens.Tournament
             bottomTeamsCount = 0;
         }
 
-        class GroupTeam : FlowContainer
+        class GroupTeam : Container
         {
             public Team Team;
 
+            private FlowContainer innerContainer;
             private Sprite flagSprite;
 
             public GroupTeam(Team team)
@@ -144,29 +160,49 @@ namespace osu.Game.Screens.Tournament
 
                 Size = new Vector2(36, 0);
                 AutoSizeAxes = Axes.Y;
-                Direction = FlowDirections.Vertical;
-
-                Spacing = new Vector2(0, 5f);
 
                 Children = new Drawable[]
                 {
-                    flagSprite = new Sprite()
+                    innerContainer = new FlowContainer()
                     {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
 
-                        FillMode = FillMode.Fit
-                    },
-                    new SpriteText()
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
 
-                        Text = team.Acronym.ToUpper(),
-                        TextSize = 10f,
-                        Font = @"Exo2.0-Bold"
+                        Direction = FlowDirections.Vertical,
+                        Spacing = new Vector2(0, 5f),
+
+                        Scale = new Vector2(1.5f),
+
+                        Children = new Drawable[]
+                        {
+                            flagSprite = new Sprite()
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+
+                                FillMode = FillMode.Fit
+                            },
+                            new SpriteText()
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+
+                                Text = team.Acronym.ToUpper(),
+                                TextSize = 10f,
+                                Font = @"Exo2.0-Bold"
+                            }
+                        }
                     }
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                innerContainer.ScaleTo(1f, 200);
             }
 
             [BackgroundDependencyLoader]
