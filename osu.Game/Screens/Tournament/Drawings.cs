@@ -1,8 +1,13 @@
 ﻿using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.MathUtils;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Screens.Tournament.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +22,25 @@ namespace osu.Game.Screens.Tournament
 
         public Drawings()
         {
-            GroupContainer gc;
+            GroupsContainer gc;
+            ScrollingTeamContainer stc;
+            Container visualiserContainer;
 
-            Children = new[]
+            Children = new Drawable[]
             {
-                gc = new GroupContainer(8)
+                // Visualiser
+                visualiserContainer = new Container()
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+
+                    RelativeSizeAxes = Axes.X,
+                    Size = new Vector2(1, 10),
+
+                    Colour = new Color4(255, 204, 34, 255)
+                },
+                // Groups
+                gc = new GroupsContainer(8)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -34,8 +53,28 @@ namespace osu.Game.Screens.Tournament
                         Top = 35f,
                         Bottom = 35f
                     }
-                }
+                },
+                stc = new ScrollingTeamContainer()
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.75f
+                },
             };
+
+            float offset = 0;
+            for (int i = 0; i < 6; i++)
+            {
+                visualiserContainer.Add(new VisualiserLine(2 * (float)Math.PI, offset, RNG.Next(10000, 12000))
+                {
+                    RelativeSizeAxes = Axes.Both,
+                });
+
+                offset += (float)Math.PI / 6f;
+            }
+
 
             Team t = new Team()
             {
@@ -44,80 +83,18 @@ namespace osu.Game.Screens.Tournament
                 FlagName = "AU"
             };
 
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-            gc.AddTeam(t);
-        }
+            List<Team> teams = new List<Team>();
 
-        class GroupContainer : Container
-        {
-            private FlowContainer<Group> topGroups;
-            private FlowContainer<Group> bottomGroups;
-
-            private List<Group> allGroups = new List<Group>();
-
-            public GroupContainer(int numGroups)
+            for (int i = 0; i < 17; i++)
             {
-                char nextGroupName = 'A';
-
-                Children = new[]
-                {
-                    topGroups = new FlowContainer<Group>()
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-
-                        AutoSizeAxes = Axes.Both,
-
-                        Spacing = new Vector2(7f, 0)
-                    },
-                    bottomGroups = new FlowContainer<Group>()
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-
-                        AutoSizeAxes = Axes.Both,
-
-                        Spacing = new Vector2(7f, 0)
-                    }
-                };
-
-                for (int i = 0; i < numGroups; i++)
-                {
-                    Group g = new Group(nextGroupName.ToString());
-
-                    allGroups.Add(g);
-                    nextGroupName++;
-
-                    if (i < (int)Math.Ceiling(numGroups / 2f))
-                        topGroups.Add(g);
-                    else
-                        bottomGroups.Add(g);
-                }
+                gc.AddTeam(t);
+                teams.Add(t);
             }
 
-            public void AddTeam(Team team)
-            {
-                for (int i = 0; i < allGroups.Count; i++)
-                {
-                    if (allGroups[i].TeamsCount == 8)
-                        continue;
+            stc.AvailableTeams = teams;
 
-                    allGroups[i].AddTeam(team);
-                    break;
-                }
-            }
+            stc.StartScrolling();
+            Delay(3000).Schedule(() => stc.StopScrolling());
         }
     }
 }

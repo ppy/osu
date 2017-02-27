@@ -209,8 +209,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
     <Compile Include="Screens\Select\WedgeBackground.cs" />
+    <Compile Include="Screens\Tournament\Components\VisualiserLine.cs" />
     <Compile Include="Screens\Tournament\Drawings.cs" />
     <Compile Include="Screens\Tournament\Group.cs" />
+    <Compile Include="Screens\Tournament\GroupsContainer.cs" />
+    <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
     <Compile Include="Screens\Tournament\Team.cs" />
     <Compile Include="Screens\Tournament\Tournament.cs" />
     <Compile Include="Users\User.cs" />
