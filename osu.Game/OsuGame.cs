@@ -214,7 +214,7 @@ namespace osu.Game
                 }
             }
 
-            return OnKeyDown(state, args);
+            return false;
         }
 
         public event Action<Screen> ModeChanged;
