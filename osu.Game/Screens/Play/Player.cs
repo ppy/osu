@@ -24,6 +24,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Logging;
+using osu.Framework.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -159,6 +160,8 @@ namespace osu.Game.Screens.Play
                 scoreOverlay,
                 pauseOverlay
             };
+
+            mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
         }
 
         private void initializeSkipButton()
@@ -325,5 +328,9 @@ namespace osu.Game.Screens.Play
         {
             Background?.FadeTo((100f - dimLevel) / 100, 800);
         }
+
+        private Bindable<bool> mouseWheelDisabled;
+
+        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !isPaused;
     }
 }
