@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Backgrounds;
@@ -125,6 +126,8 @@ namespace osu.Game.Screens.Play
 
             public BeatmapMetadataDisplay(WorkingBeatmap beatmap)
             {
+                var metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
@@ -138,7 +141,7 @@ namespace osu.Game.Screens.Play
                         {
                             new OsuSpriteText
                             {
-                                Text = beatmap.BeatmapInfo.Metadata.Title,
+                                Text = metadata.Title,
                                 TextSize = 36,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,
@@ -146,7 +149,7 @@ namespace osu.Game.Screens.Play
                             },
                             new OsuSpriteText
                             {
-                                Text = beatmap.BeatmapInfo.Metadata.Artist,
+                                Text = metadata.Artist,
                                 TextSize = 26,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,
@@ -173,7 +176,7 @@ namespace osu.Game.Screens.Play
                             },
                             new OsuSpriteText
                             {
-                                Text = beatmap.BeatmapInfo.Version,
+                                Text = beatmap.BeatmapInfo?.Version,
                                 TextSize = 26,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,
@@ -183,7 +186,7 @@ namespace osu.Game.Screens.Play
                                     Bottom = 40
                                 },
                             },
-                            new MetadataLine("Source", beatmap.BeatmapInfo.Metadata.Source)
+                            new MetadataLine("Source", metadata.Source)
                             {
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
@@ -193,7 +196,7 @@ namespace osu.Game.Screens.Play
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
-                            new MetadataLine("Mapper", beatmap.BeatmapInfo.Metadata.Author)
+                            new MetadataLine("Mapper", metadata.Author)
                             {
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
