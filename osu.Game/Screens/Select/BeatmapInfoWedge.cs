@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Select
     {
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
 
-        private Container beatmapInfoContainer;
+        private BufferedContainer beatmapInfoContainer;
 
         private OsuGameBase game;
 
