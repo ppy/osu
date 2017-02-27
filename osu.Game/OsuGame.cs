@@ -92,6 +92,8 @@ namespace osu.Game
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
 
             wheelDisabled = LocalConfig.GetBindable<bool>(OsuConfig.MouseDisableWheel);
+
+            playing.ValueChanged += delegate { options.State = Visibility.Hidden; };
         }
         
 
@@ -210,7 +212,7 @@ namespace osu.Game
                     return true;
             }
 
-            if (state.Keyboard.ControlPressed)
+            if (state.Keyboard.ControlPressed && !playing)
             {
                 switch (args.Key)
                 {
