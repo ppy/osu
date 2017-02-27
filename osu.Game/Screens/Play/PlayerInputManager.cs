@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            mouseDisabled = config.GetWeldedBindable<bool>(OsuConfig.MouseDisableButtons)
+            mouseDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableButtons)
                 ?? new Bindable<bool>(false);
         }
 

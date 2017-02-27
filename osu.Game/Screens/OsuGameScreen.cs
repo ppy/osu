@@ -46,7 +46,8 @@ namespace osu.Game.Screens
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGameBase game)
         {
-            beatmap.Weld(game?.Beatmap);
+            if (game != null)
+                beatmap.BindTo(game.Beatmap);
             beatmap.ValueChanged += beatmap_ValueChanged;
         }
 

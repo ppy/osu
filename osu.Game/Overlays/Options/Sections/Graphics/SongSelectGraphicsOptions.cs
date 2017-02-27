@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 new OsuCheckbox
                 {
                     LabelText = "Show thumbnails",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.SongSelectThumbnails)
+                    Bindable = config.GetBindable<bool>(OsuConfig.SongSelectThumbnails)
                 }
             };
         }

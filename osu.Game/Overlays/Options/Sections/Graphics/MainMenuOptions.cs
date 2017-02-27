@@ -19,27 +19,27 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 new OsuCheckbox
                 {
                     LabelText = "Snow",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.MenuSnow)
+                    Bindable = config.GetBindable<bool>(OsuConfig.MenuSnow)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Parallax",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.MenuParallax)
+                    Bindable = config.GetBindable<bool>(OsuConfig.MenuParallax)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Menu tips",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.ShowMenuTips)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ShowMenuTips)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Interface voices",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.MenuVoice)
+                    Bindable = config.GetBindable<bool>(OsuConfig.MenuVoice)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "osu! music theme",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.MenuMusic)
+                    Bindable = config.GetBindable<bool>(OsuConfig.MenuMusic)
                 },
             };
         }

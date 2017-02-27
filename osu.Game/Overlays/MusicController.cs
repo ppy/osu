@@ -211,7 +211,7 @@ namespace osu.Game.Overlays
         
             this.beatmaps = beatmaps;
             trackManager = osuGame.Audio.Track;
-            preferUnicode = config.GetWeldedBindable<bool>(OsuConfig.ShowUnicode);
+            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
             preferUnicode.ValueChanged += preferUnicode_changed;
 
             beatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();

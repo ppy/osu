@@ -20,22 +20,22 @@ namespace osu.Game.Overlays.Options.Sections.Online
                 new OsuCheckbox
                 {
                     LabelText = "Integrate with Yahoo! status display",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.YahooIntegration)
+                    Bindable = config.GetBindable<bool>(OsuConfig.YahooIntegration)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Integrate with MSN Live status display",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.MsnIntegration)
+                    Bindable = config.GetBindable<bool>(OsuConfig.MsnIntegration)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Automatically start osu!direct downloads",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.AutomaticDownload)
+                    Bindable = config.GetBindable<bool>(OsuConfig.AutomaticDownload)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Prefer no-video downloads",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.AutomaticDownloadNoVideo)
+                    Bindable = config.GetBindable<bool>(OsuConfig.AutomaticDownloadNoVideo)
                 },
             };
         }

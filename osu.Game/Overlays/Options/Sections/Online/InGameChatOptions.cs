@@ -20,32 +20,32 @@ namespace osu.Game.Overlays.Options.Sections.Online
                 new OsuCheckbox
                 {
                     LabelText = "Filter offensive words",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.ChatFilter)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ChatFilter)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Filter foreign characters",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.ChatRemoveForeign)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ChatRemoveForeign)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Log private messages",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.LogPrivateMessages)
+                    Bindable = config.GetBindable<bool>(OsuConfig.LogPrivateMessages)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Block private messages from non-friends",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.BlockNonFriendPM)
+                    Bindable = config.GetBindable<bool>(OsuConfig.BlockNonFriendPM)
                 },
                 new OptionLabel { Text = "Chat ignore list (space-seperated list)" },
                 new OptionTextBox {
                     RelativeSizeAxes = Axes.X,
-                    Bindable = config.GetWeldedBindable<string>(OsuConfig.IgnoreList)
+                    Bindable = config.GetBindable<string>(OsuConfig.IgnoreList)
                 },
                 new OptionLabel { Text = "Chat highlight words (space-seperated list)" },
                 new OptionTextBox {
                     RelativeSizeAxes = Axes.X,
-                    Bindable = config.GetWeldedBindable<string>(OsuConfig.HighlightWords)
+                    Bindable = config.GetBindable<string>(OsuConfig.HighlightWords)
                 },
             };
         }

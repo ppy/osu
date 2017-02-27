@@ -20,47 +20,47 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 new OsuCheckbox
                 {
                     LabelText = "Snaking in sliders",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.SnakingInSliders)
+                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingInSliders)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Snaking out sliders",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.SnakingOutSliders)
+                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingOutSliders)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Background video",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.Video)
+                    Bindable = config.GetBindable<bool>(OsuConfig.Video)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Storyboards",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.ShowStoryboard)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ShowStoryboard)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Combo bursts",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.ComboBurst)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ComboBurst)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Hit lighting",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.HitLighting)
+                    Bindable = config.GetBindable<bool>(OsuConfig.HitLighting)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Shaders",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.Bloom)
+                    Bindable = config.GetBindable<bool>(OsuConfig.Bloom)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Softening filter",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.BloomSoftening)
+                    Bindable = config.GetBindable<bool>(OsuConfig.BloomSoftening)
                 },
                 new OptionEnumDropDown<ScreenshotFormat>
                 {
                     LabelText = "Screenshot",
-                    Bindable = config.GetWeldedBindable<ScreenshotFormat>(OsuConfig.ScreenshotFormat)
+                    Bindable = config.GetBindable<ScreenshotFormat>(OsuConfig.ScreenshotFormat)
                 }
             };
         }

@@ -42,32 +42,32 @@ namespace osu.Game.Overlays.Options.Sections
                 new OsuCheckbox
                 {
                     LabelText = "Ignore all beatmap skins",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.IgnoreBeatmapSkins)
+                    Bindable = config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSkins)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Use skin's sound samples",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.SkinSamples)
+                    Bindable = config.GetBindable<bool>(OsuConfig.SkinSamples)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Use Taiko skin for Taiko mode",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.UseTaikoSkin)
+                    Bindable = config.GetBindable<bool>(OsuConfig.UseTaikoSkin)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Always use skin cursor",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.UseSkinCursor)
+                    Bindable = config.GetBindable<bool>(OsuConfig.UseSkinCursor)
                 },
                 new OptionSlider<double>
                 {
                     LabelText = "Cursor size",
-                    Bindable = (BindableDouble)config.GetWeldedBindable<double>(OsuConfig.CursorSize)
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.CursorSize)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Automatic cursor size",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.AutomaticCursorSizing)
+                    Bindable = config.GetBindable<bool>(OsuConfig.AutomaticCursorSizing)
                 },
             };
         }
