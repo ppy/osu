@@ -13,30 +13,41 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 
-namespace osu.Game.Overlays.Pause
+namespace osu.Game.Graphics.UserInterface
 {
-    public class PauseButton : ClickableContainer
+    public class DialogButton : ClickableContainer
     {
         private const float hover_width = 0.9f;
         private const float hover_duration = 500;
         private const float glow_fade_duration = 250;
         private const float click_duration = 200;
 
-        private Color4 backgroundColour = OsuColour.Gray(34);
-
-        private Color4 buttonColour;
-        public Color4 ButtonColour
+        private Color4 colour;
+        public new Color4 Colour
         {
             get
             {
-                return buttonColour;
+                return colour;
             }
             set
             {
-                buttonColour = value;
+                colour = value;
                 updateGlow();
-                if (colourContainer == null) return;
-                colourContainer.Colour = ButtonColour;
+                colourContainer.Colour = value;
+            }
+        }
+
+        private Color4 backgroundColour = OsuColour.Gray(34);
+        public Color4 BackgroundColour
+        {
+            get
+            {
+                return backgroundColour;
+            }
+            set
+            {
+                backgroundColour = value;
+                background.Colour = value;
             }
         }
 
@@ -50,15 +61,30 @@ namespace osu.Game.Overlays.Pause
             set
             {
                 text = value;
-                if (spriteText == null) return;
                 spriteText.Text = Text;
             }
         }
 
+        private float textSize = 28;
+        internal float TextSize
+        {
+            get
+            {
+                return textSize;
+            }
+            set
+            {
+                textSize = value;
+                spriteText.TextSize = value;
+            }
+        }
+
+        internal bool SpaceTextOnHover = true;
+
         public SampleChannel SampleClick, SampleHover;
 
         private Container backgroundContainer, colourContainer, glowContainer;
-        private Box leftGlow, centerGlow, rightGlow;
+        private Box leftGlow, centerGlow, rightGlow, background;
         private SpriteText spriteText;
 
         private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's when clicking
@@ -85,8 +111,10 @@ namespace osu.Game.Overlays.Pause
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
+            if (SpaceTextOnHover)
+                spriteText.TransformSpacingTo(new Vector2(3f, 0f), hover_duration, EasingTypes.OutElastic);
+
             colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, EasingTypes.OutElastic);
-            spriteText.TransformSpacingTo(new Vector2(3f, 0f), hover_duration, EasingTypes.OutElastic);
             glowContainer.FadeIn(glow_fade_duration, EasingTypes.Out);
             SampleHover?.Play();
             return true;
@@ -113,7 +141,7 @@ namespace osu.Game.Overlays.Pause
 
             colourContainer.Add(flash);
 
-            flash.Colour = ButtonColour;
+            flash.Colour = Colour;
             flash.BlendingMode = BlendingMode.Additive;
             flash.Alpha = 0.3f;
             flash.FadeOutFromOne(click_duration);
@@ -122,13 +150,15 @@ namespace osu.Game.Overlays.Pause
 
         private void updateGlow()
         {
-            leftGlow.ColourInfo = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
-            centerGlow.Colour = ButtonColour;
-            rightGlow.ColourInfo = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
+            leftGlow.ColourInfo = ColourInfo.GradientHorizontal(new Color4(Colour.R, Colour.G, Colour.B, 0f), Colour);
+            centerGlow.Colour = Colour;
+            rightGlow.ColourInfo = ColourInfo.GradientHorizontal(Colour, new Color4(Colour.R, Colour.G, Colour.B, 0f));
         }
 
-        public PauseButton()
+        public DialogButton()
         {
+            RelativeSizeAxes = Axes.X;
+
             Children = new Drawable[]
             {
                 backgroundContainer = new Container
@@ -137,12 +167,12 @@ namespace osu.Game.Overlays.Pause
                     Width = 1f,
                     Children = new Drawable[]
                     {
-                        new Box
+                        background = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = backgroundColour
-                        }
-                    }
+                            Colour = backgroundColour,
+                        },
+                    },
                 },
                 glowContainer = new Container
                 {
@@ -156,23 +186,23 @@ namespace osu.Game.Overlays.Pause
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.TopLeft,
                             Anchor = Anchor.TopLeft,
-                            Width = 0.125f
+                            Width = 0.125f,
                         },
                         centerGlow = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Width = 0.75f
+                            Width = 0.75f,
                         },
                         rightGlow = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
-                            Width = 0.125f
-                        }
-                    }
+                            Width = 0.125f,
+                        },
+                    },
                 },
                 new Container
                 {
@@ -194,16 +224,16 @@ namespace osu.Game.Overlays.Pause
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.2f),
-                                Radius = 5
+                                Radius = 5,
                             },
-                            Colour = ButtonColour,
+                            Colour = Colour,
                             Shear = new Vector2(0.2f, 0),
                             Children = new Drawable[]
                             {
                                 new Box
                                 {
                                     EdgeSmoothness = new Vector2(2, 0),
-                                    RelativeSizeAxes = Axes.Both
+                                    RelativeSizeAxes = Axes.Both,
                                 },
                                 new Container
                                 {
@@ -217,13 +247,13 @@ namespace osu.Game.Overlays.Pause
                                             RelativeSizeAxes = Axes.Both,
                                             TriangleScale = 4,
                                             ColourDark = OsuColour.Gray(0.88f),
-                                            Shear = new Vector2(-0.2f, 0)
-                                        }
-                                    }
+                                            Shear = new Vector2(-0.2f, 0),
+                                        },
+                                    },
                                 },
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 },
                 spriteText = new OsuSpriteText
                 {
@@ -234,8 +264,8 @@ namespace osu.Game.Overlays.Pause
                     Font = "Exo2.0-Bold",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.1f),
-                    Colour = Color4.White
-                }
+                    Colour = Color4.White,
+                },
             };
 
             updateGlow();

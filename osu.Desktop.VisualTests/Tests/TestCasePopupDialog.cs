@@ -22,55 +22,53 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 RelativeSizeAxes = Axes.Both,
                 Icon = FontAwesome.fa_trash_o,
-                ContextText = @"DELETE BEATMAP",
                 HeaderText = @"Confirm deletion of",
                 BodyText = @"Ayase Rie - Yuima-ru*World TVver.",
                 Buttons = new PopupDialogButton[]
+                {
+                    new PopupDialogOKButton
                     {
-                        new PopupDialogOKButton
-                        {
-                            Title = @"I never want to see this again.",
-                            Action = () => System.Console.WriteLine(@"OK"),
-                        },
-                        new PopupDialogCancelButton
-                        {
-                            Title = @"Firetruck, I still want quick ranks!",
-                            Action = () => System.Console.WriteLine(@"Cancel"),
-                        },
+                        Text = @"I never want to see this again.",
+                        Action = () => System.Console.WriteLine(@"OK"),
                     },
+                    new PopupDialogCancelButton
+                    {
+                        Text = @"Firetruck, I still want quick ranks!",
+                        Action = () => System.Console.WriteLine(@"Cancel"),
+                    },
+                },
             };
             var secondDialog = new PopupDialog
             {
                 RelativeSizeAxes = Axes.Both,
                 Icon = FontAwesome.fa_gear,
-                ContextText = @"BEATMAP OPTIONS",
                 HeaderText = @"What do you want to do with",
                 BodyText = "Camellia as \"Bang Riot\" - Blastix Riotz",
                 Buttons = new PopupDialogButton[]
                 {
                     new PopupDialogOKButton
                     {
-                        Title = @"Manage collections",
+                        Text = @"Manage collections",
                     },
                     new PopupDialogOKButton
                     {
-                        Title = @"Delete...",
+                        Text = @"Delete...",
                     },
                     new PopupDialogOKButton
                     {
-                        Title = @"Remove from unplayed",
+                        Text = @"Remove from unplayed",
                     },
                     new PopupDialogOKButton
                     {
-                        Title = @"Clear local scores",
+                        Text = @"Clear local scores",
                     },
                     new PopupDialogOKButton
                     {
-                        Title = @"Edit",
+                        Text = @"Edit",
                     },
                     new PopupDialogCancelButton
                     {
-                        Title = @"Cancel",
+                        Text = @"Cancel",
                     },
                 },
             };
