@@ -94,7 +94,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         protected override void PopIn()
         {
-            ClearTransformations();
+            ClearTransforms();
             FadeIn(100);
 
             schedulePopOut();

@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -80,6 +80,8 @@ namespace osu.Game.Screens.Play
 
             Schedule(() =>
             {
+                if (!IsCurrentScreen) return;
+
                 if (!Push(player))
                     Exit();
             });
@@ -89,6 +91,12 @@ namespace osu.Game.Screens.Play
         {
             Content.ScaleTo(0.7f, 150, EasingTypes.InQuint);
             FadeOut(150);
+
+            //OsuScreens are currently never finalised due to the Bindable<Beatmap> bindings.
+            //can be removed once we solve that one.
+            if (player != null && player.LoadState != LoadState.Alive)
+                player.Dispose();
+
             return base.OnExiting(next);
         }
 

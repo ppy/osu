@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
