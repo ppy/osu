@@ -38,6 +38,8 @@ namespace osu.Game
 
         public Toolbar Toolbar;
 
+        public SkinManager skins;
+
         private ChatOverlay chat;
 
         private MusicController musicController;
@@ -90,6 +92,10 @@ namespace osu.Game
             }
 
             Dependencies.Cache(this);
+            Dependencies.Cache(skins = new SkinManager());
+
+            // TODO remove ugly Initialize() call from outside of framework
+            Dependencies.Initialize(skins);
 
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
         }

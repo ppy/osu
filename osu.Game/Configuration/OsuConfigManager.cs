@@ -131,7 +131,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.ShowReplayComments, true).Disabled = true;
             Set(OsuConfig.ShowSpectators, true).Disabled = true;
             Set(OsuConfig.ShowStoryboard, true).Disabled = true;
-            //Set(OsuConfig.Skin, SkinManager.DEFAULT_SKIN).Disabled = true;
+            Set(OsuConfig.Skin, SkinManager.DEFAULT_SKIN).Disabled = true;
             Set(OsuConfig.SkinSamples, true).Disabled = true;
             Set(OsuConfig.SkipTablet, false).Disabled = true;
             Set(OsuConfig.Tablet, false).Disabled = true;
