@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 Flow = new FlowContainer
                 {
-                    FlowStrategy = FlowStrategies.GetHorizontalFlow(new Vector2(5)),
+                    FlowStrategy = FlowStrategies.CreateHorizontalFlow(new Vector2(5)),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding { Left = Toolbar.HEIGHT / 2, Right = Toolbar.HEIGHT / 2 },
@@ -106,7 +106,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 tooltipContainer = new FlowContainer
                 {
-                    FlowStrategy = FlowStrategies.GetVerticalFlow(),
+                    FlowStrategy = FlowStrategies.CreateVerticalFlow(),
                     RelativeSizeAxes = Axes.Both, //stops us being considered in parent's autosize
                     Anchor = (TooltipAnchor & Anchor.x0) > 0 ? Anchor.BottomLeft : Anchor.BottomRight,
                     Origin = TooltipAnchor,

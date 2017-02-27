@@ -46,7 +46,7 @@ namespace osu.Game.Overlays
                     {
                         sections = new FlowContainer<NotificationSection>
                         {
-                            FlowStrategy = FlowStrategies.GetVerticalFlow(),
+                            FlowStrategy = FlowStrategies.CreateVerticalFlow(),
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                             Children = new []

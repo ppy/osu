@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Toolbar
                 new ToolbarBackground(),
                 new FlowContainer
                 {
-                    FlowStrategy = FlowStrategies.GetHorizontalFlow(),
+                    FlowStrategy = FlowStrategies.CreateHorizontalFlow(),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    FlowStrategy = FlowStrategies.GetHorizontalFlow(),
+                    FlowStrategy = FlowStrategies.CreateHorizontalFlow(),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]

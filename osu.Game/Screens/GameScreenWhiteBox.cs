@@ -126,7 +126,7 @@ namespace osu.Game.Screens
                 },
                 childModeButtons = new FlowContainer
                 {
-                    FlowStrategy = FlowStrategies.GetVerticalFlow(),
+                    FlowStrategy = FlowStrategies.CreateVerticalFlow(),
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Both,

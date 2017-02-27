@@ -86,7 +86,7 @@ namespace osu.Game.Beatmaps.Drawables
                 new FlowContainer
                 {
                     Padding = new MarginPadding(5),
-                    FlowStrategy = FlowStrategies.GetHorizontalFlow(),
+                    FlowStrategy = FlowStrategies.CreateHorizontalFlow(),
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -101,13 +101,13 @@ namespace osu.Game.Beatmaps.Drawables
                         new FlowContainer
                         {
                             Padding = new MarginPadding { Left = 5 },
-                            FlowStrategy = FlowStrategies.GetVerticalFlow(),
+                            FlowStrategy = FlowStrategies.CreateVerticalFlow(),
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
                                 new FlowContainer
                                 {
-                                    FlowStrategy = FlowStrategies.GetHorizontalFlow(new Vector2(4, 0)),
+                                    FlowStrategy = FlowStrategies.CreateHorizontalFlow(new Vector2(4, 0)),
                                     AutoSizeAxes = Axes.Both,
                                     Children = new[]
                                     {

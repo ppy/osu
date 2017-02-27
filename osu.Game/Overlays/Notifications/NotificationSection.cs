@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Notifications
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            FlowStrategy = FlowStrategies.GetVerticalFlow();
+            FlowStrategy = FlowStrategies.CreateVerticalFlow();
 
             Padding = new MarginPadding
             {
@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Notifications
                             {
                                 Bottom = 5
                             },
-                            FlowStrategy = FlowStrategies.GetFillFlow(new Vector2(5, 0)),
+                            FlowStrategy = FlowStrategies.CreateFillFlow(new Vector2(5, 0)),
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Notifications
                     RelativeSizeAxes = Axes.X,
                     LayoutDuration = 150,
                     LayoutEasing = EasingTypes.OutQuart,
-                    FlowStrategy = FlowStrategies.GetFillFlow(new Vector2(3)),
+                    FlowStrategy = FlowStrategies.CreateFillFlow(new Vector2(3)),
                 }
             });
         }

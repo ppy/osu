@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Width = 0.4f, // TODO: InnerWidth property or something
-                    FlowStrategy = FlowStrategies.GetVerticalFlow(),
+                    FlowStrategy = FlowStrategies.CreateVerticalFlow(),
                     Children = new Drawable[]
                     {
                         searchTextBox = new SearchTextBox {
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Select
                     new FlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
-                        FlowStrategy = FlowStrategies.GetHorizontalFlow(new Vector2(10, 0)),
+                        FlowStrategy = FlowStrategies.CreateHorizontalFlow(new Vector2(10, 0)),
                         Children = new Drawable[]
                         {
                             new TabItem
@@ -208,7 +208,7 @@ namespace osu.Game.Screens.Select
                     new FlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
-                        FlowStrategy = FlowStrategies.GetHorizontalFlow(new Vector2(10, 0)),
+                        FlowStrategy = FlowStrategies.CreateHorizontalFlow(new Vector2(10, 0)),
                         Origin = Anchor.TopRight,
                         Anchor = Anchor.TopRight,
                         Children = new Drawable[]

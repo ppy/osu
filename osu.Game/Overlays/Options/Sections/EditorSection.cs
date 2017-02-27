@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Options.Sections
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            FlowContent.FlowStrategy = FlowStrategies.GetFillFlow(new Vector2(0, 5));
+            FlowContent.FlowStrategy = FlowStrategies.CreateFillFlow(new Vector2(0, 5));
             Children = new Drawable[]
             {
                 new OsuCheckbox

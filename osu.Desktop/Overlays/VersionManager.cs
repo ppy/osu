@@ -60,13 +60,13 @@ namespace osu.Desktop.Overlays
                 new FlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    FlowStrategy = FlowStrategies.GetVerticalFlow(),
+                    FlowStrategy = FlowStrategies.CreateVerticalFlow(),
                     Children = new Drawable[]
                     {
                         new FlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            FlowStrategy = FlowStrategies.GetHorizontalFlow(new Vector2(5)),
+                            FlowStrategy = FlowStrategies.CreateHorizontalFlow(new Vector2(5)),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Children = new Drawable[]

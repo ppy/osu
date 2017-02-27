@@ -77,7 +77,7 @@ namespace osu.Game.Overlays
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            FlowStrategy = FlowStrategies.GetVerticalFlow(),
+                            FlowStrategy = FlowStrategies.CreateVerticalFlow(),
 
                             Children = new Drawable[]
                             {
@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                    FlowStrategy = FlowStrategies.GetVerticalFlow(),
+                                    FlowStrategy = FlowStrategies.CreateVerticalFlow(),
                                     Children = sections,
                                 }
                             }
