@@ -47,7 +47,14 @@ namespace osu.Game.Screens
         private void load(OsuGameBase game)
         {
             if (game != null)
+            {
+                //if we were given a beatmap at ctor time, we want to pass this on to the game-wide beatmap.
+                var localMap = beatmap.Value;
                 beatmap.BindTo(game.Beatmap);
+                if (localMap != null)
+                    beatmap.Value = localMap;
+            }
+
             beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
