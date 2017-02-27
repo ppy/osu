@@ -21,12 +21,12 @@ namespace osu.Game.Overlays.Options.Sections.General
                 new OsuCheckbox
                 {
                     LabelText = "Prefer metadata in original language",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.ShowUnicode)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ShowUnicode)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Use alternative font for chat display",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.AlternativeChatFont)
+                    Bindable = config.GetBindable<bool>(OsuConfig.AlternativeChatFont)
                 },
             };
         }

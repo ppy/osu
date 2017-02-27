@@ -23,22 +23,22 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 new OptionEnumDropDown<FrameSync>
                 {
                     LabelText = "Frame limiter",
-                    Bindable = config.GetWeldedBindable<FrameSync>(FrameworkConfig.FrameSync)
+                    Bindable = config.GetBindable<FrameSync>(FrameworkConfig.FrameSync)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Show FPS counter",
-                    Bindable = osuConfig.GetWeldedBindable<bool>(OsuConfig.FpsCounter),
+                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.FpsCounter),
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Reduce dropped frames",
-                    Bindable = osuConfig.GetWeldedBindable<bool>(OsuConfig.ForceFrameFlush),
+                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.ForceFrameFlush),
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Detect performance issues",
-                    Bindable = osuConfig.GetWeldedBindable<bool>(OsuConfig.DetectPerformanceIssues),
+                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.DetectPerformanceIssues),
                 },
             };
         }

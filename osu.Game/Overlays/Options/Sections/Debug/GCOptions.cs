@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Options.Sections.Debug
                 new OptionEnumDropDown<GCLatencyMode>
                 {
                     LabelText = "Active mode",
-                    Bindable = config.GetWeldedBindable<GCLatencyMode>(FrameworkDebugConfig.ActiveGCMode)
+                    Bindable = config.GetBindable<GCLatencyMode>(FrameworkDebugConfig.ActiveGCMode)
                 },
                 new OsuButton
                 {

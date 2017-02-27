@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
         {
-            dimLevel = config.GetWeldedBindable<int>(OsuConfig.DimLevel);
+            dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
             try
             {
                 if (Beatmap == null)

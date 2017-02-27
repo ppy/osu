@@ -54,7 +54,7 @@ namespace osu.Game.Graphics.Cursor
             [BackgroundDependencyLoader]
             private void load(TextureStore textures, OsuConfigManager config)
             {
-                cursorScale = config.GetWeldedBindable<double>(OsuConfig.CursorSize);
+                cursorScale = config.GetBindable<double>(OsuConfig.CursorSize);
 
                 Children = new Drawable[]
                 {

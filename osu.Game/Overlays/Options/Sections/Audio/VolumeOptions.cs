@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Options.Sections.Audio
                 new OsuCheckbox
                 {
                     LabelText = "Ignore beatmap hitsounds",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.IgnoreBeatmapSamples)
+                    Bindable = config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSamples)
                 }
             };
         }

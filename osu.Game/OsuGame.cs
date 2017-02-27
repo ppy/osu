@@ -87,7 +87,7 @@ namespace osu.Game
 
             Dependencies.Cache(this);
 
-            PlayMode = LocalConfig.GetWeldedBindable<PlayMode>(OsuConfig.PlayMode);
+            PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
         }
 
         protected async void ImportBeatmapsAsync(IEnumerable<string> paths)

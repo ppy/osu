@@ -21,37 +21,37 @@ namespace osu.Game.Overlays.Options.Sections.Input
                 new OptionSlider<double>
                 {
                     LabelText = "Sensitivity",
-                    Bindable = (BindableDouble)config.GetWeldedBindable<double>(OsuConfig.MouseSpeed),
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.MouseSpeed),
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Raw input",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.RawInput)
+                    Bindable = config.GetBindable<bool>(OsuConfig.RawInput)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Map absolute raw input to the osu! window",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.AbsoluteToOsuWindow)
+                    Bindable = config.GetBindable<bool>(OsuConfig.AbsoluteToOsuWindow)
                 },
                 new OptionEnumDropDown<ConfineMouseMode>
                 {
                     LabelText = "Confine mouse cursor",
-                    Bindable = config.GetWeldedBindable<ConfineMouseMode>(OsuConfig.ConfineMouse),
+                    Bindable = config.GetBindable<ConfineMouseMode>(OsuConfig.ConfineMouse),
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Disable mouse wheel in play mode",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.MouseDisableWheel)
+                    Bindable = config.GetBindable<bool>(OsuConfig.MouseDisableWheel)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Disable mouse buttons in play mode",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.MouseDisableButtons)
+                    Bindable = config.GetBindable<bool>(OsuConfig.MouseDisableButtons)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Cursor ripples",
-                    Bindable = config.GetWeldedBindable<bool>(OsuConfig.CursorRipple)
+                    Bindable = config.GetBindable<bool>(OsuConfig.CursorRipple)
                 },
             };
         }
