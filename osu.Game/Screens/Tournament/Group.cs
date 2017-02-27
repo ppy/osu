@@ -107,12 +107,29 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        public void RemoveTeam(Team team)
+        public bool RemoveTeam(Team team)
         {
             if (topTeams.RemoveAll(gt => gt.Team == team) > 0)
+            {
                 topTeamsCount--;
+                return true;
+            }
             else if (bottomTeams.RemoveAll(gt => gt.Team == team) > 0)
+            {
                 bottomTeamsCount--;
+                return true;
+            }
+
+            return false;
+        }
+
+        public void ClearTeams()
+        {
+            topTeams.Clear();
+            bottomTeams.Clear();
+
+            topTeamsCount = 0;
+            bottomTeamsCount = 0;
         }
 
         class GroupTeam : FlowContainer
