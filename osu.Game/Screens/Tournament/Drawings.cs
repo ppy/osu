@@ -24,6 +24,7 @@ namespace osu.Game.Screens.Tournament
     public class Drawings : OsuScreen
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
+        internal override bool ShowOverlays => false;
 
         private ScrollingTeamContainer teamsContainer;
         private GroupsContainer groupsContainer;

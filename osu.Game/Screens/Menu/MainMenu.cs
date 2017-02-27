@@ -13,6 +13,7 @@ using osu.Game.Screens.Direct;
 using osu.Game.Screens.Multiplayer;
 using OpenTK;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Tournament;
 
 namespace osu.Game.Screens.Menu
 {
@@ -59,6 +60,13 @@ namespace osu.Game.Screens.Menu
             background.LoadAsync(game);
 
             buttons.OnSettings = game.ToggleOptions;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Push(new Drawings());
         }
 
         protected override void OnEntering(Screen last)
