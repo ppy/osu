@@ -16,8 +16,12 @@ namespace osu.Game.Screens.Tournament
 
         private List<Group> allGroups = new List<Group>();
 
-        public GroupsContainer(int numGroups)
+        private int maxTeams;
+
+        public GroupsContainer(int numGroups, int teamsPerGroup)
         {
+            maxTeams = teamsPerGroup;
+
             char nextGroupName = 'A';
 
             Children = new[]
@@ -60,7 +64,7 @@ namespace osu.Game.Screens.Tournament
         {
             for (int i = 0; i < allGroups.Count; i++)
             {
-                if (allGroups[i].TeamsCount == 8)
+                if (allGroups[i].TeamsCount == maxTeams)
                     continue;
 
                 allGroups[i].AddTeam(team);
