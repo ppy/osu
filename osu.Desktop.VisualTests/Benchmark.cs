@@ -13,7 +13,7 @@ namespace osu.Desktop.VisualTests
         private double timePerTest = 200;
 
         [BackgroundDependencyLoader]
-        private void load(Framework.Game game)
+        private void load()
         {
             Host.MaximumDrawHz = int.MaxValue;
             Host.MaximumUpdateHz = int.MaxValue;
