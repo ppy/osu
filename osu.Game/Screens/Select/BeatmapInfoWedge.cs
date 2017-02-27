@@ -63,6 +63,7 @@ namespace osu.Game.Screens.Select
 
             BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
+            BeatmapMetadata metadata = beatmap.BeatmapInfo?.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
             List<InfoLabel> labels = new List<InfoLabel>();
 
@@ -133,7 +134,7 @@ namespace osu.Game.Screens.Select
                             new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
-                                Text = beatmapSetInfo.Metadata.Artist + " -- " + beatmapSetInfo.Metadata.Title,
+                                Text = metadata.Artist + " -- " + metadata.Title,
                                 TextSize = 28,
                                 Shadow = true,
                             },
@@ -161,7 +162,7 @@ namespace osu.Game.Screens.Select
                                     new OsuSpriteText
                                     {
                                         Font = @"Exo2.0-Bold",
-                                        Text = beatmapSetInfo.Metadata.Author,
+                                        Text = metadata.Author,
                                         TextSize = 15,
                                         Shadow = true,
                                     },
