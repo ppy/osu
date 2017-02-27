@@ -1,42 +1,35 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transformations;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Dialog
 {
     public class PopupDialog : OverlayContainer
     {
-        private const float header_body_offset = 4;
+        private const float enter_duration = 500;
+        private const float exit_duration = 200;
         private readonly Vector2 ring_size = new Vector2(100f);
         private readonly Vector2 ring_minified_size = new Vector2(20f);
-        private readonly Vector2 buttons_enter_spacing = new Vector2(0f, 100f);
-
-        private const float enter_duration = 500;
-        private readonly EasingTypes enter_easing = EasingTypes.OutQuint;
-
-        private const float exit_duration = 500;
-        private const float button_fade_duration = 200;
-        private readonly EasingTypes exit_easing = EasingTypes.InSine;
+        private readonly Vector2 buttons_spacing = new Vector2(0f, 50f);
 
         private PopupDialogTriangles triangles;
-        private Container dialogContainer, iconRing, headerBodyContainer;
+        private Container content, ring;
+        private FlowContainer<PopupDialogButton> buttonsContainer;
         private TextAwesome iconText;
-        private OsuSpriteText contextLabel, headerLabel, bodyLabel;
-        private FlowContainer buttonsContainer;
+        private SpriteText header, body;
 
         public FontAwesome Icon
         {
@@ -50,27 +43,15 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
-        public string ContextText
-        {
-            get
-            {
-                return contextLabel.Text;
-            }
-            set
-            {
-                contextLabel.Text = value.ToUpper();
-            }
-        }
-
         public string HeaderText
         {
             get
             {
-                return headerLabel.Text;
+                return header.Text;
             }
             set
             {
-                headerLabel.Text = value;
+                header.Text = value;
             }
         }
 
@@ -78,11 +59,11 @@ namespace osu.Game.Overlays.Dialog
         {
             get
             {
-                return bodyLabel.Text;
+                return body.Text;
             }
             set
             {
-                bodyLabel.Text = value;
+                body.Text = value;
             }
         }
 
@@ -90,28 +71,16 @@ namespace osu.Game.Overlays.Dialog
         {
             get
             {
-                // buttonsContainer cannot be a FlowContainer<PopupDialogButton> because there is a crash on TransformSpacing if it is (probably a bug and will be fixed)
-
-                var buttons = new List<PopupDialogButton>();
-                foreach (Container c in buttonsContainer.Children)
-                {
-                    var button = (PopupDialogButton)c;
-                    if (button != null) buttons.Add(button);
-                }
-                return buttons.ToArray();
+                return buttonsContainer.Children.ToArray();
             }
             set
             {
                 buttonsContainer.Children = value;
-
-                // Simple way to allow direct action setting on the button but we can still call our own logic here
                 foreach (PopupDialogButton b in value)
                 {
-                    b.AlwaysPresent = true;
                     var action = b.Action;
                     b.Action = () =>
                     {
-                        fadeOutAllBut(b);
                         Hide();
                         action?.Invoke();
                     };
@@ -121,41 +90,25 @@ namespace osu.Game.Overlays.Dialog
 
         protected override void PopIn()
         {
-            // Reset various animations, but only if the entire dialog animation completed
-            if (dialogContainer.Alpha == 0)
+            // Reset various animations but only if the dialog animation fully completed
+            if (content.Alpha == 0)
             {
-                iconRing.ResizeTo(ring_minified_size);
-                buttonsContainer.TransformSpacingTo(buttons_enter_spacing);
-                headerBodyContainer.Alpha = 0;
+                buttonsContainer.TransformSpacingTo(buttons_spacing);
+                buttonsContainer.MoveToY(buttons_spacing.Y);
+                ring.ResizeTo(ring_minified_size);
             }
 
-            foreach (PopupDialogButton b in Buttons)
-                b.FadeIn(button_fade_duration, enter_easing);
-
             triangles.SlideIn();
-            dialogContainer.FadeIn(enter_duration, enter_easing);
-            iconRing.ResizeTo(ring_size, enter_duration, enter_easing);
-            headerBodyContainer.FadeIn(enter_duration, enter_easing);
-            buttonsContainer.MoveToY(0, enter_duration, enter_easing);
-            buttonsContainer.TransformSpacingTo(new Vector2(0f), enter_duration, enter_easing);
+            content.FadeIn(enter_duration, EasingTypes.OutQuint);
+            ring.ResizeTo(ring_size, enter_duration, EasingTypes.OutQuint);
+            buttonsContainer.TransformSpacingTo(Vector2.Zero, enter_duration, EasingTypes.OutQuint);
+            buttonsContainer.MoveToY(0, enter_duration, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
         {
             triangles.SlideOut();
-            dialogContainer.FadeOut(exit_duration, exit_easing);
-            headerBodyContainer.FadeOut(exit_duration, exit_easing);
-        }
-
-        private void fadeOutAllBut(PopupDialogButton button)
-        {
-            foreach (PopupDialogButton b in Buttons)
-            {
-                if (b != button)
-                {
-                    b.FadeOut(button_fade_duration, exit_easing);
-                }
-            }
+            content.FadeOut(exit_duration, EasingTypes.InSine);
         }
 
         public PopupDialog()
@@ -165,133 +118,115 @@ namespace osu.Game.Overlays.Dialog
                 triangles = new PopupDialogTriangles
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
                     Width = 0.5f,
                 },
-                dialogContainer = new Container
+                content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
                     Width = 0.4f,
-                    Alpha = 0,
                     Children = new Drawable[]
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(200),
-                        },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Height = 0.5f,
+                            Masking = true,
+                            EdgeEffect = new EdgeEffect
+                            {
+                                Type = EdgeEffectType.Shadow,
+                                Colour = Color4.Black.Opacity(0.5f),
+                                Radius = 8,
+                            },
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = OsuColour.FromHex(@"221a21"),
+                                },
+                                new Triangles
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ColourLight = OsuColour.FromHex(@"271e26"),
+                                    ColourDark = OsuColour.FromHex(@"1e171e"),
+                                    TriangleScale = 4,
+                                },
+                            },
+                        },
+                        new FlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.BottomCentre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Position = new Vector2(0f, -50f),
+                            Direction = FlowDirections.Vertical,
+                            Spacing = new Vector2(0f, 10f),
                             Children = new Drawable[]
                             {
                                 new Container
                                 {
-                                    Origin = Anchor.BottomCentre,
-                                    Anchor = Anchor.BottomCentre,
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Size = ring_size,
+                                    Margin = new MarginPadding
+                                    {
+                                        Bottom = 30,
+                                    },
                                     Children = new Drawable[]
                                     {
-                                        new FlowContainer
+                                        ring = new CircularContainer
                                         {
-                                            Origin = Anchor.BottomCentre,
-                                            Anchor = Anchor.TopCentre,
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Direction = FlowDirections.Vertical,
-                                            Spacing = new Vector2(0f, 15f),
+                                            Origin = Anchor.Centre,
+                                            Anchor = Anchor.Centre,
+                                            BorderColour = Color4.White,
+                                            BorderThickness = 5f,
                                             Children = new Drawable[]
                                             {
-                                                new Container
+                                                new Box
                                                 {
-                                                    Origin = Anchor.TopCentre,
-                                                    Anchor = Anchor.TopCentre,
-                                                    Size = ring_size,
-                                                    Children = new Drawable[]
-                                                    {
-                                                        iconRing = new CircularContainer
-                                                        {
-                                                            Origin = Anchor.Centre,
-                                                            Anchor = Anchor.Centre,
-                                                            BorderColour = Color4.White,
-                                                            BorderThickness = 10f,
-                                                            Size = ring_minified_size,
-                                                            Children = new Drawable[]
-                                                            {
-                                                                new Box
-                                                                {
-                                                                    RelativeSizeAxes = Axes.Both,
-                                                                    Colour = Color4.Black.Opacity(0),
-                                                                },
-                                                                iconText = new TextAwesome
-                                                                {
-                                                                    Origin = Anchor.Centre,
-                                                                    Anchor = Anchor.Centre,
-                                                                    Icon = FontAwesome.fa_close,
-                                                                    TextSize = 50,
-                                                                },
-                                                            },
-                                                        },
-                                                    }
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Colour = Color4.Black.Opacity(0),
                                                 },
-                                                contextLabel = new OsuSpriteText
+                                                iconText = new TextAwesome
                                                 {
-                                                    Origin = Anchor.TopCentre,
-                                                    Anchor = Anchor.TopCentre,
-                                                    Text = @"CONTEXT",
-                                                    Font = @"Exo2.0-Bold",
-                                                },
-                                            },
-                                        },
-                                        headerBodyContainer = new Container
-                                        {
-                                            Anchor = Anchor.BottomCentre,
-                                            Origin = Anchor.BottomCentre,
-                                            RelativeSizeAxes = Axes.X,
-                                            Height = 100,
-                                            Alpha = 0,
-                                            Children = new Drawable[]
-                                            {
-                                                headerLabel = new OsuSpriteText
-                                                {
-                                                    Origin = Anchor.BottomCentre,
+                                                    Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
-                                                    Position = new Vector2(0f, -header_body_offset),
-                                                    Text = @"Header",
-                                                    Font = @"Exo2.0-Bold",
-                                                    TextSize = 18,
-                                                    Alpha = 0.75f,
-                                                    BlendingMode = BlendingMode.Additive,
-                                                },
-                                                bodyLabel = new OsuSpriteText
-                                                {
-                                                    Origin = Anchor.TopCentre,
-                                                    Anchor = Anchor.Centre,
-                                                    Position = new Vector2(0f, header_body_offset),
-                                                    Text = @"Body",
-                                                    Font = @"Exo2.0-BoldItalic",
-                                                    TextSize = 18,
+                                                    Icon = FontAwesome.fa_close,
+                                                    TextSize = 50,
                                                 },
                                             },
                                         },
                                     },
                                 },
+                                header = new SpriteText
+                                {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Text = @"Header",
+                                    TextSize = 25,
+                                    Shadow = true,
+                                },
+                                body = new SpriteText
+                                {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Text = @"Body",
+                                    TextSize = 18,
+                                    Shadow = true,
+                                },
                             },
                         },
-                        buttonsContainer = new FlowContainer
+                        buttonsContainer = new FlowContainer<PopupDialogButton>
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Height = 0.5f,
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Direction = FlowDirections.Vertical,
-                            Spacing = buttons_enter_spacing,
-                            Position = new Vector2(0f, buttons_enter_spacing.Y),
                         },
                     },
                 },
