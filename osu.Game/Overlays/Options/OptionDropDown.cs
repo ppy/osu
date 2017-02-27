@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Options
         {
             Items = new KeyValuePair<string, T>[0];
 
-            FlowStrategy = FlowStrategies.GetVerticalFlow();
+            FlowStrategy = FlowStrategies.CreateVerticalFlow();
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]

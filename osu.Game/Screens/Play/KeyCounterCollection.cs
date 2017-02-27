@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Play
     {
         public KeyCounterCollection()
         {
-            FlowStrategy = FlowStrategies.GetHorizontalFlow();
+            FlowStrategy = FlowStrategies.CreateHorizontalFlow();
             AutoSizeAxes = Axes.Both;
         }
 

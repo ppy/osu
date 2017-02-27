@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Pause
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    FlowStrategy = FlowStrategies.GetVerticalFlow(new Vector2(0, 50)),
+                    FlowStrategy = FlowStrategies.CreateVerticalFlow(new Vector2(0, 50)),
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Children = new Drawable[]
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Pause
                         new FlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            FlowStrategy = FlowStrategies.GetVerticalFlow(new Vector2(0, 20)),
+                            FlowStrategy = FlowStrategies.CreateVerticalFlow(new Vector2(0, 20)),
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Children = new Drawable[]
