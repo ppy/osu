@@ -52,7 +52,7 @@ namespace osu.Game.Graphics.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures, OsuConfigManager config)
+            private void load(OsuConfigManager config)
             {
                 cursorScale = (BindableDouble)config.GetBindable<double>(OsuConfig.CursorSize);
 

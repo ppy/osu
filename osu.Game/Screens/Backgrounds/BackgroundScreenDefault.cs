@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Backgrounds
     public class BackgroundScreenDefault : BackgroundScreen
     {
         [BackgroundDependencyLoader]
-        private void load(Framework.Game game)
+        private void load()
         {
             Add(new Background(@"Backgrounds/bg1"));
         }

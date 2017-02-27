@@ -25,14 +25,12 @@ namespace osu.Game.Database
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
-        private BeatmapImporter ipc;
-
         public BeatmapDatabase(Storage storage, GameHost importHost = null)
         {
             this.storage = storage;
 
             if (importHost != null)
-                ipc = new BeatmapImporter(importHost, this);
+                new BeatmapImporter(importHost, this);
 
             if (connection == null)
             {
