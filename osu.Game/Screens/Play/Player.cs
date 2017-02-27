@@ -22,7 +22,7 @@ using System;
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Play

@@ -82,9 +82,9 @@ namespace osu.Game.Graphics.UserInterface.Volume
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            volumeMeterMaster.Bindable.Weld(audio.Volume);
-            volumeMeterEffect.Bindable.Weld(audio.VolumeSample);
-            volumeMeterMusic.Bindable.Weld(audio.VolumeTrack);
+            volumeMeterMaster.Bindable.BindTo(audio.Volume);
+            volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
+            volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
         }
 
         ScheduledDelegate popOutDelegate;
@@ -94,7 +94,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         protected override void PopIn()
         {
-            ClearTransformations();
+            ClearTransforms();
             FadeIn(100);
 
             schedulePopOut();

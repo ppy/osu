@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using OpenTK;
 using System.Linq;
 using osu.Framework.MathUtils;
-using System.Diagnostics;
 
 namespace osu.Game.Modes.Osu.Objects
 {

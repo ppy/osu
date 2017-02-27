@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Desktop.Platform;
 using osu.Framework.Platform;
@@ -66,7 +67,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         private OsuGameBase loadOsu(GameHost host)
         {
             var osu = new OsuGameBase();
-            host.Add(osu);
+            Task.Run(() => host.Run(osu));
 
             while (!osu.IsLoaded)
                 Thread.Sleep(1);

@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -27,9 +28,6 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            //ensure we are at offset 0
-            Clock = new FramedClock();
-
             List<HitObject> objects = new List<HitObject>();
 
             int time = 500;
@@ -52,33 +50,42 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(new Drawable[]
             {
-                new OsuHitRenderer
+                new Container
                 {
-                    Beatmap = beatmap,
-                    Scale = new Vector2(0.5f),
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft
-                },
-                new TaikoHitRenderer
-                {
-                    Beatmap = beatmap,
-                    Scale = new Vector2(0.5f),
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
-                },
-                new CatchHitRenderer
-                {
-                    Beatmap = beatmap,
-                    Scale = new Vector2(0.5f),
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft
-                },
-                new ManiaHitRenderer
-                {
-                    Beatmap = beatmap,
-                    Scale = new Vector2(0.5f),
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight
+                    RelativeSizeAxes = Axes.Both,
+                    //ensure we are at offset 0
+                    Clock = new FramedClock(),
+                    Children = new Drawable[]
+                    {
+                        new OsuHitRenderer
+                        {
+                            Beatmap = beatmap,
+                            Scale = new Vector2(0.5f),
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft
+                        },
+                        new TaikoHitRenderer
+                        {
+                            Beatmap = beatmap,
+                            Scale = new Vector2(0.5f),
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight
+                        },
+                        new CatchHitRenderer
+                        {
+                            Beatmap = beatmap,
+                            Scale = new Vector2(0.5f),
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft
+                        },
+                        new ManiaHitRenderer
+                        {
+                            Beatmap = beatmap,
+                            Scale = new Vector2(0.5f),
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight
+                        }
+                    }
                 }
             });
         }
