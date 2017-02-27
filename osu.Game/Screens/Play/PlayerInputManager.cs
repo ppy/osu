@@ -7,7 +7,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Input;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
-using System;
 using System.Linq;
 
 namespace osu.Game.Screens.Play

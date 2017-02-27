@@ -8,7 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
@@ -55,7 +55,7 @@ namespace osu.Game.Graphics.UserInterface
                 Roundness = 8,
             };
 
-            FadeGlowTo(0);
+            FadeEdgeEffectTo(0);
         }
 
         public bool Glowing
@@ -65,11 +65,11 @@ namespace osu.Game.Graphics.UserInterface
                 if (value)
                 {
                     FadeColour(glowingColour, 500, EasingTypes.OutQuint);
-                    FadeGlowTo(1, 500, EasingTypes.OutQuint);
+                    FadeEdgeEffectTo(1, 500, EasingTypes.OutQuint);
                 }
                 else
                 {
-                    FadeGlowTo(0, 500);
+                    FadeEdgeEffectTo(0, 500);
                     FadeColour(idleColour, 500);
                 }
             }

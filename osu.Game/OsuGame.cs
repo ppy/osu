@@ -15,7 +15,7 @@ using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Game.Database;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Timing;
 using osu.Game.Modes;
 using osu.Game.Overlays.Toolbar;
@@ -25,6 +25,7 @@ using OpenTK;
 using System.Linq;
 using osu.Framework.Graphics.Primitives;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using osu.Game.Overlays.Notifications;
 
 namespace osu.Game
@@ -81,7 +82,7 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                ImportBeatmaps(paths);
+                ImportBeatmapsAsync(paths);
             }
 
             Dependencies.Cache(this);
@@ -89,9 +90,9 @@ namespace osu.Game
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
         }
 
-        public void ImportBeatmaps(IEnumerable<string> paths)
+        protected async void ImportBeatmapsAsync(IEnumerable<string> paths)
         {
-            Schedule(delegate { Dependencies.Get<BeatmapDatabase>().Import(paths); });
+            await Task.Run(() => BeatmapDatabase.Import(paths));
         }
 
         protected override void LoadComplete()
@@ -116,7 +117,7 @@ namespace osu.Game
                 }
             });
 
-            (screenStack = new Loader()).Preload(this, d =>
+            (screenStack = new Loader()).LoadAsync(this, d =>
             {
                 screenStack.ModePushed += screenAdded;
                 screenStack.Exited += screenRemoved;
@@ -124,22 +125,22 @@ namespace osu.Game
             });
 
             //overlay elements
-            (chat = new ChatOverlay { Depth = 0 }).Preload(this, overlayContent.Add);
-            (options = new OptionsOverlay { Depth = -1 }).Preload(this, overlayContent.Add);
+            (chat = new ChatOverlay { Depth = 0 }).LoadAsync(this, overlayContent.Add);
+            (options = new OptionsOverlay { Depth = -1 }).LoadAsync(this, overlayContent.Add);
             (musicController = new MusicController()
             {
                 Depth = -2,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }).Preload(this, overlayContent.Add);
+            }).LoadAsync(this, overlayContent.Add);
 
             (notificationManager = new NotificationManager
             {
                 Depth = -2,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }).Preload(this, overlayContent.Add);
+            }).LoadAsync(this, overlayContent.Add);
 
             Logger.NewEntry += entry =>
             {
@@ -160,7 +161,7 @@ namespace osu.Game
                 Depth = -3,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
                 OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
-            }).Preload(this, t =>
+            }).LoadAsync(this, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
                 PlayMode.TriggerChange();

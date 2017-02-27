@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework;
 using osu.Framework.Allocation;
 using OpenTK;
 using OpenTK.Graphics;
@@ -19,7 +18,6 @@ using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 
@@ -179,7 +177,7 @@ namespace osu.Game.Screens.Select
                         }
                     },
                 }
-            }).Preload(game, delegate (Drawable d)
+            }).LoadAsync(game, delegate (Drawable d)
             {
                 FadeIn(250);
 

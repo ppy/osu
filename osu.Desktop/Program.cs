@@ -35,7 +35,7 @@ namespace osu.Desktop
                     foreach (var file in args)
                     {
                         Console.WriteLine(@"Importing {0}", file);
-                        if (!importer.Import(Path.GetFullPath(file)).Wait(3000))
+                        if (!importer.ImportAsync(Path.GetFullPath(file)).Wait(3000))
                             throw new TimeoutException(@"IPC took too long to send");
                     }
                 }
@@ -46,8 +46,7 @@ namespace osu.Desktop
                     Ruleset.Register(new ManiaRuleset());
                     Ruleset.Register(new CatchRuleset());
 
-                    host.Add(new OsuGameDesktop(args));
-                    host.Run();
+                    host.Run(new OsuGameDesktop(args));
                 }
                 return 0;
             }

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -24,6 +23,8 @@ namespace osu.Game
     {
         protected OsuConfigManager LocalConfig;
 
+        protected BeatmapDatabase BeatmapDatabase;
+
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
         public APIAccess API;
@@ -41,7 +42,7 @@ namespace osu.Game
         {
             Dependencies.Cache(this);
             Dependencies.Cache(LocalConfig);
-            Dependencies.Cache(new BeatmapDatabase(Host.Storage, Host));
+            Dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, Host));
             Dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
