@@ -15,7 +15,7 @@ using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Game.Database;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Timing;
 using osu.Game.Modes;
 using osu.Game.Overlays.Toolbar;
@@ -25,6 +25,7 @@ using OpenTK;
 using System.Linq;
 using osu.Framework.Graphics.Primitives;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using osu.Game.Overlays.Notifications;
 
 namespace osu.Game
@@ -81,7 +82,7 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                ImportBeatmaps(paths);
+                ImportBeatmapsAsync(paths);
             }
 
             Dependencies.Cache(this);
@@ -89,9 +90,9 @@ namespace osu.Game
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
         }
 
-        public void ImportBeatmaps(IEnumerable<string> paths)
+        protected async void ImportBeatmapsAsync(IEnumerable<string> paths)
         {
-            Schedule(delegate { Dependencies.Get<BeatmapDatabase>().Import(paths); });
+            await Task.Run(() => BeatmapDatabase.Import(paths));
         }
 
         protected override void LoadComplete()

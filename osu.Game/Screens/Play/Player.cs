@@ -22,7 +22,7 @@ using System;
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Play
@@ -312,6 +312,9 @@ namespace osu.Game.Screens.Play
             }
             else
             {
+                FadeOut(250);
+                Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
+
                 dimLevel.ValueChanged -= dimChanged;
                 Background?.FadeTo(1f, 200);
                 return base.OnExiting(next);
