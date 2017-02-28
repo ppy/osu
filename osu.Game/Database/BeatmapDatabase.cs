@@ -118,11 +118,44 @@ namespace osu.Game.Database
 
         public void Import(IEnumerable<string> paths)
         {
+            Stack<BeatmapSetInfo> sets = new Stack<BeatmapSetInfo>();
+
             foreach (string p in paths)
-                Import(p);
+                try
+                {
+                    BeatmapSetInfo set = importBeatmapSet(p);
+
+                    sets.Push(set);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $@"Could not import beatmap set");
+                }
+                finally
+                {
+                    // We may or may not want to delete the file depending on where it is stored.
+                    //  e.g. reconstructing/repairing database with beatmaps from default storage.
+                    // TODO: Add a check to prevent files from storage to be deleted.
+                    try
+                    {
+                        File.Delete(p);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not delete file at {p}");
+                    }
+                }
+            
+            // Batch commit with multiple sets to database
+            Import(sets);
         }
 
         public void Import(string path)
+        {
+            Import(new [] { path });
+        }
+
+        private BeatmapSetInfo importBeatmapSet(string path)
         {
             string hash = null;
 
@@ -156,7 +189,7 @@ namespace osu.Game.Database
                     BeatmapSetAdded?.Invoke(existing);
                 }
 
-                return;
+                return null;
             }
 
             var beatmapSet = new BeatmapSetInfo
@@ -188,7 +221,7 @@ namespace osu.Game.Database
                 }
             }
 
-            Import(new[] { beatmapSet });
+            return beatmapSet;
         }
 
         public void Import(IEnumerable<BeatmapSetInfo> beatmapSets)
@@ -198,10 +231,11 @@ namespace osu.Game.Database
                 connection.BeginTransaction();
 
                 foreach (var s in beatmapSets)
-                {
-                    connection.InsertWithChildren(s, true);
-                    BeatmapSetAdded?.Invoke(s);
-                }
+                    if (s != null)
+                    {
+                        connection.InsertWithChildren(s, true);
+                        BeatmapSetAdded?.Invoke(s);
+                    }
 
                 connection.Commit();
             }
