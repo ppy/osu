@@ -75,8 +75,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, OsuConfigManager config, BeatmapDatabase beatmaps, AudioManager audio,
-            TextureStore textures, OsuColour colours)
+        private void load(OsuGameBase osuGame, OsuConfigManager config, BeatmapDatabase beatmaps, OsuColour colours)
         {
             game = osuGame;
 
