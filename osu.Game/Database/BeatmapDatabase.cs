@@ -126,13 +126,7 @@ namespace osu.Game.Database
                     BeatmapSetInfo set = importBeatmapSet(p);
 
                     sets.Push(set);
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Could not import beatmap set");
-                }
-                finally
-                {
+
                     // We may or may not want to delete the file depending on where it is stored.
                     //  e.g. reconstructing/repairing database with beatmaps from default storage.
                     // TODO: Add a check to prevent files from storage to be deleted.
@@ -144,6 +138,10 @@ namespace osu.Game.Database
                     {
                         Logger.Error(e, $@"Could not delete file at {p}");
                     }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $@"Could not import beatmap set");
                 }
             
             // Batch commit with multiple sets to database
