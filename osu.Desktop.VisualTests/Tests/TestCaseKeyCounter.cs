@@ -3,16 +3,14 @@
 
 using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
 using OpenTK.Input;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Configuration;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests

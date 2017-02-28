@@ -7,11 +7,10 @@ using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Toolbar;
@@ -118,7 +117,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuGame game = null)
+        private void load(OsuGame game = null)
         {
             toolbar = game?.Toolbar;
         }

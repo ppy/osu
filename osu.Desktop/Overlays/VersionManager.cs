@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -19,7 +18,6 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using System.Net.Http;
-using osu.Framework.Logging;
 
 namespace osu.Desktop.Overlays
 {
@@ -39,7 +37,7 @@ namespace osu.Desktop.Overlays
         [BackgroundDependencyLoader]
         private void load(NotificationManager notification, OsuColour colours, TextureStore textures)
         {
-            this.notificationManager = notification;
+            notificationManager = notification;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
@@ -104,7 +102,7 @@ namespace osu.Desktop.Overlays
             };
 
             if (IsDeployedBuild)
-                updateChecker();
+                checkForUpdateAsync();
         }
 
         protected override void LoadComplete()
@@ -119,7 +117,7 @@ namespace osu.Desktop.Overlays
             updateManager?.Dispose();
         }
 
-        private async void updateChecker(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
+        private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
             //should we schedule a retry on completion of this check?
             bool scheduleRetry = true;
@@ -165,7 +163,7 @@ namespace osu.Desktop.Overlays
                     {
                         //could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
                         //try again without deltas.
-                        updateChecker(false, notification);
+                        checkForUpdateAsync(false, notification);
                         scheduleRetry = false;
                     }
                 }
@@ -180,7 +178,7 @@ namespace osu.Desktop.Overlays
                 if (scheduleRetry)
                 {
                     //check again in 30 minutes.
-                    Scheduler.AddDelayed(() => updateChecker(), 60000 * 30);
+                    Scheduler.AddDelayed(() => checkForUpdateAsync(), 60000 * 30);
                     if (notification != null)
                         notification.State = ProgressNotificationState.Cancelled;
                 }

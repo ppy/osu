@@ -64,7 +64,7 @@ namespace osu.Game.Modes.UI
             processor.TotalScore.ValueChanged += delegate { ScoreCounter?.Set((ulong)processor.TotalScore.Value); };
             processor.Accuracy.ValueChanged += delegate { AccuracyCounter?.Set((float)processor.Accuracy.Value); };
             processor.Combo.ValueChanged += delegate { ComboCounter?.Set((ulong)processor.Combo.Value); };
-            HealthDisplay?.Current.Weld(processor.Health);
+            HealthDisplay?.Current.BindTo(processor.Health);
         }
     }
 }

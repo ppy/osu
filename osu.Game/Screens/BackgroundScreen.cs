@@ -3,11 +3,10 @@
 
 using System;
 using System.Threading;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK;
 
@@ -43,7 +42,7 @@ namespace osu.Game.Screens
             // once it's done.
             if (screen.LoadState == LoadState.NotLoaded)
             {
-                screen.Preload(game, d => Push((BackgroundScreen)d));
+                screen.LoadAsync(game, d => Push((BackgroundScreen)d));
                 return true;
             }
 

@@ -3,7 +3,6 @@
 
 using osu.Game.Modes.UI;
 using OpenTK;
-using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Modes.Osu.UI
 {

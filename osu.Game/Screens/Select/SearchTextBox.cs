@@ -1,9 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Linq;
-using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
@@ -48,6 +45,15 @@ namespace osu.Game.Screens.Select
                     case Key.Up:
                     case Key.Down:
                     case Key.Enter:
+                        return false;
+                }
+            }
+
+            if (state.Keyboard.ShiftPressed)
+            {
+                switch (args.Key)
+                {
+                    case Key.Delete:
                         return false;
                 }
             }
