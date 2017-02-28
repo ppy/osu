@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
@@ -16,7 +17,11 @@ namespace osu.Game.Modes.Osu
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new OsuHitRenderer { Beatmap = beatmap };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap, InputManager input = null) => new OsuHitRenderer
+        {
+            Beatmap = beatmap,
+            InputManager = input
+        };
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
         {

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.UI;
@@ -14,7 +15,11 @@ namespace osu.Game.Modes.Taiko
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new TaikoHitRenderer { Beatmap = beatmap };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap, InputManager input = null) => new TaikoHitRenderer
+        {
+            Beatmap = beatmap,
+            InputManager = input,
+        };
 
         protected override PlayMode PlayMode => PlayMode.Taiko;
 

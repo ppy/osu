@@ -10,6 +10,7 @@ using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Connections;
 using osu.Game.Modes.UI;
 using System.Linq;
+using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Modes.Osu.UI
 {
@@ -53,7 +54,8 @@ namespace osu.Game.Modes.Osu.UI
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = -1,
-                }
+                },
+                new OsuCursorContainer()
             });
         }
 

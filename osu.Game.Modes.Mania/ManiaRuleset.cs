@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Modes.Mania.UI;
 using osu.Game.Modes.Objects;
@@ -14,7 +15,11 @@ namespace osu.Game.Modes.Mania
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new ManiaHitRenderer { Beatmap = beatmap };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap, InputManager input = null) => new ManiaHitRenderer
+        {
+            Beatmap = beatmap,
+            InputManager = input,
+        };
 
         protected override PlayMode PlayMode => PlayMode.Mania;
 
