@@ -1,23 +1,22 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
+using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
-using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public class PopupDialog : OverlayContainer
+    public class PopupDialog : FocusedOverlayContainer
     {
         private const float enter_duration = 500;
         private const float exit_duration = 200;
@@ -87,8 +86,52 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
+        private PopupDialogOkButton okButton
+        {
+            get
+            {
+                foreach (PopupDialogButton b in Buttons)
+                {
+                    if (b is PopupDialogOkButton)
+                        return (PopupDialogOkButton)b;
+                }
+
+                return null;
+            }
+        }
+
+        private void pressButtonAtIndex(int index)
+        {
+            if (index < Buttons.Length)
+            {
+                Buttons[index].TriggerClick();
+            }
+        }
+
+        protected override bool OnKeyDown(Framework.Input.InputState state, Framework.Input.KeyDownEventArgs args)
+        {
+            if (args.Repeat) return false;
+
+            if (args.Key == Key.Enter)
+            {
+                okButton?.TriggerClick();
+                return true;
+            }
+
+            // press button at number if 1-9 on number row or keypad are pressed
+            int k = (int)args.Key;
+            if (k >= (int)Key.Number1 && k <= (int)Key.Number9)
+                pressButtonAtIndex(k - (int)Key.Number1);
+            else if (k >= (int)Key.Keypad1 && k <= (int)Key.Keypad9)
+                pressButtonAtIndex(k - (int)Key.Keypad1);
+
+            return base.OnKeyDown(state, args);
+        }
+
         protected override void PopIn()
         {
+            base.PopIn();
+
             // Reset various animations but only if the dialog animation fully completed
             if (content.Alpha == 0)
             {
@@ -105,6 +148,8 @@ namespace osu.Game.Overlays.Dialog
 
         protected override void PopOut()
         {
+            base.PopOut();
+
             content.FadeOut(exit_duration, EasingTypes.InSine);
         }
 
