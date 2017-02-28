@@ -79,13 +79,12 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        internal bool SpaceTextOnHover = true;
-
         public SampleChannel SampleClick, SampleHover;
 
         private Container backgroundContainer, colourContainer, glowContainer;
         private Box leftGlow, centerGlow, rightGlow, background;
         private SpriteText spriteText;
+        private Vector2 hoverSpacing => new Vector2(3f, 0f);
 
         private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's when clicking
 
@@ -111,8 +110,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            if (SpaceTextOnHover)
-                spriteText.TransformSpacingTo(new Vector2(3f, 0f), hover_duration, EasingTypes.OutElastic);
+            spriteText.TransformSpacingTo(hoverSpacing, hover_duration, EasingTypes.OutElastic);
 
             colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, EasingTypes.OutElastic);
             glowContainer.FadeIn(glow_fade_duration, EasingTypes.Out);

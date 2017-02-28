@@ -15,7 +15,6 @@ namespace osu.Game.Overlays.Dialog
             Height = 50;
             BackgroundColour = OsuColour.FromHex(@"150e14");
             TextSize = 18;
-            SpaceTextOnHover = false;
         }
     }
 }
