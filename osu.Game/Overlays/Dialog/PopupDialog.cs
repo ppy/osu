@@ -86,26 +86,10 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
-        private PopupDialogOkButton okButton
-        {
-            get
-            {
-                foreach (PopupDialogButton b in Buttons)
-                {
-                    if (b is PopupDialogOkButton)
-                        return (PopupDialogOkButton)b;
-                }
-
-                return null;
-            }
-        }
-
         private void pressButtonAtIndex(int index)
         {
             if (index < Buttons.Length)
-            {
                 Buttons[index].TriggerClick();
-            }
         }
 
         protected override bool OnKeyDown(Framework.Input.InputState state, Framework.Input.KeyDownEventArgs args)
@@ -114,20 +98,20 @@ namespace osu.Game.Overlays.Dialog
 
             if (args.Key == Key.Enter)
             {
-                okButton?.TriggerClick();
+                Buttons.OfType<PopupDialogOkButton>()?.FirstOrDefault()?.TriggerClick();
                 return true;
             }
 
             // press button at number if 1-9 on number row or keypad are pressed
-            int k = (int)args.Key;
-            if (k >= (int)Key.Number1 && k <= (int)Key.Number9)
+            var k = args.Key;
+            if (k >= Key.Number1 && k <= Key.Number9)
             {
-                pressButtonAtIndex(k - (int)Key.Number1);
+                pressButtonAtIndex(k - Key.Number1);
                 return true;
             }
-            else if (k >= (int)Key.Keypad1 && k <= (int)Key.Keypad9)
+            else if (k >= Key.Keypad1 && k <= Key.Keypad9)
             {
-                pressButtonAtIndex(k - (int)Key.Keypad1);
+                pressButtonAtIndex(k - Key.Keypad1);
                 return true;
             }
 
