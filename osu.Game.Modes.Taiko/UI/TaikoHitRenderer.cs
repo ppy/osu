@@ -13,7 +13,7 @@ namespace osu.Game.Modes.Taiko.UI
     {
         protected override HitObjectConverter<TaikoHitObject> Converter => new TaikoConverter();
 
-        protected override Playfield CreatePlayfield() => new TaikoPlayfield();
+        protected override Playfield CreatePlayfield() => null;
 
         protected override DrawableHitObject GetVisualRepresentation(TaikoHitObject h)
         {

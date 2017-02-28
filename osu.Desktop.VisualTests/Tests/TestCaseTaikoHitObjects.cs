@@ -18,6 +18,7 @@ using osu.Game.Modes;
 using OpenTK.Graphics;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.Taiko.Objects.Drawables;
+using osu.Game.Modes.Taiko.UI;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -40,8 +41,7 @@ namespace osu.Desktop.VisualTests.Tests
         HitObjectType mode = HitObjectType.Don;
 
         BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
-        private Container playfieldContainer;
-        private Container approachContainer;
+        private TaikoPlayfield playfield;
 
         private void load(HitObjectType mode)
         {
@@ -163,18 +163,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Clock = framedClock,
                 Children = new[]
                 {
-                    playfieldContainer = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Width = 0.75f,
-
-                        Masking = true,
-
-                        Children = new Drawable[]
-                        {
-                        }
-                    },
-                    approachContainer = new Container { RelativeSizeAxes = Axes.Both }
+                    playfield = new TaikoPlayfield(),
                 }
             };
 
@@ -194,10 +183,7 @@ namespace osu.Desktop.VisualTests.Tests
                 h.Judgement = new TaikoJudgementInfo { Result = HitResult.Hit };
             }
 
-            playfieldContainer.Add(h);
-            var proxyable = h as IDrawableHitObjectWithProxiedApproach;
-            if (proxyable != null)
-                approachContainer.Add(proxyable.ProxiedLayer.CreateProxy());
+            playfield.HitObjects.Add(h);
         }
 
         enum HitObjectType
