@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
         public CirclePiece()
         {
-            Size = new Vector2(128);
+            Size = new Vector2(64);
 
             Masking = true;
             CornerRadius = Size.X / 2;

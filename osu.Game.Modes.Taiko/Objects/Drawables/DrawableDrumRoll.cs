@@ -40,7 +40,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
             this.drumRoll = drumRoll;
 
-            Size = new Vector2((float)drumRoll.Length * drumRoll.RepeatCount, 128);
+            Size = new Vector2((float)drumRoll.Length * drumRoll.RepeatCount, 64);
 
             Children = new Drawable[]
             {

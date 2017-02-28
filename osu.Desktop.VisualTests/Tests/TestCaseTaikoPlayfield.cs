@@ -79,7 +79,7 @@ namespace osu.Desktop.VisualTests.Tests
                     new FlowContainer()
                     {
                         RelativeSizeAxes = Axes.X,
-                        Size = new Vector2(1, 212),
+                        Size = new Vector2(1, 106),
 
                         Children = new Drawable[]
                         {

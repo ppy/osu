@@ -78,7 +78,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
         public HitCirclePiece()
         {
-            Size = new Vector2(128);
+            Size = new Vector2(64);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
