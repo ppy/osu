@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Pause
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
-            Colour = new Color4(170, 27, 39, 255); // The red from the design isn't in the palette so it's used directly
+            ButtonColour = new Color4(170, 27, 39, 255); // The red from the design isn't in the palette so it's used directly
             SampleHover = audio.Sample.Get(@"Menu/menuclick");
             SampleClick = audio.Sample.Get(@"Menu/menuback");
         }
