@@ -108,6 +108,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (args.Repeat)
+                return false;
+
             // Check if we've pressed a valid taiko key
             if (!validKeys.Contains(args.Key))
                 return false;
