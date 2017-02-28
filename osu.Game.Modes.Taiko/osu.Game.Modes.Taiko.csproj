@@ -74,10 +74,7 @@
     <Compile Include="Objects\TaikoConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Objects\TaikoHitObjectParser.cs" />
-    <Compile Include="UI\Drums\TaikoDrumInner.cs" />
-    <Compile Include="UI\Drums\TaikoDrumSet.cs" />
     <Compile Include="UI\TaikoComboCounter.cs" />
-    <Compile Include="UI\Drums\TaikoHalfDrum.cs" />
     <Compile Include="UI\TaikoHitRenderer.cs" />
     <Compile Include="UI\TaikoPlayfield.cs" />
     <Compile Include="TaikoRuleset.cs" />

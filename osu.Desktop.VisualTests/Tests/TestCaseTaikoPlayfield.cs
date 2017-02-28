@@ -12,7 +12,6 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.Taiko.Objects.Drawables;
-using osu.Game.Modes.Taiko.UI.Drums;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using System;
@@ -20,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework.Input;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -40,29 +40,6 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 new TaikoPlayField2()
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-        }
-
-        class DrumSet : Container
-        {
-            public DrumSet()
-            {
-                Size = new Vector2(202);
-
-                Children = new Drawable[]
-                {
-
-                };
-            }
-        }
-
-        class HitTarget : Container
-        {
-
         }
 
         class TaikoPlayField2 : Container
@@ -91,6 +68,11 @@ namespace osu.Desktop.VisualTests.Tests
 
                                 Masking = true,
 
+                                BorderColour = Color4.Black,
+                                BorderThickness = 1,
+
+                                Depth = 2f,
+
                                 Children = new Drawable[]
                                 {
                                     // Background
@@ -99,17 +81,15 @@ namespace osu.Desktop.VisualTests.Tests
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = new Color4(17, 17, 17, 255)
                                     },
-                                    new DrumSet()
+                                    new TaikoInputDrum()
                                     {
-                                        RelativePositionAxes = Axes.Both,
-                                        Position = new Vector2(0.65f, 0.5f)
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+
+                                        RelativePositionAxes = Axes.X,
+                                        Position = new Vector2(0.10f, 0)
                                     }
                                 },
-
-                                BorderColour = Color4.Black,
-                                BorderThickness = 1,
-
-                                Depth = 2f
                             },
                             // Right area
                             new Container()
@@ -133,19 +113,19 @@ namespace osu.Desktop.VisualTests.Tests
                                         RelativeSizeAxes = Axes.Both,
                                         RelativePositionAxes = Axes.Both,
 
-                                        Position = new Vector2(0.15f, 0),
+                                        Position = new Vector2(0.1f, 0),
 
                                         Children = new Drawable[]
                                         {
-                                            new HitTarget()
+                                            new TaikoHitTarget()
                                             {
-                                                Origin = Anchor.CentreLeft,
-                                                Anchor = Anchor.CentreLeft
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.Centre
                                             },
                                             // Todo: Add notes here
                                             notesContainer = new Container()
                                             {
-                                                RelativeSizeAxes = Axes.Both
+                                                RelativeSizeAxes = Axes.Both,
                                             }
                                         }
                                     },
@@ -168,36 +148,179 @@ namespace osu.Desktop.VisualTests.Tests
                     },
                 };
             }
+        }
 
+        class TaikoInputDrum : Container
+        {
+            public TaikoInputDrum()
+            {
+                Size = new Vector2(86);
+
+                Children = new Drawable[]
+                {
+                    new TaikoHalfDrum(false)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.CentreRight,
+
+                        RelativeSizeAxes = Axes.Both,
+
+                        Keys = new List<Key>(new[] { Key.F, Key.D })
+                    },
+                    new TaikoHalfDrum(true)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.CentreLeft,
+
+                        RelativeSizeAxes = Axes.Both,
+
+                        Position = new Vector2(-1f, 0),
+
+                        Keys = new List<Key>(new[] { Key.J, Key.K })
+                    }
+                };
+            }
+
+            class TaikoHalfDrum : Container
+            {
+                /// <summary>
+                /// Keys[0] -> Inner key
+                /// Keys[0] -> Outer key
+                /// </summary>
+                public List<Key> Keys = new List<Key>();
+
+                private Sprite outer;
+                private Sprite outerHit;
+                private Sprite inner;
+                private Sprite innerHit;
+
+                public TaikoHalfDrum(bool flipped)
+                {
+                    Masking = true;
+
+                    Children = new Drawable[]
+                    {
+                        outer = new Sprite()
+                        {
+                            Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
+                            Origin = Anchor.Centre,
+
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        outerHit = new Sprite()
+                        {
+                            Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
+                            Origin = Anchor.Centre,
+
+                            RelativeSizeAxes = Axes.Both,
+
+                            Colour = new Color4(102, 204, 255, 255),
+                            Alpha = 0,
+
+                            BlendingMode = BlendingMode.Additive
+                        },
+                        inner = new Sprite()
+                        {
+                            Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
+                            Origin = Anchor.Centre,
+
+                            RelativeSizeAxes = Axes.Both,
+                            Size = new Vector2(0.7f)
+                        },
+                        innerHit = new Sprite()
+                        {
+                            Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
+                            Origin = Anchor.Centre,
+
+                            RelativeSizeAxes = Axes.Both,
+                            Size = new Vector2(0.7f),
+
+                            Colour = new Color4(255, 102, 194, 255),
+                            Alpha = 0,
+
+                            BlendingMode = BlendingMode.Additive
+                        }
+                    };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(TextureStore textures)
+                {
+                    outer.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer");
+                    outerHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer-hit");
+                    inner.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
+                    innerHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner-hit");
+                }
+
+                protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+                {
+                    if (args.Repeat)
+                        return false;
+
+                    if (args.Key == Keys[0])
+                    {
+                        innerHit.FadeIn();
+                        innerHit.Delay(100).FadeOut(100);
+                    }
+
+                    if (args.Key == Keys[1])
+                    {
+                        outerHit.FadeIn();
+                        outerHit.Delay(100).FadeOut(100);
+                    }
+
+                    return false;
+                }
+            }
         }
 
         class TaikoHitTarget : Container
         {
-            private Sprite drumBase;
+            private Sprite outer;
+            private Sprite inner;
 
             public TaikoHitTarget()
             {
+                Size = new Vector2(106);
+
                 Children = new Drawable[]
                 {
                     new Box()
                     {
-                        Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
 
                         RelativeSizeAxes = Axes.Y,
                         Size = new Vector2(5, 1),
 
-                        Colour = Color4.Black,
-                        Alpha = 0.5f,
+                        Colour = Color4.Black
                     },
-                    drumBase = new Sprite()
+                    new Container
                     {
-                        Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
 
                         RelativeSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.7f),
 
-                        Scale = new Vector2(0.5f),
+                        Children = new[]
+                        {
+                            outer = new Sprite()
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            inner = new Sprite()
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(0.7f)
+                            }
+                        }
                     }
                 };
             }
@@ -205,90 +328,11 @@ namespace osu.Desktop.VisualTests.Tests
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                drumBase.Texture = textures.Get("Play/Taiko/taiko-drum@2x");
+                outer.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer");
+                inner.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
             }
         }
 
-        // Drawable hit objects
-        //class DrawableTaikoHitObject : DrawableHitObject
-        //{
-        //    public override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo { MaxScore = TaikoScoreResult.Hit300 }
-        //    public DrawableTaikoHitObject(TaikoHitObject hitObject)
-        //        : base(hitObject)
-        //    {
-
-        //    }
-        //}
-
-        class TaikoDrumArea : Container
-        {
-            public TaikoDrumArea()
-            {
-                Children = new Drawable[]
-                {
-                    // Background
-                    new BufferedContainer()
-                    {
-                        RelativeSizeAxes = Axes.Both,
-
-                        Masking = true,
-                        BorderColour = Color4.Black,
-                        BorderThickness = 1,
-
-                        Children = new []
-                        {
-                            new Box()
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = new Color4(17, 17, 17, 255),
-                            },
-                        }
-                    },
-
-                    // Drums
-                    new TaikoDrumSet(new[] { Key.Z, Key.X, Key.V, Key.C })
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.CentreLeft,
-
-                        RelativePositionAxes = Axes.X,
-
-                        Position = new Vector2(0.75f, 0.0f),
-
-                        Size = new Vector2(100, 100)
-                    }
-                };
-            }
-        }
-
-        class TaikoTrackArea : Container
-        {
-            public TaikoTrackArea()
-            {
-                Children = new[]
-                {
-                    // Background
-                    new BufferedContainer()
-                    {
-                        RelativeSizeAxes = Axes.Both,
-
-                        Masking = true,
-                        BorderThickness = 2,
-                        BorderColour = new Color4(85, 85, 85, 255),
-
-                        Children = new []
-                        {
-                            new Box()
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = new Color4(0, 0, 0, 127)
-                            }
-                        }
-                    }
-                };
-            }
-        }
-        
         [Flags]
         enum HitCircleStyle
         {
