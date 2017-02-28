@@ -10,6 +10,7 @@ using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
+using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -37,6 +38,12 @@ namespace osu.Game.Graphics.Backgrounds
 
         private float triangleScale = 1;
 
+        /// <summary>
+        /// Whether we should exponentially drop-off alpha values to improve the visual appearance of unbuffered fades.
+        /// This defaults to on as it is generally more aesthetically pleasing, but should be turned off in buffered contexts.
+        /// </summary>
+        public bool ExponentialAlphaAdjust = true;
+
         public float TriangleScale
         {
             get { return triangleScale; }
@@ -63,8 +70,11 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.Update();
 
+            float adjustedAlpha = ExponentialAlphaAdjust ? (float)Math.Pow(((Color4)DrawInfo.Colour.Colour).A, 3) : 1;
+
             foreach (var t in Children)
             {
+                t.Alpha = adjustedAlpha;
                 t.Position -= new Vector2(0, (float)(t.Scale.X * (50 / DrawHeight) * (Time.Elapsed / 950)) / triangleScale);
                 if (ExpireOffScreenTriangles && t.DrawPosition.Y + t.DrawSize.Y * t.Scale.Y < 0)
                     t.Expire();
