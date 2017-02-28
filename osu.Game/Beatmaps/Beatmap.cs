@@ -7,6 +7,7 @@ using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Modes.Objects;
+using osu.Game.Modes;
 
 namespace osu.Game.Beatmaps
 {
@@ -17,8 +18,8 @@ namespace osu.Game.Beatmaps
         public List<HitObject> HitObjects { get; set; }
         public List<ControlPoint> ControlPoints { get; set; }
         public List<Color4> ComboColors { get; set; }
-        public double BPMMaximum => 60000 / ControlPoints.Where(c => c.BeatLength != 0).OrderBy(c => c.BeatLength).First().BeatLength;
-        public double BPMMinimum => 60000 / ControlPoints.Where(c => c.BeatLength != 0).OrderByDescending(c => c.BeatLength).First().BeatLength;
+        public double BPMMaximum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderBy(c => c.BeatLength).FirstOrDefault() ?? ControlPoint.Default).BeatLength;
+        public double BPMMinimum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? ControlPoint.Default).BeatLength;
         public double BPMMode => BPMAt(ControlPoints.Where(c => c.BeatLength != 0).GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).First().First().Time);
 
         public double BPMAt(double time)
@@ -57,5 +58,7 @@ namespace osu.Game.Beatmaps
 
             return timingPoint ?? ControlPoint.Default;
         }
+
+        public double CalculateStarDifficulty() => Ruleset.GetRuleset(BeatmapInfo.Mode).CreateDifficultyCalculator(this).Calculate();
     }
 }

@@ -3,21 +3,20 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Overlays.Options.Sections.Gameplay;
+using osu.Game.Overlays.Options.Sections.Debug;
 
 namespace osu.Game.Overlays.Options.Sections
 {
-    public class GameplaySection : OptionsSection
+    public class DebugSection : OptionsSection
     {
-        public override string Header => "Gameplay";
-        public override FontAwesome Icon => FontAwesome.fa_circle_o;
+        public override string Header => "Debug";
+        public override FontAwesome Icon => FontAwesome.fa_bug;
 
-        public GameplaySection()
+        public DebugSection()
         {
             Children = new Drawable[]
             {
-                new GeneralOptions(),
-                new SongSelectOptions(),
+                new GCOptions(),
             };
         }
     }

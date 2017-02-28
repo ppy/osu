@@ -10,9 +10,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -29,8 +28,6 @@ namespace osu.Game.Overlays
     public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent
     {
         const float textbox_height = 40;
-
-        private DrawableChannel channelDisplay;
 
         private ScheduledDelegate messageRequest;
 
@@ -127,7 +124,7 @@ namespace osu.Game.Overlays
 
         private void addChannel(Channel channel)
         {
-            Add(channelDisplay = new DrawableChannel(channel));
+            Add(new DrawableChannel(channel));
             careChannels.Add(channel);
         }
 

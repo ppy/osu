@@ -1,10 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using Ionic.Zip;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;

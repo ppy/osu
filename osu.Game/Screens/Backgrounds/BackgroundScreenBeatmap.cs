@@ -3,7 +3,7 @@
 
 using osu.Framework.Allocation;
 using OpenTK;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
 
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Backgrounds
                     else
                         newBackground = new BeatmapBackground(beatmap);
 
-                    newBackground.Preload(Game, delegate
+                    newBackground.LoadAsync(Game, delegate
                     {
                         float newDepth = 0;
                         if (background != null)

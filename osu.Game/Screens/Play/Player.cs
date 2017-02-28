@@ -20,10 +20,9 @@ using osu.Game.Overlays.Pause;
 using osu.Framework.Configuration;
 using System;
 using System.Linq;
-using osu.Game.Beatmaps;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Play
@@ -229,7 +228,7 @@ namespace osu.Game.Screens.Play
 
             var newPlayer = new Player();
 
-            newPlayer.Preload(Game, delegate
+            newPlayer.LoadAsync(Game, delegate
             {
                 newPlayer.RestartCount = RestartCount + 1;
                 ValidForResume = false;
@@ -313,6 +312,9 @@ namespace osu.Game.Screens.Play
             }
             else
             {
+                FadeOut(250);
+                Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
+
                 dimLevel.ValueChanged -= dimChanged;
                 Background?.FadeTo(1f, 200);
                 return base.OnExiting(next);

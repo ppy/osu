@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Pause
     public class QuitButton : PauseButton
     {
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private void load(AudioManager audio)
         {
             ButtonColour = new Color4(170, 27, 39, 255); // The red from the design isn't in the palette so it's used directly
             SampleHover = audio.Sample.Get(@"Menu/menuclick");

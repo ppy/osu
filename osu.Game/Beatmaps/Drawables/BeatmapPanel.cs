@@ -26,6 +26,7 @@ namespace osu.Game.Beatmaps.Drawables
         public Action<BeatmapPanel> GainedSelection;
         public Action<BeatmapPanel> StartRequested;
         private Triangles triangles;
+        private StarCounter starCounter;
 
         protected override void Selected()
         {
@@ -54,6 +55,14 @@ namespace osu.Game.Beatmaps.Drawables
                 StartRequested?.Invoke(this);
 
             return base.OnClick(state);
+        }
+
+        protected override void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
+        {
+            base.ApplyState(last);
+
+            if (last == PanelSelectedState.Hidden && State != last)
+                starCounter.ReplayAnimation();
         }
 
         public BeatmapPanel(BeatmapInfo beatmap)
@@ -92,7 +101,6 @@ namespace osu.Game.Beatmaps.Drawables
                         new FlowContainer
                         {
                             Padding = new MarginPadding { Left = 5 },
-                            Spacing = new Vector2(0, 5),
                             Direction = FlowDirections.Vertical,
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
@@ -130,7 +138,11 @@ namespace osu.Game.Beatmaps.Drawables
                                         },
                                     }
                                 },
-                                new StarCounter { Count = beatmap.StarDifficulty, StarSize = 8 }
+                                starCounter = new StarCounter
+                                {
+                                    Count = beatmap.StarDifficulty,
+                                    Scale = new Vector2(0.8f),
+                                }
                             }
                         }
                     }

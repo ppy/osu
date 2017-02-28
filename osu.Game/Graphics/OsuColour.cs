@@ -2,9 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Diagnostics;
 using OpenTK.Graphics;
-using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Graphics
 {

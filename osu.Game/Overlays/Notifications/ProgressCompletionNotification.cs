@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Colour;
-using OpenTK.Graphics;
 
 
 namespace osu.Game.Overlays.Notifications

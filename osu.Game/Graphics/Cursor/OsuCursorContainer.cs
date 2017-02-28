@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Configuration;
 using System;
@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.Cursor
         class OsuCursor : Container
         {
             private Container cursorContainer;
-            private BindableDouble cursorScale;
+            private Bindable<double> cursorScale;
 
             public OsuCursor()
             {
@@ -52,9 +52,9 @@ namespace osu.Game.Graphics.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures, OsuConfigManager config)
+            private void load(OsuConfigManager config)
             {
-                cursorScale = (BindableDouble)config.GetBindable<double>(OsuConfig.CursorSize);
+                cursorScale = config.GetBindable<double>(OsuConfig.CursorSize);
 
                 Children = new Drawable[]
                 {
