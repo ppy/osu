@@ -27,6 +27,7 @@ using osu.Framework.Input;
 using OpenTK.Input;
 using System.Collections.Generic;
 using osu.Framework.Threading;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Select
 {
@@ -38,6 +39,7 @@ namespace osu.Game.Screens.Select
 
         private CarouselContainer carousel;
         private TrackManager trackManager;
+        private DialogOverlay dialogOverlay;
 
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
         private BeatmapInfoWedge beatmapInfoWedge;
@@ -58,7 +60,7 @@ namespace osu.Game.Screens.Select
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapDatabase beatmaps, AudioManager audio, Framework.Game game,
-            OsuGame osuGame, OsuColour colours)
+            OsuGame osuGame, DialogOverlay dialog, OsuColour colours)
         {
             const float carousel_width = 640;
             const float filter_height = 100;
@@ -142,6 +144,7 @@ namespace osu.Game.Screens.Select
             database.BeatmapSetRemoved += onBeatmapSetRemoved;
 
             trackManager = audio.Track;
+            dialogOverlay = dialog;
 
             sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
             sampleChangeBeatmap = audio.Sample.Get(@"SongSelect/select-expand");
@@ -384,18 +387,12 @@ namespace osu.Game.Screens.Select
                 case Key.Delete:
                     if (state.Keyboard.ShiftPressed)
                     {
-                        // TODO: Delete beatmap dialog here
-                        return true;
-                    }
-                    else
-                    {
                         if (Beatmap != null)
-                        {
-                            Beatmap.Dispose();
-                            database.Delete(Beatmap.BeatmapSetInfo);
-                        }
+                            dialogOverlay.Push(new BeatmapDeleteDialog(Beatmap));
+
                         return true;
                     }
+                    break;
             }
 
             return base.OnKeyDown(state, args);
