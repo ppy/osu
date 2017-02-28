@@ -17,7 +17,7 @@ namespace osu.Game.Configuration
         public static Skin DEFAULT_SKIN = new Skin {            Name = @"default",
         };
 
-        private BasicStorage storage;
+        private Storage storage;
 
         private StorageResourceStore SkinsStore;
         public TextureStore Textures { get; private set; }
@@ -30,7 +30,7 @@ namespace osu.Game.Configuration
         }
 
         [BackgroundDependencyLoader]
-        private void load(BasicGameHost host, OsuConfigManager config)
+        private void load(GameHost host, OsuConfigManager config)
         {
             selected = config.Get<Skin>(OsuConfig.Skin);
             SkinsStore = new StorageResourceStore(host.Storage);
