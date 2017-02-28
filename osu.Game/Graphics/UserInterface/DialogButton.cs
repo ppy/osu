@@ -22,16 +22,16 @@ namespace osu.Game.Graphics.UserInterface
         private const float glow_fade_duration = 250;
         private const float click_duration = 200;
 
-        private Color4 colour;
-        public new Color4 Colour
+        private Color4 buttonColour;
+        public Color4 ButtonColour
         {
             get
             {
-                return colour;
+                return buttonColour;
             }
             set
             {
-                colour = value;
+                buttonColour = value;
                 updateGlow();
                 colourContainer.Colour = value;
             }
@@ -139,7 +139,7 @@ namespace osu.Game.Graphics.UserInterface
 
             colourContainer.Add(flash);
 
-            flash.Colour = Colour;
+            flash.Colour = ButtonColour;
             flash.BlendingMode = BlendingMode.Additive;
             flash.Alpha = 0.3f;
             flash.FadeOutFromOne(click_duration);
@@ -148,9 +148,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateGlow()
         {
-            leftGlow.ColourInfo = ColourInfo.GradientHorizontal(new Color4(Colour.R, Colour.G, Colour.B, 0f), Colour);
-            centerGlow.Colour = Colour;
-            rightGlow.ColourInfo = ColourInfo.GradientHorizontal(Colour, new Color4(Colour.R, Colour.G, Colour.B, 0f));
+            leftGlow.ColourInfo = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
+            centerGlow.Colour = ButtonColour;
+            rightGlow.ColourInfo = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
         }
 
         public DialogButton()
@@ -224,7 +224,7 @@ namespace osu.Game.Graphics.UserInterface
                                 Colour = Color4.Black.Opacity(0.2f),
                                 Radius = 5,
                             },
-                            Colour = Colour,
+                            Colour = ButtonColour,
                             Shear = new Vector2(0.2f, 0),
                             Children = new Drawable[]
                             {

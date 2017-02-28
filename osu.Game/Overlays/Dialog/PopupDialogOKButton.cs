@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Dialog
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            Colour = colours.Pink;
+            ButtonColour = colours.Pink;
             SampleHover = audio.Sample.Get(@"Menu/menuclick");
             SampleClick = audio.Sample.Get(@"Menu/menu-play-click");
         }

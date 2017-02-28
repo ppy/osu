@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Pause
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
-            Colour = colours.YellowDark;
+            ButtonColour = colours.YellowDark;
             SampleHover = audio.Sample.Get(@"Menu/menuclick");
             SampleClick = audio.Sample.Get(@"Menu/menu-play-click");
         }
