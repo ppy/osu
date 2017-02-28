@@ -285,6 +285,7 @@
     <Compile Include="Overlays\Dialog\PopupDialogButton.cs" />
     <Compile Include="Overlays\Dialog\PopupDialogOKButton.cs" />
     <Compile Include="Overlays\Dialog\PopupDialogCancelButton.cs" />
+    <Compile Include="Screens\Select\BeatmapDeleteDialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
