@@ -106,7 +106,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             if (hitOffset < hitGood)
             {
-                Judgement.Result = HitResult.Hit;
+                taikoJudgement.Result = HitResult.Hit;
 
                 if (hitOffset < hitGreat)
                     taikoJudgement.Score = TaikoScoreResult.Great;
@@ -114,7 +114,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     taikoJudgement.Score = TaikoScoreResult.Good;
             }
             else
-                Judgement.Result = HitResult.Miss;
+                taikoJudgement.Result = HitResult.Miss;
         }
 
         protected override void UpdateState(ArmedState state)
