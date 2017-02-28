@@ -39,10 +39,11 @@ namespace osu.Game.Graphics.Backgrounds
         private float triangleScale = 1;
 
         /// <summary>
-        /// Whether we should exponentially drop-off alpha values to improve the visual appearance of unbuffered fades.
-        /// This defaults to on as it is generally more aesthetically pleasing, but should be turned off in buffered contexts.
+        /// Whether we should drop-off alpha values of triangles more quickly to improve
+        /// the visual appearance of fading. This defaults to on as it is generally more
+        /// aesthetically pleasing, but should be turned off in <see cref="BufferedContainer{T}"/>s.
         /// </summary>
-        public bool ExponentialAlphaAdjust = true;
+        public bool HideAlphaDiscrepancies = true;
 
         public float TriangleScale
         {
@@ -70,7 +71,10 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.Update();
 
-            float adjustedAlpha = ExponentialAlphaAdjust ? (float)Math.Pow(((Color4)DrawInfo.Colour.Colour).A, 3) : 1;
+            float adjustedAlpha = HideAlphaDiscrepancies ?
+                // Cubically scale alpha to make it drop off more sharply.
+                (float)Math.Pow(DrawInfo.Colour.AverageColour.Linear.A, 3) :
+                1;
 
             foreach (var t in Children)
             {
