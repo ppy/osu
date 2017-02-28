@@ -13,7 +13,8 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 using osu.Game.Modes.UI;
@@ -127,7 +128,7 @@ namespace osu.Game.Overlays.Mods
             sampleOff = audio.Sample.Get(@"Checkbox/check-off");
         }
 
-        protected override bool OnMouseDown(Framework.Input.InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             (args.Button == MouseButton.Right ? (Action)SelectPrevious : SelectNext)();
             return true;
