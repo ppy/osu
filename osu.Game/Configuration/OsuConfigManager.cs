@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
 using osu.Game.Modes;
+using osu.Game.Skins;
 
 namespace osu.Game.Configuration
 {

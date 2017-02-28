@@ -19,8 +19,6 @@ namespace osu.Game.Skins
         private Storage storage;
 
 
-        // TODO audio component
-
         private Bindable<SkinInfo> bindable;
         private List<Skin> skins;
         private Skin selected;
@@ -33,7 +31,14 @@ namespace osu.Game.Skins
         private void load(OsuConfigManager config)
         {
             bindable = config.GetBindable<SkinInfo>(OsuConfig.Skin);
+            bindable.ValueChanged += ChangedSkin;
             // TODO load skins, put selected one in select
+        }
+
+        private void ChangedSkin(Object sender, EventArgs e) {
+            // Should I assume it has been sent by bindable?
+            // TODO put selected in select
+            selected.UpdateSkin();
         }
     }
 }

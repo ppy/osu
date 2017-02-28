@@ -29,6 +29,7 @@ namespace osu.Game.Skins
             {
                 Textures.AddStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(SkinsStore, Path.Combine("skins", info.Path))));
             }
+            // TODO update audio component
         }
 
         [BackgroundDependencyLoader]
