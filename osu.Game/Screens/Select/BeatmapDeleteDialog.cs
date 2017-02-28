@@ -12,24 +12,11 @@ namespace osu.Game
     {
         public Action<WorkingBeatmap> OnDelete;
 
-        private WorkingBeatmap beatmap;
-        public WorkingBeatmap Beatmap
-        {
-            get
-            {
-                return beatmap;
-            }
-            set
-            {
-                beatmap = value;
-                BodyText = $@"{beatmap?.Beatmap?.Metadata?.Artist} - {beatmap?.Beatmap?.Metadata?.Title}";
-            }
-        }
-
-        public BeatmapDeleteDialog()
+        public BeatmapDeleteDialog(WorkingBeatmap beatmap)
         {
             Icon = FontAwesome.fa_trash_o;
             HeaderText = @"Confirm deletion of";
+            BodyText = $@"{beatmap?.Beatmap?.Metadata?.Artist} - {beatmap?.Beatmap?.Metadata?.Title}";
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton
@@ -37,10 +24,7 @@ namespace osu.Game
                     Text = @"Yes. Totally. Delete it.",
                     Action = () =>
                     {
-                        if (Beatmap != null)
-                        {
-                            OnDelete?.Invoke(Beatmap);
-                        }
+                        OnDelete?.Invoke(beatmap);
                     },
                 },
                 new PopupDialogCancelButton

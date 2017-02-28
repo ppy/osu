@@ -153,6 +153,7 @@ namespace osu.Game.Overlays.Dialog
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Width = 0.4f,
+                    Alpha = 0f,
                     Children = new Drawable[]
                     {
                         new Container

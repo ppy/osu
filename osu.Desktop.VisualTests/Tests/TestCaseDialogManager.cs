@@ -4,21 +4,25 @@
 using osu.Framework.Graphics;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    public class TestCasePopupDialog : TestCase
+    public class TestCaseDialogManager : TestCase
     {
-        public override string Name => @"Popup Dialog";
+        public override string Name => @"Dialog Manager";
 
-        public override string Description => @"With various dialogs";
+        public override string Description => @"Display dialogs";
 
         public override void Reset()
         {
             base.Reset();
 
-            var firstDialog = new PopupDialog
+            var manager = new DialogManager();
+            Add(manager);
+
+            AddButton("dialog #1", () => manager.Push(new PopupDialog
             {
                 RelativeSizeAxes = Axes.Both,
                 Icon = FontAwesome.fa_trash_o,
@@ -37,8 +41,9 @@ namespace osu.Desktop.VisualTests.Tests
                         Action = () => System.Console.WriteLine(@"Cancel"),
                     },
                 },
-            };
-            var secondDialog = new PopupDialog
+            }));
+
+            AddButton("dialog #2", () => manager.Push(new PopupDialog
             {
                 RelativeSizeAxes = Axes.Both,
                 Icon = FontAwesome.fa_gear,
@@ -71,13 +76,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Text = @"Cancel",
                     },
                 },
-            };
-
-            Add(firstDialog);
-            Add(secondDialog);
-
-            AddButton("dialog #1", firstDialog.ToggleVisibility);
-            AddButton("dialog #2", secondDialog.ToggleVisibility);
+            }));
         }
     }
 }

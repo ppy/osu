@@ -50,8 +50,6 @@ namespace osu.Game.Screens.Select
 
         private List<BeatmapGroup> beatmapGroups;
 
-        private BeatmapDeleteDialog deleteDialog;
-
         private Footer footer;
 
         OsuScreen player;
@@ -124,15 +122,6 @@ namespace osu.Game.Screens.Select
                             PreferredPlayMode = playMode.Value
                         })).LoadAsync(Game, l => Push(player));
                     }
-                },
-                deleteDialog = new BeatmapDeleteDialog
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    OnDelete = (b) =>
-                    {
-                        b.Dispose();
-                        database.Delete(b.BeatmapSetInfo);
-                    },
                 },
             };
 
@@ -291,7 +280,6 @@ namespace osu.Game.Screens.Select
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
             carousel.SelectBeatmap(beatmap?.BeatmapInfo);
-            deleteDialog.Beatmap = beatmap;
         }
 
         /// <summary>
@@ -396,7 +384,7 @@ namespace osu.Game.Screens.Select
                 case Key.Delete:
                     if (state.Keyboard.ShiftPressed)
                     {
-                        deleteDialog.Show();
+                        // TODO: Delete beatmap dialog here
                         return true;
                     }
                     else
