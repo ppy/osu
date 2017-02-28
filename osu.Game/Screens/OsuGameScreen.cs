@@ -24,41 +24,18 @@ namespace osu.Game.Screens
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        private bool boundToBeatmap;
-        private Bindable<WorkingBeatmap> beatmap;
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         public WorkingBeatmap Beatmap
         {
             get
             {
-                bindBeatmap();
                 return beatmap.Value;
             }
             set
             {
-                bindBeatmap();
                 beatmap.Value = value;
             }
-        }
-
-        private void bindBeatmap()
-        {
-            if (beatmap == null)
-                beatmap = new Bindable<WorkingBeatmap>();
-
-            if (!boundToBeatmap)
-            {
-                beatmap.ValueChanged += beatmap_ValueChanged;
-                boundToBeatmap = true;
-            }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            if (boundToBeatmap)
-                beatmap.ValueChanged -= beatmap_ValueChanged;
-
-            base.Dispose(isDisposing);
         }
 
         private void beatmap_ValueChanged(object sender, EventArgs e)
@@ -69,19 +46,16 @@ namespace osu.Game.Screens
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGameBase game)
         {
-            if (beatmap == null)
-                beatmap = game?.Beatmap;
-        }
-
-        public override bool Push(Screen screen)
-        {
-            OsuScreen nextOsu = screen as OsuScreen;
-            if (nextOsu != null)
+            if (game != null)
             {
-                nextOsu.beatmap = beatmap;
+                //if we were given a beatmap at ctor time, we want to pass this on to the game-wide beatmap.
+                var localMap = beatmap.Value;
+                beatmap.BindTo(game.Beatmap);
+                if (localMap != null)
+                    beatmap.Value = localMap;
             }
 
-            return base.Push(screen);
+            beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
         protected virtual void OnBeatmapChanged(WorkingBeatmap beatmap)
