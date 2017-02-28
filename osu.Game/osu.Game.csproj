@@ -322,7 +322,8 @@
     <Compile Include="Screens\Select\Options\BeatmapOptionsEditButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsRemoveFromUnplayedButton.cs" />
-    <Compile Include="Configuration\SkinManager.cs" />
+    <Compile Include="Skins\SkinManager.cs" />
+    <Compile Include="Skins\Skin.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -332,10 +333,6 @@
     <ProjectReference Include="$(SolutionDir)\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
       <Project>{d9a367c9-4c1a-489f-9b05-a0cea2b53b58}</Project>
       <Name>osu.Game.Resources</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu-framework\osu.Framework.Desktop\osu.Framework.Desktop.csproj">
-      <Project>{65DC628F-A640-4111-AB35-3A5652BC1E17}</Project>
-      <Name>osu.Framework.Desktop</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -348,7 +345,9 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Skins\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -29,6 +29,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
+using osu.Game.Skins;
 
 namespace osu.Game
 {
