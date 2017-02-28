@@ -26,7 +26,7 @@ namespace osu.Desktop.VisualTests.Tests
                 BodyText = @"Ayase Rie - Yuima-ru*World TVver.",
                 Buttons = new PopupDialogButton[]
                 {
-                    new PopupDialogOKButton
+                    new PopupDialogOkButton
                     {
                         Text = @"I never want to see this again.",
                         Action = () => System.Console.WriteLine(@"OK"),
@@ -46,23 +46,23 @@ namespace osu.Desktop.VisualTests.Tests
                 BodyText = "Camellia as \"Bang Riot\" - Blastix Riotz",
                 Buttons = new PopupDialogButton[]
                 {
-                    new PopupDialogOKButton
+                    new PopupDialogOkButton
                     {
                         Text = @"Manage collections",
                     },
-                    new PopupDialogOKButton
+                    new PopupDialogOkButton
                     {
                         Text = @"Delete...",
                     },
-                    new PopupDialogOKButton
+                    new PopupDialogOkButton
                     {
                         Text = @"Remove from unplayed",
                     },
-                    new PopupDialogOKButton
+                    new PopupDialogOkButton
                     {
                         Text = @"Clear local scores",
                     },
-                    new PopupDialogOKButton
+                    new PopupDialogOkButton
                     {
                         Text = @"Edit",
                     },
