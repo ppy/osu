@@ -18,6 +18,7 @@ using osu.Framework.Input;
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -36,7 +37,7 @@ namespace osu.Game.Screens.Tournament
         }
 
         [BackgroundDependencyLoader]
-        private void load(Framework.Game game)
+        private void load(Framework.Game game, TextureStore textures)
         {
             drawingsConfig = new DrawingsConfigManager(Game.Host.Storage);
 
@@ -45,6 +46,16 @@ namespace osu.Game.Screens.Tournament
 
             Children = new Drawable[]
             {
+                new Box()
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = new Color4(77, 77, 77, 255)
+                },
+                new Sprite()
+                {
+                    FillMode = FillMode.Fill,
+                    Texture = textures.Get(@"Backgrounds/Drawings/background.png")
+                },
                 new FlowContainer()
                 {
                     RelativeSizeAxes = Axes.Both,
