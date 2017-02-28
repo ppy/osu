@@ -73,6 +73,8 @@ namespace osu.Game.Screens.Play
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
         {
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
+            mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
+
             try
             {
                 if (Beatmap == null)
@@ -160,8 +162,6 @@ namespace osu.Game.Screens.Play
                 scoreOverlay,
                 pauseOverlay
             };
-
-            mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
         }
 
         private void initializeSkipButton()
