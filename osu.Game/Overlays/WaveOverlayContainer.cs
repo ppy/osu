@@ -8,7 +8,7 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using OpenTK;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Overlays
 {
