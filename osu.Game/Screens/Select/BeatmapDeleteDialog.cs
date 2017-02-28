@@ -2,7 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Dialog;
 
@@ -10,7 +12,13 @@ namespace osu.Game
 {
     public class BeatmapDeleteDialog : PopupDialog
     {
-        public Action<WorkingBeatmap> OnDelete;
+        private BeatmapDatabase database;
+
+        [BackgroundDependencyLoader]
+        private void load(BeatmapDatabase beatmapDatabase)
+        {
+            database = beatmapDatabase;
+        }
 
         public BeatmapDeleteDialog(WorkingBeatmap beatmap)
         {
@@ -24,7 +32,8 @@ namespace osu.Game
                     Text = @"Yes. Totally. Delete it.",
                     Action = () =>
                     {
-                        OnDelete?.Invoke(beatmap);
+                        beatmap.Dispose();
+                        database.Delete(beatmap.BeatmapSetInfo);
                     },
                 },
                 new PopupDialogCancelButton

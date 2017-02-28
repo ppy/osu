@@ -11,7 +11,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class DialogManager : FocusedOverlayContainer
+    public class DialogOverlay : FocusedOverlayContainer
     {
         private Container dialogContainer;
         private PopupDialog currentDialog;
@@ -29,10 +29,10 @@ namespace osu.Game.Overlays
                     State = Visibility.Hidden;
             };
 
-            var oldDialog = currentDialog;
+            var lastDialog = currentDialog;
             currentDialog = dialog;
-            oldDialog?.Hide();
-            oldDialog?.Expire();
+            lastDialog?.Hide();
+            lastDialog?.Expire();
         }
 
         protected override void PopIn()
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
             darken.FadeOut(200, EasingTypes.InSine);
         }
 
-        public DialogManager()
+        public DialogOverlay()
         {
             RelativeSizeAxes = Axes.Both;
 

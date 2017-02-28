@@ -9,9 +9,9 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    public class TestCaseDialogManager : TestCase
+    public class TestCaseDialogOverlay : TestCase
     {
-        public override string Name => @"Dialog Manager";
+        public override string Name => @"Dialog Overlay";
 
         public override string Description => @"Display dialogs";
 
@@ -19,12 +19,11 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            var manager = new DialogManager();
+            var manager = new DialogOverlay();
             Add(manager);
 
             AddButton("dialog #1", () => manager.Push(new PopupDialog
             {
-                RelativeSizeAxes = Axes.Both,
                 Icon = FontAwesome.fa_trash_o,
                 HeaderText = @"Confirm deletion of",
                 BodyText = @"Ayase Rie - Yuima-ru*World TVver.",
@@ -45,7 +44,6 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddButton("dialog #2", () => manager.Push(new PopupDialog
             {
-                RelativeSizeAxes = Axes.Both,
                 Icon = FontAwesome.fa_gear,
                 HeaderText = @"What do you want to do with",
                 BodyText = "Camellia as \"Bang Riot\" - Blastix Riotz",

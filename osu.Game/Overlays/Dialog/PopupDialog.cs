@@ -145,6 +145,8 @@ namespace osu.Game.Overlays.Dialog
 
         public PopupDialog()
         {
+            RelativeSizeAxes = Axes.Both;
+
             Children = new Drawable[]
             {
                 content = new Container
