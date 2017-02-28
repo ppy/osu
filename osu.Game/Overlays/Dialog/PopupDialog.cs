@@ -121,9 +121,15 @@ namespace osu.Game.Overlays.Dialog
             // press button at number if 1-9 on number row or keypad are pressed
             int k = (int)args.Key;
             if (k >= (int)Key.Number1 && k <= (int)Key.Number9)
+            {
                 pressButtonAtIndex(k - (int)Key.Number1);
+                return true;
+            }
             else if (k >= (int)Key.Keypad1 && k <= (int)Key.Keypad9)
+            {
                 pressButtonAtIndex(k - (int)Key.Keypad1);
+                return true;
+            }
 
             return base.OnKeyDown(state, args);
         }
