@@ -25,6 +25,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         protected override string Prefix => @"katsu";
     }
 
+    public class SpinnerRingPiece : RingPiece
+    {
+        protected override Color4 OverlayColour => new Color4(237, 171, 0, 255);
+        protected override string Prefix => @"spinner";
+    }
+
     public abstract class RingPiece : Container
     {
         protected abstract Color4 OverlayColour { get; }
@@ -46,7 +52,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
             Origin = Anchor.Centre;
 
             Children = new[]
-        {
+            {
                 ringBase = new Sprite()
                 {
                     Anchor = Anchor.Centre,
@@ -65,15 +71,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                },
-                innerRingOverlay = new Sprite()
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-
-                    BlendingMode = BlendingMode.Additive,
-
-                    Alpha = 0.5f
                 }
             };
         }
@@ -85,7 +82,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
             ringOverlay.Texture = textures.Get(@"Play/Taiko/ring-overlay");
 
             innerRingBase.Texture = textures.Get($@"Play/Taiko/{Prefix}-inner-ring");
-            innerRingOverlay.Texture = textures.Get($@"Play/Taiko/{Prefix}-inner-ring-overlay");
         }
     }
 }

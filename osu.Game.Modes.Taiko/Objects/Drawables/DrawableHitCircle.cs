@@ -117,13 +117,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 Judgement.Result = HitResult.Miss;
         }
 
-        protected override void UpdateInitialState()
-        {
-            base.UpdateInitialState();
-
-            explodePiece.Alpha = 0;
-        }
-
         protected override void UpdateState(ArmedState state)
         {
             if (!IsLoaded)
@@ -151,6 +144,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     Delay(flash_in * 2);
                     break;
             }
+        }
+
+        protected override void Update()
+        {
+            if (State != ArmedState.Hit)
+                base.Update();
         }
 
         protected override void Dispose(bool isDisposing)

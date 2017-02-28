@@ -57,9 +57,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                 {
                     RelativeSizeAxes = Axes.Both,
 
-                    ColourDark = yellow_colour.Darken(0.1f),
-                    ColourLight = yellow_colour.Darken(0.05f),
-                    Alpha = 0.75f,
+                    Colour = Color4.Black,
+                    Alpha = 0.05f,
                 }
             };
         }

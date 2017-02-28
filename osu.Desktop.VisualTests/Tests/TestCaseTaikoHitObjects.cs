@@ -119,14 +119,14 @@ namespace osu.Desktop.VisualTests.Tests
                         PreEmpt = 500
                     }));
                     break;
-                //case HitObjectType.Spinner:
-                //    add(new DrawableSpinner(new Spinner
-                //    {
-                //        StartTime = framedClock.CurrentTime + 600,
-                //        Length = 1000,
-                //        Position = new Vector2(0, 0),
-                //    }));
-                //    break;
+                case HitObjectType.Spinner:
+                    add(new DrawableSpinner(new Spinner
+                    {
+                        StartTime = framedClock.CurrentTime + 600,
+                        Length = 1000,
+                        PreEmpt = 500
+                    }));
+                    break;
             }
         }
 
@@ -142,7 +142,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton(@"katsu finishers", () => load(HitObjectType.KatsuFinisher));
             AddButton(@"drum roll", () => load(HitObjectType.DrumRoll));
             AddButton(@"drum roll finisher", () => load(HitObjectType.DrumRollFinisher));
-            //AddButton(@"spinner", () => load(HitObjectType.Spinner));
+            AddButton(@"spinner", () => load(HitObjectType.Spinner));
 
             AddToggle(@"auto", () => { auto = !auto; load(mode); });
 
@@ -207,7 +207,8 @@ namespace osu.Desktop.VisualTests.Tests
             DonFinisher,
             KatsuFinisher,
             DrumRoll,
-            DrumRollFinisher
+            DrumRollFinisher,
+            Spinner
         }
     }
 }

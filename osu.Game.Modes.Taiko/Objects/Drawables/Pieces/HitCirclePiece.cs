@@ -29,6 +29,19 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         protected override RingPiece CreateRing() => new KatsuRingPiece();
     }
 
+    class SpinnerPiece : HitCirclePiece
+    {
+        protected override List<Key> Keys => null;
+        protected override Color4 InternalColour => new Color4(237, 171, 0, 255);
+
+        protected override RingPiece CreateRing() => new SpinnerRingPiece();
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            return Hit?.Invoke() ?? false;
+        }
+    }
+
     class DonFinisherPiece : DonPiece
     {
         public DonFinisherPiece()

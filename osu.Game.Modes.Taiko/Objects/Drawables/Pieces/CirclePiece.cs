@@ -40,8 +40,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                 triangles = new TrianglesPiece()
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.15f
-                }
+                    Alpha = 0.05f,
+                    Colour = Color4.Black
+                },
             };
         }
 
@@ -49,10 +50,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         private void load(TextureStore textures)
         {
             disc.Texture = textures.Get(@"Play/Taiko/disc");
-
-            triangles.ColourDark = Colour.Linear.Darken(0.1f);
-            triangles.ColourLight = Colour.Linear.Darken(0.05f);
         }
     }
-
 }

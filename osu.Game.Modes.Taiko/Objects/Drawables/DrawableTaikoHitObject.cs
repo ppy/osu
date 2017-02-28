@@ -61,13 +61,15 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
         }
 
+        protected void MoveToOffset(double time)
+        {
+            TaikoHitObject tho = HitObject as TaikoHitObject;
+            MoveToX((float)((tho.StartTime - time) / tho.PreEmpt));
+        }
+
         protected override void Update()
         {
-            if (State != ArmedState.Hit)
-            {
-                TaikoHitObject tho = HitObject as TaikoHitObject;
-                MoveToX((float)((tho.StartTime - Time.Current) / tho.PreEmpt));
-            }
+            MoveToOffset(Time.Current);
         }
     }
 }
