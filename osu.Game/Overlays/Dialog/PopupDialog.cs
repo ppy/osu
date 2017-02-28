@@ -21,9 +21,9 @@ namespace osu.Game.Overlays.Dialog
     {
         private const float enter_duration = 500;
         private const float exit_duration = 200;
-        private readonly Vector2 ring_size = new Vector2(100f);
-        private readonly Vector2 ring_minified_size = new Vector2(20f);
-        private readonly Vector2 buttons_spacing = new Vector2(0f, 50f);
+        private readonly Vector2 ringSize = new Vector2(100f);
+        private readonly Vector2 ringMinifiedSize = new Vector2(20f);
+        private readonly Vector2 buttonsEnterSpacing = new Vector2(0f, 50f);
 
         private Container content, ring;
         private FlowContainer<PopupDialogButton> buttonsContainer;
@@ -92,13 +92,13 @@ namespace osu.Game.Overlays.Dialog
             // Reset various animations but only if the dialog animation fully completed
             if (content.Alpha == 0)
             {
-                buttonsContainer.TransformSpacingTo(buttons_spacing);
-                buttonsContainer.MoveToY(buttons_spacing.Y);
-                ring.ResizeTo(ring_minified_size);
+                buttonsContainer.TransformSpacingTo(buttonsEnterSpacing);
+                buttonsContainer.MoveToY(buttonsEnterSpacing.Y);
+                ring.ResizeTo(ringMinifiedSize);
             }
 
             content.FadeIn(enter_duration, EasingTypes.OutQuint);
-            ring.ResizeTo(ring_size, enter_duration, EasingTypes.OutQuint);
+            ring.ResizeTo(ringSize, enter_duration, EasingTypes.OutQuint);
             buttonsContainer.TransformSpacingTo(Vector2.Zero, enter_duration, EasingTypes.OutQuint);
             buttonsContainer.MoveToY(0, enter_duration, EasingTypes.OutQuint);
         }
@@ -161,7 +161,7 @@ namespace osu.Game.Overlays.Dialog
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    Size = ring_size,
+                                    Size = ringSize,
                                     Margin = new MarginPadding
                                     {
                                         Bottom = 30,

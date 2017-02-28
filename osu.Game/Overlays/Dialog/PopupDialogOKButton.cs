@@ -7,7 +7,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public class PopupDialogOKButton : PopupDialogButton
+    public class PopupDialogOkButton : PopupDialogButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
