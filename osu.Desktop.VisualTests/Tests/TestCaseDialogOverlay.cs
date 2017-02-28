@@ -9,20 +9,20 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    public class TestCaseDialogOverlay : TestCase
+    class TestCaseDialogOverlay : TestCase
     {
         public override string Name => @"Dialog Overlay";
-
         public override string Description => @"Display dialogs";
+
+        DialogOverlay overlay;
 
         public override void Reset()
         {
             base.Reset();
 
-            var manager = new DialogOverlay();
-            Add(manager);
+            Add(overlay = new DialogOverlay());
 
-            AddButton("dialog #1", () => manager.Push(new PopupDialog
+            AddButton("dialog #1", () => overlay.Push(new PopupDialog
             {
                 Icon = FontAwesome.fa_trash_o,
                 HeaderText = @"Confirm deletion of",
@@ -42,7 +42,7 @@ namespace osu.Desktop.VisualTests.Tests
                 },
             }));
 
-            AddButton("dialog #2", () => manager.Push(new PopupDialog
+            AddButton("dialog #2", () => overlay.Push(new PopupDialog
             {
                 Icon = FontAwesome.fa_gear,
                 HeaderText = @"What do you want to do with",
