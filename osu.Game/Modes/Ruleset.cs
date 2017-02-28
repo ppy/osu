@@ -6,6 +6,7 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
 using System;
 using System.Collections.Concurrent;
+using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
@@ -28,7 +29,7 @@ namespace osu.Game.Modes
 
         public abstract ScoreProcessor CreateScoreProcessor(int hitObjectCount);
 
-        public abstract HitRenderer CreateHitRendererWith(Beatmap beatmap);
+        public abstract HitRenderer CreateHitRendererWith(Beatmap beatmap, InputManager input = null);
 
         public abstract HitObjectParser CreateHitObjectParser();
 

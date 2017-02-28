@@ -19,12 +19,16 @@ using osu.Game.Configuration;
 using osu.Game.Overlays.Pause;
 using osu.Framework.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Framework.Input;
+using osu.Game.Graphics.Cursor;
+using osu.Game.Input.Handlers;
 
 namespace osu.Game.Screens.Play
 {
@@ -57,6 +61,7 @@ namespace osu.Game.Screens.Play
         private bool canPause => Time.Current >= (lastPauseActionTime + pauseCooldown);
 
         private IAdjustableClock sourceClock;
+        private IFrameBasedClock interpolatedSourceClock;
 
         private Ruleset ruleset;
 
@@ -67,7 +72,6 @@ namespace osu.Game.Screens.Play
 
         private ScoreOverlay scoreOverlay;
         private PauseOverlay pauseOverlay;
-        private PlayerInputManager playerInputManager;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
@@ -101,6 +105,7 @@ namespace osu.Game.Screens.Play
             }
 
             sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
+            interpolatedSourceClock = new InterpolatingFramedClock(sourceClock);
 
             Schedule(() =>
             {
@@ -135,7 +140,20 @@ namespace osu.Game.Screens.Play
                 OnQuit = Exit
             };
 
-            hitRenderer = ruleset.CreateHitRendererWith(beatmap);
+            hitRenderer = ruleset.CreateHitRendererWith(beatmap, new PlayerInputManager
+            {
+                ReplayInputHandler = new LegacyReplayInputHandler(new List<LegacyReplayInputHandler.LegacyReplayFrame>
+                {
+                    new LegacyReplayInputHandler.LegacyReplayFrame(0, 0, 0, LegacyReplayInputHandler.LegacyButtonState.None),
+                    new LegacyReplayInputHandler.LegacyReplayFrame(500, 512, 0, LegacyReplayInputHandler.LegacyButtonState.None),
+                    new LegacyReplayInputHandler.LegacyReplayFrame(1000, 512, 384, LegacyReplayInputHandler.LegacyButtonState.None),
+                    new LegacyReplayInputHandler.LegacyReplayFrame(1500, 0, 384, LegacyReplayInputHandler.LegacyButtonState.None),
+                    new LegacyReplayInputHandler.LegacyReplayFrame(2000, 0, 0, LegacyReplayInputHandler.LegacyButtonState.None),
+                    new LegacyReplayInputHandler.LegacyReplayFrame(2500, 512, 0, LegacyReplayInputHandler.LegacyButtonState.None),
+                    new LegacyReplayInputHandler.LegacyReplayFrame(3000, 512, 384, LegacyReplayInputHandler.LegacyButtonState.None),
+                    new LegacyReplayInputHandler.LegacyReplayFrame(3500, 0, 384, LegacyReplayInputHandler.LegacyButtonState.None),
+                })
+            });
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
@@ -149,14 +167,17 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                playerInputManager = new PlayerInputManager(game.Host)
+                new Container
                 {
-                    Clock = new InterpolatingFramedClock(sourceClock),
-                    PassThrough = false,
+                    RelativeSizeAxes = Axes.Both,
+                    Clock = interpolatedSourceClock,
                     Children = new Drawable[]
                     {
                         hitRenderer,
-                        skipButton = new SkipButton { Alpha = 0 },
+                        skipButton = new SkipButton
+                        {
+                            Alpha = 0
+                        },
                     }
                 },
                 scoreOverlay,
@@ -196,7 +217,6 @@ namespace osu.Game.Screens.Play
             if (canPause || force)
             {
                 lastPauseActionTime = Time.Current;
-                playerInputManager.PassThrough = true;
                 scoreOverlay.KeyCounter.IsCounting = false;
                 pauseOverlay.Retries = RestartCount;
                 pauseOverlay.Show();
@@ -212,7 +232,6 @@ namespace osu.Game.Screens.Play
         public void Resume()
         {
             lastPauseActionTime = Time.Current;
-            playerInputManager.PassThrough = false;
             scoreOverlay.KeyCounter.IsCounting = true;
             pauseOverlay.Hide();
             sourceClock.Start();
@@ -238,8 +257,8 @@ namespace osu.Game.Screens.Play
 
                 if (!Push(newPlayer))
                 {
-                    // Error(?)
-                }
+                // Error(?)
+            }
             });
         }
 

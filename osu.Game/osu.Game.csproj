@@ -79,6 +79,10 @@
     <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
+    <Compile Include="Input\Handlers\LegacyReplayInputHandler.cs" />
+    <Compile Include="IO\Legacy\ILegacySerializable.cs" />
+    <Compile Include="IO\Legacy\SerializationReader.cs" />
+    <Compile Include="IO\Legacy\SerializationWriter.cs" />
     <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Modes\Objects\NullHitObjectParser.cs" />

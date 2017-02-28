@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Beatmaps;
@@ -18,6 +19,8 @@ namespace osu.Game.Modes.UI
         public event Action<JudgementInfo> OnJudgement;
 
         public event Action OnAllJudged;
+
+        public InputManager InputManager;
 
         protected void TriggerOnJudgement(JudgementInfo j)
         {
@@ -62,10 +65,10 @@ namespace osu.Game.Modes.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
-            {
-                Playfield = CreatePlayfield()
-            };
+            Playfield = CreatePlayfield();
+            Playfield.InputManager = InputManager;
+
+            Add(Playfield);
 
             loadObjects();
         }
