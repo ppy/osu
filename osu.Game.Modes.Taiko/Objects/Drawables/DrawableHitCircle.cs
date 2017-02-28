@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
 using OpenTK.Graphics;
+using System.Diagnostics;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
@@ -77,12 +78,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             if (Judgement.Result.HasValue)
                 return false;
 
-            UpdateJudgement(true);
-            return true;
+            return UpdateJudgement(true);
         }
 
+        double hitMiss = 95;
         double hitGood = 80;
-        double hitGreat = 30;
+        double hitGreat = 35;
 
         protected override void CheckJudgement(bool userTriggered)
         {
@@ -94,6 +95,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             }
 
             double hitOffset = Math.Abs(Judgement.TimeOffset);
+
+            // Must be within great range to be hittable/missable
+            if (hitOffset > hitMiss)
+                return;
 
             TaikoJudgementInfo taikoJudgement = (Judgement as TaikoFinisherJudgementInfo)?.FirstHitJudgement;
             if (taikoJudgement == null)
@@ -142,6 +147,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
                     bodyPiece.ScaleTo(1.5f, flash_in);
                     bodyPiece.FadeOut(flash_in);
+
+                    Delay(flash_in * 2);
                     break;
             }
         }

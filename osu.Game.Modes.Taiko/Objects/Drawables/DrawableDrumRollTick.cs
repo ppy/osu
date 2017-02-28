@@ -60,6 +60,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
         }
 
+        protected override void Update()
+        {
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (!Keys.Contains(args.Key))

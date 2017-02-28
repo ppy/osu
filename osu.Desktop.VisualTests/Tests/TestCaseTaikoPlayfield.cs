@@ -67,6 +67,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         class TaikoPlayField2 : Container
         {
+            private Container notesContainer;
+
             public TaikoPlayField2()
             {
                 RelativeSizeAxes = Axes.Both;
@@ -125,10 +127,27 @@ namespace osu.Desktop.VisualTests.Tests
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = new Color4(0, 0, 0, 127)
                                     },
-                                    new HitTarget()
+                                    // Hit area + notes
+                                    new Container()
                                     {
+                                        RelativeSizeAxes = Axes.Both,
                                         RelativePositionAxes = Axes.Both,
-                                        Position = new Vector2(0.15f, 0.5f)
+
+                                        Position = new Vector2(0.15f, 0),
+
+                                        Children = new Drawable[]
+                                        {
+                                            new HitTarget()
+                                            {
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft
+                                            },
+                                            // Todo: Add notes here
+                                            notesContainer = new Container()
+                                            {
+                                                RelativeSizeAxes = Axes.Both
+                                            }
+                                        }
                                     },
                                     // Barlines
                                     new Container()

@@ -57,6 +57,7 @@ namespace osu.Desktop.VisualTests.Tests
                         var h = new HitCircle
                         {
                             StartTime = framedClock.CurrentTime + 600 + i * 80,
+                            PreEmpt = 500
                         };
 
                         add(new DrawableHitCircleDon(h));
@@ -68,6 +69,7 @@ namespace osu.Desktop.VisualTests.Tests
                         var h = new HitCircle
                         {
                             StartTime = framedClock.CurrentTime + 600 + i * 80,
+                            PreEmpt = 500
                         };
 
                         add(new DrawableHitCircleKatsu(h));
@@ -79,6 +81,7 @@ namespace osu.Desktop.VisualTests.Tests
                         var h = new HitCircle
                         {
                             StartTime = framedClock.CurrentTime + 600 + i * 80,
+                            PreEmpt = 500
                         };
 
                         add(new DrawableHitCircleDonFinisher(h));
@@ -90,6 +93,7 @@ namespace osu.Desktop.VisualTests.Tests
                         var h = new HitCircle
                         {
                             StartTime = framedClock.CurrentTime + 600 + i * 80,
+                            PreEmpt = 500
                         };
 
                         add(new DrawableHitCircleKatsuFinisher(h));
@@ -102,6 +106,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Length = 400,
                         Velocity = 1,
                         TickDistance = 100,
+                        PreEmpt = 500
                     }));
                     break;
                 case HitObjectType.DrumRollFinisher:
@@ -111,6 +116,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Length = 400,
                         Velocity = 1,
                         TickDistance = 100,
+                        PreEmpt = 500
                     }));
                     break;
                 //case HitObjectType.Spinner:
@@ -157,7 +163,17 @@ namespace osu.Desktop.VisualTests.Tests
                 Clock = framedClock,
                 Children = new[]
                 {
-                    playfieldContainer = new Container { RelativeSizeAxes = Axes.Both },
+                    playfieldContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 0.75f,
+
+                        Masking = true,
+
+                        Children = new Drawable[]
+                        {
+                        }
+                    },
                     approachContainer = new Container { RelativeSizeAxes = Axes.Both }
                 }
             };
@@ -170,7 +186,6 @@ namespace osu.Desktop.VisualTests.Tests
         int depth;
         void add(DrawableHitObject h)
         {
-            h.Anchor = Anchor.Centre;
             h.Depth = depth++;
 
             if (auto)
