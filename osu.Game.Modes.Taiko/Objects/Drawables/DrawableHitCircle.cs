@@ -54,6 +54,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         private ExplodePiece explodePiece;
         private FlashPiece flashPiece;
 
+        private bool validKeyPressed;
+
         public DrawableHitCircle(HitCircle hitCircle)
             : base(hitCircle)
         {
@@ -73,10 +75,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         protected abstract ExplodePiece CreateExplode();
         protected abstract FlashPiece CreateFlash();
 
-        protected virtual bool ProcessHit()
+        protected virtual bool ProcessHit(bool validKey)
         {
             if (Judgement.Result.HasValue)
                 return false;
+
+            validKeyPressed = validKey;
 
             return UpdateJudgement(true);
         }
@@ -100,21 +104,21 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             if (hitOffset > hitMiss)
                 return;
 
-            TaikoJudgementInfo taikoJudgement = (Judgement as TaikoFinisherJudgementInfo)?.FirstHitJudgement;
-            if (taikoJudgement == null)
-                taikoJudgement = Judgement as TaikoJudgementInfo;
+            TaikoJudgementInfo tji = Judgement as TaikoJudgementInfo;
 
-            if (hitOffset < hitGood)
+            if (!validKeyPressed)
+                Judgement.Result = HitResult.Miss;
+            else if (hitOffset < hitGood)
             {
-                taikoJudgement.Result = HitResult.Hit;
+                Judgement.Result = HitResult.Hit;
 
                 if (hitOffset < hitGreat)
-                    taikoJudgement.Score = TaikoScoreResult.Great;
+                    tji.Score = TaikoScoreResult.Great;
                 else
-                    taikoJudgement.Score = TaikoScoreResult.Good;
+                    tji.Score = TaikoScoreResult.Good;
             }
             else
-                taikoJudgement.Result = HitResult.Miss;
+                Judgement.Result = HitResult.Miss;
         }
 
         protected override void UpdateState(ArmedState state)

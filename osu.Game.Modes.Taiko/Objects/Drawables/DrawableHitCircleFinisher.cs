@@ -49,22 +49,26 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
     public abstract class DrawableHitCircleFinisher : DrawableHitCircle
     {
+        private bool validKeyPressed;
+
         public DrawableHitCircleFinisher(HitCircle hitCircle)
             : base(hitCircle)
         {
             Size *= 1.5f;
         }
 
-        public override JudgementInfo CreateJudgementInfo() => new TaikoFinisherJudgementInfo() { MaxScore = TaikoScoreResult.Great };
+        public override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo() { MaxScore = TaikoScoreResult.Great };
 
-        protected override bool ProcessHit()
+        protected override bool ProcessHit(bool validKey)
         {
-            TaikoFinisherJudgementInfo taikoJudgement = Judgement as TaikoFinisherJudgementInfo;
+            TaikoJudgementInfo tji = Judgement as TaikoJudgementInfo;
 
-            if (taikoJudgement.FirstHitJudgement.Result.HasValue)
-                return base.ProcessHit();
+            if (!tji.Result.HasValue)
+                return base.ProcessHit(validKey);
 
-            UpdateJudgement(true);
+            validKeyPressed = validKey;
+
+            CheckJudgement(true);
             return true;
         }
 
@@ -72,30 +76,25 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         protected override void CheckJudgement(bool userTriggered)
         {
-            TaikoFinisherJudgementInfo taikoJudgement = Judgement as TaikoFinisherJudgementInfo;
+            TaikoJudgementInfo tji = Judgement as TaikoJudgementInfo;
 
-            if (!taikoJudgement.FirstHitJudgement.Result.HasValue)
+            if (!tji.Result.HasValue)
             {
                 base.CheckJudgement(userTriggered);
                 return;
             }
 
-            double hitOffset = Math.Abs(taikoJudgement.TimeOffset - taikoJudgement.FirstHitJudgement.TimeOffset);
+            double timeOffset = Time.Current - HitObject.EndTime;
+            double hitOffset = Math.Abs(timeOffset - tji.TimeOffset);
 
             if (!userTriggered)
-            {
-                if (hitOffset > secondHitTime)
-                    Judgement.Result = HitResult.Miss;
                 return;
-            }
+
+            if (!validKeyPressed)
+                return;
 
             if (hitOffset < 30)
-            {
-                Judgement.Result = HitResult.Hit;
-                taikoJudgement.Score = taikoJudgement.FirstHitJudgement.Score;
-            }
-            else
-                Judgement.Result = HitResult.Miss;
+                tji.SecondHit = true;
         }
     }
 }

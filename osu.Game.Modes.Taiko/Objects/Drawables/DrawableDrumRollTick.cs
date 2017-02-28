@@ -69,8 +69,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             if (!Keys.Contains(args.Key))
                 return false;
 
-            Keys.RemoveAll(k => k == args.Key);
-
             UpdateJudgement(true);
             return true;
         }

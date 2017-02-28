@@ -19,22 +19,34 @@ namespace osu.Game.Modes.Taiko.Objects
         /// </summary>
         public TaikoScoreResult MaxScore = TaikoScoreResult.Great;
 
-        public virtual int ScoreValue => ScoreToInt(Score);
+        public int ScoreValue => ScoreToInt(Score);
 
-        public virtual int MaxScoreValue => ScoreToInt(MaxScore);
+        public int MaxScoreValue => ScoreToInt(MaxScore);
+
+        public bool SecondHit;
 
         protected virtual int ScoreToInt(TaikoScoreResult result)
         {
+            int score = 0;
+
             switch (result)
             {
                 default:
                 case TaikoScoreResult.Miss:
-                    return 0;
+                    score = 0;
+                    break;
                 case TaikoScoreResult.Good:
-                    return 100;
+                    score = 100;
+                    break;
                 case TaikoScoreResult.Great:
-                    return 300;
+                    score = 300;
+                    break;
             }
+
+            if (SecondHit)
+                score *= 4;
+
+            return score;
         }
     }
 }

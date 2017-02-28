@@ -31,14 +31,17 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
     class SpinnerPiece : HitCirclePiece
     {
-        protected override List<Key> Keys => null;
+        protected override List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
         protected override Color4 InternalColour => new Color4(237, 171, 0, 255);
 
         protected override RingPiece CreateRing() => new SpinnerRingPiece();
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            return Hit?.Invoke() ?? false;
+            if (!Keys.Contains(args.Key))
+                return false;
+
+            return Hit?.Invoke(true) ?? false;
         }
     }
 
@@ -61,13 +64,17 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
     public abstract class HitCirclePiece : Container
     {
         protected abstract List<Key> Keys { get; }
+
         protected abstract Color4 InternalColour { get; }
+
+        private List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
+        private List<Key> pressedKeys = new List<Key>();
 
         private CirclePiece circle;
         private RingPiece ring;
         private GlowPiece glow;
 
-        public Func<bool> Hit;
+        public Func<bool, bool> Hit;
 
         public HitCirclePiece()
         {
@@ -101,12 +108,20 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (!Keys.Contains(args.Key))
+            // Check if we've pressed a valid taiko key
+            if (!validKeys.Contains(args.Key))
                 return false;
 
-            Keys.RemoveAll(k => k == args.Key);
+            // Don't handle re-presses of the same key
+            if (pressedKeys.Contains(args.Key))
+                return false;
 
-            return Hit?.Invoke() ?? false;
+            bool handled = Hit?.Invoke(Keys.Contains(args.Key)) ?? false;
+
+            if (handled)
+                pressedKeys.Add(args.Key);
+
+            return handled;
         }
     }
 }
