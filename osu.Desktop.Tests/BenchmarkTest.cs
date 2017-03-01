@@ -25,8 +25,7 @@ namespace osu.Desktop.Tests
                 Ruleset.Register(new ManiaRuleset());
                 Ruleset.Register(new CatchRuleset());
 
-                host.Add(new Benchmark());
-                host.Run();
+                host.Run(new Benchmark());
             }
         }
     }

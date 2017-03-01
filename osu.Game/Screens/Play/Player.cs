@@ -12,7 +12,7 @@ using osu.Game.Modes;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
-using osu.Framework.GameModes;
+using osu.Framework.Screens;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
@@ -20,18 +20,19 @@ using osu.Game.Overlays.Pause;
 using osu.Framework.Configuration;
 using System;
 using System.Linq;
-using osu.Game.Beatmaps;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Logging;
+using osu.Framework.Input;
 
 namespace osu.Game.Screens.Play
 {
-    public class Player : OsuGameMode
+    public class Player : OsuScreen
     {
         public bool Autoplay;
 
-        protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
 
@@ -72,6 +73,8 @@ namespace osu.Game.Screens.Play
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
         {
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
+            mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
+
             try
             {
                 if (Beatmap == null)
@@ -89,7 +92,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            AudioTrack track = Beatmap.Track;
+            Track track = Beatmap.Track;
 
             if (track != null)
             {
@@ -228,7 +231,7 @@ namespace osu.Game.Screens.Play
 
             var newPlayer = new Player();
 
-            newPlayer.Preload(Game, delegate
+            newPlayer.LoadAsync(Game, delegate
             {
                 newPlayer.RestartCount = RestartCount + 1;
                 ValidForResume = false;
@@ -237,21 +240,6 @@ namespace osu.Game.Screens.Play
                 {
                     // Error(?)
                 }
-            });
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Content.Delay(250);
-            Content.FadeIn(250);
-
-            Delay(750);
-            Schedule(() =>
-            {
-                sourceClock.Start();
-                initializeSkipButton();
             });
         }
 
@@ -281,18 +269,40 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        protected override void OnEntering(GameMode last)
+        protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
 
-            (Background as BackgroundModeBeatmap)?.BlurTo(Vector2.Zero, 1000);
-            Background?.FadeTo((100f - dimLevel) / 100, 1000);
+            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, EasingTypes.OutQuint);
+            Background?.FadeTo((100f - dimLevel) / 100, 1500, EasingTypes.OutQuint);
 
             Content.Alpha = 0;
             dimLevel.ValueChanged += dimChanged;
+
+            Content.ScaleTo(0.7f);
+
+            Content.Delay(250);
+            Content.FadeIn(250);
+
+            Content.ScaleTo(1, 750, EasingTypes.OutQuint);
+
+            Delay(750);
+            Schedule(() =>
+            {
+                sourceClock.Start();
+                initializeSkipButton();
+            });
         }
 
-        protected override bool OnExiting(GameMode next)
+        protected override void OnSuspending(Screen next)
+        {
+            Content.FadeOut(350);
+            Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
+
+            base.OnSuspending(next);
+        }
+
+        protected override bool OnExiting(Screen next)
         {
             if (pauseOverlay == null) return false;
 
@@ -305,6 +315,9 @@ namespace osu.Game.Screens.Play
             }
             else
             {
+                FadeOut(250);
+                Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
+
                 dimLevel.ValueChanged -= dimChanged;
                 Background?.FadeTo(1f, 200);
                 return base.OnExiting(next);
@@ -315,5 +328,9 @@ namespace osu.Game.Screens.Play
         {
             Background?.FadeTo((100f - dimLevel) / 100, 800);
         }
+
+        private Bindable<bool> mouseWheelDisabled;
+
+        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !isPaused;
     }
 }

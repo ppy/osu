@@ -8,7 +8,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL.Textures;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Configuration;
 using OpenTK;

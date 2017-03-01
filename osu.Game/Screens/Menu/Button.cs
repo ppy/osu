@@ -9,7 +9,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Menu
         private readonly float extraWidth;
         private Key triggerKey;
         private string text;
-        private AudioSample sampleClick;
+        private SampleChannel sampleClick;
 
         public override bool Contains(Vector2 screenSpacePos)
         {
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Menu
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
             if (duration == 0) duration = 250;
 
-            icon.ClearTransformations();
+            icon.ClearTransforms();
 
             icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
 
@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Menu
 
         protected override void OnHoverLost(InputState state)
         {
-            icon.ClearTransformations();
+            icon.ClearTransforms();
             icon.RotateTo(0, 500, EasingTypes.Out);
             icon.MoveTo(Vector2.Zero, 500, EasingTypes.Out);
             icon.ScaleTo(0.7f, 500, EasingTypes.OutElasticHalf);
@@ -274,7 +274,7 @@ namespace osu.Game.Screens.Menu
 
             clickAction?.Invoke();
 
-            boxHoverLayer.ClearTransformations();
+            boxHoverLayer.ClearTransforms();
             boxHoverLayer.Alpha = 0.9f;
             boxHoverLayer.FadeOut(800, EasingTypes.OutExpo);
         }

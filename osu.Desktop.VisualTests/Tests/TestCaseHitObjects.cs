@@ -2,21 +2,17 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Framework;
-using osu.Framework.GameModes.Testing;
+using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using OpenTK;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Modes;
 using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -37,7 +33,7 @@ namespace osu.Desktop.VisualTests.Tests
             playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
         }
 
-        HitObjectType mode = HitObjectType.Spinner;
+        HitObjectType mode = HitObjectType.Slider;
 
         BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
         private Container playfieldContainer;
@@ -75,6 +71,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Length = 400,
                         Position = new Vector2(-200, 0),
                         Velocity = 1,
+                        TickDistance = 100,
                     }));
                     break;
                 case HitObjectType.Spinner:

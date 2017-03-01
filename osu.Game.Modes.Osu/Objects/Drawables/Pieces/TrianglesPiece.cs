@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
@@ -15,6 +14,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         public TrianglesPiece()
         {
             TriangleScale = 1.2f;
+            HideAlphaDiscrepancies = false;
         }
 
         protected override void Update()

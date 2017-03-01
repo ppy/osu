@@ -4,7 +4,7 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Pause
             }
         }
 
-        public AudioSample SampleClick, SampleHover;
+        public SampleChannel SampleClick, SampleHover;
 
         private Container backgroundContainer, colourContainer, glowContainer;
         private Box leftGlow, centerGlow, rightGlow;
