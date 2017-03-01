@@ -18,8 +18,8 @@ namespace osu.Game.Overlays.Dialog
 {
     public class PopupDialog : FocusedOverlayContainer
     {
-        private const float enter_duration = 500;
-        private const float exit_duration = 200;
+        public static readonly float ENTER_DURATION = 500;
+        public static readonly float EXIT_DURATION = 200;
         private readonly Vector2 ringSize = new Vector2(100f);
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);
         private readonly Vector2 buttonsEnterSpacing = new Vector2(0f, 50f);
@@ -92,27 +92,35 @@ namespace osu.Game.Overlays.Dialog
                 Buttons[index].TriggerClick();
         }
 
+        private bool triggeredButton = false; // used to make it so the user can't press multiple buttons at once with the keyboard
+
         protected override bool OnKeyDown(Framework.Input.InputState state, Framework.Input.KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
 
-            if (args.Key == Key.Enter)
+            if (!triggeredButton)
             {
-                Buttons.OfType<PopupDialogOkButton>()?.FirstOrDefault()?.TriggerClick();
-                return true;
-            }
+                if (args.Key == Key.Enter)
+                {
+                    Buttons.OfType<PopupDialogOkButton>()?.FirstOrDefault()?.TriggerClick();
+                    triggeredButton = true;
+                    return true;
+                }
 
-            // press button at number if 1-9 on number row or keypad are pressed
-            var k = args.Key;
-            if (k >= Key.Number1 && k <= Key.Number9)
-            {
-                pressButtonAtIndex(k - Key.Number1);
-                return true;
-            }
-            else if (k >= Key.Keypad1 && k <= Key.Keypad9)
-            {
-                pressButtonAtIndex(k - Key.Keypad1);
-                return true;
+                // press button at number if 1-9 on number row or keypad are pressed
+                var k = args.Key;
+                if (k >= Key.Number1 && k <= Key.Number9)
+                {
+                    pressButtonAtIndex(k - Key.Number1);
+                    triggeredButton = true;
+                    return true;
+                }
+                else if (k >= Key.Keypad1 && k <= Key.Keypad9)
+                {
+                    pressButtonAtIndex(k - Key.Keypad1);
+                    triggeredButton = true;
+                    return true;
+                }
             }
 
             return base.OnKeyDown(state, args);
@@ -122,6 +130,8 @@ namespace osu.Game.Overlays.Dialog
         {
             base.PopIn();
 
+            triggeredButton = false;
+
             // Reset various animations but only if the dialog animation fully completed
             if (content.Alpha == 0)
             {
@@ -130,17 +140,17 @@ namespace osu.Game.Overlays.Dialog
                 ring.ResizeTo(ringMinifiedSize);
             }
 
-            content.FadeIn(enter_duration, EasingTypes.OutQuint);
-            ring.ResizeTo(ringSize, enter_duration, EasingTypes.OutQuint);
-            buttonsContainer.TransformSpacingTo(Vector2.Zero, enter_duration, EasingTypes.OutQuint);
-            buttonsContainer.MoveToY(0, enter_duration, EasingTypes.OutQuint);
+            content.FadeIn(ENTER_DURATION, EasingTypes.OutQuint);
+            ring.ResizeTo(ringSize, ENTER_DURATION, EasingTypes.OutQuint);
+            buttonsContainer.TransformSpacingTo(Vector2.Zero, ENTER_DURATION, EasingTypes.OutQuint);
+            buttonsContainer.MoveToY(0, ENTER_DURATION, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            content.FadeOut(exit_duration, EasingTypes.InSine);
+            content.FadeOut(EXIT_DURATION, EasingTypes.InSine);
         }
 
         public PopupDialog()

@@ -15,7 +15,6 @@ namespace osu.Game.Overlays
     {
         private Container dialogContainer;
         private PopupDialog currentDialog;
-        private Container darken;
 
         public void Push(PopupDialog dialog)
         {
@@ -25,26 +24,30 @@ namespace osu.Game.Overlays
             dialog.Show();
             dialog.StateChanged += delegate (OverlayContainer c, Visibility v)
             {
-                if (v == Visibility.Hidden && c == currentDialog)
-                    State = Visibility.Hidden;
+                if (v == Visibility.Hidden)
+                {
+                    c.Delay(PopupDialog.EXIT_DURATION);
+                    c.Expire();
+                    if (c == currentDialog)
+                        State = Visibility.Hidden;
+                }
             };
 
             var lastDialog = currentDialog;
             currentDialog = dialog;
             lastDialog?.Hide();
-            lastDialog?.Expire();
         }
 
         protected override void PopIn()
         {
             base.PopIn();
-            darken.FadeIn(500, EasingTypes.OutQuint);
+            FadeIn(PopupDialog.ENTER_DURATION, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-            darken.FadeOut(200, EasingTypes.InSine);
+            FadeOut(PopupDialog.EXIT_DURATION, EasingTypes.InSine);
         }
 
         public DialogOverlay()
@@ -53,7 +56,7 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                darken = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]

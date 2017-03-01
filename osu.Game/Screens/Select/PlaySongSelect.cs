@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select
         FilterControl filter;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase beatmaps, AudioManager audio, /*DialogOverlay dialog,*/ Framework.Game game,
+        private void load(BeatmapDatabase beatmaps, AudioManager audio, DialogOverlay dialog, Framework.Game game,
             OsuGame osuGame, OsuColour colours)
         {
             const float carousel_width = 640;
@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Select
             database.BeatmapSetRemoved += onBeatmapSetRemoved;
 
             trackManager = audio.Track;
-            //dialogOverlay = dialog;
+            dialogOverlay = dialog;
 
             sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
             sampleChangeBeatmap = audio.Sample.Get(@"SongSelect/select-expand");
