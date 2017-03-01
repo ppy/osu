@@ -67,19 +67,16 @@ namespace osu.Game.Modes.UI
         private void load(OsuConfigManager config)
         {
             showKeyCounter = config.GetBindable<bool>(OsuConfig.KeyOverlay);
-
-            if (showKeyCounter)
-                KeyCounter.Show();
-            else KeyCounter.Hide();
-
             showKeyCounter.ValueChanged += visibilityChanged;
+            showKeyCounter.TriggerChange();
         }
 
         private void visibilityChanged(object sender, EventArgs e)
         {
             if (showKeyCounter)
                 KeyCounter.Show();
-            else KeyCounter.Hide();
+            else
+                KeyCounter.Hide();
         }
 
         public void BindProcessor(ScoreProcessor processor)
