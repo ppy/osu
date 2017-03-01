@@ -27,6 +27,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.DimLevel, 30, 0, 100);
 
             Set(OsuConfig.MouseDisableButtons, false);
+            Set(OsuConfig.MouseDisableWheel, false);
 
             Set(OsuConfig.SnakingInSliders, true);
             Set(OsuConfig.SnakingOutSliders, false);
@@ -99,7 +100,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.UsePerBeatmapManiaSpeed, true).Disabled = true;
             Set(OsuConfig.ManiaSpeedBPMScale, true).Disabled = true;
             Set(OsuConfig.MenuTip, 0).Disabled = true;
-            Set(OsuConfig.MouseDisableWheel, false).Disabled = true;
             Set(OsuConfig.MouseSpeed, 1, 0.4, 6).Disabled = true;
             Set(OsuConfig.Offset, 0, -300, 300).Disabled = true;
             Set(OsuConfig.ScoreMeterScale, 1, 0.5, 2).Disabled = true;
