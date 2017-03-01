@@ -9,6 +9,9 @@ using osu.Game.Modes.Objects;
 using OpenTK;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Screens.Play;
+using osu.Framework.Allocation;
+using osu.Game.Configuration;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Modes.UI
 {
@@ -20,6 +23,8 @@ namespace osu.Game.Modes.UI
         public PercentageCounter AccuracyCounter;
         public HealthDisplay HealthDisplay;
         public Score Score { get; set; }
+
+        private Bindable<bool> showKeyCounter;
 
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract ComboCounter CreateComboCounter();
@@ -56,6 +61,25 @@ namespace osu.Game.Modes.UI
                 AccuracyCounter = CreateAccuracyCounter(),
                 HealthDisplay = CreateHealthDisplay(),
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            showKeyCounter = config.GetBindable<bool>(OsuConfig.KeyOverlay);
+
+            if (showKeyCounter)
+                KeyCounter.Show();
+            else KeyCounter.Hide();
+
+            showKeyCounter.ValueChanged += visibilityChanged;
+        }
+
+        private void visibilityChanged(object sender, EventArgs e)
+        {
+            if (showKeyCounter)
+                KeyCounter.Show();
+            else KeyCounter.Hide();
         }
 
         public void BindProcessor(ScoreProcessor processor)
