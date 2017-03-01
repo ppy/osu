@@ -16,11 +16,18 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
     public class DrawableDrumRollTick : DrawableTaikoHitObject
     {
         protected virtual List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
+
+        private int tickIndex;
+
+        private DrumRoll drumRoll;
         private DrumRollTick drumRollTick;
 
-        public DrawableDrumRollTick(DrumRollTick drumRollTick)
+        public DrawableDrumRollTick(DrumRoll drumRoll, DrumRollTick drumRollTick, int tickIndex)
             : base(drumRollTick)
         {
+            this.tickIndex = tickIndex;
+
+            this.drumRoll = drumRoll;
             this.drumRollTick = drumRollTick;
 
             RelativePositionAxes = Axes.None;
@@ -51,18 +58,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         }
 
         public override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollJudgementInfo() { MaxScore = TaikoScoreResult.Great };
-
-        protected override void UpdateInitialState()
-        {
-        }
-
-        protected override void UpdatePreemptState()
-        {
-        }
-
-        protected override void Update()
-        {
-        }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
@@ -113,6 +108,17 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     FadeOut(flash_in);
                     break;
             }
+        }
+
+        protected override void MoveToOffset(double time)
+        {
+            TaikoHitObject tho = HitObject as TaikoHitObject;
+            MoveToX((float)(tickIndex * drumRoll.TickDistance + (drumRoll.StartTime - time) / drumRoll.Duration * Parent.DrawSize.X));
+        }
+
+        protected override void Update()
+        {
+            MoveToOffset(Math.Max(drumRoll.StartTime, Time.Current));
         }
     }
 }

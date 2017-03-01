@@ -20,7 +20,7 @@ namespace osu.Game.Modes.Taiko.UI
 
         public HitTarget()
         {
-            Size = new Vector2(106);
+            AutoSizeAxes = Axes.Both;
 
             Children = new Drawable[]
             {
@@ -29,8 +29,7 @@ namespace osu.Game.Modes.Taiko.UI
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
 
-                        RelativeSizeAxes = Axes.Y,
-                        Size = new Vector2(5, 1),
+                        Size = new Vector2(5, 106),
 
                         Colour = Color4.Black
                     },
@@ -39,7 +38,7 @@ namespace osu.Game.Modes.Taiko.UI
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
 
-                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(106),
                         Scale = new Vector2(0.7f),
 
                         Children = new[]

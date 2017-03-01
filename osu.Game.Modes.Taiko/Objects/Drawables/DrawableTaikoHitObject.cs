@@ -17,7 +17,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             : base(hitObject)
         {
             Anchor = Anchor.CentreLeft;
-            Origin = Anchor.Centre;
+            Origin = Anchor.CentreLeft;
 
             RelativePositionAxes = Axes.X;
         }
@@ -43,25 +43,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             TaikoHitObject tho = HitObject as TaikoHitObject;
 
             Flush();
-
-            //UpdateInitialState();
-
-            //Delay(HitObject.StartTime - Time.Current - tho.PreEmpt, true);
-
-            //UpdatePreemptState();
-
-            //Delay(tho.PreEmpt, true);
         }
 
-        protected virtual void UpdateInitialState()
-        {
-        }
-
-        protected virtual void UpdatePreemptState()
-        {
-        }
-
-        protected void MoveToOffset(double time)
+        protected virtual void MoveToOffset(double time)
         {
             TaikoHitObject tho = HitObject as TaikoHitObject;
             MoveToX((float)((tho.StartTime - time) / tho.PreEmpt));

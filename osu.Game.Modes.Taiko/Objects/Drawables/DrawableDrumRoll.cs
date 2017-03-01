@@ -31,6 +31,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         private DrumRoll drumRoll;
 
         private DrumRollBodyPiece body;
+        private Container ticksContainer;
         private Container<DrawableDrumRollTick> ticks;
 
         private List<DrawableDrumRollTick> allTicks = new List<DrawableDrumRollTick>();
@@ -45,24 +46,17 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             Children = new Drawable[]
             {
                 body = CreateBody(Size.X),
-                ticks = new Container<DrawableDrumRollTick>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                }
            };
 
-            float posX = 0;
+            int tickIndex = 0;
             foreach (var tick in drumRoll.Ticks)
             {
-                var newTick = new DrawableDrumRollTick(tick)
-                {
-                    Position = new Vector2(posX, 0)
-                };
+                var newTick = new DrawableDrumRollTick(drumRoll, tick, tickIndex);
 
-                ticks.Add(newTick);
+                body.Ticks.Add(newTick);
                 allTicks.Add(newTick);
 
-                posX += (float)drumRoll.TickDistance;
+                tickIndex++;
             }
         }
 
@@ -92,6 +86,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             }
             else
                 Judgement.Result = HitResult.Miss;
+        }
+
+        protected override void Update()
+        {
+            MoveToOffset(Math.Min(Time.Current, HitObject.StartTime));
+            body.Progress = (float)((Math.Max(HitObject.StartTime, Time.Current) - HitObject.StartTime) / HitObject.Duration);
         }
     }
 }

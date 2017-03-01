@@ -28,16 +28,24 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
         public override float CornerRadius => 32;
 
+        public Container<DrawableDrumRollTick> Ticks;
+
+        public float Progress;
+
+        private float baseLength;
+
         public DrumRollBodyPiece(float baseLength)
         {
-            Size = new Vector2(baseLength + CornerRadius * 2, CornerRadius * 2);
+            this.baseLength = baseLength;
 
-            Origin = Anchor.Centre;
-            Anchor = Anchor.Centre;
+            Origin = Anchor.CentreLeft;
+            Anchor = Anchor.CentreLeft;
 
             Masking = true;
             BorderColour = Color4.White;
             BorderThickness = 4;
+
+            Position = new Vector2(-CornerRadius, 0);
 
             EdgeEffect = new EdgeEffect()
             {
@@ -55,12 +63,40 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                 },
                 new DrumRollTrianglesPiece()
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(baseLength + CornerRadius * 2, CornerRadius * 2),
 
                     Colour = Color4.Black,
                     Alpha = 0.05f,
+                },
+                new Container()
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+
+                    Size = new Vector2(baseLength + CornerRadius * 2 - BorderThickness, CornerRadius * 2),
+                    Position = new Vector2(BorderThickness / 2f, 0),
+
+                    Masking = true,
+                    CornerRadius = CornerRadius,
+
+                    Children = new[]
+                    {
+                        Ticks = new Container<DrawableDrumRollTick>()
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+
+                            Size = new Vector2(baseLength, CornerRadius * 2),
+                            Position = new Vector2(CornerRadius, 0)
+                        }
+                    }
                 }
             };
+        }
+
+        protected override void Update()
+        {
+            Size = new Vector2(baseLength * MathHelper.Clamp(1.0f - Progress, 0, 1) + CornerRadius * 2, CornerRadius * 2);
         }
     }
 }
