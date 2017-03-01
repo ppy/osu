@@ -4,11 +4,13 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +33,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         private DrumRoll drumRoll;
 
         private DrumRollBodyPiece body;
-        private Container ticksContainer;
         private Container<DrawableDrumRollTick> ticks;
 
         private List<DrawableDrumRollTick> allTicks = new List<DrawableDrumRollTick>();
@@ -41,22 +42,32 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
             this.drumRoll = drumRoll;
 
+            Origin = Anchor.CentreLeft;
+
             Size = new Vector2((float)drumRoll.Length * drumRoll.RepeatCount, 64);
 
             Children = new Drawable[]
             {
                 body = CreateBody(Size.X),
+                ticks = new Container<DrawableDrumRollTick>()
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+
+                    RelativeSizeAxes = Axes.Both
+                }
            };
 
             int tickIndex = 0;
             foreach (var tick in drumRoll.Ticks)
             {
-                var newTick = new DrawableDrumRollTick(drumRoll, tick, tickIndex)
+                var newTick = new DrawableDrumRollTick(drumRoll, tick)
                 {
-                    Depth = tickIndex
+                    Depth = tickIndex,
+                    Position = new Vector2(tickIndex * (float)drumRoll.TickDistance, 0)
                 };
 
-                body.Ticks.Add(newTick);
+                ticks.Add(newTick);
                 allTicks.Add(newTick);
 
                 tickIndex++;
@@ -89,12 +100,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             }
             else
                 Judgement.Result = HitResult.Miss;
-        }
-
-        protected override void Update()
-        {
-            MoveToOffset(Math.Min(Time.Current, HitObject.StartTime));
-            body.Progress = (float)((Math.Max(HitObject.StartTime, Time.Current) - HitObject.StartTime) / HitObject.Duration);
         }
     }
 }

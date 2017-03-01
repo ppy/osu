@@ -22,18 +22,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         private Container bodyPiece;
         private ExplodePiece explodePiece;
 
-        private int tickIndex;
-
         private DrumRoll drumRoll;
         private DrumRollTick drumRollTick;
 
-        private double hitDuration => drumRollTick.TickDistance / drumRoll.Length * drumRoll.Duration;
+        private double hitDuration => drumRoll.TickDistance / drumRoll.Length * drumRoll.Duration;
 
-        public DrawableDrumRollTick(DrumRoll drumRoll, DrumRollTick drumRollTick, int tickIndex)
+        public DrawableDrumRollTick(DrumRoll drumRoll, DrumRollTick drumRollTick)
             : base(drumRollTick)
         {
-            this.tickIndex = tickIndex;
-
             this.drumRoll = drumRoll;
             this.drumRollTick = drumRollTick;
 
@@ -72,9 +68,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 },
                 explodePiece = new ExplodePiece()
                 {
+                    RelativeSizeAxes = Axes.None,
+                    Size = new Vector2(128),
+
                     Colour = new Color4(238, 170, 0, 255),
-                    
-                    Size = new Vector2(128)
                 }
             };
 
@@ -85,11 +82,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (Judgement.Result.HasValue)
+                return false;
+
             if (!Keys.Contains(args.Key))
                 return false;
 
-            UpdateJudgement(true);
-            return true;
+            return UpdateJudgement(true);
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -140,15 +139,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             }
         }
 
-        protected override void MoveToOffset(double time)
-        {
-            TaikoHitObject tho = HitObject as TaikoHitObject;
-            MoveToX((float)(tickIndex * drumRoll.TickDistance + (drumRoll.StartTime - time) / drumRoll.Duration * Parent.DrawSize.X));
-        }
-
         protected override void Update()
         {
-            MoveToOffset(Math.Max(drumRoll.StartTime, Time.Current));
         }
     }
 }

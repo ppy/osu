@@ -103,17 +103,26 @@ namespace osu.Desktop.VisualTests.Tests
                     add(new DrawableDrumRoll(new DrumRoll
                     {
                         StartTime = framedClock.CurrentTime + 600,
-                        Length = 400,
+                        Length = 100 * (1000 / 500) - 10,
                         Velocity = 1,
-                        TickDistance = 100,
+                        TickDistance = 100 * (1000 / 500),
                         PreEmpt = 500
                     }));
+
+                    for (int i = 0; i <= 400; i += 100)
+                    {
+                        add(new DrawableHitCircleDon(new HitCircle
+                        {
+                            StartTime = framedClock.CurrentTime + 600 + i,
+                            PreEmpt = 500
+                        }));
+                    }
                     break;
                 case HitObjectType.DrumRollFinisher:
                     add(new DrawableDrumRollFinisher(new DrumRoll
                     {
                         StartTime = framedClock.CurrentTime + 600,
-                        Length = 400,
+                        Length = 1600,
                         Velocity = 1,
                         TickDistance = 100,
                         PreEmpt = 500
