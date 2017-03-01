@@ -37,7 +37,7 @@ namespace osu.Desktop.Overlays
         [BackgroundDependencyLoader]
         private void load(NotificationManager notification, OsuColour colours, TextureStore textures)
         {
-            this.notificationManager = notification;
+            notificationManager = notification;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;

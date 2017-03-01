@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
         private FlowContainer<NotificationSection> sections;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours)
+        private void load()
         {
             Width = width;
             RelativeSizeAxes = Axes.Y;

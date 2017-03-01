@@ -256,7 +256,7 @@ namespace osu.Game.Overlays.Notifications
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
                 Size = new Vector2(6, 15);
 
