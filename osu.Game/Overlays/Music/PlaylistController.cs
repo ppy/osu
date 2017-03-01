@@ -21,7 +21,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistController : Container
+    public class PlaylistController : FocusedOverlayContainer
     {
         public BeatmapDatabase Beatmaps { get; private set; }
         public List<BeatmapSetInfo> PlayList { get; private set; }
@@ -40,42 +40,48 @@ namespace osu.Game.Overlays.Music
 
         public PlaylistController()
         {
-            RelativeSizeAxes = Axes.X;
-            Height = 450;
-            Masking = true;
-            CornerRadius = 5;
-            EdgeEffect = new EdgeEffect
-            {
-                Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(40),
-                Radius = 5,
-            };
-
+            AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
-                new Box
+                new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.FromHex("333333"),
-                    Depth = float.MaxValue
-                },
-                new FlowContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Direction = FlowDirections.Vertical,
-                    Padding = new MarginPadding(15),
-                    Spacing = new Vector2(0, 5),
+                    Masking = true,
+                    CornerRadius = 5,
+                    EdgeEffect = new EdgeEffect
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = Color4.Black.Opacity(40),
+                        Radius = 5,
+                    },
+                    Width = 400,
+                    Height = 450,
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SearchTextBox
+                        new Box
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 40,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = OsuColour.FromHex("333333"),
+                            Depth = float.MaxValue
                         },
-                        playlistView = new Playlist
+                        new FlowContainer
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 380,
+                            RelativeSizeAxes = Axes.Both,
+                            Direction = FlowDirections.Vertical,
+                            Padding = new MarginPadding(15),
+                            Spacing = new Vector2(0, 5),
+                            Children = new Drawable[]
+                            {
+                                searchTextBox = new SearchTextBox
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 40,
+                                },
+                                playlistView = new Playlist
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 380,
+                                }
+                            }
                         }
                     }
                 }
@@ -108,20 +114,23 @@ namespace osu.Game.Overlays.Music
         protected override void LoadComplete()
         {
             BeatmapSource.ValueChanged += workingChanged;
+            handleInput = IsPresent;
             base.LoadComplete();
         }
 
         private void workingChanged(object sender, EventArgs e) => playlistView.SelectedItem = BeatmapSource.Value.BeatmapSetInfo;
 
-        public void FadeIn()
+        protected override void PopIn()
         {
+            base.PopIn();
             FadeIn(800, EasingTypes.OutQuint);
             handleInput = true;
             searchTextBox.HoldFocus = true;
         }
 
-        public void FadeOut()
+        protected override void PopOut()
         {
+            base.PopOut();
             FadeOut(800, EasingTypes.OutQuint);
             handleInput = false;
             searchTextBox.HoldFocus = false;
