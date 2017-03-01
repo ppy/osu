@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuGame game = null)
+        private void load(OsuGame game = null)
         {
             toolbar = game?.Toolbar;
         }

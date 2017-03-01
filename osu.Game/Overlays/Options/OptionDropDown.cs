@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Options
                 {
                     Margin = new MarginPadding { Top = 5 },
                     RelativeSizeAxes = Axes.X,
-                    Items = this.Items,
+                    Items = Items,
                 }
             };
             dropdown.ValueChanged += dropdown_ValueChanged;
