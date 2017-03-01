@@ -60,13 +60,13 @@ namespace osu.Desktop.Overlays
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FlowDirection.Down,
+                    Direction = FillDirection.Down,
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Direction = FlowDirection.Right,
+                            Direction = FillDirection.Right,
                             Spacing = new Vector2(5),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,

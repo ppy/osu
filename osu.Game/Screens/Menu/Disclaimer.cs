@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Menu
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Direction = FlowDirection.Down,
+                    Direction = FillDirection.Down,
                     Spacing = new Vector2(0, 2),
                     Children = new Drawable[]
                     {

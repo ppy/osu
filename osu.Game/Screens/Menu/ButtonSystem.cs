@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Menu
                         },
                         buttonFlow = new FlowContainerWithOrigin
                         {
-                            Direction = FlowDirection.Right,
+                            Direction = FillDirection.Right,
                             Spacing = new Vector2(-WEDGE_WIDTH, 0),
                             Anchor = Anchor.Centre,
                             AutoSizeAxes = Axes.Both,

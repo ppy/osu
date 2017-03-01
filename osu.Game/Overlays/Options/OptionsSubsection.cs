@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Options
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FlowDirection.Down;
+            Direction = FillDirection.Down;
             AddInternal(new Drawable[]
             {
                 new OsuSpriteText
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Options
                 },
                 content = new FillFlowContainer
                 {
-                    Direction = FlowDirection.Down,
+                    Direction = FillDirection.Down,
                     Spacing = new Vector2(0, 5),
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,

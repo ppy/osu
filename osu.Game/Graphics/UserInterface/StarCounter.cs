@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.UserInterface
                 stars = new FillFlowContainer<Star>
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FlowDirection.Right,
+                    Direction = FillDirection.Right,
                     Spacing = new Vector2(star_spacing),
                 }
             };

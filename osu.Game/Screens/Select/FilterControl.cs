@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Width = 0.4f, // TODO: InnerWidth property or something
-                    Direction = FlowDirection.Down,
+                    Direction = FillDirection.Down,
                     Children = new Drawable[]
                     {
                         searchTextBox = new SearchTextBox {
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Select
                     new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
-                        Direction = FlowDirection.Right,
+                        Direction = FillDirection.Right,
                         Spacing = new Vector2(10, 0),
                         Children = new Drawable[]
                         {
@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Select
                     new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
-                        Direction = FlowDirection.Right,
+                        Direction = FillDirection.Right,
                         Spacing = new Vector2(10, 0),
                         Origin = Anchor.TopRight,
                         Anchor = Anchor.TopRight,
