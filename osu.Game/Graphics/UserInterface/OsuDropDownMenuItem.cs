@@ -19,9 +19,9 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new[]
             {
-                new FlowContainer
+                new FillFlowContainer
                 {
-                    FlowStrategy = FlowStrategies.CreateHorizontalFlow(),
+                    Direction = FlowDirection.Right,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]

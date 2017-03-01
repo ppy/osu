@@ -16,7 +16,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class NotificationSection : FlowContainer
+    public class NotificationSection : FillFlowContainer
     {
         private OsuSpriteText titleText;
         private OsuSpriteText countText;
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Notifications
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            FlowStrategy = FlowStrategies.CreateVerticalFlow();
+            Direction = FlowDirection.Down;
 
             Padding = new MarginPadding
             {
@@ -85,13 +85,13 @@ namespace osu.Game.Overlays.Notifications
                             Origin = Anchor.TopRight,
                             Action = clearAll
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             Margin = new MarginPadding
                             {
                                 Bottom = 5
                             },
-                            FlowStrategy = FlowStrategies.CreateFillFlow(new Vector2(5, 0)),
+                            Spacing = new Vector2(5, 0),
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
@@ -110,13 +110,13 @@ namespace osu.Game.Overlays.Notifications
                         },
                     },
                 },
-                notifications = new FlowContainer<Notification>
+                notifications = new FillFlowContainer<Notification>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     LayoutDuration = 150,
                     LayoutEasing = EasingTypes.OutQuart,
-                    FlowStrategy = FlowStrategies.CreateFillFlow(new Vector2(3)),
+                    Spacing = new Vector2(3),
                 }
             });
         }

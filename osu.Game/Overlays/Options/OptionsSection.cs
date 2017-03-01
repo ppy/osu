@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Options
 {
     public abstract class OptionsSection : Container
     {
-        protected FlowContainer FlowContent;
+        protected FillFlowContainer FlowContent;
         protected override Container<Drawable> Content => FlowContent;
 
         public abstract FontAwesome Icon { get; }
@@ -58,10 +58,11 @@ namespace osu.Game.Overlays.Options
                             TextSize = header_size,
                             Text = Header,
                         },
-                        FlowContent = new FlowContainer
+                        FlowContent = new FillFlowContainer
                         {
                             Margin = new MarginPadding { Top = header_size + header_margin },
-                            FlowStrategy = FlowStrategies.CreateVerticalFlow(new Vector2(0, 30)),
+                            Direction = FlowDirection.Down,
+                            Spacing = new Vector2(0, 30),
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                         },

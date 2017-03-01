@@ -73,11 +73,11 @@ namespace osu.Game.Overlays
                     Margin = new MarginPadding { Left = SIDEBAR_WIDTH },
                     Children = new[]
                     {
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            FlowStrategy = FlowStrategies.CreateVerticalFlow(),
+                            Direction = FlowDirection.Down,
 
                             Children = new Drawable[]
                             {
@@ -94,11 +94,11 @@ namespace osu.Game.Overlays
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
                                 },
-                                new FlowContainer
+                                new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                    FlowStrategy = FlowStrategies.CreateVerticalFlow(),
+                                    Direction = FlowDirection.Down,
                                     Children = sections,
                                 }
                             }

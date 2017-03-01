@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Options.Sections
 
         public MaintenanceSection()
         {
-            FlowContent.FlowStrategy = FlowStrategies.CreateFillFlow(new Vector2(0, 5));
+            FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
                 new OsuButton

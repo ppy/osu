@@ -9,7 +9,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
 {
-    public abstract class OptionsSubsection : FlowContainer
+    public abstract class OptionsSubsection : FillFlowContainer
     {
         private Container<Drawable> content;
         protected override Container<Drawable> Content => content;
@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Options
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            FlowStrategy = FlowStrategies.CreateVerticalFlow();
+            Direction = FlowDirection.Down;
             AddInternal(new Drawable[]
             {
                 new OsuSpriteText
@@ -29,9 +29,10 @@ namespace osu.Game.Overlays.Options
                     Margin = new MarginPadding { Bottom = 10 },
                     Font = @"Exo2.0-Black",
                 },
-                content = new FlowContainer
+                content = new FillFlowContainer
                 {
-                    FlowStrategy = FlowStrategies.CreateVerticalFlow(new Vector2(0, 5)),
+                    Direction = FlowDirection.Down,
+                    Spacing = new Vector2(0, 5),
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 },

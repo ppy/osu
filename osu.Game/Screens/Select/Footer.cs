@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Select
         public Action OnBack;
         public Action OnStart;
 
-        private FlowContainer buttons;
+        private FillFlowContainer buttons;
 
         public OsuLogo StartButton;
 
@@ -91,20 +91,21 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.BottomLeft,
                     Action = () => OnBack?.Invoke(),
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Position = new Vector2(BackButton.SIZE_EXTENDED.X + padding, 0),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    FlowStrategy = FlowStrategies.CreateHorizontalFlow(new Vector2(padding, 0)),
+                    Direction = FlowDirection.Right,
+                    Spacing = new Vector2(padding, 0),
                     Children = new Drawable[]
                     {
-
-                        buttons = new FlowContainer
+                        buttons = new FillFlowContainer
                         {
-                            FlowStrategy = FlowStrategies.CreateHorizontalFlow(new Vector2(0.2f, 0)),
+                            Direction = FlowDirection.Right,
+                            Spacing = new Vector2(0.2f, 0),
                             AutoSizeAxes = Axes.Both,
                         }
                     }

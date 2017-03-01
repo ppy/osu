@@ -121,11 +121,11 @@ namespace osu.Game.Screens.Select
                         },
                     },
                     // Text for beatmap info
-                    new FlowContainer
+                    new FillFlowContainer
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        FlowStrategy = FlowStrategies.CreateVerticalFlow(),
+                        Direction = FlowDirection.Down,
                         Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -144,10 +144,10 @@ namespace osu.Game.Screens.Select
                                 TextSize = 17,
                                 Shadow = true,
                             },
-                            new FlowContainer
+                            new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 10 },
-                                FlowStrategy = FlowStrategies.CreateHorizontalFlow(),
+                                Direction = FlowDirection.Right,
                                 AutoSizeAxes = Axes.Both,
                                 Children = new []
                                 {
@@ -167,10 +167,10 @@ namespace osu.Game.Screens.Select
                                     },
                                 }
                             },
-                            new FlowContainer
+                            new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 20 },
-                                FlowStrategy = FlowStrategies.CreateFillFlow(new Vector2(40, 0)),
+                                Spacing = new Vector2(40, 0),
                                 AutoSizeAxes = Axes.Both,
                                 Children = labels
                             },

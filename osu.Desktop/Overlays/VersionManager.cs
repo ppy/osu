@@ -57,16 +57,17 @@ namespace osu.Desktop.Overlays
 
             Children = new Drawable[]
             {
-                new FlowContainer
+                new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    FlowStrategy = FlowStrategies.CreateVerticalFlow(),
+                    Direction = FlowDirection.Down,
                     Children = new Drawable[]
                     {
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            FlowStrategy = FlowStrategies.CreateHorizontalFlow(new Vector2(5)),
+                            Direction = FlowDirection.Right,
+                            Spacing = new Vector2(5),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Children = new Drawable[]
