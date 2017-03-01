@@ -142,17 +142,7 @@ namespace osu.Game.Screens.Play
 
             hitRenderer = ruleset.CreateHitRendererWith(beatmap, new PlayerInputManager
             {
-                ReplayInputHandler = new LegacyReplayInputHandler(new List<LegacyReplayInputHandler.LegacyReplayFrame>
-                {
-                    new LegacyReplayInputHandler.LegacyReplayFrame(0, 0, 0, LegacyReplayInputHandler.LegacyButtonState.None),
-                    new LegacyReplayInputHandler.LegacyReplayFrame(500, 512, 0, LegacyReplayInputHandler.LegacyButtonState.None),
-                    new LegacyReplayInputHandler.LegacyReplayFrame(1000, 512, 384, LegacyReplayInputHandler.LegacyButtonState.None),
-                    new LegacyReplayInputHandler.LegacyReplayFrame(1500, 0, 384, LegacyReplayInputHandler.LegacyButtonState.None),
-                    new LegacyReplayInputHandler.LegacyReplayFrame(2000, 0, 0, LegacyReplayInputHandler.LegacyButtonState.None),
-                    new LegacyReplayInputHandler.LegacyReplayFrame(2500, 512, 0, LegacyReplayInputHandler.LegacyButtonState.None),
-                    new LegacyReplayInputHandler.LegacyReplayFrame(3000, 512, 384, LegacyReplayInputHandler.LegacyButtonState.None),
-                    new LegacyReplayInputHandler.LegacyReplayFrame(3500, 0, 384, LegacyReplayInputHandler.LegacyButtonState.None),
-                })
+                ReplayInputHandler = ReplayInputHandler
             });
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
@@ -349,6 +339,8 @@ namespace osu.Game.Screens.Play
         }
 
         private Bindable<bool> mouseWheelDisabled;
+
+        public LegacyReplayInputHandler ReplayInputHandler;
 
         protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !isPaused;
     }
