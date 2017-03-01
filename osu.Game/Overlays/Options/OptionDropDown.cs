@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionDropDown<T> : FlowContainer
+    public class OptionDropDown<T> : FillFlowContainer
     {
         private DropDownMenu<T> dropdown;
         private SpriteText text;
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Options
         {
             Items = new KeyValuePair<string, T>[0];
 
-            FlowStrategy = FlowStrategies.CreateVerticalFlow();
+            Direction = FlowDirection.Down;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]

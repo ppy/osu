@@ -13,7 +13,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class HitExplosion : FlowContainer
+    public class HitExplosion : FillFlowContainer
     {
         private readonly OsuJudgementInfo judgement;
         private SpriteText line1;
@@ -25,7 +25,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             AutoSizeAxes = Axes.Both;
             Origin = Anchor.Centre;
 
-            FlowStrategy = FlowStrategies.CreateVerticalFlow(new Vector2(0, 2));
+            Direction = FlowDirection.Down;
+            Spacing = new Vector2(0, 2);
             Position = (h?.StackedEndPosition ?? Vector2.Zero) + judgement.PositionOffset;
 
             Children = new Drawable[]

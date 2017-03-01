@@ -27,12 +27,13 @@ namespace osu.Game.Screens.Menu
 
             Children = new Drawable[]
             {
-                new FlowContainer
+                new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    FlowStrategy = FlowStrategies.CreateVerticalFlow(new Vector2(0, 2)),
+                    Direction = FlowDirection.Down,
+                    Spacing = new Vector2(0, 2),
                     Children = new Drawable[]
                     {
                         icon = new TextAwesome

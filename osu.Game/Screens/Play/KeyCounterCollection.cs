@@ -8,11 +8,11 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterCollection : FlowContainer<KeyCounter>
+    public class KeyCounterCollection : FillFlowContainer<KeyCounter>
     {
         public KeyCounterCollection()
         {
-            FlowStrategy = FlowStrategies.CreateHorizontalFlow();
+            Direction = FlowDirection.Right;
             AutoSizeAxes = Axes.Both;
         }
 

@@ -83,10 +83,10 @@ namespace osu.Game.Beatmaps.Drawables
                     ColourLight = OsuColour.FromHex(@"3a7285"),
                     ColourDark = OsuColour.FromHex(@"123744")
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     Padding = new MarginPadding(5),
-                    FlowStrategy = FlowStrategies.CreateHorizontalFlow(),
+                    Direction = FlowDirection.Right,
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -98,16 +98,17 @@ namespace osu.Game.Beatmaps.Drawables
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             Padding = new MarginPadding { Left = 5 },
-                            FlowStrategy = FlowStrategies.CreateVerticalFlow(),
+                            Direction = FlowDirection.Down,
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                new FlowContainer
+                                new FillFlowContainer
                                 {
-                                    FlowStrategy = FlowStrategies.CreateHorizontalFlow(new Vector2(4, 0)),
+                                    Direction = FlowDirection.Right,
+                                    Spacing = new Vector2(4, 0),
                                     AutoSizeAxes = Axes.Both,
                                     Children = new[]
                                     {

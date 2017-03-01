@@ -33,13 +33,13 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
             Children = new Drawable[]
             {
-                new FlowContainer
+                new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Margin = new MarginPadding { Left = 10, Right = 10, Top = 30, Bottom = 30 },
-                    FlowStrategy = FlowStrategies.CreateFillFlow(new Vector2(15, 0)),
+                    Spacing = new Vector2(15, 0),
                     Children = new Drawable[]
                     {
                         volumeMeterMaster = new VolumeMeter("Master"),

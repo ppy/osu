@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// A flow container with an origin based on one of its contained drawables.
     /// </summary>
-    public class FlowContainerWithOrigin : FlowContainer
+    public class FlowContainerWithOrigin : FillFlowContainer
     {
         /// <summary>
         /// A target drawable which this flowcontainer should be centered around.
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Menu
 
         protected override IComparer<Drawable> DepthComparer => new ReverseCreationOrderDepthComparer();
 
-        protected override IEnumerable<Drawable> SortedChildren => base.SortedChildren.Reverse();
+        protected override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
 
         public override Anchor Origin => Anchor.Custom;
 
