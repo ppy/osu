@@ -123,7 +123,7 @@ namespace osu.Game.Database
             foreach (string p in paths)
                 try
                 {
-                    BeatmapSetInfo set = importBeatmapSet(p);
+                    BeatmapSetInfo set = getBeatmapSet(p);
 
                     sets.Push(set);
 
@@ -153,7 +153,13 @@ namespace osu.Game.Database
             Import(new [] { path });
         }
 
-        private BeatmapSetInfo importBeatmapSet(string path)
+        /// <summary>
+        /// Duplicates content from <paramref name="path"/> to storage and returns a representing <see cref="BeatmapSetInfo"/>.
+        /// Returns null if a representation already exists.
+        /// </summary>
+        /// <param name="path">Content location</param>
+        /// <returns><see cref="BeatmapSetInfo"/> or null</returns>
+        private BeatmapSetInfo getBeatmapSet(string path)
         {
             string hash = null;
 
