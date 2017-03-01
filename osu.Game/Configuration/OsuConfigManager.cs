@@ -33,6 +33,8 @@ namespace osu.Game.Configuration
             Set(OsuConfig.SnakingOutSliders, false);
 
             Set(OsuConfig.MenuParallax, true);
+
+            Set(OsuConfig.KeyOverlay, false);
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
@@ -80,7 +82,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.IgnoreBeatmapSamples, false).Disabled = true;
             Set(OsuConfig.IgnoreBeatmapSkins, false).Disabled = true;
             Set(OsuConfig.IgnoreList, string.Empty).Disabled = true;
-            Set(OsuConfig.KeyOverlay, false).Disabled = true;
             Set(OsuConfig.Language, @"unknown").Disabled = true;
             Set(OsuConfig.AllowNowPlayingHighlights, false).Disabled = true;
             Set(OsuConfig.LastVersion, string.Empty).Disabled = true;
