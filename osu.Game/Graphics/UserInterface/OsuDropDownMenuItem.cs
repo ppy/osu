@@ -21,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 new FillFlowContainer
                 {
-                    Direction = FlowDirection.Right,
+                    Direction = FillDirection.Right,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]

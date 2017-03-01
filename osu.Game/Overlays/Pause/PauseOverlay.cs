@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Pause
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FlowDirection.Down,
+                    Direction = FillDirection.Down,
                     Spacing = new Vector2(0, 50),
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -113,7 +113,7 @@ namespace osu.Game.Overlays.Pause
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Direction = FlowDirection.Down,
+                            Direction = FillDirection.Down,
                             Spacing = new Vector2(0, 20),
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,

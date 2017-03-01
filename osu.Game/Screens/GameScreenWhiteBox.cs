@@ -126,7 +126,7 @@ namespace osu.Game.Screens
                 },
                 childModeButtons = new FillFlowContainer
                 {
-                    Direction = FlowDirection.Down,
+                    Direction = FillDirection.Down,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Both,
