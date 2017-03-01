@@ -5,7 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using osu.Framework;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
@@ -14,13 +15,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Music;
 using OpenTK;
@@ -42,7 +44,8 @@ namespace osu.Game.Overlays
         private Bindable<WorkingBeatmap> beatmapSource;
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap current;
-        private BaseGame game;
+        private BeatmapDatabase beatmaps;
+        private Framework.Game game;
 
         public BeatmapDatabase Beatmaps => playlistController.Beatmaps;
         public List<BeatmapSetInfo> PlayList => playlistController.PlayList;
@@ -81,6 +84,8 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame, OsuConfigManager config, OsuColour colours)
         {
+            game = osuGame;
+
             unicodeString = config.GetUnicodeString;
 
             Children = new Drawable[]
@@ -228,7 +233,7 @@ namespace osu.Game.Overlays
             preferUnicode.ValueChanged += preferUnicode_changed;
 
             beatmapSource = new Bindable<WorkingBeatmap>();
-            beatmapSource.Weld(playlistController.BeatmapSource);
+            beatmapSource.BindTo(playlistController.BeatmapSource);
 
             playerContainer.Add(backgroundSprite = new MusicControllerBackground());
         }
@@ -268,7 +273,7 @@ namespace osu.Game.Overlays
         {
             progress.IsEnabled = beatmapSource.Value != null;
             if (beatmapSource.Value == current) return;
-            bool audioEquals = current?.BeatmapInfo.AudioEquals(beatmapSource.Value.BeatmapInfo) ?? false;
+            bool audioEquals = current?.BeatmapInfo?.AudioEquals(beatmapSource?.Value?.BeatmapInfo) ?? false;
             current = beatmapSource.Value;
             if (!audioEquals)
             {
@@ -280,6 +285,8 @@ namespace osu.Game.Overlays
 
         private void appendToHistory(BeatmapInfo beatmap)
         {
+            if (beatmap == null) return;
+
             if (playHistoryIndex >= 0)
             {
                 if (beatmap.AudioEquals(playHistory[playHistoryIndex]))
@@ -338,12 +345,6 @@ namespace osu.Game.Overlays
             updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
-        protected override void PerformLoad(BaseGame game)
-        {
-            this.game = game;
-            base.PerformLoad(game);
-        }
-
         Action pendingBeatmapSwitch;
 
         private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
@@ -365,7 +366,7 @@ namespace osu.Game.Overlays
 
                 MusicControllerBackground newBackground;
 
-                (newBackground = new MusicControllerBackground(beatmap)).Preload(game, delegate
+                (newBackground = new MusicControllerBackground(beatmap)).LoadAsync(game, delegate
                 {
                     playerContainer.Add(newBackground);
 

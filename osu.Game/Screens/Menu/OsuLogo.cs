@@ -2,18 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
-using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using OpenTK;
@@ -33,7 +30,7 @@ namespace osu.Game.Screens.Menu
         private Container logoBounceContainer;
         private Container logoHoverContainer;
 
-        private AudioSample sampleClick;
+        private SampleChannel sampleClick;
 
         private Container colourAndTriangles;
 
@@ -195,10 +192,11 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-
             logoBounceContainer.ScaleTo(1f, 500, EasingTypes.OutElastic);
             return true;
         }
+
+        protected override bool OnDragStart(InputState state) => true;
 
         protected override bool OnClick(InputState state)
         {
@@ -206,7 +204,7 @@ namespace osu.Game.Screens.Menu
 
             sampleClick.Play();
 
-            flashLayer.ClearTransformations();
+            flashLayer.ClearTransforms();
             flashLayer.Alpha = 0.4f;
             flashLayer.FadeOut(1500, EasingTypes.OutExpo);
 

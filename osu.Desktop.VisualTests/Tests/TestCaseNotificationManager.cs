@@ -3,13 +3,11 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.GameModes.Testing;
+using osu.Framework.Screens.Testing;
 using osu.Framework.MathUtils;
-using osu.Framework.Timing;
 using osu.Game.Overlays;
 using System.Linq;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Screens.Backgrounds;
 
 namespace osu.Desktop.VisualTests.Tests
 {

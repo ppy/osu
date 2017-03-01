@@ -7,6 +7,7 @@ using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Modes.Objects;
+using osu.Game.Modes;
 
 namespace osu.Game.Beatmaps
 {
@@ -17,8 +18,8 @@ namespace osu.Game.Beatmaps
         public List<HitObject> HitObjects { get; set; }
         public List<ControlPoint> ControlPoints { get; set; }
         public List<Color4> ComboColors { get; set; }
-        public double BPMMaximum => 60000 / ControlPoints.Where(c => c.BeatLength != 0).OrderBy(c => c.BeatLength).First().BeatLength;
-        public double BPMMinimum => 60000 / ControlPoints.Where(c => c.BeatLength != 0).OrderByDescending(c => c.BeatLength).First().BeatLength;
+        public double BPMMaximum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderBy(c => c.BeatLength).FirstOrDefault() ?? ControlPoint.Default).BeatLength;
+        public double BPMMinimum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? ControlPoint.Default).BeatLength;
         public double BPMMode => BPMAt(ControlPoints.Where(c => c.BeatLength != 0).GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).First().First().Time);
 
         public double BPMAt(double time)
@@ -26,26 +27,38 @@ namespace osu.Game.Beatmaps
             return 60000 / BeatLengthAt(time);
         }
 
-        public double BeatLengthAt(double time, bool applyMultipliers = false)
+        public double BeatLengthAt(double time)
         {
-            int point = 0;
-            int samplePoint = 0;
-
-            for (int i = 0; i < ControlPoints.Count; i++)
-                if (ControlPoints[i].Time <= time)
-                {
-                    if (ControlPoints[i].TimingChange)
-                        point = i;
-                    else
-                        samplePoint = i;
-                }
-
-            double mult = 1;
-
-            if (applyMultipliers && samplePoint > point)
-                mult = ControlPoints[samplePoint].VelocityAdjustment;
-
-            return ControlPoints[point].BeatLength * mult;
+            ControlPoint overridePoint;
+            ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
+            return timingPoint.BeatLength;
         }
+
+        public ControlPoint TimingPointAt(double time, out ControlPoint overridePoint)
+        {
+            overridePoint = null;
+
+            ControlPoint timingPoint = null;
+            foreach (var controlPoint in ControlPoints)
+            {
+                // Some beatmaps have the first timingPoint (accidentally) start after the first HitObject(s).
+                // This null check makes it so that the first ControlPoint that makes a timing change is used as
+                // the timingPoint for those HitObject(s).
+                if (controlPoint.Time <= time || timingPoint == null)
+                {
+                    if (controlPoint.TimingChange)
+                    {
+                        timingPoint = controlPoint;
+                        overridePoint = null;
+                    }
+                    else overridePoint = controlPoint;
+                }
+                else break;
+            }
+
+            return timingPoint ?? ControlPoint.Default;
+        }
+
+        public double CalculateStarDifficulty() => Ruleset.GetRuleset(BeatmapInfo.Mode).CreateDifficultyCalculator(this).Calculate();
     }
 }

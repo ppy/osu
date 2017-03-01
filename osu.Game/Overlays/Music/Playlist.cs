@@ -59,6 +59,7 @@ namespace osu.Game.Overlays.Music
             {
                 new ScrollContainer
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
                         playlistFlow = new FlowContainer<PlaylistItem>

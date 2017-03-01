@@ -34,7 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenTK, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>..\packages\ppy.OpenTK.2.0.50727.1339\lib\net45\OpenTK.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.2.0.50727.1340\lib\net45\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -59,14 +59,18 @@
     <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
     <Compile Include="Objects\Drawables\HitExplosion.cs" />
     <Compile Include="Objects\Drawables\Pieces\NumberPiece.cs" />
+    <Compile Include="Objects\Drawables\DrawableSliderTick.cs" />
     <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBouncer.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerDisc.cs" />
     <Compile Include="Objects\Drawables\Pieces\TrianglesPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBall.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
+    <Compile Include="Objects\OsuHitObjectDifficulty.cs" />
     <Compile Include="Objects\OsuHitObjectParser.cs" />
     <Compile Include="Objects\SliderCurve.cs" />
+    <Compile Include="Objects\SliderTick.cs" />
+    <Compile Include="OsuDifficultyCalculator.cs" />
     <Compile Include="OsuScore.cs" />
     <Compile Include="OsuScoreProcessor.cs" />
     <Compile Include="UI\OsuComboCounter.cs" />

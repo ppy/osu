@@ -10,7 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Music
                                 playlistView = new Playlist
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    Height = 380,
+                                    Height = 380
                                 }
                             }
                         }

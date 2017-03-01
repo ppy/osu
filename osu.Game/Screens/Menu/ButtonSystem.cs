@@ -7,11 +7,10 @@ using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Toolbar;
@@ -31,8 +30,6 @@ namespace osu.Game.Screens.Menu
         public Action OnMulti;
         public Action OnChart;
         public Action OnTest;
-
-        private AudioSample sampleOsuClick;
 
         private Toolbar toolbar;
 
@@ -120,9 +117,8 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuGame game = null)
+        private void load(OsuGame game = null)
         {
-            sampleOsuClick = audio.Sample.Get(@"Menu/menuhit");
             toolbar = game?.Toolbar;
         }
 
@@ -181,7 +177,6 @@ namespace osu.Game.Screens.Menu
             switch (state)
             {
                 case MenuState.Initial:
-                    sampleOsuClick.Play();
                     State = MenuState.TopLevel;
                     return;
                 case MenuState.TopLevel:
@@ -218,6 +213,7 @@ namespace osu.Game.Screens.Menu
 
                 switch (state)
                 {
+                    case MenuState.Exit:
                     case MenuState.Initial:
                         toolbar?.Hide();
 
@@ -233,6 +229,12 @@ namespace osu.Game.Screens.Menu
 
                         foreach (Button b in buttonsPlay)
                             b.State = ButtonState.Contracted;
+
+                        if (state == MenuState.Exit)
+                        {
+                            osuLogo.RotateTo(20, EXIT_DELAY * 1.5f);
+                            osuLogo.FadeOut(EXIT_DELAY);
+                        }
                         break;
                     case MenuState.TopLevel:
                         buttonArea.Flush(true);
@@ -275,21 +277,6 @@ namespace osu.Game.Screens.Menu
 
                         foreach (Button b in buttonsPlay)
                             b.State = ButtonState.Contracted;
-                        break;
-                    case MenuState.Exit:
-                        buttonArea.FadeOut(200);
-
-                        foreach (Button b in buttonsTopLevel)
-                            b.State = ButtonState.Contracted;
-
-                        foreach (Button b in buttonsPlay)
-                            b.State = ButtonState.Contracted;
-
-                        osuLogo.Delay(150);
-
-                        osuLogo.ScaleTo(1f, EXIT_DELAY * 1.5f);
-                        osuLogo.RotateTo(20, EXIT_DELAY * 1.5f);
-                        osuLogo.FadeOut(EXIT_DELAY);
                         break;
                 }
 

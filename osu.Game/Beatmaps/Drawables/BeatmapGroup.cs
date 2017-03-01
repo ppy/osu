@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
 using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -60,15 +59,21 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
-        public BeatmapGroup(WorkingBeatmap beatmap, BeatmapSetInfo set = null)
+        public BeatmapGroup(BeatmapSetInfo beatmapSet, BeatmapDatabase database)
         {
+            BeatmapSet = beatmapSet;
+            WorkingBeatmap beatmap = database.GetWorkingBeatmap(BeatmapSet.Beatmaps.FirstOrDefault());
+            foreach (var b in BeatmapSet.Beatmaps)
+                b.StarDifficulty = (float)(database.GetWorkingBeatmap(b).Beatmap?.CalculateStarDifficulty() ?? 0);
+
             Header = new BeatmapSetHeader(beatmap)
             {
                 GainedSelection = headerGainedSelection,
                 RelativeSizeAxes = Axes.X,
             };
-
-            BeatmapPanels = beatmap.BeatmapSetInfo.Beatmaps.Select(b => new BeatmapPanel(b)
+            
+            BeatmapSet.Beatmaps = BeatmapSet.Beatmaps.OrderBy(b => b.StarDifficulty).ToList();
+            BeatmapPanels = BeatmapSet.Beatmaps.Select(b => new BeatmapPanel(b)
             {
                 Alpha = 0,
                 GainedSelection = panelGainedSelection,
@@ -76,7 +81,6 @@ namespace osu.Game.Beatmaps.Drawables
                 RelativeSizeAxes = Axes.X,
             }).ToList();
 
-            BeatmapSet = set;
             Header.AddDifficultyIcons(BeatmapPanels);
         }
 

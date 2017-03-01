@@ -60,6 +60,35 @@ namespace osu.Game.Overlays.Music
             Action = () => OnSelected?.Invoke(BeatmapSetInfo);
 
             AutoSizeAxes = Axes.Both;
+            ////Children = new[]
+            ////{
+            ////    new FlowContainer<SpriteText>
+            ////    {
+            ////        Direction = FlowDirections.Horizontal,
+            ////        Spacing = new Vector2(10, 0),
+            ////        AutoSizeAxes = Axes.Both,
+            ////        Children = new[]
+            ////        {
+            ////            title = new SpriteText
+            ////            {
+            ////                Font = @"Exo2.0-Regular",
+            ////                TextSize = 14,
+            ////                Colour = Color4.White
+            ////            },
+            ////            artist = new SpriteText
+            ////            {
+            ////                Font = @"Exo2.0-Bold",
+            ////                TextSize = 12,
+            ////                Colour = OsuColour.FromHex("999")
+            ////            }
+            ////        }
+            ////    }
+            ////};
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
             Children = new[]
             {
                 new FlowContainer<SpriteText>
@@ -69,13 +98,13 @@ namespace osu.Game.Overlays.Music
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        title = new OsuSpriteText
+                        title = new SpriteText
                         {
                             Font = @"Exo2.0-Regular",
                             TextSize = 14,
                             Colour = Color4.White
                         },
-                        artist = new OsuSpriteText
+                        artist = new SpriteText
                         {
                             Font = @"Exo2.0-Bold",
                             TextSize = 12,
@@ -84,11 +113,7 @@ namespace osu.Game.Overlays.Music
                     }
                 }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
             unicodeString = config.GetUnicodeString;
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
             preferUnicode.ValueChanged += preferUnicode_changed;

@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
@@ -89,7 +89,6 @@ namespace osu.Game.Overlays.Notifications
                                 IconContent = new Container
                                 {
                                     Size = new Vector2(40),
-                                    Colour = Color4.DarkGray,
                                     Masking = true,
                                     CornerRadius = 5,
                                 },
@@ -212,7 +211,7 @@ namespace osu.Game.Overlays.Notifications
                 {
                     pulsate = value;
 
-                    pulsateLayer.ClearTransformations();
+                    pulsateLayer.ClearTransforms();
                     pulsateLayer.Alpha = 1;
 
                     if (pulsate)
@@ -257,7 +256,7 @@ namespace osu.Game.Overlays.Notifications
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
                 Size = new Vector2(6, 15);
 

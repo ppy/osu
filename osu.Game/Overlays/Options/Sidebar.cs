@@ -1,16 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Threading;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Toolbar;
 
 namespace osu.Game.Overlays.Options
@@ -74,6 +72,7 @@ namespace osu.Game.Overlays.Options
             {
                 Content.Anchor = Anchor.CentreLeft;
                 Content.Origin = Anchor.CentreLeft;
+                RelativeSizeAxes = Axes.Both;
             }
         }
     }

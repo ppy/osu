@@ -2,22 +2,16 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.GameModes.Testing;
+using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Modes;
-using osu.Game.Modes.Catch;
 using osu.Game.Modes.Catch.UI;
-using osu.Game.Modes.Mania;
 using osu.Game.Modes.Mania.UI;
-using osu.Game.Modes.Osu;
 using osu.Game.Modes.Osu.UI;
-using osu.Game.Modes.Taiko;
 using osu.Game.Modes.Taiko.UI;
 using osu.Game.Modes.UI;
-using osu.Game.Screens.Play;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Primitives;
@@ -164,7 +158,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddButton(@"Alter stars", delegate
             {
-                stars.Count = RNG.NextSingle() * (stars.MaxStars + 1);
+                stars.Count = RNG.NextSingle() * (stars.StarCount + 1);
                 starsLabel.Text = stars.Count.ToString("0.00");
             });
 
