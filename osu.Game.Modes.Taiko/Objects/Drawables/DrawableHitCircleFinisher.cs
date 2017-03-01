@@ -21,8 +21,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         }
 
         protected override HitCirclePiece CreateBody() => new DonFinisherPiece();
-
-        protected override ExplodePiece CreateExplode() => new FinisherExplodePiece()
+        protected override ExplodePiece CreateExplode() => new ExplodePiece()
         {
             Colour = new Color4(187, 17, 119, 255)
         };
@@ -38,10 +37,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         }
 
         protected override HitCirclePiece CreateBody() => new KatsuFinisherPiece();
-
-        protected override ExplodePiece CreateExplode() => new FinisherExplodePiece()
+        protected override ExplodePiece CreateExplode() => new ExplodePiece()
         {
-            Colour = new Color4(17, 136, 170, 255),
+            Colour = new Color4(17, 136, 170, 255)
         };
 
         protected override FlashPiece CreateFlash() => new FinisherFlashPiece();

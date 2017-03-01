@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
@@ -17,10 +19,15 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
     {
         protected virtual List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
 
+        private Container bodyPiece;
+        private ExplodePiece explodePiece;
+
         private int tickIndex;
 
         private DrumRoll drumRoll;
         private DrumRollTick drumRollTick;
+
+        private double hitDuration => drumRollTick.TickDistance / drumRoll.Length * drumRoll.Duration;
 
         public DrawableDrumRollTick(DrumRoll drumRoll, DrumRollTick drumRollTick, int tickIndex)
             : base(drumRollTick)
@@ -34,23 +41,40 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             Size = new Vector2(16) * drumRollTick.Scale;
 
-            Masking = true;
-            CornerRadius = Size.X / 2;
-
             Origin = Anchor.Centre;
             Anchor = Anchor.CentreLeft;
 
-            BorderThickness = 3;
-            BorderColour = Color4.White;
-
-            Children = new[]
+            Children = new Drawable[]
             {
-                new Box()
+                bodyPiece = new Container()
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
-                    Alpha = drumRollTick.FirstTick ? 1f : 0f,
-                    AlwaysPresent = true
+
+                    Masking = true,
+                    CornerRadius = Size.X / 2,
+
+                    BorderThickness = 3,
+                    BorderColour = Color4.White,
+
+                    Children = new[]
+                    {
+                        new Box()
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.White,
+                            Alpha = drumRollTick.FirstTick ? 1f : 0f,
+                            AlwaysPresent = true
+                        },
+                    }
+                },
+                explodePiece = new ExplodePiece()
+                {
+                    Colour = new Color4(238, 170, 0, 255),
+                    
+                    Size = new Vector2(128)
                 }
             };
 
@@ -72,7 +96,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > drumRollTick.TickDistance / 2)
+                if (Judgement.TimeOffset > hitDuration / 2)
                     Judgement.Result = HitResult.Miss;
                 return;
             }
@@ -81,7 +105,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             TaikoJudgementInfo taikoJudgement = Judgement as TaikoJudgementInfo;
             
-            if (hitOffset < drumRollTick.TickDistance / 2)
+            if (hitOffset < hitDuration / 2)
             {
                 Judgement.Result = HitResult.Hit;
                 taikoJudgement.Score = TaikoScoreResult.Great;
@@ -102,10 +126,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 case ArmedState.Miss:
                     break;
                 case ArmedState.Hit:
-                    const double flash_in = 100;
+                    const double flash_in = 200;
 
-                    ScaleTo(1.5f, flash_in);
-                    FadeOut(flash_in);
+                    explodePiece.FadeIn();
+                    explodePiece.ScaleTo(3f, flash_in);
+                    explodePiece.FadeOut(flash_in);
+
+                    bodyPiece.ScaleTo(1.5f, flash_in);
+                    bodyPiece.FadeOut(flash_in);
+
+                    Delay(flash_in * 2);
                     break;
             }
         }

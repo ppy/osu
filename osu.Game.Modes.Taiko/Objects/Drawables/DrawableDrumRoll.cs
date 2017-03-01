@@ -51,7 +51,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             int tickIndex = 0;
             foreach (var tick in drumRoll.Ticks)
             {
-                var newTick = new DrawableDrumRollTick(drumRoll, tick, tickIndex);
+                var newTick = new DrawableDrumRollTick(drumRoll, tick, tickIndex)
+                {
+                    Depth = tickIndex
+                };
 
                 body.Ticks.Add(newTick);
                 allTicks.Add(newTick);

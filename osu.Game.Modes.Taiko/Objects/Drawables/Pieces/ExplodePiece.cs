@@ -11,19 +11,11 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 {
-    public class FinisherExplodePiece : ExplodePiece
-    {
-        public FinisherExplodePiece()
-        {
-            Size *= 1.5f;
-        }
-    }
-
     public class ExplodePiece : CircularContainer
     {
         public ExplodePiece()
         {
-            Size = new Vector2(128);
+            RelativeSizeAxes = Axes.Both;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
