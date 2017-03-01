@@ -14,6 +14,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         public TrianglesPiece()
         {
             TriangleScale = 1.2f;
+            HideAlphaDiscrepancies = false;
         }
 
         protected override void Update()

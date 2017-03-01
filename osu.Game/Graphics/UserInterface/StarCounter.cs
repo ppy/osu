@@ -14,8 +14,6 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly Container<Star> stars;
 
-        private double transformStartTime;
-
         /// <summary>
         /// Maximum amount of stars displayed.
         /// </summary>
