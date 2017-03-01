@@ -203,7 +203,6 @@ namespace osu.Game.Database
             {
                 string[] mapNames = reader.BeatmapFilenames;
                 foreach (var name in mapNames)
-                {
                     using (var stream = new StreamReader(reader.GetStream(name)))
                     {
                         var decoder = BeatmapDecoder.GetDecoder(stream);
@@ -215,8 +214,7 @@ namespace osu.Game.Database
 
                         beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
                     }
-                    beatmapSet.StoryboardFile = reader.StoryboardFilename;
-                }
+                beatmapSet.StoryboardFile = reader.StoryboardFilename;
             }
 
             return beatmapSet;
