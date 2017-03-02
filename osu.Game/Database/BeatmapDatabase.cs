@@ -125,7 +125,8 @@ namespace osu.Game.Database
                 {
                     BeatmapSetInfo set = getBeatmapSet(p);
 
-                    sets.Push(set);
+                    if (set.ID == 0)
+                        sets.Push(set);
 
                     // We may or may not want to delete the file depending on where it is stored.
                     //  e.g. reconstructing/repairing database with beatmaps from default storage.
@@ -193,7 +194,7 @@ namespace osu.Game.Database
                     BeatmapSetAdded?.Invoke(existing);
                 }
 
-                return null;
+                return existing;
             }
 
             var beatmapSet = new BeatmapSetInfo
@@ -233,11 +234,10 @@ namespace osu.Game.Database
                 connection.BeginTransaction();
 
                 foreach (var s in beatmapSets)
-                    if (s != null)
-                    {
-                        connection.InsertWithChildren(s, true);
-                        BeatmapSetAdded?.Invoke(s);
-                    }
+                {
+                    connection.InsertWithChildren(s, true);
+                    BeatmapSetAdded?.Invoke(s);
+                }
 
                 connection.Commit();
             }
