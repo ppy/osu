@@ -192,8 +192,10 @@ namespace osu.Game.Screens.Select
             ScrollTo(selectedY, animated);
         }
 
-        public void Sort(FilterControl.SortMode mode) {
-            switch (mode) { 
+        public void Sort(FilterControl.SortMode mode)
+        {
+            switch (mode)
+            {
                 case FilterControl.SortMode.Artist:
                     groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist));
                     break;
@@ -206,15 +208,17 @@ namespace osu.Game.Screens.Select
                 case FilterControl.SortMode.Difficulty:
                     groups.Sort((x, y) =>
                     {
-                        float xAverage=0, yAverage=0;
-                        int counter=0;
-                        foreach (BeatmapInfo set in x.BeatmapSet.Beatmaps) {
+                        float xAverage = 0, yAverage = 0;
+                        int counter = 0;
+                        foreach (BeatmapInfo set in x.BeatmapSet.Beatmaps)
+                        {
                             xAverage += set.StarDifficulty;
                             counter++;
                         }
                         xAverage /= counter;
                         counter = 0;
-                        foreach (BeatmapInfo set in y.BeatmapSet.Beatmaps) {
+                        foreach (BeatmapInfo set in y.BeatmapSet.Beatmaps)
+                        {
                             yAverage += set.StarDifficulty;
                             counter++;
                         }
