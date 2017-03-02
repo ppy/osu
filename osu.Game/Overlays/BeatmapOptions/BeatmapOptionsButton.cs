@@ -16,6 +16,8 @@ namespace osu.Game.Overlays.BeatmapOptions
 {
     public class BeatmapOptionsButton : ClickableContainer
     {
+        public static readonly Vector2 SIZE = new Vector2(130f, 100f);
+
         private Box background, flash;
         private TextAwesome iconText;
         private OsuSpriteText firstLine, secondLine;
@@ -67,7 +69,7 @@ namespace osu.Game.Overlays.BeatmapOptions
 
         public BeatmapOptionsButton()
         {
-            Size = new Vector2(130f, 100f);
+            Size = SIZE;
 
             Children = new Drawable[]
             {
