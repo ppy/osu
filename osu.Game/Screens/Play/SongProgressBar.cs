@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play
 
         public SongProgressBar()
         {
-            fill.Colour = SongProgress.FILL_COLOUR;
+            Fill.Colour = SongProgress.FILL_COLOUR;
             Height = SongProgress.BAR_HEIGHT;
 
             Add(new Box
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play
                 Alpha = 0.5f,
                 Depth = 1
             });
-            fillContainer.Add(handle = new Container
+            FillContainer.Add(handle = new Container
             {
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,
