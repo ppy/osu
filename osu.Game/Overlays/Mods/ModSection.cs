@@ -16,7 +16,7 @@ using osu.Game.Modes;
 
 namespace osu.Game.Overlays.Mods
 {
-    class AlwaysPresentFlowContainer : FlowContainer
+    class AlwaysPresentFlowContainer : FillFlowContainer
     {
         public override bool IsPresent => true;
     }
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Mods
         private OsuSpriteText headerLabel;
 
         private AlwaysPresentFlowContainer buttonsContainer;
-        public FlowContainer ButtonsContainer => buttonsContainer;
+        public FillFlowContainer ButtonsContainer => buttonsContainer;
 
         public Action<Mod> Action;
         protected virtual Key[] ToggleKeys => new Key[] { };

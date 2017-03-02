@@ -33,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
             Children = new Drawable[]
             {
-                new FlowContainer
+                new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
