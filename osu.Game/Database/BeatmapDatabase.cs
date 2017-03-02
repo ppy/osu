@@ -130,6 +130,7 @@ namespace osu.Game.Database
 
                     // We may or may not want to delete the file depending on where it is stored.
                     //  e.g. reconstructing/repairing database with beatmaps from default storage.
+                    // Also, not always a single file, i.e. for LegacyFilesystemReader
                     // TODO: Add a check to prevent files from storage to be deleted.
                     try
                     {
@@ -156,10 +157,9 @@ namespace osu.Game.Database
 
         /// <summary>
         /// Duplicates content from <paramref name="path"/> to storage and returns a representing <see cref="BeatmapSetInfo"/>.
-        /// Returns null if a representation already exists.
         /// </summary>
         /// <param name="path">Content location</param>
-        /// <returns><see cref="BeatmapSetInfo"/> or null</returns>
+        /// <returns><see cref="BeatmapSetInfo"/></returns>
         private BeatmapSetInfo getBeatmapSet(string path)
         {
             string hash = null;
