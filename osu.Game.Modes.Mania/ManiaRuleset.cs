@@ -8,8 +8,6 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays.Mods;
-using OpenTK.Input;
 
 namespace osu.Game.Modes.Mania
 {
@@ -18,31 +16,6 @@ namespace osu.Game.Modes.Mania
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
         public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new ManiaHitRenderer { Beatmap = beatmap };
-
-        public override IEnumerable<Mod> AvailableMods => new Mod[]
-        {
-            new ManiaModNoFail(),
-            new ManiaModEasy(),
-            new ManiaModHidden(),
-            new ManiaModHardRock(),
-            new ManiaModSuddenDeath(),
-            new ManiaModDoubleTime(),
-            new ManiaModHalfTime(),
-            new ManiaModNightcore(),
-            new ManiaModFlashlight(),
-            new ManiaModFadeIn(),
-            new ManiaModRandom(),
-            new ManiaModKey1(),
-            new ManiaModKey2(),
-            new ManiaModKey3(),
-            new ManiaModKey4(),
-            new ManiaModKey5(),
-            new ManiaModKey6(),
-            new ManiaModKey7(),
-            new ManiaModKey8(),
-            new ManiaModKey9(),
-            new ManiaModKeyCoop(),
-        };
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {

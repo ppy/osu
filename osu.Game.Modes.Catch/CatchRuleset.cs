@@ -8,8 +8,6 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays.Mods;
-using OpenTK.Input;
 
 namespace osu.Game.Modes.Catch
 {
@@ -18,20 +16,6 @@ namespace osu.Game.Modes.Catch
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
         public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new CatchHitRenderer { Beatmap = beatmap };
-
-        public override IEnumerable<Mod> AvailableMods => new Mod[]
-        {
-            new CatchModNoFail(),
-            new CatchModEasy(),
-            new CatchModHidden(),
-            new CatchModHardRock(),
-            new CatchModSuddenDeath(),
-            new CatchModDoubleTime(),
-            new CatchModRelax(),
-            new CatchModHalfTime(),
-            new CatchModNightcore(),
-            new CatchModFlashlight(),
-        };
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {

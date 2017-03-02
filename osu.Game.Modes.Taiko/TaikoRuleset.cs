@@ -8,8 +8,6 @@ using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.Taiko.UI;
 using osu.Game.Modes.UI;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays.Mods;
-using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko
 {
@@ -18,20 +16,6 @@ namespace osu.Game.Modes.Taiko
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
         public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new TaikoHitRenderer { Beatmap = beatmap };
-
-        public override IEnumerable<Mod> AvailableMods => new Mod[]
-        {
-            new TaikoModNoFail(),
-            new TaikoModEasy(),
-            new TaikoModHidden(),
-            new TaikoModHardRock(),
-            new TaikoModSuddenDeath(),
-            new TaikoModDoubleTime(),
-            new TaikoModRelax(),
-            new TaikoModHalfTime(),
-            new TaikoModNightcore(),
-            new TaikoModFlashlight(),
-        };
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
