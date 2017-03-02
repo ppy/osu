@@ -39,8 +39,8 @@ namespace osu.Game.Modes.Taiko.UI
                 return new DrawableDrumRoll(h as DrumRoll);
             }
 
-            if (h is Spinner)
-                return new DrawableSpinner(h as Spinner);
+            if (h is Bash)
+                return new DrawableBash(h as Bash);
 
             return null;
         }

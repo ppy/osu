@@ -108,15 +108,6 @@ namespace osu.Desktop.VisualTests.Tests
                         TickDistance = 100 * (1000 / 500),
                         PreEmpt = 500
                     }));
-
-                    for (int i = 0; i <= 400; i += 100)
-                    {
-                        add(new DrawableHitCircleDon(new HitCircle
-                        {
-                            StartTime = framedClock.CurrentTime + 600 + i,
-                            PreEmpt = 500
-                        }));
-                    }
                     break;
                 case HitObjectType.DrumRollFinisher:
                     add(new DrawableDrumRollFinisher(new DrumRoll
@@ -129,11 +120,12 @@ namespace osu.Desktop.VisualTests.Tests
                     }));
                     break;
                 case HitObjectType.Spinner:
-                    add(new DrawableSpinner(new Spinner
+                    add(new DrawableBash(new Bash
                     {
                         StartTime = framedClock.CurrentTime + 600,
                         Length = 1000,
-                        PreEmpt = 500
+                        PreEmpt = 500,
+                        RequiredHits = 20
                     }));
                     break;
             }

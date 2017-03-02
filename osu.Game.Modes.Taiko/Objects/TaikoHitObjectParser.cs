@@ -41,7 +41,7 @@ namespace osu.Game.Modes.Taiko.Objects
                     };
                     break;
                 case HitObjectType.Spinner:
-                    result = new Spinner
+                    result = new Bash
                     {
                         Length = Convert.ToDouble(split[5], CultureInfo.InvariantCulture) - Convert.ToDouble(split[2], CultureInfo.InvariantCulture),
                     };

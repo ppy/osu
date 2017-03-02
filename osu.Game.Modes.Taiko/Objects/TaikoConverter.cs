@@ -49,7 +49,7 @@ namespace osu.Game.Modes.Taiko.Objects
 
                     if (o is Osu.Objects.Spinner)
                     {
-                        h = new Spinner()
+                        h = new Bash()
                         {
                             StartTime = o.StartTime,
                             Sample = o.Sample,

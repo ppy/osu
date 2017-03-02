@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Objects\Drawables\DrawableDrumRollTick.cs" />
-    <Compile Include="Objects\Drawables\DrawableSpinner.cs" />
+    <Compile Include="Objects\Drawables\DrawableBash.cs" />
     <Compile Include="Objects\Drawables\DrawableTaikoHitObject.cs" />
     <Compile Include="Objects\Drawables\DrawableHitCircle.cs" />
     <Compile Include="Objects\Drawables\DrawableHitCircleFinisher.cs" />
@@ -65,7 +65,7 @@
     <Compile Include="Objects\DrumRoll.cs" />
     <Compile Include="Objects\DrumRollTick.cs" />
     <Compile Include="Objects\HitCircle.cs" />
-    <Compile Include="Objects\Spinner.cs" />
+    <Compile Include="Objects\Bash.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
     <Compile Include="Objects\TaikoDrumRollJudgementInfo.cs" />
     <Compile Include="Objects\TaikoScoreResult.cs" />

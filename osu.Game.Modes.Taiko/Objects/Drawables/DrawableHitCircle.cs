@@ -63,8 +63,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             Children = new Drawable[]
             {
-                bodyPiece = CreateBody(),
                 explodePiece = CreateExplode(),
+                bodyPiece = CreateBody(),
                 flashPiece = CreateFlash()
             };
 
