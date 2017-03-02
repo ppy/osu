@@ -28,14 +28,13 @@ namespace osu.Desktop.VisualTests.Tests
                 RelativeSizeAxes = Axes.X,
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.BottomCentre,
-                ModMode = PlayMode.Osu,
             });
 
             AddButton("Toggle", modSelect.ToggleVisibility);
-            AddButton("osu!", () => modSelect.ModMode = PlayMode.Osu);
-            AddButton("osu!taiko", () => modSelect.ModMode = PlayMode.Taiko);
-            AddButton("osu!catch", () => modSelect.ModMode = PlayMode.Catch);
-            AddButton("osu!mania", () => modSelect.ModMode = PlayMode.Mania);
+            AddButton("osu!", () => modSelect.PlayMode.Value = PlayMode.Osu);
+            AddButton("osu!taiko", () => modSelect.PlayMode.Value = PlayMode.Taiko);
+            AddButton("osu!catch", () => modSelect.PlayMode.Value = PlayMode.Catch);
+            AddButton("osu!mania", () => modSelect.PlayMode.Value = PlayMode.Mania);
         }
     }
 }
