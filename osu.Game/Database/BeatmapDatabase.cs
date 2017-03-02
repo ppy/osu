@@ -143,6 +143,7 @@ namespace osu.Game.Database
                 }
                 catch (Exception e)
                 {
+                    e = e.InnerException ?? e;
                     Logger.Error(e, $@"Could not import beatmap set");
                 }
             
