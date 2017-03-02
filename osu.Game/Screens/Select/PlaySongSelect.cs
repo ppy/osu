@@ -56,7 +56,22 @@ namespace osu.Game.Screens.Select
 
         OsuScreen player;
 
-        FilterControl filter;
+        private FilterControl filter;
+        public FilterControl Filter
+        {
+            get
+            {
+                return filter;
+            }
+            private set
+            {
+                if (filter != value)
+                {
+                    filter = value;
+                    filterChanged();
+                }
+            }
+        }
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapDatabase beatmaps, AudioManager audio, DialogOverlay dialog, Framework.Game game,
@@ -164,6 +179,7 @@ namespace osu.Game.Screens.Select
                 filterTask = null;
                 var search = filter.Search;
                 BeatmapGroup newSelection = null;
+                carousel.Sort(filter.Sort);
                 foreach (var beatmapGroup in carousel)
                 {
                     var set = beatmapGroup.BeatmapSet;
@@ -375,6 +391,7 @@ namespace osu.Game.Screens.Select
                 if (token.IsCancellationRequested) return;
                 addBeatmapSet(beatmapSet, game);
             }
+            filterChanged();
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
