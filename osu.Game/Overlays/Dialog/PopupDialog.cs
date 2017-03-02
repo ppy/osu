@@ -3,9 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -14,6 +11,9 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 
 namespace osu.Game.Overlays.Dialog
 {
@@ -32,46 +32,25 @@ namespace osu.Game.Overlays.Dialog
 
         public FontAwesome Icon
         {
-            get
-            {
-                return iconText.Icon;
-            }
-            set
-            {
-                iconText.Icon = value;
-            }
+            get { return iconText.Icon; }
+            set { iconText.Icon = value; }
         }
 
         public string HeaderText
         {
-            get
-            {
-                return header.Text;
-            }
-            set
-            {
-                header.Text = value;
-            }
+            get { return header.Text; }
+            set { header.Text = value; }
         }
 
         public string BodyText
         {
-            get
-            {
-                return body.Text;
-            }
-            set
-            {
-                body.Text = value;
-            }
+            get { return body.Text; }
+            set { body.Text = value; }
         }
 
-        public PopupDialogButton[] Buttons
+        public IEnumerable<PopupDialogButton> Buttons
         {
-            get
-            {
-                return buttonsContainer.Children.ToArray();
-            }
+            get { return buttonsContainer.Children; }
             set
             {
                 buttonsContainer.Children = value;
@@ -89,8 +68,8 @@ namespace osu.Game.Overlays.Dialog
 
         private void pressButtonAtIndex(int index)
         {
-            if (index < Buttons.Length)
-                Buttons[index].TriggerClick();
+            if (index < Buttons.Count())
+                Buttons.Skip(index).First().TriggerClick();
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
