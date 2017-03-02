@@ -27,12 +27,12 @@ namespace osu.Game.Screens.Menu
 
             Children = new Drawable[]
             {
-                new FlowContainer
+                new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Down,
                     Spacing = new Vector2(0, 2),
                     Children = new Drawable[]
                     {

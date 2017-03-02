@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps.Drawables
         private OsuConfigManager config;
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap beatmap;
-        private FlowContainer difficultyIcons;
+        private FillFlowContainer difficultyIcons;
 
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
@@ -36,9 +36,9 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Down,
                     Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
@@ -58,7 +58,7 @@ namespace osu.Game.Beatmaps.Drawables
                             TextSize = 17,
                             Shadow = true,
                         },
-                        difficultyIcons = new FlowContainer
+                        difficultyIcons = new FillFlowContainer
                         {
                             Margin = new MarginPadding { Top = 5 },
                             AutoSizeAxes = Axes.Both,
@@ -109,10 +109,10 @@ namespace osu.Game.Beatmaps.Drawables
 
                 Children = new[]
                 {
-                    new FlowContainer
+                    new FillFlowContainer
                     {
                         Depth = -1,
-                        Direction = FlowDirections.Horizontal,
+                        Direction = FillDirection.Right,
                         RelativeSizeAxes = Axes.Both,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),

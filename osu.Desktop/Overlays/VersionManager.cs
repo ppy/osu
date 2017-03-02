@@ -37,7 +37,7 @@ namespace osu.Desktop.Overlays
         [BackgroundDependencyLoader]
         private void load(NotificationManager notification, OsuColour colours, TextureStore textures)
         {
-            this.notificationManager = notification;
+            notificationManager = notification;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
@@ -57,19 +57,19 @@ namespace osu.Desktop.Overlays
 
             Children = new Drawable[]
             {
-                new FlowContainer
+                new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Down,
                     Children = new Drawable[]
                     {
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Direction = FlowDirections.Horizontal,
+                            Direction = FillDirection.Right,
+                            Spacing = new Vector2(5),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
                                 new OsuSpriteText
@@ -95,6 +95,8 @@ namespace osu.Desktop.Overlays
                         },
                         new Sprite
                         {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             Texture = textures.Get(@"Menu/dev-build-footer"),
                         },
                     }

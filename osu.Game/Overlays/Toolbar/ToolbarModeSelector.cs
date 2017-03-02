@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         const float padding = 10;
 
-        private FlowContainer modeButtons;
+        private FillFlowContainer modeButtons;
         private Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
@@ -32,11 +32,11 @@ namespace osu.Game.Overlays.Toolbar
             Children = new Drawable[]
             {
                 new OpaqueBackground(),
-                modeButtons = new FlowContainer
+                modeButtons = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Direction = FlowDirections.Horizontal,
+                    Direction = FillDirection.Right,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding { Left = padding, Right = padding },
