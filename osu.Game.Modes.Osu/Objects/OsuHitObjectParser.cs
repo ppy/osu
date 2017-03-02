@@ -1,12 +1,9 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects;
 using OpenTK;
@@ -18,21 +15,22 @@ namespace osu.Game.Modes.Osu.Objects
         public override HitObject Parse(string text)
         {
             string[] split = text.Split(',');
-            var type = (OsuHitObject.HitObjectType)int.Parse(split[3]);
-            bool combo = type.HasFlag(OsuHitObject.HitObjectType.NewCombo);
-            type &= (OsuHitObject.HitObjectType)0xF;
-            type &= ~OsuHitObject.HitObjectType.NewCombo;
+            var type = (HitObjectType)int.Parse(split[3]);
+            bool combo = type.HasFlag(HitObjectType.NewCombo);
+            type &= (HitObjectType)0xF;
+            type &= ~HitObjectType.NewCombo;
             OsuHitObject result;
             switch (type)
             {
-                case OsuHitObject.HitObjectType.Circle:
-                    result = new HitCircle();
+                case HitObjectType.Circle:
+                    result = new HitCircle
+                    {
+                        Position = new Vector2(int.Parse(split[0]), int.Parse(split[1]))
+                    };
                     break;
-                case OsuHitObject.HitObjectType.Slider:
-                    Slider s = new Slider();
-
+                case HitObjectType.Slider:
                     CurveTypes curveType = CurveTypes.Catmull;
-                    int repeatCount = 0;
+                    int repeatCount;
                     double length = 0;
                     List<Vector2> points = new List<Vector2>();
 
@@ -79,29 +77,28 @@ namespace osu.Game.Modes.Osu.Objects
                     if (split.Length > 7)
                         length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
 
-                    s.RepeatCount = repeatCount;
-
-                    s.Curve = new SliderCurve
+                    result = new Slider
                     {
                         ControlPoints = points,
                         Length = length,
-                        CurveType = curveType
+                        CurveType = curveType,
+                        RepeatCount = repeatCount,
+                        Position = new Vector2(int.Parse(split[0]), int.Parse(split[1]))
                     };
-
-                    s.Curve.Calculate();
-
-                    result = s;
                     break;
-                case OsuHitObject.HitObjectType.Spinner:
-                    result = new Spinner();
+                case HitObjectType.Spinner:
+                    result = new Spinner
+                    {
+                        Length = Convert.ToDouble(split[5], CultureInfo.InvariantCulture) - Convert.ToDouble(split[2], CultureInfo.InvariantCulture),
+                        Position = new Vector2(512, 384) / 2,
+                    };
                     break;
                 default:
-                    //throw new InvalidOperationException($@"Unknown hit object type {type}");
-                    return null;
+                    throw new InvalidOperationException($@"Unknown hit object type {type}");
             }
-            result.Position = new Vector2(int.Parse(split[0]), int.Parse(split[1]));
-            result.StartTime = double.Parse(split[2]);
-            result.Sample = new HitSampleInfo {
+            result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
+            result.Sample = new HitSampleInfo
+            {
                 Type = (SampleType)int.Parse(split[4]),
                 Set = SampleSet.Soft,
             };

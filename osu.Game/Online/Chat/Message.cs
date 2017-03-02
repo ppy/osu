@@ -1,5 +1,5 @@
-//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using Newtonsoft.Json;
@@ -11,6 +11,7 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"message_id")]
         public long Id;
 
+        //todo: this should be inside sender.
         [JsonProperty(@"user_id")]
         public int UserId;
 

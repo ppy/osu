@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Linq;
@@ -8,12 +8,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
-using osu.Game.Graphics.Backgrounds;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Modes;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -21,7 +19,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         const float padding = 10;
 
-        private FlowContainer modeButtons;
+        private FillFlowContainer modeButtons;
         private Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
@@ -34,19 +32,18 @@ namespace osu.Game.Overlays.Toolbar
             Children = new Drawable[]
             {
                 new OpaqueBackground(),
-                modeButtons = new FlowContainer
+                modeButtons = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Direction = FlowDirection.HorizontalOnly,
+                    Direction = FillDirection.Right,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding { Left = 10, Right = 10 },
+                    Padding = new MarginPadding { Left = padding, Right = padding },
                 },
                 modeButtonLine = new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(0.3f, 3),
+                    Size = new Vector2(padding * 2 + ToolbarButton.WIDTH, 3),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
                     Masking = true,

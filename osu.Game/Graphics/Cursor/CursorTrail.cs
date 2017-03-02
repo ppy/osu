@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -34,9 +34,9 @@ namespace osu.Game.Graphics.Cursor
         private float time;
         
         private TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
-        private const int MAX_SPRITES = 2048;
+        private const int max_sprites = 2048;
 
-        private TrailPart[] parts = new TrailPart[MAX_SPRITES];
+        private TrailPart[] parts = new TrailPart[max_sprites];
 
         private Vector2? lastPosition;
 
@@ -62,7 +62,7 @@ namespace osu.Game.Graphics.Cursor
         {
             RelativeSizeAxes = Axes.Both;
 
-            for (int i = 0; i < MAX_SPRITES; i++)
+            for (int i = 0; i < max_sprites; i++)
             {
                 parts[i].InvalidationID = 0;
                 parts[i].WasUpdated = true;
@@ -87,10 +87,10 @@ namespace osu.Game.Graphics.Cursor
 
             time = (float)(Time.Current - timeOffset) / 500f;
             if (time > fadeClockResetThreshold)
-                ResetTime();
+                resetTime();
         }
 
-        private void ResetTime()
+        private void resetTime()
         {
             for (int i = 0; i < parts.Length; ++i)
             {
@@ -134,7 +134,7 @@ namespace osu.Game.Graphics.Cursor
             parts[currentIndex].Time = time;
             ++parts[currentIndex].InvalidationID;
 
-            currentIndex = (currentIndex + 1) % MAX_SPRITES;
+            currentIndex = (currentIndex + 1) % max_sprites;
         }
 
         struct TrailPart
@@ -158,12 +158,12 @@ namespace osu.Game.Graphics.Cursor
             public float Time;
             public TrailDrawNodeSharedData Shared;
 
-            public TrailPart[] Parts = new TrailPart[MAX_SPRITES];
+            public TrailPart[] Parts = new TrailPart[max_sprites];
             public Vector2 Size;
 
             public TrailDrawNode()
             {
-                for (int i = 0; i < MAX_SPRITES; i++)
+                for (int i = 0; i < max_sprites; i++)
                 {
                     Parts[i].InvalidationID = 0;
                     Parts[i].WasUpdated = false;
@@ -173,7 +173,7 @@ namespace osu.Game.Graphics.Cursor
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
                 if (Shared.VertexBuffer == null)
-                    Shared.VertexBuffer = new QuadVertexBuffer<TexturedVertex2D>(MAX_SPRITES, BufferUsageHint.DynamicDraw);
+                    Shared.VertexBuffer = new QuadVertexBuffer<TexturedVertex2D>(max_sprites, BufferUsageHint.DynamicDraw);
 
                 Shader.GetUniform<float>("g_FadeClock").Value = Time;
 

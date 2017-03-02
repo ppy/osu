@@ -1,17 +1,15 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -32,10 +30,15 @@ namespace osu.Game.Graphics.UserInterface
             Font = @"Exo2.0-Bold",
         };
 
+        public override bool HandleInput => Action != null;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Colour = colours.BlueDark;
+            if (Action == null)
+                Colour = OsuColour.Gray(0.5f);
+
+            BackgroundColour = colours.BlueDark;
 
             Content.Masking = true;
             Content.CornerRadius = 5;

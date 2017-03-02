@@ -4,16 +4,12 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Play;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Game.Overlays;
 using System.Collections.Generic;
-using System;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Screens.Play
 {

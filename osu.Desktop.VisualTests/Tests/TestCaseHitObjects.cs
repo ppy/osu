@@ -1,18 +1,19 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework;
-using osu.Framework.GameModes.Testing;
+using System.Collections.Generic;
+using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using OpenTK;
-using osu.Framework.Allocation;
-using osu.Game.Modes.Objects;
+using osu.Framework.Configuration;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Modes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
+using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -20,44 +21,125 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Name => @"Hit Objects";
 
+        private StopwatchClock rateAdjustClock;
+        private FramedClock framedClock;
+
+        bool auto = false;
+
         public TestCaseHitObjects()
         {
-            var swClock = new StopwatchClock(true) { Rate = 0.2f };
-            Clock = new FramedClock(swClock);
+            rateAdjustClock = new StopwatchClock(true);
+            framedClock = new FramedClock(rateAdjustClock);
+            playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
+        }
+
+        HitObjectType mode = HitObjectType.Slider;
+
+        BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
+        private Container playfieldContainer;
+        private Container approachContainer;
+
+        private void load(HitObjectType mode)
+        {
+            this.mode = mode;
+
+            switch (mode)
+            {
+                case HitObjectType.Circle:
+                    const int count = 10;
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        var h = new HitCircle
+                        {
+                            StartTime = framedClock.CurrentTime + 600 + i * 80,
+                            Position = new Vector2((i - count / 2) * 14),
+                        };
+
+                        add(new DrawableHitCircle(h));
+                    }
+                    break;
+                case HitObjectType.Slider:
+                    add(new DrawableSlider(new Slider
+                    {
+                        StartTime = framedClock.CurrentTime + 600,
+                        ControlPoints = new List<Vector2>()
+                        {
+                            new Vector2(-200, 0),
+                            new Vector2(400, 0),
+                        },
+                        Length = 400,
+                        Position = new Vector2(-200, 0),
+                        Velocity = 1,
+                        TickDistance = 100,
+                    }));
+                    break;
+                case HitObjectType.Spinner:
+                    add(new DrawableSpinner(new Spinner
+                    {
+                        StartTime = framedClock.CurrentTime + 600,
+                        Length = 1000,
+                        Position = new Vector2(0, 0),
+                    }));
+                    break;
+            }
         }
 
         public override void Reset()
         {
             base.Reset();
 
-            Clock.ProcessFrame();
+            playbackSpeed.TriggerChange();
 
-            Container approachContainer = new Container { Depth = float.MinValue, };
+            AddButton(@"circles", () => load(HitObjectType.Circle));
+            AddButton(@"slider", () => load(HitObjectType.Slider));
+            AddButton(@"spinner", () => load(HitObjectType.Spinner));
 
-            Add(approachContainer);
+            AddToggle(@"auto", (state) => { auto = state; load(mode); });
 
-            const int count = 10;
-
-            for (int i = 0; i < count; i++)
+            ButtonsContainer.Add(new SpriteText { Text = "Playback Speed" });
+            ButtonsContainer.Add(new BasicSliderBar<double>
             {
-                var h = new HitCircle
+                Width = 150,
+                Height = 10,
+                SelectionColor = Color4.Orange,
+                Bindable = playbackSpeed
+            });
+
+            framedClock.ProcessFrame();
+
+            var clockAdjustContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Clock = framedClock,
+                Children = new[]
                 {
-                    StartTime = Clock.CurrentTime + 600 + i * 80,
-                    Position = new Vector2((i - count / 2) * 14),
-                };
+                    playfieldContainer = new Container { RelativeSizeAxes = Axes.Both },
+                    approachContainer = new Container { RelativeSizeAxes = Axes.Both }
+                }
+            };
 
-                DrawableHitCircle d = new DrawableHitCircle(h)
-                {
-                    Anchor = Anchor.Centre,
-                    Depth = i,
-                    State = ArmedState.Hit,
-                    Judgement = new OsuJudgementInfo { Result = HitResult.Hit }
-                };
+            Add(clockAdjustContainer);
 
+            load(mode);
+        }
 
-                approachContainer.Add(d.ApproachCircle.CreateProxy());
-                Add(d);
+        int depth;
+        void add(DrawableHitObject h)
+        {
+            h.Anchor = Anchor.Centre;
+            h.Depth = depth++;
+
+            if (auto)
+            {
+                h.State = ArmedState.Hit;
+                h.Judgement = new OsuJudgementInfo { Result = HitResult.Hit };
             }
+
+            playfieldContainer.Add(h);
+            var proxyable = h as IDrawableHitObjectWithProxiedApproach;
+            if (proxyable != null)
+                approachContainer.Add(proxyable.ProxiedLayer.CreateProxy());
         }
     }
 }

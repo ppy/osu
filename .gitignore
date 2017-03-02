@@ -11,7 +11,7 @@
 *.userprefs
 
 # Build results
-[Dd]ebug/
+bin/[Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
@@ -256,3 +256,4 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+Staging/

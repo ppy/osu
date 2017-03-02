@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -89,6 +89,8 @@ namespace osu.Game.Screens.Play
                         new OsuSpriteText
                         {
                             Text = Name,
+                            Font = @"Venera",
+                            TextSize = 12,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Both,

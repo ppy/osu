@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Play
 
         private void recreateGraph()
         {
-            RemoveAll(delegate { return true; }, true);
+            RemoveAll(delegate { return true; });
             columns.RemoveAll(delegate { return true; });
 
             for (int x = 0; x < DrawWidth; x += 3)

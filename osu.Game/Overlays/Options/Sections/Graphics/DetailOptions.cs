@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                     LabelText = "Softening filter",
                     Bindable = config.GetBindable<bool>(OsuConfig.BloomSoftening)
                 },
-                new OptionDropDown<ScreenshotFormat>
+                new OptionEnumDropDown<ScreenshotFormat>
                 {
                     LabelText = "Screenshot",
                     Bindable = config.GetBindable<ScreenshotFormat>(OsuConfig.ScreenshotFormat)

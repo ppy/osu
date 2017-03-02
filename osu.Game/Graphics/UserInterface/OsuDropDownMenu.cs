@@ -1,12 +1,9 @@
-//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
@@ -17,16 +14,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override DropDownHeader CreateHeader() => new OsuDropDownHeader();
 
-        protected override IEnumerable<DropDownMenuItem<U>> GetDropDownItems(IEnumerable<U> values)
-        {
-            return values.Select(v =>
-            {
-                var field = typeof(U).GetField(Enum.GetName(typeof(U), v));
-                return new OsuDropDownMenuItem<U>(
-                    field.GetCustomAttribute<DescriptionAttribute>()?.Description ?? field.Name, v);
-            });
-
-        }
+        protected override IEnumerable<DropDownMenuItem<U>> GetDropDownItems(IEnumerable<KeyValuePair<string, U>> values)
+            => values.Select(v => new OsuDropDownMenuItem<U>(v.Key, v.Value));
 
         public OsuDropDownMenu()
         {

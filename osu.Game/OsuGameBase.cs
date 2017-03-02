@@ -1,7 +1,6 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -20,9 +19,11 @@ using osu.Game.Online.API;
 
 namespace osu.Game
 {
-    public class OsuGameBase : BaseGame, IOnlineComponent
+    public class OsuGameBase : Framework.Game, IOnlineComponent
     {
         protected OsuConfigManager LocalConfig;
+
+        protected BeatmapDatabase BeatmapDatabase;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -41,7 +42,7 @@ namespace osu.Game
         {
             Dependencies.Cache(this);
             Dependencies.Cache(LocalConfig);
-            Dependencies.Cache(new BeatmapDatabase(Host.Storage, Host));
+            Dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, Host));
             Dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
@@ -51,6 +52,8 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
+
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto"));
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-RegularItalic"));
@@ -99,7 +102,7 @@ namespace osu.Game
             });
         }
 
-        public override void SetHost(BasicGameHost host)
+        public override void SetHost(GameHost host)
         {
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(host.Storage);

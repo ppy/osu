@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -14,11 +14,11 @@ namespace osu.Game.Overlays.Options.Sections.General
         protected override string Header => "Updates";
 
         [BackgroundDependencyLoader]
-        private void load(BasicStorage storage, OsuConfigManager config)
+        private void load(Storage storage, OsuConfigManager config)
         {
             Children = new Drawable[]
             {
-                new OptionDropDown<ReleaseStream>
+                new OptionEnumDropDown<ReleaseStream>
                 {
                     LabelText = "Release stream",
                     Bindable = config.GetBindable<ReleaseStream>(OsuConfig.ReleaseStream),

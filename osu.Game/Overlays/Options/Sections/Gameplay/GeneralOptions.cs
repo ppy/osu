@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -23,12 +23,12 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                     LabelText = "Background dim",
                     Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.DimLevel)
                 },
-                new OptionDropDown<ProgressBarType>
+                new OptionEnumDropDown<ProgressBarType>
                 {
                     LabelText = "Progress display",
                     Bindable = config.GetBindable<ProgressBarType>(OsuConfig.ProgressBarType)
                 },
-                new OptionDropDown<ScoreMeterType>
+                new OptionEnumDropDown<ScoreMeterType>
                 {
                     LabelText = "Score meter type",
                     Bindable = config.GetBindable<ScoreMeterType>(OsuConfig.ScoreMeter)

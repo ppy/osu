@@ -1,10 +1,11 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.Mania.Objects
 {
@@ -17,11 +18,11 @@ namespace osu.Game.Modes.Mania.Objects
             this.columns = columns;
         }
 
-        public override List<ManiaBaseHit> Convert(List<HitObject> input)
+        public override List<ManiaBaseHit> Convert(Beatmap beatmap)
         {
             List<ManiaBaseHit> output = new List<ManiaBaseHit>();
 
-            foreach (HitObject i in input)
+            foreach (HitObject i in beatmap.HitObjects)
             {
                 ManiaBaseHit h = i as ManiaBaseHit;
 

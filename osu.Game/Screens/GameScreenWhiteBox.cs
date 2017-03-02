@@ -1,13 +1,13 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.GameModes;
+using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Backgrounds;
@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens
 {
-    public class GameModeWhiteBox : OsuGameMode
+    public class ScreenWhiteBox : OsuScreen
     {
         private BackButton popButton;
 
@@ -25,13 +25,13 @@ namespace osu.Game.Screens
 
         protected virtual IEnumerable<Type> PossibleChildren => null;
 
-        private FlowContainer childModeButtons;
+        private FillFlowContainer childModeButtons;
         private Container textContainer;
         private Box box;
 
-        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg2");
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg2");
 
-        protected override void OnEntering(GameMode last)
+        protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
 
@@ -54,7 +54,7 @@ namespace osu.Game.Screens
             Content.FadeIn(transition_time, EasingTypes.OutExpo);
         }
 
-        protected override bool OnExiting(GameMode next)
+        protected override bool OnExiting(Screen next)
         {
             textContainer.MoveTo(new Vector2((DrawSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
@@ -62,7 +62,7 @@ namespace osu.Game.Screens
             return base.OnExiting(next);
         }
 
-        protected override void OnSuspending(GameMode next)
+        protected override void OnSuspending(Screen next)
         {
             base.OnSuspending(next);
 
@@ -70,7 +70,7 @@ namespace osu.Game.Screens
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
         }
 
-        protected override void OnResuming(GameMode last)
+        protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
 
@@ -78,7 +78,7 @@ namespace osu.Game.Screens
             Content.FadeIn(transition_time, EasingTypes.OutExpo);
         }
 
-        public GameModeWhiteBox()
+        public ScreenWhiteBox()
         {
             Children = new Drawable[]
             {
@@ -124,9 +124,9 @@ namespace osu.Game.Screens
                         Exit();
                     }
                 },
-                childModeButtons = new FlowContainer
+                childModeButtons = new FillFlowContainer
                 {
-                    Direction = FlowDirection.VerticalOnly,
+                    Direction = FillDirection.Down,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Both,
@@ -145,10 +145,10 @@ namespace osu.Game.Screens
                         Size = new Vector2(1, 40),
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
-                        Colour = getColourFor(t),
+                        BackgroundColour = getColourFor(t),
                         Action = delegate
                         {
-                            Push(Activator.CreateInstance(t) as GameMode);
+                            Push(Activator.CreateInstance(t) as Screen);
                         }
                     });
                 }

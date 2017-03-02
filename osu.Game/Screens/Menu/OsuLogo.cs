@@ -1,17 +1,16 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
-using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using OpenTK;
@@ -22,7 +21,7 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// osu! logo and its attachments (pulsing, visualiser etc.)
     /// </summary>
-    public partial class OsuLogo : Container
+    public class OsuLogo : Container
     {
         public Color4 OsuPink = OsuColour.FromHex(@"e967a1");
 
@@ -30,7 +29,8 @@ namespace osu.Game.Screens.Menu
         private CircularContainer logoContainer;
         private Container logoBounceContainer;
         private Container logoHoverContainer;
-        private MenuVisualisation vis;
+
+        private SampleChannel sampleClick;
 
         private Container colourAndTriangles;
 
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Menu
                                         }
                                     }
                                 },
-                                vis = new MenuVisualisation
+                                new MenuVisualisation
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -166,8 +166,9 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(TextureStore textures, AudioManager audio)
         {
+            sampleClick = audio.Sample.Get(@"Menu/menuhit");
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
         }
@@ -191,16 +192,19 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-
             logoBounceContainer.ScaleTo(1f, 500, EasingTypes.OutElastic);
             return true;
         }
+
+        protected override bool OnDragStart(InputState state) => true;
 
         protected override bool OnClick(InputState state)
         {
             if (!Interactive) return false;
 
-            flashLayer.ClearTransformations();
+            sampleClick.Play();
+
+            flashLayer.ClearTransforms();
             flashLayer.Alpha = 0.4f;
             flashLayer.FadeOut(1500, EasingTypes.OutExpo);
 

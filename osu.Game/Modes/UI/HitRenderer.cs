@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.UI
 {
@@ -37,7 +38,7 @@ namespace osu.Game.Modes.UI
     {
         private List<T> objects;
 
-        public List<HitObject> Objects
+        public Beatmap Beatmap
         {
             set
             {
@@ -51,7 +52,7 @@ namespace osu.Game.Modes.UI
 
         protected abstract HitObjectConverter<T> Converter { get; }
 
-        protected virtual List<T> Convert(List<HitObject> objects) => Converter.Convert(objects);
+        protected virtual List<T> Convert(Beatmap beatmap) => Converter.Convert(beatmap);
 
         public HitRenderer()
         {
@@ -82,6 +83,7 @@ namespace osu.Game.Modes.UI
 
                 Playfield.Add(drawableObject);
             }
+            Playfield.PostProcess();
         }
 
         private void onJudgement(DrawableHitObject o, JudgementInfo j) => TriggerOnJudgement(j);

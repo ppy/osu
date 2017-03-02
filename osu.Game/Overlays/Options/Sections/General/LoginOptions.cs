@@ -1,11 +1,10 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
@@ -19,7 +18,7 @@ namespace osu.Game.Overlays.Options.Sections.General
     {
         private bool bounding = true;
 
-        protected override string Header => "Sign In";
+        protected override string Header => "Account";
 
         public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
 
@@ -85,14 +84,11 @@ namespace osu.Game.Overlays.Options.Sections.General
             }
         }
 
-        class LoginForm : FlowContainer
+        class LoginForm : FillFlowContainer
         {
             private TextBox username;
             private TextBox password;
             private APIAccess api;
-
-            private OsuCheckbox saveUsername;
-            private OsuCheckbox savePassword;
 
             private void performLogin()
             {
@@ -104,27 +100,31 @@ namespace osu.Game.Overlays.Options.Sections.General
             private void load(APIAccess api, OsuConfigManager config)
             {
                 this.api = api;
-                Direction = FlowDirection.VerticalOnly;
+                Direction = FillDirection.Down;
+                Spacing = new Vector2(0, 5);
                 AutoSizeAxes = Axes.Y;
                 RelativeSizeAxes = Axes.X;
-                Spacing = new Vector2(0, 5);
                 Children = new Drawable[]
                 {
                     username = new OsuTextBox
                     {
+                        PlaceholderText = "Username",
                         RelativeSizeAxes = Axes.X,
-                        Text = api?.Username ?? string.Empty
+                        Text = api?.Username ?? string.Empty,
+                        TabbableContentContainer = this
                     },
                     password = new OsuPasswordTextBox
                     {
-                        RelativeSizeAxes = Axes.X
+                        PlaceholderText = "Password",
+                        RelativeSizeAxes = Axes.X,
+                        TabbableContentContainer = this
                     },
-                    saveUsername = new OsuCheckbox
+                    new OsuCheckbox
                     {
                         LabelText = "Remember username",
                         Bindable = config.GetBindable<bool>(OsuConfig.SaveUsername),
                     },
-                    savePassword = new OsuCheckbox
+                    new OsuCheckbox
                     {
                         LabelText = "Stay logged in",
                         Bindable = config.GetBindable<bool>(OsuConfig.SavePassword),

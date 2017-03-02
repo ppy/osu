@@ -1,10 +1,9 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -22,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
         private void load(AudioManager audio, OsuColour colours)
         {
             ActivationSound = audio.Sample.Get(@"Menu/menuback");
-            Colour = colours.Pink;
+            BackgroundColour = colours.Pink;
             HoverColour = colours.PinkDark;
         }
     }

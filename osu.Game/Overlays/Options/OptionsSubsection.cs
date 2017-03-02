@@ -1,16 +1,15 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
 {
-    public abstract class OptionsSubsection : FlowContainer
+    public abstract class OptionsSubsection : FillFlowContainer
     {
         private Container<Drawable> content;
         protected override Container<Drawable> Content => content;
@@ -21,7 +20,7 @@ namespace osu.Game.Overlays.Options
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FlowDirection.VerticalOnly;
+            Direction = FillDirection.Down;
             AddInternal(new Drawable[]
             {
                 new OsuSpriteText
@@ -30,12 +29,12 @@ namespace osu.Game.Overlays.Options
                     Margin = new MarginPadding { Bottom = 10 },
                     Font = @"Exo2.0-Black",
                 },
-                content = new FlowContainer
+                content = new FillFlowContainer
                 {
-                    Direction = FlowDirection.VerticalOnly,
+                    Direction = FillDirection.Down,
+                    Spacing = new Vector2(0, 5),
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(0, 5),
                 },
             });
         }

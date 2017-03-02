@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// A flow container with an origin based on one of its contained drawables.
     /// </summary>
-    public class FlowContainerWithOrigin : FlowContainer
+    public class FlowContainerWithOrigin : FillFlowContainer
     {
         /// <summary>
         /// A target drawable which this flowcontainer should be centered around.
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Menu
 
         protected override IComparer<Drawable> DepthComparer => new ReverseCreationOrderDepthComparer();
 
-        protected override IEnumerable<Drawable> SortedChildren => base.SortedChildren.Reverse();
+        protected override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
 
         public override Anchor Origin => Anchor.Custom;
 

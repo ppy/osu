@@ -1,10 +1,10 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Easing for the counter rollover animation.
         /// </summary>
-        protected virtual EasingTypes RollingEasing => EasingTypes.Out;
+        protected virtual EasingTypes RollingEasing => EasingTypes.OutQuint;
 
         private T displayedCount;
 
@@ -60,7 +60,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected T count;
+        private T count;
 
         /// <summary>
         /// Actual value of counter.
@@ -88,7 +88,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public abstract void Increment(T amount);
 
-        protected float textSize;
+        private float textSize;
 
         public float TextSize
         {
@@ -107,17 +107,16 @@ namespace osu.Game.Graphics.UserInterface
         {
             Children = new Drawable[]
             {
-                DisplayedCountSpriteText = new OsuSpriteText(),
+                DisplayedCountSpriteText = new OsuSpriteText()
+                {
+                    Font = @"Venera"
+                },
             };
 
             TextSize = 40;
             AutoSizeAxes = Axes.Both;
 
             DisplayedCount = Count;
-
-            DisplayedCountSpriteText.Text = FormatCount(count);
-            DisplayedCountSpriteText.Anchor = Anchor;
-            DisplayedCountSpriteText.Origin = Origin;
         }
 
         protected override void LoadComplete()
@@ -125,6 +124,10 @@ namespace osu.Game.Graphics.UserInterface
             base.LoadComplete();
 
             Flush(false, TransformType);
+
+            DisplayedCountSpriteText.Text = FormatCount(count);
+            DisplayedCountSpriteText.Anchor = Anchor;
+            DisplayedCountSpriteText.Origin = Origin;
         }
 
         /// <summary>

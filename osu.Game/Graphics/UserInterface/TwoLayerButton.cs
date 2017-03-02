@@ -1,12 +1,12 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
@@ -28,14 +28,14 @@ namespace osu.Game.Graphics.UserInterface
 
         public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
-        public AudioSample ActivationSound;
+        public SampleChannel ActivationSound;
         private SpriteText text;
 
         public Color4 HoverColour;
         private Container c1;
         private Container c2;
 
-        public Color4 Colour
+        public Color4 BackgroundColour
         {
             set
             {
@@ -164,7 +164,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(InputState state)
         {
-            icon.ClearTransformations();
+            icon.ClearTransforms();
 
             ResizeTo(SIZE_EXTENDED, transform_time, EasingTypes.OutElastic);
 
@@ -193,7 +193,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(InputState state)
         {
-            icon.ClearTransformations();
+            icon.ClearTransforms();
 
             ResizeTo(SIZE_RETRACTED, transform_time, EasingTypes.OutElastic);
 

@@ -1,9 +1,8 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Modes.UI;
 using OpenTK;
-using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Modes.Osu.UI
 {
@@ -17,7 +16,7 @@ namespace osu.Game.Modes.Osu.UI
         protected virtual float PopOutSmallScale => 1.1f;
         protected virtual bool CanPopOutWhileRolling => false;
 
-        public Vector2 PopOutScale = new Vector2(1.6f);
+        public new Vector2 PopOutScale = new Vector2(1.6f);
 
         protected override void LoadComplete()
         {

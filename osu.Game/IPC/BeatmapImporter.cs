@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -13,7 +13,7 @@ namespace osu.Game.IPC
         private IpcChannel<BeatmapImportMessage> channel;
         private BeatmapDatabase beatmaps;
 
-        public BeatmapImporter(BasicGameHost host,  BeatmapDatabase beatmaps = null)
+        public BeatmapImporter(GameHost host,  BeatmapDatabase beatmaps = null)
         {
             this.beatmaps = beatmaps;
 
@@ -21,13 +21,13 @@ namespace osu.Game.IPC
             channel.MessageReceived += messageReceived;
         }
 
-        public async Task Import(string path)
+        public async Task ImportAsync(string path)
         {
             if (beatmaps != null)
                 beatmaps.Import(path);
             else
             {
-                await channel.SendMessage(new BeatmapImportMessage { Path = path });
+                await channel.SendMessageAsync(new BeatmapImportMessage { Path = path });
             }
         }
 
@@ -35,7 +35,7 @@ namespace osu.Game.IPC
         {
             Debug.Assert(beatmaps != null);
 
-            Import(msg.Path);
+            ImportAsync(msg.Path);
         }
     }
 

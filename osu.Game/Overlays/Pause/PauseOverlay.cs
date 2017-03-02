@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics;
@@ -8,8 +11,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transformations;
-using System.Threading.Tasks;
+using osu.Framework.Graphics.Transforms;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Pause
 {
@@ -18,6 +21,8 @@ namespace osu.Game.Overlays.Pause
         private const int transition_duration = 200;
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
+
+        protected override bool HideOnEscape => false;
 
         public Action OnResume;
         public Action OnRetry;
@@ -34,14 +39,14 @@ namespace osu.Game.Overlays.Pause
 
                     retryCounterContainer.Children = new Drawable[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = "You've retried ",
                             Shadow = true,
                             ShadowColour = new Color4(0, 0, 0, 0.25f),
                             TextSize = 18
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = String.Format("{0:n0}", value),
                             Font = @"Exo2.0-Bold",
@@ -49,7 +54,7 @@ namespace osu.Game.Overlays.Pause
                             ShadowColour = new Color4(0, 0, 0, 0.25f),
                             TextSize = 18
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = $" time{((value == 1) ? "" : "s")} in this session",
                             Shadow = true,
@@ -61,7 +66,7 @@ namespace osu.Game.Overlays.Pause
             }
         }
 
-        private FlowContainer retryCounterContainer;
+        private FillFlowContainer retryCounterContainer;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
         public override bool HandleInput => State == Visibility.Visible;
@@ -80,6 +85,7 @@ namespace osu.Game.Overlays.Pause
                 resume();
                 return true;
             }
+
             return base.OnKeyDown(state, args);
         }
 
@@ -94,26 +100,26 @@ namespace osu.Game.Overlays.Pause
                     Colour = Color4.Black,
                     Alpha = background_alpha,
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FlowDirection.VerticalOnly,
-                    Spacing = new Vector2(0f, 50f),
+                    Direction = FillDirection.Down,
+                    Spacing = new Vector2(0, 50),
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Direction = FlowDirection.VerticalOnly,
-                            Spacing = new Vector2(0f, 20f),
+                            Direction = FillDirection.Down,
+                            Spacing = new Vector2(0, 20),
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Children = new Drawable[]
                             {
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Text = @"paused",
                                     Font = @"Exo2.0-Medium",
@@ -125,7 +131,7 @@ namespace osu.Game.Overlays.Pause
                                     Shadow = true,
                                     ShadowColour = new Color4(0, 0, 0, 0.25f)
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Text = @"you're not going to do what i think you're going to do, are ya?",
                                     Origin = Anchor.TopCentre,
@@ -135,7 +141,7 @@ namespace osu.Game.Overlays.Pause
                                 }
                             }
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -150,7 +156,6 @@ namespace osu.Game.Overlays.Pause
                             {
                                 new ResumeButton
                                 {
-                                    RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = button_height,
@@ -158,7 +163,6 @@ namespace osu.Game.Overlays.Pause
                                 },
                                 new RetryButton
                                 {
-                                    RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = button_height,
@@ -170,7 +174,6 @@ namespace osu.Game.Overlays.Pause
                                 },
                                 new QuitButton
                                 {
-                                    RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = button_height,
@@ -182,7 +185,7 @@ namespace osu.Game.Overlays.Pause
                                 }
                             }
                         },
-                        retryCounterContainer = new FlowContainer
+                        retryCounterContainer = new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Origin = Anchor.TopCentre,

@@ -1,7 +1,6 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Input;
@@ -20,13 +19,13 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (args.Button == this.Button) IsLit = true;
+            if (args.Button == Button) IsLit = true;
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            if (args.Button == this.Button) IsLit = false;
+            if (args.Button == Button) IsLit = false;
             return base.OnMouseUp(state, args);
         }
     }

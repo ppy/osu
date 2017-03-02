@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
@@ -20,6 +20,8 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarUserButton()
         {
+            AutoSizeAxes = Axes.X;
+
             DrawableText.Font = @"Exo2.0-MediumItalic";
 
             Add(new OpaqueBackground { Depth = 1 });
@@ -100,7 +102,7 @@ namespace osu.Game.Overlays.Toolbar
 
                     newSprite.FillMode = FillMode.Fit;
 
-                    newSprite.Preload(game, s =>
+                    newSprite.LoadAsync(game, s =>
                     {
                         Sprite?.FadeOut();
                         Sprite?.Expire();
@@ -118,7 +120,6 @@ namespace osu.Game.Overlays.Toolbar
             public class OnlineSprite : Sprite
             {
                 private readonly string url;
-                private readonly int userId;
 
                 public OnlineSprite(string url)
                 {

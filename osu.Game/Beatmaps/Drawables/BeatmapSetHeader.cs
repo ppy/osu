@@ -1,5 +1,5 @@
-//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
@@ -25,7 +24,7 @@ namespace osu.Game.Beatmaps.Drawables
         private OsuConfigManager config;
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap beatmap;
-        private FlowContainer difficultyIcons;
+        private FillFlowContainer difficultyIcons;
 
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
@@ -37,9 +36,9 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
-                    Direction = FlowDirection.VerticalOnly,
+                    Direction = FillDirection.Down,
                     Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
@@ -59,7 +58,7 @@ namespace osu.Game.Beatmaps.Drawables
                             TextSize = 17,
                             Shadow = true,
                         },
-                        difficultyIcons = new FlowContainer
+                        difficultyIcons = new FillFlowContainer
                         {
                             Margin = new MarginPadding { Top = 5 },
                             AutoSizeAxes = Axes.Both,
@@ -110,10 +109,10 @@ namespace osu.Game.Beatmaps.Drawables
 
                 Children = new[]
                 {
-                    new FlowContainer
+                    new FillFlowContainer
                     {
                         Depth = -1,
-                        Direction = FlowDirection.HorizontalOnly,
+                        Direction = FillDirection.Right,
                         RelativeSizeAxes = Axes.Both,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),
@@ -162,7 +161,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fill,
-                }.Preload(game, (bg) =>
+                }.LoadAsync(game, (bg) =>
                 {
                     Add(bg);
                     ForceRedraw();

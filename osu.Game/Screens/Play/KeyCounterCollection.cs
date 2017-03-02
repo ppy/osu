@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -8,11 +8,11 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterCollection : FlowContainer<KeyCounter>
+    public class KeyCounterCollection : FillFlowContainer<KeyCounter>
     {
         public KeyCounterCollection()
         {
-            Direction = FlowDirection.HorizontalOnly;
+            Direction = FillDirection.Right;
             AutoSizeAxes = Axes.Both;
         }
 

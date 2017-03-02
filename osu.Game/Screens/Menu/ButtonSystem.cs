@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
@@ -7,13 +7,13 @@ using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Toolbar;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -31,14 +31,14 @@ namespace osu.Game.Screens.Menu
         public Action OnChart;
         public Action OnTest;
 
-        private AudioSample sampleOsuClick;
+        private Toolbar toolbar;
 
         private FlowContainerWithOrigin buttonFlow;
 
         //todo: make these non-internal somehow.
-        internal const float button_area_height = 100;
-        internal const float button_width = 140f;
-        internal const float wedge_width = 20;
+        internal const float BUTTON_AREA_HEIGHT = 100;
+        internal const float BUTTON_WIDTH = 140f;
+        internal const float WEDGE_WIDTH = 20;
 
         public const int EXIT_DELAY = 3000;
 
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(1, button_area_height),
+                    Size = new Vector2(1, BUTTON_AREA_HEIGHT),
                     Alpha = 0,
                     Children = new Drawable[]
                     {
@@ -78,17 +78,17 @@ namespace osu.Game.Screens.Menu
                         },
                         buttonFlow = new FlowContainerWithOrigin
                         {
-                            Direction = FlowDirection.HorizontalOnly,
+                            Direction = FillDirection.Right,
+                            Spacing = new Vector2(-WEDGE_WIDTH, 0),
                             Anchor = Anchor.Centre,
                             AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(-wedge_width, 0),
                             Children = new[]
                             {
-                                settingsButton = new Button(@"settings", @"options", FontAwesome.fa_gear, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -wedge_width, Key.O),
-                                backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -wedge_width, Key.Escape),
+                                settingsButton = new Button(@"settings", @"options", FontAwesome.fa_gear, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
+                                backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -WEDGE_WIDTH),
                                 iconFacade = new Container //need a container to make the osu! icon flow properly.
-								{
-                                    Size = new Vector2(0, button_area_height)
+                                {
+                                    Size = new Vector2(0, BUTTON_AREA_HEIGHT)
                                 }
                             },
                             CentreTarget = iconFacade
@@ -103,11 +103,11 @@ namespace osu.Game.Screens.Menu
                 }
             };
 
-            buttonsPlay.Add(new Button(@"solo", @"freeplay", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), wedge_width, Key.P));
+            buttonsPlay.Add(new Button(@"solo", @"freeplay", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
             buttonsPlay.Add(new Button(@"multi", @"multiplayer", FontAwesome.fa_users, new Color4(94, 63, 186, 255), () => OnMulti?.Invoke(), 0, Key.M));
             buttonsPlay.Add(new Button(@"chart", @"charts", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
 
-            buttonsTopLevel.Add(new Button(@"play", @"play", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, wedge_width, Key.P));
+            buttonsTopLevel.Add(new Button(@"play", @"play", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, WEDGE_WIDTH, Key.P));
             buttonsTopLevel.Add(new Button(@"osu!editor", @"edit", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
             buttonsTopLevel.Add(new Button(@"osu!direct", @"direct", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
             buttonsTopLevel.Add(new Button(@"exit", @"exit", FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), onExit, 0, Key.Q));
@@ -116,10 +116,10 @@ namespace osu.Game.Screens.Menu
             buttonFlow.Add(buttonsTopLevel);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame game = null)
         {
-            sampleOsuClick = audio.Sample.Get(@"Menu/menuhit");
+            toolbar = game?.Toolbar;
         }
 
         protected override void LoadComplete()
@@ -127,22 +127,31 @@ namespace osu.Game.Screens.Menu
             base.LoadComplete();
 
             // osuLogo.SizeForFlow relies on loading to be complete.
-            buttonFlow.Position = new Vector2(wedge_width * 2 - (button_width + osuLogo.SizeForFlow / 4), 0);
+            buttonFlow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + osuLogo.SizeForFlow / 4), 0);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (args.Repeat) return false;
+
             switch (args.Key)
             {
                 case Key.Space:
                     osuLogo.TriggerClick(state);
                     return true;
                 case Key.Escape:
-                    if (State == MenuState.Initial)
-                        return false;
+                    switch (State)
+                    {
+                        case MenuState.TopLevel:
+                            State = MenuState.Initial;
+                            return true;
+                        case MenuState.Play:
+                            backButton.TriggerClick();
+                            return true;
+                    }
 
-                    State = MenuState.Initial;
-                    return true;
+
+                    return false;
             }
 
             return false;
@@ -168,14 +177,13 @@ namespace osu.Game.Screens.Menu
             switch (state)
             {
                 case MenuState.Initial:
-                    sampleOsuClick.Play();
                     State = MenuState.TopLevel;
                     return;
                 case MenuState.TopLevel:
-                    buttonsTopLevel.First().TriggerMouseDown();
+                    buttonsTopLevel.First().TriggerClick();
                     return;
                 case MenuState.Play:
-                    buttonsPlay.First().TriggerMouseDown();
+                    buttonsPlay.First().TriggerClick();
                     return;
             }
         }
@@ -205,9 +213,12 @@ namespace osu.Game.Screens.Menu
 
                 switch (state)
                 {
+                    case MenuState.Exit:
                     case MenuState.Initial:
+                        toolbar?.Hide();
+
                         buttonAreaBackground.ScaleTo(Vector2.One, 500, EasingTypes.Out);
-                        buttonArea.FadeOut(500);
+                        buttonArea.FadeOut(300);
 
                         osuLogo.Delay(150);
                         osuLogo.MoveTo(Vector2.Zero, 800, EasingTypes.OutExpo);
@@ -218,8 +229,16 @@ namespace osu.Game.Screens.Menu
 
                         foreach (Button b in buttonsPlay)
                             b.State = ButtonState.Contracted;
+
+                        if (state == MenuState.Exit)
+                        {
+                            osuLogo.RotateTo(20, EXIT_DELAY * 1.5f);
+                            osuLogo.FadeOut(EXIT_DELAY);
+                        }
                         break;
                     case MenuState.TopLevel:
+                        buttonArea.Flush(true);
+
                         buttonAreaBackground.ScaleTo(Vector2.One, 200, EasingTypes.Out);
 
                         osuLogo.MoveTo(buttonFlow.DrawPosition, 200, EasingTypes.In);
@@ -228,8 +247,9 @@ namespace osu.Game.Screens.Menu
                         buttonArea.FadeIn(300);
 
                         if (lastState == MenuState.Initial)
-                            //todo: this propagates to invisible children and causes delays later down the track (on first MenuState.Play)
                             buttonArea.Delay(150, true);
+
+                        Scheduler.AddDelayed(() => toolbar?.Show(), 150);
 
                         foreach (Button b in buttonsTopLevel)
                             b.State = ButtonState.Expanded;
@@ -258,21 +278,6 @@ namespace osu.Game.Screens.Menu
                         foreach (Button b in buttonsPlay)
                             b.State = ButtonState.Contracted;
                         break;
-                    case MenuState.Exit:
-                        buttonArea.FadeOut(200);
-
-                        foreach (Button b in buttonsTopLevel)
-                            b.State = ButtonState.Contracted;
-
-                        foreach (Button b in buttonsPlay)
-                            b.State = ButtonState.Contracted;
-
-                        osuLogo.Delay(150);
-
-                        osuLogo.ScaleTo(1f, EXIT_DELAY * 1.5f);
-                        osuLogo.RotateTo(20, EXIT_DELAY * 1.5f);
-                        osuLogo.FadeOut(EXIT_DELAY);
-                        break;
                 }
 
                 backButton.State = state == MenuState.Play ? ButtonState.Expanded : ButtonState.Contracted;
@@ -287,6 +292,8 @@ namespace osu.Game.Screens.Menu
         {
             //if (OsuGame.IdleTime > 6000 && State != MenuState.Exit)
             //    State = MenuState.Initial;
+
+            osuLogo.Interactive = Alpha > 0.2f;
 
             iconFacade.Width = osuLogo.SizeForFlow * 0.5f;
             base.Update();
