@@ -57,6 +57,18 @@ namespace osu.Game.Database
                 try
                 {
                     storage.Delete(b.Path);
+
+                    GetChildren(b, true);
+
+                    foreach (var i in b.Beatmaps)
+                    {
+                        if (i.Metadata != null) connection.Delete(i.Metadata);
+                        if (i.BaseDifficulty != null) connection.Delete(i.BaseDifficulty);
+
+                        connection.Delete(i);
+                    }
+
+                    if (b.Metadata != null) connection.Delete(b.Metadata);
                     connection.Delete(b);
                 }
                 catch (Exception e)

@@ -27,11 +27,14 @@ namespace osu.Game.Configuration
             Set(OsuConfig.DimLevel, 30, 0, 100);
 
             Set(OsuConfig.MouseDisableButtons, false);
+            Set(OsuConfig.MouseDisableWheel, false);
 
             Set(OsuConfig.SnakingInSliders, true);
             Set(OsuConfig.SnakingOutSliders, false);
 
             Set(OsuConfig.MenuParallax, true);
+
+            Set(OsuConfig.KeyOverlay, false);
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
@@ -79,7 +82,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.IgnoreBeatmapSamples, false).Disabled = true;
             Set(OsuConfig.IgnoreBeatmapSkins, false).Disabled = true;
             Set(OsuConfig.IgnoreList, string.Empty).Disabled = true;
-            Set(OsuConfig.KeyOverlay, false).Disabled = true;
             Set(OsuConfig.Language, @"unknown").Disabled = true;
             Set(OsuConfig.AllowNowPlayingHighlights, false).Disabled = true;
             Set(OsuConfig.LastVersion, string.Empty).Disabled = true;
@@ -99,7 +101,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.UsePerBeatmapManiaSpeed, true).Disabled = true;
             Set(OsuConfig.ManiaSpeedBPMScale, true).Disabled = true;
             Set(OsuConfig.MenuTip, 0).Disabled = true;
-            Set(OsuConfig.MouseDisableWheel, false).Disabled = true;
             Set(OsuConfig.MouseSpeed, 1, 0.4, 6).Disabled = true;
             Set(OsuConfig.Offset, 0, -300, 300).Disabled = true;
             Set(OsuConfig.ScoreMeterScale, 1, 0.5, 2).Disabled = true;

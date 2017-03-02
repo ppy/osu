@@ -24,6 +24,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Logging;
+using osu.Framework.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -72,6 +73,8 @@ namespace osu.Game.Screens.Play
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
         {
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
+            mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
+
             try
             {
                 if (Beatmap == null)
@@ -149,7 +152,6 @@ namespace osu.Game.Screens.Play
                 playerInputManager = new PlayerInputManager(game.Host)
                 {
                     Clock = new InterpolatingFramedClock(sourceClock),
-                    PassThrough = false,
                     Children = new Drawable[]
                     {
                         hitRenderer,
@@ -193,7 +195,6 @@ namespace osu.Game.Screens.Play
             if (canPause || force)
             {
                 lastPauseActionTime = Time.Current;
-                playerInputManager.PassThrough = true;
                 scoreOverlay.KeyCounter.IsCounting = false;
                 pauseOverlay.Retries = RestartCount;
                 pauseOverlay.Show();
@@ -209,7 +210,6 @@ namespace osu.Game.Screens.Play
         public void Resume()
         {
             lastPauseActionTime = Time.Current;
-            playerInputManager.PassThrough = false;
             scoreOverlay.KeyCounter.IsCounting = true;
             pauseOverlay.Hide();
             sourceClock.Start();
@@ -325,5 +325,9 @@ namespace osu.Game.Screens.Play
         {
             Background?.FadeTo((100f - dimLevel) / 100, 800);
         }
+
+        private Bindable<bool> mouseWheelDisabled;
+
+        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !isPaused;
     }
 }

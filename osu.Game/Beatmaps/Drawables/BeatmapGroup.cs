@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps.Drawables
             BeatmapSet = beatmapSet;
             WorkingBeatmap beatmap = database.GetWorkingBeatmap(BeatmapSet.Beatmaps.FirstOrDefault());
             foreach (var b in BeatmapSet.Beatmaps)
-                b.StarDifficulty = (float)database.GetWorkingBeatmap(b).Beatmap.CalculateStarDifficulty();
+                b.StarDifficulty = (float)(database.GetWorkingBeatmap(b).Beatmap?.CalculateStarDifficulty() ?? -1f);
 
             Header = new BeatmapSetHeader(beatmap)
             {
