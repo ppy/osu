@@ -2,12 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 
@@ -26,6 +29,7 @@ namespace osu.Game.Overlays.Mods
         public FlowContainer ButtonsContainer => buttonsContainer;
 
         public Action<Mod> Action;
+        protected virtual Key[] ToggleKeys => new Key[] { };
 
         public Mod[] SelectedMods
         {
@@ -117,6 +121,15 @@ namespace osu.Game.Overlays.Mods
                     button.SelectedColour = value;
                 }
             }
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            var index = Array.IndexOf(ToggleKeys, args.Key);
+            if (index > -1 && index < Buttons.Length)
+                Buttons[index].SelectNext();
+
+            return base.OnKeyDown(state, args);
         }
 
         public void DeselectAll()
