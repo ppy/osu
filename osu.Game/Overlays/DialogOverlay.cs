@@ -18,24 +18,28 @@ namespace osu.Game.Overlays
 
         public void Push(PopupDialog dialog)
         {
+            if (dialog == currentDialog) return;
+
             State = Visibility.Visible;
 
             dialogContainer.Add(dialog);
-            dialog.Show();
-            dialog.StateChanged += delegate (OverlayContainer c, Visibility v)
-            {
-                if (v == Visibility.Hidden)
-                {
-                    c.Delay(PopupDialog.EXIT_DURATION);
-                    c.Expire();
-                    if (c == currentDialog)
-                        State = Visibility.Hidden;
-                }
-            };
 
-            var lastDialog = currentDialog;
+            dialog.Show();
+            dialog.StateChanged += onDialogOnStateChanged;
+
+            currentDialog?.Hide();
             currentDialog = dialog;
-            lastDialog?.Hide();
+        }
+
+        private void onDialogOnStateChanged(OverlayContainer dialog, Visibility v)
+        {
+            if (v != Visibility.Hidden) return;
+
+            //handle the dialog being dismissed.
+            dialog.Delay(PopupDialog.EXIT_DURATION);
+            dialog.Expire();
+            if (dialog == currentDialog)
+                State = Visibility.Hidden;
         }
 
         protected override void PopIn()

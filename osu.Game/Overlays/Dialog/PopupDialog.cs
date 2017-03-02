@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 
@@ -92,35 +93,28 @@ namespace osu.Game.Overlays.Dialog
                 Buttons[index].TriggerClick();
         }
 
-        private bool triggeredButton = false; // used to make it so the user can't press multiple buttons at once with the keyboard
-
-        protected override bool OnKeyDown(Framework.Input.InputState state, Framework.Input.KeyDownEventArgs args)
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
 
-            if (!triggeredButton)
+            if (args.Key == Key.Enter)
             {
-                if (args.Key == Key.Enter)
-                {
-                    Buttons.OfType<PopupDialogOkButton>()?.FirstOrDefault()?.TriggerClick();
-                    triggeredButton = true;
-                    return true;
-                }
+                Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerClick();
+                return true;
+            }
 
-                // press button at number if 1-9 on number row or keypad are pressed
-                var k = args.Key;
-                if (k >= Key.Number1 && k <= Key.Number9)
-                {
-                    pressButtonAtIndex(k - Key.Number1);
-                    triggeredButton = true;
-                    return true;
-                }
-                else if (k >= Key.Keypad1 && k <= Key.Keypad9)
-                {
-                    pressButtonAtIndex(k - Key.Keypad1);
-                    triggeredButton = true;
-                    return true;
-                }
+            // press button at number if 1-9 on number row or keypad are pressed
+            var k = args.Key;
+            if (k >= Key.Number1 && k <= Key.Number9)
+            {
+                pressButtonAtIndex(k - Key.Number1);
+                return true;
+            }
+
+            if (k >= Key.Keypad1 && k <= Key.Keypad9)
+            {
+                pressButtonAtIndex(k - Key.Keypad1);
+                return true;
             }
 
             return base.OnKeyDown(state, args);
@@ -129,8 +123,6 @@ namespace osu.Game.Overlays.Dialog
         protected override void PopIn()
         {
             base.PopIn();
-
-            triggeredButton = false;
 
             // Reset various animations but only if the dialog animation fully completed
             if (content.Alpha == 0)
