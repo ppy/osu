@@ -36,6 +36,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         private Container flashContainer;
 
         private int userHits;
+        private bool ringsVisible;
 
         public DrawableBash(Bash spinner)
             : base(spinner)
@@ -217,17 +218,15 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             }
         }
 
-        bool b;
-
         protected override void Update()
         {
             MoveToOffset(Math.Min(Time.Current, HitObject.StartTime));
 
-            if (Time.Current >= HitObject.StartTime && !b)
+            if (Time.Current >= HitObject.StartTime && !ringsVisible)
             {
                 bashOuterRingContainer.FadeIn(200);
                 bashInnerRingContainer.FadeIn(200);
-                b = true;
+                ringsVisible = true;
             }
         }
     }

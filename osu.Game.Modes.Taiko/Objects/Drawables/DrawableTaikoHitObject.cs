@@ -33,6 +33,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 Judgement = CreateJudgementInfo();
 
             UpdateState(State);
+
+            // Very naive, but should be enough, given that notes scroll more than 50% of the stage
+            // before start time, so they should scroll off the screen before start time + preempt
+            TaikoHitObject tho = HitObject as TaikoHitObject;
+            LifetimeStart = HitObject.StartTime - tho.PreEmpt * 2;
+            LifetimeEnd = HitObject.EndTime + tho.PreEmpt;
         }
 
         protected override void UpdateState(ArmedState state)

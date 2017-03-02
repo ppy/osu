@@ -21,12 +21,7 @@ namespace osu.Game.Modes.UI
 
         public Playfield()
         {
-            AddInternal(content = new ScaledContainer()
-            {
-                RelativeSizeAxes = Axes.Both,
-            });
-
-            Add(HitObjects = new HitObjectContainer
+            AddInternal(HitObjects = new HitObjectContainer
             {
                 RelativeSizeAxes = Axes.Both,
             });

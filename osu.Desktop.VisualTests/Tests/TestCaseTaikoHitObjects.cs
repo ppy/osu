@@ -184,7 +184,7 @@ namespace osu.Desktop.VisualTests.Tests
                 h.Judgement = new TaikoJudgementInfo { Result = HitResult.Hit };
             }
 
-            playfield.HitObjects.Add(h);
+            playfield.Add(h);
         }
 
         enum HitObjectType

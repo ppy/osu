@@ -65,6 +65,7 @@ namespace osu.Game.Modes.Taiko.Objects
                     yield return new DrumRollTick()
                     {
                         FirstTick = i == 0,
+                        PreEmpt = PreEmpt,
                         TickDistance = TickDistance,
                         Colour = Colour,
                         StartTime = StartTime + pos / Length * Duration,

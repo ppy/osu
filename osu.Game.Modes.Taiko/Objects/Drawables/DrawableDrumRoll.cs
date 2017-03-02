@@ -35,7 +35,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         private DrumRollBodyPiece body;
         private Container<DrawableDrumRollTick> ticks;
 
-        private List<DrawableDrumRollTick> allTicks = new List<DrawableDrumRollTick>();
+        public readonly List<DrawableDrumRollTick> AllTicks = new List<DrawableDrumRollTick>();
 
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
@@ -68,7 +68,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 };
 
                 ticks.Add(newTick);
-                allTicks.Add(newTick);
+                AllTicks.Add(newTick);
 
                 tickIndex++;
             }
@@ -86,7 +86,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             TaikoJudgementInfo taikoJudgement = Judgement as TaikoJudgementInfo;
 
-            int countHit = allTicks.Count(t => t.Judgement.Result.HasValue);
+            int countHit = AllTicks.Count(t => t.Judgement.Result.HasValue);
 
             if (countHit < drumRoll.RequiredGoodHits)
             {

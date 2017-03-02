@@ -48,8 +48,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         protected override FlashPiece CreateFlash() => new FlashPiece();
     }
 
-    public abstract class DrawableHitCircle : DrawableTaikoHitObject
+    public abstract class DrawableHitCircle : DrawableTaikoHitObject, IDrawableHitObjectWithProxiedApproach
     {
+        public Drawable ProxiedLayer { get; set; }
+
         private HitCirclePiece bodyPiece;
         private ExplodePiece explodePiece;
         private FlashPiece flashPiece;
@@ -63,9 +65,17 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             Children = new Drawable[]
             {
-                explodePiece = CreateExplode(),
                 bodyPiece = CreateBody(),
-                flashPiece = CreateFlash()
+                ProxiedLayer = new Container()
+                {
+                    RelativeSizeAxes = Axes.Both,
+
+                    Children = new Drawable[]
+                    {
+                        explodePiece = CreateExplode(),
+                        flashPiece = CreateFlash()
+                    }
+                }
             };
 
             bodyPiece.Hit += ProcessHit;
