@@ -8,6 +8,8 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays.Mods;
+using OpenTK.Input;
 
 namespace osu.Game.Modes.Catch
 {
@@ -29,6 +31,111 @@ namespace osu.Game.Modes.Catch
             new CatchModHalfTime(),
             new CatchModNightcore(),
             new CatchModFlashlight(),
+        };
+
+        public override IEnumerable<ModSection> CreateModSections() => new ModSection[]
+        {
+            new DifficultyReductionSection
+            {
+                Buttons = new[]
+                {
+                    new ModButton
+                    {
+                        ToggleKey = Key.Q,
+                        Mods = new Mod[]
+                        {
+                            new CatchModEasy(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.W,
+                        Mods = new Mod[]
+                        {
+                            new CatchModNoFail(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.E,
+                        Mods = new Mod[]
+                        {
+                            new CatchModHalfTime(),
+                        },
+                    },
+                },
+            },
+            new DifficultyIncreaseSection
+            {
+                Buttons = new ModButton[]
+                {
+                    new ModButton
+                    {
+                        ToggleKey = Key.A,
+                        Mods = new Mod[]
+                        {
+                            new CatchModHardRock(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.S,
+                        Mods = new Mod[]
+                        {
+                            new CatchModSuddenDeath(),
+                            new ModPerfect(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.D,
+                        Mods = new Mod[]
+                        {
+                            new CatchModDoubleTime(),
+                            new CatchModNightcore(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.F,
+                        Mods = new Mod[]
+                        {
+                            new CatchModHidden(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.G,
+                        Mods = new Mod[]
+                        {
+                            new CatchModFlashlight(),
+                        },
+                    },
+                },
+            },
+            new AssistedSection
+            {
+                Buttons = new[]
+                {
+                    new ModButton
+                    {
+                        ToggleKey = Key.Z,
+                        Mods = new Mod[]
+                        {
+                            new CatchModRelax(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.B,
+                        Mods = new Mod[]
+                        {
+                            new ModAutoplay(),
+                            new ModCinema(),
+                        },
+                    },
+                }
+            },
         };
 
         protected override PlayMode PlayMode => PlayMode.Catch;

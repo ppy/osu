@@ -15,9 +15,6 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 using osu.Framework.Allocation;
-using osu.Framework.Input;
-using OpenTK.Input;
-using System.Linq;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -45,33 +42,18 @@ namespace osu.Game.Overlays.Mods
             }
             set
             {
-                if (value == modMode) return;
                 modMode = value;
 
-                modSectionsContainer.Children = new ModSection[]
+                modSectionsContainer.RemoveAll(delegate (ModSection m) { return true; });
+                foreach (ModSection s in Ruleset.GetRuleset(value).CreateModSections())
                 {
-                    new DifficultyReductionSection
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre,
-                        Action = modButtonPressed,
-                    },
-                    new DifficultyIncreaseSection
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre,
-                        Action = modButtonPressed,
-                    },
-                    new AssistedSection(value)
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre,
-                        Action = modButtonPressed,
-                    },
-                };
+                    s.RelativeSizeAxes = Axes.X;
+                    s.Origin = Anchor.TopCentre;
+                    s.Anchor = Anchor.TopCentre;
+                    s.Action = modButtonPressed;
+
+                    modSectionsContainer.Add(s);
+                }
             }
         }
 
@@ -312,30 +294,6 @@ namespace osu.Game.Overlays.Mods
                             AutoSizeAxes = Axes.Y,
                             Spacing = new Vector2(0f, 10f),
                             Width = content_width,
-                            Children = new ModSection[]
-                            {
-                                new DifficultyReductionSection
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Action = modButtonPressed,
-                                },
-                                new DifficultyIncreaseSection
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Action = modButtonPressed,
-                                },
-                                new AssistedSection(PlayMode.Osu)
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Action = modButtonPressed,
-                                },
-                            },
                         },
                         // Footer
                         new Container

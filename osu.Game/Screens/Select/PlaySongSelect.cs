@@ -145,12 +145,8 @@ namespace osu.Game.Screens.Select
             if (osuGame != null)
             {
                 playMode = osuGame.PlayMode;
-                playMode.ValueChanged += playMode_ValueChanged;
                 modSelect.ModMode = playMode;
-            }
-            else
-            {
-                modSelect.ModMode = PlayMode.Osu;
+                playMode.ValueChanged += playMode_ValueChanged;
             }
 
             if (database == null)

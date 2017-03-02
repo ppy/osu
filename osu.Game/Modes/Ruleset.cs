@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Modes
 {
@@ -27,6 +28,8 @@ namespace osu.Game.Modes
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
         public abstract IEnumerable<Mod> AvailableMods { get; }
+
+        public abstract IEnumerable<ModSection> CreateModSections();
 
         public abstract ScoreProcessor CreateScoreProcessor(int hitObjectCount);
 
