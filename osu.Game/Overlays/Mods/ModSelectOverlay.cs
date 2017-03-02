@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using OpenTK;
@@ -34,53 +35,51 @@ namespace osu.Game.Overlays.Mods
 
         public Bindable<Mod[]> SelectedMods = new Bindable<Mod[]>();
 
-        private PlayMode modMode;
-        public PlayMode ModMode
-        {
-            get
-            {
-                return modMode;
-            }
-            set
-            {
-                modMode = value;
-                var ruleset = Ruleset.GetRuleset(value);
+        public readonly Bindable<PlayMode> PlayMode = new Bindable<PlayMode>();
 
-                modSectionsContainer.Children = new ModSection[]
+        private void modeChanged(object sender, EventArgs eventArgs)
+        {
+            var ruleset = Ruleset.GetRuleset(PlayMode);
+
+            modSectionsContainer.Children = new ModSection[]
+            {
+                new DifficultyReductionSection
                 {
-                    new DifficultyReductionSection
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre,
-                        Action = modButtonPressed,
-                        Buttons = ruleset.GetModsFor(ModType.DifficultyReduction).Select(m => new ModButton(m)).ToArray(),
-                    },
-                    new DifficultyIncreaseSection
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre,
-                        Action = modButtonPressed,
-                        Buttons = ruleset.GetModsFor(ModType.DifficultyIncrease).Select(m => new ModButton(m)).ToArray(),
-                    },
-                    new AssistedSection
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre,
-                        Action = modButtonPressed,
-                        Buttons = ruleset.GetModsFor(ModType.Special).Select(m => new ModButton(m)).ToArray(),
-                    },
-                };
-            }
+                    RelativeSizeAxes = Axes.X,
+                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.TopCentre,
+                    Action = modButtonPressed,
+                    Buttons = ruleset.GetModsFor(ModType.DifficultyReduction).Select(m => new ModButton(m)).ToArray(),
+                },
+                new DifficultyIncreaseSection
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.TopCentre,
+                    Action = modButtonPressed,
+                    Buttons = ruleset.GetModsFor(ModType.DifficultyIncrease).Select(m => new ModButton(m)).ToArray(),
+                },
+                new AssistedSection
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.TopCentre,
+                    Action = modButtonPressed,
+                    Buttons = ruleset.GetModsFor(ModType.Special).Select(m => new ModButton(m)).ToArray(),
+                },
+            };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(permitNulls:true)]
+        private void load(OsuColour colours, OsuGame osu)
         {
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
+
+            if (osu != null)
+                PlayMode.BindTo(osu.PlayMode);
+            PlayMode.ValueChanged += modeChanged;
+            PlayMode.TriggerChange();
         }
 
         protected override void PopOut()

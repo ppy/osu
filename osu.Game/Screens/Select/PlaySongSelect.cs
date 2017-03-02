@@ -162,7 +162,6 @@ namespace osu.Game.Screens.Select
             if (osuGame != null)
             {
                 playMode = osuGame.PlayMode;
-                modSelect.ModMode = playMode;
                 playMode.ValueChanged += playMode_ValueChanged;
             }
 
@@ -287,7 +286,6 @@ namespace osu.Game.Screens.Select
 
         private void playMode_ValueChanged(object sender, EventArgs e)
         {
-            modSelect.ModMode = playMode;
         }
 
         private void changeBackground(WorkingBeatmap beatmap)
