@@ -33,110 +33,60 @@ namespace osu.Game.Modes.Taiko
             new TaikoModFlashlight(),
         };
 
-        public override IEnumerable<ModSection> CreateModSections() => new ModSection[]
+        public override IEnumerable<Mod> GetModsFor(ModType type)
         {
-            new DifficultyReductionSection
+            switch (type)
             {
-                Buttons = new[]
-                {
-                    new ModButton
+                case ModType.DifficultyReduction:
+                    return new Mod[]
                     {
-                        ToggleKey = Key.Q,
-                        Mods = new Mod[]
-                        {
-                            new TaikoModEasy(),
-                        },
-                    },
-                    new ModButton
+                        new TaikoModEasy(),
+                        new TaikoModNoFail(),
+                        new TaikoModHalfTime(),
+                    };
+
+                case ModType.DifficultyIncrease:
+                    return new Mod[]
                     {
-                        ToggleKey = Key.W,
-                        Mods = new Mod[]
+                        new TaikoModHardRock(),
+                        new MultiMod
                         {
-                            new TaikoModNoFail(),
+                            Mods = new Mod[]
+                            {
+                                new TaikoModPerfect(),
+                                new TaikoModSuddenDeath(),
+                            },
                         },
-                    },
-                    new ModButton
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new TaikoModDoubleTime(),
+                                new TaikoModNightcore(),
+                            },
+                        },
+                        new TaikoModHidden(),
+                        new TaikoModFlashlight(),
+                    };
+
+                case ModType.Special:
+                    return new Mod[]
                     {
-                        ToggleKey = Key.E,
-                        Mods = new Mod[]
+                        new TaikoModRelax(),
+                        new MultiMod
                         {
-                            new TaikoModHalfTime(),
+                            Mods = new Mod[]
+                            {
+                                new ModAutoplay(),
+                                new ModCinema(),
+                            },
                         },
-                    },
-                },
-            },
-            new DifficultyIncreaseSection
-            {
-                Buttons = new ModButton[]
-                {
-                    new ModButton
-                    {
-                        ToggleKey = Key.A,
-                        Mods = new Mod[]
-                        {
-                            new TaikoModHardRock(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.S,
-                        Mods = new Mod[]
-                        {
-                            new TaikoModSuddenDeath(),
-                            new ModPerfect(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.D,
-                        Mods = new Mod[]
-                        {
-                            new TaikoModDoubleTime(),
-                            new TaikoModNightcore(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.F,
-                        Mods = new Mod[]
-                        {
-                            new TaikoModHidden(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.G,
-                        Mods = new Mod[]
-                        {
-                            new TaikoModFlashlight(),
-                        },
-                    },
-                },
-            },
-            new AssistedSection
-            {
-                Buttons = new[]
-                {
-                    new ModButton
-                    {
-                        ToggleKey = Key.Z,
-                        Mods = new Mod[]
-                        {
-                            new TaikoModRelax(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.B,
-                        Mods = new Mod[]
-                        {
-                            new ModAutoplay(),
-                            new ModCinema(),
-                        },
-                    },
-                }
-            },
-        };
+                    };
+
+                default:
+                    return new Mod[] { };
+            }
+        }
 
         protected override PlayMode PlayMode => PlayMode.Taiko;
 

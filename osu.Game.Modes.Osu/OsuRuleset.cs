@@ -53,134 +53,63 @@ namespace osu.Game.Modes.Osu
             new OsuModTarget(),
         };
 
-        public override IEnumerable<ModSection> CreateModSections() => new ModSection[]
+        public override IEnumerable<Mod> GetModsFor(ModType type)
         {
-            new DifficultyReductionSection
+            switch (type)
             {
-                Buttons = new[]
-                {
-                    new ModButton
+                case ModType.DifficultyReduction:
+                    return new Mod[]
                     {
-                        ToggleKey = Key.Q,
-                        Mods = new Mod[]
-                        {
-                            new OsuModEasy(),
-                        },
-                    },
-                    new ModButton
+                        new OsuModEasy(),
+                        new OsuModNoFail(),
+                        new OsuModHalfTime(),
+                    };
+
+                case ModType.DifficultyIncrease:
+                    return new Mod[]
                     {
-                        ToggleKey = Key.W,
-                        Mods = new Mod[]
+                        new OsuModHardRock(),
+                        new MultiMod
                         {
-                            new OsuModNoFail(),
+                            Mods = new Mod[]
+                            {
+                                new OsuModSuddenDeath(),
+                                new OsuModPerfect(),
+                            },
                         },
-                    },
-                    new ModButton
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new OsuModDoubleTime(),
+                                new OsuModNightcore(),
+                            },
+                        },
+                        new OsuModHidden(),
+                        new OsuModFlashlight(),
+                    };
+
+                case ModType.Special:
+                    return new Mod[]
                     {
-                        ToggleKey = Key.E,
-                        Mods = new Mod[]
+                        new OsuModRelax(),
+                        new OsuModAutopilot(),
+                        new OsuModTarget(),
+                        new OsuModSpunOut(),
+                        new MultiMod
                         {
-                            new OsuModHalfTime(),
+                            Mods = new Mod[]
+                            {
+                                new ModAutoplay(),
+                                new ModCinema(),
+                            },
                         },
-                    },
-                },
-            },
-            new DifficultyIncreaseSection
-            {
-                Buttons = new ModButton[]
-                {
-                    new ModButton
-                    {
-                        ToggleKey = Key.A,
-                        Mods = new Mod[]
-                        {
-                            new OsuModHardRock(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.S,
-                        Mods = new Mod[]
-                        {
-                            new OsuModSuddenDeath(),
-                            new ModPerfect(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.D,
-                        Mods = new Mod[]
-                        {
-                            new OsuModDoubleTime(),
-                            new OsuModNightcore(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.F,
-                        Mods = new Mod[]
-                        {
-                            new OsuModHidden(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.G,
-                        Mods = new Mod[]
-                        {
-                            new OsuModFlashlight(),
-                        },
-                    },
-                },
-            },
-            new AssistedSection
-            {
-                Buttons = new[]
-                {
-                    new ModButton
-                    {
-                        ToggleKey = Key.Z,
-                        Mods = new Mod[]
-                        {
-                            new OsuModRelax(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.X,
-                        Mods = new Mod[]
-                        {
-                            new OsuModAutopilot(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.C,
-                        Mods = new Mod[]
-                        {
-                            new OsuModTarget(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.V,
-                        Mods = new Mod[]
-                        {
-                            new OsuModSpunOut(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.B,
-                        Mods = new Mod[]
-                        {
-                            new ModAutoplay(),
-                            new ModCinema(),
-                        },
-                    },
-                }
-            },
-        };
+                    };
+
+                default:
+                    return new Mod[] { };
+            }
+        }
 
         public override FontAwesome Icon => FontAwesome.fa_osu_osu_o;
 

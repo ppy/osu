@@ -44,134 +44,76 @@ namespace osu.Game.Modes.Mania
             new ManiaModKeyCoop(),
         };
 
-        public override IEnumerable<ModSection> CreateModSections() => new ModSection[]
+        public override IEnumerable<Mod> GetModsFor(ModType type)
         {
-            new DifficultyReductionSection
+            switch (type)
             {
-                Buttons = new[]
-                {
-                    new ModButton
+                case ModType.DifficultyReduction:
+                    return new Mod[]
                     {
-                        ToggleKey = Key.Q,
-                        Mods = new Mod[]
-                        {
-                            new ManiaModEasy(),
-                        },
-                    },
-                    new ModButton
+                        new ManiaModEasy(),
+                        new ManiaModNoFail(),
+                        new ManiaModHalfTime(),
+                    };
+
+                case ModType.DifficultyIncrease:
+                    return new Mod[]
                     {
-                        ToggleKey = Key.W,
-                        Mods = new Mod[]
+                        new ManiaModHardRock(),
+                        new MultiMod
                         {
-                            new ManiaModNoFail(),
+                            Mods = new Mod[]
+                            {
+                                new ManiaModPerfect(),
+                                new ManiaModSuddenDeath(),
+                            },
                         },
-                    },
-                    new ModButton
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ManiaModDoubleTime(),
+                                new ManiaModNightcore(),
+                            },
+                        },
+                        new ManiaModHidden(),
+                        new ManiaModFlashlight(),
+                    };
+
+                case ModType.Special:
+                    return new Mod[]
                     {
-                        ToggleKey = Key.E,
-                        Mods = new Mod[]
+                        new MultiMod
                         {
-                            new ManiaModHalfTime(),
+                            Mods = new Mod[]
+                            {
+                                new ManiaModKey4(),
+                                new ManiaModKey5(),
+                                new ManiaModKey6(),
+                                new ManiaModKey7(),
+                                new ManiaModKey8(),
+                                new ManiaModKey9(),
+                                new ManiaModKey1(),
+                                new ManiaModKey2(),
+                                new ManiaModKey3(),
+                            },
                         },
-                    },
-                },
-            },
-            new DifficultyIncreaseSection
-            {
-                Buttons = new ModButton[]
-                {
-                    new ModButton
-                    {
-                        ToggleKey = Key.A,
-                        Mods = new Mod[]
+                        new ManiaModKeyCoop(),
+                        new ManiaModRandom(),
+                        new MultiMod
                         {
-                            new ManiaModHardRock(),
+                            Mods = new Mod[]
+                            {
+                                new ModAutoplay(),
+                                new ModCinema(),
+                            },
                         },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.S,
-                        Mods = new Mod[]
-                        {
-                            new ManiaModSuddenDeath(),
-                            new ModPerfect(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.D,
-                        Mods = new Mod[]
-                        {
-                            new ManiaModDoubleTime(),
-                            new ManiaModNightcore(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.F,
-                        Mods = new Mod[]
-                        {
-                            new ManiaModHidden(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.G,
-                        Mods = new Mod[]
-                        {
-                            new ManiaModFlashlight(),
-                        },
-                    },
-                },
-            },
-            new AssistedSection
-            {
-                Buttons = new[]
-                {
-                    new ModButton
-                    {
-                        ToggleKey = Key.Z,
-                        Mods = new Mod[]
-                        {
-                            new ManiaModKey4(),
-                            new ManiaModKey5(),
-                            new ManiaModKey6(),
-                            new ManiaModKey7(),
-                            new ManiaModKey8(),
-                            new ManiaModKey9(),
-                            new ManiaModKey1(),
-                            new ManiaModKey2(),
-                            new ManiaModKey3(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.X,
-                        Mods = new Mod[]
-                        {
-                            new ManiaModKeyCoop(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.C,
-                        Mods = new Mod[]
-                        {
-                            new ManiaModRandom(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.V,
-                        Mods = new Mod[]
-                        {
-                            new ModAutoplay(),
-                            new ModCinema(),
-                        },
-                    },
-                }
-            },
-        };
+                    };
+
+                default:
+                    return new Mod[] { };
+            }
+        }
 
         protected override PlayMode PlayMode => PlayMode.Mania;
 

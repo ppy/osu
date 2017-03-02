@@ -33,110 +33,60 @@ namespace osu.Game.Modes.Catch
             new CatchModFlashlight(),
         };
 
-        public override IEnumerable<ModSection> CreateModSections() => new ModSection[]
+        public override IEnumerable<Mod> GetModsFor(ModType type)
         {
-            new DifficultyReductionSection
+            switch (type)
             {
-                Buttons = new[]
-                {
-                    new ModButton
+                case ModType.DifficultyReduction:
+                    return new Mod[]
                     {
-                        ToggleKey = Key.Q,
-                        Mods = new Mod[]
-                        {
-                            new CatchModEasy(),
-                        },
-                    },
-                    new ModButton
+                        new CatchModEasy(),
+                        new CatchModNoFail(),
+                        new CatchModHalfTime(),
+                    };
+
+                case ModType.DifficultyIncrease:
+                    return new Mod[]
                     {
-                        ToggleKey = Key.W,
-                        Mods = new Mod[]
+                        new CatchModHardRock(),
+                        new MultiMod
                         {
-                            new CatchModNoFail(),
+                            Mods = new Mod[]
+                            {
+                                new CatchModPerfect(),
+                                new CatchModSuddenDeath(),
+                            },
                         },
-                    },
-                    new ModButton
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new CatchModDoubleTime(),
+                                new CatchModNightcore(),
+                            },
+                        },
+                        new CatchModHidden(),
+                        new CatchModFlashlight(),
+                    };
+
+                case ModType.Special:
+                    return new Mod[]
                     {
-                        ToggleKey = Key.E,
-                        Mods = new Mod[]
+                        new CatchModRelax(),
+                        new MultiMod
                         {
-                            new CatchModHalfTime(),
+                            Mods = new Mod[]
+                            {
+                                new ModAutoplay(),
+                                new ModCinema(),
+                            },
                         },
-                    },
-                },
-            },
-            new DifficultyIncreaseSection
-            {
-                Buttons = new ModButton[]
-                {
-                    new ModButton
-                    {
-                        ToggleKey = Key.A,
-                        Mods = new Mod[]
-                        {
-                            new CatchModHardRock(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.S,
-                        Mods = new Mod[]
-                        {
-                            new CatchModSuddenDeath(),
-                            new ModPerfect(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.D,
-                        Mods = new Mod[]
-                        {
-                            new CatchModDoubleTime(),
-                            new CatchModNightcore(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.F,
-                        Mods = new Mod[]
-                        {
-                            new CatchModHidden(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.G,
-                        Mods = new Mod[]
-                        {
-                            new CatchModFlashlight(),
-                        },
-                    },
-                },
-            },
-            new AssistedSection
-            {
-                Buttons = new[]
-                {
-                    new ModButton
-                    {
-                        ToggleKey = Key.Z,
-                        Mods = new Mod[]
-                        {
-                            new CatchModRelax(),
-                        },
-                    },
-                    new ModButton
-                    {
-                        ToggleKey = Key.B,
-                        Mods = new Mod[]
-                        {
-                            new ModAutoplay(),
-                            new ModCinema(),
-                        },
-                    },
-                }
-            },
-        };
+                    };
+
+                default:
+                    return new Mod[] { };
+            }
+        }
 
         protected override PlayMode PlayMode => PlayMode.Catch;
 
