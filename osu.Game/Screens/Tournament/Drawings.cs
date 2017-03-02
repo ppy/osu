@@ -30,11 +30,12 @@ namespace osu.Game.Screens.Tournament
         private ScrollingTeamContainer teamsContainer;
         private GroupsContainer groupsContainer;
 
+        private List<Team> allTeams = new List<Team>();
+
         private DrawingsConfigManager drawingsConfig;
 
-        public Drawings()
-        {
-        }
+        private Task lastWriteOp;
+        private Task writeOp;
 
         [BackgroundDependencyLoader]
         private void load(Framework.Game game, TextureStore textures)
@@ -202,7 +203,7 @@ namespace osu.Game.Screens.Tournament
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Reset",
-                                            Action = reset
+                                            Action = () => reset(false)
                                         }
                                     }
                                 }
@@ -229,16 +230,38 @@ namespace osu.Game.Screens.Tournament
 
                 st.Text = t.Team.FullName;
                 st.FadeIn(200);
+
+                writeResults(groupsContainer.ToStringRepresentation());
             };
 
             teamsContainer.OnScrollStarted += () => st.FadeOut(200);
 
-            reloadTeams();
+            reset(true);
+        }
+
+        private void writeResults(string text)
+        {
+            lastWriteOp = writeOp;
+            writeOp = Task.Run(async () =>
+            {
+                if (lastWriteOp != null)
+                    await lastWriteOp;
+
+                // Write to drawings_results
+                try
+                {
+                    File.WriteAllText("drawings_results.txt", text);
+                }
+                catch
+                {
+                }
+            });
         }
 
         private void reloadTeams()
         {
             teamsContainer.ClearTeams();
+            allTeams.Clear();
 
             try
             {
@@ -255,23 +278,61 @@ namespace osu.Game.Screens.Tournament
                     if (groupsContainer.ContainsTeam(name))
                         continue;
 
-                    teamsContainer.AddTeam(new Team()
+                    Team t = new Team()
                     {
                         FlagName = flagName,
                         FullName = name,
                         Acronym = acronym
-                    });
+                    };
+
+                    allTeams.Add(t);
+                    teamsContainer.AddTeam(t);
                 }
             }
             catch { }
         }
 
-        private void reset()
+        private void reset(bool loadLastResults = false)
         {
             groupsContainer.ClearTeams();
-            teamsContainer.ClearTeams();
 
             reloadTeams();
+
+            try
+            {
+                if (loadLastResults)
+                {
+                    // Read from drawings_results
+                    using (StreamReader sr = new StreamReader(File.OpenRead("drawings_results.txt")))
+                    {
+                        while (sr.Peek() != -1)
+                        {
+                            string line = sr.ReadLine();
+
+                            if (string.IsNullOrEmpty(line))
+                                continue;
+
+                            if (line.ToUpper().StartsWith("GROUP"))
+                                continue;
+
+                            Team teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
+
+                            if (teamToAdd == null)
+                                continue;
+
+                            groupsContainer.AddTeam(teamToAdd);
+                            teamsContainer.RemoveTeam(teamToAdd);
+                        }
+                    }
+                }
+                else
+                {
+                    writeResults(string.Empty);
+                }
+            }
+            catch
+            {
+            }
         }
     }
 }

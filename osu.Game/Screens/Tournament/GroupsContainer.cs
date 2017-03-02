@@ -62,12 +62,12 @@ namespace osu.Game.Screens.Tournament
 
         public void AddTeam(Team team)
         {
-            for (int i = 0; i < allGroups.Count; i++)
+            foreach (Group g in allGroups)
             {
-                if (allGroups[i].TeamsCount == maxTeams)
+                if (g.TeamsCount == maxTeams)
                     continue;
 
-                allGroups[i].AddTeam(team);
+                g.AddTeam(team);
                 break;
             }
         }
@@ -79,9 +79,9 @@ namespace osu.Game.Screens.Tournament
 
         public bool RemoveTeam(Team team)
         {
-            for (int i = 0; i < allGroups.Count; i++)
+            foreach (Group g in allGroups)
             {
-                if (allGroups[i].RemoveTeam(team))
+                if (g.RemoveTeam(team))
                     return true;
             }
 
@@ -94,6 +94,21 @@ namespace osu.Game.Screens.Tournament
             {
                 allGroups[i].ClearTeams();
             }
+        }
+
+        public string ToStringRepresentation()
+        {
+            StringBuilder sb = new StringBuilder();
+            
+            foreach (Group g in allGroups)
+            {
+                if (g != allGroups.First())
+                    sb.AppendLine();
+                sb.AppendLine($"Group {g.GroupName}");
+                sb.Append(g.ToStringRepresentation());
+            }
+
+            return sb.ToString();
         }
     }
 }

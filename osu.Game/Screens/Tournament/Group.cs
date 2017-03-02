@@ -147,6 +147,14 @@ namespace osu.Game.Screens.Tournament
             bottomTeamsCount = 0;
         }
 
+        public string ToStringRepresentation()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (GroupTeam gt in allTeams)
+                sb.AppendLine(gt.Team.FullName);
+            return sb.ToString();
+        }
+
         class GroupTeam : Container
         {
             public Team Team;
