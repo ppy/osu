@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Pause
             }
         }
 
-        private FlowContainer retryCounterContainer;
+        private FillFlowContainer retryCounterContainer;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
         public override bool HandleInput => State == Visibility.Visible;
@@ -100,21 +100,21 @@ namespace osu.Game.Overlays.Pause
                     Colour = Color4.Black,
                     Alpha = background_alpha,
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FlowDirections.Vertical,
-                    Spacing = new Vector2(0f, 50f),
+                    Direction = FillDirection.Down,
+                    Spacing = new Vector2(0, 50),
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Direction = FlowDirections.Vertical,
-                            Spacing = new Vector2(0f, 20f),
+                            Direction = FillDirection.Down,
+                            Spacing = new Vector2(0, 20),
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Children = new Drawable[]
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Pause
                                 }
                             }
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -188,7 +188,7 @@ namespace osu.Game.Overlays.Pause
                                 }
                             }
                         },
-                        retryCounterContainer = new FlowContainer
+                        retryCounterContainer = new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Origin = Anchor.TopCentre,
