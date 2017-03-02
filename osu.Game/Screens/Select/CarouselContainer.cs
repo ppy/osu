@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Select
                     scrollableContent.Add(panel);
                 }
             }
-            SelectGroup(groups.FirstOrDefault(), groups.First().BeatmapPanels.FirstOrDefault());
+
         }
 
         private static float offsetX(float dist, float halfHeight)
