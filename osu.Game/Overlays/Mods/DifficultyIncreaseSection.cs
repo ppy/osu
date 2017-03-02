@@ -27,51 +27,51 @@ namespace osu.Game
         public DifficultyIncreaseSection()
         {
             Header = @"Gameplay Difficulty Increase";
-            Buttons = new ModButton[]
-            {
-                new ModButton
-                {
-                    ToggleKey = Key.A,
-                    Mods = new Mod[]
-                    {
-                        new ModHardRock(),
-                    },
-                },
-                new ModButton
-                {
-                    ToggleKey = Key.S,
-                    Mods = new Mod[]
-                    {
-                        new ModSuddenDeath(),
-                        new ModPerfect(),
-                    },
-                },
-                new ModButton
-                {
-                    ToggleKey = Key.D,
-                    Mods = new Mod[]
-                    {
-                        new ModDoubleTime(),
-                        new ModNightcore(),
-                    },
-                },
-                new ModButton
-                {
-                    ToggleKey = Key.F,
-                    Mods = new Mod[]
-                    {
-                        new ModHidden(),
-                    },
-                },
-                new ModButton
-                {
-                    ToggleKey = Key.G,
-                    Mods = new Mod[]
-                    {
-                        new ModFlashlight(),
-                    },
-                },
-            };
+            //Buttons = new ModButton[]
+            //{
+            //    new ModButton
+            //    {
+            //        ToggleKey = Key.A,
+            //        Mods = new Mod[]
+            //        {
+            //            new ModHardRock(),
+            //        },
+            //    },
+            //    new ModButton
+            //    {
+            //        ToggleKey = Key.S,
+            //        Mods = new Mod[]
+            //        {
+            //            new ModSuddenDeath(),
+            //            new ModPerfect(),
+            //        },
+            //    },
+            //    new ModButton
+            //    {
+            //        ToggleKey = Key.D,
+            //        Mods = new Mod[]
+            //        {
+            //            new ModDoubleTime(),
+            //            new ModNightcore(),
+            //        },
+            //    },
+            //    new ModButton
+            //    {
+            //        ToggleKey = Key.F,
+            //        Mods = new Mod[]
+            //        {
+            //            new ModHidden(),
+            //        },
+            //    },
+            //    new ModButton
+            //    {
+            //        ToggleKey = Key.G,
+            //        Mods = new Mod[]
+            //        {
+            //            new ModFlashlight(),
+            //        },
+            //    },
+            //};
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.UI;
@@ -15,6 +16,20 @@ namespace osu.Game.Modes.Taiko
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
         public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new TaikoHitRenderer { Beatmap = beatmap };
+
+        public override IEnumerable<Mod> AvailableMods => new Mod[]
+        {
+            new TaikoModNoFail(),
+            new TaikoModEasy(),
+            new TaikoModHidden(),
+            new TaikoModHardRock(),
+            new TaikoModSuddenDeath(),
+            new TaikoModDoubleTime(),
+            new TaikoModRelax(),
+            new TaikoModHalfTime(),
+            new TaikoModNightcore(),
+            new TaikoModFlashlight(),
+        };
 
         protected override PlayMode PlayMode => PlayMode.Taiko;
 

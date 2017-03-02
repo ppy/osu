@@ -34,6 +34,23 @@ namespace osu.Game.Modes.Osu
             }
         };
 
+        public override IEnumerable<Mod> AvailableMods => new Mod[]
+        {
+            new OsuModNoFail(),
+            new OsuModEasy(),
+            new OsuModHidden(),
+            new OsuModHardRock(),
+            new OsuModSuddenDeath(),
+            new OsuModDoubleTime(),
+            new OsuModRelax(),
+            new OsuModHalfTime(),
+            new OsuModNightcore(),
+            new OsuModFlashlight(),
+            new OsuModSpunOut(),
+            new OsuModAutopilot(),
+            new OsuModTarget(),
+        };
+
         public override FontAwesome Icon => FontAwesome.fa_osu_osu_o;
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();

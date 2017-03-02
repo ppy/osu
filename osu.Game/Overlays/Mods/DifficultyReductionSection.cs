@@ -25,33 +25,33 @@ namespace osu.Game
         public DifficultyReductionSection()
         {
             Header = @"Gameplay Difficulty Reduction";
-            Buttons = new ModButton[]
-            {
-                new ModButton
-                {
-                    ToggleKey = Key.Q,
-                    Mods = new Mod[]
-                    {
-                        new ModEasy(),
-                    },
-                },
-                new ModButton
-                {
-                    ToggleKey = Key.W,
-                    Mods = new Mod[]
-                    {
-                        new ModNoFail(),
-                    },
-                },
-                new ModButton
-                {
-                    ToggleKey = Key.E,
-                    Mods = new Mod[]
-                    {
-                        new ModHalfTime(),
-                    },
-                },
-            };
+            //Buttons = new ModButton[]
+            //{
+            //    new ModButton
+            //    {
+            //        ToggleKey = Key.Q,
+            //        Mods = new Mod[]
+            //        {
+            //            new ModEasy(),
+            //        },
+            //    },
+            //    new ModButton
+            //    {
+            //        ToggleKey = Key.W,
+            //        Mods = new Mod[]
+            //        {
+            //            new ModNoFail(),
+            //        },
+            //    },
+            //    new ModButton
+            //    {
+            //        ToggleKey = Key.E,
+            //        Mods = new Mod[]
+            //        {
+            //            new ModHalfTime(),
+            //        },
+            //    },
+            //};
         }
     }
 }
