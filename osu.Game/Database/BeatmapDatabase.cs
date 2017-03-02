@@ -116,6 +116,10 @@ namespace osu.Game.Database
             connection.DeleteAll<BeatmapInfo>();
         }
 
+        /// <summary>
+        /// Import multiple <see cref="BeatmapSetInfo"/> from <paramref name="paths"/>.
+        /// </summary>
+        /// <param name="paths">Multiple locations on disk</param>
         public void Import(IEnumerable<string> paths)
         {
             Stack<BeatmapSetInfo> sets = new Stack<BeatmapSetInfo>();
@@ -151,6 +155,10 @@ namespace osu.Game.Database
             Import(sets);
         }
 
+        /// <summary>
+        /// Import <see cref="BeatmapSetInfo"/> from <paramref name="path"/>.
+        /// </summary>
+        /// <param name="path">Location on disk</param>
         public void Import(string path)
         {
             Import(new [] { path });
