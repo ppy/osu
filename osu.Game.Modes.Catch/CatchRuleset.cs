@@ -37,8 +37,8 @@ namespace osu.Game.Modes.Catch
                         {
                             Mods = new Mod[]
                             {
-                                new CatchModPerfect(),
                                 new CatchModSuddenDeath(),
+                                new CatchModPerfect(),
                             },
                         },
                         new MultiMod

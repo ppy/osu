@@ -37,8 +37,8 @@ namespace osu.Game.Modes.Mania
                         {
                             Mods = new Mod[]
                             {
-                                new ManiaModPerfect(),
                                 new ManiaModSuddenDeath(),
+                                new ManiaModPerfect(),
                             },
                         },
                         new MultiMod
