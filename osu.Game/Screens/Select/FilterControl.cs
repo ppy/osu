@@ -21,7 +21,18 @@ namespace osu.Game.Screens.Select
         public Action FilterChanged;
 
         public string Search => searchTextBox.Text;
-        public SortMode Sort { get; private set; } = SortMode.Title;
+        private SortMode sort = SortMode.Title;
+        public SortMode Sort { 
+            get { return sort; } 
+            set {
+                if (sort != value)
+                {
+                    sort = value;
+                    FilterChanged?.Invoke();
+                }
+            } 
+        }
+
         public Action Exit;
 
         private SearchTextBox searchTextBox;
@@ -251,9 +262,9 @@ namespace osu.Game.Screens.Select
         
         public enum SortMode
         {
-            Arist,
+            Artist,
             BPM,
-            Creator,
+            Author,
             DateAdded,
             Difficulty,
             Length,
@@ -264,9 +275,9 @@ namespace osu.Game.Screens.Select
         public enum GroupMode
         {
             NoGrouping,
-            Arist,
+            Artist,
             BPM,
-            Creator,
+            Author,
             DateAdded,
             Difficulty,
             Length,
