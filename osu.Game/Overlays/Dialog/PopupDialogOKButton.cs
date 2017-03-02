@@ -4,23 +4,17 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Pause
+namespace osu.Game.Overlays.Dialog
 {
-    public class ResumeButton : DialogButton
+    public class PopupDialogOkButton : PopupDialogButton
     {
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
-            ButtonColour = colours.Green;
+            ButtonColour = colours.Pink;
             SampleHover = audio.Sample.Get(@"Menu/menuclick");
-            SampleClick = audio.Sample.Get(@"Menu/menuback");
-        }
-
-        public ResumeButton()
-        {
-            Text = @"Continue";
+            SampleClick = audio.Sample.Get(@"Menu/menu-play-click");
         }
     }
 }

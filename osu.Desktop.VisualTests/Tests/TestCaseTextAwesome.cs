@@ -22,9 +22,9 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            FlowContainer flow;
+            FillFlowContainer flow;
 
-            Add(flow = new FlowContainer()
+            Add(flow = new FillFlowContainer()
             {
                 RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(0.5f),
