@@ -20,15 +20,14 @@ namespace osu.Game.Overlays
         {
             if (dialog == currentDialog) return;
 
-            State = Visibility.Visible;
-
-            dialogContainer.Add(dialog);
-
-            dialog.Show();
-            dialog.StateChanged += onDialogOnStateChanged;
-
             currentDialog?.Hide();
             currentDialog = dialog;
+
+            dialogContainer.Add(currentDialog);
+
+            currentDialog.Show();
+            currentDialog.StateChanged += onDialogOnStateChanged;
+            State = Visibility.Visible;
         }
 
         private void onDialogOnStateChanged(OverlayContainer dialog, Visibility v)
@@ -38,6 +37,7 @@ namespace osu.Game.Overlays
             //handle the dialog being dismissed.
             dialog.Delay(PopupDialog.EXIT_DURATION);
             dialog.Expire();
+
             if (dialog == currentDialog)
                 State = Visibility.Hidden;
         }
