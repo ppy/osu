@@ -3,14 +3,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
-using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Modes.Osu
 {
@@ -34,23 +32,6 @@ namespace osu.Game.Modes.Osu
                 Content = beatmap.Beatmap.HitObjects.Count(h => h is Slider).ToString(),
                 Icon = FontAwesome.fa_circle_o
             }
-        };
-
-        public override IEnumerable<Mod> AvailableMods => new Mod[]
-        {
-            new OsuModNoFail(),
-            new OsuModEasy(),
-            new OsuModHidden(),
-            new OsuModHardRock(),
-            new OsuModSuddenDeath(),
-            new OsuModDoubleTime(),
-            new OsuModRelax(),
-            new OsuModHalfTime(),
-            new OsuModNightcore(),
-            new OsuModFlashlight(),
-            new OsuModSpunOut(),
-            new OsuModAutopilot(),
-            new OsuModTarget(),
         };
 
         public override IEnumerable<Mod> GetModsFor(ModType type)

@@ -27,8 +27,6 @@ namespace osu.Game.Modes
 
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
-        public abstract IEnumerable<Mod> AvailableMods { get; }
-
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
         public abstract ScoreProcessor CreateScoreProcessor(int hitObjectCount);
