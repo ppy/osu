@@ -79,6 +79,31 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
+        [Test]
+        public void TestImportWhenFileOpen()
+        {
+            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new HeadlessGameHost())
+            {
+                var osu = loadOsu(host);
+
+                var temp = prepareTempCopy(osz_path);
+
+                Assert.IsTrue(File.Exists(temp));
+
+                using (FileStream stream = File.OpenRead(temp))
+                    osu.Dependencies.Get<BeatmapDatabase>().Import(temp);
+
+                ensureLoaded(osu);
+
+                Assert.IsTrue(File.Exists(temp));
+                
+                File.Delete(temp);
+
+                Assert.IsFalse(File.Exists(temp));
+            }
+        }
+
         private string prepareTempCopy(string path)
         {
             var temp = Path.GetTempFileName();
