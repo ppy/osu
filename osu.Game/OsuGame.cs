@@ -42,6 +42,8 @@ namespace osu.Game
 
         private NotificationManager notificationManager;
 
+        private DialogOverlay dialogOverlay;
+
         private Intro intro
         {
             get
@@ -142,6 +144,11 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }).LoadAsync(this, overlayContent.Add);
 
+            (dialogOverlay = new DialogOverlay
+            {
+                Depth = -4,
+            }).LoadAsync(this, overlayContent.Add);
+
             Logger.NewEntry += entry =>
             {
                 if (entry.Level < LogLevel.Important) return;
@@ -155,6 +162,7 @@ namespace osu.Game
             Dependencies.Cache(options);
             Dependencies.Cache(musicController);
             Dependencies.Cache(notificationManager);
+            Dependencies.Cache(dialogOverlay);
 
             (Toolbar = new Toolbar
             {
@@ -214,7 +222,7 @@ namespace osu.Game
                 }
             }
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
 
         public event Action<Screen> ModeChanged;

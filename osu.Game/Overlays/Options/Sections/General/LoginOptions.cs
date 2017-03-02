@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Options.Sections.General
             }
         }
 
-        class LoginForm : FlowContainer
+        class LoginForm : FillFlowContainer
         {
             private TextBox username;
             private TextBox password;
@@ -100,10 +100,10 @@ namespace osu.Game.Overlays.Options.Sections.General
             private void load(APIAccess api, OsuConfigManager config)
             {
                 this.api = api;
-                Direction = FlowDirections.Vertical;
+                Direction = FillDirection.Down;
+                Spacing = new Vector2(0, 5);
                 AutoSizeAxes = Axes.Y;
                 RelativeSizeAxes = Axes.X;
-                Spacing = new Vector2(0, 5);
                 Children = new Drawable[]
                 {
                     username = new OsuTextBox

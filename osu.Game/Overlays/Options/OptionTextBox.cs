@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Options
                 bindable = value;
                 if (bindable != null)
                 {
-                    base.Text = bindable.Value;
+                    Text = bindable.Value;
                     bindable.ValueChanged += bindableValueChanged;
                 }
 
