@@ -348,7 +348,7 @@ namespace osu.Game.Screens.Select
 
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
-            if (!skipDifficulties)
+            if (!skipDifficulties && SelectedGroup != null)
             {
                 int i = SelectedGroup.BeatmapPanels.IndexOf(SelectedPanel) + direction;
 
