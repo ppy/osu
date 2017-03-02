@@ -11,10 +11,6 @@ namespace osu.Game
 {
     public class DifficultyReductionSection : ModSection
     {
-        public ModButton EasyButton => Buttons[0];
-        public ModButton NoFailButton => Buttons[1];
-        public ModButton HalfTimeButton => Buttons[2];
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -25,33 +21,6 @@ namespace osu.Game
         public DifficultyReductionSection()
         {
             Header = @"Gameplay Difficulty Reduction";
-            //Buttons = new ModButton[]
-            //{
-            //    new ModButton
-            //    {
-            //        ToggleKey = Key.Q,
-            //        Mods = new Mod[]
-            //        {
-            //            new ModEasy(),
-            //        },
-            //    },
-            //    new ModButton
-            //    {
-            //        ToggleKey = Key.W,
-            //        Mods = new Mod[]
-            //        {
-            //            new ModNoFail(),
-            //        },
-            //    },
-            //    new ModButton
-            //    {
-            //        ToggleKey = Key.E,
-            //        Mods = new Mod[]
-            //        {
-            //            new ModHalfTime(),
-            //        },
-            //    },
-            //};
         }
     }
 }

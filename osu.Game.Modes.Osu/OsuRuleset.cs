@@ -3,12 +3,14 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using OpenTK.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
+using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Modes.Osu
 {
@@ -49,6 +51,135 @@ namespace osu.Game.Modes.Osu
             new OsuModSpunOut(),
             new OsuModAutopilot(),
             new OsuModTarget(),
+        };
+
+        public override IEnumerable<ModSection> CreateModSections() => new ModSection[]
+        {
+            new DifficultyReductionSection
+            {
+                Buttons = new[]
+                {
+                    new ModButton
+                    {
+                        ToggleKey = Key.Q,
+                        Mods = new Mod[]
+                        {
+                            new OsuModEasy(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.W,
+                        Mods = new Mod[]
+                        {
+                            new OsuModNoFail(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.E,
+                        Mods = new Mod[]
+                        {
+                            new OsuModHalfTime(),
+                        },
+                    },
+                },
+            },
+            new DifficultyIncreaseSection
+            {
+                Buttons = new ModButton[]
+                {
+                    new ModButton
+                    {
+                        ToggleKey = Key.A,
+                        Mods = new Mod[]
+                        {
+                            new OsuModHardRock(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.S,
+                        Mods = new Mod[]
+                        {
+                            new OsuModSuddenDeath(),
+                            new ModPerfect(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.D,
+                        Mods = new Mod[]
+                        {
+                            new OsuModDoubleTime(),
+                            new OsuModNightcore(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.F,
+                        Mods = new Mod[]
+                        {
+                            new OsuModHidden(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.G,
+                        Mods = new Mod[]
+                        {
+                            new OsuModFlashlight(),
+                        },
+                    },
+                },
+            },
+            new AssistedSection
+            {
+                Buttons = new[]
+                {
+                    new ModButton
+                    {
+                        ToggleKey = Key.Z,
+                        Mods = new Mod[]
+                        {
+                            new OsuModRelax(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.X,
+                        Mods = new Mod[]
+                        {
+                            new OsuModAutopilot(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.C,
+                        Mods = new Mod[]
+                        {
+                            new OsuModTarget(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.V,
+                        Mods = new Mod[]
+                        {
+                            new OsuModSpunOut(),
+                        },
+                    },
+                    new ModButton
+                    {
+                        ToggleKey = Key.B,
+                        Mods = new Mod[]
+                        {
+                            new ModAutoplay(),
+                            new ModCinema(),
+                        },
+                    },
+                }
+            },
         };
 
         public override FontAwesome Icon => FontAwesome.fa_osu_osu_o;
