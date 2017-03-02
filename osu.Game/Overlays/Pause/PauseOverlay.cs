@@ -156,7 +156,6 @@ namespace osu.Game.Overlays.Pause
                             {
                                 new ResumeButton
                                 {
-                                    RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = button_height,
@@ -164,7 +163,6 @@ namespace osu.Game.Overlays.Pause
                                 },
                                 new RetryButton
                                 {
-                                    RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = button_height,
@@ -176,7 +174,6 @@ namespace osu.Game.Overlays.Pause
                                 },
                                 new QuitButton
                                 {
-                                    RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = button_height,
