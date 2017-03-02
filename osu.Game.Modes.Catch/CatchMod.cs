@@ -56,4 +56,9 @@ namespace osu.Game.Modes.Catch
         public override double ScoreMultiplier => 1.12;
         public override Mods[] DisablesMods => new Mods[] { };
     }
+
+    public class CatchModPerfect : ModPerfect
+    {
+
+    }
 }

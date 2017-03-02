@@ -54,6 +54,11 @@ namespace osu.Game.Modes.Mania
         public override Mods[] DisablesMods => new Mods[] { Mods.Hidden };
     }
 
+    public class ManiaModPerfect : ModPerfect
+    {
+
+    }
+
     public class ManiaModFadeIn : Mod
     {
         public override Mods Name => Mods.FadeIn;

@@ -59,6 +59,11 @@ namespace osu.Game.Modes.Osu
         public override Mods[] DisablesMods => new Mods[] { };
     }
 
+    public class OsuModPerfect : ModPerfect
+    {
+        
+    }
+
     public class OsuModSpunOut : Mod
     {
         public override Mods Name => Mods.SpunOut;

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
@@ -10,11 +11,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
-using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -43,17 +44,35 @@ namespace osu.Game.Overlays.Mods
             set
             {
                 modMode = value;
+                var ruleset = Ruleset.GetRuleset(value);
 
-                modSectionsContainer.RemoveAll(delegate (ModSection m) { return true; });
-                foreach (ModSection s in Ruleset.GetRuleset(value).CreateModSections())
+                modSectionsContainer.Children = new ModSection[]
                 {
-                    s.RelativeSizeAxes = Axes.X;
-                    s.Origin = Anchor.TopCentre;
-                    s.Anchor = Anchor.TopCentre;
-                    s.Action = modButtonPressed;
-
-                    modSectionsContainer.Add(s);
-                }
+                    new DifficultyReductionSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Action = modButtonPressed,
+                        Buttons = ruleset.GetModsFor(ModType.DifficultyReduction).Select(m => new ModButton(m)).ToArray(),
+                    },
+                    new DifficultyIncreaseSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Action = modButtonPressed,
+                        Buttons = ruleset.GetModsFor(ModType.DifficultyIncrease).Select(m => new ModButton(m)).ToArray(),
+                    },
+                    new AssistedSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Action = modButtonPressed,
+                        Buttons = ruleset.GetModsFor(ModType.Special).Select(m => new ModButton(m)).ToArray(),
+                    },
+                };
             }
         }
 
@@ -109,51 +128,6 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private void modButtonPressed(Mod selectedMod)
-        {
-            if (selectedMod != null)
-            {
-                foreach (Modes.Mods disableMod in selectedMod.DisablesMods)
-                {
-                    DeselectMod(disableMod);
-                }
-                refreshSelectedMods();
-            }
-
-            double multiplier = 1;
-            bool ranked = true;
-
-            foreach (Mod mod in SelectedMods.Value)
-            {
-                multiplier *= mod.ScoreMultiplier;
-
-                if (ranked)
-                {
-                    ranked = mod.Ranked;
-                }
-            }
-
-            // 1.00x
-            // 1.05x
-            // 1.20x
-
-            multiplierLabel.Text = string.Format("{0:N2}x", multiplier);
-            string rankedString = ranked ? "Ranked" : "Unranked";
-            rankedLabel.Text = $@"{rankedString}, Score Multiplier: ";
-            if (multiplier > 1.0)
-            {
-                multiplierLabel.FadeColour(highMultiplierColour, 200);
-            }
-            else if (multiplier < 1.0)
-            {
-                multiplierLabel.FadeColour(lowMultiplierColour, 200);
-            }
-            else
-            {
-                multiplierLabel.FadeColour(Color4.White, 200);
-            }
-        }
-
         public void DeselectMod(Modes.Mods modName)
         {
             foreach (ModSection section in modSectionsContainer.Children)
@@ -169,6 +143,51 @@ namespace osu.Game.Overlays.Mods
                         }
                     }
                 }
+            }
+        }
+
+        private void modButtonPressed(Mod selectedMod)
+        {
+            if (selectedMod != null)
+            {
+                foreach (Modes.Mods disableMod in selectedMod.DisablesMods)
+                {
+                    DeselectMod(disableMod);
+                }
+            }
+
+            refreshSelectedMods();
+
+            double multiplier = 1.0;
+            bool ranked = true;
+
+            foreach (Mod mod in SelectedMods.Value)
+            {
+                multiplier *= mod.ScoreMultiplier;
+
+                if (ranked)
+                    ranked = mod.Ranked;
+            }
+
+            // 1.00x
+            // 1.05x
+            // 1.20x
+
+            multiplierLabel.Text = string.Format("{0:N2}x", multiplier);
+            string rankedString = ranked ? "Ranked" : "Unranked";
+            rankedLabel.Text = $@"{rankedString}, Score Multiplier: ";
+
+            if (multiplier > 1.0)
+            {
+                multiplierLabel.FadeColour(highMultiplierColour, 200);
+            }
+            else if (multiplier < 1.0)
+            {
+                multiplierLabel.FadeColour(lowMultiplierColour, 200);
+            }
+            else
+            {
+                multiplierLabel.FadeColour(Color4.White, 200);
             }
         }
 

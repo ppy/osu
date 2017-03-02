@@ -29,7 +29,7 @@ namespace osu.Game.Modes
 
         public abstract IEnumerable<Mod> AvailableMods { get; }
 
-        public abstract IEnumerable<ModSection> CreateModSections();
+        public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
         public abstract ScoreProcessor CreateScoreProcessor(int hitObjectCount);
 

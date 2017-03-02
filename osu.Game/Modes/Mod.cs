@@ -43,6 +43,18 @@ namespace osu.Game.Modes
         public abstract Mods[] DisablesMods { get; }
     }
 
+    public class MultiMod : Mod
+    {
+        public override Mods Name => Modes.Mods.None;
+        public override FontAwesome Icon => FontAwesome.fa_close;
+        public override string Description => @"";
+        public override double ScoreMultiplier => 0.0;
+        public override bool Ranked => false;
+        public override Mods[] DisablesMods => new Mods[] { };
+
+        public Mod[] Mods;
+    }
+
     public abstract class ModNoFail : Mod
     {
         public override Mods Name => Mods.NoFail;
@@ -140,7 +152,7 @@ namespace osu.Game.Modes
         public override Mods[] DisablesMods => new Mods[] { Mods.Relax, Mods.Autopilot, Mods.SpunOut, Mods.SuddenDeath, Mods.Perfect };
     }
 
-    public class ModPerfect : ModSuddenDeath
+    public abstract class ModPerfect : ModSuddenDeath
     {
         public override Mods Name => Mods.Perfect;
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_perfect;
@@ -249,5 +261,12 @@ namespace osu.Game.Modes
         KeyMod = Key1 | Key2 | Key3 | Key4 | Key5 | Key6 | Key7 | Key8 | Key9 | KeyCoop,
         FreeModAllowed = NoFail | Easy | Hidden | HardRock | SuddenDeath | Flashlight | FadeIn | Relax | Autopilot | SpunOut | KeyMod,
         ScoreIncreaseMods = Hidden | HardRock | DoubleTime | Flashlight | FadeIn
+    }
+
+    public enum ModType
+    {
+        DifficultyReduction,
+        DifficultyIncrease,
+        Special,
     }
 }

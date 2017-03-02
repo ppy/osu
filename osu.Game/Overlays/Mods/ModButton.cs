@@ -100,24 +100,37 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private Mod[] mods;
-        public Mod[] Mods
+        private Mod mod;
+        public Mod Mod
         {
             get
             {
-                return mods;
+                return mod;
             }
             set
             {
-                if (mods == value) return;
-                mods = value;
-                createIcons();
-                if (value.Length > 0)
+                if (mod == value) return;
+                mod = value;
+
+                if (mod is MultiMod)
                 {
-                    displayMod(value[0]);
+                    mods = ((MultiMod)mod).Mods;
+                }
+                else
+                {
+                    mods = new Mod[] { mod };
+                }
+
+                createIcons();
+                if (mods.Length > 0)
+                {
+                    displayMod(mods[0]);
                 }
             }
         }
+
+        private Mod[] mods;
+        public Mod[] Mods => mods; // the mods from Mod, only multiple if Mod is a MultiMod
 
         public Mod SelectedMod => Mods.ElementAtOrDefault(selectedMod);
 
@@ -233,7 +246,7 @@ namespace osu.Game.Overlays.Mods
             return base.OnKeyDown(state, args);
         }
 
-        public ModButton()
+        public ModButton(Mod m)
         {
             Direction = FlowDirections.Vertical;
             Spacing = new Vector2(0f, -5f);
@@ -263,6 +276,8 @@ namespace osu.Game.Overlays.Mods
                     TextSize = 18,
                 },
             };
+
+            Mod = m;
         }
     }
 }

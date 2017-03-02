@@ -37,9 +37,7 @@ namespace osu.Game.Overlays.Mods
                 {
                     Mod selectedMod = button.SelectedMod;
                     if (selectedMod != null)
-                    {
                         selectedMods.Add(selectedMod);
-                    }
                 }
 
                 return selectedMods.ToArray();
@@ -75,6 +73,7 @@ namespace osu.Game.Overlays.Mods
                 foreach (ModButton button in value)
                 {
                     button.Colour = Colour;
+                    button.SelectedColour = selectedColour;
                     button.Action = buttonPressed;
                 }
 
