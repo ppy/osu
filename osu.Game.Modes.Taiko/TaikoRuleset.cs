@@ -37,8 +37,8 @@ namespace osu.Game.Modes.Taiko
                         {
                             Mods = new Mod[]
                             {
-                                new TaikoModPerfect(),
                                 new TaikoModSuddenDeath(),
+                                new TaikoModPerfect(),
                             },
                         },
                         new MultiMod
