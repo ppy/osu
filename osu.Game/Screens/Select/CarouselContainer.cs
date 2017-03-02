@@ -183,12 +183,65 @@ namespace osu.Game.Screens.Select
             if (SelectedGroup != null && SelectedGroup != group && SelectedGroup.State != BeatmapGroupState.Hidden)
                 SelectedGroup.State = BeatmapGroupState.Collapsed;
 
+            group.State = BeatmapGroupState.Expanded;
             SelectedGroup = group;
             panel.State = PanelSelectedState.Selected;
             SelectedPanel = panel;
 
             float selectedY = computeYPositions(animated);
             ScrollTo(selectedY, animated);
+        }
+
+        public void Sort(FilterControl.SortMode mode) {
+            switch (mode) { 
+                case FilterControl.SortMode.Artist:
+                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist));
+                    break;
+                case FilterControl.SortMode.Title:
+                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title));
+                    break;
+                case FilterControl.SortMode.Author:
+                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author));
+                    break;
+                case FilterControl.SortMode.Difficulty:
+                    groups.Sort((x, y) =>
+                    {
+                        float xAverage=0, yAverage=0;
+                        int counter=0;
+                        foreach (BeatmapInfo set in x.BeatmapSet.Beatmaps) {
+                            xAverage += set.StarDifficulty;
+                            counter++;
+                        }
+                        xAverage /= counter;
+                        counter = 0;
+                        foreach (BeatmapInfo set in y.BeatmapSet.Beatmaps) {
+                            yAverage += set.StarDifficulty;
+                            counter++;
+                        }
+                        yAverage /= counter;
+                        if (xAverage > yAverage)
+                            return 1;
+                        else
+                            return -1;
+                    });
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            scrollableContent.Clear(false);
+            lifetime.Clear();
+            foreach (BeatmapGroup group in groups)
+            {
+                group.Header.Depth = -scrollableContent.Children.Count();
+                scrollableContent.Add(group.Header);
+
+                foreach (BeatmapPanel panel in group.BeatmapPanels)
+                {
+                    panel.Depth = -scrollableContent.Children.Count();
+                    scrollableContent.Add(panel);
+                }
+            }
+            SelectGroup(groups.FirstOrDefault(), groups.First().BeatmapPanels.FirstOrDefault());
         }
 
         private static float offsetX(float dist, float halfHeight)

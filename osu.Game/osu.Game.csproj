@@ -273,7 +273,6 @@
     <Compile Include="Screens\Select\SearchTextBox.cs" />
     <Compile Include="Screens\Select\FooterButton.cs" />
     <Compile Include="Screens\Select\Footer.cs" />
-    <Compile Include="Overlays\Pause\PauseButton.cs" />
     <Compile Include="Overlays\Pause\PauseOverlay.cs" />
     <Compile Include="Overlays\Pause\PauseProgressBar.cs" />
     <Compile Include="Overlays\Pause\PauseProgressGraph.cs" />
@@ -287,6 +286,13 @@
     <Compile Include="Overlays\Mods\ModSection.cs" />
     <Compile Include="Overlays\Mods\DifficultyReductionSection.cs" />
     <Compile Include="Overlays\Mods\DifficultyIncreaseSection.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialog.cs" />
+    <Compile Include="Graphics\UserInterface\DialogButton.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialogButton.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialogOKButton.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialogCancelButton.cs" />
+    <Compile Include="Screens\Select\BeatmapDeleteDialog.cs" />
+    <Compile Include="Overlays\DialogOverlay.cs" />
     <Compile Include="Overlays\Mods\AssistedSection.cs" />
     <Compile Include="Overlays\WaveOverlayContainer.cs" />
   </ItemGroup>
@@ -310,6 +316,9 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Overlays\Dialog\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

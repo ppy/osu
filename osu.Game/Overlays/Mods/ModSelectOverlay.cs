@@ -28,9 +28,9 @@ namespace osu.Game.Overlays.Mods
         private Color4 lowMultiplierColour, highMultiplierColour;
 
         private OsuSpriteText rankedLabel, multiplierLabel;
-        private FlowContainer rankedMultiplerContainer;
+        private FillFlowContainer rankedMultiplerContainer;
 
-        private FlowContainer<ModSection> modSectionsContainer;
+        private FillFlowContainer<ModSection> modSectionsContainer;
 
         public Bindable<Mod[]> SelectedMods = new Bindable<Mod[]>();
 
@@ -238,13 +238,13 @@ namespace osu.Game.Overlays.Mods
                         },
                     },
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Down,
                     Spacing = new Vector2(0f, 10f),
                     Children = new Drawable[]
                     {
@@ -262,13 +262,13 @@ namespace osu.Game.Overlays.Mods
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = OsuColour.Gray(10).Opacity(100),
                                 },
-                                new FlowContainer
+                                new FillFlowContainer
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Direction = FlowDirections.Vertical,
+                                    Direction = FillDirection.Down,
                                     Width = content_width,
                                     Padding = new MarginPadding
                                     {
@@ -305,7 +305,7 @@ namespace osu.Game.Overlays.Mods
                             },
                         },
                         // Body
-                        modSectionsContainer = new FlowContainer<ModSection>
+                        modSectionsContainer = new FillFlowContainer<ModSection>
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
@@ -329,14 +329,14 @@ namespace osu.Game.Overlays.Mods
                                     Colour = new Color4(172, 20, 116, 255),
                                     Alpha = 0.5f,
                                 },
-                                rankedMultiplerContainer = new FlowContainer
+                                rankedMultiplerContainer = new FillFlowContainer
                                 {
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.BottomCentre,
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
                                     Width = content_width,
-                                    Direction = FlowDirections.Horizontal,
+                                    Direction = FillDirection.Right,
                                     Padding = new MarginPadding
                                     {
                                         Top = 20,

@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Options.Sections
 {

@@ -21,7 +21,7 @@ using osu.Game.Modes.UI;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModButton : FlowContainer
+    public class ModButton : FillFlowContainer
     {
         private ModIcon[] icons;
         private ModIcon displayIcon => icons[icons.Length - 1];
@@ -236,7 +236,7 @@ namespace osu.Game.Overlays.Mods
 
         public ModButton(Mod m)
         {
-            Direction = FlowDirections.Vertical;
+            Direction = FillDirection.Down;
             Spacing = new Vector2(0f, -5f);
             Size = new Vector2(100f);
 
