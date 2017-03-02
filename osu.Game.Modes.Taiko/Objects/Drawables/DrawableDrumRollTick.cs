@@ -27,15 +27,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         private DrumRoll drumRoll;
         private DrumRollTick drumRollTick;
 
-        private double hitDuration => drumRoll.TickDistance / drumRoll.Length * drumRoll.Duration;
-
         public DrawableDrumRollTick(DrumRoll drumRoll, DrumRollTick drumRollTick)
             : base(drumRollTick)
         {
             this.drumRoll = drumRoll;
             this.drumRollTick = drumRollTick;
 
-            RelativePositionAxes = Axes.None;
+            RelativePositionAxes = Axes.X;
 
             Size = new Vector2(16) * drumRollTick.Scale;
 
@@ -105,7 +103,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > hitDuration / 2)
+                if (Judgement.TimeOffset > drumRollTick.TickTimeDistance / 2)
                     Judgement.Result = HitResult.Miss;
                 return;
             }
@@ -114,7 +112,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             TaikoJudgementInfo taikoJudgement = Judgement as TaikoJudgementInfo;
             
-            if (hitOffset < hitDuration / 2)
+            if (hitOffset < drumRollTick.TickTimeDistance / 2)
             {
                 Judgement.Result = HitResult.Hit;
                 taikoJudgement.Score = TaikoScoreResult.Great;

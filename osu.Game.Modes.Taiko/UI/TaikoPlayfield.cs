@@ -17,6 +17,8 @@ namespace osu.Game.Modes.Taiko.UI
 {
     public class TaikoPlayfield : Playfield
     {
+        protected override Container<Drawable> Content => this;
+
         private const float left_area_size = 0.25f;
         private const float hit_target_offset = 0.1f;
         private const float playfield_height = 106;

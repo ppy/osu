@@ -58,6 +58,7 @@ namespace osu.Game.Modes.Taiko.Objects
                     }
                 }
 
+                h.SetDefaultsFromBeatmap(beatmap);
                 output.Add(h);
             }
 

@@ -105,7 +105,7 @@ namespace osu.Desktop.VisualTests.Tests
                         StartTime = framedClock.CurrentTime + 600,
                         Length = 100 * (1000 / 500) - 10,
                         Velocity = 1,
-                        TickDistance = 100 * (1000 / 500),
+                        TickTimeDistance = 50,
                         PreEmpt = 500
                     }));
                     break;
@@ -115,7 +115,7 @@ namespace osu.Desktop.VisualTests.Tests
                         StartTime = framedClock.CurrentTime + 600,
                         Length = 1600,
                         Velocity = 1,
-                        TickDistance = 100,
+                        TickTimeDistance = 50,
                         PreEmpt = 500
                     }));
                     break;

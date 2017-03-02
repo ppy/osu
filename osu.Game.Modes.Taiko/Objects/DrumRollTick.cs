@@ -15,9 +15,6 @@ namespace osu.Game.Modes.Taiko.Objects
         /// </summary>
         public bool FirstTick;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public double TickDistance;
+        public double TickTimeDistance;
     }
 }

@@ -76,7 +76,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(new Player
             {
-                PreferredPlayMode = PlayMode.Osu,
+                PreferredPlayMode = PlayMode.Taiko,
                 Beatmap = beatmap
             });
         }

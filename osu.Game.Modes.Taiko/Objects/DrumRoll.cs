@@ -19,7 +19,7 @@ namespace osu.Game.Modes.Taiko.Objects
         public int RepeatCount = 1;
 
         public double Velocity;
-        public double TickDistance;
+        public double TickTimeDistance;
 
         /// <summary>
         /// Number of slider ticks required for a "Good" hit.
@@ -35,17 +35,28 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.SetDefaultsFromBeatmap(beatmap);
 
+            // Don't ask... Old osu! had a random multiplier here, that we now have to multiply everywhere
+            float fudgeFactor = 1.4f;
+
+            Length *= fudgeFactor;
+
             var baseDifficulty = beatmap.BeatmapInfo.BaseDifficulty;
 
             ControlPoint overridePoint;
             ControlPoint timingPoint = beatmap.TimingPointAt(StartTime, out overridePoint);
             var velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
-            var baseVelocity = 100 * baseDifficulty.SliderMultiplier / velocityAdjustment;
+            var baseVelocity = 100 * baseDifficulty.SliderMultiplier * fudgeFactor / velocityAdjustment;
 
             Velocity = baseVelocity / timingPoint.BeatLength;
-            TickDistance = baseVelocity / baseDifficulty.SliderTickRate;
 
-            int totalTicks = (int)(Length / TickDistance) + 1;
+            TickTimeDistance = timingPoint.BeatLength;
+
+            if (baseDifficulty.SliderTickRate == 3)
+                TickTimeDistance /= 3;
+            else
+                TickTimeDistance /= 4;
+
+            int totalTicks = Ticks.Count();
             RequiredGoodHits = (int)(totalTicks * Math.Min(0.15, 0.05 + (0.10 / 6) * beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty));
             RequiredGreatHits = (int)(totalTicks * Math.Min(0.30, 0.10 + (0.20 / 6) * beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty));
         }
@@ -54,21 +65,18 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             get
             {
-                if (TickDistance == 0) yield break;
+                if (TickTimeDistance == 0) yield break;
 
-                int totalTicks = (int)(Length / TickDistance);
-
-                for (int i = 0; i <= totalTicks; i++)
+                bool first = true;
+                for (double t = StartTime; t < EndTime; t += TickTimeDistance)
                 {
-                    double pos = (i * TickDistance);
-
                     yield return new DrumRollTick()
                     {
-                        FirstTick = i == 0,
+                        FirstTick = first,
                         PreEmpt = PreEmpt,
-                        TickDistance = TickDistance,
+                        TickTimeDistance = TickTimeDistance,
                         Colour = Colour,
-                        StartTime = StartTime + pos / Length * Duration,
+                        StartTime = t,
                         Scale = Scale,
                         Sample = new HitSampleInfo()
                         {
@@ -76,6 +84,8 @@ namespace osu.Game.Modes.Taiko.Objects
                             Set = SampleSet.Soft
                         }
                     };
+
+                    first = false;
                 }
             }
         }

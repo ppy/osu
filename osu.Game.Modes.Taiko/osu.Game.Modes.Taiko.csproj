@@ -74,6 +74,7 @@
     <Compile Include="Objects\TaikoConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Objects\TaikoHitObjectParser.cs" />
+    <Compile Include="TaikoScoreProcessor.cs" />
     <Compile Include="UI\HitTarget.cs" />
     <Compile Include="UI\InputDrum.cs" />
     <Compile Include="UI\TaikoComboCounter.cs" />

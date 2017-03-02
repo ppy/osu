@@ -64,7 +64,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 var newTick = new DrawableDrumRollTick(drumRoll, tick)
                 {
                     Depth = tickIndex,
-                    Position = new Vector2(tickIndex * (float)drumRoll.TickDistance, 0)
+                    Position = new Vector2((float)((tick.StartTime - HitObject.StartTime) / HitObject.Duration), 0)
                 };
 
                 ticks.Add(newTick);

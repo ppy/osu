@@ -106,9 +106,9 @@ namespace osu.Game.Screens.Play
 
             var beatmap = Beatmap.Beatmap;
 
-            if (beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
+            if (beatmap.BeatmapInfo?.Mode > PlayMode.Taiko)
             {
-                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
+                //we only support osu!/taiko modes for now because the hitobject parsing is crappy and needs a refactor.
                 Exit();
                 return;
             }
