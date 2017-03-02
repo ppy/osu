@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Mods
         {
             if (selectedMod != null)
             {
-                foreach (Modes.Mods disableMod in selectedMod.DisablesMods(ModMode))
+                foreach (Modes.Mods disableMod in selectedMod.DisablesMods)
                 {
                     DeselectMod(disableMod);
                 }
@@ -143,11 +143,11 @@ namespace osu.Game.Overlays.Mods
 
             foreach (Mod mod in SelectedMods.Value)
             {
-                multiplier *= mod.ScoreMultiplier(ModMode);
+                multiplier *= mod.ScoreMultiplier;
 
                 if (ranked)
                 {
-                    ranked = mod.Ranked(ModMode);
+                    ranked = mod.Ranked;
                 }
             }
 

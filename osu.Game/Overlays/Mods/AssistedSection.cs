@@ -32,130 +32,129 @@ namespace osu.Game
         public AssistedSection(PlayMode mode)
         {
             Header = @"Assisted";
+            //switch (mode)
+            //{
+            //    case PlayMode.Osu:
+            //        Buttons = new ModButton[]
+            //        {
+            //            RelaxButton = new ModButton
+            //            {
+            //                ToggleKey = Key.Z,
+            //                Mods = new Mod[]
+            //                {
+            //                    new ModRelax(),
+            //                },
+            //            },
+            //            AutopilotButton = new ModButton
+            //            {
+            //                ToggleKey = Key.X,
+            //                Mods = new Mod[]
+            //                {
+            //                    new OsuModAutopilot(),
+            //                },
+            //            },
+            //            TargetPracticeButton = new ModButton
+            //            {
+            //                ToggleKey = Key.C,
+            //                Mods = new Mod[]
+            //                {
+            //                    new OsuModTarget(),
+            //                },
+            //            },
+            //            SpunOutButton = new ModButton
+            //            {
+            //                ToggleKey = Key.V,
+            //                Mods = new Mod[]
+            //                {
+            //                    new OsuModSpunOut(),
+            //                },
+            //            },
+            //            AutoplayCinemaButton = new ModButton
+            //            {
+            //                ToggleKey = Key.B,
+            //                Mods = new Mod[]
+            //                {
+            //                    new ModAutoplay(),
+            //                    new ModCinema(),
+            //                },
+            //            },
+            //        };
+            //        break;
 
-            switch (mode)
-            {
-                case PlayMode.Osu:
-                    Buttons = new ModButton[]
-                    {
-                        RelaxButton = new ModButton
-                        {
-                            ToggleKey = Key.Z,
-                            Mods = new Mod[]
-                            {
-                                new ModRelax(),
-                            },
-                        },
-                        AutopilotButton = new ModButton
-                        {
-                            ToggleKey = Key.X,
-                            Mods = new Mod[]
-                            {
-                                new ModAutopilot(),
-                            },
-                        },
-                        TargetPracticeButton = new ModButton
-                        {
-                            ToggleKey = Key.C,
-                            Mods = new Mod[]
-                            {
-                                new ModTarget(),
-                            },
-                        },
-                        SpunOutButton = new ModButton
-                        {
-                            ToggleKey = Key.V,
-                            Mods = new Mod[]
-                            {
-                                new ModSpunOut(),
-                            },
-                        },
-                        AutoplayCinemaButton = new ModButton
-                        {
-                            ToggleKey = Key.B,
-                            Mods = new Mod[]
-                            {
-                                new ModAutoplay(),
-                                new ModCinema(),
-                            },
-                        },
-                    };
-                    break;
+            //    case PlayMode.Taiko:
+            //    case PlayMode.Catch:
+            //        Buttons = new ModButton[]
+            //        {
+            //            RelaxButton = new ModButton
+            //            {
+            //                ToggleKey = Key.Z,
+            //                Mods = new Mod[]
+            //                {
+            //                    new ModRelax(),
+            //                },
+            //            },
+            //            AutoplayCinemaButton = new ModButton
+            //            {
+            //                ToggleKey = Key.X,
+            //                Mods = new Mod[]
+            //                {
+            //                    new ModAutoplay(),
+            //                    new ModCinema(),
+            //                },
+            //            },
+            //        };
+            //        break;
 
-                case PlayMode.Taiko:
-                case PlayMode.Catch:
-                    Buttons = new ModButton[]
-                    {
-                        RelaxButton = new ModButton
-                        {
-                            ToggleKey = Key.Z,
-                            Mods = new Mod[]
-                            {
-                                new ModRelax(),
-                            },
-                        },
-                        AutoplayCinemaButton = new ModButton
-                        {
-                            ToggleKey = Key.X,
-                            Mods = new Mod[]
-                            {
-                                new ModAutoplay(),
-                                new ModCinema(),
-                            },
-                        },
-                    };
-                    break;
+            //    case PlayMode.Mania:
+            //        Buttons = new ModButton[]
+            //        {
+            //            KeyButton = new ModButton
+            //            {
+            //                ToggleKey = Key.Z,
+            //                Mods = new Mod[]
+            //                {
+            //                    new ManiaModKey4(),
+            //                    new ManiaModKey5(),
+            //                    new ManiaModKey6(),
+            //                    new ManiaModKey7(),
+            //                    new ManiaModKey8(),
+            //                    new ManiaModKey9(),
+            //                    new ManiaModKey1(),
+            //                    new ManiaModKey2(),
+            //                    new ManiaModKey3(),
+            //                },
+            //            },
+            //            CoopButton = new ModButton
+            //            {
+            //                ToggleKey = Key.X,
+            //                Mods = new Mod[]
+            //                {
+            //                    new ManiaModKeyCoop(),
+            //                },
+            //            },
+            //            RandomButton = new ModButton
+            //            {
+            //                ToggleKey = Key.C,
+            //                Mods = new Mod[]
+            //                {
+            //                    new ManiaModRandom(),
+            //                },
+            //            },
+            //            AutoplayCinemaButton = new ModButton
+            //            {
+            //                ToggleKey = Key.V,
+            //                Mods = new Mod[]
+            //                {
+            //                    new ModAutoplay(),
+            //                    new ModCinema(),
+            //                },
+            //            },
+            //        };
+            //        break;
 
-                case PlayMode.Mania:
-                    Buttons = new ModButton[]
-                    {
-                        KeyButton = new ModButton
-                        {
-                            ToggleKey = Key.Z,
-                            Mods = new Mod[]
-                            {
-                                new ModKey4(),
-                                new ModKey5(),
-                                new ModKey6(),
-                                new ModKey7(),
-                                new ModKey8(),
-                                new ModKey9(),
-                                new ModKey1(),
-                                new ModKey2(),
-                                new ModKey3(),
-                            },
-                        },
-                        CoopButton = new ModButton
-                        {
-                            ToggleKey = Key.X,
-                            Mods = new Mod[]
-                            {
-                                new ModKeyCoop(),
-                            },
-                        },
-                        RandomButton = new ModButton
-                        {
-                            ToggleKey = Key.C,
-                            Mods = new Mod[]
-                            {
-                                new ModRandom(),
-                            },
-                        },
-                        AutoplayCinemaButton = new ModButton
-                        {
-                            ToggleKey = Key.V,
-                            Mods = new Mod[]
-                            {
-                                new ModAutoplay(),
-                                new ModCinema(),
-                            },
-                        },
-                    };
-                    break;
-
-                default:
-                    throw new NotSupportedException();
-            }
+            //    default:
+            //        throw new NotSupportedException();
+            //}
         }
     }
 }
