@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Dialog
         private readonly Vector2 buttonsEnterSpacing = new Vector2(0f, 50f);
 
         private Container content, ring;
-        private FlowContainer<PopupDialogButton> buttonsContainer;
+        private FillFlowContainer<PopupDialogButton> buttonsContainer;
         private TextAwesome iconText;
         private SpriteText header, body;
 
@@ -194,14 +194,14 @@ namespace osu.Game.Overlays.Dialog
                                 },
                             },
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Position = new Vector2(0f, -50f),
-                            Direction = FlowDirections.Vertical,
+                            Direction = FillDirection.Down,
                             Spacing = new Vector2(0f, 10f),
                             Children = new Drawable[]
                             {
@@ -258,13 +258,13 @@ namespace osu.Game.Overlays.Dialog
                                 },
                             },
                         },
-                        buttonsContainer = new FlowContainer<PopupDialogButton>
+                        buttonsContainer = new FillFlowContainer<PopupDialogButton>
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FlowDirections.Vertical,
+                            Direction = FillDirection.Down,
                         },
                     },
                 },
