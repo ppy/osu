@@ -1,10 +1,12 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -65,6 +67,8 @@ namespace osu.Game.Screens.Multiplayer
 
         private Nub nub;
         private SpriteText labelSpriteText;
+        private SampleChannel sampleChecked;
+        private SampleChannel sampleUnchecked;
 
         public MultiCheckBox()
         {
@@ -114,8 +118,16 @@ namespace osu.Game.Screens.Multiplayer
             base.OnHoverLost(state);
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleChecked = audio.Sample.Get(@"Checkbox/check-on");
+            sampleUnchecked = audio.Sample.Get(@"Checkbox/check-off");
+        }
+
         protected override void OnChecked()
         {
+            sampleChecked?.Play();
             nub.State = CheckBoxState.Checked;
 
             if (bindable != null)
@@ -124,6 +136,7 @@ namespace osu.Game.Screens.Multiplayer
 
         protected override void OnUnchecked()
         {
+            sampleUnchecked?.Play();
             nub.State = CheckBoxState.Unchecked;
 
             if (bindable != null)
