@@ -27,6 +27,7 @@ using osu.Framework.Input;
 using OpenTK.Input;
 using System.Collections.Generic;
 using osu.Framework.Threading;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Select
 {
@@ -38,6 +39,7 @@ namespace osu.Game.Screens.Select
 
         private CarouselContainer carousel;
         private TrackManager trackManager;
+        private DialogOverlay dialogOverlay;
 
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
         private BeatmapInfoWedge beatmapInfoWedge;
@@ -57,7 +59,7 @@ namespace osu.Game.Screens.Select
         FilterControl filter;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase beatmaps, AudioManager audio, Framework.Game game,
+        private void load(BeatmapDatabase beatmaps, AudioManager audio, DialogOverlay dialog, Framework.Game game,
             OsuGame osuGame, OsuColour colours)
         {
             const float carousel_width = 640;
@@ -122,7 +124,7 @@ namespace osu.Game.Screens.Select
                             PreferredPlayMode = playMode.Value
                         })).LoadAsync(Game, l => Push(player));
                     }
-                }
+                },
             };
 
             footer.AddButton(@"mods", colours.Yellow, null);
@@ -142,6 +144,7 @@ namespace osu.Game.Screens.Select
             database.BeatmapSetRemoved += onBeatmapSetRemoved;
 
             trackManager = audio.Track;
+            dialogOverlay = dialog;
 
             sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
             sampleChangeBeatmap = audio.Sample.Get(@"SongSelect/select-expand");
@@ -382,12 +385,14 @@ namespace osu.Game.Screens.Select
                     footer.StartButton.TriggerClick();
                     return true;
                 case Key.Delete:
-                    if (Beatmap != null)
+                    if (state.Keyboard.ShiftPressed)
                     {
-                        Beatmap.Dispose();
-                        database.Delete(Beatmap.BeatmapSetInfo);
+                        if (Beatmap != null)
+                            dialogOverlay?.Push(new BeatmapDeleteDialog(Beatmap));
+
+                        return true;
                     }
-                    return true;
+                    break;
             }
 
             return base.OnKeyDown(state, args);
