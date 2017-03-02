@@ -24,31 +24,19 @@ using SharpCompress.Readers;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseReplay : TestCase
+    class TestCaseReplay : TestCasePlayer
     {
         private WorkingBeatmap beatmap;
+
+        private LegacyReplayInputHandler replay;
+
         public override string Name => @"Replay";
 
         public override string Description => @"Testing replay playback.";
 
-        [BackgroundDependencyLoader]
-        private void load(BeatmapDatabase db)
-        {
-            var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault();
-            if (beatmapInfo != null)
-                beatmap = db.GetWorkingBeatmap(beatmapInfo);
-        }
-
         public override void Reset()
         {
             base.Reset();
-
-            Add(new Box
-            {
-                RelativeSizeAxes = Framework.Graphics.Axes.Both,
-                Colour = Color4.Black,
-            });
-
 
             var list = new List<LegacyReplayInputHandler.LegacyReplayFrame>();
 
@@ -70,7 +58,7 @@ namespace osu.Desktop.VisualTests.Tests
             }
 
 
-            var replay = new LegacyReplayInputHandler(list);
+            replay = new LegacyReplayInputHandler(list);
 
             //var data = File.ReadAllBytes(@"C:\Users\Dean\.osu\Replays\Tao - O2i3 - Ooi [Game Edit] [Advanced] (2016-08-08) Osu.osr");
             //using (MemoryStream dataStream = new MemoryStream(data))
@@ -80,28 +68,13 @@ namespace osu.Desktop.VisualTests.Tests
 
             //    Console.WriteLine(obj);
             //}
-
-
-            Add(new PlayerLoader(new Player
-            {
-                PreferredPlayMode = PlayMode.Osu,
-                ReplayInputHandler = replay,
-                Beatmap = beatmap
-            })
-            {
-                Beatmap = beatmap
-            });
         }
 
-        class TestWorkingBeatmap : WorkingBeatmap
+        protected override Player CreatePlayer(WorkingBeatmap beatmap)
         {
-            public TestWorkingBeatmap(Beatmap beatmap)
-                : base(beatmap.BeatmapInfo, beatmap.BeatmapInfo.BeatmapSet)
-            {
-                Beatmap = beatmap;
-            }
-
-            protected override ArchiveReader GetReader() => null;
+            var player = base.CreatePlayer(beatmap);
+            player.ReplayInputHandler = replay;
+            return player;
         }
     }
 }
