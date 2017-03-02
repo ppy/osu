@@ -169,6 +169,8 @@ namespace osu.Game.Screens.Tournament
 
         public void RemoveTeam(Team team)
         {
+            availableTeams.Remove(team);
+
             foreach (var c in Children)
             {
                 ScrollingTeam st = c as ScrollingTeam;
@@ -186,11 +188,17 @@ namespace osu.Game.Screens.Tournament
 
         public void StartScrolling()
         {
+            if (availableTeams.Count == 0)
+                return;
+
             scrollState = ScrollState.Scrolling;
         }
 
         public void StopScrolling()
         {
+            if (availableTeams.Count == 0)
+                return;
+
             scrollState = ScrollState.Stopping;
         }
 
