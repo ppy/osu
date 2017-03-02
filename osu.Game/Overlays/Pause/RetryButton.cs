@@ -4,10 +4,11 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Pause
 {
-    public class RetryButton : PauseButton
+    public class RetryButton : DialogButton
     {
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
