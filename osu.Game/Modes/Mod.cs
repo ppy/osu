@@ -155,7 +155,7 @@ namespace osu.Game.Modes
     public abstract class ModPerfect : ModSuddenDeath
     {
         public override Mods Name => Mods.Perfect;
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_perfect;
+        public override FontAwesome Icon => FontAwesome.fa_close;
         public override string Description => @"SS or quit.";
     }
 
