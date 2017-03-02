@@ -2,16 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK.Graphics;
-using osu.Game.Screens.Play;
-using osu.Framework.Graphics;
-using osu.Framework.GameModes.Testing;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.GameModes.Testing;
-using osu.Framework.Graphics.Colour;
 using System.Collections.Generic;
+using osu.Framework.Graphics;
+using osu.Framework.Screens.Testing;
+using osu.Game.Screens.Play;
 
-namespace osu.Desktop.VisualTests
+namespace osu.Desktop.VisualTests.Tests
 {
     public class TestCaseSongProgress : TestCase
     {

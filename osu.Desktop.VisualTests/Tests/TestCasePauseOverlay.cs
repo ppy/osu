@@ -1,13 +1,9 @@
-﻿using System;
-using OpenTK.Graphics;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
 using osu.Framework.Logging;
-using osu.Framework.Graphics;
 using osu.Game.Overlays.Pause;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.GameModes.Testing;
-using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Screens.Testing;
 
 namespace osu.Desktop.VisualTests.Tests
 {

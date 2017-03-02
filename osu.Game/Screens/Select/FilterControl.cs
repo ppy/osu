@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -9,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
 {
@@ -17,24 +21,33 @@ namespace osu.Game.Screens.Select
         public Action FilterChanged;
 
         public string Search => searchTextBox.Text;
-        public SortMode Sort { get; private set; } = SortMode.Title;
+        private SortMode sort = SortMode.Title;
+        public SortMode Sort { 
+            get { return sort; } 
+            set {
+                if (sort != value)
+                {
+                    sort = value;
+                    FilterChanged?.Invoke();
+                }
+            } 
+        }
+
         public Action Exit;
 
         private SearchTextBox searchTextBox;
 
         public FilterControl()
         {
-            AutoSizeAxes = Axes.Y;
-
             Children = new Drawable[]
             {
                 new Box
                 {
                     Colour = Color4.Black,
-                    Alpha = 0.6f,
+                    Alpha = 0.8f,
                     RelativeSizeAxes = Axes.Both,
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     Padding = new MarginPadding(20),
                     AutoSizeAxes = Axes.Y,
@@ -42,21 +55,22 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Width = 0.4f, // TODO: InnerWidth property or something
-                    Direction = FlowDirection.VerticalOnly,
+                    Direction = FillDirection.Down,
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SearchTextBox { RelativeSizeAxes = Axes.X },
+                        searchTextBox = new SearchTextBox {
+                            RelativeSizeAxes = Axes.X,
+                            OnChange = (TextBox sender, bool newText) =>
+                            {
+                                if (newText)
+                                    FilterChanged?.Invoke();
+                            },
+                            Exit = () => Exit?.Invoke(),
+                        },
                         new GroupSortTabs()
                     }
                 }
             };
-
-            searchTextBox.OnChange += (TextBox sender, bool newText) =>
-            {
-                if (newText)
-                    FilterChanged?.Invoke();
-            };
-            searchTextBox.Exit = () => Exit?.Invoke();
         }
 
         public void Deactivate()
@@ -78,13 +92,13 @@ namespace osu.Game.Screens.Select
                 set { text.Text = value; }
             }
 
-            private void FadeActive()
+            private void fadeActive()
             {
                 box.FadeIn(300);
                 text.FadeColour(Color4.White, 300);
             }
 
-            private void FadeInactive()
+            private void fadeInactive()
             {
                 box.FadeOut(300);
                 text.FadeColour(fadeColour, 300);
@@ -98,9 +112,9 @@ namespace osu.Game.Screens.Select
                 {
                     active = value;
                     if (active)
-                        FadeActive();
+                        fadeActive();
                     else
-                        FadeInactive();
+                        fadeInactive();
                 }
             }
         
@@ -111,14 +125,14 @@ namespace osu.Game.Screens.Select
             protected override bool OnHover(InputState state)
             {
                 if (!active)
-                    FadeActive();
+                    fadeActive();
                 return true;
             }
             
             protected override void OnHoverLost(InputState state)
             {
                 if (!active)
-                    FadeInactive();
+                    fadeInactive();
             }
         
             public TabItem()
@@ -126,7 +140,7 @@ namespace osu.Game.Screens.Select
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    text = new SpriteText
+                    text = new OsuSpriteText
                     {
                         Margin = new MarginPadding(5),
                         TextSize = 14,
@@ -171,10 +185,10 @@ namespace osu.Game.Screens.Select
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                     },
-                    new FlowContainer
+                    new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
-                        Direction = FlowDirection.HorizontalOnly,
+                        Direction = FillDirection.Right,
                         Spacing = new Vector2(10, 0),
                         Children = new Drawable[]
                         {
@@ -203,16 +217,16 @@ namespace osu.Game.Screens.Select
                             }
                         }
                     },
-                    new FlowContainer
+                    new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
-                        Direction = FlowDirection.HorizontalOnly,
+                        Direction = FillDirection.Right,
                         Spacing = new Vector2(10, 0),
                         Origin = Anchor.TopRight,
                         Anchor = Anchor.TopRight,
                         Children = new Drawable[]
                         {
-                            sortLabel = new SpriteText
+                            sortLabel = new OsuSpriteText
                             {
                                 Font = @"Exo2.0-Bold",
                                 Text = "Sort results by",
@@ -248,9 +262,9 @@ namespace osu.Game.Screens.Select
         
         public enum SortMode
         {
-            Arist,
+            Artist,
             BPM,
-            Creator,
+            Author,
             DateAdded,
             Difficulty,
             Length,
@@ -261,9 +275,9 @@ namespace osu.Game.Screens.Select
         public enum GroupMode
         {
             NoGrouping,
-            Arist,
+            Artist,
             BPM,
-            Creator,
+            Author,
             DateAdded,
             Difficulty,
             Length,

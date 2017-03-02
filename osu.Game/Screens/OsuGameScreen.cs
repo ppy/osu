@@ -1,66 +1,41 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.GameModes;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuGameMode : GameMode
+    public abstract class OsuScreen : Screen
     {
-        internal BackgroundMode Background { get; private set; }
+        internal BackgroundScreen Background { get; private set; }
 
         /// <summary>
         /// Override to create a BackgroundMode for the current GameMode.
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
-        protected virtual BackgroundMode CreateBackground() => null;
+        protected virtual BackgroundScreen CreateBackground() => null;
 
         internal virtual bool ShowOverlays => true;
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        protected float ToolbarPadding => ShowOverlays ? (Game as OsuGame)?.Toolbar.DrawHeight ?? 0 : 0;
-
-        private bool boundToBeatmap;
-        private Bindable<WorkingBeatmap> beatmap;
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         public WorkingBeatmap Beatmap
         {
             get
             {
-                bindBeatmap();
                 return beatmap.Value;
             }
             set
             {
-                bindBeatmap();
                 beatmap.Value = value;
             }
-        }
-
-        private void bindBeatmap()
-        {
-            if (beatmap == null)
-                beatmap = new Bindable<WorkingBeatmap>();
-
-            if (!boundToBeatmap)
-            {
-                beatmap.ValueChanged += beatmap_ValueChanged;
-                boundToBeatmap = true;
-            }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            if (boundToBeatmap)
-                beatmap.ValueChanged -= beatmap_ValueChanged;
-
-            base.Dispose(isDisposing);
         }
 
         private void beatmap_ValueChanged(object sender, EventArgs e)
@@ -71,19 +46,16 @@ namespace osu.Game.Screens
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGameBase game)
         {
-            if (beatmap == null)
-                beatmap = game?.Beatmap;
-        }
-
-        public override bool Push(GameMode mode)
-        {
-            OsuGameMode nextOsu = mode as OsuGameMode;
-            if (nextOsu != null)
+            if (game != null)
             {
-                nextOsu.beatmap = beatmap;
+                //if we were given a beatmap at ctor time, we want to pass this on to the game-wide beatmap.
+                var localMap = beatmap.Value;
+                beatmap.BindTo(game.Beatmap);
+                if (localMap != null)
+                    beatmap.Value = localMap;
             }
 
-            return base.Push(mode);
+            beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
         protected virtual void OnBeatmapChanged(WorkingBeatmap beatmap)
@@ -91,11 +63,11 @@ namespace osu.Game.Screens
 
         }
 
-        protected override void OnEntering(GameMode last)
+        protected override void OnEntering(Screen last)
         {
-            OsuGameMode lastOsu = last as OsuGameMode;
+            OsuScreen lastOsu = last as OsuScreen;
 
-            BackgroundMode bg = CreateBackground();
+            BackgroundScreen bg = CreateBackground();
 
             if (lastOsu?.Background != null)
             {
@@ -122,9 +94,9 @@ namespace osu.Game.Screens
             base.OnEntering(last);
         }
 
-        protected override bool OnExiting(GameMode next)
+        protected override bool OnExiting(Screen next)
         {
-            OsuGameMode nextOsu = next as OsuGameMode;
+            OsuScreen nextOsu = next as OsuScreen;
 
             if (Background != null && !Background.Equals(nextOsu?.Background))
             {

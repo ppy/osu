@@ -1,10 +1,10 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
@@ -38,6 +38,8 @@ namespace osu.Game.Beatmaps.Drawables
                 CornerRadius = 10,
                 BorderColour = new Color4(221, 255, 255, 255),
             });
+
+            Alpha = 0;
         }
 
         public void SetMultiplicativeAlpha(float alpha)
@@ -48,10 +50,10 @@ namespace osu.Game.Beatmaps.Drawables
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            applyState();
+            ApplyState();
         }
 
-        private void applyState()
+        protected virtual void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
         {
             switch (state)
             {
@@ -79,9 +81,10 @@ namespace osu.Game.Beatmaps.Drawables
             set
             {
                 if (state == value) return;
-                state = value;
 
-                applyState();
+                var last = state;
+                state = value;
+                ApplyState(last);
             }
         }
 

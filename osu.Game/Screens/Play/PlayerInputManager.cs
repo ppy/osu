@@ -1,17 +1,19 @@
-﻿using OpenTK.Input;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Input;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
-using System;
 using System.Linq;
 
 namespace osu.Game.Screens.Play
 {
     class PlayerInputManager : UserInputManager
     {
-        public PlayerInputManager(BasicGameHost host)
+        public PlayerInputManager(GameHost host)
             : base(host)
         {
         }

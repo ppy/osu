@@ -1,9 +1,8 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
-using osu.Framework;
 using osu.Framework.Allocation;
 using OpenTK;
 using OpenTK.Graphics;
@@ -19,7 +18,6 @@ using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 
@@ -29,7 +27,7 @@ namespace osu.Game.Screens.Select
     {
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
 
-        private Container beatmapInfoContainer;
+        private BufferedContainer beatmapInfoContainer;
 
         private OsuGameBase game;
 
@@ -63,8 +61,8 @@ namespace osu.Game.Screens.Select
 
             float newDepth = lastContainer?.Depth + 1 ?? 0;
 
-            BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
+            BeatmapMetadata metadata = beatmap.BeatmapInfo?.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
             List<InfoLabel> labels = new List<InfoLabel>();
 
@@ -74,7 +72,7 @@ namespace osu.Game.Screens.Select
                 {
                     Name = "Length",
                     Icon = FontAwesome.fa_clock_o,
-                    Content = TimeSpan.FromMilliseconds(beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
+                    Content = beatmap.Beatmap.HitObjects.Count == 0 ? "-" : TimeSpan.FromMilliseconds(beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
                 }));
 
                 labels.Add(new InfoLabel(new BeatmapStatistic
@@ -123,11 +121,11 @@ namespace osu.Game.Screens.Select
                         },
                     },
                     // Text for beatmap info
-                    new FlowContainer
+                    new FillFlowContainer
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Direction = FlowDirection.VerticalOnly,
+                        Direction = FillDirection.Down,
                         Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -135,7 +133,7 @@ namespace osu.Game.Screens.Select
                             new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
-                                Text = beatmapSetInfo.Metadata.Artist + " -- " + beatmapSetInfo.Metadata.Title,
+                                Text = metadata.Artist + " -- " + metadata.Title,
                                 TextSize = 28,
                                 Shadow = true,
                             },
@@ -146,10 +144,10 @@ namespace osu.Game.Screens.Select
                                 TextSize = 17,
                                 Shadow = true,
                             },
-                            new FlowContainer
+                            new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 10 },
-                                Direction = FlowDirection.HorizontalOnly,
+                                Direction = FillDirection.Right,
                                 AutoSizeAxes = Axes.Both,
                                 Children = new []
                                 {
@@ -163,23 +161,23 @@ namespace osu.Game.Screens.Select
                                     new OsuSpriteText
                                     {
                                         Font = @"Exo2.0-Bold",
-                                        Text = beatmapSetInfo.Metadata.Author,
+                                        Text = metadata.Author,
                                         TextSize = 15,
                                         Shadow = true,
                                     },
                                 }
                             },
-                            new FlowContainer
+                            new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 20 },
-                                Spacing = new Vector2(40,0),
+                                Spacing = new Vector2(40, 0),
                                 AutoSizeAxes = Axes.Both,
                                 Children = labels
                             },
                         }
                     },
                 }
-            }).Preload(game, delegate (Drawable d)
+            }).LoadAsync(game, delegate (Drawable d)
             {
                 FadeIn(250);
 

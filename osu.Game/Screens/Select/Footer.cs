@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using OpenTK;
@@ -7,7 +7,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
@@ -25,10 +25,14 @@ namespace osu.Game.Screens.Select
 
         private const float padding = 80;
 
+        public override bool Contains(Vector2 screenSpacePos) => true;
+
         public Action OnBack;
         public Action OnStart;
 
-        private FlowContainer buttons;
+        private FillFlowContainer buttons;
+
+        public OsuLogo StartButton;
 
         public void AddButton(string text, Color4 colour, Action action)
         {
@@ -54,10 +58,10 @@ namespace osu.Game.Screens.Select
 
         public Footer()
         {
-            const float bottomToolHeight = 50;
+            const float bottom_tool_height = 50;
 
             RelativeSizeAxes = Axes.X;
-            Height = bottomToolHeight;
+            Height = bottom_tool_height;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
@@ -74,7 +78,7 @@ namespace osu.Game.Screens.Select
                     Height = 3,
                     Position = new Vector2(0, -3),
                 },
-                new OsuLogo()
+                StartButton = new OsuLogo
                 {
                     Anchor = Anchor.BottomRight,
                     Scale = new Vector2(0.4f),
@@ -87,21 +91,20 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.BottomLeft,
                     Action = () => OnBack?.Invoke(),
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Position = new Vector2(BackButton.SIZE_EXTENDED.X + padding, 0),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Direction = FlowDirection.HorizontalOnly,
+                    Direction = FillDirection.Right,
                     Spacing = new Vector2(padding, 0),
                     Children = new Drawable[]
                     {
-
-                        buttons = new FlowContainer
+                        buttons = new FillFlowContainer
                         {
-                            Direction = FlowDirection.HorizontalOnly,
+                            Direction = FillDirection.Right,
                             Spacing = new Vector2(0.2f, 0),
                             AutoSizeAxes = Axes.Both,
                         }

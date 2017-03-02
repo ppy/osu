@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using OpenTK;
@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Options
         private SpriteText headerText;
         private Box backgroundBox;
         private Box selectionIndicator;
-        public Container text;
+        private Container text;
         public Action Action;
 
         private OptionsSection section;
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Options
 
         public SidebarButton()
         {
-            Height = Sidebar.default_width;
+            Height = Sidebar.DEFAULT_WIDTH;
             RelativeSizeAxes = Axes.X;
             Children = new Drawable[]
             {
@@ -73,13 +73,13 @@ namespace osu.Game.Overlays.Options
                 },
                 text = new Container
                 {
-                    Width = Sidebar.default_width,
+                    Width = Sidebar.DEFAULT_WIDTH,
                     RelativeSizeAxes = Axes.Y,
                     Children = new[]
                     {
                         headerText = new OsuSpriteText
                         {
-                            Position = new Vector2(Sidebar.default_width + 10, 0),
+                            Position = new Vector2(Sidebar.DEFAULT_WIDTH + 10, 0),
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },

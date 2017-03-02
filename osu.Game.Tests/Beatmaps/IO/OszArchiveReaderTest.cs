@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
 using System.IO;
 using NUnit.Framework;
 using osu.Game.Beatmaps.IO;
@@ -39,7 +41,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     "Soleily - Renatus (MMzz) [Muzukashii].osu",
                     "Soleily - Renatus (MMzz) [Oni].osu"
                 };
-                var maps = reader.ReadBeatmaps();
+                var maps = reader.BeatmapFilenames;
                 foreach (var map in expected)
                     Assert.Contains(map, maps);
             }

@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
@@ -14,13 +14,13 @@ namespace osu.Game.Beatmaps.IO
     {
         private class Reader
         {
-            public Func<BasicStorage, string, bool> Test { get; set; }
+            public Func<Storage, string, bool> Test { get; set; }
             public Type Type { get; set; }
         }
 
         private static List<Reader> readers { get; } = new List<Reader>();
-    
-        public static ArchiveReader GetReader(BasicStorage storage, string path)
+
+        public static ArchiveReader GetReader(Storage storage, string path)
         {
             foreach (var reader in readers)
             {
@@ -29,20 +29,27 @@ namespace osu.Game.Beatmaps.IO
             }
             throw new IOException(@"Unknown file format");
         }
-        
-        protected static void AddReader<T>(Func<BasicStorage, string, bool> test) where T : ArchiveReader
+
+        protected static void AddReader<T>(Func<Storage, string, bool> test) where T : ArchiveReader
         {
             readers.Add(new Reader { Test = test, Type = typeof(T) });
         }
-    
+
         /// <summary>
         /// Reads the beatmap metadata from this archive.
         /// </summary>
         public abstract BeatmapMetadata ReadMetadata();
+
         /// <summary>
         /// Gets a list of beatmap file names.
         /// </summary>
-        public abstract string[] ReadBeatmaps();
+        public string[] BeatmapFilenames { get; protected set; }
+
+        /// <summary>
+        /// The storyboard filename. Null if no storyboard is present.
+        /// </summary>
+        public string StoryboardFilename { get; protected set; }
+
         /// <summary>
         /// Opens a stream for reading a specific file from this archive.
         /// </summary>

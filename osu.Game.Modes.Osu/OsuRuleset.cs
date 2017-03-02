@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace osu.Game.Modes.Osu
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(List<HitObject> objects) => new OsuHitRenderer { Objects = objects };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new OsuHitRenderer { Beatmap = beatmap };
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
         {
@@ -39,6 +39,8 @@ namespace osu.Game.Modes.Osu
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => new OsuScoreProcessor(hitObjectCount);
+
+        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
 
         protected override PlayMode PlayMode => PlayMode.Osu;
     }

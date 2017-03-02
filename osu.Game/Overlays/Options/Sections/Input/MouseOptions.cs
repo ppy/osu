@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Options.Sections.Input
                     LabelText = "Map absolute raw input to the osu! window",
                     Bindable = config.GetBindable<bool>(OsuConfig.AbsoluteToOsuWindow)
                 },
-                new OptionDropDown<ConfineMouseMode>
+                new OptionEnumDropDown<ConfineMouseMode>
                 {
                     LabelText = "Confine mouse cursor",
                     Bindable = config.GetBindable<ConfineMouseMode>(OsuConfig.ConfineMouse),

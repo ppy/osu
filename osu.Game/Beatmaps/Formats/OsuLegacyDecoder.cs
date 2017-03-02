@@ -1,18 +1,15 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using OpenTK.Graphics;
-using osu.Game.Database;
 using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -179,14 +176,14 @@ namespace osu.Game.Beatmaps.Formats
                 return; // TODO
             string[] split = val.Split(',');
             EventType type;
-            int _type;
-            if (!int.TryParse(split[0], out _type))
+            int intType;
+            if (!int.TryParse(split[0], out intType))
             {
                 if (!Enum.TryParse(split[0], out type))
                     throw new InvalidDataException($@"Unknown event type {split[0]}");
             }
             else
-                type = (EventType)_type;
+                type = (EventType)intType;
             // TODO: Parse and store the rest of the event
             if (type == EventType.Background)
                 beatmap.BeatmapInfo.Metadata.BackgroundFile = split[2].Trim('"');
@@ -200,7 +197,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (split.Length > 2)
             {
-                int kiai_flags = split.Length > 7 ? Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : 0;
+                int kiaiFlags = split.Length > 7 ? Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : 0;
                 double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
                 cp = new ControlPoint
                 {
@@ -233,20 +230,8 @@ namespace osu.Game.Beatmaps.Formats
             });
         }
 
-        protected override Beatmap ParseFile(TextReader stream)
+        protected override void ParseFile(TextReader stream, Beatmap beatmap)
         {
-            var beatmap = new Beatmap
-            {
-                HitObjects = new List<HitObject>(),
-                ControlPoints = new List<ControlPoint>(),
-                ComboColors = new List<Color4>(),
-                BeatmapInfo = new BeatmapInfo
-                {
-                    Metadata = new BeatmapMetadata(),
-                    BaseDifficulty = new BaseDifficulty(),
-                },
-            };
-
             HitObjectParser parser = null;
 
             var section = Section.None;
@@ -309,8 +294,6 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                 }
             }
-
-            return beatmap;
         }
     }
 }

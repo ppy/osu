@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
 using OpenTK.Input;
@@ -8,7 +8,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 
@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuSliderBar<U> : SliderBar<U> where U : struct
     {
-        private AudioSample sample;
+        private SampleChannel sample;
         private double lastSampleTime;
 
         private Nub nub;

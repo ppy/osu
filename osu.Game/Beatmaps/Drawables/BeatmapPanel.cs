@@ -1,5 +1,5 @@
-//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework.Graphics;
@@ -26,6 +26,7 @@ namespace osu.Game.Beatmaps.Drawables
         public Action<BeatmapPanel> GainedSelection;
         public Action<BeatmapPanel> StartRequested;
         private Triangles triangles;
+        private StarCounter starCounter;
 
         protected override void Selected()
         {
@@ -56,6 +57,14 @@ namespace osu.Game.Beatmaps.Drawables
             return base.OnClick(state);
         }
 
+        protected override void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
+        {
+            base.ApplyState(last);
+
+            if (last == PanelSelectedState.Hidden && State != last)
+                starCounter.ReplayAnimation();
+        }
+
         public BeatmapPanel(BeatmapInfo beatmap)
         {
             Beatmap = beatmap;
@@ -74,10 +83,10 @@ namespace osu.Game.Beatmaps.Drawables
                     ColourLight = OsuColour.FromHex(@"3a7285"),
                     ColourDark = OsuColour.FromHex(@"123744")
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     Padding = new MarginPadding(5),
-                    Direction = FlowDirection.HorizontalOnly,
+                    Direction = FillDirection.Right,
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -89,19 +98,18 @@ namespace osu.Game.Beatmaps.Drawables
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             Padding = new MarginPadding { Left = 5 },
-                            Spacing = new Vector2(0, 5),
-                            Direction = FlowDirection.VerticalOnly,
+                            Direction = FillDirection.Down,
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                new FlowContainer
+                                new FillFlowContainer
                                 {
-                                    Direction = FlowDirection.HorizontalOnly,
-                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Right,
                                     Spacing = new Vector2(4, 0),
+                                    AutoSizeAxes = Axes.Both,
                                     Children = new[]
                                     {
                                         new OsuSpriteText
@@ -130,7 +138,11 @@ namespace osu.Game.Beatmaps.Drawables
                                         },
                                     }
                                 },
-                                new StarCounter { Count = beatmap.StarDifficulty, StarSize = 8 }
+                                starCounter = new StarCounter
+                                {
+                                    Count = beatmap.StarDifficulty,
+                                    Scale = new Vector2(0.8f),
+                                }
                             }
                         }
                     }

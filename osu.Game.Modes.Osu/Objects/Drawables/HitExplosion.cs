@@ -1,18 +1,19 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class HitExplosion : FlowContainer
+    public class HitExplosion : FillFlowContainer
     {
         private readonly OsuJudgementInfo judgement;
         private SpriteText line1;
@@ -24,13 +25,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             AutoSizeAxes = Axes.Both;
             Origin = Anchor.Centre;
 
-            Direction = FlowDirection.VerticalOnly;
+            Direction = FillDirection.Down;
             Spacing = new Vector2(0, 2);
-            Position = (h?.EndPosition ?? Vector2.Zero) + judgement.PositionOffset;
+            Position = (h?.StackedEndPosition ?? Vector2.Zero) + judgement.PositionOffset;
 
             Children = new Drawable[]
             {
-                line1 = new SpriteText
+                line1 = new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -38,7 +39,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Font = @"Venera",
                     TextSize = 16,
                 },
-                line2 = new SpriteText
+                line2 = new OsuSpriteText
                 {
                     Text = judgement.Combo.GetDescription(),
                     Font = @"Venera",

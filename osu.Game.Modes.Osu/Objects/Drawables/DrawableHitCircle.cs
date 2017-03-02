@@ -1,19 +1,18 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.ComponentModel;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class DrawableHitCircle : DrawableOsuHitObject
+    public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
-        private HitCircle osuObject;
+        private OsuHitObject osuObject;
 
         public ApproachCircle ApproachCircle;
         private CirclePiece circle;
@@ -23,12 +22,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private NumberPiece number;
         private GlowPiece glow;
 
-        public DrawableHitCircle(HitCircle h) : base(h)
+        public DrawableHitCircle(OsuHitObject h) : base(h)
         {
+            Origin = Anchor.Centre;
+
             osuObject = h;
 
-            Origin = Anchor.Centre;
-            Position = osuObject.Position;
+            Position = osuObject.StackedPosition;
             Scale = new Vector2(osuObject.Scale);
 
             Children = new Drawable[]
@@ -49,7 +49,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                         return true;
                     },
                 },
-                number = new NumberPiece(),
+                number = new NumberPiece()
+                {
+                    Text = h is Spinner ? "S" : (HitObject.ComboIndex + 1).ToString(),
+                },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),
                 explode = new ExplodePiece
@@ -81,18 +84,18 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             double hitOffset = Math.Abs(Judgement.TimeOffset);
 
+            OsuJudgementInfo osuJudgement = Judgement as OsuJudgementInfo;
+
             if (hitOffset < hit50)
             {
                 Judgement.Result = HitResult.Hit;
 
-                OsuJudgementInfo osuInfo = Judgement as OsuJudgementInfo;
-
                 if (hitOffset < hit300)
-                    osuInfo.Score = OsuScoreResult.Hit300;
+                    osuJudgement.Score = OsuScoreResult.Hit300;
                 else if (hitOffset < hit100)
-                    osuInfo.Score = OsuScoreResult.Hit100;
+                    osuJudgement.Score = OsuScoreResult.Hit100;
                 else if (hitOffset < hit50)
-                    osuInfo.Score = OsuScoreResult.Hit50;
+                    osuJudgement.Score = OsuScoreResult.Hit50;
             }
             else
                 Judgement.Result = HitResult.Miss;
@@ -124,6 +127,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             base.UpdateState(state);
 
             ApproachCircle.FadeOut();
+
+            glow.Delay(osuObject.Duration);
             glow.FadeOut(400);
 
             switch (state)
@@ -156,5 +161,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     break;
             }
         }
+
+        public Drawable ProxiedLayer => ApproachCircle;
     }
 }

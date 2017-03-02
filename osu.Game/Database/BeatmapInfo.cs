@@ -1,11 +1,10 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Linq;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes;
-using osu.Game.Screens.Play;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 
@@ -73,14 +72,23 @@ namespace osu.Game.Database
         // Metadata
         public string Version { get; set; }
 
-        public float StarDifficulty => BaseDifficulty?.OverallDifficulty ?? 5; //todo: implement properly
+        private float starDifficulty = -1;
+        public float StarDifficulty
+        {
+            get
+            {
+                return (starDifficulty < 0) ? (BaseDifficulty?.OverallDifficulty ?? 5) : starDifficulty;
+            }
+            
+            set { starDifficulty = value; }
+        }
 
         public bool Equals(BeatmapInfo other)
         {
             return ID == other?.ID;
         }
 
-        public bool AudioEquals(BeatmapInfo other) => other != null &&
+        public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
             BeatmapSet.Path == other.BeatmapSet.Path &&
             (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
     }

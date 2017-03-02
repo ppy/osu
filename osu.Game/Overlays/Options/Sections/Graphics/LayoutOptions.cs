@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -18,10 +18,10 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
             Children = new Drawable[]
             {
                 new OptionLabel { Text = "Resolution: TODO dropdown" },
-                new OsuCheckbox
+                new OptionEnumDropDown<WindowMode>
                 {
-                    LabelText = "Fullscreen mode",
-                    Bindable = config.GetBindable<bool>(FrameworkConfig.Fullscreen),
+                    LabelText = "Screen mode",
+                    Bindable = config.GetBindable<WindowMode>(FrameworkConfig.WindowMode),
                 },
                 new OsuCheckbox
                 {

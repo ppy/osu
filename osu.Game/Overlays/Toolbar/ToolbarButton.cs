@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework.Allocation;
@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -21,6 +21,8 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarButton : Container
     {
+        public const float WIDTH = Toolbar.HEIGHT * 1.4f;
+
         public FontAwesome Icon
         {
             get { return DrawableIcon.Icon; }
@@ -54,18 +56,23 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
+        protected virtual Anchor TooltipAnchor => Anchor.TopLeft;
+
         public Action Action;
         protected TextAwesome DrawableIcon;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
-        private FlowContainer tooltipContainer;
+        private FillFlowContainer tooltipContainer;
         private SpriteText tooltip1;
         private SpriteText tooltip2;
-        protected FlowContainer Flow;
-        private AudioSample sampleClick;
+        protected FillFlowContainer Flow;
+        private SampleChannel sampleClick;
 
         public ToolbarButton()
         {
+            Width = WIDTH;
+            RelativeSizeAxes = Axes.Y;
+
             Children = new Drawable[]
             {
                 HoverBackground = new Box
@@ -75,21 +82,21 @@ namespace osu.Game.Overlays.Toolbar
                     BlendingMode = BlendingMode.Additive,
                     Alpha = 0,
                 },
-                Flow = new FlowContainer
+                Flow = new FillFlowContainer
                 {
-                    Direction = FlowDirection.HorizontalOnly,
+                    Direction = FillDirection.Right,
+                    Spacing = new Vector2(5),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding { Left = 20, Right = 20 },
-                    Spacing = new Vector2(5),
+                    Padding = new MarginPadding { Left = Toolbar.HEIGHT / 2, Right = Toolbar.HEIGHT / 2 },
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         DrawableIcon = new TextAwesome
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                         },
                         DrawableText = new OsuSpriteText
                         {
@@ -98,32 +105,34 @@ namespace osu.Game.Overlays.Toolbar
                         },
                     },
                 },
-                tooltipContainer = new FlowContainer
+                tooltipContainer = new FillFlowContainer
                 {
-                    Direction = FlowDirection.VerticalOnly,
+                    Direction = FillDirection.Down,
                     RelativeSizeAxes = Axes.Both, //stops us being considered in parent's autosize
-                    Anchor = Anchor.BottomLeft,
-                    Position = new Vector2(5, 5),
+                    Anchor = (TooltipAnchor & Anchor.x0) > 0 ? Anchor.BottomLeft : Anchor.BottomRight,
+                    Origin = TooltipAnchor,
+                    Position = new Vector2((TooltipAnchor & Anchor.x0) > 0 ? 5 : -5, 5),
                     Alpha = 0,
                     Children = new[]
                     {
                         tooltip1 = new OsuSpriteText
                         {
+                            Anchor = TooltipAnchor,
+                            Origin = TooltipAnchor,
                             Shadow = true,
                             TextSize = 22,
                             Font = @"Exo2.0-Bold",
                         },
                         tooltip2 = new OsuSpriteText
                         {
+                            Anchor = TooltipAnchor,
+                            Origin = TooltipAnchor,
                             Shadow = true,
                             TextSize = 16
                         }
                     }
                 }
             };
-
-            RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]

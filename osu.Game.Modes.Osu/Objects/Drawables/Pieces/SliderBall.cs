@@ -1,17 +1,16 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
-using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
-    public class SliderBall : Container, ISliderProgress
+    public class SliderBall : CircularContainer, ISliderProgress
     {
         private readonly Slider slider;
         private Box follow;
@@ -39,7 +38,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     Height = width,
                     Alpha = 0,
                 },
-                new Container
+                new CircularContainer
                 {
                     Masking = true,
                     AutoSizeAxes = Axes.Both,
@@ -48,7 +47,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     BorderThickness = 10,
                     BorderColour = Color4.White,
                     Alpha = 1,
-                    CornerRadius = width / 2,
                     Children = new[]
                     {
                         new Box
@@ -104,8 +102,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         {
             base.Update();
 
-            CornerRadius = DrawWidth / 2;
-            Tracking = canCurrentlyTrack && lastState != null && Contains(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
+            if (Time.Current < slider.EndTime)
+                Tracking = canCurrentlyTrack && lastState != null && Contains(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
         }
 
         public void UpdateProgress(double progress, int repeat)

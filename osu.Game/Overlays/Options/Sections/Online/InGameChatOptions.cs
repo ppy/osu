@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,8 +10,6 @@ namespace osu.Game.Overlays.Options.Sections.Online
 {
     public class InGameChatOptions : OptionsSubsection
     {
-        private OptionTextBox chatIgnoreList;
-        private OptionTextBox chatHighlightWords;
         protected override string Header => "Chat";
 
         [BackgroundDependencyLoader]
@@ -40,12 +38,12 @@ namespace osu.Game.Overlays.Options.Sections.Online
                     Bindable = config.GetBindable<bool>(OsuConfig.BlockNonFriendPM)
                 },
                 new OptionLabel { Text = "Chat ignore list (space-seperated list)" },
-                chatIgnoreList = new OptionTextBox {
+                new OptionTextBox {
                     RelativeSizeAxes = Axes.X,
                     Bindable = config.GetBindable<string>(OsuConfig.IgnoreList)
                 },
                 new OptionLabel { Text = "Chat highlight words (space-seperated list)" },
-                chatHighlightWords = new OptionTextBox {
+                new OptionTextBox {
                     RelativeSizeAxes = Axes.X,
                     Bindable = config.GetBindable<string>(OsuConfig.HighlightWords)
                 },
