@@ -53,17 +53,17 @@ namespace osu.Game.Screens.Play
 
         private void fillActive()
         {
-            Color4 colour = State == ColumnState.Lit ? lit_colour : dimmed_colour;
+            Color4 colour = State == ColumnState.Lit ? litColour : dimmedColour;
 
             for (int i = 0; i < drawableRows.Count; i++)
             {
                 if (Filled == 0) // i <= Filled doesn't work for zero fill
                 {
-                    drawableRows[i].Colour = empty_colour;
+                    drawableRows[i].Colour = emptyColour;
                 }
                 else
                 {
-                    drawableRows[i].Colour = i <= Filled ? colour : empty_colour;
+                    drawableRows[i].Colour = i <= Filled ? colour : emptyColour;
                 }
             }
         }
