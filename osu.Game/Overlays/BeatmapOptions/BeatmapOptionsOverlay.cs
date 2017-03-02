@@ -6,6 +6,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
@@ -76,22 +77,19 @@ namespace osu.Game.Overlays.BeatmapOptions
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
+                    Direction = FillDirection.Left,
+                    Padding = new MarginPadding
+                    {
+                        Left = BeatmapOptionsButton.SIZE.X, // For some reason autosize on this flow container is one button too short
+                    },
                     Children = new BeatmapOptionsButton[]
                     {
-                        new BeatmapOptionsRemoveFromUnplayedButton
+                        new BeatmapOptionsDeleteButton
                         {
                             Action = () =>
                             {
                                 Hide();
-                                OnRemoveFromUnplayed?.Invoke();
-                            },
-                        },
-                        new BeatmapOptionsClearLocalScoresButton
-                        {
-                            Action = () =>
-                            {
-                                Hide();
-                                OnClearLocalScores?.Invoke();
+                                OnDelete?.Invoke();
                             },
                         },
                         new BeatmapOptionsEditButton
@@ -102,12 +100,20 @@ namespace osu.Game.Overlays.BeatmapOptions
                                 OnEdit?.Invoke();
                             },
                         },
-                        new BeatmapOptionsDeleteButton
+                        new BeatmapOptionsClearLocalScoresButton
                         {
                             Action = () =>
                             {
                                 Hide();
-                                OnDelete?.Invoke();
+                                OnClearLocalScores?.Invoke();
+                            },
+                        },
+                        new BeatmapOptionsRemoveFromUnplayedButton
+                        {
+                            Action = () =>
+                            {
+                                Hide();
+                                OnRemoveFromUnplayed?.Invoke();
                             },
                         },
                     },
