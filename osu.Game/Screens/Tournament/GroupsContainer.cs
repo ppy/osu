@@ -27,25 +27,25 @@ namespace osu.Game.Screens.Tournament
 
             Children = new[]
             {
-                    topGroups = new FlowContainer<Group>()
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
+                topGroups = new FillFlowContainer<Group>()
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
 
-                        AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.Both,
 
-                        Spacing = new Vector2(7f, 0)
-                    },
-                    bottomGroups = new FlowContainer<Group>()
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
+                    Spacing = new Vector2(7f, 0)
+                },
+                bottomGroups = new FillFlowContainer<Group>()
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
 
-                        AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.Both,
 
-                        Spacing = new Vector2(7f, 0)
-                    }
-                };
+                    Spacing = new Vector2(7f, 0)
+                }
+            };
 
             for (int i = 0; i < numGroups; i++)
             {
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Tournament
         public string ToStringRepresentation()
         {
             StringBuilder sb = new StringBuilder();
-            
+
             foreach (Group g in allGroups)
             {
                 if (g != allGroups.First())

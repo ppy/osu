@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Tournament
                     Font = @"Exo2.0-Bold",
                     Colour = new Color4(255, 204, 34, 255),
                 },
-                topTeams = new FlowContainer<GroupTeam>()
+                topTeams = new FillFlowContainer<GroupTeam>()
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
@@ -72,9 +72,9 @@ namespace osu.Game.Screens.Tournament
                         Right = 7f
                     },
 
-                    Direction = FlowDirections.Horizontal
+                    Direction = FillDirection.Right
                 },
-                bottomTeams = new FlowContainer<GroupTeam>()
+                bottomTeams = new FillFlowContainer<GroupTeam>()
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Tournament
                         Right = 7f
                     },
 
-                    Direction = FlowDirections.Horizontal
+                    Direction = FillDirection.Right
                 }
             };
         }
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Tournament
         {
             public Team Team;
 
-            private FlowContainer innerContainer;
+            private FillFlowContainer innerContainer;
             private Sprite flagSprite;
 
             public GroupTeam(Team team)
@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Tournament
 
                 Children = new Drawable[]
                 {
-                    innerContainer = new FlowContainer()
+                    innerContainer = new FillFlowContainer()
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Tournament
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
 
-                        Direction = FlowDirections.Vertical,
+                        Direction = FillDirection.Down,
                         Spacing = new Vector2(0, 5f),
 
                         Scale = new Vector2(1.5f),
