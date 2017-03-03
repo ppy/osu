@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Tournament
         private Storage storage;
 
         [BackgroundDependencyLoader]
-        private void load(Framework.Game game, TextureStore textures, Storage storage)
+        private void load(TextureStore textures, Storage storage)
         {
             this.storage = storage;
 
