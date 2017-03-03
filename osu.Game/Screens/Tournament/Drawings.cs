@@ -300,10 +300,9 @@ namespace osu.Game.Screens.Tournament
                     using (Stream stream = storage.GetStream(results_filename, FileAccess.Read, FileMode.Open))
                     using (StreamReader sr = new StreamReader(stream))
                     {
-                        while (sr.Peek() != -1)
+                        string line;
+                        while ((line = sr.ReadLine()?.Trim()) != null)
                         {
-                            string line = sr.ReadLine().Trim();
-
                             if (string.IsNullOrEmpty(line))
                                 continue;
 
