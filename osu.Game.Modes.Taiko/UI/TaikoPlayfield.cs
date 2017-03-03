@@ -91,6 +91,14 @@ namespace osu.Game.Modes.Taiko.UI
             HitObjects.Position = new Vector2(left_area_size + hit_target_offset * (1f - left_area_size), 0);
             HitObjects.Size = new Vector2(1f - left_area_size - hit_target_offset * (1f - left_area_size), playfield_height);
 
+            AddInternal(judgementContainer = new Container()
+            {
+                Origin = Anchor.BottomCentre,
+
+                RelativePositionAxes = Axes.Both,
+                Position = new Vector2(left_area_size + hit_target_offset * (1f - left_area_size), 0)
+            });
+
             // Bar lines
             AddInternal(new Container()
             {
@@ -142,64 +150,43 @@ namespace osu.Game.Modes.Taiko.UI
 
         private void onJudgement(DrawableHitObject h, JudgementInfo j)
         {
-            TaikoJudgementInfo tj = j as TaikoJudgementInfo;
+            TaikoJudgementInfo tji = j as TaikoJudgementInfo;
             DrawableTaikoHitObject dth = h as DrawableTaikoHitObject;
 
+            // Add ring
             ExplodingRing ring = null;
 
-            if (tj.Score == TaikoScoreResult.Great)
+            if (tji.Score == TaikoScoreResult.Great)
             {
                 hitTarget.Flash(dth.ExplodeColour);
                 ring = new ExplodingRing(dth.ExplodeColour, true);
             }
-            else if (tj.Score == TaikoScoreResult.Good)
+            else if (tji.Score == TaikoScoreResult.Good)
                 ring = new ExplodingRing(dth.ExplodeColour, false);
 
             if (ring != null)
                 explosionRingContainer.Add(ring);
-        }
 
-        class ExplodingRing : CircularContainer
-        {
-            private const float offset_min = -0.5f;
-            private const float offset_max = 0.5f;
-
-            public ExplodingRing(Color4 fillColour, bool fill)
+            // Add judgement
+            string judgementString = "";
+            switch (tji.Score)
             {
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-
-                RelativeSizeAxes = Axes.Both;
-                RelativePositionAxes = Axes.Both;
-
-                BorderColour = Color4.White;
-                BorderThickness = 1;
-
-                Alpha = 0.5f;
-
-                Children = new[]
-                {
-                    new Box()
-                    {
-                        RelativeSizeAxes = Axes.Both,
-
-                        Alpha = fill ? 0.5f : 0,
-                        Colour = fillColour,
-
-                        AlwaysPresent = true
-                    }
-                };
+                case TaikoScoreResult.Miss:
+                    judgementString = "MISS";
+                    break;
+                case TaikoScoreResult.Good:
+                    judgementString = "GOOD";
+                    break;
+                case TaikoScoreResult.Great:
+                    judgementString = "GREAT";
+                    break;
             }
 
-            protected override void LoadComplete()
+            judgementContainer.Add(new JudgementText()
             {
-                base.LoadComplete();
-
-                ScaleTo(5f, 500);
-                FadeOut(500);
-
-                Expire();
-            }
+                Text = judgementString,
+                GlowColour = dth.ExplodeColour
+            });
         }
     }
 }
