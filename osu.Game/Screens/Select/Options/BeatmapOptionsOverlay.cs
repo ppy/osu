@@ -78,10 +78,6 @@ namespace osu.Game.Screens.Select.Options
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Direction = FillDirection.Left,
-                    Padding = new MarginPadding
-                    {
-                        Left = BeatmapOptionsButton.SIZE.X, // For some reason autosize on this flow container is one button too short
-                    },
                     Children = new BeatmapOptionsButton[]
                     {
                         new BeatmapOptionsDeleteButton
