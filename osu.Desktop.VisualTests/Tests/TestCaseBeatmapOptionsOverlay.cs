@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
-using osu.Game.Overlays.BeatmapOptions;
+using osu.Game.Screens.Select.Options;
 
 namespace osu.Desktop.VisualTests
 {
