@@ -37,12 +37,12 @@ namespace osu.Game.Screens.Tournament
 
         private ScrollingTeamContainer teamsContainer;
         private GroupsContainer groupsContainer;
+        private SpriteText fullTeamNameText;
 
         private List<Team> allTeams = new List<Team>();
 
         private DrawingsConfigManager drawingsConfig;
 
-        private Task lastWriteOp;
         private Task writeOp;
 
         private Storage storage;
@@ -61,7 +61,6 @@ namespace osu.Game.Screens.Tournament
             drawingsConfig = new DrawingsConfigManager(storage);
 
             Container visualiserContainer;
-            SpriteText st;
 
             Children = new Drawable[]
             {
@@ -125,7 +124,7 @@ namespace osu.Game.Screens.Tournament
                                     RelativeSizeAxes = Axes.X,
                                 },
                                 // Scrolling team name
-                                st = new SpriteText()
+                                fullTeamNameText = new SpriteText()
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.TopCentre,
@@ -242,42 +241,38 @@ namespace osu.Game.Screens.Tournament
                 offset += (float)Math.PI / 6f;
             }
 
-            teamsContainer.OnSelected += t =>
-            {
-                groupsContainer.AddTeam(t.Team);
-
-                st.Text = t.Team.FullName;
-                st.FadeIn(200);
-
-                writeResults(groupsContainer.ToStringRepresentation());
-            };
-
-            teamsContainer.OnScrollStarted += () => st.FadeOut(200);
+            teamsContainer.OnSelected += onTeamSelected;
+            teamsContainer.OnScrollStarted += () => fullTeamNameText.FadeOut(200);
 
             reset(true);
         }
 
+        private void onTeamSelected(Team team)
+        {
+            groupsContainer.AddTeam(team);
+
+            fullTeamNameText.Text = team.FullName;
+            fullTeamNameText.FadeIn(200);
+
+            writeResults(groupsContainer.ToStringRepresentation());
+        }
+
         private void writeResults(string text)
         {
-            lastWriteOp = writeOp;
-            writeOp = Task.Run(async () =>
+            Action writeAction = () =>
             {
-                if (lastWriteOp != null)
-                    await lastWriteOp;
-
                 // Write to drawings_results
-                try
+                using (Stream stream = storage.GetStream(results_filename, FileAccess.Write, FileMode.Create))
+                using (StreamWriter sw = new StreamWriter(stream))
                 {
-                    using (Stream stream = storage.GetStream(results_filename, FileAccess.Write, FileMode.Create))
-                    using (StreamWriter sw = new StreamWriter(stream))
-                    {
-                        sw.Write(text);
-                    }
+                    sw.Write(text);
                 }
-                catch
-                {
-                }
-            });
+            };
+
+            if (writeOp == null)
+                writeOp = Task.Run(writeAction);
+            else
+                writeOp = writeOp.ContinueWith(t => { writeAction(); });
         }
 
         private void reloadTeams()

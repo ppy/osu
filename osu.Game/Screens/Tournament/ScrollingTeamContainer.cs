@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Tournament
     public class ScrollingTeamContainer : Container
     {
         public event Action OnScrollStarted;
-        public event Action<ScrollingTeam> OnSelected;
+        public event Action<Team> OnSelected;
 
         private readonly List<Team> availableTeams = new List<Team>();
 
@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Tournament
                         availableTeams.RemoveAll(at => at == st.Team);
 
                         st.Selected = true;
-                        OnSelected?.Invoke(st);
+                        OnSelected?.Invoke(st.Team);
 
                         delayedStateChangeDelegate = Delay(10000).Schedule(() => scrollState = ScrollState.Idle);
                         break;
