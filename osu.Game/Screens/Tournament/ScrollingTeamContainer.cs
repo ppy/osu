@@ -1,24 +1,19 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using osu.Framework.Allocation;
-using osu.Framework.Caching;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using osu.Framework.Input;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.Timing;
-using osu.Framework.Threading;
-using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Transforms;
+using osu.Framework.Threading;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -31,8 +26,8 @@ namespace osu.Game.Screens.Tournament
 
         private Container tracker;
 
-        private float speed = 0f;
-        private int expiredCount = 0;
+        private float speed;
+        private int expiredCount;
 
         private float offset;
         private float timeOffset;
@@ -48,7 +43,7 @@ namespace osu.Game.Screens.Tournament
 
             Children = new Drawable[]
             {
-                tracker = new Container()
+                tracker = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -61,7 +56,7 @@ namespace osu.Game.Screens.Tournament
 
                     Children = new[]
                     {
-                        new Box()
+                        new Box
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.BottomCentre,
@@ -69,7 +64,7 @@ namespace osu.Game.Screens.Tournament
 
                             ColourInfo = ColourInfo.GradientVertical(Color4.Transparent, Color4.White)
                         },
-                        new Box()
+                        new Box
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.TopCentre,
@@ -358,12 +353,12 @@ namespace osu.Game.Screens.Tournament
 
                 Children = new Drawable[]
                 {
-                    outline = new Box()
+                    outline = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0
                     },
-                    flagSprite = new Sprite()
+                    flagSprite = new Sprite
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
