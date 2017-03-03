@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Tournament
         private List<Group> allGroups = new List<Group>();
 
         private int maxTeams;
+        private int currentGroup;
 
         public GroupsContainer(int numGroups, int teamsPerGroup)
         {
@@ -62,14 +63,12 @@ namespace osu.Game.Screens.Tournament
 
         public void AddTeam(Team team)
         {
-            foreach (Group g in allGroups)
-            {
-                if (g.TeamsCount == maxTeams)
-                    continue;
+            if (allGroups[currentGroup].TeamsCount == maxTeams)
+                return;
 
-                g.AddTeam(team);
-                break;
-            }
+            allGroups[currentGroup].AddTeam(team);
+
+            currentGroup = (currentGroup + 1) % allGroups.Count;
         }
 
         public bool ContainsTeam(string fullName)
@@ -77,23 +76,12 @@ namespace osu.Game.Screens.Tournament
             return allGroups.Any(g => g.ContainsTeam(fullName));
         }
 
-        public bool RemoveTeam(Team team)
-        {
-            foreach (Group g in allGroups)
-            {
-                if (g.RemoveTeam(team))
-                    return true;
-            }
-
-            return false;
-        }
-
         public void ClearTeams()
         {
-            for (int i = 0; i < allGroups.Count; i++)
-            {
-                allGroups[i].ClearTeams();
-            }
+            foreach (Group g in allGroups)
+                g.ClearTeams();
+
+            currentGroup = 0;
         }
 
         public string ToStringRepresentation()
