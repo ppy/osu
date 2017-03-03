@@ -57,10 +57,7 @@ namespace osu.Game.Graphics.UserInterface
                 c1.Origin = c1.Anchor = (value & Anchor.x2) > 0 ? Anchor.TopLeft : Anchor.TopRight;
                 c2.Origin = c2.Anchor = (value & Anchor.x2) > 0 ? Anchor.TopRight : Anchor.TopLeft;
 
-                Margin = new MarginPadding
-                {
-                    Right = (value & Anchor.x2) > 0 ? -SIZE_RETRACTED.X * shear * 0.5f : 0
-                };
+                X = (value & Anchor.x2) > 0 ? SIZE_RETRACTED.X * shear * 0.5f : 0;
 
                 c1.Depth = (value & Anchor.x2) > 0 ? 0 : 1;
                 c2.Depth = (value & Anchor.x2) > 0 ? 1 : 0;
