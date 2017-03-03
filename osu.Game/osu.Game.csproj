@@ -274,12 +274,12 @@
     <Compile Include="Screens\Select\SearchTextBox.cs" />
     <Compile Include="Screens\Select\FooterButton.cs" />
     <Compile Include="Screens\Select\Footer.cs" />
-    <Compile Include="Overlays\Pause\PauseOverlay.cs" />
-    <Compile Include="Overlays\Pause\PauseProgressBar.cs" />
-    <Compile Include="Overlays\Pause\PauseProgressGraph.cs" />
-    <Compile Include="Overlays\Pause\ResumeButton.cs" />
-    <Compile Include="Overlays\Pause\RetryButton.cs" />
-    <Compile Include="Overlays\Pause\QuitButton.cs" />
+    <Compile Include="Screens\Play\PauseOverlay.cs" />
+    <Compile Include="Screens\Play\Pause\PauseProgressBar.cs" />
+    <Compile Include="Screens\Play\Pause\PauseProgressGraph.cs" />
+    <Compile Include="Screens\Play\Pause\ResumeButton.cs" />
+    <Compile Include="Screens\Play\Pause\RetryButton.cs" />
+    <Compile Include="Screens\Play\Pause\QuitButton.cs" />
     <Compile Include="Overlays\Dialog\PopupDialog.cs" />
     <Compile Include="Graphics\UserInterface\DialogButton.cs" />
     <Compile Include="Overlays\Dialog\PopupDialogButton.cs" />
@@ -287,6 +287,12 @@
     <Compile Include="Overlays\Dialog\PopupDialogCancelButton.cs" />
     <Compile Include="Screens\Select\BeatmapDeleteDialog.cs" />
     <Compile Include="Overlays\DialogOverlay.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsClearLocalScoresButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsDeleteButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsEditButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsRemoveFromUnplayedButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -307,9 +313,7 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Overlays\Dialog\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -52,7 +52,6 @@ namespace osu.Game.Beatmaps.Drawables
                         },
                         artist = new OsuSpriteText
                         {
-                            Margin = new MarginPadding { Top = -1 },
                             Font = @"Exo2.0-SemiBoldItalic",
                             Text = beatmap.BeatmapSetInfo.Metadata.Artist,
                             TextSize = 17,
