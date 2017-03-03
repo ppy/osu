@@ -212,7 +212,7 @@
     <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
     <Compile Include="Screens\Select\WedgeBackground.cs" />
     <Compile Include="Screens\Tournament\Components\DrawingsConfigManager.cs" />
-    <Compile Include="Screens\Tournament\Components\VisualiserLine.cs" />
+    <Compile Include="Screens\Tournament\Components\VisualiserContainer.cs" />
     <Compile Include="Screens\Tournament\Drawings.cs" />
     <Compile Include="Screens\Tournament\Group.cs" />
     <Compile Include="Screens\Tournament\GroupsContainer.cs" />
