@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Tournament
 {
     public class Group : Container
     {
-        public string GroupName;
+        public readonly string GroupName;
 
         public int TeamsCount { get; private set; }
 
