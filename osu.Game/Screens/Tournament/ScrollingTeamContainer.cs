@@ -88,6 +88,9 @@ namespace osu.Game.Screens.Tournament
             get { return _scrollState; }
             set
             {
+                if (_scrollState == value)
+                    return;
+
                 _scrollState = value;
 
                 delayedStateChangeDelegate?.Cancel();
