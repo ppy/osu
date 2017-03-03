@@ -60,8 +60,6 @@ namespace osu.Game.Screens.Tournament
 
             drawingsConfig = new DrawingsConfigManager(storage);
 
-            Container visualiserContainer;
-
             Children = new Drawable[]
             {
                 new Box()
@@ -90,7 +88,7 @@ namespace osu.Game.Screens.Tournament
                             Children = new Drawable[]
                             {
                                 // Visualiser
-                                visualiserContainer = new Container()
+                                new VisualiserContainer()
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -98,7 +96,9 @@ namespace osu.Game.Screens.Tournament
                                     RelativeSizeAxes = Axes.X,
                                     Size = new Vector2(1, 10),
 
-                                    Colour = new Color4(255, 204, 34, 255)
+                                    Colour = new Color4(255, 204, 34, 255),
+
+                                    Lines = 6
                                 },
                                 // Groups
                                 groupsContainer = new GroupsContainer(drawingsConfig.Get<int>(DrawingsConfig.Groups), drawingsConfig.Get<int>(DrawingsConfig.TeamsPerGroup))
@@ -229,17 +229,6 @@ namespace osu.Game.Screens.Tournament
                     }
                 }
             };
-
-            float offset = 0;
-            for (int i = 0; i < 6; i++)
-            {
-                visualiserContainer.Add(new VisualiserLine(2 * (float)Math.PI, offset, RNG.Next(10000, 12000))
-                {
-                    RelativeSizeAxes = Axes.Both,
-                });
-
-                offset += (float)Math.PI / 6f;
-            }
 
             teamsContainer.OnSelected += onTeamSelected;
             teamsContainer.OnScrollStarted += () => fullTeamNameText.FadeOut(200);
