@@ -70,23 +70,23 @@ namespace osu.Game.Screens.Tournament.Components
         /// <summary>
         /// The period offset this line was constructed with, in radians.
         /// </summary>
-        private float initialPeriodOffset;
+        private readonly float initialPeriodOffset;
         /// <summary>
         /// The rolling period offset (by transformation), in radians.
         /// </summary>
-        private float internalPeriodOffset;
+        private float _periodOffset;
         /// <summary>
         /// The final period offset, in radians.
         /// </summary>
         private float periodOffset
         {
-            get { return initialPeriodOffset + internalPeriodOffset; }
+            get { return initialPeriodOffset + _periodOffset; }
             set
             {
-                if (internalPeriodOffset == value)
+                if (_periodOffset == value)
                     return;
 
-                internalPeriodOffset = value;
+                _periodOffset = value;
                 Invalidate(Invalidation.DrawNode, shallPropagate: false);
             }
         }
