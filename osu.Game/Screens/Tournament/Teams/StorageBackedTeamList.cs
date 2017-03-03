@@ -1,21 +1,21 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Logging;
-using osu.Framework.Platform;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using osu.Framework.Logging;
+using osu.Framework.Platform;
 
-namespace osu.Game.Screens.Tournament
+namespace osu.Game.Screens.Tournament.Teams
 {
-    public class FileTeamList : ITeamList
+    public class StorageBackedTeamList : ITeamList
     {
         private const string teams_filename = "drawings.txt";
 
         private Storage storage;
 
-        public FileTeamList(Storage storage)
+        public StorageBackedTeamList(Storage storage)
         {
             this.storage = storage;
         }

@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace osu.Game.Screens.Tournament
+namespace osu.Game.Screens.Tournament.Teams
 {
     public interface ITeamList
     {

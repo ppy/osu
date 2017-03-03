@@ -1,33 +1,33 @@
-﻿using OpenTK;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Screens.Tournament.Teams;
+using OpenTK;
 
 namespace osu.Game.Screens.Tournament
 {
     public class GroupsContainer : Container
     {
-        private FlowContainer<Group> topGroups;
-        private FlowContainer<Group> bottomGroups;
-
-        private List<Group> allGroups = new List<Group>();
+        private List<Group> groups = new List<Group>();
 
         private int maxTeams;
         private int currentGroup;
 
         public GroupsContainer(int numGroups, int teamsPerGroup)
         {
+            FlowContainer<Group> bottomGroups;
+            FlowContainer<Group> topGroups;
+
             maxTeams = teamsPerGroup;
 
             char nextGroupName = 'A';
 
             Children = new[]
             {
-                topGroups = new FillFlowContainer<Group>()
+                topGroups = new FillFlowContainer<Group>
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Tournament
 
                     Spacing = new Vector2(7f, 0)
                 },
-                bottomGroups = new FillFlowContainer<Group>()
+                bottomGroups = new FillFlowContainer<Group>
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Tournament
             {
                 Group g = new Group(nextGroupName.ToString());
 
-                allGroups.Add(g);
+                groups.Add(g);
                 nextGroupName++;
 
                 if (i < (int)Math.Ceiling(numGroups / 2f))
@@ -63,37 +63,37 @@ namespace osu.Game.Screens.Tournament
 
         public void AddTeam(Team team)
         {
-            if (allGroups[currentGroup].TeamsCount == maxTeams)
+            if (groups[currentGroup].TeamsCount == maxTeams)
                 return;
 
-            allGroups[currentGroup].AddTeam(team);
+            groups[currentGroup].AddTeam(team);
 
-            currentGroup = (currentGroup + 1) % allGroups.Count;
+            currentGroup = (currentGroup + 1) % groups.Count;
         }
 
         public bool ContainsTeam(string fullName)
         {
-            return allGroups.Any(g => g.ContainsTeam(fullName));
+            return groups.Any(g => g.ContainsTeam(fullName));
         }
 
         public void ClearTeams()
         {
-            foreach (Group g in allGroups)
+            foreach (Group g in groups)
                 g.ClearTeams();
 
             currentGroup = 0;
         }
 
-        public string ToStringRepresentation()
+        public string GetStringRepresentation()
         {
             StringBuilder sb = new StringBuilder();
 
-            foreach (Group g in allGroups)
+            foreach (Group g in groups)
             {
-                if (g != allGroups.First())
+                if (g != groups.First())
                     sb.AppendLine();
                 sb.AppendLine($"Group {g.GroupName}");
-                sb.Append(g.ToStringRepresentation());
+                sb.Append(g.GetStringRepresentation());
             }
 
             return sb.ToString();

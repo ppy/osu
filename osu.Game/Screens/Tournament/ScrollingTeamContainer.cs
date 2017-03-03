@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
+using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
 

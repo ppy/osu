@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.Tournament
                 teams = new FillFlowContainer<GroupTeam>
                 {
                     RelativeSizeAxes = Axes.Both,
-                    
+
                     Spacing = new Vector2(6f, 22),
 
                     Margin = new MarginPadding
@@ -111,7 +112,7 @@ namespace osu.Game.Screens.Tournament
             TeamsCount = 0;
         }
 
-        public string ToStringRepresentation()
+        public string GetStringRepresentation()
         {
             StringBuilder sb = new StringBuilder();
             foreach (GroupTeam gt in allTeams)
@@ -130,7 +131,7 @@ namespace osu.Game.Screens.Tournament
             {
                 Team = team;
 
-                Size = new Vector2(36, 0);
+                Width = 36;
                 AutoSizeAxes = Axes.Y;
 
                 Children = new Drawable[]
@@ -145,8 +146,6 @@ namespace osu.Game.Screens.Tournament
 
                         Direction = FillDirection.Down,
                         Spacing = new Vector2(0, 5f),
-
-                        Scale = new Vector2(1.5f),
 
                         Children = new Drawable[]
                         {
@@ -174,6 +173,7 @@ namespace osu.Game.Screens.Tournament
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+                innerContainer.ScaleTo(1.5f);
                 innerContainer.ScaleTo(1f, 200);
             }
 
