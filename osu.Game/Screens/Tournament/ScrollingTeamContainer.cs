@@ -214,6 +214,9 @@ namespace osu.Game.Screens.Tournament
             if (availableTeams.Count == 0)
                 return;
 
+            if (scrollState == ScrollState.Stopped)
+                return;
+
             scrollState = ScrollState.Stopping;
         }
 
@@ -295,6 +298,7 @@ namespace osu.Game.Screens.Tournament
 
         enum ScrollState
         {
+            None,
             Idle,
             Stopping,
             Stopped,
