@@ -123,14 +123,6 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White.Opacity(50),
-                    },
-                },
             });
         }
 

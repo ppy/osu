@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Mods
 
         private FillFlowContainer<ModSection> modSectionsContainer;
 
-        public Bindable<Mod[]> SelectedMods = new Bindable<Mod[]>();
+        public readonly Bindable<Mod[]> SelectedMods = new Bindable<Mod[]>();
 
         public readonly Bindable<PlayMode> PlayMode = new Bindable<PlayMode>();
 
@@ -95,8 +95,6 @@ namespace osu.Game.Overlays.Mods
                 section.ButtonsContainer.MoveToX(100f, APPEAR_DURATION, EasingTypes.InSine);
                 section.ButtonsContainer.FadeOut(APPEAR_DURATION, EasingTypes.InSine);
             }
-
-            TriggerFocusLost();
         }
 
         protected override void PopIn()
@@ -112,8 +110,6 @@ namespace osu.Game.Overlays.Mods
                 section.ButtonsContainer.MoveToX(0, button_duration, EasingTypes.OutQuint);
                 section.ButtonsContainer.FadeIn(button_duration, EasingTypes.OutQuint);
             }
-
-            Schedule(TriggerFocusContention);
         }
 
         public void DeselectAll()
