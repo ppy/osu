@@ -214,8 +214,12 @@ namespace osu.Game.Screens.Tournament
             if (availableTeams.Count == 0)
                 return;
 
-            if (scrollState == ScrollState.Stopped)
-                return;
+            switch (scrollState)
+            {
+                case ScrollState.Stopped:
+                case ScrollState.Idle:
+                    return;
+            }
 
             scrollState = ScrollState.Stopping;
         }
