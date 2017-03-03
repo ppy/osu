@@ -231,7 +231,8 @@ namespace osu.Game.Overlays.Mods
                         new Triangles
                         {
                             TriangleScale = 5,
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                            Height = Height, //set the height from the start to ensure correct triangle density.
                             ColourLight = new Color4(53, 66, 82, 255),
                             ColourDark = new Color4(41, 54, 70, 255),
                         },
