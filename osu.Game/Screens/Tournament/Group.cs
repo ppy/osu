@@ -22,15 +22,11 @@ namespace osu.Game.Screens.Tournament
     {
         public string GroupName;
 
-        public int TeamsCount => topTeamsCount + bottomTeamsCount;
+        public int TeamsCount { get; private set; }
 
-        private FlowContainer<GroupTeam> topTeams;
-        private FlowContainer<GroupTeam> bottomTeams;
+        private FlowContainer<GroupTeam> teams;
 
         private List<GroupTeam> allTeams = new List<GroupTeam>();
-
-        private int topTeamsCount;
-        private int bottomTeamsCount;
 
         public Group(string name)
         {
@@ -61,59 +57,33 @@ namespace osu.Game.Screens.Tournament
                     Font = @"Exo2.0-Bold",
                     Colour = new Color4(255, 204, 34, 255),
                 },
-                topTeams = new FillFlowContainer<GroupTeam>()
+                teams = new FillFlowContainer<GroupTeam>()
                 {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Both,
+                    
+                    Spacing = new Vector2(6f, 22),
 
-                    Position = new Vector2(0, 21f),
-                    Spacing = new Vector2(6f, 0),
-
-                    Padding = new MarginPadding()
+                    Margin = new MarginPadding()
                     {
+                        Top = 21f,
+                        Bottom = 7f,
                         Left = 7f,
                         Right = 7f
-                    },
-
-                    Direction = FillDirection.Right
-                },
-                bottomTeams = new FillFlowContainer<GroupTeam>()
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-
-                    Position = new Vector2(0, -7f),
-                    Spacing = new Vector2(6f, 0),
-
-                    Padding = new MarginPadding()
-                    {
-                        Left =  7f,
-                        Right = 7f
-                    },
-
-                    Direction = FillDirection.Right
+                    }
                 }
             };
         }
 
         public void AddTeam(Team team)
         {
-
             GroupTeam gt = new GroupTeam(team);
-            if (topTeamsCount < 4)
+
+            if (TeamsCount < 8)
             {
-                topTeams.Add(gt);
+                teams.Add(gt);
                 allTeams.Add(gt);
-                topTeamsCount++;
-            }
-            else if (bottomTeamsCount < 4)
-            {
-                bottomTeams.Add(gt);
-                allTeams.Add(gt);
-                bottomTeamsCount++;
+
+                TeamsCount++;
             }
         }
 
@@ -126,14 +96,9 @@ namespace osu.Game.Screens.Tournament
         {
             allTeams.RemoveAll(gt => gt.Team == team);
 
-            if (topTeams.RemoveAll(gt => gt.Team == team) > 0)
+            if (teams.RemoveAll(gt => gt.Team == team) > 0)
             {
-                topTeamsCount--;
-                return true;
-            }
-            else if (bottomTeams.RemoveAll(gt => gt.Team == team) > 0)
-            {
-                bottomTeamsCount--;
+                TeamsCount--;
                 return true;
             }
 
@@ -143,11 +108,9 @@ namespace osu.Game.Screens.Tournament
         public void ClearTeams()
         {
             allTeams.Clear();
-            topTeams.Clear();
-            bottomTeams.Clear();
+            teams.Clear();
 
-            topTeamsCount = 0;
-            bottomTeamsCount = 0;
+            TeamsCount = 0;
         }
 
         public string ToStringRepresentation()
