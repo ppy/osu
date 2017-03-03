@@ -58,6 +58,7 @@
     <Compile Include="UI\ManiaHitRenderer.cs" />
     <Compile Include="UI\ManiaPlayfield.cs" />
     <Compile Include="ManiaRuleset.cs" />
+    <Compile Include="ManiaMod.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">

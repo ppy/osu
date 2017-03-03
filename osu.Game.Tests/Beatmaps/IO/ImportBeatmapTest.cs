@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -40,8 +41,16 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (HeadlessGameHost host = new HeadlessGameHost())
             {
                 var osu = loadOsu(host);
-                osu.Dependencies.Get<BeatmapDatabase>().Import(osz_path);
+
+                var temp = prepareTempCopy(osz_path);
+
+                Assert.IsTrue(File.Exists(temp));
+
+                osu.Dependencies.Get<BeatmapDatabase>().Import(temp);
+
                 ensureLoaded(osu);
+
+                Assert.IsFalse(File.Exists(temp));
             }
         }
 
@@ -56,12 +65,49 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 var osu = loadOsu(host);
 
+                var temp = prepareTempCopy(osz_path);
+
+                Assert.IsTrue(File.Exists(temp));
+
                 var importer = new BeatmapImporter(client);
-                if (!importer.ImportAsync(osz_path).Wait(1000))
+                if (!importer.ImportAsync(temp).Wait(1000))
                     Assert.Fail(@"IPC took too long to send");
 
                 ensureLoaded(osu);
+
+                Assert.IsFalse(File.Exists(temp));
             }
+        }
+
+        [Test]
+        public void TestImportWhenFileOpen()
+        {
+            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new HeadlessGameHost())
+            {
+                var osu = loadOsu(host);
+
+                var temp = prepareTempCopy(osz_path);
+
+                Assert.IsTrue(File.Exists(temp));
+
+                using (FileStream stream = File.OpenRead(temp))
+                    osu.Dependencies.Get<BeatmapDatabase>().Import(temp);
+
+                ensureLoaded(osu);
+
+                Assert.IsTrue(File.Exists(temp));
+                
+                File.Delete(temp);
+
+                Assert.IsFalse(File.Exists(temp));
+            }
+        }
+
+        private string prepareTempCopy(string path)
+        {
+            var temp = Path.GetTempFileName();
+            return new FileInfo(osz_path).CopyTo(temp, true).FullName;
         }
 
         private OsuGameBase loadOsu(GameHost host)
