@@ -5,6 +5,7 @@ using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Overlays;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -30,7 +31,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Anchor = Anchor.Centre
             };
             Add(mc);
-            AddToggle(@"Show", mc.ToggleVisibility);
+            AddToggle(@"Show", (state) => mc.State = state ? Visibility.Visible : Visibility.Hidden);
         }
     }
 }

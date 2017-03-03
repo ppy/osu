@@ -5,21 +5,16 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.Pause
+namespace osu.Game.Overlays.Dialog
 {
-    public class RetryButton : PauseButton
+    public class PopupDialogCancelButton : PopupDialogButton
     {
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
-            ButtonColour = colours.YellowDark;
+            ButtonColour = colours.Blue;
             SampleHover = audio.Sample.Get(@"Menu/menuclick");
-            SampleClick = audio.Sample.Get(@"Menu/menu-play-click");
-        }
-
-        public RetryButton()
-        {
-            Text = @"Retry";
+            SampleClick = audio.Sample.Get(@"Menu/menuback");
         }
     }
 }

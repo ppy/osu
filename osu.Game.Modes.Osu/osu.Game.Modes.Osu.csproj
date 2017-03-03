@@ -85,6 +85,7 @@
     <Compile Include="Objects\Spinner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\OsuScoreOverlay.cs" />
+    <Compile Include="OsuMod.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">

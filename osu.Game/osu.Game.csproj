@@ -156,7 +156,6 @@
     <Compile Include="Screens\Select\CarouselContainer.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameScreen.cs" />
-    <Compile Include="Screens\Play\ModSelect.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Screens\Play\Player.cs" />
@@ -211,6 +210,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
     <Compile Include="Screens\Select\WedgeBackground.cs" />
+    <Compile Include="Screens\Tournament\Components\DrawingsConfigManager.cs" />
+    <Compile Include="Screens\Tournament\Components\VisualiserContainer.cs" />
+    <Compile Include="Screens\Tournament\Drawings.cs" />
+    <Compile Include="Screens\Tournament\Group.cs" />
+    <Compile Include="Screens\Tournament\GroupContainer.cs" />
+    <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
+    <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
+    <Compile Include="Screens\Tournament\Teams\Team.cs" />
+    <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
@@ -274,13 +282,34 @@
     <Compile Include="Screens\Select\SearchTextBox.cs" />
     <Compile Include="Screens\Select\FooterButton.cs" />
     <Compile Include="Screens\Select\Footer.cs" />
-    <Compile Include="Overlays\Pause\PauseButton.cs" />
-    <Compile Include="Overlays\Pause\PauseOverlay.cs" />
-    <Compile Include="Overlays\Pause\PauseProgressBar.cs" />
-    <Compile Include="Overlays\Pause\PauseProgressGraph.cs" />
-    <Compile Include="Overlays\Pause\ResumeButton.cs" />
-    <Compile Include="Overlays\Pause\RetryButton.cs" />
-    <Compile Include="Overlays\Pause\QuitButton.cs" />
+    <Compile Include="Screens\Play\PauseOverlay.cs" />
+    <Compile Include="Screens\Play\Pause\PauseProgressBar.cs" />
+    <Compile Include="Screens\Play\Pause\PauseProgressGraph.cs" />
+    <Compile Include="Screens\Play\Pause\ResumeButton.cs" />
+    <Compile Include="Screens\Play\Pause\RetryButton.cs" />
+    <Compile Include="Screens\Play\Pause\QuitButton.cs" />
+    <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
+    <Compile Include="Modes\Mod.cs" />
+    <Compile Include="Overlays\Mods\ModButton.cs" />
+    <Compile Include="Modes\UI\ModIcon.cs" />
+    <Compile Include="Overlays\Mods\ModSection.cs" />
+    <Compile Include="Overlays\Mods\DifficultyReductionSection.cs" />
+    <Compile Include="Overlays\Mods\DifficultyIncreaseSection.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialog.cs" />
+    <Compile Include="Graphics\UserInterface\DialogButton.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialogButton.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialogOKButton.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialogCancelButton.cs" />
+    <Compile Include="Screens\Select\BeatmapDeleteDialog.cs" />
+    <Compile Include="Overlays\DialogOverlay.cs" />
+    <Compile Include="Overlays\Mods\AssistedSection.cs" />
+    <Compile Include="Overlays\WaveOverlayContainer.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsClearLocalScoresButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsDeleteButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsEditButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsRemoveFromUnplayedButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -298,6 +327,7 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
