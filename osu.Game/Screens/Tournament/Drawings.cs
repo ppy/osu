@@ -40,6 +40,12 @@ namespace osu.Game.Screens.Tournament
         [BackgroundDependencyLoader]
         private void load(Framework.Game game, TextureStore textures)
         {
+            if (!File.Exists("drawings.txt"))
+            {
+                Exit();
+                return;
+            }
+
             drawingsConfig = new DrawingsConfigManager(Game.Host.Storage);
 
             Container visualiserContainer;
