@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Tournament.Components;
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Tournament
 
         private ScrollingTeamContainer teamsContainer;
         private GroupsContainer groupsContainer;
-        private SpriteText fullTeamNameText;
+        private OsuSpriteText fullTeamNameText;
 
         private List<Team> allTeams = new List<Team>();
 
@@ -124,7 +125,7 @@ namespace osu.Game.Screens.Tournament
                                     RelativeSizeAxes = Axes.X,
                                 },
                                 // Scrolling team name
-                                fullTeamNameText = new SpriteText
+                                fullTeamNameText = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.TopCentre,
@@ -151,7 +152,7 @@ namespace osu.Game.Screens.Tournament
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = new Color4(54, 54, 54, 255)
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,

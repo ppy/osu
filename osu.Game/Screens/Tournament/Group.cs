@@ -1,20 +1,18 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Timing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using osu.Game.Graphics.Sprites;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -39,13 +37,13 @@ namespace osu.Game.Screens.Tournament
 
             Children = new Drawable[]
             {
-                new Box()
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = new Color4(54, 54, 54, 255)
                 },
                 // Group name
-                new SpriteText()
+                new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -57,13 +55,13 @@ namespace osu.Game.Screens.Tournament
                     Font = @"Exo2.0-Bold",
                     Colour = new Color4(255, 204, 34, 255),
                 },
-                teams = new FillFlowContainer<GroupTeam>()
+                teams = new FillFlowContainer<GroupTeam>
                 {
                     RelativeSizeAxes = Axes.Both,
                     
                     Spacing = new Vector2(6f, 22),
 
-                    Margin = new MarginPadding()
+                    Margin = new MarginPadding
                     {
                         Top = 21f,
                         Bottom = 7f,
@@ -137,7 +135,7 @@ namespace osu.Game.Screens.Tournament
 
                 Children = new Drawable[]
                 {
-                    innerContainer = new FillFlowContainer()
+                    innerContainer = new FillFlowContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -152,14 +150,14 @@ namespace osu.Game.Screens.Tournament
 
                         Children = new Drawable[]
                         {
-                            flagSprite = new Sprite()
+                            flagSprite = new Sprite
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
 
                                 FillMode = FillMode.Fit
                             },
-                            new SpriteText()
+                            new OsuSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
