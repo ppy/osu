@@ -56,6 +56,7 @@
     <Compile Include="UI\TaikoHitRenderer.cs" />
     <Compile Include="UI\TaikoPlayfield.cs" />
     <Compile Include="TaikoRuleset.cs" />
+    <Compile Include="TaikoMod.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\osu.licenseheader">

@@ -27,6 +27,7 @@ using osu.Framework.Input;
 using OpenTK.Input;
 using System.Collections.Generic;
 using osu.Framework.Threading;
+using osu.Game.Overlays.Mods;
 using osu.Game.Overlays;
 using osu.Game.Screens.Select.Options;
 
@@ -44,6 +45,8 @@ namespace osu.Game.Screens.Select
 
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
         private BeatmapInfoWedge beatmapInfoWedge;
+
+        private ModSelectOverlay modSelect;
 
         private static readonly Vector2 background_blur = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
@@ -138,6 +141,16 @@ namespace osu.Game.Screens.Select
                         Bottom = 50,
                     },
                 },
+                modSelect = new ModSelectOverlay
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomCentre,
+                    Margin = new MarginPadding
+                    {
+                        Bottom = 50,
+                    },
+                },
                 footer = new Footer
                 {
                     OnBack = Exit,
@@ -155,7 +168,7 @@ namespace osu.Game.Screens.Select
                 },
             };
 
-            footer.AddButton(@"mods", colours.Yellow, null);
+            footer.AddButton(@"mods", colours.Yellow, modSelect.ToggleVisibility);
             footer.AddButton(@"random", colours.Green, carousel.SelectRandom);
             footer.AddButton(@"options", colours.Blue, beatmapOptions.ToggleVisibility);
 
