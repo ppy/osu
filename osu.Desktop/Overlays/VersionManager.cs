@@ -18,6 +18,7 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using System.Net.Http;
+using osu.Framework.Logging;
 
 namespace osu.Desktop.Overlays
 {
@@ -159,14 +160,20 @@ namespace osu.Desktop.Overlays
 
                     Schedule(() => notification.State = ProgressNotificationState.Completed);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     if (useDeltaPatching)
                     {
+                        Logger.Error(e, @"delta patching failed!");
+
                         //could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
                         //try again without deltas.
                         checkForUpdateAsync(false, notification);
                         scheduleRetry = false;
+                    }
+                    else
+                    {
+                        Logger.Error(e, @"update failed!");
                     }
                 }
             }
