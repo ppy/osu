@@ -902,6 +902,6 @@ namespace osu.Game.Graphics
         fa_osu_mod_spunout = 0xe046,
         fa_osu_mod_suddendeath = 0xe047,
         fa_osu_mod_target = 0xe048,
-        fa_osu_mod_bg = 0xe049,
+        fa_osu_mod_bg = 0xe04a,
     }
 }
