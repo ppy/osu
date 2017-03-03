@@ -129,6 +129,7 @@ namespace osu.Game.Database
                 {
                     BeatmapSetInfo set = getBeatmapSet(p);
 
+                    //If we have an ID then we already exist in the database.
                     if (set.ID == 0)
                         sets.Push(set);
 
