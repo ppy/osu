@@ -215,7 +215,7 @@
     <Compile Include="Screens\Tournament\Components\VisualiserContainer.cs" />
     <Compile Include="Screens\Tournament\Drawings.cs" />
     <Compile Include="Screens\Tournament\Group.cs" />
-    <Compile Include="Screens\Tournament\GroupsContainer.cs" />
+    <Compile Include="Screens\Tournament\GroupContainer.cs" />
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
     <Compile Include="Screens\Tournament\Teams\Team.cs" />

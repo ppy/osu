@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Tournament
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
         private ScrollingTeamContainer teamsContainer;
-        private GroupsContainer groupsContainer;
+        private GroupContainer groupsContainer;
         private OsuSpriteText fullTeamNameText;
 
         private List<Team> allTeams = new List<Team>();
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Tournament
                                     Lines = 6
                                 },
                                 // Groups
-                                groupsContainer = new GroupsContainer(drawingsConfig.Get<int>(DrawingsConfig.Groups), drawingsConfig.Get<int>(DrawingsConfig.TeamsPerGroup))
+                                groupsContainer = new GroupContainer(drawingsConfig.Get<int>(DrawingsConfig.Groups), drawingsConfig.Get<int>(DrawingsConfig.TeamsPerGroup))
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,

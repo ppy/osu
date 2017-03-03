@@ -9,14 +9,14 @@ using OpenTK;
 
 namespace osu.Game.Screens.Tournament
 {
-    public class GroupsContainer : Container
+    public class GroupContainer : Container
     {
         private List<Group> groups = new List<Group>();
 
         private int maxTeams;
         private int currentGroup;
 
-        public GroupsContainer(int numGroups, int teamsPerGroup)
+        public GroupContainer(int numGroups, int teamsPerGroup)
         {
             FlowContainer<Group> bottomGroups;
             FlowContainer<Group> topGroups;
