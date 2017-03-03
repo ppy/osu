@@ -8,11 +8,14 @@ using osu.Game.Modes.Objects;
 using osu.Framework.Graphics.Transformations;
 using OpenTK;
 using osu.Framework.Graphics;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public class DrawableTaikoHitObject : DrawableHitObject
+    public abstract class DrawableTaikoHitObject : DrawableHitObject
     {
+        public abstract Color4 ExplodeColour { get; }
+
         public override bool ExpireOnStateChange => false;
 
         public DrawableTaikoHitObject(TaikoHitObject hitObject)
@@ -59,8 +62,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             MoveToX((float)((tho.StartTime - time) / tho.PreEmpt));
         }
 
+        bool auto = false;
+
         protected override void Update()
         {
+            if (!auto && Time.Current >= HitObject.EndTime)
+            {
+                auto = true;
+                UpdateJudgement(true);
+            }
+
             MoveToOffset(Time.Current);
         }
     }

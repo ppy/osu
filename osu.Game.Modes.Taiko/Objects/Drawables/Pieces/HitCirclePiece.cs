@@ -63,6 +63,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
     public abstract class HitCirclePiece : Container
     {
+        public Func<bool, bool> Hit;
+        public bool Kiai;
+
         protected abstract List<Key> Keys { get; }
 
         protected abstract Color4 InternalColour { get; }
@@ -73,8 +76,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         private CirclePiece circle;
         private RingPiece ring;
         private GlowPiece glow;
-
-        public Func<bool, bool> Hit;
 
         public HitCirclePiece()
         {
@@ -91,17 +92,25 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                 },
                 circle = new CirclePiece()
                 {
-                    Colour = InternalColour,
-
-                    EdgeEffect = new EdgeEffect()
-                    {
-                        Colour = new Color4(InternalColour.R, InternalColour.G, InternalColour.B, 0.75f),
-                        Radius = 50,
-                        Type = EdgeEffectType.Glow,
-                    }
+                    Colour = InternalColour
                 },
                 ring = CreateRing()
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (Kiai)
+            {
+                circle.EdgeEffect = new EdgeEffect()
+                {
+                    Colour = new Color4(InternalColour.R, InternalColour.G, InternalColour.B, 0.75f),
+                    Radius = 50,
+                    Type = EdgeEffectType.Glow,
+                };
+            }
         }
 
         protected abstract RingPiece CreateRing();

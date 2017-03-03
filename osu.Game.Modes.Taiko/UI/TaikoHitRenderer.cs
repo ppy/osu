@@ -6,6 +6,8 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.UI;
+using osu.Framework.Graphics;
+using OpenTK;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -13,7 +15,11 @@ namespace osu.Game.Modes.Taiko.UI
     {
         protected override HitObjectConverter<TaikoHitObject> Converter => new TaikoConverter();
 
-        protected override Playfield CreatePlayfield() => new TaikoPlayfield();
+        protected override Playfield CreatePlayfield() => new TaikoPlayfield()
+        {
+            RelativePositionAxes = Axes.Y,
+            Position = new Vector2(0, 0.4f)
+        };
 
         protected override DrawableHitObject GetVisualRepresentation(TaikoHitObject h)
         {

@@ -12,6 +12,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables;
+using osu.Game.Modes.Taiko.Objects;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -23,7 +25,9 @@ namespace osu.Game.Modes.Taiko.UI
         private const float hit_target_offset = 0.1f;
         private const float playfield_height = 106;
 
-        private Container explosionContainer;
+        private HitTarget hitTarget;
+        private Container explosionRingContainer;
+        private Container judgementContainer;
 
         public TaikoPlayfield()
         {
@@ -60,11 +64,19 @@ namespace osu.Game.Modes.Taiko.UI
 
                         Children = new Drawable[]
                         {
-                            new HitTarget()
+                            explosionRingContainer = new Container()
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.Centre,
+
+                                RelativeSizeAxes = Axes.Y,
+                                Size = new Vector2(74.2f, 0.7f),
+                            },
+                            hitTarget = new HitTarget()
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.Centre
-                            },
+                            }
                         }
                     },
                 }
@@ -117,35 +129,77 @@ namespace osu.Game.Modes.Taiko.UI
                     }
                 }
             });
-
-            AddInternal(explosionContainer = new Container()
-            {
-                RelativeSizeAxes = Axes.Both
-            });
         }
 
         public override void Add(DrawableHitObject h)
         {
             h.Depth = (float)h.HitObject.StartTime;
 
-            DrawableDrumRoll ddr = h as DrawableDrumRoll;
-            if (ddr != null)
-            {
-                foreach (var tick in ddr.AllTicks)
-                {
-                    var tp = tick as IDrawableHitObjectWithProxiedApproach;
-                    if (tp != null)
-                        explosionContainer.Add(tp.ProxiedLayer.CreateProxy());
-                }
-            }
-            else
-            {
-                var p = h as IDrawableHitObjectWithProxiedApproach;
-                if (p != null)
-                    explosionContainer.Add(p.ProxiedLayer.CreateProxy());
-            }
+            h.OnJudgement += onJudgement;
 
             base.Add(h);
+        }
+
+        private void onJudgement(DrawableHitObject h, JudgementInfo j)
+        {
+            TaikoJudgementInfo tj = j as TaikoJudgementInfo;
+            DrawableTaikoHitObject dth = h as DrawableTaikoHitObject;
+
+            ExplodingRing ring = null;
+
+            if (tj.Score == TaikoScoreResult.Great)
+            {
+                hitTarget.Flash(dth.ExplodeColour);
+                ring = new ExplodingRing(dth.ExplodeColour, true);
+            }
+            else if (tj.Score == TaikoScoreResult.Good)
+                ring = new ExplodingRing(dth.ExplodeColour, false);
+
+            if (ring != null)
+                explosionRingContainer.Add(ring);
+        }
+
+        class ExplodingRing : CircularContainer
+        {
+            private const float offset_min = -0.5f;
+            private const float offset_max = 0.5f;
+
+            public ExplodingRing(Color4 fillColour, bool fill)
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+
+                RelativeSizeAxes = Axes.Both;
+                RelativePositionAxes = Axes.Both;
+
+                BorderColour = Color4.White;
+                BorderThickness = 1;
+
+                Alpha = 0.5f;
+
+                Children = new[]
+                {
+                    new Box()
+                    {
+                        RelativeSizeAxes = Axes.Both,
+
+                        Alpha = fill ? 0.5f : 0,
+                        Colour = fillColour,
+
+                        AlwaysPresent = true
+                    }
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                ScaleTo(5f, 500);
+                FadeOut(500);
+
+                Expire();
+            }
         }
     }
 }

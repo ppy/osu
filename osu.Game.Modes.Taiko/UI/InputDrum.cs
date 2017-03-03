@@ -125,13 +125,13 @@ namespace osu.Game.Modes.Taiko.UI
                 if (args.Key == Keys[0])
                 {
                     innerHit.FadeIn();
-                    innerHit.Delay(100).FadeOut(100);
+                    innerHit.Delay(20).FadeOut(20);
                 }
 
                 if (args.Key == Keys[1])
                 {
                     outerHit.FadeIn();
-                    outerHit.Delay(100).FadeOut(100);
+                    outerHit.Delay(20).FadeOut(20);
                 }
 
                 return false;

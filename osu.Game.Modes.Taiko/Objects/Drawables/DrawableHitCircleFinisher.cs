@@ -15,34 +15,26 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableHitCircleDonFinisher : DrawableHitCircleFinisher
     {
+        public override Color4 ExplodeColour => new Color4(187, 17, 119, 255);
+
         public DrawableHitCircleDonFinisher(HitCircle hitCircle)
             : base(hitCircle)
         {
         }
 
         protected override HitCirclePiece CreateBody() => new DonFinisherPiece();
-        protected override ExplodePiece CreateExplode() => new ExplodePiece()
-        {
-            Colour = new Color4(187, 17, 119, 255)
-        };
-
-        protected override FlashPiece CreateFlash() => new FinisherFlashPiece();
     }
 
     public class DrawableHitCircleKatsuFinisher : DrawableHitCircleFinisher
     {
+        public override Color4 ExplodeColour => new Color4(17, 136, 170, 255);
+
         public DrawableHitCircleKatsuFinisher(HitCircle hitCircle)
             : base(hitCircle)
         {
         }
 
         protected override HitCirclePiece CreateBody() => new KatsuFinisherPiece();
-        protected override ExplodePiece CreateExplode() => new ExplodePiece()
-        {
-            Colour = new Color4(17, 136, 170, 255)
-        };
-
-        protected override FlashPiece CreateFlash() => new FinisherFlashPiece();
     }
 
     public abstract class DrawableHitCircleFinisher : DrawableHitCircle

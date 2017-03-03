@@ -17,6 +17,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableHitCircleDon : DrawableHitCircle
     {
+        public override Color4 ExplodeColour => new Color4(187, 17, 119, 255);
 
         public DrawableHitCircleDon(HitCircle hitCircle)
             : base(hitCircle)
@@ -24,39 +25,25 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         }
 
         protected override HitCirclePiece CreateBody() => new DonPiece();
-        protected override ExplodePiece CreateExplode() => new ExplodePiece()
-        {
-            Colour = new Color4(187, 17, 119, 255)
-        };
-
-        protected override FlashPiece CreateFlash() => new FlashPiece();
     }
 
     public class DrawableHitCircleKatsu : DrawableHitCircle
     {
+        public override Color4 ExplodeColour => new Color4(17, 136, 170, 255);
+
         public DrawableHitCircleKatsu(HitCircle hitCircle)
             : base(hitCircle)
         {
         }
 
         protected override HitCirclePiece CreateBody() => new KatsuPiece();
-        protected override ExplodePiece CreateExplode() => new ExplodePiece()
-        {
-            Colour = new Color4(17, 136, 170, 255)
-        };
-
-        protected override FlashPiece CreateFlash() => new FlashPiece();
     }
 
-    public abstract class DrawableHitCircle : DrawableTaikoHitObject, IDrawableHitObjectWithProxiedApproach
+    public abstract class DrawableHitCircle : DrawableTaikoHitObject
     {
-        public Drawable ProxiedLayer { get; set; }
-
         private HitCirclePiece bodyPiece;
-        private ExplodePiece explodePiece;
-        private FlashPiece flashPiece;
 
-        private bool validKeyPressed;
+        private bool validKeyPressed = true;
 
         public DrawableHitCircle(HitCircle hitCircle)
             : base(hitCircle)
@@ -65,25 +52,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             Children = new Drawable[]
             {
-                bodyPiece = CreateBody(),
-                ProxiedLayer = new Container()
-                {
-                    RelativeSizeAxes = Axes.Both,
-
-                    Children = new Drawable[]
-                    {
-                        explodePiece = CreateExplode(),
-                        flashPiece = CreateFlash()
-                    }
-                }
+                bodyPiece = CreateBody()
             };
 
+            bodyPiece.Kiai = hitCircle.Kiai;
             bodyPiece.Hit += ProcessHit;
         }
 
         protected abstract HitCirclePiece CreateBody();
-        protected abstract ExplodePiece CreateExplode();
-        protected abstract FlashPiece CreateFlash();
 
         protected virtual bool ProcessHit(bool validKey)
         {
@@ -146,10 +122,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     break;
                 case ArmedState.Hit:
                     const double flash_in = 200;
-
-                    explodePiece.FadeIn();
-                    explodePiece.ScaleTo(3f, flash_in);
-                    explodePiece.FadeOut(flash_in);
 
                     bodyPiece.ScaleTo(1.5f, flash_in);
                     bodyPiece.FadeOut(flash_in);

@@ -50,7 +50,7 @@ namespace osu.Desktop.VisualTests.Tests
             switch (mode)
             {
                 case HitObjectType.Don:
-                    const int count = 10;
+                    const int count = 1000;
 
                     for (int i = 0; i < count; i++)
                     {
@@ -164,7 +164,11 @@ namespace osu.Desktop.VisualTests.Tests
                 Clock = framedClock,
                 Children = new[]
                 {
-                    playfield = new TaikoPlayfield(),
+                    playfield = new TaikoPlayfield()
+                    {
+                        RelativePositionAxes = Axes.Y,
+                        Position = new Vector2(0, 0.4f)
+                    },
                 }
             };
 

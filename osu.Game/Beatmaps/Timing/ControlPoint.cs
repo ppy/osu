@@ -15,7 +15,39 @@ namespace osu.Game.Beatmaps.Timing
         public double BeatLength;
         public double VelocityAdjustment;
         public bool TimingChange;
+
+        public EffectFlags EffectFlags;
         
+        public bool KiaiMode
+        {
+            get { return (EffectFlags & EffectFlags.Kiai) > 0; }
+            set
+            {
+                if (value)
+                    EffectFlags |= EffectFlags.Kiai;
+                else
+                    EffectFlags &= ~EffectFlags.Kiai;
+            }
+        }
+
+        public bool OmitFirstBarLine
+        {
+            get { return (EffectFlags & EffectFlags.OmitFirstBarLine) > 0; }
+            set
+            {
+                if (value)
+                    EffectFlags |= EffectFlags.OmitFirstBarLine;
+                else
+                    EffectFlags &= ~EffectFlags.OmitFirstBarLine;
+            }
+        }
+    }
+
+    public enum EffectFlags
+    {
+        None = 0,
+        Kiai = 1,
+        OmitFirstBarLine = 8
     }
 
     internal enum TimeSignatures

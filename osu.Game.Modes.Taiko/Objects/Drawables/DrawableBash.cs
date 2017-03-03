@@ -22,6 +22,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
     {
         private const float outer_scale = 3f;
 
+        public override Color4 ExplodeColour => new Color4(237, 171, 0, 255);
+
         protected virtual List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
 
         private HitCirclePiece bodyPiece;
@@ -31,9 +33,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         private Container bashInnerRingContainer;
         private Sprite bashInnerRing;
-
-        private Container explodeContainer;
-        private Container flashContainer;
 
         private int userHits;
         private bool ringsVisible;
@@ -45,11 +44,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             Children = new Drawable[]
             {
-                explodeContainer = new Container()
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(237, 171, 0, 255)
-                },
                 bashOuterRingContainer = new Container()
                 {
                     Anchor = Anchor.Centre,
@@ -92,30 +86,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                         }
                     }
                 },
-                flashContainer = new CircularContainer()
+                bodyPiece = new SpinnerPiece()
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-
-                    Size = new Vector2(141),
-                    Scale = new Vector2(outer_scale),
-
-                    Alpha = 0,
-
-                    Children = new[]
-                    {
-                        new Box()
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-
-                            RelativeSizeAxes = Axes.Both,
-
-                            Colour = Color4.White
-                        }
-                    }
+                    Kiai = spinner.Kiai
                 },
-                bodyPiece = new SpinnerPiece(),
             };
         }
 
@@ -153,14 +127,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     return;
 
                 userHits++;
-
-                ExplodePiece ep;
-                explodeContainer.Add(ep = new ExplodePiece());
-
-                ep.FadeIn();
-                ep.ScaleTo(3f, 200);
-                ep.FadeOut(200);
-                ep.Expire();
 
                 bashInnerRingContainer.ScaleTo(1f + (outer_scale - 1) * userHits / spinner.RequiredHits, 50);
 
@@ -207,11 +173,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
                     bashOuterRingContainer.FadeOut(flash_in);
                     bashInnerRingContainer.FadeOut(flash_in);
-
-                    explodeContainer.FadeOut(flash_in);
-
-                    flashContainer.FadeIn();
-                    flashContainer.FadeOut(flash_in);
 
                     Delay(flash_in * 2);
                     break;

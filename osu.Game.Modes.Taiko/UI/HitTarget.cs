@@ -2,6 +2,7 @@
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -18,48 +19,118 @@ namespace osu.Game.Modes.Taiko.UI
         private Sprite outer;
         private Sprite inner;
 
+        private Container flashContainer;
+        private Container innerFlash;
+        private Container outerFlash;
+
         public HitTarget()
         {
             AutoSizeAxes = Axes.Both;
 
             Children = new Drawable[]
             {
-                    new Box()
+                new Box()
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+
+                    Size = new Vector2(5, 106),
+
+                    Colour = Color4.Black
+                },
+                new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+
+                    Size = new Vector2(106),
+                    Scale = new Vector2(0.7f),
+
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-
-                        Size = new Vector2(5, 106),
-
-                        Colour = Color4.Black
-                    },
-                    new Container
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-
-                        Size = new Vector2(106),
-                        Scale = new Vector2(0.7f),
-
-                        Children = new[]
+                        outer = new Sprite()
                         {
-                            outer = new Sprite()
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
 
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                            inner = new Sprite()
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        inner = new Sprite()
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
 
-                                RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(0.7f)
+                            RelativeSizeAxes = Axes.Both,
+                            Size = new Vector2(0.7f)
+                        },
+                        flashContainer = new Container()
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+
+                            RelativeSizeAxes = Axes.Both,
+
+                            Alpha = 0,
+
+                            Children = new Drawable[]
+                            {
+                                outerFlash = new Container()
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+
+                                    Size = new Vector2(74.2f, 530),
+
+                                    Masking = true,
+                                    CornerRadius = 74.2f,
+
+                                    Alpha = 0.2f,
+
+                                    Children = new Drawable[]
+                                    {
+                                        outerFlash = new Container()
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+
+                                            RelativeSizeAxes = Axes.Both,
+
+                                            Masking = true,
+
+                                            Children = new[]
+                                            {
+                                                new Box()
+                                                {
+                                                    Alpha = 0,
+                                                    AlwaysPresent = true
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                innerFlash = new CircularContainer()
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+
+                                    RelativeSizeAxes = Axes.Both,
+
+                                    Masking = true,
+
+                                    Children = new[]
+                                    {
+                                        new Box()
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+
+                                            Colour = Color4.White,
+                                        }
+                                    },
+                                }
                             }
                         }
                     }
+                }
             };
         }
 
@@ -68,6 +139,26 @@ namespace osu.Game.Modes.Taiko.UI
         {
             outer.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer");
             inner.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
+        }
+
+        public void Flash(Color4 colour)
+        {
+            innerFlash.EdgeEffect = new EdgeEffect()
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = colour,
+                Radius = 20
+            };
+
+            outerFlash.EdgeEffect = new EdgeEffect()
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = colour,
+                Radius = 250
+            };
+
+            flashContainer.FadeIn(50);
+            flashContainer.Delay(50).FadeOut(100);
         }
     }
 }

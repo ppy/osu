@@ -56,8 +56,6 @@
     <Compile Include="Objects\Drawables\DrawableDrumRoll.cs" />
     <Compile Include="Objects\Drawables\Pieces\DrumRollBodyPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\DrumRollTrianglesPiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\ExplodePiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\FlashPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\HitCirclePiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />

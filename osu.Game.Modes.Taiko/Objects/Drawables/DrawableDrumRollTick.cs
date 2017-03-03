@@ -15,14 +15,13 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public class DrawableDrumRollTick : DrawableTaikoHitObject, IDrawableHitObjectWithProxiedApproach
+    public class DrawableDrumRollTick : DrawableTaikoHitObject
     {
-        public Drawable ProxiedLayer { get; set; }
+        public override Color4 ExplodeColour => new Color4(238, 170, 0, 255);
 
         protected virtual List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
 
         private Container bodyPiece;
-        private ExplodePiece explodePiece;
 
         private DrumRoll drumRoll;
         private DrumRollTick drumRollTick;
@@ -35,7 +34,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             RelativePositionAxes = Axes.X;
 
-            Size = new Vector2(16) * drumRollTick.Scale;
+            Size = new Vector2(12) * drumRollTick.Scale;
 
             Origin = Anchor.Centre;
             Anchor = Anchor.CentreLeft;
@@ -63,27 +62,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                             Colour = Color4.White,
                             Alpha = drumRollTick.FirstTick ? 1f : 0f,
                             AlwaysPresent = true
-                        },
-                    }
-                },
-                ProxiedLayer = new Container()
-                {
-                    RelativeSizeAxes = Axes.Both,
-
-                    Children = new[]
-                    {
-                        explodePiece = new ExplodePiece()
-                        {
-                            RelativeSizeAxes = Axes.None,
-                            Size = new Vector2(128),
-
-                            Colour = new Color4(238, 170, 0, 255),
                         }
                     }
                 }
             };
-
-            AlwaysPresent = true;
         }
 
         public override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollJudgementInfo() { MaxScore = TaikoScoreResult.Great };
@@ -135,10 +117,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 case ArmedState.Hit:
                     const double flash_in = 200;
 
-                    explodePiece.FadeIn();
-                    explodePiece.ScaleTo(3f, flash_in);
-                    explodePiece.FadeOut(flash_in);
-
                     bodyPiece.ScaleTo(1.5f, flash_in);
                     bodyPiece.FadeOut(flash_in);
 
@@ -149,8 +127,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         protected override void Update()
         {
-            if (State == ArmedState.Hit)
-                MoveToOffset(Time.Current - HitObject.StartTime + Judgement.TimeOffset);
         }
     }
 }

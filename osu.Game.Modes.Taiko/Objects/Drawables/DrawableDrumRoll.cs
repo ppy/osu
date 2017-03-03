@@ -30,6 +30,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
     public class DrawableDrumRoll : DrawableTaikoHitObject
     {
+        public override Color4 ExplodeColour => new Color4(238, 170, 0, 255);
+
         private DrumRoll drumRoll;
 
         private DrumRollBodyPiece body;

@@ -6,13 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Samples;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
     public class TaikoHitObject : HitObject
     {
-        public float Scale { get; set; } = 1;
-        public double PreEmpt { get; set; }
+        public double PreEmpt;
+        public float Scale = 1;
+        public bool Kiai;
 
         public TaikoHitType Type => ((Sample?.Type ?? SampleType.None) & (~SampleType.Finish & ~SampleType.Normal)) == 0 ? TaikoHitType.Don : TaikoHitType.Katsu;
         public bool IsFinisher => ((Sample?.Type ?? SampleType.None) & SampleType.Finish) > 0;
@@ -23,6 +25,12 @@ namespace osu.Game.Modes.Taiko.Objects
 
             Scale = 1f - 0.7f * -3f / 5 / 2;
             PreEmpt = 600 / beatmap.SliderVelocityAt(StartTime) * 1000;
+
+            ControlPoint overridePoint;
+            Kiai = beatmap.TimingPointAt(StartTime, out overridePoint).KiaiMode;
+
+            if (overridePoint != null)
+                Kiai |= overridePoint.KiaiMode;
         }
     }
 

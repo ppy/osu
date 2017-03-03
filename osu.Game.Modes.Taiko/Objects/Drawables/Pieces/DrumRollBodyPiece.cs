@@ -28,6 +28,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
         public override float CornerRadius => 32;
 
+        public bool Kiai;
+
         public DrumRollBodyPiece(float baseLength)
         {
             Size = new Vector2(baseLength + CornerRadius * 2, CornerRadius * 2);
@@ -38,13 +40,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
             Masking = true;
             BorderColour = Color4.White;
             BorderThickness = 4;
-
-            EdgeEffect = new EdgeEffect()
-            {
-                Colour = new Color4(yellow_colour.R, yellow_colour.G, yellow_colour.B, 0.75f),
-                Radius = 50,
-                Type = EdgeEffectType.Glow,
-            };
 
             Children = new Drawable[]
             {
@@ -61,6 +56,21 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                     Alpha = 0.05f,
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (Kiai)
+            {
+                EdgeEffect = new EdgeEffect()
+                {
+                    Colour = new Color4(yellow_colour.R, yellow_colour.G, yellow_colour.B, 0.75f),
+                    Radius = 50,
+                    Type = EdgeEffectType.Glow,
+                };
+            }
         }
     }
 }
