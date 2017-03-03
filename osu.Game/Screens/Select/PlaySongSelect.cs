@@ -28,7 +28,7 @@ using OpenTK.Input;
 using System.Collections.Generic;
 using osu.Framework.Threading;
 using osu.Game.Overlays;
-using osu.Game.Overlays.BeatmapOptions;
+using osu.Game.Screens.Select.Options;
 
 namespace osu.Game.Screens.Select
 {

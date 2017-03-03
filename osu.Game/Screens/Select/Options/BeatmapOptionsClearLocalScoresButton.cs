@@ -4,21 +4,21 @@
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.BeatmapOptions
+namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsEditButton : BeatmapOptionsButton
+    public class BeatmapOptionsClearLocalScoresButton : BeatmapOptionsButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
-            ButtonColour = colour.Yellow;
+            ButtonColour = colour.Purple;
         }
 
-        public BeatmapOptionsEditButton()
+        public BeatmapOptionsClearLocalScoresButton()
         {
-            Icon = FontAwesome.fa_pencil;
-            FirstLineText = @"Edit";
-            SecondLineText = @"Beatmap";
+            Icon = FontAwesome.fa_eraser;
+            FirstLineText = @"Clear";
+            SecondLineText = @"local scores";
         }
     }
 }
