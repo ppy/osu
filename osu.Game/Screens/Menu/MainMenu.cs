@@ -13,6 +13,9 @@ using osu.Game.Screens.Direct;
 using osu.Game.Screens.Multiplayer;
 using OpenTK;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Tournament;
+using osu.Framework.Input;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
@@ -96,6 +99,17 @@ namespace osu.Game.Screens.Menu
             buttons.State = MenuState.Exit;
             Content.FadeOut(3000);
             return base.OnExiting(next);
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (!args.Repeat && state.Keyboard.ControlPressed && state.Keyboard.ShiftPressed && args.Key == Key.D)
+            {
+                Push(new Drawings());
+                return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
     }
 }
