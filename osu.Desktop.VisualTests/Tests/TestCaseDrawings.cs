@@ -70,11 +70,13 @@ namespace osu.Desktop.VisualTests.Tests
                         {
                             FlagName = "RO",
                             FullName = "Romania",
+                            Acronym = "ROM"
                         },
                         new Team()
                         {
                             FlagName = "IT",
                             FullName = "Italy",
+                            Acronym = "PIZZA"
                         },
                         new Team()
                         {
