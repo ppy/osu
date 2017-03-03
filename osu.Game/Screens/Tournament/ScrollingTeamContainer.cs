@@ -163,6 +163,15 @@ namespace osu.Game.Screens.Tournament
             scrollState = ScrollState.Idle;
         }
 
+        public void AddTeams(IEnumerable<Team> teams)
+        {
+            if (teams == null)
+                return;
+
+            foreach (Team t in teams)
+                AddTeam(t);
+        }
+
         public void ClearTeams()
         {
             availableTeams.Clear();

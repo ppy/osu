@@ -24,6 +24,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -250,11 +251,18 @@ namespace osu.Game.Screens.Tournament
         {
             Action writeAction = () =>
             {
-                // Write to drawings_results
-                using (Stream stream = storage.GetStream(results_filename, FileAccess.Write, FileMode.Create))
-                using (StreamWriter sw = new StreamWriter(stream))
+                try
                 {
-                    sw.Write(text);
+                    // Write to drawings_results
+                    using (Stream stream = storage.GetStream(results_filename, FileAccess.Write, FileMode.Create))
+                    using (StreamWriter sw = new StreamWriter(stream))
+                    {
+                        sw.Write(text);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Failed to write results.");
                 }
             };
 
@@ -269,6 +277,8 @@ namespace osu.Game.Screens.Tournament
             teamsContainer.ClearTeams();
             allTeams.Clear();
 
+            List<Team> newTeams = new List<Team>();
+
             try
             {
                 using (Stream stream = storage.GetStream(teams_filename, FileAccess.Read, FileMode.Open))
@@ -276,32 +286,46 @@ namespace osu.Game.Screens.Tournament
                 {
                     while (sr.Peek() != -1)
                     {
-                        string line = sr.ReadLine();
+                        string line = sr.ReadLine().Trim();
+
+                        if (string.IsNullOrEmpty(line))
+                            continue;
 
                         string[] split = line.Split(':');
+
+                        if (split.Length < 2)
+                        {
+                            Logger.Log($"Invalid team definition: {line}. Expected \"flag_name : team_name : team_acronym\".");
+                            continue;
+                        }
+
                         string flagName = split[0].Trim();
-                        string name = split[1].Trim();
+                        string teamName = split[1].Trim();
 
-                        string acronym = name.Substring(0, Math.Min(3, name.Length));
-                        if (split.Length >= 3)
-                            acronym = split[2].Trim();
+                        string acronym = split.Length >= 3 ? split[2].Trim() : teamName;
+                        acronym = acronym.Substring(0, Math.Min(3, acronym.Length));
 
-                        if (groupsContainer.ContainsTeam(name))
+                        if (groupsContainer.ContainsTeam(teamName))
                             continue;
 
                         Team t = new Team()
                         {
                             FlagName = flagName,
-                            FullName = name,
+                            FullName = teamName,
                             Acronym = acronym
                         };
 
-                        allTeams.Add(t);
-                        teamsContainer.AddTeam(t);
+                        newTeams.Add(t);
                     }
                 }
+
+                allTeams = newTeams;
+                teamsContainer.AddTeams(allTeams);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to read teams.");
+            }
         }
 
         private void reset(bool loadLastResults = false)
@@ -310,9 +334,9 @@ namespace osu.Game.Screens.Tournament
 
             reloadTeams();
 
-            try
+            if (loadLastResults)
             {
-                if (loadLastResults)
+                try
                 {
                     // Read from drawings_results
                     using (Stream stream = storage.GetStream(results_filename, FileAccess.Read, FileMode.Open))
@@ -320,7 +344,7 @@ namespace osu.Game.Screens.Tournament
                     {
                         while (sr.Peek() != -1)
                         {
-                            string line = sr.ReadLine();
+                            string line = sr.ReadLine().Trim();
 
                             if (string.IsNullOrEmpty(line))
                                 continue;
@@ -338,13 +362,15 @@ namespace osu.Game.Screens.Tournament
                         }
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    writeResults(string.Empty);
+                    Logger.Error(ex, "Failed to read last drawings results.");
                 }
+
             }
-            catch
+            else
             {
+                writeResults(string.Empty);
             }
         }
     }
