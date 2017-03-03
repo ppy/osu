@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
@@ -48,15 +50,14 @@ namespace osu.Game.Screens.Tournament.Components
             {
                 RelativeSizeAxes = Axes.Both,
 
-                PeriodOffset = offset,
-                Period = 2 * (float)Math.PI,
-                CycleTime = RNG.Next(10000, 12000)
+                Offset = offset,
+                CycleTime = RNG.Next(10000, 12000),
             };
 
             allLines.Add(newLine);
             Add(newLine);
 
-            offset += (float)Math.PI / 6f;
+            offset += RNG.Next(100, 5000);
         }
 
         private void removeLine()
@@ -68,140 +69,65 @@ namespace osu.Game.Screens.Tournament.Components
             allLines.Remove(allLines.First());
         }
 
-        class VisualiserLine : Drawable
+        class VisualiserLine : Container
         {
             /// <summary>
-            /// Width of the line strokes.
+            /// Time offset.
             /// </summary>
-            public float StrokeWidth = 1f;
+            public float Offset;
 
-            /// <summary>
-            /// Height of the line strokes.
-            /// </summary>
-            public float StrokeHeight = 1f;
-
-            /// <summary>
-            /// Separation between strokes in the line.
-            /// </summary>
-            public float Separation = 0;
-
-            /// <summary>
-            /// Period offset of the line.
-            /// </summary>
-            public float PeriodOffset;
-
-            /// <summary>
-            /// Period of the line.
-            /// </summary>
-            public float Period;
-
-            /// <summary>
-            /// The time to cycle one period of the line in milliseconds.
-            /// </summary>
             public double CycleTime;
 
-            private Shader shader;
+            private float leftPos => -(float)((Time.Current + Offset) / CycleTime) + expiredCount;
 
-            private VisualiserLineDrawNodeSharedData visualiserLineDrawNodeSharedData => new VisualiserLineDrawNodeSharedData();
+            private Texture texture;
 
-            private float runningPeriodOffset;
-
-            protected override void Update()
-            {
-                base.Update();
-
-                if (CycleTime != 0)
-                {
-                    runningPeriodOffset += (float)(Time.Elapsed / CycleTime) * Period;
-                    Invalidate(Invalidation.DrawNode, shallPropagate: false);
-                }
-            }
-
-            protected override DrawNode CreateDrawNode() => new VisualiserLineDrawNode();
+            private int expiredCount = 0;
 
             [BackgroundDependencyLoader]
-            private void load(ShaderManager shaders)
+            private void load(TextureStore textures)
             {
-                shader = shaders?.Load(VertexShaderDescriptor.Colour, @"DottedLine");
+                texture = textures.Get("Drawings/visualiser-line");
             }
 
-            protected override void ApplyDrawNode(DrawNode node)
+            protected override void UpdateAfterChildren()
             {
-                base.ApplyDrawNode(node);
+                base.UpdateAfterChildren();
 
-                VisualiserLineDrawNode vNode = node as VisualiserLineDrawNode;
-                vNode.Shader = shader;
-                vNode.Shared = visualiserLineDrawNodeSharedData;
-                vNode.ScreenSpaceDrawQuad = ScreenSpaceDrawQuad;
+                while (Children.Count() < 3)
+                    addLine();
 
-                vNode.Period = Period;
-                vNode.PeriodOffset = PeriodOffset + runningPeriodOffset;
-                vNode.StrokeWidth = StrokeWidth;
-                vNode.StrokeHeight = StrokeHeight;
-                vNode.Separation = Separation;
-            }
+                float pos = leftPos;
 
-            class VisualiserLineDrawNodeSharedData
-            {
-                public QuadBatch<Vertex2D> QuadBatch = new QuadBatch<Vertex2D>(1, 1);
-            }
-
-            class VisualiserLineDrawNode : DrawNode
-            {
-                public Shader Shader;
-                public VisualiserLineDrawNodeSharedData Shared;
-
-                public Quad ScreenSpaceDrawQuad;
-
-                public float Period;
-                public float PeriodOffset;
-
-                public float StrokeWidth;
-                public float StrokeHeight;
-                public float Separation;
-
-                public override void Draw(Action<TexturedVertex2D> vertexAction)
+                foreach (var c in Children)
                 {
-                    base.Draw(vertexAction);
-
-                    Shader.Bind();
-
-                    Shader.GetUniform<Vector2>(@"g_Position").Value = ScreenSpaceDrawQuad.TopLeft;
-                    Shader.GetUniform<Vector2>(@"g_Size").Value = ScreenSpaceDrawQuad.Size;
-
-                    Shader.GetUniform<float>(@"g_Period").Value = Period;
-                    Shader.GetUniform<float>(@"g_PeriodOffset").Value = PeriodOffset;
-
-                    Shader.GetUniform<float>(@"g_StrokeWidth").Value = StrokeWidth;
-                    Shader.GetUniform<float>(@"g_StrokeHeight").Value = StrokeHeight;
-                    Shader.GetUniform<float>(@"g_Separation").Value = Separation;
-
-                    Shared.QuadBatch.Add(new Vertex2D()
+                    if (c.Position.X < -1)
                     {
-                        Position = ScreenSpaceDrawQuad.BottomLeft,
-                        Colour = DrawInfo.Colour.BottomLeft.Linear
-                    });
+                        c.ClearTransforms();
+                        c.Expire();
+                        expiredCount++;
+                    }
+                    else
+                        c.MoveToX(pos, 100);
 
-                    Shared.QuadBatch.Add(new Vertex2D()
-                    {
-                        Position = ScreenSpaceDrawQuad.BottomRight,
-                        Colour = DrawInfo.Colour.BottomRight.Linear
-                    });
-
-                    Shared.QuadBatch.Add(new Vertex2D()
-                    {
-                        Position = ScreenSpaceDrawQuad.TopRight,
-                        Colour = DrawInfo.Colour.TopRight.Linear
-                    });
-
-                    Shared.QuadBatch.Add(new Vertex2D()
-                    {
-                        Position = ScreenSpaceDrawQuad.TopLeft,
-                        Colour = DrawInfo.Colour.TopLeft.Linear
-                    });
-
-                    Shader.Unbind();
+                    pos += 1;
                 }
+            }
+
+            private void addLine()
+            {
+                Add(new Sprite()
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+
+                    RelativePositionAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both,
+
+                    Texture = texture,
+
+                    X = leftPos + 1
+                });
             }
         }
     }
