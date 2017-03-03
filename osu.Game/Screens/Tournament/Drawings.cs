@@ -30,8 +30,8 @@ namespace osu.Game.Screens.Tournament
 {
     public class Drawings : OsuScreen
     {
+        public const string TEAMS_FILENAME = "drawings.txt";
         private const string results_filename = "drawings_results.txt";
-        private const string teams_filename = "drawings.txt";
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
         internal override bool ShowOverlays => false;
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Tournament
         {
             this.storage = storage;
 
-            if (!storage.Exists(teams_filename))
+            if (!storage.Exists(TEAMS_FILENAME))
             {
                 Exit();
                 return;
@@ -281,7 +281,7 @@ namespace osu.Game.Screens.Tournament
 
             try
             {
-                using (Stream stream = storage.GetStream(teams_filename, FileAccess.Read, FileMode.Open))
+                using (Stream stream = storage.GetStream(TEAMS_FILENAME, FileAccess.Read, FileMode.Open))
                 using (StreamReader sr = new StreamReader(stream))
                 {
                     while (sr.Peek() != -1)
