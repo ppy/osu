@@ -21,6 +21,7 @@ namespace osu.Game.Screens.Select.Options
         private Box background, flash;
         private TextAwesome iconText;
         private OsuSpriteText firstLine, secondLine;
+        private Container box;
 
         public Color4 ButtonColour
         {
@@ -67,6 +68,8 @@ namespace osu.Game.Screens.Select.Options
             return base.OnClick(state);
         }
 
+        public override bool Contains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
+
         public BeatmapOptionsButton()
         {
             Width = width;
@@ -74,7 +77,7 @@ namespace osu.Game.Screens.Select.Options
 
             Children = new Drawable[]
             {
-                new Container
+                box = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
