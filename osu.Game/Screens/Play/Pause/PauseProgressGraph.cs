@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Overlays.Pause
+namespace osu.Game.Screens.Play.Pause
 {
     public class PauseProgressGraph : Container
     {
