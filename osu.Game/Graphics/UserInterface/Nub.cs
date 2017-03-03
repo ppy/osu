@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -19,14 +19,14 @@ namespace osu.Game.Graphics.UserInterface
         public const float EXPANDED_SIZE = 40;
 
         private Box fill;
+        private int nubType;
 
         const float border_width = 3;
         private Color4 glowingColour, idleColour;
 
-        public Nub()
+        public Nub(int type = 0)
         {
-            Size = new Vector2(COLLAPSED_SIZE, 12);
-
+            nubType = type;
             BorderColour = Color4.White;
             BorderThickness = border_width;
 
@@ -39,23 +39,44 @@ namespace osu.Game.Graphics.UserInterface
                     AlwaysPresent = true,
                 },
             };
+
+            if (type == 0) Size = new Vector2(COLLAPSED_SIZE, 12);
+            if (type == 1) Size = new Vector2(12, 12);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Colour = idleColour = colours.Pink;
-            glowingColour = colours.PinkLighter;
-
-            EdgeEffect = new EdgeEffect
+            if (nubType == 0)
             {
-                Colour = colours.PinkDarker,
-                Type = EdgeEffectType.Glow,
-                Radius = 10,
-                Roundness = 8,
-            };
+                Colour = idleColour = colours.Pink;
+                glowingColour = colours.PinkLighter;
 
-            FadeEdgeEffectTo(0);
+                EdgeEffect = new EdgeEffect
+                {
+                    Colour = colours.PinkDarker,
+                    Type = EdgeEffectType.Glow,
+                    Radius = 10,
+                    Roundness = 8,
+                };
+
+                FadeEdgeEffectTo(0);
+            }
+            else if (nubType == 1)
+            {
+                Colour = idleColour = Color4.White;
+                glowingColour = colours.YellowLighter;
+
+                EdgeEffect = new EdgeEffect
+                {
+                    Colour = colours.YellowDarker,
+                    Type = EdgeEffectType.Glow,
+                    Radius = 6,
+                    Roundness = 2,
+                };
+
+                FadeEdgeEffectTo(0);
+            }
         }
 
         public bool Glowing
