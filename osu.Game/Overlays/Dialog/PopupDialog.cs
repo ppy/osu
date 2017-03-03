@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -211,7 +212,7 @@ namespace osu.Game.Overlays.Dialog
                                         },
                                     },
                                 },
-                                header = new SpriteText
+                                header = new OsuSpriteText
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
@@ -219,7 +220,7 @@ namespace osu.Game.Overlays.Dialog
                                     TextSize = 25,
                                     Shadow = true,
                                 },
-                                body = new SpriteText
+                                body = new OsuSpriteText
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
