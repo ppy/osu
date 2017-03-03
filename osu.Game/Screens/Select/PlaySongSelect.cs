@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using osu.Framework.Threading;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays;
+using osu.Game.Screens.Select.Options;
 
 namespace osu.Game.Screens.Select
 {
@@ -55,6 +56,7 @@ namespace osu.Game.Screens.Select
 
         private List<BeatmapGroup> beatmapGroups;
 
+        private BeatmapOptionsOverlay beatmapOptions;
         private Footer footer;
 
         OsuScreen player;
@@ -138,6 +140,17 @@ namespace osu.Game.Screens.Select
                         Bottom = 50,
                     },
                 },
+                beatmapOptions = new BeatmapOptionsOverlay
+                {
+                    OnRemoveFromUnplayed = null,
+                    OnClearLocalScores = null,
+                    OnEdit = null,
+                    OnDelete = promptDelete,
+                    Margin = new MarginPadding
+                    {
+                        Bottom = 50,
+                    },
+                },
                 footer = new Footer
                 {
                     OnBack = Exit,
@@ -157,7 +170,7 @@ namespace osu.Game.Screens.Select
 
             footer.AddButton(@"mods", colours.Yellow, modSelect.ToggleVisibility);
             footer.AddButton(@"random", colours.Green, carousel.SelectRandom);
-            footer.AddButton(@"options", colours.Blue, null);
+            footer.AddButton(@"options", colours.Blue, beatmapOptions.ToggleVisibility);
 
             if (osu != null)
                 playMode.BindTo(osu.PlayMode);
@@ -422,6 +435,12 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        private void promptDelete()
+        {
+            if (Beatmap != null)
+                dialogOverlay?.Push(new BeatmapDeleteDialog(Beatmap));
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             switch (args.Key)
@@ -432,9 +451,7 @@ namespace osu.Game.Screens.Select
                 case Key.Delete:
                     if (state.Keyboard.ShiftPressed)
                     {
-                        if (Beatmap != null)
-                            dialogOverlay?.Push(new BeatmapDeleteDialog(Beatmap));
-
+                        promptDelete();
                         return true;
                     }
                     break;
