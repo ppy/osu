@@ -19,11 +19,16 @@ using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 
 namespace osu.Game.Screens.Tournament
 {
     public class Drawings : OsuScreen
     {
+        private const string results_filename = "drawings_results.txt";
+        private const string teams_filename = "drawings.txt";
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
         internal override bool ShowOverlays => false;
 
@@ -37,16 +42,20 @@ namespace osu.Game.Screens.Tournament
         private Task lastWriteOp;
         private Task writeOp;
 
+        private Storage storage;
+
         [BackgroundDependencyLoader]
-        private void load(Framework.Game game, TextureStore textures)
+        private void load(Framework.Game game, TextureStore textures, Storage storage)
         {
-            if (!File.Exists("drawings.txt"))
+            this.storage = storage;
+
+            if (!storage.Exists(teams_filename))
             {
                 Exit();
                 return;
             }
 
-            drawingsConfig = new DrawingsConfigManager(Game.Host.Storage);
+            drawingsConfig = new DrawingsConfigManager(storage);
 
             Container visualiserContainer;
             SpriteText st;
@@ -256,7 +265,11 @@ namespace osu.Game.Screens.Tournament
                 // Write to drawings_results
                 try
                 {
-                    File.WriteAllText("drawings_results.txt", text);
+                    using (Stream stream = storage.GetStream(results_filename, FileAccess.Write, FileMode.Create))
+                    using (StreamWriter sw = new StreamWriter(stream))
+                    {
+                        sw.Write(text);
+                    }
                 }
                 catch
                 {
@@ -271,28 +284,34 @@ namespace osu.Game.Screens.Tournament
 
             try
             {
-                foreach (string s in File.ReadAllLines("drawings.txt"))
+                using (Stream stream = storage.GetStream(teams_filename, FileAccess.Read, FileMode.Open))
+                using (StreamReader sr = new StreamReader(stream))
                 {
-                    string[] split = s.Split(':');
-                    string flagName = split[0].Trim();
-                    string name = split[1].Trim();
-
-                    string acronym = name.Substring(0, Math.Min(3, name.Length));
-                    if (split.Length >= 3)
-                        acronym = split[2].Trim();
-
-                    if (groupsContainer.ContainsTeam(name))
-                        continue;
-
-                    Team t = new Team()
+                    while (sr.Peek() != -1)
                     {
-                        FlagName = flagName,
-                        FullName = name,
-                        Acronym = acronym
-                    };
+                        string line = sr.ReadLine();
 
-                    allTeams.Add(t);
-                    teamsContainer.AddTeam(t);
+                        string[] split = line.Split(':');
+                        string flagName = split[0].Trim();
+                        string name = split[1].Trim();
+
+                        string acronym = name.Substring(0, Math.Min(3, name.Length));
+                        if (split.Length >= 3)
+                            acronym = split[2].Trim();
+
+                        if (groupsContainer.ContainsTeam(name))
+                            continue;
+
+                        Team t = new Team()
+                        {
+                            FlagName = flagName,
+                            FullName = name,
+                            Acronym = acronym
+                        };
+
+                        allTeams.Add(t);
+                        teamsContainer.AddTeam(t);
+                    }
                 }
             }
             catch { }
@@ -309,7 +328,8 @@ namespace osu.Game.Screens.Tournament
                 if (loadLastResults)
                 {
                     // Read from drawings_results
-                    using (StreamReader sr = new StreamReader(File.OpenRead("drawings_results.txt")))
+                    using (Stream stream = storage.GetStream(results_filename, FileAccess.Read, FileMode.Open))
+                    using (StreamReader sr = new StreamReader(stream))
                     {
                         while (sr.Peek() != -1)
                         {
