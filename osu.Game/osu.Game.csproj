@@ -216,8 +216,10 @@
     <Compile Include="Screens\Tournament\Drawings.cs" />
     <Compile Include="Screens\Tournament\Group.cs" />
     <Compile Include="Screens\Tournament\GroupsContainer.cs" />
+    <Compile Include="Screens\Tournament\ITeamList.cs" />
     <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
     <Compile Include="Screens\Tournament\Team.cs" />
+    <Compile Include="Screens\Tournament\FileTeamList.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />

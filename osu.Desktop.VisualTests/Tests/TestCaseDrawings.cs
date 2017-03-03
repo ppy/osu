@@ -19,31 +19,78 @@ namespace osu.Desktop.VisualTests.Tests
         [BackgroundDependencyLoader]
         private void load(Storage storage)
         {
-            string[] testTeams =
-            {
-                "GB:United Kingdom:UK",
-                "FR:France:FRA",
-                "CN:China:CHN",
-                "AU:Australia:AUS",
-                "JP:Japan:JPN",
-                "RO:Romania",
-                "IT:Italy",
-                "VE:Venezuela:VNZ"
-            };
-
-            using (Stream stream = storage.GetStream(Drawings.TEAMS_FILENAME, FileAccess.Write, FileMode.Create))
-            using (StreamWriter sw = new StreamWriter(stream))
-            {
-                foreach (string line in testTeams)
-                    sw.WriteLine(line);
-            }
         }
 
         public override void Reset()
         {
             base.Reset();
 
-            Add(new Drawings());
+            Add(new Drawings(new TestTeamList()));
+        }
+
+        class TestTeamList : ITeamList
+        {
+            public IEnumerable<Team> Teams
+            {
+                get
+                {
+                    return new Team[]
+                    {
+                        new Team()
+                        {
+                            FlagName = "GB",
+                            FullName = "United Kingdom",
+                            Acronym = "UK"
+                        },
+                        new Team()
+                        {
+                            FlagName = "FR",
+                            FullName = "France",
+                            Acronym = "FRA"
+                        },
+                        new Team()
+                        {
+                            FlagName = "CN",
+                            FullName = "China",
+                            Acronym = "CHN"
+                        },
+                        new Team()
+                        {
+                            FlagName = "AU",
+                            FullName = "Australia",
+                            Acronym = "AUS"
+                        },
+                        new Team()
+                        {
+                            FlagName = "JP",
+                            FullName = "Japan",
+                            Acronym = "JPN"
+                        },
+                        new Team()
+                        {
+                            FlagName = "RO",
+                            FullName = "Romania",
+                        },
+                        new Team()
+                        {
+                            FlagName = "IT",
+                            FullName = "Italy",
+                        },
+                        new Team()
+                        {
+                            FlagName = "VE",
+                            FullName = "Venezuela",
+                            Acronym = "VNZ"
+                        },
+                        new Team()
+                        {
+                            FlagName = "US",
+                            FullName = "United States of America",
+                            Acronym = "USA"
+                        }
+                    };
+                }
+            }
         }
     }
 }
