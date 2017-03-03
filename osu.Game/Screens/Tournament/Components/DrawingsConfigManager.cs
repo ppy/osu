@@ -14,10 +14,8 @@ namespace osu.Game.Screens.Tournament.Components
 
         protected override void InitialiseDefaults()
         {
-#pragma warning disable CS0612 // Type or member is obsolete
             Set(DrawingsConfig.Groups, 8, 1, 8);
             Set(DrawingsConfig.TeamsPerGroup, 8, 1, 8);
-#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         public DrawingsConfigManager(Storage storage)
