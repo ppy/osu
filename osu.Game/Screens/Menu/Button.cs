@@ -259,7 +259,7 @@ namespace osu.Game.Screens.Menu
         {
             if (args.Repeat) return false;
 
-            if (triggerKey == args.Key && triggerKey != Key.Unknown)
+            if (triggerKey == args.Key && triggerKey != Key.Unknown && !(state.Keyboard.ControlPressed || state.Keyboard.ShiftPressed || state.Keyboard.AltPressed))
             {
                 trigger();
                 return true;
