@@ -130,22 +130,22 @@ namespace osu.Game.Screens.Select
                         Right = 20,
                     },
                 },
-                modSelect = new ModSelectOverlay
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
-                    Margin = new MarginPadding
-                    {
-                        Bottom = 50,
-                    },
-                },
                 beatmapOptions = new BeatmapOptionsOverlay
                 {
                     OnRemoveFromUnplayed = null,
                     OnClearLocalScores = null,
                     OnEdit = null,
                     OnDelete = promptDelete,
+                    Margin = new MarginPadding
+                    {
+                        Bottom = 50,
+                    },
+                },
+                modSelect = new ModSelectOverlay
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomCentre,
                     Margin = new MarginPadding
                     {
                         Bottom = 50,
