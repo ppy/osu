@@ -1,30 +1,24 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.MathUtils;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Tournament.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using osu.Framework.Input;
-using System.IO;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
-using osu.Framework.Platform;
-using osu.Framework.Logging;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -48,19 +42,17 @@ namespace osu.Game.Screens.Tournament
 
         private Storage storage;
 
-        private ITeamList teamList;
-
-        public Drawings(ITeamList teamList)
-        {
-            this.teamList = teamList;
-        }
+        public ITeamList TeamList;
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, Storage storage)
         {
             this.storage = storage;
 
-            if (teamList.Teams.Count() == 0)
+            if (TeamList == null)
+                TeamList = new FileTeamList(storage);
+
+            if (!TeamList.Teams.Any())
             {
                 Exit();
                 return;
@@ -70,17 +62,17 @@ namespace osu.Game.Screens.Tournament
 
             Children = new Drawable[]
             {
-                new Box()
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = new Color4(77, 77, 77, 255)
                 },
-                new Sprite()
+                new Sprite
                 {
                     FillMode = FillMode.Fill,
                     Texture = textures.Get(@"Backgrounds/Drawings/background.png")
                 },
-                new FillFlowContainer()
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Right,
@@ -88,7 +80,7 @@ namespace osu.Game.Screens.Tournament
                     Children = new Drawable[]
                     {
                         // Main container
-                        new Container()
+                        new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.85f,
@@ -96,7 +88,7 @@ namespace osu.Game.Screens.Tournament
                             Children = new Drawable[]
                             {
                                 // Visualiser
-                                new VisualiserContainer()
+                                new VisualiserContainer
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -117,14 +109,14 @@ namespace osu.Game.Screens.Tournament
                                     RelativeSizeAxes = Axes.Y,
                                     AutoSizeAxes = Axes.X,
 
-                                    Padding = new MarginPadding()
+                                    Padding = new MarginPadding
                                     {
                                         Top = 35f,
                                         Bottom = 35f
                                     }
                                 },
                                 // Scrolling teams
-                                teamsContainer = new ScrollingTeamContainer()
+                                teamsContainer = new ScrollingTeamContainer
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -132,7 +124,7 @@ namespace osu.Game.Screens.Tournament
                                     RelativeSizeAxes = Axes.X,
                                 },
                                 // Scrolling team name
-                                fullTeamNameText = new SpriteText()
+                                fullTeamNameText = new SpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.TopCentre,
@@ -147,19 +139,19 @@ namespace osu.Game.Screens.Tournament
                             }
                         },
                         // Control panel container
-                        new Container()
+                        new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.15f,
 
                             Children = new Drawable[]
                             {
-                                new Box()
+                                new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = new Color4(54, 54, 54, 255)
                                 },
-                                new SpriteText()
+                                new SpriteText
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
@@ -168,7 +160,7 @@ namespace osu.Game.Screens.Tournament
                                     TextSize = 22f,
                                     Font = "Exo2.0-Boldd"
                                 },
-                                new FillFlowContainer()
+                                new FillFlowContainer
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
@@ -184,21 +176,21 @@ namespace osu.Game.Screens.Tournament
 
                                     Children = new Drawable[]
                                     {
-                                        new OsuButton()
+                                        new OsuButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Begin random",
                                             Action = teamsContainer.StartScrolling,
                                         },
-                                        new OsuButton()
+                                        new OsuButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Stop random",
                                             Action = teamsContainer.StopScrolling,
                                         },
-                                        new OsuButton()
+                                        new OsuButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
@@ -207,7 +199,7 @@ namespace osu.Game.Screens.Tournament
                                         }
                                     }
                                 },
-                                new FillFlowContainer()
+                                new FillFlowContainer
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomCentre,
@@ -223,7 +215,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Children = new Drawable[]
                                     {
-                                        new OsuButton()
+                                        new OsuButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
@@ -284,9 +276,7 @@ namespace osu.Game.Screens.Tournament
             teamsContainer.ClearTeams();
             allTeams.Clear();
 
-            List<Team> newTeams = teamList.Teams.ToList();
-
-            foreach (Team t in newTeams)
+            foreach (Team t in TeamList.Teams)
             {
                 if (groupsContainer.ContainsTeam(t.FullName))
                     continue;

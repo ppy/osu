@@ -1,13 +1,11 @@
-﻿using osu.Framework.Allocation;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
+
+using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Framework.Screens.Testing;
 using osu.Game.Screens.Tournament;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -25,74 +23,71 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            Add(new Drawings(new TestTeamList()));
+            Add(new Drawings
+            {
+                TeamList = new TestTeamList(),
+            });
         }
 
         class TestTeamList : ITeamList
         {
-            public IEnumerable<Team> Teams
+            public IEnumerable<Team> Teams { get; } = new[]
             {
-                get
+                new Team
                 {
-                    return new Team[]
-                    {
-                        new Team()
-                        {
-                            FlagName = "GB",
-                            FullName = "United Kingdom",
-                            Acronym = "UK"
-                        },
-                        new Team()
-                        {
-                            FlagName = "FR",
-                            FullName = "France",
-                            Acronym = "FRA"
-                        },
-                        new Team()
-                        {
-                            FlagName = "CN",
-                            FullName = "China",
-                            Acronym = "CHN"
-                        },
-                        new Team()
-                        {
-                            FlagName = "AU",
-                            FullName = "Australia",
-                            Acronym = "AUS"
-                        },
-                        new Team()
-                        {
-                            FlagName = "JP",
-                            FullName = "Japan",
-                            Acronym = "JPN"
-                        },
-                        new Team()
-                        {
-                            FlagName = "RO",
-                            FullName = "Romania",
-                            Acronym = "ROM"
-                        },
-                        new Team()
-                        {
-                            FlagName = "IT",
-                            FullName = "Italy",
-                            Acronym = "PIZZA"
-                        },
-                        new Team()
-                        {
-                            FlagName = "VE",
-                            FullName = "Venezuela",
-                            Acronym = "VNZ"
-                        },
-                        new Team()
-                        {
-                            FlagName = "US",
-                            FullName = "United States of America",
-                            Acronym = "USA"
-                        }
-                    };
-                }
-            }
+                    FlagName = "GB",
+                    FullName = "United Kingdom",
+                    Acronym = "UK"
+                },
+                new Team
+                {
+                    FlagName = "FR",
+                    FullName = "France",
+                    Acronym = "FRA"
+                },
+                new Team
+                {
+                    FlagName = "CN",
+                    FullName = "China",
+                    Acronym = "CHN"
+                },
+                new Team
+                {
+                    FlagName = "AU",
+                    FullName = "Australia",
+                    Acronym = "AUS"
+                },
+                new Team
+                {
+                    FlagName = "JP",
+                    FullName = "Japan",
+                    Acronym = "JPN"
+                },
+                new Team
+                {
+                    FlagName = "RO",
+                    FullName = "Romania",
+                    Acronym = "ROM"
+                },
+                new Team
+                {
+                    FlagName = "IT",
+                    FullName = "Italy",
+                    Acronym = "PIZZA"
+                },
+                new Team
+                {
+                    FlagName = "VE",
+                    FullName = "Venezuela",
+                    Acronym = "VNZ"
+                },
+                new Team
+                {
+                    FlagName = "US",
+                    FullName = "United States of America",
+                    Acronym = "USA"
+                },
+            };
         }
     }
 }

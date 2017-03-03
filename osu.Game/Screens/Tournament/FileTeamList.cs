@@ -6,9 +6,6 @@ using osu.Framework.Platform;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -27,7 +24,7 @@ namespace osu.Game.Screens.Tournament
         {
             get
             {
-                List<Team> teams = new List<Team>();
+                var teams = new List<Team>();
 
                 try
                 {
