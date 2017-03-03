@@ -128,6 +128,8 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
+            base.PopIn();
+
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Visible;
 
@@ -137,6 +139,8 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
+            base.PopOut();
+
             contentContainer.FadeOut(DISAPPEAR_DURATION, EasingTypes.In);
             contentContainer.MoveToY(DrawHeight * 2f, DISAPPEAR_DURATION, EasingTypes.In);
 
