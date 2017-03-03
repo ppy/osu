@@ -2,19 +2,20 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;
-using OpenTK.Input;
-using OpenTK.Graphics;
-using osu.Game.Graphics;
-using osu.Framework.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Play.Pause;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 
-namespace osu.Game.Overlays.Pause
+namespace osu.Game.Screens.Play
 {
     public class PauseOverlay : OverlayContainer
     {

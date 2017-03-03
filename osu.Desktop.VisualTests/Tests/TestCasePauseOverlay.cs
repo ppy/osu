@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Logging;
-using osu.Game.Overlays.Pause;
 using osu.Framework.Screens.Testing;
+using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {

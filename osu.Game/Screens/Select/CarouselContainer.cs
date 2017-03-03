@@ -192,8 +192,10 @@ namespace osu.Game.Screens.Select
             ScrollTo(selectedY, animated);
         }
 
-        public void Sort(FilterControl.SortMode mode) {
-            switch (mode) { 
+        public void Sort(FilterControl.SortMode mode)
+        {
+            switch (mode)
+            {
                 case FilterControl.SortMode.Artist:
                     groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist));
                     break;
@@ -206,15 +208,17 @@ namespace osu.Game.Screens.Select
                 case FilterControl.SortMode.Difficulty:
                     groups.Sort((x, y) =>
                     {
-                        float xAverage=0, yAverage=0;
-                        int counter=0;
-                        foreach (BeatmapInfo set in x.BeatmapSet.Beatmaps) {
+                        float xAverage = 0, yAverage = 0;
+                        int counter = 0;
+                        foreach (BeatmapInfo set in x.BeatmapSet.Beatmaps)
+                        {
                             xAverage += set.StarDifficulty;
                             counter++;
                         }
                         xAverage /= counter;
                         counter = 0;
-                        foreach (BeatmapInfo set in y.BeatmapSet.Beatmaps) {
+                        foreach (BeatmapInfo set in y.BeatmapSet.Beatmaps)
+                        {
                             yAverage += set.StarDifficulty;
                             counter++;
                         }
@@ -241,7 +245,7 @@ namespace osu.Game.Screens.Select
                     scrollableContent.Add(panel);
                 }
             }
-            SelectGroup(groups.FirstOrDefault(), groups.First().BeatmapPanels.FirstOrDefault());
+
         }
 
         private static float offsetX(float dist, float halfHeight)
@@ -344,7 +348,7 @@ namespace osu.Game.Screens.Select
 
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
-            if (!skipDifficulties)
+            if (!skipDifficulties && SelectedGroup != null)
             {
                 int i = SelectedGroup.BeatmapPanels.IndexOf(SelectedPanel) + direction;
 

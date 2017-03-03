@@ -14,6 +14,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override Drawable GetDrawableCharacter(char c) => new PasswordMaskChar(CalculatedTextSize);
 
+        public override bool AllowClipboardExport => false;
+
         public class PasswordMaskChar : Container
         {
             private CircularContainer circle;
