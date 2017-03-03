@@ -62,15 +62,15 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             MoveToX((float)((tho.StartTime - time) / tho.PreEmpt));
         }
 
-        bool auto = false;
+        protected virtual void UpdateAuto()
+        {
+            if (!Judgement.Result.HasValue && Time.Current >= HitObject.EndTime)
+                UpdateJudgement(true);
+        }
 
         protected override void Update()
         {
-            if (!auto && Time.Current >= HitObject.EndTime)
-            {
-                auto = true;
-                UpdateJudgement(true);
-            }
+            UpdateAuto();
 
             MoveToOffset(Time.Current);
         }

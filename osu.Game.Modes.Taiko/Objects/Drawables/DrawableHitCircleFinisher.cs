@@ -86,5 +86,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             if (hitOffset < 30)
                 tji.SecondHit = true;
         }
+
+        protected override void UpdateAuto()
+        {
+            base.UpdateAuto();
+
+            TaikoJudgementInfo tji = Judgement as TaikoJudgementInfo;
+            if (!tji.SecondHit && Time.Current >= HitObject.EndTime)
+                base.UpdateAuto();
+        }
     }
 }

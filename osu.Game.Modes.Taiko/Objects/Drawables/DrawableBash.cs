@@ -159,7 +159,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             base.UpdateState(state);
 
-            const double flash_in = 200;
+            const double scale_out = 150;
 
             switch (State)
             {
@@ -168,20 +168,32 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 case ArmedState.Miss:
                     break;
                 case ArmedState.Hit:
-                    bodyPiece.ScaleTo(1.5f, flash_in);
-                    bodyPiece.FadeOut(flash_in);
+                    bodyPiece.ScaleTo(1.5f, scale_out);
+                    bodyPiece.FadeOut(scale_out);
 
-                    bashOuterRingContainer.FadeOut(flash_in);
-                    bashInnerRingContainer.FadeOut(flash_in);
-
-                    Delay(flash_in * 2);
+                    bashOuterRingContainer.FadeOut(scale_out);
+                    bashInnerRingContainer.FadeOut(scale_out);
                     break;
+            }
+        }
+
+        double lastAutoHitTime;
+        protected override void UpdateAuto()
+        {
+            Bash spinner = HitObject as Bash;
+            if (spinner.RequiredHits > 0 && (Time.Current - lastAutoHitTime) >= HitObject.Duration / spinner.RequiredHits)
+            {
+                UpdateJudgement(true);
+
+                lastAutoHitTime += HitObject.Duration / spinner.RequiredHits;
             }
         }
 
         protected override void Update()
         {
             MoveToOffset(Math.Min(Time.Current, HitObject.StartTime));
+
+            UpdateAuto();
 
             if (Time.Current >= HitObject.StartTime && !ringsVisible)
             {

@@ -115,18 +115,17 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 case ArmedState.Miss:
                     break;
                 case ArmedState.Hit:
-                    const double flash_in = 200;
+                    const double scale_out = 50;
 
-                    bodyPiece.ScaleTo(1.5f, flash_in);
-                    bodyPiece.FadeOut(flash_in);
+                    bodyPiece.ScaleTo(0, scale_out);
 
-                    Delay(flash_in * 2);
                     break;
             }
         }
 
         protected override void Update()
         {
+            base.UpdateAuto();
         }
     }
 }

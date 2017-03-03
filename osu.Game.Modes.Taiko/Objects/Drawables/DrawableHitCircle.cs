@@ -42,6 +42,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
     public abstract class DrawableHitCircle : DrawableTaikoHitObject
     {
         private HitCirclePiece bodyPiece;
+        private Container bodyContainer;
 
         private bool validKeyPressed = true;
 
@@ -52,7 +53,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             Children = new Drawable[]
             {
-                bodyPiece = CreateBody()
+                bodyContainer = new Container()
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    
+                    Children = new[]
+                    {
+                        bodyPiece = CreateBody()
+                    }
+                }
             };
 
             bodyPiece.Kiai = hitCircle.Kiai;
@@ -121,12 +131,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 case ArmedState.Miss:
                     break;
                 case ArmedState.Hit:
-                    const double flash_in = 200;
+                    const double scale_out = 150;
 
-                    bodyPiece.ScaleTo(1.5f, flash_in);
-                    bodyPiece.FadeOut(flash_in);
-
-                    Delay(flash_in * 2);
+                    bodyContainer.ScaleTo(1.5f, scale_out);
+                    bodyContainer.FadeOut(scale_out);
                     break;
             }
         }
