@@ -8,7 +8,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Dialog;
 
-namespace osu.Game
+namespace osu.Game.Screens.Select
 {
     public class BeatmapDeleteDialog : PopupDialog
     {
