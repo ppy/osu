@@ -273,12 +273,12 @@
     <Compile Include="Screens\Select\SearchTextBox.cs" />
     <Compile Include="Screens\Select\FooterButton.cs" />
     <Compile Include="Screens\Select\Footer.cs" />
-    <Compile Include="Overlays\Pause\PauseOverlay.cs" />
-    <Compile Include="Overlays\Pause\PauseProgressBar.cs" />
-    <Compile Include="Overlays\Pause\PauseProgressGraph.cs" />
-    <Compile Include="Overlays\Pause\ResumeButton.cs" />
-    <Compile Include="Overlays\Pause\RetryButton.cs" />
-    <Compile Include="Overlays\Pause\QuitButton.cs" />
+    <Compile Include="Screens\Play\PauseOverlay.cs" />
+    <Compile Include="Screens\Play\Pause\PauseProgressBar.cs" />
+    <Compile Include="Screens\Play\Pause\PauseProgressGraph.cs" />
+    <Compile Include="Screens\Play\Pause\ResumeButton.cs" />
+    <Compile Include="Screens\Play\Pause\RetryButton.cs" />
+    <Compile Include="Screens\Play\Pause\QuitButton.cs" />
     <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
     <Compile Include="Modes\Mod.cs" />
     <Compile Include="Overlays\Mods\ModButton.cs" />
@@ -316,9 +316,6 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Overlays\Dialog\" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
