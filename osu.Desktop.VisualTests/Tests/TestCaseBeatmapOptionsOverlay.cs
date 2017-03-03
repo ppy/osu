@@ -18,10 +18,7 @@ namespace osu.Desktop.VisualTests
         {
             base.Reset();
 
-            var overlay = new BeatmapOptionsOverlay
-            {
-                RelativeSizeAxes = Axes.Both,
-            };
+            var overlay = new BeatmapOptionsOverlay();
 
             Add(overlay);
 

@@ -17,9 +17,8 @@ namespace osu.Game.Screens.Select.Options
     {
         private const float transition_duration = 500;
         private const float x_position = 290;
-        private const float height = 100;
 
-        private Container background;
+        private Box holder;
         private FillFlowContainer<BeatmapOptionsButton> buttonsContainer;
 
         public Action OnRemoveFromUnplayed;
@@ -36,7 +35,8 @@ namespace osu.Game.Screens.Select.Options
 
             buttonsContainer.Alpha = 1;
 
-            background.FadeIn(transition_duration, EasingTypes.OutQuint);
+            holder.ScaleTo(new Vector2(1, 1), transition_duration / 2, EasingTypes.OutQuint);
+
             buttonsContainer.MoveToX(x_position, transition_duration, EasingTypes.OutQuint);
             buttonsContainer.TransformSpacingTo(Vector2.Zero, transition_duration, EasingTypes.OutQuint);
         }
@@ -45,7 +45,8 @@ namespace osu.Game.Screens.Select.Options
         {
             base.PopOut();
 
-            background.FadeOut(transition_duration, EasingTypes.InSine);
+            holder.ScaleTo(new Vector2(1, 0), transition_duration / 2, EasingTypes.InSine);
+
             buttonsContainer.MoveToX(DrawWidth, transition_duration, EasingTypes.InSine);
             buttonsContainer.TransformSpacingTo(new Vector2(200f, 0f), transition_duration, EasingTypes.InSine);
 
@@ -59,19 +60,21 @@ namespace osu.Game.Screens.Select.Options
 
         public BeatmapOptionsOverlay()
         {
+            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
+            Anchor = Anchor.BottomLeft;
+            Origin = Anchor.BottomLeft;
+
             Children = new Drawable[]
             {
-                background = new Container
+                holder = new Box
                 {
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(0.5f),
-                        },
-                    },
+                    Height = 0.5f,
+                    Scale = new Vector2(1, 0),
+                    Colour = Color4.Black.Opacity(0.5f),
                 },
                 buttonsContainer = new FillFlowContainer<BeatmapOptionsButton>
                 {

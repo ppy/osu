@@ -129,9 +129,6 @@ namespace osu.Game.Screens.Select
                 },
                 beatmapOptions = new BeatmapOptionsOverlay
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
                     OnRemoveFromUnplayed = null,
                     OnClearLocalScores = null,
                     OnEdit = null,
