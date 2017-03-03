@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Menu
         {
             if (!args.Repeat && state.Keyboard.ControlPressed && state.Keyboard.ShiftPressed && args.Key == Key.D)
             {
-                Push(new Drawings());
+                Push(new Drawings(new FileTeamList(Game.Host.Storage)));
                 return true;
             }
 

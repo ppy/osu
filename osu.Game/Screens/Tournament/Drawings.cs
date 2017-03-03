@@ -30,11 +30,11 @@ namespace osu.Game.Screens.Tournament
 {
     public class Drawings : OsuScreen
     {
-        public const string TEAMS_FILENAME = "drawings.txt";
         private const string results_filename = "drawings_results.txt";
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
         internal override bool ShowOverlays => false;
+
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
         private ScrollingTeamContainer teamsContainer;
         private GroupsContainer groupsContainer;
@@ -48,12 +48,19 @@ namespace osu.Game.Screens.Tournament
 
         private Storage storage;
 
+        private ITeamList teamList;
+
+        public Drawings(ITeamList teamList)
+        {
+            this.teamList = teamList;
+        }
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, Storage storage)
         {
             this.storage = storage;
 
-            if (!storage.Exists(TEAMS_FILENAME))
+            if (teamList.Teams.Count() == 0)
             {
                 Exit();
                 return;
@@ -277,54 +284,15 @@ namespace osu.Game.Screens.Tournament
             teamsContainer.ClearTeams();
             allTeams.Clear();
 
-            List<Team> newTeams = new List<Team>();
+            List<Team> newTeams = teamList.Teams.ToList();
 
-            try
+            foreach (Team t in newTeams)
             {
-                using (Stream stream = storage.GetStream(TEAMS_FILENAME, FileAccess.Read, FileMode.Open))
-                using (StreamReader sr = new StreamReader(stream))
-                {
-                    while (sr.Peek() != -1)
-                    {
-                        string line = sr.ReadLine().Trim();
+                if (groupsContainer.ContainsTeam(t.FullName))
+                    continue;
 
-                        if (string.IsNullOrEmpty(line))
-                            continue;
-
-                        string[] split = line.Split(':');
-
-                        if (split.Length < 2)
-                        {
-                            Logger.Log($"Invalid team definition: {line}. Expected \"flag_name : team_name : team_acronym\".");
-                            continue;
-                        }
-
-                        string flagName = split[0].Trim();
-                        string teamName = split[1].Trim();
-
-                        string acronym = split.Length >= 3 ? split[2].Trim() : teamName;
-                        acronym = acronym.Substring(0, Math.Min(3, acronym.Length));
-
-                        if (groupsContainer.ContainsTeam(teamName))
-                            continue;
-
-                        Team t = new Team()
-                        {
-                            FlagName = flagName,
-                            FullName = teamName,
-                            Acronym = acronym
-                        };
-
-                        newTeams.Add(t);
-                    }
-                }
-
-                allTeams = newTeams;
-                teamsContainer.AddTeams(allTeams);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Failed to read teams.");
+                allTeams.Add(t);
+                teamsContainer.AddTeam(t);
             }
         }
 
