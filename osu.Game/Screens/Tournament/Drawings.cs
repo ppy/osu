@@ -72,10 +72,10 @@ namespace osu.Game.Screens.Tournament
                     FillMode = FillMode.Fill,
                     Texture = textures.Get(@"Backgrounds/Drawings/background.png")
                 },
-                new FlowContainer()
+                new FillFlowContainer()
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Direction = FlowDirections.Horizontal,
+                    Direction = FillDirection.Right,
 
                     Children = new Drawable[]
                     {
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Tournament
                                     TextSize = 22f,
                                     Font = "Exo2.0-Boldd"
                                 },
-                                new FlowContainer()
+                                new FillFlowContainer()
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Position = new Vector2(0, 35f),
 
-                                    Direction = FlowDirections.Vertical,
+                                    Direction = FillDirection.Down,
                                     Spacing = new Vector2(0, 5f),
 
                                     Children = new Drawable[]
@@ -197,7 +197,7 @@ namespace osu.Game.Screens.Tournament
                                         }
                                     }
                                 },
-                                new FlowContainer()
+                                new FillFlowContainer()
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomCentre,
@@ -208,7 +208,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Position = new Vector2(0, -5f),
 
-                                    Direction = FlowDirections.Vertical,
+                                    Direction = FillDirection.Down,
                                     Spacing = new Vector2(0, 5f),
 
                                     Children = new Drawable[]
