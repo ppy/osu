@@ -12,7 +12,7 @@ using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
-namespace osu.Game.Overlays.BeatmapOptions
+namespace osu.Game.Screens.Select.Options
 {
     public class BeatmapOptionsButton : ClickableContainer
     {

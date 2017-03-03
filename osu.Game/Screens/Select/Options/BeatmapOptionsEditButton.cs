@@ -4,21 +4,21 @@
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.BeatmapOptions
+namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsRemoveFromUnplayedButton : BeatmapOptionsButton
+    public class BeatmapOptionsEditButton : BeatmapOptionsButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
-            ButtonColour = colour.Purple;
+            ButtonColour = colour.Yellow;
         }
 
-        public BeatmapOptionsRemoveFromUnplayedButton()
+        public BeatmapOptionsEditButton()
         {
-            Icon = FontAwesome.fa_times_circle_o;
-            FirstLineText = @"Remove";
-            SecondLineText = @"from Unplayed";
+            Icon = FontAwesome.fa_pencil;
+            FirstLineText = @"Edit";
+            SecondLineText = @"Beatmap";
         }
     }
 }

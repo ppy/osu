@@ -287,12 +287,12 @@
     <Compile Include="Overlays\Dialog\PopupDialogCancelButton.cs" />
     <Compile Include="Screens\Select\BeatmapDeleteDialog.cs" />
     <Compile Include="Overlays\DialogOverlay.cs" />
-    <Compile Include="Overlays\BeatmapOptions\BeatmapOptionsOverlay.cs" />
-    <Compile Include="Overlays\BeatmapOptions\BeatmapOptionsButton.cs" />
-    <Compile Include="Overlays\BeatmapOptions\BeatmapOptionsRemoveFromUnplayedButton.cs" />
-    <Compile Include="Overlays\BeatmapOptions\BeatmapOptionsClearLocalScoresButton.cs" />
-    <Compile Include="Overlays\BeatmapOptions\BeatmapOptionsEditButton.cs" />
-    <Compile Include="Overlays\BeatmapOptions\BeatmapOptionsDeleteButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsClearLocalScoresButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsDeleteButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsEditButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsRemoveFromUnplayedButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -315,7 +315,7 @@
   <ItemGroup />
   <ItemGroup>
     <Folder Include="Overlays\Dialog\" />
-    <Folder Include="Overlays\BeatmapOptions\" />
+    <Folder Include="Screens\Select\Options\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

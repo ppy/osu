@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.BeatmapOptions
+namespace osu.Game.Screens.Select.Options
 {
     public class BeatmapOptionsDeleteButton : BeatmapOptionsButton
     {

@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.BeatmapOptions
+namespace osu.Game.Screens.Select.Options
 {
     public class BeatmapOptionsOverlay : FocusedOverlayContainer
     {

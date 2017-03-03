@@ -4,9 +4,9 @@
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.BeatmapOptions
+namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsClearLocalScoresButton : BeatmapOptionsButton
+    public class BeatmapOptionsRemoveFromUnplayedButton : BeatmapOptionsButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
@@ -14,11 +14,11 @@ namespace osu.Game.Overlays.BeatmapOptions
             ButtonColour = colour.Purple;
         }
 
-        public BeatmapOptionsClearLocalScoresButton()
+        public BeatmapOptionsRemoveFromUnplayedButton()
         {
-            Icon = FontAwesome.fa_eraser;
-            FirstLineText = @"Clear";
-            SecondLineText = @"local scores";
+            Icon = FontAwesome.fa_times_circle_o;
+            FirstLineText = @"Remove";
+            SecondLineText = @"from Unplayed";
         }
     }
 }
