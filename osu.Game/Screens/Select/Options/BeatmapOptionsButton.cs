@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Select.Options
 {
     public class BeatmapOptionsButton : ClickableContainer
     {
-        public static readonly Vector2 SIZE = new Vector2(130f, 100f);
+        private static readonly float width = 130;
 
         private Box background, flash;
         private TextAwesome iconText;
@@ -69,7 +69,8 @@ namespace osu.Game.Screens.Select.Options
 
         public BeatmapOptionsButton()
         {
-            Size = SIZE;
+            Width = width;
+            RelativeSizeAxes = Axes.Y;
 
             Children = new Drawable[]
             {

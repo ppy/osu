@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Select.Options
     {
         private const float transition_duration = 500;
         private const float x_position = 290;
+        private const float height = 100;
 
         private Container background;
         private FillFlowContainer<BeatmapOptionsButton> buttonsContainer;
@@ -74,7 +75,8 @@ namespace osu.Game.Screens.Select.Options
                 },
                 buttonsContainer = new FillFlowContainer<BeatmapOptionsButton>
                 {
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.X,
+                    Height = 100,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Direction = FillDirection.Left,
