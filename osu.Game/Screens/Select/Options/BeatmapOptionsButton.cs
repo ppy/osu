@@ -76,6 +76,8 @@ namespace osu.Game.Screens.Select.Options
             {
                 new Container
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Shear = new Vector2(0.2f, 0f),
                     Masking = true,
@@ -110,7 +112,6 @@ namespace osu.Game.Screens.Select.Options
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Position = new Vector2(-10f, -5f), // center the content visually
                     Direction = FillDirection.Down,
                     Children = new Drawable[]
                     {
