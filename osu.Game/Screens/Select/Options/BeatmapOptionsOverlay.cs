@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
@@ -17,6 +19,8 @@ namespace osu.Game.Screens.Select.Options
     {
         private const float transition_duration = 500;
         private const float x_position = 290;
+
+        private const float height = 100;
 
         private Box holder;
         private FillFlowContainer<BeatmapOptionsButton> buttonsContainer;
@@ -76,29 +80,20 @@ namespace osu.Game.Screens.Select.Options
                     Scale = new Vector2(1, 0),
                     Colour = Color4.Black.Opacity(0.5f),
                 },
-                buttonsContainer = new FillFlowContainer<BeatmapOptionsButton>
+                buttonsContainer = new ButtonFlow
                 {
+                    Height = height,
                     AutoSizeAxes = Axes.X,
-                    Height = 100,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                    Direction = FillDirection.Left,
                     Children = new BeatmapOptionsButton[]
                     {
-                        new BeatmapOptionsDeleteButton
+                        new BeatmapOptionsRemoveFromUnplayedButton
                         {
                             Action = () =>
                             {
                                 Hide();
-                                OnDelete?.Invoke();
-                            },
-                        },
-                        new BeatmapOptionsEditButton
-                        {
-                            Action = () =>
-                            {
-                                Hide();
-                                OnEdit?.Invoke();
+                                OnRemoveFromUnplayed?.Invoke();
                             },
                         },
                         new BeatmapOptionsClearLocalScoresButton
@@ -109,17 +104,36 @@ namespace osu.Game.Screens.Select.Options
                                 OnClearLocalScores?.Invoke();
                             },
                         },
-                        new BeatmapOptionsRemoveFromUnplayedButton
+                        new BeatmapOptionsEditButton
                         {
                             Action = () =>
                             {
                                 Hide();
-                                OnRemoveFromUnplayed?.Invoke();
+                                OnEdit?.Invoke();
+                            },
+                        },
+                        new BeatmapOptionsDeleteButton
+                        {
+                            Action = () =>
+                            {
+                                Hide();
+                                OnDelete?.Invoke();
                             },
                         },
                     },
                 },
             };
+        }
+
+        class ButtonFlow : FillFlowContainer<BeatmapOptionsButton>
+        {
+            protected override IComparer<Drawable> DepthComparer => new ReverseCreationOrderDepthComparer();
+            protected override IEnumerable<BeatmapOptionsButton> FlowingChildren => base.FlowingChildren.Reverse();
+
+            public ButtonFlow()
+            {
+                Direction = FillDirection.Right;
+            }
         }
     }
 }
