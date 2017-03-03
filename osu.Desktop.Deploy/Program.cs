@@ -74,7 +74,7 @@ namespace osu.Desktop.Deploy
             refreshDirectory(StagingFolder);
 
             //increment build number until we have a unique one.
-            string verBase = DateTime.Now.ToString("yyyy.Md.");
+            string verBase = DateTime.Now.ToString("yyyy.Mdd.");
             int increment = 0;
             while (Directory.GetFiles(ReleasesFolder, $"*{verBase}{increment}*").Any())
                 increment++;
