@@ -225,8 +225,6 @@ namespace osu.Game.Screens.Tournament
 
         protected override void UpdateAfterChildren()
         {
-            base.Update();
-
             timeOffset -= (float)(Time.Current - lastTime) / 1000 * speed;
             lastTime = Time.Current;
 
