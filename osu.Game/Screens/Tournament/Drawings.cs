@@ -18,6 +18,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Tournament.Components;
+using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -51,7 +52,7 @@ namespace osu.Game.Screens.Tournament
             this.storage = storage;
 
             if (TeamList == null)
-                TeamList = new FileTeamList(storage);
+                TeamList = new StorageBackedTeamList(storage);
 
             if (!TeamList.Teams.Any())
             {
@@ -244,7 +245,7 @@ namespace osu.Game.Screens.Tournament
             fullTeamNameText.Text = team.FullName;
             fullTeamNameText.FadeIn(200);
 
-            writeResults(groupsContainer.ToStringRepresentation());
+            writeResults(groupsContainer.GetStringRepresentation());
         }
 
         private void writeResults(string text)

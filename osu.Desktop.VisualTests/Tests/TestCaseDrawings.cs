@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Framework.Screens.Testing;
 using osu.Game.Screens.Tournament;
+using osu.Game.Screens.Tournament.Teams;
 
 namespace osu.Desktop.VisualTests.Tests
 {
