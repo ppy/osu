@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Tournament
 
         private double lastTime;
 
-        private ScheduledDelegate delayedModeChangeDelegate;
+        private ScheduledDelegate delayedStateChangeDelegate;
 
         public ScrollingTeamContainer()
         {
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Tournament
             {
                 _scrollState = value;
 
-                delayedModeChangeDelegate?.Cancel();
+                delayedStateChangeDelegate?.Cancel();
 
                 switch (value)
                 {
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Tournament
                         speedTo(0f, 2000);
                         tracker.FadeIn(200);
 
-                        delayedModeChangeDelegate = Delay(2300).Schedule(() => scrollState = ScrollState.Stopped);
+                        delayedStateChangeDelegate = Delay(2300).Schedule(() => scrollState = ScrollState.Stopped);
                         break;
                     case ScrollState.Stopped:
                         // Find closest to center
@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Tournament
                         st.Selected = true;
                         OnSelected?.Invoke(st);
 
-                        delayedModeChangeDelegate = Delay(10000).Schedule(() => scrollState = ScrollState.Idle);
+                        delayedStateChangeDelegate = Delay(10000).Schedule(() => scrollState = ScrollState.Idle);
                         break;
                     case ScrollState.Idle:
                         resetSelected();
