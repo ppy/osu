@@ -376,6 +376,7 @@ namespace osu.Game.Screens.Select
 
         public void SelectRandom()
         {
+            List<BeatmapGroup> groups = this.groups.Where( (BeatmapGroup selectGroup) => selectGroup.State != BeatmapGroupState.Hidden).ToList();
             if (groups.Count < 1)
                 return;
             BeatmapGroup group = groups[RNG.Next(groups.Count)];
