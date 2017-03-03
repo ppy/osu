@@ -116,13 +116,61 @@ namespace osu.Game.Database
             connection.DeleteAll<BeatmapInfo>();
         }
 
+        /// <summary>
+        /// Import multiple <see cref="BeatmapSetInfo"/> from <paramref name="paths"/>.
+        /// </summary>
+        /// <param name="paths">Multiple locations on disk</param>
         public void Import(IEnumerable<string> paths)
         {
+            Stack<BeatmapSetInfo> sets = new Stack<BeatmapSetInfo>();
+
             foreach (string p in paths)
-                Import(p);
+                try
+                {
+                    BeatmapSetInfo set = getBeatmapSet(p);
+
+                    //If we have an ID then we already exist in the database.
+                    if (set.ID == 0)
+                        sets.Push(set);
+
+                    // We may or may not want to delete the file depending on where it is stored.
+                    //  e.g. reconstructing/repairing database with beatmaps from default storage.
+                    // Also, not always a single file, i.e. for LegacyFilesystemReader
+                    // TODO: Add a check to prevent files from storage to be deleted.
+                    try
+                    {
+                        File.Delete(p);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not delete file at {p}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    e = e.InnerException ?? e;
+                    Logger.Error(e, $@"Could not import beatmap set");
+                }
+            
+            // Batch commit with multiple sets to database
+            Import(sets);
         }
 
+        /// <summary>
+        /// Import <see cref="BeatmapSetInfo"/> from <paramref name="path"/>.
+        /// </summary>
+        /// <param name="path">Location on disk</param>
         public void Import(string path)
+        {
+            Import(new [] { path });
+        }
+
+        /// <summary>
+        /// Duplicates content from <paramref name="path"/> to storage and returns a representing <see cref="BeatmapSetInfo"/>.
+        /// </summary>
+        /// <param name="path">Content location</param>
+        /// <returns><see cref="BeatmapSetInfo"/></returns>
+        private BeatmapSetInfo getBeatmapSet(string path)
         {
             string hash = null;
 
@@ -156,7 +204,7 @@ namespace osu.Game.Database
                     BeatmapSetAdded?.Invoke(existing);
                 }
 
-                return;
+                return existing;
             }
 
             var beatmapSet = new BeatmapSetInfo
@@ -172,7 +220,6 @@ namespace osu.Game.Database
             {
                 string[] mapNames = reader.BeatmapFilenames;
                 foreach (var name in mapNames)
-                {
                     using (var stream = new StreamReader(reader.GetStream(name)))
                     {
                         var decoder = BeatmapDecoder.GetDecoder(stream);
@@ -184,11 +231,10 @@ namespace osu.Game.Database
 
                         beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
                     }
-                    beatmapSet.StoryboardFile = reader.StoryboardFilename;
-                }
+                beatmapSet.StoryboardFile = reader.StoryboardFilename;
             }
 
-            Import(new[] { beatmapSet });
+            return beatmapSet;
         }
 
         public void Import(IEnumerable<BeatmapSetInfo> beatmapSets)
