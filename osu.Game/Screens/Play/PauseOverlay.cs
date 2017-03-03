@@ -2,19 +2,20 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;
-using OpenTK.Input;
-using OpenTK.Graphics;
-using osu.Game.Graphics;
-using osu.Framework.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Play.Pause;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 
-namespace osu.Game.Overlays.Pause
+namespace osu.Game.Screens.Play
 {
     public class PauseOverlay : OverlayContainer
     {
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays.Pause
             }
         }
 
-        private FlowContainer retryCounterContainer;
+        private FillFlowContainer retryCounterContainer;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
         public override bool HandleInput => State == Visibility.Visible;
@@ -100,21 +101,21 @@ namespace osu.Game.Overlays.Pause
                     Colour = Color4.Black,
                     Alpha = background_alpha,
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FlowDirections.Vertical,
-                    Spacing = new Vector2(0f, 50f),
+                    Direction = FillDirection.Down,
+                    Spacing = new Vector2(0, 50),
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Direction = FlowDirections.Vertical,
-                            Spacing = new Vector2(0f, 20f),
+                            Direction = FillDirection.Down,
+                            Spacing = new Vector2(0, 20),
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Children = new Drawable[]
@@ -141,7 +142,7 @@ namespace osu.Game.Overlays.Pause
                                 }
                             }
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -156,7 +157,6 @@ namespace osu.Game.Overlays.Pause
                             {
                                 new ResumeButton
                                 {
-                                    RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = button_height,
@@ -164,7 +164,6 @@ namespace osu.Game.Overlays.Pause
                                 },
                                 new RetryButton
                                 {
-                                    RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = button_height,
@@ -176,7 +175,6 @@ namespace osu.Game.Overlays.Pause
                                 },
                                 new QuitButton
                                 {
-                                    RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Height = button_height,
@@ -188,7 +186,7 @@ namespace osu.Game.Overlays.Pause
                                 }
                             }
                         },
-                        retryCounterContainer = new FlowContainer
+                        retryCounterContainer = new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Origin = Anchor.TopCentre,

@@ -68,10 +68,10 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                stars = new FlowContainer<Star>
+                stars = new FillFlowContainer<Star>
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FlowDirections.Horizontal,
+                    Direction = FillDirection.Right,
                     Spacing = new Vector2(star_spacing),
                 }
             };

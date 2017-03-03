@@ -16,7 +16,6 @@ using osu.Framework.Screens;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
-using osu.Game.Overlays.Pause;
 using osu.Framework.Configuration;
 using System;
 using System.Linq;
@@ -152,7 +151,6 @@ namespace osu.Game.Screens.Play
                 playerInputManager = new PlayerInputManager(game.Host)
                 {
                     Clock = new InterpolatingFramedClock(sourceClock),
-                    PassThrough = false,
                     Children = new Drawable[]
                     {
                         hitRenderer,
@@ -196,7 +194,6 @@ namespace osu.Game.Screens.Play
             if (canPause || force)
             {
                 lastPauseActionTime = Time.Current;
-                playerInputManager.PassThrough = true;
                 scoreOverlay.KeyCounter.IsCounting = false;
                 pauseOverlay.Retries = RestartCount;
                 pauseOverlay.Show();
@@ -212,7 +209,6 @@ namespace osu.Game.Screens.Play
         public void Resume()
         {
             lastPauseActionTime = Time.Current;
-            playerInputManager.PassThrough = false;
             scoreOverlay.KeyCounter.IsCounting = true;
             pauseOverlay.Hide();
             sourceClock.Start();
