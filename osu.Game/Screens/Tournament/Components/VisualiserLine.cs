@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Tournament.Components
             }
         }
 
-        private float separation = 1;
+        private float separation = 0;
         public float Separation
         {
             get { return separation; }
