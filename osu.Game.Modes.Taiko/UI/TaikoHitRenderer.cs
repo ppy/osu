@@ -8,12 +8,21 @@ using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.UI;
 using osu.Framework.Graphics;
 using OpenTK;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.Taiko.UI
 {
     public class TaikoHitRenderer : HitRenderer<TaikoHitObject>
     {
         protected override HitObjectConverter<TaikoHitObject> Converter => new TaikoConverter();
+
+        private Beatmap beatmap;
+
+        public TaikoHitRenderer(Beatmap beatmap)
+            : base(beatmap)
+        {
+            this.beatmap = beatmap;
+        }
 
         protected override Playfield CreatePlayfield() => new TaikoPlayfield()
         {

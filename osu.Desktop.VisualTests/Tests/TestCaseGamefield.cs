@@ -56,30 +56,26 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(new Drawable[]
             {
-                new OsuHitRenderer
+                new OsuHitRenderer(beatmap)
                 {
-                    Beatmap = beatmap,
                     Scale = new Vector2(0.5f),
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft
                 },
-                new TaikoHitRenderer
+                new TaikoHitRenderer(beatmap)
                 {
-                    Beatmap = beatmap,
                     Scale = new Vector2(0.5f),
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight
                 },
-                new CatchHitRenderer
+                new CatchHitRenderer(beatmap)
                 {
-                    Beatmap = beatmap,
                     Scale = new Vector2(0.5f),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft
                 },
-                new ManiaHitRenderer
+                new ManiaHitRenderer(beatmap)
                 {
-                    Beatmap = beatmap,
                     Scale = new Vector2(0.5f),
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight

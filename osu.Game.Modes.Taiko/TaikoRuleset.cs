@@ -16,7 +16,7 @@ namespace osu.Game.Modes.Taiko
     {
         public override ScoreOverlay CreateScoreOverlay() => new TaikoScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new TaikoHitRenderer { Beatmap = beatmap };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new TaikoHitRenderer(beatmap);
 
         protected override PlayMode PlayMode => PlayMode.Taiko;
 

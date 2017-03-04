@@ -36,28 +36,20 @@ namespace osu.Game.Modes.UI
     public abstract class HitRenderer<T> : HitRenderer
         where T : HitObject
     {
-        private List<T> objects;
-
-        public Beatmap Beatmap
-        {
-            set
-            {
-                objects = Convert(value);
-                if (IsLoaded)
-                    loadObjects();
-            }
-        }
-
-        protected abstract Playfield CreatePlayfield();
-
         protected abstract HitObjectConverter<T> Converter { get; }
 
         protected virtual List<T> Convert(Beatmap beatmap) => Converter.Convert(beatmap);
 
-        public HitRenderer()
+        private Beatmap beatmap;
+
+        public HitRenderer(Beatmap beatmap)
         {
+            this.beatmap = beatmap;
+
             RelativeSizeAxes = Axes.Both;
         }
+
+        protected abstract Playfield CreatePlayfield();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -72,17 +64,18 @@ namespace osu.Game.Modes.UI
 
         private void loadObjects()
         {
-            if (objects == null) return;
-            foreach (T h in objects)
+            foreach (T h in Convert(beatmap))
             {
                 var drawableObject = GetVisualRepresentation(h);
 
-                if (drawableObject == null) continue;
+                if (drawableObject == null)
+                    continue;
 
                 drawableObject.OnJudgement += onJudgement;
 
                 Playfield.Add(drawableObject);
             }
+
             Playfield.PostProcess();
         }
 

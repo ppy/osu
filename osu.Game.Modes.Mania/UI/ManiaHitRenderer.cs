@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps;
 using osu.Game.Modes.Mania.Objects;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
@@ -10,14 +11,15 @@ namespace osu.Game.Modes.Mania.UI
 {
     public class ManiaHitRenderer : HitRenderer<ManiaBaseHit>
     {
+        protected override HitObjectConverter<ManiaBaseHit> Converter => new ManiaConverter(columns);
+
         private readonly int columns;
 
-        public ManiaHitRenderer(int columns = 5)
+        public ManiaHitRenderer(Beatmap beatmap, int columns = 5)
+            : base(beatmap)
         {
             this.columns = columns;
         }
-
-        protected override HitObjectConverter<ManiaBaseHit> Converter => new ManiaConverter(columns);
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(columns);
 

@@ -15,7 +15,7 @@ namespace osu.Game.Modes.Catch
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new CatchHitRenderer { Beatmap = beatmap };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new CatchHitRenderer(beatmap);
 
         protected override PlayMode PlayMode => PlayMode.Catch;
 

@@ -16,7 +16,7 @@ namespace osu.Game.Modes.Osu
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new OsuHitRenderer { Beatmap = beatmap };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new OsuHitRenderer(beatmap);
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
         {
