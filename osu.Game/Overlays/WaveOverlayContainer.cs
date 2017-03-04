@@ -126,19 +126,13 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White.Opacity(50),
-                    },
-                },
             });
         }
 
         protected override void PopIn()
         {
+            base.PopIn();
+
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Visible;
 
@@ -148,6 +142,8 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
+            base.PopOut();
+
             contentContainer.FadeOut(DISAPPEAR_DURATION, EasingTypes.In);
             contentContainer.MoveToY(DrawHeight * 2f, DISAPPEAR_DURATION, EasingTypes.In);
 
