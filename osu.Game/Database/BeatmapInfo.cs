@@ -39,6 +39,8 @@ namespace osu.Game.Database
 
         public string Path { get; set; }
 
+        public string Hash { get; set; }
+
         // General
         public int AudioLeadIn { get; set; }
         public bool Countdown { get; set; }
@@ -64,6 +66,7 @@ namespace osu.Game.Database
                 StoredBookmarks = string.Join(",", value);
             }
         }
+
         public double DistanceSpacing { get; set; }
         public int BeatDivisor { get; set; }
         public int GridSize { get; set; }
