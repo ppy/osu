@@ -60,6 +60,9 @@ namespace osu.Game.Screens.Select
         public void RemoveGroup(BeatmapGroup group)
         {
             groups.Remove(group);
+            foreach (var p in group.BeatmapPanels)
+                panels.Remove(p);
+
             scrollableContent.Remove(group.Header);
             scrollableContent.Remove(group.BeatmapPanels);
 
