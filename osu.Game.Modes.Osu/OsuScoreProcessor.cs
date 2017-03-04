@@ -12,6 +12,7 @@ namespace osu.Game.Modes.Osu
             : base(hitObjectCount)
         {
             Health.Value = 1;
+            Accuracy.Value = 1;
         }
 
         protected override void UpdateCalculations(JudgementInfo judgement)

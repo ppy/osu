@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
         public PercentageCounter()
         {
             DisplayedCountSpriteText.FixedWidth = true;
-            Count = 1.0f;
+            Count = DisplayedCount = 1.0f;
         }
 
         protected override string FormatCount(float count)
