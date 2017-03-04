@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,10 +21,11 @@ namespace osu.Game.Modes.Taiko.UI
 
         public ExplodingRing(Color4 fillColour, bool fill)
         {
+            Size = new Vector2(128);
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
 
             BorderColour = Color4.White;

@@ -19,6 +19,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         protected override Color4 InternalColour => new Color4(187, 17, 119, 255);
 
         protected override RingPiece CreateRing() => new DonRingPiece();
+
+        protected override EdgeEffect CreateBackingGlow()
+        {
+            return new EdgeEffect()
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = new Color4(187, 17, 119, 255),
+                Radius = 4f
+            };
+        }
     }
 
     class KatsuPiece : HitCirclePiece
@@ -27,6 +37,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         protected override Color4 InternalColour => new Color4(17, 136, 170, 255);
 
         protected override RingPiece CreateRing() => new KatsuRingPiece();
+
+        protected override EdgeEffect CreateBackingGlow()
+        {
+            return new EdgeEffect()
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = new Color4(17, 136, 170, 255),
+                Radius = 4f
+            };
+        }
     }
 
     class SpinnerPiece : HitCirclePiece
@@ -34,14 +54,24 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         protected override List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
         protected override Color4 InternalColour => new Color4(237, 171, 0, 255);
 
-        protected override RingPiece CreateRing() => new SpinnerRingPiece();
-
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (!Keys.Contains(args.Key))
                 return false;
 
             return Hit?.Invoke(true) ?? false;
+        }
+
+        protected override RingPiece CreateRing() => new SpinnerRingPiece();
+
+        protected override EdgeEffect CreateBackingGlow()
+        {
+            return new EdgeEffect()
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = new Color4(237, 171, 0, 255),
+                Radius = 4f
+            };
         }
     }
 
@@ -75,26 +105,29 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
         private CirclePiece circle;
         private RingPiece ring;
-        private GlowPiece glow;
 
         public HitCirclePiece()
         {
-            Size = new Vector2(64);
+            Size = new Vector2(128);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             Children = new Drawable[]
             {
-                glow = new GlowPiece()
+                new CircularContainer()
                 {
-                    Colour = InternalColour
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+
+                    RelativeSizeAxes = Axes.Both,
+                    EdgeEffect = CreateBackingGlow()
                 },
                 circle = new CirclePiece()
                 {
                     Colour = InternalColour
                 },
-                ring = CreateRing()
+                ring = CreateRing(),
             };
         }
 
@@ -113,6 +146,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
             }
         }
 
+        protected abstract EdgeEffect CreateBackingGlow();
         protected abstract RingPiece CreateRing();
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)

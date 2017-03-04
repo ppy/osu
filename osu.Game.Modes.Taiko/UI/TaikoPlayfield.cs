@@ -19,11 +19,15 @@ namespace osu.Game.Modes.Taiko.UI
 {
     public class TaikoPlayfield : Playfield
     {
+        public const float PLAYFIELD_BASE_HEIGHT = 242;
+        public const float PLAYFIELD_SCALE = 0.65f;
+
+        public static float PLAYFIELD_HEIGHT => PLAYFIELD_BASE_HEIGHT * PLAYFIELD_SCALE;
+
         protected override Container<Drawable> Content => this;
 
-        private const float left_area_size = 0.15f;
+        private static float left_area_size = 0.15f / PLAYFIELD_SCALE;
         private const float hit_target_offset = 0.1f;
-        private const float playfield_height = 106;
 
         private HitTarget hitTarget;
         private Container explosionRingContainer;
@@ -39,7 +43,7 @@ namespace osu.Game.Modes.Taiko.UI
                 RelativeSizeAxes = Axes.X,
                 RelativePositionAxes = Axes.X,
                 Position = new Vector2(left_area_size, 0),
-                Size = new Vector2(1f - left_area_size, playfield_height),
+                Size = new Vector2(1f - left_area_size, PLAYFIELD_HEIGHT),
 
                 BorderColour = new Color4(17, 17, 17, 255),
                 BorderThickness = 2,
@@ -68,9 +72,9 @@ namespace osu.Game.Modes.Taiko.UI
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.Centre,
-
-                                RelativeSizeAxes = Axes.Y,
-                                Size = new Vector2(74.2f, 0.7f),
+                                
+                                Size = new Vector2(128),
+                                Scale = new Vector2(PLAYFIELD_SCALE),
 
                                 BlendingMode = BlendingMode.Additive
                             },
@@ -91,7 +95,7 @@ namespace osu.Game.Modes.Taiko.UI
             HitObjects.RelativePositionAxes = Axes.X;
             HitObjects.RelativeSizeAxes = Axes.X;
             HitObjects.Position = new Vector2(left_area_size + hit_target_offset * (1f - left_area_size), 0);
-            HitObjects.Size = new Vector2(1f - left_area_size - hit_target_offset * (1f - left_area_size), playfield_height);
+            HitObjects.Size = new Vector2(1f - left_area_size - hit_target_offset * (1f - left_area_size), PLAYFIELD_HEIGHT);
 
             AddInternal(judgementContainer = new Container()
             {
@@ -116,7 +120,7 @@ namespace osu.Game.Modes.Taiko.UI
             AddInternal(new Container()
             {
                 RelativeSizeAxes = Axes.X,
-                Size = new Vector2(left_area_size, 106),
+                Size = new Vector2(left_area_size, PLAYFIELD_HEIGHT),
 
                 Masking = true,
 
@@ -145,6 +149,8 @@ namespace osu.Game.Modes.Taiko.UI
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
+
+                                Scale = new Vector2(0.9f)
                             },
                         }
                     }
@@ -155,6 +161,7 @@ namespace osu.Game.Modes.Taiko.UI
         public override void Add(DrawableHitObject h)
         {
             h.Depth = (float)h.HitObject.StartTime;
+            h.Scale = new Vector2(PLAYFIELD_SCALE);
 
             h.OnJudgement += onJudgement;
 

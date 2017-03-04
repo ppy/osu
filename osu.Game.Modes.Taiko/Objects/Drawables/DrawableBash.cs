@@ -20,7 +20,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableBash : DrawableTaikoHitObject
     {
-        private const float outer_scale = 3f;
+        private const float outer_scale = 5f;
 
         public override Color4 ExplodeColour => new Color4(237, 171, 0, 255);
 
@@ -28,11 +28,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         private HitCirclePiece bodyPiece;
 
-        private Container bashOuterRingContainer;
-        private Sprite bashOuterRing;
-
-        private Container bashInnerRingContainer;
-        private Sprite bashInnerRing;
+        private Container bashInnerRing;
+        private Container bashOuterRing;
 
         private int userHits;
         private bool ringsVisible;
@@ -44,45 +41,72 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             Children = new Drawable[]
             {
-                bashOuterRingContainer = new Container()
+                bashOuterRing = new CircularContainer()
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
 
-                    AutoSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both,
 
                     Scale = new Vector2(outer_scale),
-
                     Alpha = 0f,
+
+                    BorderThickness = 4,
+                    BorderColour = new Color4(237, 171, 0, 25),
 
                     Children = new Drawable[]
                     {
-                        bashOuterRing = new Sprite()
+                        new Box()
+                        {
+                            RelativeSizeAxes = Axes.Both,
+
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        },
+                        new CircularContainer()
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
 
-                            Size = new Vector2(151)
+                            RelativeSizeAxes = Axes.Both,
+
+                            BorderThickness = 1,
+                            BorderColour = Color4.White,
+
+                            Children = new[]
+                            {
+                                new Box()
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+
+                                    Alpha = 0,
+                                    AlwaysPresent = true
+                                }
+                            }
                         }
                     }
                 },
-                bashInnerRingContainer = new Container()
+                bashInnerRing = new CircularContainer()
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
 
-                    AutoSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both,
 
                     Alpha = 0f,
 
-                    Children = new Drawable[]
-                    {
-                        bashInnerRing = new Sprite()
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                    BorderThickness = 1,
+                    BorderColour = Color4.White,
 
-                            Size = new Vector2(151)
+                    Children = new[]
+                    {
+                        new Box()
+                        {
+                            RelativeSizeAxes = Axes.Both,
+
+                            Colour = new Color4(204, 102, 0, 255),
+                            Alpha = 0.3f,
+                            AlwaysPresent = true
                         }
                     }
                 },
@@ -91,13 +115,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     Kiai = spinner.Kiai
                 },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            bashOuterRing.Texture = textures.Get(@"Play/Taiko/bash-outer-ring");
-            bashInnerRing.Texture = textures.Get(@"Play/Taiko/bash-inner-ring");
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -128,7 +145,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
                 userHits++;
 
-                bashInnerRingContainer.ScaleTo(1f + (outer_scale - 1) * userHits / spinner.RequiredHits, 50);
+                bashInnerRing.ScaleTo(1f + (outer_scale - 1) * userHits / spinner.RequiredHits, 50);
 
                 if (userHits == spinner.RequiredHits)
                 {
@@ -171,8 +188,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     bodyPiece.ScaleTo(1.5f, scale_out);
                     bodyPiece.FadeOut(scale_out);
 
-                    bashOuterRingContainer.FadeOut(scale_out);
-                    bashInnerRingContainer.FadeOut(scale_out);
+                    bashOuterRing.FadeOut(scale_out);
+                    bashInnerRing.FadeOut(scale_out);
                     break;
             }
         }
@@ -197,8 +214,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             if (Time.Current >= HitObject.StartTime && !ringsVisible)
             {
-                bashOuterRingContainer.FadeIn(200);
-                bashInnerRingContainer.FadeIn(200);
+                bashOuterRing.FadeIn(200);
+                bashInnerRing.FadeIn(200);
                 ringsVisible = true;
             }
         }

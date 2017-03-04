@@ -19,30 +19,30 @@ namespace osu.Game.Modes.Taiko.UI
     {
         public InputDrum()
         {
-            Size = new Vector2(86);
+            Size = new Vector2(TaikoPlayfield.PLAYFIELD_HEIGHT);
 
             Children = new Drawable[]
             {
-                    new TaikoHalfDrum(false)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.CentreRight,
+                new TaikoHalfDrum(false)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.CentreRight,
 
-                        RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both,
 
-                        Keys = new List<Key>(new[] { Key.F, Key.D })
-                    },
-                    new TaikoHalfDrum(true)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.CentreLeft,
+                    Keys = new List<Key>(new[] { Key.F, Key.D })
+                },
+                new TaikoHalfDrum(true)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.CentreLeft,
 
-                        RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both,
 
-                        Position = new Vector2(-1f, 0),
+                    Position = new Vector2(-1f, 0),
 
-                        Keys = new List<Key>(new[] { Key.J, Key.K })
-                    }
+                    Keys = new List<Key>(new[] { Key.J, Key.K })
+                }
             };
         }
 
@@ -65,46 +65,46 @@ namespace osu.Game.Modes.Taiko.UI
 
                 Children = new Drawable[]
                 {
-                        outer = new Sprite()
-                        {
-                            Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
-                            Origin = Anchor.Centre,
+                    outer = new Sprite()
+                    {
+                        Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
+                        Origin = Anchor.Centre,
 
-                            RelativeSizeAxes = Axes.Both
-                        },
-                        outerHit = new Sprite()
-                        {
-                            Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
-                            Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    outerHit = new Sprite()
+                    {
+                        Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
+                        Origin = Anchor.Centre,
 
-                            RelativeSizeAxes = Axes.Both,
+                        RelativeSizeAxes = Axes.Both,
 
-                            Colour = new Color4(102, 204, 255, 255),
-                            Alpha = 0,
+                        Colour = new Color4(102, 204, 255, 255),
+                        Alpha = 0,
 
-                            BlendingMode = BlendingMode.Additive
-                        },
-                        inner = new Sprite()
-                        {
-                            Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
-                            Origin = Anchor.Centre,
+                        BlendingMode = BlendingMode.Additive
+                    },
+                    inner = new Sprite()
+                    {
+                        Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
+                        Origin = Anchor.Centre,
 
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.7f)
-                        },
-                        innerHit = new Sprite()
-                        {
-                            Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
-                            Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(0.7f)
+                    },
+                    innerHit = new Sprite()
+                    {
+                        Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
+                        Origin = Anchor.Centre,
 
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.7f),
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(0.7f),
 
-                            Colour = new Color4(255, 102, 194, 255),
-                            Alpha = 0,
+                        Colour = new Color4(255, 102, 194, 255),
+                        Alpha = 0,
 
-                            BlendingMode = BlendingMode.Additive
-                        }
+                        BlendingMode = BlendingMode.Additive
+                    }
                 };
             }
 

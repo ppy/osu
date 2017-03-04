@@ -34,7 +34,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
 
-                    Size = new Vector2(5, 106),
+                    Size = new Vector2(5, TaikoPlayfield.PLAYFIELD_HEIGHT),
 
                     Colour = Color4.Black
                 },
@@ -43,7 +43,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
 
-                    Size = new Vector2(106),
+                    Size = new Vector2(TaikoPlayfield.PLAYFIELD_HEIGHT),
                     Scale = new Vector2(0.7f),
 
                     Children = new Drawable[]

@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,73 +16,96 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 {
     public class DonRingPiece : RingPiece
     {
-        protected override Color4 OverlayColour => new Color4(187, 17, 119, 255);
-        protected override string Prefix => @"don";
+        protected override Drawable CreateInnerPiece()
+        {
+            return new CircularContainer()
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+
+                Size = new Vector2(45f),
+
+                Children = new[]
+                {
+                    new Box()
+                    {
+                        RelativeSizeAxes = Axes.Both,
+
+                        Alpha = 1
+                    }
+                }
+            };
+        }
     }
 
     public class KatsuRingPiece : RingPiece
     {
-        protected override Color4 OverlayColour => new Color4(17, 136, 170, 255);
-        protected override string Prefix => @"katsu";
+        protected override Drawable CreateInnerPiece()
+        {
+            return new CircularContainer()
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+
+                Size = new Vector2(61f),
+
+                BorderColour = Color4.White,
+                BorderThickness = 8,
+
+                Children = new[]
+                {
+                    new Box()
+                    {
+                        RelativeSizeAxes = Axes.Both,
+
+                        Alpha = 0,
+                        AlwaysPresent = true
+                    }
+                }
+            };
+        }
     }
 
     public class SpinnerRingPiece : RingPiece
     {
-        protected override Color4 OverlayColour => new Color4(237, 171, 0, 255);
-        protected override string Prefix => @"spinner";
+        protected override Drawable CreateInnerPiece()
+        {
+            return new TextAwesome()
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+
+                TextSize = 45f,
+                Icon = FontAwesome.fa_asterisk
+            };
+        }
     }
 
-    public abstract class RingPiece : Container
+    public abstract class RingPiece : CircularContainer
     {
-        protected abstract Color4 OverlayColour { get; }
-        protected abstract string Prefix { get; }
-
-        private Sprite ringBase;
-        private Sprite ringOverlay;
-        private Sprite innerRingBase;
-        private Sprite innerRingOverlay;
-
         public RingPiece()
         {
-            Size = new Vector2(64);
-
-            Masking = true;
-            CornerRadius = Size.X / 2;
+            Size = new Vector2(128);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
+            BorderThickness = 8f;
+            BorderColour = Color4.White;
+
             Children = new[]
             {
-                ringBase = new Sprite()
+                new Box()
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
-                ringOverlay = new Sprite()
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
 
-                    BlendingMode = BlendingMode.Additive,
-
-                    Alpha = 0.5f
+                    Alpha = 0,
+                    AlwaysPresent = true
                 },
-                innerRingBase = new Sprite()
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
+                CreateInnerPiece()
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            ringBase.Texture = textures.Get(@"Play/Taiko/ring");
-            ringOverlay.Texture = textures.Get(@"Play/Taiko/ring-overlay");
-
-            innerRingBase.Texture = textures.Get($@"Play/Taiko/{Prefix}-inner-ring");
-        }
+        protected abstract Drawable CreateInnerPiece();
     }
 }

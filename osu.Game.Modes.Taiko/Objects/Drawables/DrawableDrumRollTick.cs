@@ -34,7 +34,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             RelativePositionAxes = Axes.X;
 
-            Size = new Vector2(12) * drumRollTick.Scale;
+            Size = new Vector2(24) * drumRollTick.Scale;
 
             Origin = Anchor.Centre;
             Anchor = Anchor.CentreLeft;

@@ -14,42 +14,31 @@ using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 {
-    class CirclePiece : Container
+    class CirclePiece : CircularContainer
     {
-        private Sprite disc;
-
         private TrianglesPiece triangles;
 
         public CirclePiece()
         {
-            Size = new Vector2(64);
-
-            Masking = true;
-            CornerRadius = Size.X / 2;
+            Size = new Vector2(128);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             Children = new Drawable[]
             {
-                disc = new Sprite()
+                new Box()
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 1
                 },
                 triangles = new TrianglesPiece()
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.05f,
+                    Alpha = 0.1f,
                     Colour = Color4.Black
                 },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            disc.Texture = textures.Get(@"Play/Taiko/disc");
         }
     }
 }

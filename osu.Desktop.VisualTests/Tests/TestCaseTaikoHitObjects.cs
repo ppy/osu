@@ -40,7 +40,7 @@ namespace osu.Desktop.VisualTests.Tests
             playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
         }
 
-        HitObjectType mode = HitObjectType.Don;
+        HitObjectType mode = HitObjectType.Spinner;
 
         BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
         private TaikoPlayfield playfield;
@@ -52,7 +52,7 @@ namespace osu.Desktop.VisualTests.Tests
             switch (mode)
             {
                 case HitObjectType.Don:
-                    const int count = 1000;
+                    const int count = 10;
 
                     for (int i = 0; i < count; i++)
                     {

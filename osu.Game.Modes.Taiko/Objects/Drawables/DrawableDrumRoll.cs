@@ -9,6 +9,7 @@ using osu.Framework.Logging;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Modes.Taiko.UI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -50,7 +51,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
             base.LoadComplete();
 
-            Size = new Vector2((float)(drumRoll.Length / 640f * drumRoll.RepeatCount) * Parent.DrawSize.X, 64);
+            Size = new Vector2((float)(HitObject.Duration / drumRoll.PreEmpt) * Parent.DrawSize.X * (1f / Scale.X), 128);
 
             Children = new Drawable[]
             {

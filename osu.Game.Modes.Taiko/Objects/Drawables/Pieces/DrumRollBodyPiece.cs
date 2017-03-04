@@ -26,7 +26,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
     {
         private static Color4 yellow_colour = new Color4(238, 170, 0, 255);
 
-        public override float CornerRadius => 32;
+        public override float CornerRadius => 64;
 
         public bool Kiai;
 
