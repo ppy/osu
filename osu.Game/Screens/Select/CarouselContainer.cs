@@ -207,6 +207,14 @@ namespace osu.Game.Screens.Select
                 AddGroup(group);
         }
 
+        /// <summary>
+        /// Computes the x-offset of currently visible panels. Makes the carousel appear round.
+        /// </summary>
+        /// <param name="dist">
+        /// Vertical distance from the center of the carousel container
+        /// ranging from -1 to 1.
+        /// </param>
+        /// <param name="halfHeight">Half the height of the carousel container.</param>
         private static float offsetX(float dist, float halfHeight)
         {
             // The radius of the circle the carousel moves on.
@@ -270,14 +278,18 @@ namespace osu.Game.Screens.Select
                 if (panel.State == PanelSelectedState.Hidden)
                     continue;
 
+                // Only add if we're not already part of the content.
                 if (!scrollableContent.Contains(panel))
                 {
-                    panel.Depth = i + (panel is BeatmapSetHeader ? 0 : panels.Count);
+                    // Makes sure headers are always _below_ panels,
+                    // and depth flows downward.
+                    panel.Depth = i + (panel is BeatmapSetHeader ? panels.Count : 0);
                     scrollableContent.Add(panel);
                 }
             }
 
-            // Update currently visible panels
+            // Update externally controlled state of currently visible panels
+            // (e.g. x-offset and opacity).
             float halfHeight = drawHeight / 2;
             foreach (Panel p in scrollableContent.Children)
                 updatePanel(p, halfHeight);
