@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Tournament
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
 
-                        Direction = FillDirection.Down,
+                        Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0, 5f),
 
                         Children = new Drawable[]

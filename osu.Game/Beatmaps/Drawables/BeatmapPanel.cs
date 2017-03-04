@@ -86,7 +86,7 @@ namespace osu.Game.Beatmaps.Drawables
                 new FillFlowContainer
                 {
                     Padding = new MarginPadding(5),
-                    Direction = FillDirection.Right,
+                    Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -95,19 +95,17 @@ namespace osu.Game.Beatmaps.Drawables
                         new DifficultyIcon(beatmap)
                         {
                             Scale = new Vector2(1.8f),
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
                         },
                         new FillFlowContainer
                         {
                             Padding = new MarginPadding { Left = 5 },
-                            Direction = FillDirection.Down,
+                            Direction = FillDirection.Vertical,
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
                                 new FillFlowContainer
                                 {
-                                    Direction = FillDirection.Right,
+                                    Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(4, 0),
                                     AutoSizeAxes = Axes.Both,
                                     Children = new[]

@@ -98,13 +98,13 @@ namespace osu.Game.Screens.Select
                     Position = new Vector2(BackButton.SIZE_EXTENDED.X + padding, 0),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Direction = FillDirection.Right,
+                    Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(padding, 0),
                     Children = new Drawable[]
                     {
                         buttons = new FillFlowContainer
                         {
-                            Direction = FillDirection.Right,
+                            Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(0.2f, 0),
                             AutoSizeAxes = Axes.Both,
                         }
