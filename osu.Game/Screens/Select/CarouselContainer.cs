@@ -16,6 +16,7 @@ using osu.Framework.Input;
 using OpenTK.Input;
 using System.Collections;
 using osu.Framework.MathUtils;
+using System.Diagnostics;
 
 namespace osu.Game.Screens.Select
 {
@@ -23,59 +24,21 @@ namespace osu.Game.Screens.Select
     {
         private Container<Panel> scrollableContent;
         private List<BeatmapGroup> groups = new List<BeatmapGroup>();
+        private List<Panel> panels = new List<Panel>();
 
         public BeatmapGroup SelectedGroup { get; private set; }
         public BeatmapPanel SelectedPanel { get; private set; }
 
         private List<float> yPositions = new List<float>();
-        private CarouselLifetimeList<Panel> lifetime;
 
         public CarouselContainer()
         {
             DistanceDecayJump = 0.01;
 
-            Add(scrollableContent = new Container<Panel>(lifetime = new CarouselLifetimeList<Panel>(DepthComparer))
+            Add(scrollableContent = new Container<Panel>
             {
                 RelativeSizeAxes = Axes.X,
             });
-        }
-
-        internal class CarouselLifetimeList<T> : LifetimeList<Panel>
-        {
-            public CarouselLifetimeList(IComparer<Panel> comparer)
-                : base(comparer)
-            {
-            }
-
-            public int StartIndex;
-            public int EndIndex;
-
-            public override bool Update(FrameTimeInfo time)
-            {
-                bool anyAliveChanged = false;
-
-                //check existing items to make sure they haven't died.
-                foreach (var item in AliveItems.ToArray())
-                {
-                    item.UpdateTime(time);
-                    if (!item.IsAlive)
-                    {
-                        //todo: make this more efficient
-                        int i = IndexOf(item);
-                        anyAliveChanged |= CheckItem(item, ref i);
-                    }
-                }
-
-                //handle custom range
-                for (int i = StartIndex; i < EndIndex; i++)
-                {
-                    var item = this[i];
-                    item.UpdateTime(time);
-                    anyAliveChanged |= CheckItem(item, ref i);
-                }
-
-                return anyAliveChanged;
-            }
         }
 
         public void AddGroup(BeatmapGroup group)
@@ -83,13 +46,12 @@ namespace osu.Game.Screens.Select
             group.State = BeatmapGroupState.Collapsed;
             groups.Add(group);
 
-            group.Header.Depth = -scrollableContent.Children.Count();
-            scrollableContent.Add(group.Header);
-
+            panels.Add(group.Header);
+            group.Header.Clock = Clock;
             foreach (BeatmapPanel panel in group.BeatmapPanels)
             {
-                panel.Depth = -scrollableContent.Children.Count();
-                scrollableContent.Add(panel);
+                panels.Add(panel);
+                panel.Clock = Clock;
             }
 
             computeYPositions();
@@ -107,7 +69,7 @@ namespace osu.Game.Screens.Select
         private void movePanel(Panel panel, bool advance, bool animated, ref float currentY)
         {
             yPositions.Add(currentY);
-            panel.MoveToY(currentY, animated && (panel.IsOnScreen || panel.State != PanelSelectedState.Hidden) ? 750 : 0, EasingTypes.OutExpo);
+            panel.MoveToY(currentY, animated && (panel.State != PanelSelectedState.Hidden) ? 750 : 0, EasingTypes.OutExpo);
 
             if (advance)
                 currentY += panel.DrawHeight + 5;
@@ -194,19 +156,20 @@ namespace osu.Game.Screens.Select
 
         public void Sort(FilterControl.SortMode mode)
         {
+            List<BeatmapGroup> sortedGroups = new List<BeatmapGroup>(groups);
             switch (mode)
             {
                 case FilterControl.SortMode.Artist:
-                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist));
+                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist));
                     break;
                 case FilterControl.SortMode.Title:
-                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title));
+                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title));
                     break;
                 case FilterControl.SortMode.Author:
-                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author));
+                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author));
                     break;
                 case FilterControl.SortMode.Difficulty:
-                    groups.Sort((x, y) =>
+                    sortedGroups.Sort((x, y) =>
                     {
                         float xAverage = 0, yAverage = 0;
                         int counter = 0;
@@ -232,20 +195,13 @@ namespace osu.Game.Screens.Select
                 default:
                     throw new NotImplementedException();
             }
+
             scrollableContent.Clear(false);
-            lifetime.Clear();
-            foreach (BeatmapGroup group in groups)
-            {
-                group.Header.Depth = -scrollableContent.Children.Count();
-                scrollableContent.Add(group.Header);
+            panels.Clear();
+            groups.Clear();
 
-                foreach (BeatmapPanel panel in group.BeatmapPanels)
-                {
-                    panel.Depth = -scrollableContent.Children.Count();
-                    scrollableContent.Add(panel);
-                }
-            }
-
+            foreach (BeatmapGroup group in sortedGroups)
+                AddGroup(group);
         }
 
         private static float offsetX(float dist, float halfHeight)
@@ -286,34 +242,42 @@ namespace osu.Game.Screens.Select
         {
             base.Update();
 
-            // Determine which items stopped being on screen for future removal from the lifetimelist.
             float drawHeight = DrawHeight;
-            float halfHeight = drawHeight / 2;
 
-            foreach (Panel p in lifetime.AliveItems)
+            // Remove all panels that should no longer be on-screen
+            scrollableContent.RemoveAll(delegate (Panel p)
             {
                 float panelPosY = p.Position.Y;
-                p.IsOnScreen = panelPosY >= Current - p.DrawHeight && panelPosY <= Current + drawHeight;
-                updatePanel(p, halfHeight);
-            }
+                bool remove = panelPosY < Current - p.DrawHeight || panelPosY > Current + drawHeight || !p.IsPresent;
+                return remove;
+            });
 
-            // Determine range of indices for items that are now definitely on screen to be added
-            // to the lifetimelist in the future.
+            // Find index range of all panels that should be on-screen
+            Trace.Assert(panels.Count == yPositions.Count);
+
             int firstIndex = yPositions.BinarySearch(Current - Panel.MAX_HEIGHT);
             if (firstIndex < 0) firstIndex = ~firstIndex;
             int lastIndex = yPositions.BinarySearch(Current + drawHeight);
             if (lastIndex < 0) lastIndex = ~lastIndex;
 
-            lifetime.StartIndex = firstIndex;
-            lifetime.EndIndex = lastIndex;
-
+            // Add those panels within the previously found index range that should be displayed.
             for (int i = firstIndex; i < lastIndex; ++i)
             {
-                Panel p = lifetime[i];
-                if (p.State != PanelSelectedState.Hidden)
-                    p.IsOnScreen = true; //we don't want to update the on-screen state of hidden pannels as they have incorrect (stacked) y values.
-                updatePanel(p, halfHeight);
+                Panel panel = panels[i];
+                if (panel.State == PanelSelectedState.Hidden)
+                    continue;
+
+                if (!scrollableContent.Contains(panel))
+                {
+                    panel.Depth = i + (panel is BeatmapSetHeader ? 0 : panels.Count);
+                    scrollableContent.Add(panel);
+                }
             }
+
+            // Update currently visible panels
+            float halfHeight = drawHeight / 2;
+            foreach (Panel p in scrollableContent.Children)
+                updatePanel(p, halfHeight);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
