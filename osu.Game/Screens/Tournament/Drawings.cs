@@ -294,6 +294,9 @@ namespace osu.Game.Screens.Tournament
 
             reloadTeams();
 
+            if (!storage.Exists(results_filename))
+                return;
+
             if (loadLastResults)
             {
                 try
