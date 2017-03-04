@@ -21,11 +21,12 @@ namespace osu.Game.Modes.Taiko.UI
     {
         protected override Container<Drawable> Content => this;
 
-        private const float left_area_size = 0.25f;
+        private const float left_area_size = 0.15f;
         private const float hit_target_offset = 0.1f;
         private const float playfield_height = 106;
 
         private HitTarget hitTarget;
+        private ComboCounter comboCounter;
         private Container explosionRingContainer;
         private Container judgementContainer;
 
@@ -71,6 +72,8 @@ namespace osu.Game.Modes.Taiko.UI
 
                                 RelativeSizeAxes = Axes.Y,
                                 Size = new Vector2(74.2f, 0.7f),
+
+                                BlendingMode = BlendingMode.Additive
                             },
                             hitTarget = new HitTarget()
                             {
@@ -96,7 +99,9 @@ namespace osu.Game.Modes.Taiko.UI
                 Origin = Anchor.BottomCentre,
 
                 RelativePositionAxes = Axes.Both,
-                Position = new Vector2(left_area_size + hit_target_offset * (1f - left_area_size), 0)
+                Position = new Vector2(left_area_size + hit_target_offset * (1f - left_area_size), 0),
+
+                BlendingMode = BlendingMode.Additive
             });
 
             // Bar lines
@@ -127,16 +132,32 @@ namespace osu.Game.Modes.Taiko.UI
                         RelativeSizeAxes = Axes.Both,
                         Colour = new Color4(17, 17, 17, 255)
                     },
-                    new InputDrum()
+                    new Container()
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
 
                         RelativePositionAxes = Axes.X,
-                        Position = new Vector2(0.10f, 0)
+                        Position = new Vector2(0.10f, 0),
+
+                        Children = new Drawable[]
+                        {
+                            new InputDrum()
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
+                            comboCounter = new TaikoComboCounter()
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            }
+                        }
                     }
                 }
             });
+
+            comboCounter.Set(8888);
         }
 
         public override void Add(DrawableHitObject h)
@@ -163,6 +184,8 @@ namespace osu.Game.Modes.Taiko.UI
             }
             else if (tji.Score == TaikoScoreResult.Good)
                 ring = new ExplodingRing(dth.ExplodeColour, false);
+            else
+                hitTarget.Flash(Color4.Red);
 
             if (ring != null)
                 explosionRingContainer.Add(ring);

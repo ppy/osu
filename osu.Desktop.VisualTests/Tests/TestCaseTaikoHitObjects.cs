@@ -19,6 +19,8 @@ using OpenTK.Graphics;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.UI;
+using osu.Game.Modes.UI;
+using System;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -162,12 +164,12 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 RelativeSizeAxes = Axes.Both,
                 Clock = framedClock,
-                Children = new[]
+                Children = new Drawable[]
                 {
                     playfield = new TaikoPlayfield()
                     {
                         RelativePositionAxes = Axes.Y,
-                        Position = new Vector2(0, 0.4f)
+                        Position = new Vector2(160, 0.4f)
                     },
                 }
             };

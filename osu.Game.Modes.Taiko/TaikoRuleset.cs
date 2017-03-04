@@ -14,7 +14,7 @@ namespace osu.Game.Modes.Taiko
 {
     public class TaikoRuleset : Ruleset
     {
-        public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
+        public override ScoreOverlay CreateScoreOverlay() => new TaikoScoreOverlay();
 
         public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new TaikoHitRenderer { Beatmap = beatmap };
 

@@ -40,7 +40,9 @@ namespace osu.Game.Modes.Taiko.UI
                     CacheDrawnFrameBuffer = true,
 
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(2),
+                    Size = new Vector2(3),
+
+                    BlendingMode = BlendingMode.Additive,
 
                     Children = new[]
                     {
