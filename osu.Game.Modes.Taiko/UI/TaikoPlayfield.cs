@@ -26,7 +26,6 @@ namespace osu.Game.Modes.Taiko.UI
         private const float playfield_height = 106;
 
         private HitTarget hitTarget;
-        private ComboCounter comboCounter;
         private Container explosionRingContainer;
         private Container judgementContainer;
 
@@ -147,17 +146,10 @@ namespace osu.Game.Modes.Taiko.UI
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                             },
-                            comboCounter = new TaikoComboCounter()
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            }
                         }
                     }
                 }
             });
-
-            comboCounter.Set(8888);
         }
 
         public override void Add(DrawableHitObject h)

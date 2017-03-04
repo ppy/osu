@@ -8,6 +8,7 @@ using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Screens.Play;
+using osu.Game.Modes.Osu.UI;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -31,11 +32,11 @@ namespace osu.Game.Modes.Taiko.UI
             Margin = new MarginPadding { Right = 5 },
         };
 
-        /// <summary>
-        /// Taiko combo counter is handled at a playfield level.
-        /// </summary>
-        /// <returns></returns>
-        protected override ComboCounter CreateComboCounter() => null;
+        protected override ComboCounter CreateComboCounter() => new OsuComboCounter()
+        {
+            Anchor = Anchor.BottomLeft,
+            Origin = Anchor.BottomLeft,
+        };
 
         protected override KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
         {
@@ -46,10 +47,10 @@ namespace osu.Game.Modes.Taiko.UI
             Margin = new MarginPadding(10),
             Children = new KeyCounter[]
             {
-                new KeyCounterKeyboard(@"Z", Key.Z),
-                new KeyCounterKeyboard(@"X", Key.X),
-                new KeyCounterMouse(@"M1", MouseButton.Left),
-                new KeyCounterMouse(@"M2", MouseButton.Right),
+                new KeyCounterKeyboard(@"D", Key.D),
+                new KeyCounterKeyboard(@"F", Key.F),
+                new KeyCounterKeyboard(@"J", Key.J),
+                new KeyCounterKeyboard(@"K", Key.K),
             }
         };
     }

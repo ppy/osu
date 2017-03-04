@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -43,8 +44,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             this.drumRoll = drumRoll;
 
             Origin = Anchor.CentreLeft;
+        }
 
-            Size = new Vector2((float)drumRoll.Length * drumRoll.RepeatCount, 64);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Size = new Vector2((float)(drumRoll.Length / 640f * drumRoll.RepeatCount) * Parent.DrawSize.X, 64);
 
             Children = new Drawable[]
             {
@@ -88,11 +94,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             int countHit = NestedHitObjects.Count(t => t.Judgement.Result.HasValue);
 
-            if (countHit < drumRoll.RequiredGoodHits)
+            if (countHit > drumRoll.RequiredGoodHits)
             {
                 Judgement.Result = HitResult.Hit;
 
-                if (countHit < drumRoll.RequiredGreatHits)
+                if (countHit >= drumRoll.RequiredGreatHits)
                     taikoJudgement.Score = TaikoScoreResult.Great;
                 else
                     taikoJudgement.Score = TaikoScoreResult.Good;

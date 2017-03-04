@@ -1,117 +1,115 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
 using osu.Game.Modes.UI;
 using OpenTK;
-using osu.Game.Graphics.Sprites;
-using osu.Framework.Graphics.Containers;
-using OpenTK.Graphics;
-using osu.Game.Modes.Objects.Drawables;
-using System;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Modes.Taiko.UI
 {
     /// <summary>
-    /// Allows tint and scaling animations. Used in osu!taiko.
+    /// Uses the 'x' symbol and has a pop-out effect while rolling over. Used in osu! standard.
     /// </summary>
     public class TaikoComboCounter : ComboCounter
     {
-        protected virtual EasingTypes AnimationEasing => EasingTypes.None;
-        protected virtual float ScaleFactor => 2;
-        protected virtual int AnimationDuration => 300;
-        protected virtual bool CanAnimateWhenBackwards => false;
+        protected uint ScheduledPopOutCurrentId = 0;
 
-        private BufferedContainer glowContainer;
-        private OsuSpriteText glowText;
+        protected virtual float PopOutSmallScale => 1.1f;
+        protected virtual bool CanPopOutWhileRolling => false;
 
-        public override float TextSize
-        {
-            get { return base.TextSize; }
-
-            set
-            {
-                base.TextSize = value;
-
-                if (glowText != null)
-                    glowText.TextSize = value;
-            }
-        }
-
-        public TaikoComboCounter()
-        {
-            Add(glowContainer = new BufferedContainer()
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-
-                BlurSigma = new Vector2(20),
-                CacheDrawnFrameBuffer = true,
-
-                RelativeSizeAxes = Axes.Both,
-                Size = new Vector2(3),
-
-                BlendingMode = BlendingMode.Additive,
-
-                Depth = 1,
-
-                Children = new[]
-                {
-                    new Container()
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-
-                        AutoSizeAxes = Axes.Both,
-
-                        Children = new[]
-                        {
-                            glowText = new OsuSpriteText()
-                            {
-                                Anchor = Anchor,
-                                Origin = Origin,
-
-                                Font = "Venera",
-
-                                Colour = new Color4(17, 136, 170, 255)
-                            }
-                        }
-                    }
-                }
-            });
-
-            TextSize = 14f;
-        }
+        public new Vector2 PopOutScale = new Vector2(1.6f);
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            DisplayedCountSpriteText.Font = "Venera";
-            DisplayedCountSpriteText.Anchor = Anchor;
-            DisplayedCountSpriteText.Origin = Origin;
+            PopOutCount.Origin = Origin;
+            PopOutCount.Anchor = Anchor;
         }
 
-        protected virtual void TransformAnimate(ulong newValue)
+        protected override string FormatCount(ulong count)
         {
-            DisplayedCountSpriteText.Text = FormatCount(newValue);
-            DisplayedCountSpriteText.ScaleTo(new Vector2(1, ScaleFactor));
-            DisplayedCountSpriteText.ScaleTo(new Vector2(1, 1), AnimationDuration, AnimationEasing);
-
-            glowText.Text = FormatCount(newValue);
-            glowContainer.ScaleTo(new Vector2(1, ScaleFactor));
-            glowContainer.ScaleTo(new Vector2(1, 1), AnimationDuration, AnimationEasing);
-            glowContainer.ForceRedraw();
+            return $@"{count}x";
         }
 
-        protected virtual void TransformNotAnimate(ulong newValue)
+        protected virtual void TransformPopOut(ulong newValue)
+        {
+            PopOutCount.Text = FormatCount(newValue);
+
+            PopOutCount.ScaleTo(PopOutScale);
+            PopOutCount.FadeTo(PopOutInitialAlpha);
+            PopOutCount.MoveTo(Vector2.Zero);
+
+            PopOutCount.ScaleTo(1, PopOutDuration, PopOutEasing);
+            PopOutCount.FadeOut(PopOutDuration, PopOutEasing);
+            PopOutCount.MoveTo(DisplayedCountSpriteText.Position, PopOutDuration, PopOutEasing);
+        }
+
+        protected virtual void TransformPopOutRolling(ulong newValue)
+        {
+            TransformPopOut(newValue);
+            TransformPopOutSmall(newValue);
+        }
+
+        protected virtual void TransformNoPopOut(ulong newValue)
         {
             DisplayedCountSpriteText.Text = FormatCount(newValue);
             DisplayedCountSpriteText.ScaleTo(1);
+        }
 
-            glowText.Text = FormatCount(newValue);
-            glowContainer.ScaleTo(1);
+        protected virtual void TransformPopOutSmall(ulong newValue)
+        {
+            DisplayedCountSpriteText.Text = FormatCount(newValue);
+            DisplayedCountSpriteText.ScaleTo(PopOutSmallScale);
+            DisplayedCountSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
+        }
+
+        protected virtual void ScheduledPopOutSmall(uint id)
+        {
+            // Too late; scheduled task invalidated
+            if (id != ScheduledPopOutCurrentId)
+                return;
+
+            DisplayedCount++;
+        }
+
+        protected override void OnCountRolling(ulong currentValue, ulong newValue)
+        {
+            ScheduledPopOutCurrentId++;
+
+            // Hides displayed count if was increasing from 0 to 1 but didn't finish
+            if (currentValue == 0 && newValue == 0)
+                DisplayedCountSpriteText.FadeOut(FadeOutDuration);
+
+            base.OnCountRolling(currentValue, newValue);
+        }
+
+        protected override void OnCountIncrement(ulong currentValue, ulong newValue)
+        {
+            ScheduledPopOutCurrentId++;
+
+            if (DisplayedCount < currentValue)
+                DisplayedCount++;
+
+            DisplayedCountSpriteText.Show();
+
+            TransformPopOut(newValue);
+
+            uint newTaskId = ScheduledPopOutCurrentId;
+            Scheduler.AddDelayed(delegate
+            {
+                ScheduledPopOutSmall(newTaskId);
+            }, PopOutDuration);
+        }
+
+        protected override void OnCountChange(ulong currentValue, ulong newValue)
+        {
+            ScheduledPopOutCurrentId++;
+
+            if (newValue == 0)
+                DisplayedCountSpriteText.FadeOut();
+
+            base.OnCountChange(currentValue, newValue);
         }
 
         protected override void OnDisplayedCountRolling(ulong currentValue, ulong newValue)
@@ -121,21 +119,24 @@ namespace osu.Game.Modes.Taiko.UI
             else
                 DisplayedCountSpriteText.Show();
 
-            TransformNotAnimate(newValue);
+            if (CanPopOutWhileRolling)
+                TransformPopOutRolling(newValue);
+            else
+                TransformNoPopOut(newValue);
         }
 
         protected override void OnDisplayedCountChange(ulong newValue)
         {
             DisplayedCountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
 
-            TransformNotAnimate(newValue);
+            TransformNoPopOut(newValue);
         }
 
         protected override void OnDisplayedCountIncrement(ulong newValue)
         {
             DisplayedCountSpriteText.Show();
 
-            TransformAnimate(newValue);
+            TransformPopOutSmall(newValue);
         }
     }
 }

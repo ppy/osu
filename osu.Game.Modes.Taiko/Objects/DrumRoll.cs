@@ -68,7 +68,7 @@ namespace osu.Game.Modes.Taiko.Objects
                 if (TickTimeDistance == 0) yield break;
 
                 bool first = true;
-                for (double t = StartTime; t < EndTime; t += TickTimeDistance)
+                for (double t = StartTime; t < EndTime + TickTimeDistance; t += TickTimeDistance)
                 {
                     yield return new DrumRollTick()
                     {

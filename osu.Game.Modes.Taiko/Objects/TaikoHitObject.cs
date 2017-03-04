@@ -23,8 +23,11 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.SetDefaultsFromBeatmap(beatmap);
 
+            // Don't ask... Old osu! had a random multiplier here, that we now have to multiply everywhere
+            float fudgeFactor = 1.4f;
+
             Scale = 1f - 0.7f * -3f / 5 / 2;
-            PreEmpt = 600 / beatmap.SliderVelocityAt(StartTime) * 1000;
+            PreEmpt = 600 / (beatmap.SliderVelocityAt(StartTime) * fudgeFactor) * 1000;
 
             ControlPoint overridePoint;
             Kiai = beatmap.TimingPointAt(StartTime, out overridePoint).KiaiMode;
