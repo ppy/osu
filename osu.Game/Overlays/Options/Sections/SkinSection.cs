@@ -8,6 +8,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
+using osu.Game.Skins;
 
 namespace osu.Game.Overlays.Options.Sections
 {
@@ -17,13 +18,16 @@ namespace osu.Game.Overlays.Options.Sections
         public override FontAwesome Icon => FontAwesome.fa_paint_brush;
         
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(SkinManager manager, OsuConfigManager config)
         {
             FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
                 new OptionLabel { Text = "TODO: Skin preview textures" },
-                new OptionLabel { Text = "Current skin: TODO dropdown" },
+                new OptionDropDown<SkinInfo> {
+                    Bindable = config.GetBindable<SkinInfo>(OsuConfig.Skin),
+                    Items = manager.UpdateItems()
+                },
                 new OsuButton
                 {
                     RelativeSizeAxes = Axes.X,

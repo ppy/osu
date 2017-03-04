@@ -2,21 +2,46 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using osu.Framework.Platform;
+using osu.Game.Database;
 
 namespace osu.Game.IPC
 {
     public class SkinImporter
     {
         private IpcChannel<SkinImportMessage> channel;
-        // SkinDatabase database; ?
+        private SkinDatabase skins;
 
-        public SkinImporter()
+        public SkinImporter(GameHost host, SkinDatabase database = null)
         {
+            this.skins = database;
+
+            channel = new IpcChannel<SkinImportMessage>(host);
+            channel.MessageReceived += messageReceived;
+        }
+
+        public async Task ImportAsync(string path) 
+        {            if (skins != null)
+            {
+                skins.Import(path);
+            }
+            else 
+            {
+                await channel.SendMessageAsync(new SkinImportMessage{Path = path});
+            }
+        }
+
+        private void messageReceived(SkinImportMessage msg) 
+        {
+            Debug.Assert(skins != null);
+
+            ImportAsync(msg.Path);
         }
     }
 
     public class SkinImportMessage {
-        string Path;
+        public string Path;
     }
 }

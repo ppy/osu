@@ -325,6 +325,7 @@
     <Compile Include="Skins\SkinManager.cs" />
     <Compile Include="Skins\Skin.cs" />
     <Compile Include="IPC\SkinImporter.cs" />
+    <Compile Include="Database\SkinDatabase.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
