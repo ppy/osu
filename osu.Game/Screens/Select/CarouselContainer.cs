@@ -356,10 +356,10 @@ namespace osu.Game.Screens.Select
 
         public void SelectRandom()
         {
-            if (groups.Count < 1)
+            List<BeatmapGroup> visibleGroups = this.groups.Where((BeatmapGroup selectGroup) => selectGroup.State != BeatmapGroupState.Hidden).ToList();
+            if (visibleGroups.Count < 1)
                 return;
-
-            BeatmapGroup group = groups[RNG.Next(groups.Count)];
+            BeatmapGroup group = visibleGroups[RNG.Next(visibleGroups.Count)];
             BeatmapPanel panel = group?.BeatmapPanels.First();
 
             if (panel == null)
