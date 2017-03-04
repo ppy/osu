@@ -74,6 +74,7 @@
     <Compile Include="OsuScore.cs" />
     <Compile Include="OsuScoreProcessor.cs" />
     <Compile Include="UI\OsuComboCounter.cs" />
+    <Compile Include="UI\OsuComboFire.cs" />
     <Compile Include="UI\OsuHitRenderer.cs" />
     <Compile Include="UI\OsuPlayfield.cs" />
     <Compile Include="OsuRuleset.cs" />

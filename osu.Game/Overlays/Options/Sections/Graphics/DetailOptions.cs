@@ -44,6 +44,11 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 },
                 new OsuCheckbox
                 {
+                    LabelText = "Combofire",
+                    Bindable = config.GetBindable<bool>(OsuConfig.ComboFire)
+                },
+                new OsuCheckbox
+                {
                     LabelText = "Hit lighting",
                     Bindable = config.GetBindable<bool>(OsuConfig.HitLighting)
                 },

@@ -8,11 +8,15 @@ using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Screens.Play;
+using OpenTK.Graphics;
+using osu.Game.Modes.Objects;
 
 namespace osu.Game.Modes.Osu.UI
 {
     public class OsuScoreOverlay : ScoreOverlay
     {
+        private OsuComboFire comboFire;
+
         protected override ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
         {
             Anchor = Anchor.TopCentre,
@@ -52,5 +56,25 @@ namespace osu.Game.Modes.Osu.UI
                 new KeyCounterMouse(@"M2", MouseButton.Right),
             }
         };
+
+        public OsuScoreOverlay() : base()
+        {
+            Add(comboFire = new OsuComboFire()
+            {
+                RelativeSizeAxes = Axes.Both,
+                Height = 0.25f,
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                ColourLight = Color4.Yellow,
+                ColourDark = Color4.Red,
+                TriangleScale = 0.5f,
+            });
+        }
+
+        public override void BindProcessor(ScoreProcessor processor)
+        {
+            base.BindProcessor(processor);
+            processor.Combo.ValueChanged += delegate { comboFire.Combo = processor.Combo; };
+        }
     }
 }
