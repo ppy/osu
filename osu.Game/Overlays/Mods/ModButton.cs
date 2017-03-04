@@ -236,7 +236,7 @@ namespace osu.Game.Overlays.Mods
 
         public ModButton(Mod m)
         {
-            Direction = FillDirection.Down;
+            Direction = FillDirection.Vertical;
             Spacing = new Vector2(0f, -5f);
             Size = new Vector2(100f);
 

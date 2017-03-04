@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Play
     {
         public KeyCounterCollection()
         {
-            Direction = FillDirection.Right;
+            Direction = FillDirection.Horizontal;
             AutoSizeAxes = Axes.Both;
         }
 
