@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Online.API;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {

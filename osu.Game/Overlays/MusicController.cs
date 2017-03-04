@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
