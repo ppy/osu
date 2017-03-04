@@ -1,6 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Input.Handlers;
+using osu.Game.Input.Handlers;
+
 namespace osu.Game.Modes
 {
     public class Score
@@ -10,5 +13,12 @@ namespace osu.Game.Modes
         public double Combo { get; set; }
         public double MaxCombo { get; set; }
         public double Health { get; set; }
+
+        public Replay Replay;
+    }
+
+    public class Replay
+    {
+        public virtual ReplayInputHandler GetInputHandler() => null;
     }
 }

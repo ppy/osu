@@ -30,7 +30,7 @@ namespace osu.Game.Modes
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
-        public abstract ScoreProcessor CreateScoreProcessor(int hitObjectCount);
+        public abstract ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0);
 
         public abstract HitRenderer CreateHitRendererWith(Beatmap beatmap, InputManager input = null);
 
