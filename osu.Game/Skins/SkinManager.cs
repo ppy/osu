@@ -16,9 +16,6 @@ namespace osu.Game.Skins
             Name = @"default",
         };
 
-        private Storage storage;
-
-
         private Bindable<SkinInfo> bindable;
         private List<Skin> skins;
         private Skin selected;
@@ -32,12 +29,19 @@ namespace osu.Game.Skins
         {
             bindable = config.GetBindable<SkinInfo>(OsuConfig.Skin);
             bindable.ValueChanged += ChangedSkin;
-            // TODO load skins, put selected one in select
+            foreach (Skin skin in skins)
+            {
+                skin.UpdateSkin();
+                if (skin.info.Path == bindable.Value.Path)
+                    selected = skin;
+            }
         }
 
-        private void ChangedSkin(Object sender, EventArgs e) {
-            // Should I assume it has been sent by bindable?
-            // TODO put selected in select
+        private void ChangedSkin(object sender, EventArgs e) {s
+            foreach (Skin skin in skins) {
+                if(skin.info.Path == bindable.Value.Path)
+                    selected = skin;
+            }
             selected.UpdateSkin();
         }
     }
