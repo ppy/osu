@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Tournament
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Right,
+                    Direction = FillDirection.Horizontal,
 
                     Children = new Drawable[]
                     {
@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Position = new Vector2(0, 35f),
 
-                                    Direction = FillDirection.Down,
+                                    Direction = FillDirection.Vertical,
                                     Spacing = new Vector2(0, 5f),
 
                                     Children = new Drawable[]
@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Position = new Vector2(0, -5f),
 
-                                    Direction = FillDirection.Down,
+                                    Direction = FillDirection.Vertical,
                                     Spacing = new Vector2(0, 5f),
 
                                     Children = new Drawable[]

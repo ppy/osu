@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Select.Options
 
             public ButtonFlow()
             {
-                Direction = FillDirection.Right;
+                Direction = FillDirection.Horizontal;
             }
         }
     }
