@@ -41,9 +41,9 @@ namespace osu.Game.Overlays.Toolbar
             Children = new Drawable[]
             {
                 new ToolbarBackground(),
-                new FlowContainer
+                new FillFlowContainer
                 {
-                    Direction = FlowDirections.Horizontal,
+                    Direction = FillDirection.Right,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
@@ -55,7 +55,10 @@ namespace osu.Game.Overlays.Toolbar
                         },
                         modeSelector = new ToolbarModeSelector
                         {
-                            OnPlayModeChange = OnPlayModeChange
+                            OnPlayModeChange = (PlayMode mode) =>
+                            {
+                                OnPlayModeChange?.Invoke(mode);
+                            }
                         }
                     }
                 },
@@ -63,7 +66,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Direction = FlowDirections.Horizontal,
+                    Direction = FillDirection.Right,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
@@ -141,7 +144,7 @@ namespace osu.Game.Overlays.Toolbar
             FadeOut(transition_time);
         }
 
-        class PassThroughFlowContainer : FlowContainer
+        class PassThroughFlowContainer : FillFlowContainer
         {
             //needed to get input to the login overlay.
             public override bool Contains(Vector2 screenSpacePos) => true;

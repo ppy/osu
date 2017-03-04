@@ -25,7 +25,7 @@ namespace osu.Game.Screens
 
         protected virtual IEnumerable<Type> PossibleChildren => null;
 
-        private FlowContainer childModeButtons;
+        private FillFlowContainer childModeButtons;
         private Container textContainer;
         private Box box;
 
@@ -124,9 +124,9 @@ namespace osu.Game.Screens
                         Exit();
                     }
                 },
-                childModeButtons = new FlowContainer
+                childModeButtons = new FillFlowContainer
                 {
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Down,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Both,

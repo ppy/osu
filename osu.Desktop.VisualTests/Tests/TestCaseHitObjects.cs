@@ -95,7 +95,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton(@"slider", () => load(HitObjectType.Slider));
             AddButton(@"spinner", () => load(HitObjectType.Spinner));
 
-            AddToggle(@"auto", () => { auto = !auto; load(mode); });
+            AddToggle(@"auto", (state) => { auto = state; load(mode); });
 
             ButtonsContainer.Add(new SpriteText { Text = "Playback Speed" });
             ButtonsContainer.Add(new BasicSliderBar<double>

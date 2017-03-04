@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Input;
+using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.UI;
@@ -20,6 +21,61 @@ namespace osu.Game.Modes.Taiko
             Beatmap = beatmap,
             InputManager = input,
         };
+
+        public override IEnumerable<Mod> GetModsFor(ModType type)
+        {
+            switch (type)
+            {
+                case ModType.DifficultyReduction:
+                    return new Mod[]
+                    {
+                        new TaikoModEasy(),
+                        new TaikoModNoFail(),
+                        new TaikoModHalfTime(),
+                    };
+
+                case ModType.DifficultyIncrease:
+                    return new Mod[]
+                    {
+                        new TaikoModHardRock(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new TaikoModSuddenDeath(),
+                                new TaikoModPerfect(),
+                            },
+                        },
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new TaikoModDoubleTime(),
+                                new TaikoModNightcore(),
+                            },
+                        },
+                        new TaikoModHidden(),
+                        new TaikoModFlashlight(),
+                    };
+
+                case ModType.Special:
+                    return new Mod[]
+                    {
+                        new TaikoModRelax(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModAutoplay(),
+                                new ModCinema(),
+                            },
+                        },
+                    };
+
+                default:
+                    return new Mod[] { };
+            }
+        }
 
         protected override PlayMode PlayMode => PlayMode.Taiko;
 
