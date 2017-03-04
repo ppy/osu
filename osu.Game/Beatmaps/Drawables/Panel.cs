@@ -18,10 +18,6 @@ namespace osu.Game.Beatmaps.Drawables
 
         public override bool RemoveWhenNotAlive => false;
 
-        public bool IsOnScreen;
-
-        public override bool IsAlive => IsOnScreen && base.IsAlive;
-
         private Container nestedContainer;
 
         protected override Container<Drawable> Content => nestedContainer;

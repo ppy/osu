@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Select.Options
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Down,
+                    Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
                         iconText = new TextAwesome
