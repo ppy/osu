@@ -190,7 +190,7 @@
     <Compile Include="Graphics\UserInterface\PercentageCounter.cs" />
     <Compile Include="Graphics\UserInterface\ScoreCounter.cs" />
     <Compile Include="Graphics\UserInterface\StarCounter.cs" />
-    <Compile Include="IPC\BeatmapImporter.cs" />
+    <Compile Include="IPC\BeatmapIPCChannel.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
     <Compile Include="Online\API\APIRequest.cs" />
     <Compile Include="Online\API\OAuth.cs" />
