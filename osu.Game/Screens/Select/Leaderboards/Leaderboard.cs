@@ -7,31 +7,28 @@ using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
 using osu.Game.Modes;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Allocation;
-using osu.Framework.MathUtils;
-using System;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
     public class Leaderboard : Container
     {
-        private FillFlowContainer scrollFlow;
+        private FillFlowContainer<LeaderboardScoreDisplay> scrollFlow;
 
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private LeaderboardScore[] scores;
+        public LeaderboardScore[] Scores
         {
-            for (int i = 0; i < 10; i++)
+            get { return scores; }
+            set
             {
-                scrollFlow.Add(new LeaderboardScoreDisplay(new LeaderboardScore
+                scores = value;
+
+                var scoreDisplays = new List<LeaderboardScoreDisplay>();
+                for (int i = 0; i < value.Length; i++)
                 {
-                    Avatar = textures.Get(@"Online/avatar-guest"),
-                    Flag = textures.Get(@"Flags/__"),
-                    Name = @"ultralaserxx",
-                    MaxCombo = RNG.Next(0, 3000),
-                    Accuracy = Math.Round(RNG.NextDouble(0, 100), 2),
-                    Score = RNG.Next(0, 1000000),
-                    Mods = new Mod[] { },
-                }, i + 1));
+                    scoreDisplays.Add(new LeaderboardScoreDisplay(value[i], i + 1));
+                }
+
+                scrollFlow.Children = scoreDisplays;
             }
         }
 
@@ -45,7 +42,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     ScrollDraggerVisible = false,
                     Children = new Drawable[]
                     {
-                        scrollFlow = new FillFlowContainer
+                        scrollFlow = new FillFlowContainer<LeaderboardScoreDisplay>
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
