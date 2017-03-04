@@ -36,12 +36,12 @@ namespace osu.Desktop.VisualTests
             {
                 scores.Add(new LeaderboardScore
                 {
+                    Name = @"ultralaserxx",
                     Avatar = ts.Get(@"Online/avatar-guest"),
                     Flag = ts.Get(@"Flags/__"),
-                    Name = @"ultralaserxx",
-                    MaxCombo = RNG.Next(0, 3000),
-                    Accuracy = Math.Round(RNG.NextDouble(0, 100), 2),
                     Score = RNG.Next(0, 1000000),
+                    Accuracy = Math.Round(RNG.NextDouble(0, 100), 2),
+                    MaxCombo = RNG.Next(0, 3000),
                     Mods = new Mod[] { },
                 });
             }

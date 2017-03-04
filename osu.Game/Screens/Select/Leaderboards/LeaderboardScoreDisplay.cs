@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Modes;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -22,7 +23,10 @@ namespace osu.Game.Screens.Select.Leaderboards
         private const float score_letter_size = 20f;
 
         private Box background;
+        private Container content;
+        private FillFlowContainer<ScoreModIcon> modsContainer;
 
+        private readonly int index;
         public readonly LeaderboardScore Score;
 
         protected override bool OnHover(Framework.Input.InputState state)
@@ -37,9 +41,24 @@ namespace osu.Game.Screens.Select.Leaderboards
             base.OnHoverLost(state);
         }
 
-        public LeaderboardScoreDisplay(LeaderboardScore score, int index)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            FadeTo(0.01f); // TODO: This is hacky, find a better way
+            Delay(index * 50);
+            Schedule(() =>
+            {
+                FadeInFromZero(200);
+                content.MoveToX(DrawSize.X);
+                content.MoveToX(0, 500, EasingTypes.OutQuint);
+            });
+        }
+
+        public LeaderboardScoreDisplay(LeaderboardScore score, int i)
         {
             Score = score;
+            index = i;
 
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -62,7 +81,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         },
                     },
                 },
-                new Container
+                content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Left = 40, },
@@ -180,7 +199,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     Text = Score.Score.ToString(),
                                     TextSize = 23,
                                 },
-                                new FillFlowContainer
+                                modsContainer = new FillFlowContainer<ScoreModIcon>
                                 {
                                     Anchor = Anchor.BottomRight,
                                     Origin = Anchor.BottomRight,
@@ -188,19 +207,18 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     // TODO: Probably remove? Seems like others don't like this kind of thing
                                     Position = new Vector2(0f, 4f), //properly align the mod icons
                                     Direction = FillDirection.Left,
-                                    Children = new[]
-                                    {
-                                        new ScoreModIcon(FontAwesome.fa_osu_mod_doubletime, OsuColour.FromHex(@"ffcc22")),
-                                        new ScoreModIcon(FontAwesome.fa_osu_mod_flashlight, OsuColour.FromHex(@"ffcc22")),
-                                        new ScoreModIcon(FontAwesome.fa_osu_mod_hidden, OsuColour.FromHex(@"ffcc22")),
-                                        new ScoreModIcon(FontAwesome.fa_osu_mod_hardrock, OsuColour.FromHex(@"ffcc22")),
-                                    },
                                 },
                             },
                         },
                     },
                 },
             };
+
+            foreach (Mod mod in Score.Mods)
+            {
+                // TODO: Get actual mod colours
+                modsContainer.Add(new ScoreModIcon(mod.Icon, OsuColour.FromHex(@"ffcc22")));
+            }
         }
 
         class ScoreModIcon : Container
