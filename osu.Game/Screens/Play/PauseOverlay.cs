@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Play
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Down,
+                    Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 50),
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Play
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Down,
+                            Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0, 20),
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
