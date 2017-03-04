@@ -26,11 +26,26 @@ namespace osu.Game.Beatmaps
             return 60000 / BeatLengthAt(time);
         }
 
-        public double BeatLengthAt(double time)
+        public double BPMMultiplierAt(double time)
         {
             ControlPoint overridePoint;
             ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
-            return timingPoint.BeatLength;
+
+            return overridePoint?.VelocityAdjustment ?? 1;
+        }
+
+        public double BeatLengthAt(double time, bool addVelocity = true)
+        {
+            ControlPoint overridePoint;
+            ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
+
+            double velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
+            double d = timingPoint.BeatLength;
+
+            if (addVelocity)
+                d *= velocityAdjustment;
+
+            return d;
         }
 
         public ControlPoint TimingPointAt(double time, out ControlPoint overridePoint)
@@ -50,7 +65,8 @@ namespace osu.Game.Beatmaps
                         timingPoint = controlPoint;
                         overridePoint = null;
                     }
-                    else overridePoint = controlPoint;
+                    else
+                        overridePoint = controlPoint;
                 }
                 else break;
             }
