@@ -6,6 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Input;
 using osu.Game.Configuration;
 using System.Linq;
+using osu.Framework.Input.Handlers;
 using osu.Framework.Timing;
 using osu.Game.Input.Handlers;
 using OpenTK.Input;
@@ -23,8 +24,8 @@ namespace osu.Game.Screens.Play
         private ManualClock clock = new ManualClock();
         private IFrameBasedClock parentClock;
 
-        private LegacyReplayInputHandler replayInputHandler;
-        public LegacyReplayInputHandler ReplayInputHandler
+        private ReplayInputHandler replayInputHandler;
+        public ReplayInputHandler ReplayInputHandler
         {
             get { return replayInputHandler; }
             set

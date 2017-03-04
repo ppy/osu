@@ -26,6 +26,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Framework.Input;
+using osu.Framework.Input.Handlers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Handlers;
 
@@ -339,7 +340,7 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> mouseWheelDisabled;
 
-        public LegacyReplayInputHandler ReplayInputHandler;
+        public ReplayInputHandler ReplayInputHandler;
 
         protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !isPaused;
     }
