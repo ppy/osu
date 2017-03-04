@@ -43,7 +43,6 @@ namespace osu.Game.Screens.Select
 
         public void AddGroup(BeatmapGroup group)
         {
-            group.State = BeatmapGroupState.Collapsed;
             groups.Add(group);
 
             panels.Add(group.Header);
