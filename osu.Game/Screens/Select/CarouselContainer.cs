@@ -137,14 +137,16 @@ namespace osu.Game.Screens.Select
                 var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
                 if (panel != null)
                 {
-                    SelectGroup(group, panel, animated);
+                    selectGroup(group, panel, animated);
                     return;
                 }
             }
         }
 
-        public void SelectGroup(BeatmapGroup group, BeatmapPanel panel, bool animated = true)
+        private void selectGroup(BeatmapGroup group, BeatmapPanel panel, bool animated = true)
         {
+            Trace.Assert(group.BeatmapPanels.Contains(panel), @"Selected panel must be in provided group");
+
             if (SelectedGroup != null && SelectedGroup != group && SelectedGroup.State != BeatmapGroupState.Hidden)
                 SelectedGroup.State = BeatmapGroupState.Collapsed;
 
@@ -334,7 +336,7 @@ namespace osu.Game.Screens.Select
                 if (i >= 0 && i < SelectedGroup.BeatmapPanels.Count)
                 {
                     //changing difficulty panel, not set.
-                    SelectGroup(SelectedGroup, SelectedGroup.BeatmapPanels[i]);
+                    selectGroup(SelectedGroup, SelectedGroup.BeatmapPanels[i]);
                     return;
                 }
             }
@@ -357,11 +359,14 @@ namespace osu.Game.Screens.Select
         {
             if (groups.Count < 1)
                 return;
+
             BeatmapGroup group = groups[RNG.Next(groups.Count)];
             BeatmapPanel panel = group?.BeatmapPanels.First();
+
             if (panel == null)
                 return;
-            SelectGroup(group, panel);
+
+            selectGroup(group, panel);
         }
 
         public IEnumerator<BeatmapGroup> GetEnumerator() => groups.GetEnumerator();

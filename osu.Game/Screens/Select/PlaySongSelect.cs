@@ -403,11 +403,7 @@ namespace osu.Game.Screens.Select
                 if (Beatmap == null || select)
                     carousel.SelectBeatmap(beatmapSet.Beatmaps.First());
                 else
-                {
-                    var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(Beatmap.BeatmapInfo));
-                    if (panel != null)
-                        carousel.SelectGroup(group, panel);
-                }
+                    carousel.SelectBeatmap(Beatmap.BeatmapInfo);
             }));
         }
 
