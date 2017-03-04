@@ -396,6 +396,7 @@ namespace osu.Game.Screens.Select
             {
                 beatmapGroups.Add(group);
 
+                group.State = BeatmapGroupState.Collapsed;
                 carousel.AddGroup(group);
 
                 filterChanged(false, false);
