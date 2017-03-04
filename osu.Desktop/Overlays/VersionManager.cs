@@ -18,6 +18,7 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using System.Net.Http;
+using osu.Framework.Logging;
 
 namespace osu.Desktop.Overlays
 {
@@ -57,19 +58,19 @@ namespace osu.Desktop.Overlays
 
             Children = new Drawable[]
             {
-                new FlowContainer
+                new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Down,
                     Children = new Drawable[]
                     {
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Direction = FlowDirections.Horizontal,
+                            Direction = FillDirection.Right,
+                            Spacing = new Vector2(5),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
                                 new OsuSpriteText
@@ -95,6 +96,8 @@ namespace osu.Desktop.Overlays
                         },
                         new Sprite
                         {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             Texture = textures.Get(@"Menu/dev-build-footer"),
                         },
                     }
@@ -157,14 +160,20 @@ namespace osu.Desktop.Overlays
 
                     Schedule(() => notification.State = ProgressNotificationState.Completed);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     if (useDeltaPatching)
                     {
+                        Logger.Error(e, @"delta patching failed!");
+
                         //could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
                         //try again without deltas.
                         checkForUpdateAsync(false, notification);
                         scheduleRetry = false;
+                    }
+                    else
+                    {
+                        Logger.Error(e, @"update failed!");
                     }
                 }
             }

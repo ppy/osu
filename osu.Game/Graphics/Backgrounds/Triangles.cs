@@ -10,7 +10,6 @@ using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
-using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Graphics.Backgrounds
 {

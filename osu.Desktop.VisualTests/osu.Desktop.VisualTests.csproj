@@ -183,6 +183,7 @@
     <Compile Include="Benchmark.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Tests\TestCaseChatDisplay.cs" />
+    <Compile Include="Tests\TestCaseDrawings.cs" />
     <Compile Include="Tests\TestCaseGamefield.cs" />
     <Compile Include="Tests\TestCaseMusicController.cs" />
     <Compile Include="Tests\TestCaseNotificationManager.cs" />
@@ -199,6 +200,9 @@
     <Compile Include="Platform\TestStorage.cs" />
     <Compile Include="Tests\TestCaseOptions.cs" />
     <Compile Include="Tests\TestCasePauseOverlay.cs" />
+    <Compile Include="Tests\TestCaseModSelectOverlay.cs" />
+    <Compile Include="Tests\TestCaseDialogOverlay.cs" />
+    <Compile Include="Tests\TestCaseBeatmapOptionsOverlay.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

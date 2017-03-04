@@ -12,7 +12,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionSlider<T> : FlowContainer where T : struct
+    public class OptionSlider<T> : FillFlowContainer where T : struct
     {
         private SliderBar<T> slider;
         private SpriteText text;
@@ -40,7 +40,6 @@ namespace osu.Game.Overlays.Options
 
         public OptionSlider()
         {
-            Direction = FlowDirections.Vertical;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = 5 };
