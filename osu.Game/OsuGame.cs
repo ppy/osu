@@ -25,6 +25,7 @@ using OpenTK;
 using System.Linq;
 using osu.Framework.Graphics.Primitives;
 using System.Threading.Tasks;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
@@ -93,13 +94,17 @@ namespace osu.Game
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
         }
 
+        private ScheduledDelegate scoreLoad;
+
         protected void LoadScore(Score s)
         {
+            scoreLoad?.Cancel();
+
             var menu = intro.ChildScreen;
 
             if (menu == null)
             {
-                Schedule(() => LoadScore(s));
+                scoreLoad = Schedule(() => LoadScore(s));
                 return;
             }
 
@@ -107,7 +112,7 @@ namespace osu.Game
             {
                 menu.MakeCurrent();
                 Delay(500);
-                Schedule(() => LoadScore(s));
+                scoreLoad = Schedule(() => LoadScore(s));
                 return;
             }
 
