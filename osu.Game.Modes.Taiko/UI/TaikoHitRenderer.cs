@@ -9,6 +9,8 @@ using osu.Game.Modes.UI;
 using osu.Framework.Graphics;
 using OpenTK;
 using osu.Game.Beatmaps;
+using osu.Framework.Allocation;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -22,6 +24,12 @@ namespace osu.Game.Modes.Taiko.UI
             : base(beatmap)
         {
             this.beatmap = beatmap;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+
         }
 
         protected override Playfield CreatePlayfield() => new TaikoPlayfield()
@@ -58,6 +66,11 @@ namespace osu.Game.Modes.Taiko.UI
                 return new DrawableBash(h as Bash);
 
             return null;
+        }
+
+        private DrawableBarLine GetVisualRepresentation(ControlPoint c)
+        {
+            return new DrawableMajorLine(c);
         }
     }
 }
