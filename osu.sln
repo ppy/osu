@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Desktop", "osu.Desktop\osu.Desktop.csproj", "{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}"
 EndProject
@@ -34,6 +34,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Desktop.Deploy", "osu.Desktop.Deploy\osu.Desktop.Deploy.csproj", "{BAEA2F74-0315-4667-84E0-ACAC0B4BF785}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{6EAD7610-89D8-48A2-8BE0-E348297E4D8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Modes.Vitaru", "osu.Game.Modes.Vitaru\osu.Game.Modes.Vitaru.csproj", "{9A615027-B2AB-435E-B865-0C7209933457}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +93,10 @@ Global
 		{230AC4F3-7783-49FB-9AEC-B83CDA3B9F3D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BAEA2F74-0315-4667-84E0-ACAC0B4BF785}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BAEA2F74-0315-4667-84E0-ACAC0B4BF785}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A615027-B2AB-435E-B865-0C7209933457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A615027-B2AB-435E-B865-0C7209933457}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A615027-B2AB-435E-B865-0C7209933457}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A615027-B2AB-435E-B865-0C7209933457}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,6 +115,7 @@ Global
 		{48F4582B-7687-4621-9CBE-5C24197CB536} = {0D37A2AD-80A4-464F-A1DE-1560B70F1CE3}
 		{230AC4F3-7783-49FB-9AEC-B83CDA3B9F3D} = {0D37A2AD-80A4-464F-A1DE-1560B70F1CE3}
 		{BAEA2F74-0315-4667-84E0-ACAC0B4BF785} = {6EAD7610-89D8-48A2-8BE0-E348297E4D8B}
+		{9A615027-B2AB-435E-B865-0C7209933457} = {0D37A2AD-80A4-464F-A1DE-1560B70F1CE3}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
