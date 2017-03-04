@@ -9,6 +9,7 @@ using osu.Framework.Desktop.Platform;
 using osu.Desktop.Overlays;
 using System.Reflection;
 using System.Drawing;
+using System.Threading.Tasks;
 using osu.Game.Screens.Menu;
 
 namespace osu.Desktop
@@ -56,7 +57,7 @@ namespace osu.Desktop
             // this method will only be executed if e.Effect in dragEnter gets set to something other that None.
             var dropData = e.Data.GetData(DataFormats.FileDrop) as object[];
             var filePaths = dropData.Select(f => f.ToString()).ToArray();
-            ImportBeatmapsAsync(filePaths);
+            Task.Run(() => BeatmapDatabase.Import(filePaths));
         }
 
         private void dragEnter(DragEventArgs e)

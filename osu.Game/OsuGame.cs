@@ -84,17 +84,12 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                ImportBeatmapsAsync(paths);
+                Task.Run(() => BeatmapDatabase.Import(paths));
             }
 
             Dependencies.Cache(this);
 
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
-        }
-
-        protected async void ImportBeatmapsAsync(IEnumerable<string> paths)
-        {
-            await Task.Run(() => BeatmapDatabase.Import(paths));
         }
 
         protected override void LoadComplete()
