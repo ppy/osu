@@ -210,10 +210,9 @@ namespace osu.Game.Screens.Select
                             groupsEllipsis = new TextAwesome
                             {
                                 Icon = FontAwesome.fa_ellipsis_h,
+                                Origin = Anchor.TopLeft,
                                 TextSize = 14,
                                 Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                                Origin = Anchor.BottomLeft,
-                                Anchor = Anchor.BottomLeft,
                             }
                         }
                     },
@@ -241,10 +240,9 @@ namespace osu.Game.Screens.Select
                             sortEllipsis = new TextAwesome
                             {
                                 Icon = FontAwesome.fa_ellipsis_h,
+                                Origin = Anchor.TopLeft,
                                 TextSize = 14,
                                 Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                                Origin = Anchor.BottomLeft,
-                                Anchor = Anchor.BottomLeft,
                             }
                         }
                     },

@@ -95,8 +95,6 @@ namespace osu.Game.Beatmaps.Drawables
                         new DifficultyIcon(beatmap)
                         {
                             Scale = new Vector2(1.8f),
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
                         },
                         new FillFlowContainer
                         {
