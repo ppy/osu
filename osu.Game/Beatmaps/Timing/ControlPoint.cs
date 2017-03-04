@@ -13,7 +13,13 @@ namespace osu.Game.Beatmaps.Timing
 
         public double Time;
         public double BeatLength;
+
+        /// <summary>
+        /// This should only be used for Taiko conversion. Use <see cref="VelocityAdjustment"/> instead.
+        /// </summary>
+        public float FloatVelocityAdjustment;
         public double VelocityAdjustment;
+
         public bool TimingChange;
 
         public EffectFlags EffectFlags;

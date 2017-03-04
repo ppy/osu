@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
 using osu.Game.Screens.Play;
+using OpenTK;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -206,7 +207,8 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     Time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo),
                     BeatLength = beatLength > 0 ? beatLength : 0,
-                    VelocityAdjustment = beatLength < 0 ? -beatLength / 100.0 : 1,
+                    VelocityAdjustment = beatLength < 0 ? MathHelper.Clamp(-beatLength, 10, 1000) / 100.0 : 1,
+                    FloatVelocityAdjustment = beatLength < 0 ? MathHelper.Clamp((float)-beatLength, 10, 1000) / 100f : 1,
                     TimingChange = split.Length <= 6 || split[6][0] == '1',
                     EffectFlags = effectFlags
                 };
