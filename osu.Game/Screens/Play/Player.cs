@@ -315,6 +315,8 @@ namespace osu.Game.Screens.Play
         {
             if (pauseOverlay == null) return false;
 
+            if (ReplayInputHandler != null) return false;
+
             if (pauseOverlay.State != Visibility.Visible && !canPause) return true;
 
             if (!IsPaused && sourceClock.IsRunning) // For if the user presses escape quickly when entering the map
