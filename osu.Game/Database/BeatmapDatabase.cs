@@ -25,14 +25,14 @@ namespace osu.Game.Database
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
-        private BeatmapImporter ipc;
+        private BeatmapIPCChannel ipc;
 
-        public BeatmapDatabase(Storage storage, GameHost importHost = null)
+        public BeatmapDatabase(Storage storage, IIpcHost importHost = null)
         {
             this.storage = storage;
 
             if (importHost != null)
-                ipc = new BeatmapImporter(importHost, this);
+                ipc = new BeatmapIPCChannel(importHost, this);
 
             if (connection == null)
             {
@@ -151,7 +151,7 @@ namespace osu.Game.Database
                     e = e.InnerException ?? e;
                     Logger.Error(e, $@"Could not import beatmap set");
                 }
-            
+
             // Batch commit with multiple sets to database
             Import(sets);
         }
