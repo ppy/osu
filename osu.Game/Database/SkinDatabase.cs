@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Skins;
@@ -47,9 +48,12 @@ namespace osu.Game.Database
             return conn;
         }
 
-        internal void Import(string path)
+        private void Import(IEnumerable<string> paths) { 
+        }
+
+        private void Import(string path)
         {
-            throw new NotImplementedException();
+            Import(new [] { path });
         }
     }
 }

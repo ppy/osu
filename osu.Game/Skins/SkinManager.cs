@@ -32,9 +32,9 @@ namespace osu.Game.Skins
 
         public List<KeyValuePair<string, SkinInfo>> UpdateItems() {
             var list = new List<KeyValuePair<string, SkinInfo>>();
-            foreach (SkinInfo info in skins)
+            foreach (SkinInfo skin in skins)
             {
-                list.Add(new KeyValuePair<string, SkinInfo>(info.Name, info));
+                list.Add(new KeyValuePair<string, SkinInfo>(skin.Name, skin));
             }
             return list;
         }
@@ -48,12 +48,14 @@ namespace osu.Game.Skins
             // TODO load skins
         }
 
+        private Skin GetSkinContents(SkinInfo skin) => skinContents.Find((x) => (x.info.Path == skin.Path));
+
         private void ChangedSkin(object sender, EventArgs e) {
-            foreach (SkinInfo info in skins) {
-                if (info.Path == bindable.Value.Path)
-                    selected = info;
+            foreach (SkinInfo skin in skins) {
+                if (skin.Path == bindable.Value.Path)
+                    selected = skin;
             }
-            selectedContents = skinContents.Find((x) => (x.info.Path == selected.Path));
+            selectedContents = GetSkinContents(selected);
         }
     }
 }
