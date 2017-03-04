@@ -20,6 +20,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return scores; }
             set
             {
+                if (value == scores) return;
                 scores = value;
 
                 var scoreDisplays = new List<LeaderboardScoreDisplay>();
@@ -56,13 +57,13 @@ namespace osu.Game.Screens.Select.Leaderboards
 
     public class LeaderboardScore
     {
+        public string Name;
         public Texture Avatar;
         public Texture Flag;
         public Texture Badge;
-        public string Name;
-        public int MaxCombo;
-        public double Accuracy;
         public int Score;
+        public double Accuracy;
+        public int MaxCombo;
         public IEnumerable<Mod> Mods;
     }
 }
