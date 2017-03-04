@@ -12,6 +12,7 @@ using osu.Framework.Audio.Sample;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Graphics.UserInterface
 {

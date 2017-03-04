@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using System.Threading.Tasks;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Platform;
 using osu.Game.Database;
 

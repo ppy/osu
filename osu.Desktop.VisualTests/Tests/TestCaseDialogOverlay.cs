@@ -11,7 +11,6 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseDialogOverlay : TestCase
     {
-        public override string Name => @"Dialog Overlay";
         public override string Description => @"Display dialogs";
 
         DialogOverlay overlay;
