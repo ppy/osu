@@ -24,9 +24,10 @@ using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
 using osu.Framework.Graphics.Primitives;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Screens.Play;
 
 namespace osu.Game
 {
@@ -90,6 +91,39 @@ namespace osu.Game
             Dependencies.Cache(this);
 
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
+        }
+
+        protected void LoadScore(Score s)
+        {
+            var menu = intro.ChildScreen;
+
+            if (menu == null)
+            {
+                Schedule(() => LoadScore(s));
+                return;
+            }
+
+            if (!menu.IsCurrentScreen)
+            {
+                menu.MakeCurrent();
+                Delay(500);
+                Schedule(() => LoadScore(s));
+                return;
+            }
+
+            if (s.Beatmap == null)
+            {
+                notificationManager.Post(new SimpleNotification
+                {
+                    Text = @"Tried to load a score for a beatmap we don't have!",
+                    Icon = FontAwesome.fa_life_saver,
+                });
+                return;
+            }
+
+            Beatmap.Value = BeatmapDatabase.GetWorkingBeatmap(s.Beatmap);
+
+            menu.Push(new PlayerLoader(new Player { ReplayInputHandler = s.Replay.GetInputHandler() }));
         }
 
         protected override void LoadComplete()

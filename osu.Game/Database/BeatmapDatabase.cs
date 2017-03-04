@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -162,7 +163,7 @@ namespace osu.Game.Database
         /// <param name="path">Location on disk</param>
         public void Import(string path)
         {
-            Import(new [] { path });
+            Import(new[] { path });
         }
 
         /// <summary>
@@ -181,10 +182,9 @@ namespace osu.Game.Database
 
             if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
             {
-                using (var md5 = MD5.Create())
                 using (var input = storage.GetStream(path))
                 {
-                    hash = BitConverter.ToString(md5.ComputeHash(input)).Replace("-", "").ToLowerInvariant();
+                    hash = input.GetMd5Hash();
                     input.Seek(0, SeekOrigin.Begin);
                     path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
                     if (!storage.Exists(path))
@@ -216,22 +216,29 @@ namespace osu.Game.Database
                 Metadata = metadata
             };
 
-            using (var reader = ArchiveReader.GetReader(storage, path))
+            using (var archive = ArchiveReader.GetReader(storage, path))
             {
-                string[] mapNames = reader.BeatmapFilenames;
+                string[] mapNames = archive.BeatmapFilenames;
                 foreach (var name in mapNames)
-                    using (var stream = new StreamReader(reader.GetStream(name)))
+                    using (var raw = archive.GetStream(name))
+                    using (var ms = new MemoryStream()) //we need a memory stream so we can seek and shit
+                    using (var sr = new StreamReader(ms))
                     {
-                        var decoder = BeatmapDecoder.GetDecoder(stream);
-                        Beatmap beatmap = decoder.Decode(stream);
+                        raw.CopyTo(ms);
+                        ms.Position = 0;
+
+                        var decoder = BeatmapDecoder.GetDecoder(sr);
+                        Beatmap beatmap = decoder.Decode(sr);
+
                         beatmap.BeatmapInfo.Path = name;
+                        beatmap.BeatmapInfo.Hash = ms.GetMd5Hash();
 
                         // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
                         beatmap.BeatmapInfo.Metadata = null;
 
                         beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
                     }
-                beatmapSet.StoryboardFile = reader.StoryboardFilename;
+                beatmapSet.StoryboardFile = archive.StoryboardFilename;
             }
 
             return beatmapSet;

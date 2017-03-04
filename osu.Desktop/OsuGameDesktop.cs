@@ -9,6 +9,7 @@ using osu.Framework.Desktop.Platform;
 using osu.Desktop.Overlays;
 using System.Reflection;
 using System.Drawing;
+using System.IO;
 using System.Threading.Tasks;
 using osu.Game.Screens.Menu;
 
@@ -55,10 +56,20 @@ namespace osu.Desktop
         private void dragDrop(DragEventArgs e)
         {
             // this method will only be executed if e.Effect in dragEnter gets set to something other that None.
-            var dropData = e.Data.GetData(DataFormats.FileDrop) as object[];
+            var dropData = (object[])e.Data.GetData(DataFormats.FileDrop);
             var filePaths = dropData.Select(f => f.ToString()).ToArray();
-            Task.Run(() => BeatmapDatabase.Import(filePaths));
+
+            if (filePaths.All(f => Path.GetExtension(f) == @".osz"))
+                Task.Run(() => BeatmapDatabase.Import(filePaths));
+            else if (filePaths.All(f => Path.GetExtension(f) == @".osr"))
+                Task.Run(() =>
+                {
+                    var score = ScoreDatabase.ReadReplayFile(filePaths.First());
+                    Schedule(() => LoadScore(score));
+                });
         }
+
+        static readonly string[] allowed_extensions = { @".osz", @".osr" };
 
         private void dragEnter(DragEventArgs e)
         {
@@ -66,8 +77,8 @@ namespace osu.Desktop
             bool isFile = e.Data.GetDataPresent(DataFormats.FileDrop);
             if (isFile)
             {
-                var paths = (e.Data.GetData(DataFormats.FileDrop) as object[]).Select(f => f.ToString()).ToArray();
-                if (paths.Any(p => !p.EndsWith(".osz")))
+                var paths = ((object[])e.Data.GetData(DataFormats.FileDrop)).Select(f => f.ToString()).ToArray();
+                if (paths.Any(p => !allowed_extensions.Any(ext => p.EndsWith(ext))))
                     e.Effect = DragDropEffects.None;
                 else
                     e.Effect = DragDropEffects.Copy;

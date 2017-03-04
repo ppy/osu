@@ -2,7 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Input.Handlers;
-using osu.Game.Input.Handlers;
+using osu.Game.Database;
+using SQLite.Net;
 
 namespace osu.Game.Modes
 {
@@ -15,10 +16,6 @@ namespace osu.Game.Modes
         public double Health { get; set; }
 
         public Replay Replay;
-    }
-
-    public class Replay
-    {
-        public virtual ReplayInputHandler GetInputHandler() => null;
+        public BeatmapInfo Beatmap;
     }
 }
