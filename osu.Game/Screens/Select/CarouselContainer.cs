@@ -47,11 +47,11 @@ namespace osu.Game.Screens.Select
             groups.Add(group);
 
             panels.Add(group.Header);
-            group.Header.Clock = Clock;
+            group.Header.UpdateClock(Clock);
             foreach (BeatmapPanel panel in group.BeatmapPanels)
             {
                 panels.Add(panel);
-                panel.Clock = Clock;
+                panel.UpdateClock(Clock);
             }
 
             computeYPositions();
@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select
         private void movePanel(Panel panel, bool advance, bool animated, ref float currentY)
         {
             yPositions.Add(currentY);
-            panel.MoveToY(currentY, animated && (panel.State != PanelSelectedState.Hidden) ? 750 : 0, EasingTypes.OutExpo);
+            panel.MoveToY(currentY, animated ? 750 : 0, EasingTypes.OutExpo);
 
             if (advance)
                 currentY += panel.DrawHeight + 5;
