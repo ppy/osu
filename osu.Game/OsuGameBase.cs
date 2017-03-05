@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
+using osu.Game.Skins;
 
 namespace osu.Game
 {
@@ -26,6 +27,7 @@ namespace osu.Game
         protected BeatmapDatabase BeatmapDatabase;
 
         protected ScoreDatabase ScoreDatabase;
+        protected SkinManager skins;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -47,6 +49,11 @@ namespace osu.Game
             Dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, Host));
             Dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, Host, BeatmapDatabase));
             Dependencies.Cache(new OsuColour());
+
+            Dependencies.Cache(skins = new SkinManager());
+
+            // TODO remove ugly Initialize() call from outside of framework
+            Dependencies.Initialize(skins);
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
             Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 }, true);

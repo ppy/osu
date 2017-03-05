@@ -76,6 +76,7 @@ namespace osu.Game.Database
                 // TODO
             };
 
+            return info;
         }
 
         public void Import(IEnumerable<string> paths) {

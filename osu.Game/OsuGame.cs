@@ -29,7 +29,6 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
-using osu.Game.Skins;
 
 namespace osu.Game
 {
@@ -38,8 +37,6 @@ namespace osu.Game
         public virtual bool IsDeployedBuild => false;
 
         public Toolbar Toolbar;
-
-        public SkinManager skins;
 
         private ChatOverlay chat;
 
@@ -93,10 +90,6 @@ namespace osu.Game
             }
 
             Dependencies.Cache(this);
-            Dependencies.Cache(skins = new SkinManager());
-
-            // TODO remove ugly Initialize() call from outside of framework
-            Dependencies.Initialize(skins);
 
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
         }
