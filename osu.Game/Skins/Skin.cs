@@ -1,11 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.IO;
 
@@ -13,7 +10,7 @@ namespace osu.Game.Skins
 {
     public class Skin
     {
-        public SkinInfo info;
+        public SkinInfo Info { get; private set; }
         public TextureStore Textures { get; private set; }
 
         private ArchiveReader skinsStore;
@@ -21,12 +18,12 @@ namespace osu.Game.Skins
 
         public Skin(SkinInfo info)
         {
-            this.info = info;
+            Info = info;
         }
 
         public void UpdateSkin() {
             Textures = new TextureStore();
-            if (info.Name != SkinManager.DefaultSkin.Name)
+            if (Info.Name != SkinManager.DefaultSkin.Name)
             {
                 Textures.AddStore(new RawTextureLoaderStore(skinsStore));
             }
@@ -36,7 +33,7 @@ namespace osu.Game.Skins
         [BackgroundDependencyLoader]
         private void load(GameHost host) {
             storage = host.Storage;
-            skinsStore = ArchiveReader.GetReader(storage, info.Path);
+            skinsStore = ArchiveReader.GetReader(storage, Info.Path);
             UpdateSkin();
         }
     }
