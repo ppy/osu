@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Play
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
-            hitRenderer.OnAllJudged += onPass;
+            hitRenderer.OnAllJudged += onCompletion;
 
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
@@ -244,8 +244,12 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private void onPass()
+        private void onCompletion()
         {
+            // Force a final check to see if the player has failed
+            // Some game modes (e.g. taiko) fail at the end of the map
+            scoreProcessor.CheckFailed();
+
             Delay(1000);
             Schedule(delegate
             {

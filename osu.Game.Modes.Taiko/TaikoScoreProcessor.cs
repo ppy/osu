@@ -20,8 +20,11 @@ namespace osu.Game.Modes.Taiko
         private const double combo_portion_ratio = 0.2f;
         private const double accuracy_portion_ratio = 0.8f;
 
+        protected override bool ShouldFail => totalHits == maxTotalHits && Health.Value <= 0.5;
+
         private double comboScore => 1000000 * combo_portion_ratio * comboPortion / maxComboPortion;
         private double accuracyScore => 1000000 * accuracy_portion_ratio * Math.Pow(Accuracy, 3.6) * accurateHits / maxAccurateHits;
+
         private double bonusScore;
 
         private double hpIncreaseTick;
@@ -33,25 +36,26 @@ namespace osu.Game.Modes.Taiko
 
         private double maxComboPortion;
         private int maxAccurateHits;
+        private int maxTotalHits;
 
         private double comboPortion;
         private int accurateHits;
+        private int totalHits;
 
         public TaikoScoreProcessor(int hitObjectCount)
             : base(hitObjectCount)
         {
-            Health.Value = hp_max;
         }
 
         public override void Initialize(Beatmap beatmap)
         {
             List<TaikoHitObject> objects = new TaikoConverter().Convert(beatmap);
 
-            double hpMultiplierNormal = hp_max / (0.06 * objects.FindAll(o => o is HitCircle).Count * beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98, Mods.None));
-            hpIncreaseTick = 0.0001;
-            hpIncreaseGreat = hpMultiplierNormal * hp_hit_300;
-            hpIncreaseGood = hpMultiplierNormal * beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_hit_100 * 8, hp_hit_100, hp_hit_100, Mods.None);
-            hpIncreaseMiss = beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, -6, -25, -40, Mods.None);
+            double hpMultiplierNormal = 1 / (0.06 * objects.FindAll(o => o is HitCircle).Count * beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98, Mods.None));
+            hpIncreaseTick = 0.0001 / 200.0;
+            hpIncreaseGreat = hpMultiplierNormal * hp_hit_300 / 200.0;
+            hpIncreaseGood = hpMultiplierNormal * beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_hit_100 * 8, hp_hit_100, hp_hit_100, Mods.None) / 200.0;
+            hpIncreaseMiss = beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, -6, -25, -40, Mods.None) / 200.0;
 
             List<TaikoHitObject> finishers = objects.FindAll(o => (o as HitCircle)?.IsFinisher ?? false);
             finisherScoreScale = -7d / 90d * MathHelper.Clamp(finishers.Count, 30, 120) + 111d / 9d;
@@ -96,8 +100,11 @@ namespace osu.Game.Modes.Taiko
                         Score = TaikoScoreResult.Great
                     });
                 }
+
+                totalHits++;
             }
 
+            maxTotalHits = totalHits;
             maxComboPortion = comboPortion;
             maxAccurateHits = accurateHits;
         }
@@ -134,6 +141,9 @@ namespace osu.Game.Modes.Taiko
                     break;
             }
 
+            if (!(tji is TaikoDrumRollTickJudgementInfo))
+                totalHits++;
+
             // Hp calculations
             switch (judgement.Result)
             {
@@ -156,7 +166,7 @@ namespace osu.Game.Modes.Taiko
                     break;
             }
 
-            // Todo: The following is wrong
+            // Todo: The following accuracy is wrong
             int score = 0;
             int maxScore = 0;
 
@@ -167,6 +177,7 @@ namespace osu.Game.Modes.Taiko
             }
 
             Accuracy.Value = (double)score / maxScore;
+
             TotalScore.Value = comboScore + accuracyScore + bonusScore;
         }
 
@@ -174,9 +185,12 @@ namespace osu.Game.Modes.Taiko
         {
             base.Reset();
 
+            Health.Value = 0;
+
             bonusScore = 0;
             comboPortion = 0;
             accurateHits = 0;
+            totalHits = 0;
         }
     }
 }

@@ -32,11 +32,9 @@ namespace osu.Game.Modes
         public readonly BindableInt Combo = new BindableInt();
 
         /// <summary>
-        /// Are we allowed to fail?
+        /// Whether the player is in a failable state.
         /// </summary>
-        protected bool CanFail => true;
-
-        protected bool HasFailed { get; private set; }
+        protected abstract bool ShouldFail { get; }
 
         /// <summary>
         /// Called when we reach a failing health of zero.
@@ -50,6 +48,8 @@ namespace osu.Game.Modes
         public readonly BindableInt HighestCombo = new BindableInt();
 
         public readonly List<JudgementInfo> Judgements;
+
+        private bool hasFailed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScoreProcessor"/> class.
@@ -68,11 +68,8 @@ namespace osu.Game.Modes
             UpdateCalculations(judgement);
 
             judgement.ComboAtHit = (ulong)Combo.Value;
-            if (Health.Value == Health.MinValue && !HasFailed)
-            {
-                HasFailed = true;
-                Failed?.Invoke();
-            }
+
+            CheckFailed();
         }
 
         /// <summary>
@@ -81,11 +78,14 @@ namespace osu.Game.Modes
         /// <param name="beatmap">The beatmap to initialize calculations with.</param>
         public abstract void Initialize(Beatmap beatmap);
 
+        /// <summary>
+        /// Rests the score processor to a stale state.
+        /// </summary>
         public virtual void Reset()
         {
             Judgements.Clear();
 
-            HasFailed = false;
+            hasFailed = false;
             TotalScore.Value = 0;
             Accuracy.Value = 0;
             Health.Value = 0;
@@ -98,5 +98,17 @@ namespace osu.Game.Modes
         /// </summary>
         /// <param name="newJudgement">A new JudgementInfo that triggered this calculation. May be null.</param>
         protected abstract void UpdateCalculations(JudgementInfo newJudgement);
+
+        /// <summary>
+        /// Checks if the player has failed.
+        /// </summary>
+        public void CheckFailed()
+        {
+            if (!hasFailed && ShouldFail)
+            {
+                hasFailed = true;
+                Failed?.Invoke();
+            }
+        }
     }
 }

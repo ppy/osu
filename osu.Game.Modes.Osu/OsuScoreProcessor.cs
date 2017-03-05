@@ -10,6 +10,8 @@ namespace osu.Game.Modes.Osu
 {
     class OsuScoreProcessor : ScoreProcessor
     {
+        protected override bool ShouldFail => Health.Value == Health.MinValue;
+
         public OsuScoreProcessor(int hitObjectCount)
             : base(hitObjectCount)
         {
