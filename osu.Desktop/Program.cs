@@ -71,8 +71,7 @@ namespace osu.Desktop
                     var rulesets = Assembly.LoadFile(file).GetTypes().Where((Type t) => t.IsSubclassOf(typeof(Ruleset)));
                     foreach (Type rulesetType in rulesets)
                     {
-                        Ruleset ruleset = Activator.CreateInstance(rulesetType) as Ruleset;
-                        Ruleset.Register(ruleset);
+                        Ruleset.Register(Activator.CreateInstance(rulesetType) as Ruleset);
                     }
                     
                 }

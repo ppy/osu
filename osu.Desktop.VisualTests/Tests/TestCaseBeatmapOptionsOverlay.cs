@@ -11,7 +11,6 @@ namespace osu.Desktop.VisualTests
 {
     class TestCaseBeatmapOptionsOverlay : TestCase
     {
-        public override string Name => @"Beatmap Options";
         public override string Description => @"Beatmap options in song select";
 
         public override void Reset()

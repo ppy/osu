@@ -17,8 +17,6 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseKeyCounter : TestCase
     {
-        public override string Name => @"KeyCounter";
-
         public override string Description => @"Tests key counter";
 
         public override void Reset()

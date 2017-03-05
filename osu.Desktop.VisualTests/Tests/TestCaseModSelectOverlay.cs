@@ -13,7 +13,6 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseModSelectOverlay : TestCase
     {
-        public override string Name => @"Mod Select";
 
         public override string Description => @"Tests the mod select overlay";
 

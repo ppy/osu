@@ -19,7 +19,6 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseHitObjects : TestCase
     {
-        public override string Name => @"Hit Objects";
 
         private StopwatchClock rateAdjustClock;
         private FramedClock framedClock;

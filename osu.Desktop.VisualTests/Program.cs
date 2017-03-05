@@ -9,7 +9,6 @@ using osu.Game.Modes.Catch;
 using osu.Game.Modes.Mania;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Taiko;
-using osu.Game.Modes.Vitaru;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -53,8 +52,7 @@ namespace osu.Desktop.VisualTests
                     var rulesets = Assembly.LoadFile(file).GetTypes().Where((Type t) => t.IsSubclassOf(typeof(Ruleset)));
                     foreach (Type rulesetType in rulesets)
                     {
-                        Ruleset ruleset = Activator.CreateInstance(rulesetType) as Ruleset;
-                        Ruleset.Register(ruleset);
+                        Ruleset.Register(Activator.CreateInstance(rulesetType) as Ruleset);
                     }
 
                 }

@@ -21,7 +21,6 @@ namespace osu.Desktop.VisualTests.Tests
     class TestCasePlayer : TestCase
     {
         protected WorkingBeatmap Beatmap;
-        public override string Name => @"Player";
 
         public override string Description => @"Showing everything to play the game.";
 

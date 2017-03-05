@@ -14,7 +14,6 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseTextAwesome : TestCase
     {
-        public override string Name => @"TextAwesome";
 
         public override string Description => @"Tests display of icons";
 
