@@ -2,29 +2,55 @@
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;
+using OpenTK.Input;
+using osu.Game.Modes.Vitaru.UI;
+using osu.Game.Modes.Osu.UI;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics;
+using OpenTK;
 
 namespace osu.Game.Modes.Vitaru
 {
     internal class VitaruScoreOverlay : ScoreOverlay
     {
-        protected override PercentageCounter CreateAccuracyCounter()
+        protected override ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
         {
-            throw new NotImplementedException();
-        }
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
+            TextSize = 40,
+            Position = new Vector2(0, 30),
+            Margin = new MarginPadding { Right = 5 },
+        };
 
-        protected override ComboCounter CreateComboCounter()
+        protected override PercentageCounter CreateAccuracyCounter() => new EnergyMeter()
         {
-            throw new NotImplementedException();
-        }
+            Anchor = Anchor.TopRight,
+            Origin = Anchor.TopRight,
+            Position = new Vector2(0, 65),
+            TextSize = 20,
+            Margin = new MarginPadding { Right = 5 },
+        };
 
-        protected override KeyCounterCollection CreateKeyCounter()
+        protected override ComboCounter CreateComboCounter() => new VitaruComboCounter()
         {
-            throw new NotImplementedException();
-        }
+            Anchor = Anchor.BottomLeft,
+            Origin = Anchor.BottomLeft,
+        };
 
-        protected override ScoreCounter CreateScoreCounter()
+        protected override KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
         {
-            throw new NotImplementedException();
-        }
+            IsCounting = true,
+            FadeTime = 50,
+            Anchor = Anchor.BottomRight,
+            Origin = Anchor.BottomRight,
+            Margin = new MarginPadding(10),
+            Children = new KeyCounter[]
+            {
+                new KeyCounterKeyboard(@"W", Key.W),
+                new KeyCounterKeyboard(@"A", Key.A),
+                new KeyCounterKeyboard(@"S", Key.S),
+                new KeyCounterKeyboard(@"D", Key.D),
+            }
+        };
     }
 }

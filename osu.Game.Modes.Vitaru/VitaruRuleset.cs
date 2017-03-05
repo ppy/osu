@@ -6,7 +6,6 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
 using osu.Game.Modes.Vitaru.UI;
 using System;
-using osu.Game.Modes.Vitaru.UI;
 using osu.Game.Graphics;
 using osu.Game.Beatmaps;
 
@@ -20,10 +19,7 @@ namespace osu.Game.Modes.Vitaru
 
         public ScoreProcessor CreateScoreProcessor() => new VitaruScoreProcessor();
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount)
-        {
-            throw new NotImplementedException();
-        }
+        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => new VitaruScoreProcessor();
 
         public override HitRenderer CreateHitRendererWith(Beatmap beatmap)
         {

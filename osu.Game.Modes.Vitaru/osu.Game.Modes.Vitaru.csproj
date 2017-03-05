@@ -45,9 +45,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Objects\Bullet.cs" />
     <Compile Include="Objects\Character.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Objects\VitaruHitObject.cs" />
+    <Compile Include="UI\EnergyMeter.cs" />
     <Compile Include="VitaruHitRenderer.cs" />
     <Compile Include="VitaruMod.cs" />
     <Compile Include="VitaruObjectParser.cs" />
