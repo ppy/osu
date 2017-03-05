@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.IO;
+using SQLite.Net.Attributes;
 
 namespace osu.Game.Skins
 {
@@ -40,7 +41,10 @@ namespace osu.Game.Skins
 
     public class SkinInfo
     {
-        public string Name;
-        public string Path;
+        [PrimaryKey, AutoIncrement]
+        public int ID { get; set; }
+
+        public string Name { get; set; }
+        public string Path { get; set; }
     }
 }

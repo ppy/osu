@@ -48,7 +48,7 @@ namespace osu.Game.Skins
             // TODO load skins
         }
 
-        private Skin getSkinContents(SkinInfo skin) => skinContents.Find((x) => (x.info.Path == skin.Path));
+        private Skin getSkinContents(SkinInfo skin) => skinContents.Find((x) => (x.Info.Path == skin.Path));
 
         private void changedSkin(object sender, EventArgs e) {
             foreach (SkinInfo skin in skins) {

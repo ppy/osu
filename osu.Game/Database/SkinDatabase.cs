@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-using Ionic.Zip;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Skins;
 using SQLite.Net;
+using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Database
 {
@@ -17,6 +17,8 @@ namespace osu.Game.Database
     {
         private SQLiteConnection connection { get; set; }
         private Storage storage;
+
+        public Action<SkinInfo> SkinAdded;
 
         public SkinDatabase(Storage storage)
         {
@@ -41,7 +43,7 @@ namespace osu.Game.Database
             SQLiteConnection conn = storage.GetDatabase(@"skins");
             try
             {
-                connection.CreateTable <SkinInfo>();
+                connection.CreateTable<SkinInfo>();
             }
             catch 
             {
@@ -73,18 +75,33 @@ namespace osu.Game.Database
 
             SkinInfo info = new SkinInfo
             {
-                // TODO
+                //Maybe name should be taken from the folder inside the osk, not the osk itself
+                Name = Path.GetFileName(path)
             };
 
             return info;
         }
 
         public void Import(IEnumerable<string> paths) {
+            List<SkinInfo> infos = new List<SkinInfo>();
             foreach (string path in paths) 
             {
-                getSkin(path);
+                SkinInfo info  = getSkin(path);
+                infos.Add(info);
             }
-            throw new NotImplementedException();
+            Import(infos);
+        }
+
+        public void Import(IEnumerable<SkinInfo> infos) 
+        {
+            connection.BeginTransaction();
+            foreach (SkinInfo info in infos) 
+            {
+                connection.Insert(info);
+                SkinAdded?.Invoke(info);
+            }
+
+            connection.Commit();
         }
 
         public void Import(string path)
