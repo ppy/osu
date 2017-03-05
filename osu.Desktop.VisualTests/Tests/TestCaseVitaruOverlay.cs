@@ -37,7 +37,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void addAccuracy(float accuracy)
         {
-            energy.Set(energy.Count + accuracy);
+            energy.Set((float)Math.Round(energy.Count + accuracy,1));
         }
     }
 }
