@@ -56,7 +56,7 @@ namespace osu.Game.Modes.Osu.Objects
             var baseVelocity = 100 * baseDifficulty.SliderMultiplier;
 
             Velocity = baseVelocity / beatmap.BeatLengthAt(StartTime);
-            TickDistance = baseVelocity / baseDifficulty.SliderTickRate / beatmap.BPMMultiplierAt(StartTime);
+            TickDistance = baseVelocity / (baseDifficulty.SliderTickRate * beatmap.BPMMultiplierAt(StartTime));
         }
 
         public int RepeatCount = 1;
