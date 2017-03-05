@@ -40,17 +40,14 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.SetDefaultsFromBeatmap(beatmap);
 
-            // Don't ask... Old osu! had a random multiplier here, that we now have to multiply everywhere
-            float fudgeFactor = 1.4f;
-
-            Length *= fudgeFactor;
+            Length *= SLIDER_FUDGE_FACTOR;
 
             var baseDifficulty = beatmap.BeatmapInfo.BaseDifficulty;
 
             ControlPoint overridePoint;
             ControlPoint timingPoint = beatmap.TimingPointAt(StartTime, out overridePoint);
             var velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
-            var baseVelocity = 100 * baseDifficulty.SliderMultiplier * fudgeFactor / velocityAdjustment;
+            var baseVelocity = 100 * baseDifficulty.SliderMultiplier * SLIDER_FUDGE_FACTOR / velocityAdjustment;
 
             Velocity = baseVelocity / timingPoint.BeatLength;
 

@@ -41,9 +41,6 @@ namespace osu.Game.Modes.Taiko.Objects
                     {
                         Slider slider = o as Osu.Objects.Slider;
 
-                        // Don't ask... Old osu! had a random multiplier here, that we now have to multiply everywhere
-                        double fudgeFactor = 1.4;
-
                         // We compute slider velocity ourselves since we use double VelocityAdjustment here, whereas
                         // the old osu! used float. This creates a veeeeeeeeeeery tiny (on the order of 2.4092825810839713E-05) offset
                         // to slider velocity, that results in triggering the below conditional in some incorrect cases. This doesn't
@@ -61,8 +58,8 @@ namespace osu.Game.Modes.Taiko.Objects
                         else
                             newSv = scoringDistance;
 
-                        double l = slider.Length * fudgeFactor * slider.RepeatCount;
-                        double v = newSv * fudgeFactor;
+                        double l = slider.Length * TaikoHitObject.SLIDER_FUDGE_FACTOR * slider.RepeatCount;
+                        double v = newSv * TaikoHitObject.SLIDER_FUDGE_FACTOR;
                         double bl = beatmap.BeatLengthAt(slider.StartTime, false);
 
                         double skipPeriod = Math.Min(bl / beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate, slider.Duration / slider.RepeatCount);

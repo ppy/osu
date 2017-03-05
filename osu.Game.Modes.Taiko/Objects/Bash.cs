@@ -9,6 +9,11 @@ namespace osu.Game.Modes.Taiko.Objects
 {
     public class Bash : TaikoHitObject
     {
+        /// <summary>
+        /// Old osu! constant that increases number of "spins" required.
+        /// </summary>
+        private const double spinner_ratio = 1.65;
+
         public double Length;
 
         public override double EndTime => StartTime + Length;
@@ -22,7 +27,7 @@ namespace osu.Game.Modes.Taiko.Objects
             // Todo: Diff range
             float spinnerRotationRatio = 5;
 
-            RequiredHits = (int)Math.Max(1, Length / 1000f * spinnerRotationRatio * 1.65f);
+            RequiredHits = (int)Math.Max(1, Length / 1000f * spinnerRotationRatio * spinner_ratio);
         }
     }
 }

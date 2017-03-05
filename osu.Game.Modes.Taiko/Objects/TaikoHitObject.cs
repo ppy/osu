@@ -12,6 +12,13 @@ namespace osu.Game.Modes.Taiko.Objects
 {
     public class TaikoHitObject : HitObject
     {
+        /// <summary>
+        /// To be honest, I don't know why this is needed. Old osu! scaled the
+        /// slider multiplier by this factor, seemingly randomly, but now we unfortunately
+        /// have to replicate that here anywhere slider length/slider multipliers are used :(
+        /// </summary>
+        public const double SLIDER_FUDGE_FACTOR = 1.4;
+        
         public double HitWindowGreat;
         public double HitWindowGood;
         public double HitWindowMiss;
@@ -27,11 +34,8 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.SetDefaultsFromBeatmap(beatmap);
 
-            // Don't ask... Old osu! had a random multiplier here, that we now have to multiply everywhere
-            float fudgeFactor = 1.4f;
-
             Scale = 1f - 0.7f * -3f / 5 / 2;
-            PreEmpt = 600 / (beatmap.SliderVelocityAt(StartTime) * fudgeFactor) * 1000;
+            PreEmpt = 600 / (beatmap.SliderVelocityAt(StartTime) * SLIDER_FUDGE_FACTOR) * 1000;
 
             ControlPoint overridePoint;
             Kiai = beatmap.TimingPointAt(StartTime, out overridePoint).KiaiMode;

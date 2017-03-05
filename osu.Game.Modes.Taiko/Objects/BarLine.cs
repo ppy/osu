@@ -17,10 +17,7 @@ namespace osu.Game.Modes.Taiko.Objects
 
         public void SetDefaultsFromBeatmap(Beatmap beatmap)
         {
-            // Don't ask... Old osu! had a random multiplier here, that we now have to multiply everywhere
-            float fudgeFactor = 1.4f;
-
-            PreEmpt = 600 / (beatmap.SliderVelocityAt(StartTime) * fudgeFactor) * 1000;
+            PreEmpt = 600 / (beatmap.SliderVelocityAt(StartTime) * TaikoHitObject.SLIDER_FUDGE_FACTOR) * 1000;
         }
     }
 }
