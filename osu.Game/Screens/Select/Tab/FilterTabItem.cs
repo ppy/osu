@@ -1,0 +1,105 @@
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface.Tab;
+using osu.Framework.Input;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using OpenTK.Graphics;
+
+namespace osu.Game.Screens.Select.Tab
+{
+    public class FilterTabItem<T> : TabItem<T>
+    {
+        private SpriteText text;
+        private Box box;
+        private Color4 fadeColour;
+
+        public new T Value
+        {
+            get { return base.Value; }
+            set
+            {
+                base.Value = value;
+                text.Text = (value as Enum)?.GetDescription();
+            }
+        }
+
+        public override bool Active
+        {
+            get { return base.Active; }
+            set
+            {
+                if (value)
+                    fadeActive();
+                else
+                    fadeInactive();
+                base.Active = value;
+            }
+        }
+
+        private void fadeActive()
+        {
+            box.FadeIn(300);
+            text.FadeColour(Color4.White, 300);
+        }
+
+        private void fadeInactive()
+        {
+            box.FadeOut(300);
+            text.FadeColour(fadeColour, 300);
+        }
+
+        protected override bool OnHover(InputState state) {
+            if (!Active)
+                fadeActive();
+            return true;
+        }
+
+        protected override void OnHoverLost(InputState state) {
+            if (!Active)
+                fadeInactive();
+        }
+
+        public FilterTabItem()
+        {
+            AutoSizeAxes = Axes.Both;
+            Children = new Drawable[]
+            {
+                text = new OsuSpriteText
+                {
+                    Margin = new MarginPadding(5),
+                    TextSize = 14,
+                    Font = @"Exo2.0-Bold", // Font should only turn bold when active?
+                },
+                box = new Box
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 1,
+                    Alpha = 0,
+                    Colour = Color4.White,
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
+                }
+            };
+        }
+
+        // TODO: Remove this (for debugging)
+        public override string ToString() {
+            return Value.ToString();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            fadeColour = colours.Blue;
+            text.Colour = colours.Blue;
+        }
+    }
+}

@@ -84,6 +84,11 @@
     <Compile Include="Graphics\UserInterface\OsuPasswordTextBox.cs" />
     <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
+    <Compile Include="Screens\Select\Tab\FilterTabControl.cs" />
+    <Compile Include="Screens\Select\Tab\FilterTabDropDownMenu.cs" />
+    <Compile Include="Screens\Select\Tab\FilterTabItem.cs" />
+    <Compile Include="Screens\Select\Tab\FilterTabDropDownHeader.cs" />
+    <Compile Include="Screens\Select\Tab\FilterTabDropDownMenuItem.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
     <Compile Include="Input\Handlers\ReplayInputHandler.cs" />
     <Compile Include="IO\Legacy\ILegacySerializable.cs" />
@@ -175,6 +180,8 @@
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Modes\UI\StandardComboCounter.cs" />
     <Compile Include="Screens\Select\CarouselContainer.cs" />
+    <Compile Include="Screens\Select\Filter\GroupMode.cs" />
+    <Compile Include="Screens\Select\Filter\SortMode.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameScreen.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
