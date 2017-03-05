@@ -2,16 +2,19 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
+using osu.Framework.Graphics.UserInterface.Tab;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Select.Filter;
+using osu.Game.Screens.Select.Tab;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.Select
 {
@@ -23,7 +26,8 @@ namespace osu.Game.Screens.Select
         private SortMode sort = SortMode.Title;
         public SortMode Sort { 
             get { return sort; } 
-            set {
+            set
+            {
                 if (sort != value)
                 {
                     sort = value;
@@ -36,7 +40,7 @@ namespace osu.Game.Screens.Select
 
         private SearchTextBox searchTextBox;
 
-        public FilterControl()
+        public FilterControl(float height)
         {
             Children = new Drawable[]
             {
@@ -44,7 +48,8 @@ namespace osu.Game.Screens.Select
                 {
                     Colour = Color4.Black,
                     Alpha = 0.8f,
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    Height = height
                 },
                 new FillFlowContainer
                 {
@@ -57,7 +62,8 @@ namespace osu.Game.Screens.Select
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SearchTextBox {
+                        searchTextBox = new SearchTextBox
+                        {
                             RelativeSizeAxes = Axes.X,
                             OnChange = (sender, newText) =>
                             {
@@ -83,97 +89,20 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = true;
         }
 
-        private class TabItem : ClickableContainer
+        private class GroupSortTabs : Container
         {
-            public string Text
-            {
-                get { return text.Text; }
-                set { text.Text = value; }
-            }
+            private TabControl<GroupMode> groupTabs;
+            private TabControl<SortMode> sortTabs;
 
-            private void fadeActive()
+            public GroupSortTabs()
             {
-                box.FadeIn(300);
-                text.FadeColour(Color4.White, 300);
-            }
-
-            private void fadeInactive()
-            {
-                box.FadeOut(300);
-                text.FadeColour(fadeColour, 300);
-            }
-
-            private bool active;
-            public bool Active
-            {
-                get { return active; }
-                set
-                {
-                    active = value;
-                    if (active)
-                        fadeActive();
-                    else
-                        fadeInactive();
-                }
-            }
-        
-            private SpriteText text;
-            private Box box;
-            private Color4 fadeColour;
-            
-            protected override bool OnHover(InputState state)
-            {
-                if (!active)
-                    fadeActive();
-                return true;
-            }
-            
-            protected override void OnHoverLost(InputState state)
-            {
-                if (!active)
-                    fadeInactive();
-            }
-        
-            public TabItem()
-            {
-                AutoSizeAxes = Axes.Both;
-                Children = new Drawable[]
-                {
-                    text = new OsuSpriteText
-                    {
-                        Margin = new MarginPadding(5),
-                        TextSize = 14,
-                        Font = @"Exo2.0-Bold",
-                    },
-                    box = new Box
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 1,
-                        Alpha = 0,
-                        Colour = Color4.White,
-                        Origin = Anchor.BottomLeft,
-                        Anchor = Anchor.BottomLeft,
-                    }
-                };
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                text.Colour = colours.Blue;
-                fadeColour = colours.Blue;
-            }
-        }
-
-        private class GroupSortTabs : Container
-        {
-            private TextAwesome groupsEllipsis, sortEllipsis;
-            private SpriteText sortLabel;
-        
-            public GroupSortTabs()
-            {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
                 Children = new Drawable[]
                 {
                     new Box
@@ -181,110 +110,34 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
                         Colour = OsuColour.Gray(80),
-                        Origin = Anchor.BottomLeft,
-                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.TopLeft,
+                        Anchor = Anchor.TopLeft,
+                        Position = new Vector2(0, 23)
                     },
-                    new FillFlowContainer
+                    groupTabs = new FilterTabControl<GroupMode>
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(10, 0),
-                        Children = new Drawable[]
-                        {
-                            new TabItem
-                            {
-                                Text = "All",
-                                Active = true,
-                            },
-                            new TabItem
-                            {
-                                Text = "Recently Played",
-                                Active = false,
-                            },
-                            new TabItem
-                            {
-                                Text = "Collections",
-                                Active = false,
-                            },
-                            groupsEllipsis = new TextAwesome
-                            {
-                                Icon = FontAwesome.fa_ellipsis_h,
-                                Origin = Anchor.TopLeft,
-                                TextSize = 14,
-                                Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                            }
-                        }
+                        Width = 210
                     },
-                    new FillFlowContainer
+                    sortTabs = new FilterTabControl<SortMode>
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(10, 0),
-                        Origin = Anchor.TopRight,
+                        Width = 180,
                         Anchor = Anchor.TopRight,
-                        Children = new Drawable[]
-                        {
-                            sortLabel = new OsuSpriteText
-                            {
-                                Font = @"Exo2.0-Bold",
-                                Text = "Sort results by",
-                                TextSize = 14,
-                                Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                            },
-                            new TabItem
-                            {
-                                Text = "Artist",
-                                Active = true,
-                            },
-                            sortEllipsis = new TextAwesome
-                            {
-                                Icon = FontAwesome.fa_ellipsis_h,
-                                Origin = Anchor.TopLeft,
-                                TextSize = 14,
-                                Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                            }
-                        }
-                    },
+                        Origin = Anchor.TopRight
+                    }
                 };
+                sortTabs.Prefix.Children = new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Font = @"Exo2.0-Bold",
+                        Text = "Sort results by",
+                        TextSize = 14,
+                        Margin = new MarginPadding { Top = 5, Bottom = 5 },
+                    }
+                };
+                groupTabs.Pin(GroupMode.All);
+                groupTabs.Pin(GroupMode.RecentlyPlayed);
             }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                groupsEllipsis.Colour = colours.Blue;
-                sortLabel.Colour = colours.GreenLight;
-                sortEllipsis.Colour = colours.GreenLight;
-            }
-        }
-        
-        public enum SortMode
-        {
-            Artist,
-            BPM,
-            Author,
-            DateAdded,
-            Difficulty,
-            Length,
-            RankAchieved,
-            Title
-        }
-
-        public enum GroupMode
-        {
-            NoGrouping,
-            Artist,
-            BPM,
-            Author,
-            DateAdded,
-            Difficulty,
-            Length,
-            RankAchieved,
-            Title,
-            Collections,
-            Favorites,
-            MyMaps,
-            RankedStatus,
-            RecentlyPlayed
         }
     }
 }

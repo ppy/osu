@@ -15,6 +15,7 @@ using OpenTK.Input;
 using System.Collections;
 using osu.Framework.MathUtils;
 using System.Diagnostics;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
 {
@@ -157,21 +158,21 @@ namespace osu.Game.Screens.Select
             ScrollTo(selectedY, animated);
         }
 
-        public void Sort(FilterControl.SortMode mode)
+        public void Sort(SortMode mode)
         {
             List<BeatmapGroup> sortedGroups = new List<BeatmapGroup>(groups);
             switch (mode)
             {
-                case FilterControl.SortMode.Artist:
+                case SortMode.Artist:
                     sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist, StringComparison.InvariantCultureIgnoreCase));
                     break;
-                case FilterControl.SortMode.Title:
+                case SortMode.Title:
                     sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title, StringComparison.InvariantCultureIgnoreCase));
                     break;
-                case FilterControl.SortMode.Author:
+                case SortMode.Author:
                     sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author, StringComparison.InvariantCultureIgnoreCase));
                     break;
-                case FilterControl.SortMode.Difficulty:
+                case SortMode.Difficulty:
                     sortedGroups.Sort((x, y) =>
                     {
                         float xAverage = 0, yAverage = 0;
