@@ -8,7 +8,6 @@ using System;
 using System.Collections.Concurrent;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Modes
 {
