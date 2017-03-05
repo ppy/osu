@@ -157,14 +157,12 @@ namespace osu.Game.Screens.Select.Leaderboards
                                             Origin = Anchor.BottomLeft,
                                             Anchor = Anchor.BottomLeft,
                                             AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Right,
+                                            Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(10f, 0f),
                                             Children = new Drawable[]
                                             {
                                                 new Container
                                                 {
-                                                    Origin = Anchor.BottomLeft,
-                                                    Anchor = Anchor.BottomLeft,
                                                     Size = new Vector2(87f, 20f),
                                                     Masking = true,
                                                     Children = new Drawable[]
@@ -186,7 +184,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                 new FillFlowContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Right,
+                                                    Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10f, 0f),
                                                     Margin = new MarginPadding { Left = 10, },
                                                     Children = new Drawable[]
@@ -218,7 +216,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     AutoSizeAxes = Axes.Both,
                                     // TODO: Probably remove? Seems like others don't like this kind of thing
                                     Position = new Vector2(0f, 4f), //properly align the mod icons
-                                    Direction = FillDirection.Left,
+                                    Direction = FillDirection.Horizontal,
                                 },
                             },
                         },
