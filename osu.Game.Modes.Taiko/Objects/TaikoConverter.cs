@@ -47,7 +47,7 @@ namespace osu.Game.Modes.Taiko.Objects
                         // seem fixable by Precision.AlmostBigger(), because the error is extremely small (and is also dependent on float precision).
                         ControlPoint overridePoint;
                         ControlPoint controlPoint = beatmap.TimingPointAt(slider.StartTime, out overridePoint);
-                        double origBeatLength = beatmap.BeatLengthAt(slider.StartTime, false);
+                        double origBeatLength = beatmap.BeatLengthAt(slider.StartTime);
                         float origVelocityAdjustment = overridePoint?.FloatVelocityAdjustment ?? 1;
 
                         double scoringDistance = 100 * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
@@ -60,7 +60,7 @@ namespace osu.Game.Modes.Taiko.Objects
 
                         double l = slider.Length * TaikoHitObject.SLIDER_FUDGE_FACTOR * slider.RepeatCount;
                         double v = newSv * TaikoHitObject.SLIDER_FUDGE_FACTOR;
-                        double bl = beatmap.BeatLengthAt(slider.StartTime, false);
+                        double bl = beatmap.BeatLengthAt(slider.StartTime);
 
                         double skipPeriod = Math.Min(bl / beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate, slider.Duration / slider.RepeatCount);
 

@@ -53,10 +53,10 @@ namespace osu.Game.Modes.Osu.Objects
             base.SetDefaultsFromBeatmap(beatmap);
 
             var baseDifficulty = beatmap.BeatmapInfo.BaseDifficulty;
-            var baseVelocity = 100 * baseDifficulty.SliderMultiplier;
+            var scoringDistance = 100 * baseDifficulty.SliderMultiplier;
 
-            Velocity = baseVelocity / beatmap.BeatLengthAt(StartTime);
-            TickDistance = baseVelocity / (baseDifficulty.SliderTickRate * beatmap.BPMMultiplierAt(StartTime));
+            Velocity = scoringDistance / beatmap.BeatDistanceAt(StartTime);
+            TickDistance = scoringDistance / (baseDifficulty.SliderTickRate * beatmap.BPMMultiplierAt(StartTime));
         }
 
         public int RepeatCount = 1;

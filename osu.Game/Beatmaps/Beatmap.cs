@@ -27,6 +27,11 @@ namespace osu.Game.Beatmaps
             return 60000 / BeatLengthAt(time);
         }
 
+        /// <summary>
+        /// Finds the BPM multiplier at a time.
+        /// </summary>
+        /// <param name="time">The time to find the BPM multiplier at.</param>
+        /// <returns>The BPM multiplier.</returns>
         public double BPMMultiplierAt(double time)
         {
             ControlPoint overridePoint;
@@ -35,20 +40,51 @@ namespace osu.Game.Beatmaps
             return overridePoint?.VelocityAdjustment ?? 1;
         }
 
-        public double BeatLengthAt(double time, bool addVelocity = true)
+        /// <summary>
+        /// Finds the beat length (in milliseconds) at a time.
+        /// </summary>
+        /// <param name="time">The time to find the beat length at.</param>
+        /// <returns>The beat length.</returns>
+        public double BeatLengthAt(double time)
         {
             ControlPoint overridePoint;
             ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
 
-            double velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
-            double d = timingPoint.BeatLength;
-
-            if (addVelocity)
-                d *= velocityAdjustment;
-
-            return d;
+            return timingPoint.BeatLength;
         }
 
+        /// <summary>
+        /// Finds the beat velocity at a time.
+        /// </summary>
+        /// <param name="time">The time to find the velocity at.</param>
+        /// <returns>The velocity.</returns>
+        public double BeatVelocityAt(double time)
+        {
+            ControlPoint overridePoint;
+            TimingPointAt(time, out overridePoint);
+
+            return overridePoint?.VelocityAdjustment ?? 1;
+        }
+
+        /// <summary>
+        /// Finds the beat length (in distance) at a time.
+        /// </summary>
+        /// <param name="time">The time to find the beat length at.</param>
+        /// <returns>The beat length.</returns>
+        public double BeatDistanceAt(double time)
+        {
+            ControlPoint overridePoint;
+            ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
+
+            return timingPoint.BeatLength * (overridePoint?.VelocityAdjustment ?? 1);
+        }
+
+        /// <summary>
+        /// Finds the timing point at a time.
+        /// </summary>
+        /// <param name="time">The time to find the timing point at.</param>
+        /// <param name="overridePoint">The timing point containing the velocity change of the returned timing point.</param>
+        /// <returns>The timing point.</returns>
         public ControlPoint TimingPointAt(double time, out ControlPoint overridePoint)
         {
             overridePoint = null;
@@ -75,13 +111,18 @@ namespace osu.Game.Beatmaps
             return timingPoint ?? ControlPoint.Default;
         }
 
+        /// <summary>
+        /// Finds the slider velocity at a time.
+        /// </summary>
+        /// <param name="time">The time.</param>
+        /// <returns>The slider velocity</returns>
         public double SliderVelocityAt(double time)
         {
             double scoringDistance = 100 * BeatmapInfo.BaseDifficulty.SliderMultiplier;
-            double beatLength = BeatLengthAt(time);
+            double beatDistance = BeatDistanceAt(time);
 
-            if (beatLength > 0)
-                return scoringDistance * 1000 / beatLength;
+            if (beatDistance > 0)
+                return scoringDistance / beatDistance * 1000;
             return scoringDistance;
         }
 
