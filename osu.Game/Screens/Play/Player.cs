@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Play
 
         public BeatmapInfo BeatmapInfo;
 
-        public PlayMode PreferredPlayMode;
+        public int PreferredPlayMode;
 
         private bool isPaused;
         public bool IsPaused
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            PlayMode usablePlayMode = beatmap.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode;
+            int usablePlayMode = beatmap.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode;
 
             ruleset = Ruleset.GetRuleset(usablePlayMode);
 

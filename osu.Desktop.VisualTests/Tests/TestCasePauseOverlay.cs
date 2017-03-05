@@ -9,6 +9,8 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCasePauseOverlay : TestCase
     {
+        public override string Name => @"PauseOverlay";
+
         public override string Description => @"Tests the pause overlay";
 
         private PauseOverlay pauseOverlay;

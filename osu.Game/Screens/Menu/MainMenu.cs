@@ -22,6 +22,7 @@ namespace osu.Game.Screens.Menu
     public class MainMenu : OsuScreen
     {
         private ButtonSystem buttons;
+        public override string Name => @"Main Menu";
 
         internal override bool ShowOverlays => buttons.State != MenuState.Initial;
 

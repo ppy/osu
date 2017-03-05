@@ -59,7 +59,7 @@ namespace osu.Game
 
         private VolumeControl volume;
 
-        public Bindable<PlayMode> PlayMode;
+        public Bindable<int> PlayMode;
 
         string[] args;
 
@@ -89,7 +89,7 @@ namespace osu.Game
 
             Dependencies.Cache(this);
 
-            PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
+            PlayMode = LocalConfig.GetBindable<int>(OsuConfig.PlayMode);
         }
 
         protected async void ImportBeatmapsAsync(IEnumerable<string> paths)
@@ -168,7 +168,7 @@ namespace osu.Game
             {
                 Depth = -3,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
-                OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
+                OnPlayModeChange = delegate (int m) { PlayMode.Value = m; },
             }).LoadAsync(this, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };

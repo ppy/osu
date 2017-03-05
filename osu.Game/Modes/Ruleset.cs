@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Modes
 {
@@ -20,7 +21,7 @@ namespace osu.Game.Modes
 
     public abstract class Ruleset
     {
-        private static ConcurrentDictionary<PlayMode, Type> availableRulesets = new ConcurrentDictionary<PlayMode, Type>();
+        private static ConcurrentDictionary<int, Type> availableRulesets = new ConcurrentDictionary<int, Type>();
 
         public abstract ScoreOverlay CreateScoreOverlay();
 
@@ -36,13 +37,19 @@ namespace osu.Game.Modes
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap);
 
-        public static void Register(Ruleset ruleset) => availableRulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
+        public static void Register(Ruleset ruleset)
+        {
+            availableRulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
+            Modes.PlayMode.Description.Add(ruleset.PlayMode, ruleset.Description);
+        }
 
-        protected abstract PlayMode PlayMode { get; }
+        protected abstract int PlayMode { get; }
 
         public virtual FontAwesome Icon => FontAwesome.fa_question_circle;
 
-        public static Ruleset GetRuleset(PlayMode mode)
+        protected abstract string Description { get; }
+
+        public static Ruleset GetRuleset(int mode)
         {
             Type type;
 

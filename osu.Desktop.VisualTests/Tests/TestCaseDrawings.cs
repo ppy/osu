@@ -12,6 +12,7 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseDrawings : TestCase
     {
+        public override string Name => @"Drawings";
         public override string Description => "Tournament drawings";
 
         [BackgroundDependencyLoader]

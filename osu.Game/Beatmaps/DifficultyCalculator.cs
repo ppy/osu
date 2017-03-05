@@ -10,7 +10,7 @@ namespace osu.Game.Beatmaps
 {
     public abstract class DifficultyCalculator
     {
-        protected abstract PlayMode PlayMode { get; }
+        protected abstract int PlayMode { get; }
 
         protected double TimeRate = 1;
 

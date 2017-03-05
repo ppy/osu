@@ -20,6 +20,8 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseGamefield : TestCase
     {
+        public override string Name => @"Gamefield";
+
         public override string Description => @"Showing hitobjects and what not.";
 
         public override void Reset()

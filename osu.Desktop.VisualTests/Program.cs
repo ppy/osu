@@ -9,6 +9,11 @@ using osu.Game.Modes.Catch;
 using osu.Game.Modes.Mania;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Taiko;
+using osu.Game.Modes.Vitaru;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Linq;
 
 namespace osu.Desktop.VisualTests
 {
@@ -21,15 +26,39 @@ namespace osu.Desktop.VisualTests
 
             using (GameHost host = Host.GetSuitableHost(@"osu"))
             {
-                Ruleset.Register(new OsuRuleset());
-                Ruleset.Register(new TaikoRuleset());
-                Ruleset.Register(new ManiaRuleset());
-                Ruleset.Register(new CatchRuleset());
+                var cwd = Environment.CurrentDirectory;
+                if (Debugger.IsAttached)
+                    cwd = Directory.GetParent(Directory.GetParent(cwd).FullName).FullName;
+                loadRulesets(cwd);
 
                 if (benchmark)
                     host.Run(new Benchmark());
                 else
                     host.Run(new VisualTestGame());
+            }
+        }
+
+        [DebuggerNonUserCode]
+        private static void loadRulesets(string cwd)
+        {
+            foreach (string dir in Directory.EnumerateDirectories(cwd))
+                loadRulesets(dir);
+
+            foreach (string file in Directory.EnumerateFiles(cwd))
+            {
+                if (!file.EndsWith(".dll"))
+                    continue;
+                try
+                {
+                    var rulesets = Assembly.LoadFile(file).GetTypes().Where((Type t) => t.IsSubclassOf(typeof(Ruleset)));
+                    foreach (Type rulesetType in rulesets)
+                    {
+                        Ruleset ruleset = Activator.CreateInstance(rulesetType) as Ruleset;
+                        Ruleset.Register(ruleset);
+                    }
+
+                }
+                catch (Exception e) { }
             }
         }
     }

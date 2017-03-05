@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -21,7 +20,7 @@ namespace osu.Game.Overlays.Toolbar
         public const float TOOLTIP_HEIGHT = 30;
 
         public Action OnHome;
-        public Action<PlayMode> OnPlayModeChange;
+        public Action<int> OnPlayModeChange;
 
         private ToolbarModeSelector modeSelector;
         private ToolbarUserArea userArea;
@@ -56,7 +55,7 @@ namespace osu.Game.Overlays.Toolbar
                         },
                         modeSelector = new ToolbarModeSelector
                         {
-                            OnPlayModeChange = (PlayMode mode) =>
+                            OnPlayModeChange = (int mode) =>
                             {
                                 OnPlayModeChange?.Invoke(mode);
                             }
@@ -129,7 +128,7 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
-        public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
+        public void SetGameMode(int mode) => modeSelector.SetGameMode(mode);
 
         protected override void PopIn()
         {

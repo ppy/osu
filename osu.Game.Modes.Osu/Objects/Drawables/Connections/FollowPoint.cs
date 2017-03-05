@@ -3,11 +3,11 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
+using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
 {

@@ -12,6 +12,11 @@ using osu.Game.Modes.Catch;
 using osu.Game.Modes.Mania;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Taiko;
+using osu.Game.Modes.Vitaru;
+using System.Reflection;
+using System.Linq;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace osu.Desktop
 {
@@ -41,14 +46,37 @@ namespace osu.Desktop
                 }
                 else
                 {
-                    Ruleset.Register(new OsuRuleset());
-                    Ruleset.Register(new TaikoRuleset());
-                    Ruleset.Register(new ManiaRuleset());
-                    Ruleset.Register(new CatchRuleset());
+                    if (Debugger.IsAttached)
+                        cwd = Directory.GetParent(Directory.GetParent(cwd).FullName).FullName;
+                    loadRulesets(cwd);
 
                     host.Run(new OsuGameDesktop(args));
                 }
                 return 0;
+            }
+        }
+
+        [DebuggerNonUserCode]
+        private static void loadRulesets(string cwd)
+        {
+            foreach (string dir in Directory.EnumerateDirectories(cwd))
+                loadRulesets(dir);
+            
+            foreach (string file in Directory.EnumerateFiles(cwd))
+            {
+                if (!file.EndsWith(".dll"))
+                    continue;
+                try
+                {
+                    var rulesets = Assembly.LoadFile(file).GetTypes().Where((Type t) => t.IsSubclassOf(typeof(Ruleset)));
+                    foreach (Type rulesetType in rulesets)
+                    {
+                        Ruleset ruleset = Activator.CreateInstance(rulesetType) as Ruleset;
+                        Ruleset.Register(ruleset);
+                    }
+                    
+                }
+                catch (Exception e) { }
             }
         }
     }

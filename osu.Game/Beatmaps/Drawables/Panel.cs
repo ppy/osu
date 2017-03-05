@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {

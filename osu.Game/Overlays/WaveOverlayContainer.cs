@@ -3,11 +3,13 @@
 
 using osu.Framework;
 using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using OpenTK;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Graphics.Primitives;
 using System;
 
 namespace osu.Game.Overlays

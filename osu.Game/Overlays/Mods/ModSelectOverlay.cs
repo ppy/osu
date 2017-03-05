@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -36,7 +35,7 @@ namespace osu.Game.Overlays.Mods
 
         public readonly Bindable<Mod[]> SelectedMods = new Bindable<Mod[]>();
 
-        public readonly Bindable<PlayMode> PlayMode = new Bindable<PlayMode>();
+        public readonly Bindable<int> PlayMode = new Bindable<int>();
 
         private void modeChanged(object sender, EventArgs eventArgs)
         {

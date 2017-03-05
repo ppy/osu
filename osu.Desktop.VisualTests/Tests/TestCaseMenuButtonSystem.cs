@@ -11,6 +11,7 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseMenuButtonSystem : TestCase
     {
+        public override string Name => @"ButtonSystem";
         public override string Description => @"Main menu button system";
 
         public override void Reset()

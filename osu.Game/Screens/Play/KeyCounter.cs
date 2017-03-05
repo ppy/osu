@@ -19,6 +19,7 @@ namespace osu.Game.Screens.Play
         private Container textLayer;
         private SpriteText countSpriteText;
 
+        public override string Name { get; }
         public bool IsCounting { get; set; }
         private int count;
         public int Count

@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Select
 {
     public class PlaySongSelect : OsuScreen
     {
-        private Bindable<PlayMode> playMode = new Bindable<PlayMode>();
+        private Bindable<int> playMode = new Bindable<int>();
         private BeatmapDatabase database;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 

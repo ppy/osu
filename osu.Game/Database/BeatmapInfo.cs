@@ -45,7 +45,7 @@ namespace osu.Game.Database
         public SampleSet SampleSet { get; set; }
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
-        public PlayMode Mode { get; set; }
+        public int Mode { get; set; }
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
 

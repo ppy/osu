@@ -11,7 +11,7 @@ namespace osu.Game.Modes.Taiko
 {
     public class TaikoDifficultyCalculator : DifficultyCalculator<TaikoBaseHit>
     {
-        protected override PlayMode PlayMode => PlayMode.Taiko;
+        protected override int PlayMode => Modes.PlayMode.Taiko;
 
         public TaikoDifficultyCalculator(Beatmap beatmap) : base(beatmap)
         {

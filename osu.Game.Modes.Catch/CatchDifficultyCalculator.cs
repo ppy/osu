@@ -5,13 +5,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Modes.Catch.Objects;
 using osu.Game.Modes.Objects;
 using System;
+using osu.Game.Modes;
 using System.Collections.Generic;
 
 namespace osu.Game.Modes.Catch
 {
     public class CatchDifficultyCalculator : DifficultyCalculator<CatchBaseHit>
     {
-        protected override PlayMode PlayMode => PlayMode.Catch;
+        protected override int PlayMode => Modes.PlayMode.Catch;
 
         public CatchDifficultyCalculator(Beatmap beatmap) : base(beatmap)
         {

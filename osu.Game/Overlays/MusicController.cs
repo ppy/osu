@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -22,7 +23,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays
 {

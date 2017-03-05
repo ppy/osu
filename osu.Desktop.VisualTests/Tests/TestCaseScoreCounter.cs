@@ -20,6 +20,8 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseScoreCounter : TestCase
     {
+        public override string Name => @"ScoreCounter";
+
         public override string Description => @"Tests multiple counters";
 
         public override void Reset()

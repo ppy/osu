@@ -11,7 +11,7 @@ namespace osu.Game.Modes.Mania
 {
     public class ManiaDifficultyCalculator : DifficultyCalculator<ManiaBaseHit>
     {
-        protected override PlayMode PlayMode => PlayMode.Mania;
+        protected override int PlayMode => Modes.PlayMode.Mania;
 
         private int columns;
 

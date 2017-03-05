@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Toolbar
         private Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
-        public Action<PlayMode> OnPlayModeChange;
+        public Action<int> OnPlayModeChange;
         
         public ToolbarModeSelector()
         {
@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Toolbar
             };
 
             int amountButtons = 0;
-            foreach (PlayMode m in Enum.GetValues(typeof(PlayMode)))
+            foreach (int m in PlayMode.Description.Keys)
             {
                 ++amountButtons;
 
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Toolbar
             Size = new Vector2(modeButtons.DrawSize.X, 1);
         }
 
-        public void SetGameMode(PlayMode mode)
+        public void SetGameMode(int mode)
         {
             foreach (ToolbarModeButton m in modeButtons.Children.Cast<ToolbarModeButton>())
             {

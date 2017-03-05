@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Play
     public class KeyCounterMouse : KeyCounter
     {
         public MouseButton Button { get; }
-        public KeyCounterMouse(MouseButton button) : base(button.ToString())
+        public KeyCounterMouse(string name, MouseButton button) : base(name)
         {
             Button = button;
         }
