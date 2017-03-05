@@ -142,6 +142,14 @@ namespace osu.Game.Modes
         public override bool Ranked => true;
     }
 
+    public abstract class ModDoubleTrouble : Mod
+    {
+        public override Mods Name => Mods.DoubleTrouble;
+        public override FontAwesome Icon => FontAwesome.fa_osu_mod_perfect; //FontAwesome.fa_osu_mod_doubleTrouble;
+        public override string Description => @"Twice as many Bosses";
+        public override bool Ranked => true;
+    }
+
     public class ModAutoplay : Mod
     {
         public override Mods Name => Mods.Autoplay;
@@ -202,6 +210,9 @@ namespace osu.Game.Modes
         [Description(@"Flashlight")]
         Flashlight = 1 << 10,
 
+        [Description(@"Double Trouble")]
+        DoubleTrouble = 1 << 29,
+
         [Description(@"Auto")]
         Autoplay = 1 << 11,
 
@@ -256,11 +267,11 @@ namespace osu.Game.Modes
         [Description(@"2K")]
         Key2 = 1 << 28,
 
-        LastMod = 1 << 29,
+        LastMod = 1 << 30,
 
         KeyMod = Key1 | Key2 | Key3 | Key4 | Key5 | Key6 | Key7 | Key8 | Key9 | KeyCoop,
         FreeModAllowed = NoFail | Easy | Hidden | HardRock | SuddenDeath | Flashlight | FadeIn | Relax | Autopilot | SpunOut | KeyMod,
-        ScoreIncreaseMods = Hidden | HardRock | DoubleTime | Flashlight | FadeIn
+        ScoreIncreaseMods = Hidden | HardRock | DoubleTime | Flashlight | FadeIn | DoubleTrouble
     }
 
     public enum ModType
