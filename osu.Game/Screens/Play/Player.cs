@@ -42,8 +42,6 @@ namespace osu.Game.Screens.Play
 
         public BeatmapInfo BeatmapInfo;
 
-        public PlayMode PreferredPlayMode;
-
         private bool isPaused;
         public bool IsPaused
         {
@@ -121,9 +119,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            PlayMode usablePlayMode = beatmap.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode;
-
-            ruleset = Ruleset.GetRuleset(usablePlayMode);
+            ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
 
             scoreOverlay = ruleset.CreateScoreOverlay();
             scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));

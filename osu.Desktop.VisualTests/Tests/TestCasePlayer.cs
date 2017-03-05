@@ -97,7 +97,6 @@ namespace osu.Desktop.VisualTests.Tests
         {
             return new Player
             {
-                PreferredPlayMode = PlayMode.Osu,
                 Beatmap = beatmap
             };
         }

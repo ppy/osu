@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
+using osu.Game.Modes;
 
 namespace osu.Game.Beatmaps
 {
@@ -16,6 +17,14 @@ namespace osu.Game.Beatmaps
         public readonly BeatmapInfo BeatmapInfo;
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
+
+        /// <summary>
+        /// A play mode that is preferred for this beatmap. This allows for conversion between game modes where feasible,
+        /// but does not gurantee an outcome.
+        /// </summary>
+        public PlayMode PreferredPlayMode;
+
+        public PlayMode PlayMode => beatmap?.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode;
 
         public readonly bool WithStoryboard;
 
