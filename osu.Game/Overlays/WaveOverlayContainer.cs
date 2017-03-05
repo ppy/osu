@@ -9,6 +9,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Graphics.Primitives;
+using System;
 
 namespace osu.Game.Overlays
 {
@@ -86,9 +88,10 @@ namespace osu.Game.Overlays
 
             AddInternal(wavesContainer = new Container<Wave>
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
                 Origin = Anchor.TopCentre,
                 Anchor = Anchor.TopCentre,
+                Masking = true,
                 Children = new[]
                 {
                     firstWave = new Wave
@@ -123,19 +126,13 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White.Opacity(50),
-                    },
-                },
             });
         }
 
         protected override void PopIn()
         {
+            base.PopIn();
+
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Visible;
 
@@ -145,11 +142,22 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
+            base.PopOut();
+
             contentContainer.FadeOut(DISAPPEAR_DURATION, EasingTypes.In);
             contentContainer.MoveToY(DrawHeight * 2f, DISAPPEAR_DURATION, EasingTypes.In);
 
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Hidden;
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            // This is done as an optimization, such that invisible parts of the waves
+            // are masked away, and thus do not consume fill rate.
+            wavesContainer.Height = Math.Max(0, DrawHeight - (contentContainer.DrawHeight - contentContainer.Y));
         }
 
         private class Wave : Container, IStateful<Visibility>
@@ -158,8 +166,8 @@ namespace osu.Game.Overlays
 
             public Wave()
             {
-                RelativeSizeAxes = Axes.Both;
-                Size = new Vector2(1.5f);
+                RelativeSizeAxes = Axes.X;
+                Width = 1.5f;
                 Masking = true;
                 EdgeEffect = new EdgeEffect
                 {
@@ -177,6 +185,15 @@ namespace osu.Game.Overlays
                 };
             }
 
+            protected override void Update()
+            {
+                base.Update();
+
+                // We can not use RelativeSizeAxes for Height, because the height
+                // of our parent diminishes as the content moves up.
+                Height = Parent.Parent.DrawSize.Y * 1.5f;
+            }
+
             private Visibility state;
             public Visibility State
             {
@@ -188,7 +205,7 @@ namespace osu.Game.Overlays
                     switch (value)
                     {
                         case Visibility.Hidden:
-                            MoveToY(DrawHeight / Height, DISAPPEAR_DURATION, easing_hide);
+                            MoveToY(Parent.Parent.DrawSize.Y, DISAPPEAR_DURATION, easing_hide);
                             break;
                         case Visibility.Visible:
                             MoveToY(FinalPosition, APPEAR_DURATION, easing_show);
