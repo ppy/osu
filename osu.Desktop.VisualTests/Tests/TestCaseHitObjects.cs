@@ -19,7 +19,6 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseHitObjects : TestCase
     {
-
         private StopwatchClock rateAdjustClock;
         private FramedClock framedClock;
 

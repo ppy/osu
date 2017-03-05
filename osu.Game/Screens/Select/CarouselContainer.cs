@@ -9,9 +9,7 @@ using osu.Game.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Lists;
 using osu.Game.Beatmaps.Drawables;
-using osu.Framework.Timing;
 using osu.Framework.Input;
 using OpenTK.Input;
 using System.Collections;
@@ -356,7 +354,7 @@ namespace osu.Game.Screens.Select
 
         public void SelectRandom()
         {
-            List<BeatmapGroup> visibleGroups = this.groups.Where((BeatmapGroup selectGroup) => selectGroup.State != BeatmapGroupState.Hidden).ToList();
+            List<BeatmapGroup> visibleGroups = groups.Where((BeatmapGroup selectGroup) => selectGroup.State != BeatmapGroupState.Hidden).ToList();
             if (visibleGroups.Count < 1)
                 return;
             BeatmapGroup group = visibleGroups[RNG.Next(visibleGroups.Count)];

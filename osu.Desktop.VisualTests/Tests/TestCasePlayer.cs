@@ -20,7 +20,7 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCasePlayer : TestCase
     {
-        protected WorkingBeatmap Beatmap;
+        private WorkingBeatmap beatmap;
 
         public override string Description => @"Showing everything to play the game.";
 
@@ -29,14 +29,14 @@ namespace osu.Desktop.VisualTests.Tests
         {
             var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault();
             if (beatmapInfo != null)
-                Beatmap = db.GetWorkingBeatmap(beatmapInfo);
+                beatmap = db.GetWorkingBeatmap(beatmapInfo);
         }
 
         public override void Reset()
         {
             base.Reset();
 
-            if (Beatmap?.Track == null)
+            if (beatmap?.Track == null)
             {
                 var objects = new List<HitObject>();
 
@@ -72,7 +72,7 @@ namespace osu.Desktop.VisualTests.Tests
 
                 decoder.Process(b);
 
-                Beatmap = new TestWorkingBeatmap(b);
+                beatmap = new TestWorkingBeatmap(b);
             }
 
             Add(new Box
@@ -84,10 +84,10 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new PlayerLoader(new Player
             {
                 PreferredPlayMode = PlayMode.Osu,
-                Beatmap = Beatmap
+                Beatmap = beatmap
             })
             {
-                Beatmap = Beatmap
+                Beatmap = beatmap
             });
         }
 

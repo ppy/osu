@@ -34,7 +34,7 @@ namespace osu.Game.Modes.Osu
                     ((Slider)h).Curve.Calculate();
         }
 
-        protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
+        protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
         {
             // Fill our custom DifficultyHitObject class, that carries additional information
             DifficultyHitObjects.Clear();

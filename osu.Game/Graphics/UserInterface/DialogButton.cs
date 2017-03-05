@@ -3,13 +3,13 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Audio.Sample;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 

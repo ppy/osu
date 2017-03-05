@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System; 
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Platform;
 using osu.Framework.Screens.Testing;
@@ -17,7 +16,6 @@ namespace osu.Desktop.VisualTests.Tests
         private BeatmapDatabase db, oldDb;
         private TestStorage storage;
         private PlaySongSelect songSelect;
-        
         public override string Description => @"with fake data";
 
         public override void Reset()

@@ -14,7 +14,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using osu.Game.Screens.Play;

@@ -5,15 +5,11 @@ using osu.Framework.Graphics;
 using osu.Game.Overlays.Mods;
 using osu.Framework.Screens.Testing;
 using osu.Game.Modes;
-using osu.Game.Graphics;
-using osu.Framework.Allocation;
-using osu.Game.Overlays;
 
 namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseModSelectOverlay : TestCase
     {
-
         public override string Description => @"Tests the mod select overlay";
 
         private ModSelectOverlay modSelect;
