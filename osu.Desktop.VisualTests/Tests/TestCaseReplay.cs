@@ -53,7 +53,7 @@ namespace osu.Desktop.VisualTests.Tests
         protected override Player CreatePlayer(WorkingBeatmap beatmap)
         {
             var player = base.CreatePlayer(beatmap);
-            player.ReplayInputHandler = scoreDatabase.ReadReplayFile(@"Tao - O2i3 - Ooi [Game Edit] [Advanced] (2016-08-08) Osu.osr").Replay.GetInputHandler();
+            player.ReplayInputHandler = Ruleset.GetRuleset(beatmap.PlayMode).CreateAutoplayReplay(beatmap.Beatmap)?.Replay?.GetInputHandler();
             return player;
         }
     }

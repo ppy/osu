@@ -101,9 +101,20 @@ namespace osu.Game.Modes.Osu
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => new OsuScoreProcessor(hitObjectCount);
+        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => new OsuScoreProcessor(hitObjectCount);
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
+
+        public override Score CreateAutoplayReplay(Beatmap beatmap)
+        {
+            var processor = CreateScoreProcessor();
+
+            var score = processor.GetScore();
+
+            score.Replay = new OsuAutoReplay(beatmap);
+
+            return score;
+        }
 
         protected override PlayMode PlayMode => PlayMode.Osu;
     }

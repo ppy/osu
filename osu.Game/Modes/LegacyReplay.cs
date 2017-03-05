@@ -17,7 +17,12 @@ namespace osu.Game.Modes
 {
     public class LegacyReplay : Replay
     {
-        private List<LegacyReplayFrame> frames = new List<LegacyReplayFrame>();
+        protected List<LegacyReplayFrame> Frames = new List<LegacyReplayFrame>();
+
+        protected LegacyReplay()
+        {
+
+        }
 
         public LegacyReplay(StreamReader reader)
         {
@@ -31,7 +36,7 @@ namespace osu.Game.Modes
 
                 lastTime += float.Parse(split[0]);
 
-                frames.Add(new LegacyReplayFrame(
+                Frames.Add(new LegacyReplayFrame(
                     lastTime,
                     float.Parse(split[1]),
                     384 - float.Parse(split[2]),
@@ -40,7 +45,7 @@ namespace osu.Game.Modes
             }
         }
 
-        public override ReplayInputHandler GetInputHandler() => new LegacyReplayInputHandler(frames);
+        public override ReplayInputHandler GetInputHandler() => new LegacyReplayInputHandler(Frames);
 
         /// <summary>
         /// The ReplayHandler will take a replay and handle the propagation of updates to the input stack.
