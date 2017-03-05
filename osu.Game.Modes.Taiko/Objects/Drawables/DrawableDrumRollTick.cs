@@ -15,6 +15,16 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
+    public class DrawableDrumRollFinisherTick : DrawableDrumRollTick
+    {
+        public DrawableDrumRollFinisherTick(DrumRoll drumRoll, DrumRollTick drumRollTick)
+            : base(drumRoll, drumRollTick)
+        {
+        }
+
+        public override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollTickJudgementInfo() { MaxScore = TaikoScoreResult.Great, SecondHit = true };
+    }
+
     public class DrawableDrumRollTick : DrawableTaikoHitObject
     {
         public override Color4 ExplodeColour => new Color4(238, 170, 0, 255);
@@ -68,7 +78,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             };
         }
 
-        public override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollJudgementInfo() { MaxScore = TaikoScoreResult.Great };
+        public override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollTickJudgementInfo() { MaxScore = TaikoScoreResult.Great };
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {

@@ -7,6 +7,7 @@ using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Modes.Objects;
+using System;
 
 namespace osu.Game.Beatmaps
 {
@@ -83,5 +84,48 @@ namespace osu.Game.Beatmaps
                 return scoringDistance * 1000 / beatLength;
             return scoringDistance;
         }
+
+        /// <summary>
+        /// Applies the mods Easy and HardRock to the provided difficulty value.
+        /// </summary>
+        /// <param name="difficulty">Difficulty value to be modified.</param>
+        /// <param name="hardRockFactor">Factor by which HardRock increases difficulty.</param>
+        /// <param name="mods">Mods to be applied.</param>
+        /// <returns>Modified difficulty value.</returns>
+        public double ApplyModsToDifficulty(double difficulty, double hardRockFactor, Mods mods)
+        {
+            if ((mods & Mods.Easy) > 0)
+                difficulty = Math.Max(0, difficulty / 2);
+            if ((mods & Mods.HardRock) > 0)
+                difficulty = Math.Min(10, difficulty * hardRockFactor);
+
+            return difficulty;
+        }
+
+        /// <summary>
+        /// Maps a difficulty value [0, 10] to a range of resulting values with respect to currently active mods.
+        /// </summary>
+        /// <param name="difficulty">The difficulty value to be mapped.</param>
+        /// <param name="min">Minimum of the resulting range which will be achieved by a difficulty value of 0.</param>
+        /// <param name="mid">Midpoint of the resulting range which will be achieved by a difficulty value of 5.</param>
+        /// <param name="max">Maximum of the resulting range which will be achieved by a difficulty value of 10.</param>
+        /// <returns>Value to which the difficulty value maps in the specified range.</returns>
+        public double MapDifficultyRange(double difficulty, double min, double mid, double max, Mods mods)
+        {
+            difficulty = ApplyModsToDifficulty(difficulty, 1.4, mods);
+
+            if (difficulty > 5)
+                return mid + (max - mid) * (difficulty - 5) / 5;
+            if (difficulty < 5)
+                return mid - (mid - min) * (5 - difficulty) / 5;
+            return mid;
+        }
+    }
+
+    public enum Mods
+    {
+        None,
+        Easy,
+        HardRock
     }
 }

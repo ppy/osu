@@ -7,15 +7,13 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    public class TaikoDrumRollJudgementInfo : TaikoJudgementInfo
+    public class TaikoDrumRollTickJudgementInfo : TaikoJudgementInfo
     {
         protected override int ScoreToInt(TaikoScoreResult result)
         {
             switch (result)
             {
                 default:
-                case TaikoScoreResult.Miss:
-                    return 0;
                 case TaikoScoreResult.Great:
                     return 200;
             }

@@ -39,6 +39,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
     public abstract class DrawableHitCircleFinisher : DrawableHitCircle
     {
+        private const double second_hit_window = 30;
+
         private bool validKeyPressed;
 
         public DrawableHitCircleFinisher(HitCircle hitCircle)
@@ -47,7 +49,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             Size *= 1.5f;
         }
 
-        public override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo() { MaxScore = TaikoScoreResult.Great };
+        public override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo() { MaxScore = TaikoScoreResult.Great, SecondHit = true };
 
         protected override bool ProcessHit(bool validKey)
         {
@@ -61,8 +63,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             CheckJudgement(true);
             return true;
         }
-
-        double secondHitTime = 30;
 
         protected override void CheckJudgement(bool userTriggered)
         {

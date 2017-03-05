@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables;
 
@@ -11,6 +13,17 @@ namespace osu.Game.Modes.Osu
         public OsuScoreProcessor(int hitObjectCount)
             : base(hitObjectCount)
         {
+        }
+
+        public override void Initialize(Beatmap beatmap)
+        {
+            // Initialize HP + final values
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+
             Health.Value = 1;
         }
 

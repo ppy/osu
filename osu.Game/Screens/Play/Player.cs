@@ -117,8 +117,12 @@ namespace osu.Game.Screens.Play
 
             ruleset = Ruleset.GetRuleset(usablePlayMode);
 
+            scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count);
+            scoreProcessor.Initialize(beatmap);
+            scoreProcessor.Reset();
+
             scoreOverlay = ruleset.CreateScoreOverlay();
-            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
+            scoreOverlay.BindProcessor(scoreProcessor);
 
             pauseOverlay = new PauseOverlay
             {

@@ -27,6 +27,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             Size *= new Vector2(1, 1.5f);
         }
 
+        public override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo() { MaxScore = TaikoScoreResult.Great, SecondHit = true };
+
+        protected override DrawableDrumRollTick CreateTick(DrumRoll drumRoll, DrumRollTick tick) => new DrawableDrumRollFinisherTick(drumRoll, tick);
+
         protected override DrumRollBodyPiece CreateBody(float length) => new DrumRollFinisherBodyPiece(length);
     }
 
@@ -68,11 +72,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             int tickIndex = 0;
             foreach (var tick in drumRoll.Ticks)
             {
-                var newTick = new DrawableDrumRollTick(drumRoll, tick)
-                {
-                    Depth = tickIndex,
-                    Position = new Vector2((float)((tick.StartTime - HitObject.StartTime) / HitObject.Duration), 0)
-                };
+                var newTick = CreateTick(drumRoll, tick);
+                newTick.Depth = tickIndex;
+                newTick.Position = new Vector2((float)((tick.StartTime - HitObject.StartTime) / HitObject.Duration), 0);
 
                 ticks.Add(newTick);
                 AddNested(newTick);
@@ -80,6 +82,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 tickIndex++;
             }
         }
+
+        protected virtual DrawableDrumRollTick CreateTick(DrumRoll drumRoll, DrumRollTick tick) => new DrawableDrumRollTick(drumRoll, tick);
 
         protected virtual DrumRollBodyPiece CreateBody(float length) => new DrumRollBodyPiece(length);
 

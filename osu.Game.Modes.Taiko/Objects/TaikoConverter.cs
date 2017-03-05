@@ -37,11 +37,10 @@ namespace osu.Game.Modes.Taiko.Objects
                             NewCombo = o.NewCombo,
                         };
                     }
-
-                    Osu.Objects.Slider slider = o as Osu.Objects.Slider;
-
-                    if (slider != null)
+                    else if (o is Osu.Objects.Slider)
                     {
+                        Slider slider = o as Osu.Objects.Slider;
+
                         // Don't ask... Old osu! had a random multiplier here, that we now have to multiply everywhere
                         double fudgeFactor = 1.4;
 
@@ -97,8 +96,7 @@ namespace osu.Game.Modes.Taiko.Objects
                             RepeatCount = (o as Osu.Objects.Slider).RepeatCount
                         };
                     }
-
-                    if (o is Osu.Objects.Spinner)
+                    else if (o is Osu.Objects.Spinner)
                     {
                         h = new Bash()
                         {

@@ -81,15 +81,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             return UpdateJudgement(true);
         }
 
-        double hitMiss = 95;
-        double hitGood = 80;
-        double hitGreat = 35;
-
         protected override void CheckJudgement(bool userTriggered)
         {
+            TaikoHitObject tho = HitObject as TaikoHitObject;
+
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > hitGood)
+                if (Judgement.TimeOffset > tho.HitWindowGood)
                     Judgement.Result = HitResult.Miss;
                 return;
             }
@@ -97,18 +95,18 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             double hitOffset = Math.Abs(Judgement.TimeOffset);
 
             // Must be within great range to be hittable/missable
-            if (hitOffset > hitMiss)
+            if (hitOffset > tho.HitWindowMiss)
                 return;
 
             TaikoJudgementInfo tji = Judgement as TaikoJudgementInfo;
 
             if (!validKeyPressed)
                 Judgement.Result = HitResult.Miss;
-            else if (hitOffset < hitGood)
+            else if (hitOffset < tho.HitWindowGood)
             {
                 Judgement.Result = HitResult.Hit;
 
-                if (hitOffset < hitGreat)
+                if (hitOffset < tho.HitWindowGreat)
                     tji.Score = TaikoScoreResult.Great;
                 else
                     tji.Score = TaikoScoreResult.Good;

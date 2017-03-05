@@ -12,6 +12,10 @@ namespace osu.Game.Modes.Taiko.Objects
 {
     public class TaikoHitObject : HitObject
     {
+        public double HitWindowGreat;
+        public double HitWindowGood;
+        public double HitWindowMiss;
+
         public double PreEmpt;
         public float Scale = 1;
         public bool Kiai;
@@ -34,6 +38,10 @@ namespace osu.Game.Modes.Taiko.Objects
 
             if (overridePoint != null)
                 Kiai |= overridePoint.KiaiMode;
+
+            HitWindowGreat = beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 50, 35, 20, Mods.None);
+            HitWindowGood = beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 120, 80, 50, Mods.None);
+            HitWindowGreat = beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 135, 95, 70, Mods.None);
         }
     }
 

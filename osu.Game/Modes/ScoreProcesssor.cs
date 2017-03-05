@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using osu.Framework.Configuration;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes
 {
@@ -72,6 +73,24 @@ namespace osu.Game.Modes
                 HasFailed = true;
                 Failed?.Invoke();
             }
+        }
+
+        /// <summary>
+        /// Initialize final values by simulating an auto-play of the beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to initialize calculations with.</param>
+        public abstract void Initialize(Beatmap beatmap);
+
+        public virtual void Reset()
+        {
+            Judgements.Clear();
+
+            HasFailed = false;
+            TotalScore.Value = 0;
+            Accuracy.Value = 0;
+            Health.Value = 0;
+            Combo.Value = 0;
+            HighestCombo.Value = 0;
         }
 
         /// <summary>

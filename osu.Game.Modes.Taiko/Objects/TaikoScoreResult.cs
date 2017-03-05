@@ -8,7 +8,6 @@ namespace osu.Game.Modes.Taiko.Objects
 {
     public enum TaikoScoreResult
     {
-        Miss,
         Good,
         Great
     }

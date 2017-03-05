@@ -200,17 +200,19 @@ namespace osu.Game.Modes.Taiko.UI
 
             // Add judgement
             string judgementString = "";
-            switch (tji.Score)
+            if (tji.Result == HitResult.Miss)
+                judgementString = "MISS";
+            else
             {
-                case TaikoScoreResult.Miss:
-                    judgementString = "MISS";
-                    break;
-                case TaikoScoreResult.Good:
-                    judgementString = "GOOD";
-                    break;
-                case TaikoScoreResult.Great:
-                    judgementString = "GREAT";
-                    break;
+                switch (tji.Score)
+                {
+                    case TaikoScoreResult.Good:
+                        judgementString = "GOOD";
+                        break;
+                    case TaikoScoreResult.Great:
+                        judgementString = "GREAT";
+                        break;
+                }
             }
 
             judgementContainer.Add(new JudgementText()

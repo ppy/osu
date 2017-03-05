@@ -32,9 +32,6 @@ namespace osu.Game.Modes.Taiko.Objects
             switch (result)
             {
                 default:
-                case TaikoScoreResult.Miss:
-                    score = 0;
-                    break;
                 case TaikoScoreResult.Good:
                     score = 100;
                     break;
@@ -42,9 +39,6 @@ namespace osu.Game.Modes.Taiko.Objects
                     score = 300;
                     break;
             }
-
-            if (SecondHit)
-                score *= 4;
 
             return score;
         }
