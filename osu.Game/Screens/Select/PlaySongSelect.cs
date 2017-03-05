@@ -30,6 +30,7 @@ using osu.Framework.Threading;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays;
 using osu.Game.Screens.Select.Options;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
 {

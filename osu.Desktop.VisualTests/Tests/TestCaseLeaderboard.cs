@@ -1,17 +1,18 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
-using osu.Game.Screens.Select.Leaderboards;
-using OpenTK;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Allocation;
-using System;
 using osu.Framework.MathUtils;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Modes;
-using System.Collections.Generic;
 
 namespace osu.Desktop.VisualTests
 {
@@ -21,28 +22,24 @@ namespace osu.Desktop.VisualTests
         public override string Description => @"From song select";
 
         private Leaderboard leaderboard;
-        private TextureStore ts;
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            ts = textures;
-        }
 
         private void newScores()
         {
-            var scores = new List<LeaderboardScore>();
+            var scores = new List<Score>();
             for (int i = 0; i < 10; i++)
             {
-                scores.Add(new LeaderboardScore
+                scores.Add(new Score
                 {
-                    Name = @"ultralaserxx",
-                    Avatar = ts.Get(@"Online/avatar-guest"),
-                    Flag = ts.Get(@"Flags/__"),
-                    Score = RNG.Next(0, 1000000),
                     Accuracy = Math.Round(RNG.NextDouble(0, 100), 2),
                     MaxCombo = RNG.Next(0, 3000),
-                    Mods = new Mod[] { },
+                    TotalScore = RNG.Next(1, 1000000),
+                    Mods = Ruleset.GetRuleset(PlayMode.Osu).GetModsFor(ModType.DifficultyIncrease).ToArray(),
+                    User = new Game.Users.User
+                    {
+                        Id = 2,
+                        Username = @"peppy",
+                        FlagName = @"AU",
+                    },
                 });
             }
 

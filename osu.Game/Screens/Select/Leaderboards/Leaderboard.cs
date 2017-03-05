@@ -1,21 +1,28 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using System.Collections.Generic;
+using osu.Framework.Graphics.Colour;
+using osu.Game.Graphics;
 using osu.Game.Modes;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
     public class Leaderboard : Container
     {
+        private ScrollContainer scrollContainer;
         private FillFlowContainer<LeaderboardScoreDisplay> scrollFlow;
 
-        private LeaderboardScore[] scores;
-        public LeaderboardScore[] Scores
+        private Score[] scores;
+        public Score[] Scores
         {
             get { return scores; }
             set
@@ -30,6 +37,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
 
                 scrollFlow.Children = scoreDisplays;
+                scrollContainer.ScrollTo(0f, false);
             }
         }
 
@@ -37,7 +45,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             Children = new Drawable[]
             {
-                new ScrollContainer
+                scrollContainer = new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollDraggerVisible = false,
@@ -55,15 +63,28 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
     }
 
-    public class LeaderboardScore
+    class LeaderboardFade : Container
     {
-        public string Name;
-        public Texture Avatar;
-        public Texture Flag;
-        public Texture Badge;
-        public int Score;
-        public double Accuracy;
-        public int MaxCombo;
-        public IEnumerable<Mod> Mods;
+        private Box gradient;
+
+        protected override bool OnMouseDown(Framework.Input.InputState state, Framework.Input.MouseDownEventArgs args)
+        {
+            if (state.Keyboard.ShiftPressed)
+                FadeIn();
+            else
+                FadeOut();
+            
+            return base.OnMouseDown(state, args);
+        }
+
+        public void FadeIn()
+        {
+            gradient.FadeColour(Color4.White, 300, EasingTypes.OutQuint);
+        }
+
+        public void FadeOut()
+        {
+            gradient.FadeColour(Color4.White.Opacity(0), 300, EasingTypes.OutQuint);
+        }
     }
 }
