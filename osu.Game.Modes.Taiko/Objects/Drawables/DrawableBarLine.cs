@@ -82,7 +82,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
                     RelativeSizeAxes = Axes.Both,
 
-                    Alpha = 0.5f
+                    Alpha = 0.75f
                 }
             };
         }
