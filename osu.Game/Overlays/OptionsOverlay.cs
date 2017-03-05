@@ -77,7 +77,7 @@ namespace osu.Game.Overlays
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Direction = FillDirection.Down,
+                            Direction = FillDirection.Vertical,
 
                             Children = new Drawable[]
                             {
@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                    Direction = FillDirection.Down,
+                                    Direction = FillDirection.Vertical,
                                     Children = sections,
                                 }
                             }

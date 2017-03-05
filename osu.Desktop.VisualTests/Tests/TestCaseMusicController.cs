@@ -11,7 +11,6 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseMusicController : TestCase
     {
-        public override string Name => @"Music Controller";
         public override string Description => @"Tests music controller ui.";
 
         private MusicController mc;

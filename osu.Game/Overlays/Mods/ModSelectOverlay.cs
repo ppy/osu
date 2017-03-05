@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -240,7 +241,7 @@ namespace osu.Game.Overlays.Mods
                     AutoSizeAxes = Axes.Y,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Direction = FillDirection.Down,
+                    Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0f, 10f),
                     Children = new Drawable[]
                     {
@@ -264,7 +265,7 @@ namespace osu.Game.Overlays.Mods
                                     Anchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Down,
+                                    Direction = FillDirection.Vertical,
                                     Width = content_width,
                                     Padding = new MarginPadding
                                     {
@@ -332,7 +333,7 @@ namespace osu.Game.Overlays.Mods
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
                                     Width = content_width,
-                                    Direction = FillDirection.Right,
+                                    Direction = FillDirection.Horizontal,
                                     Padding = new MarginPadding
                                     {
                                         Top = 20,

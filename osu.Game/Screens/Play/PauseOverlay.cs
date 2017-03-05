@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -105,7 +106,7 @@ namespace osu.Game.Screens.Play
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Down,
+                    Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 50),
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -113,11 +114,12 @@ namespace osu.Game.Screens.Play
                     {
                         new FillFlowContainer
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Down,
-                            Spacing = new Vector2(0, 20),
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 20),
                             Children = new Drawable[]
                             {
                                 new OsuSpriteText
@@ -144,6 +146,8 @@ namespace osu.Game.Screens.Play
                         },
                         new FillFlowContainer
                         {
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Masking = true,
@@ -188,9 +192,9 @@ namespace osu.Game.Screens.Play
                         },
                         retryCounterContainer = new FillFlowContainer
                         {
-                            AutoSizeAxes = Axes.Both,
                             Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre
+                            Anchor = Anchor.TopCentre,
+                            AutoSizeAxes = Axes.Both,
                         }
                     }
                 },

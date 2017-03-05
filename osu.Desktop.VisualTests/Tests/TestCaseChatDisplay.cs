@@ -12,7 +12,6 @@ namespace osu.Desktop.VisualTests.Tests
     {
         private ScheduledDelegate messageRequest;
 
-        public override string Name => @"Chat";
         public override string Description => @"Testing chat api and overlay";
 
         public override void Reset()
