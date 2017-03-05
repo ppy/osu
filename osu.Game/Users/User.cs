@@ -7,5 +7,10 @@ namespace osu.Game.Users
     {
         public int Id;
         public string Username;
+
+        /// <summary>
+        /// Two-letter flag acronym (ISO 3166 standard)
+        /// </summary>
+        public string FlagName;
     }
 }

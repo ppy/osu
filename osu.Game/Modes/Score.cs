@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Users;
+
 namespace osu.Game.Modes
 {
     public class Score
@@ -10,5 +12,7 @@ namespace osu.Game.Modes
         public double Combo { get; set; }
         public double MaxCombo { get; set; }
         public double Health { get; set; }
+        public Mod[] Mods { get; set; }
+        public User User { get; set; }
     }
 }
