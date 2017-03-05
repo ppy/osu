@@ -58,36 +58,6 @@ namespace osu.Desktop.VisualTests.Tests
             };
             Add(standardCombo);
 
-            CatchComboCounter catchCombo = new CatchComboCounter
-            {
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Count = 0,
-                TextSize = 40,
-            };
-            Add(catchCombo);
-
-            ComboCounter taikoCombo = new TaikoComboCounter
-            {
-                Origin = Anchor.BottomCentre,
-                Anchor = Anchor.Centre,
-                Position = new Vector2(0, -160),
-                Count = 0,
-                TextSize = 40,
-            };
-            Add(taikoCombo);
-
-            ManiaComboCounter maniaCombo = new ManiaComboCounter
-            {
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Position = new Vector2(0, -80),
-                Count = 0,
-                TextSize = 40,
-            };
-            Add(maniaCombo);
-
-
             PercentageCounter accuracyCombo = new PercentageCounter
             {
                 Origin = Anchor.TopRight,
@@ -118,9 +88,6 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 score.Count = 0;
                 standardCombo.Count = 0;
-                taikoCombo.Count = 0;
-                maniaCombo.Count = 0;
-                catchCombo.Count = 0;
                 numerator = denominator = 0;
                 accuracyCombo.SetFraction(0, 0);
                 stars.Count = 0;
@@ -131,14 +98,6 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 score.Count += 300 + (ulong)(300.0 * (standardCombo.Count > 0 ? standardCombo.Count - 1 : 0) / 25.0);
                 standardCombo.Count++;
-                taikoCombo.Count++;
-                maniaCombo.Count++;
-                catchCombo.CatchFruit(new Color4(
-                    Math.Max(0.5f, RNG.NextSingle()),
-                    Math.Max(0.5f, RNG.NextSingle()),
-                    Math.Max(0.5f, RNG.NextSingle()),
-                    1)
-                );
                 numerator++; denominator++;
                 accuracyCombo.SetFraction(numerator, denominator);
             });
@@ -146,19 +105,12 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton(@"miss...", delegate
             {
                 standardCombo.Roll();
-                taikoCombo.Roll();
-                maniaCombo.Roll();
-                catchCombo.Roll();
                 denominator++;
                 accuracyCombo.SetFraction(numerator, denominator);
             });
 
             AddButton(@"mania hold", delegate
             {
-                if (!maniaHold)
-                    maniaCombo.HoldStart();
-                else
-                    maniaCombo.HoldEnd();
                 maniaHold = !maniaHold;
             });
 
@@ -172,9 +124,6 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 score.StopRolling();
                 standardCombo.StopRolling();
-                catchCombo.StopRolling();
-                taikoCombo.StopRolling();
-                maniaCombo.StopRolling();
                 accuracyCombo.StopRolling();
                 stars.StopAnimation();
             });
