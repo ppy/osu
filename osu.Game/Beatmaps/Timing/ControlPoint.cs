@@ -11,6 +11,8 @@ namespace osu.Game.Beatmaps.Timing
             TimingChange = true,
         };
 
+        public TimeSignatures TimeSignature;
+
         public double Time;
         public double BeatLength;
 
@@ -38,13 +40,13 @@ namespace osu.Game.Beatmaps.Timing
 
         public bool OmitFirstBarLine
         {
-            get { return (EffectFlags & EffectFlags.OmitFirstBarLine) > 0; }
+            get { return (EffectFlags & EffectFlags.OmitBarLine) > 0; }
             set
             {
                 if (value)
-                    EffectFlags |= EffectFlags.OmitFirstBarLine;
+                    EffectFlags |= EffectFlags.OmitBarLine;
                 else
-                    EffectFlags &= ~EffectFlags.OmitFirstBarLine;
+                    EffectFlags &= ~EffectFlags.OmitBarLine;
             }
         }
     }
@@ -53,10 +55,10 @@ namespace osu.Game.Beatmaps.Timing
     {
         None = 0,
         Kiai = 1,
-        OmitFirstBarLine = 8
+        OmitBarLine = 8
     }
 
-    internal enum TimeSignatures
+    public enum TimeSignatures
     {
         SimpleQuadruple = 4,
         SimpleTriple = 3

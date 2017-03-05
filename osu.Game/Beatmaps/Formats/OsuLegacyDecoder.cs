@@ -209,8 +209,19 @@ namespace osu.Game.Beatmaps.Formats
                     BeatLength = beatLength > 0 ? beatLength : 0,
                     VelocityAdjustment = beatLength < 0 ? MathHelper.Clamp(-beatLength, 10, 1000) / 100.0 : 1,
                     FloatVelocityAdjustment = beatLength < 0 ? MathHelper.Clamp((float)-beatLength, 10, 1000) / 100f : 1,
+                    TimeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)int.Parse(split[2]),
                     TimingChange = split.Length <= 6 || split[6][0] == '1',
                     EffectFlags = effectFlags
+                };
+            }
+            else
+            {
+                double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
+                cp = new ControlPoint
+                {
+                    Time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo),
+                    BeatLength = beatLength > 0 ? beatLength : 0,
+                    TimingChange = true
                 };
             }
 

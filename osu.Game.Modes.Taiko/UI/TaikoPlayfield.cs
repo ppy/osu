@@ -30,8 +30,9 @@ namespace osu.Game.Modes.Taiko.UI
         private const float hit_target_offset = 0.1f;
 
         private HitTarget hitTarget;
-        private Container explosionRingContainer;
-        private Container judgementContainer;
+        private Container<ExplodingRing> explosionRingContainer;
+        private Container<DrawableBarLine> barLineContainer;
+        private Container<JudgementText> judgementContainer;
 
         public TaikoPlayfield()
         {
@@ -68,7 +69,7 @@ namespace osu.Game.Modes.Taiko.UI
 
                         Children = new Drawable[]
                         {
-                            explosionRingContainer = new Container()
+                            explosionRingContainer = new Container<ExplodingRing>()
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.Centre,
@@ -97,7 +98,17 @@ namespace osu.Game.Modes.Taiko.UI
             HitObjects.Position = new Vector2(left_area_size + hit_target_offset * (1f - left_area_size), 0);
             HitObjects.Size = new Vector2(1f - left_area_size - hit_target_offset * (1f - left_area_size), PLAYFIELD_HEIGHT);
 
-            AddInternal(judgementContainer = new Container()
+            // Bar lines
+            AddInternal(barLineContainer = new Container<DrawableBarLine>()
+            {
+                RelativePositionAxes = HitObjects.RelativePositionAxes,
+                RelativeSizeAxes = HitObjects.RelativeSizeAxes,
+                Position = HitObjects.Position,
+                Size = HitObjects.Size
+            });
+
+            // Judgements
+            AddInternal(judgementContainer = new Container<JudgementText>()
             {
                 Origin = Anchor.BottomCentre,
 
@@ -105,15 +116,6 @@ namespace osu.Game.Modes.Taiko.UI
                 Position = new Vector2(left_area_size + hit_target_offset * (1f - left_area_size), 0),
 
                 BlendingMode = BlendingMode.Additive
-            });
-
-            // Bar lines
-            AddInternal(new Container()
-            {
-                RelativePositionAxes = HitObjects.RelativePositionAxes,
-                RelativeSizeAxes = HitObjects.RelativeSizeAxes,
-                Position = HitObjects.Position,
-                Size = HitObjects.Size
             });
 
             // Left area above notes
@@ -166,6 +168,13 @@ namespace osu.Game.Modes.Taiko.UI
             h.OnJudgement += onJudgement;
 
             base.Add(h);
+        }
+
+        public void AddBarLine(DrawableBarLine b)
+        {
+            b.Scale = new Vector2(PLAYFIELD_SCALE);
+
+            barLineContainer.Add(b);
         }
 
         private void onJudgement(DrawableHitObject h, JudgementInfo j)
