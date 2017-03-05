@@ -46,10 +46,10 @@ namespace osu.Game.Modes.Osu.UI
             Margin = new MarginPadding(10),
             Children = new KeyCounter[]
             {
-                new KeyCounterKeyboard(@"Z", Key.Z),
-                new KeyCounterKeyboard(@"X", Key.X),
-                new KeyCounterMouse(@"M1", MouseButton.Left),
-                new KeyCounterMouse(@"M2", MouseButton.Right),
+                new KeyCounterKeyboard(Key.Z),
+                new KeyCounterKeyboard(Key.X),
+                new KeyCounterMouse(MouseButton.Left),
+                new KeyCounterMouse(MouseButton.Right),
             }
         };
     }

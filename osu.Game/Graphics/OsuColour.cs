@@ -6,12 +6,6 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Graphics
 {
-    public static class OsuColourExtensions
-    {
-        public static Color4 Opacity(this Color4 color, float a) => new Color4(color.R, color.G, color.B, a);
-        public static Color4 Opacity(this Color4 color, byte a) => new Color4(color.R, color.G, color.B, a / 255f);
-    }
-
     public class OsuColour
     {
         public static Color4 Gray(float amt) => new Color4(amt, amt, amt, 1f);

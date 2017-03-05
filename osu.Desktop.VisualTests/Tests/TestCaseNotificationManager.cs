@@ -14,7 +14,6 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseNotificationManager : TestCase
     {
-        public override string Name => @"Notification Manager";
         public override string Description => @"I handle notifications";
 
         NotificationManager manager;

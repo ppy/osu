@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
@@ -11,7 +10,6 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseDialogOverlay : TestCase
     {
-        public override string Name => @"Dialog Overlay";
         public override string Description => @"Display dialogs";
 
         DialogOverlay overlay;
