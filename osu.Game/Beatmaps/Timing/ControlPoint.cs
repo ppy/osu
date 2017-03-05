@@ -40,13 +40,13 @@ namespace osu.Game.Beatmaps.Timing
 
         public bool OmitFirstBarLine
         {
-            get { return (EffectFlags & EffectFlags.OmitBarLine) > 0; }
+            get { return (EffectFlags & EffectFlags.OmitFirstBarLine) > 0; }
             set
             {
                 if (value)
-                    EffectFlags |= EffectFlags.OmitBarLine;
+                    EffectFlags |= EffectFlags.OmitFirstBarLine;
                 else
-                    EffectFlags &= ~EffectFlags.OmitBarLine;
+                    EffectFlags &= ~EffectFlags.OmitFirstBarLine;
             }
         }
     }
@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps.Timing
     {
         None = 0,
         Kiai = 1,
-        OmitBarLine = 8
+        OmitFirstBarLine = 8
     }
 
     public enum TimeSignatures

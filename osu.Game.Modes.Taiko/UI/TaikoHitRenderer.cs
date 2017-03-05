@@ -98,7 +98,7 @@ namespace osu.Game.Modes.Taiko.UI
             {
                 ControlPoint current = timingPoints[currentIndex];
 
-                if (time > current.Time || (current.EffectFlags & EffectFlags.OmitBarLine) == 0)
+                if (time > current.Time || !current.OmitFirstBarLine)
                 {
                     BarLine barLine = new BarLine()
                     {
