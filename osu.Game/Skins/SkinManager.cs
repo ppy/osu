@@ -12,7 +12,7 @@ namespace osu.Game.Skins
 {
     public class SkinManager
     {
-        public static SkinInfo DEFAULT_SKIN = new SkinInfo {
+        public static SkinInfo DefaultSkin = new SkinInfo {
             Name = @"default",
         };
 
@@ -43,19 +43,19 @@ namespace osu.Game.Skins
         private void load(OsuConfigManager config)
         {
             bindable = config.GetBindable<SkinInfo>(OsuConfig.Skin);
-            bindable.ValueChanged += ChangedSkin;
-            skins.Add(DEFAULT_SKIN);
+            bindable.ValueChanged += changedSkin;
+            skins.Add(DefaultSkin);
             // TODO load skins
         }
 
-        private Skin GetSkinContents(SkinInfo skin) => skinContents.Find((x) => (x.info.Path == skin.Path));
+        private Skin getSkinContents(SkinInfo skin) => skinContents.Find((x) => (x.info.Path == skin.Path));
 
-        private void ChangedSkin(object sender, EventArgs e) {
+        private void changedSkin(object sender, EventArgs e) {
             foreach (SkinInfo skin in skins) {
                 if (skin.Path == bindable.Value.Path)
                     selected = skin;
             }
-            selectedContents = GetSkinContents(selected);
+            selectedContents = getSkinContents(selected);
         }
     }
 }

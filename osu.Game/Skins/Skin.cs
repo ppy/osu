@@ -16,7 +16,7 @@ namespace osu.Game.Skins
         public SkinInfo info;
         public TextureStore Textures { get; private set; }
 
-        private ArchiveReader SkinsStore;
+        private ArchiveReader skinsStore;
         private Storage storage;
 
         public Skin(SkinInfo info)
@@ -26,9 +26,9 @@ namespace osu.Game.Skins
 
         public void UpdateSkin() {
             Textures = new TextureStore();
-            if (info.Name != SkinManager.DEFAULT_SKIN.Name)
+            if (info.Name != SkinManager.DefaultSkin.Name)
             {
-                Textures.AddStore(new RawTextureLoaderStore(SkinsStore));
+                Textures.AddStore(new RawTextureLoaderStore(skinsStore));
             }
             // TODO update audio component
         }
@@ -36,7 +36,7 @@ namespace osu.Game.Skins
         [BackgroundDependencyLoader]
         private void load(GameHost host) {
             storage = host.Storage;
-            SkinsStore = ArchiveReader.GetReader(storage, info.Path);
+            skinsStore = ArchiveReader.GetReader(storage, info.Path);
             UpdateSkin();
         }
     }

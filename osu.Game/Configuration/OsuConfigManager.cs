@@ -37,7 +37,7 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.KeyOverlay, false);
 
-            Set(OsuConfig.Skin, SkinManager.DEFAULT_SKIN);
+            Set(OsuConfig.Skin, SkinManager.DefaultSkin);
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
