@@ -43,6 +43,8 @@ namespace osu.Game.Modes
 
         public virtual FontAwesome Icon => FontAwesome.fa_question_circle;
 
+        public virtual Score CreateAutoplayReplay(Beatmap beatmap) => null;
+
         public static Ruleset GetRuleset(PlayMode mode)
         {
             Type type;
@@ -52,5 +54,6 @@ namespace osu.Game.Modes
 
             return Activator.CreateInstance(type) as Ruleset;
         }
+
     }
 }
