@@ -23,7 +23,8 @@ namespace osu.Game.IPC
         }
 
         public async Task ImportAsync(string path) 
-        {            if (skins != null)
+        {
+            if (skins != null)
             {
                 skins.Import(path);
             }
