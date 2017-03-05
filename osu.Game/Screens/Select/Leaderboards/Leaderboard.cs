@@ -62,29 +62,4 @@ namespace osu.Game.Screens.Select.Leaderboards
             };
         }
     }
-
-    class LeaderboardFade : Container
-    {
-        private Box gradient;
-
-        protected override bool OnMouseDown(Framework.Input.InputState state, Framework.Input.MouseDownEventArgs args)
-        {
-            if (state.Keyboard.ShiftPressed)
-                FadeIn();
-            else
-                FadeOut();
-            
-            return base.OnMouseDown(state, args);
-        }
-
-        public void FadeIn()
-        {
-            gradient.FadeColour(Color4.White, 300, EasingTypes.OutQuint);
-        }
-
-        public void FadeOut()
-        {
-            gradient.FadeColour(Color4.White.Opacity(0), 300, EasingTypes.OutQuint);
-        }
-    }
 }
