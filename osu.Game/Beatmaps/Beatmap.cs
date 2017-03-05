@@ -133,7 +133,7 @@ namespace osu.Game.Beatmaps
         /// <param name="hardRockFactor">Factor by which HardRock increases difficulty.</param>
         /// <param name="mods">Mods to be applied.</param>
         /// <returns>Modified difficulty value.</returns>
-        public double ApplyModsToDifficulty(double difficulty, double hardRockFactor, Mods mods)
+        public static double ApplyModsToDifficulty(double difficulty, double hardRockFactor, Mods mods)
         {
             if ((mods & Mods.Easy) > 0)
                 difficulty = Math.Max(0, difficulty / 2);
@@ -151,7 +151,7 @@ namespace osu.Game.Beatmaps
         /// <param name="mid">Midpoint of the resulting range which will be achieved by a difficulty value of 5.</param>
         /// <param name="max">Maximum of the resulting range which will be achieved by a difficulty value of 10.</param>
         /// <returns>Value to which the difficulty value maps in the specified range.</returns>
-        public double MapDifficultyRange(double difficulty, double min, double mid, double max, Mods mods)
+        public static double MapDifficultyRange(double difficulty, double min, double mid, double max, Mods mods)
         {
             difficulty = ApplyModsToDifficulty(difficulty, 1.4, mods);
 

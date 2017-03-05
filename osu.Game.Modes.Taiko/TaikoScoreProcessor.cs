@@ -51,11 +51,11 @@ namespace osu.Game.Modes.Taiko
         {
             List<TaikoHitObject> objects = new TaikoConverter().Convert(beatmap);
 
-            double hpMultiplierNormal = 1 / (0.06 * objects.FindAll(o => o is HitCircle).Count * beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98, Mods.None));
+            double hpMultiplierNormal = 1 / (0.06 * objects.FindAll(o => o is HitCircle).Count * Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98, Mods.None));
             hpIncreaseTick = 0.0001 / 200.0;
             hpIncreaseGreat = hpMultiplierNormal * hp_hit_300 / 200.0;
-            hpIncreaseGood = hpMultiplierNormal * beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_hit_100 * 8, hp_hit_100, hp_hit_100, Mods.None) / 200.0;
-            hpIncreaseMiss = beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, -6, -25, -40, Mods.None) / 200.0;
+            hpIncreaseGood = hpMultiplierNormal * Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_hit_100 * 8, hp_hit_100, hp_hit_100, Mods.None) / 200.0;
+            hpIncreaseMiss = Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, -6, -25, -40, Mods.None) / 200.0;
 
             List<TaikoHitObject> finishers = objects.FindAll(o => (o.Type & (TaikoHitType.HitCircle | TaikoHitType.Finisher)) > 0);
             finisherScoreScale = -7d / 90d * MathHelper.Clamp(finishers.Count, 30, 120) + 111d / 9d;
