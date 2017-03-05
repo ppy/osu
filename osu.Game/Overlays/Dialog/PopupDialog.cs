@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -173,7 +174,7 @@ namespace osu.Game.Overlays.Dialog
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Position = new Vector2(0f, -50f),
-                            Direction = FillDirection.Down,
+                            Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0f, 10f),
                             Children = new Drawable[]
                             {
@@ -236,7 +237,7 @@ namespace osu.Game.Overlays.Dialog
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Down,
+                            Direction = FillDirection.Vertical,
                         },
                     },
                 },

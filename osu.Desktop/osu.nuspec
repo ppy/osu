@@ -18,6 +18,7 @@
     <files>
       <file src="*.exe" target="lib\net45\" exclude="**vshost**"/>
       <file src="*.dll" target="lib\net45\"/>
+      <file src="*.config" target="lib\net45\"/>
       <file src="x86\*.dll" target="lib\net45\x86\"/>
       <file src="x64\*.dll" target="lib\net45\x64\"/>
     </files>

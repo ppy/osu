@@ -23,7 +23,6 @@ namespace osu.Desktop.VisualTests.Tests
         protected Player Player;
         private BeatmapDatabase db;
 
-        public override string Name => @"Player";
 
         public override string Description => @"Showing everything to play the game.";
 

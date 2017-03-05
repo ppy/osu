@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Play
                         AutoSizeAxes = Axes.Both,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
-                        Direction = FillDirection.Down,
+                        Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
                             new OsuSpriteText

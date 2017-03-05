@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -125,7 +126,7 @@ namespace osu.Game.Screens.Select
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Direction = FillDirection.Down,
+                        Direction = FillDirection.Vertical,
                         Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -147,7 +148,7 @@ namespace osu.Game.Screens.Select
                             new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 10 },
-                                Direction = FillDirection.Right,
+                                Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
                                 Children = new []
                                 {

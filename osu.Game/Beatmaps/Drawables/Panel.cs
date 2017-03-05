@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -17,10 +17,6 @@ namespace osu.Game.Beatmaps.Drawables
         public const float MAX_HEIGHT = 80;
 
         public override bool RemoveWhenNotAlive => false;
-
-        public bool IsOnScreen;
-
-        public override bool IsAlive => IsOnScreen && base.IsAlive;
 
         private Container nestedContainer;
 

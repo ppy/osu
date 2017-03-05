@@ -42,8 +42,6 @@ namespace osu.Desktop.VisualTests.Tests
         private Func<Stream> getReplayStream;
         private ScoreDatabase scoreDatabase;
 
-        public override string Name => @"Replay";
-
         public override string Description => @"Testing replay playback.";
 
         [BackgroundDependencyLoader]
