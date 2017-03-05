@@ -41,29 +41,28 @@ namespace osu.Game.Modes.Taiko.UI
 
         protected override DrawableHitObject GetVisualRepresentation(TaikoHitObject h)
         {
-            if (h is HitCircle)
+            if ((h.Type & TaikoHitType.HitCircle) > 0)
             {
-                switch (h.Type)
+                if ((h.Type & TaikoHitType.Don) > 0)
                 {
-                    case TaikoHitType.Don:
-                        if (h.IsFinisher)
-                            return new DrawableHitCircleDonFinisher(h as HitCircle);
-                        return new DrawableHitCircleDon(h as HitCircle);
-                    case TaikoHitType.Katsu:
-                        if (h.IsFinisher)
-                            return new DrawableHitCircleKatsuFinisher(h as HitCircle);
-                        return new DrawableHitCircleKatsu(h as HitCircle);
+                    if ((h.Type & TaikoHitType.Finisher) > 0)
+                        return new DrawableHitCircleDonFinisher(h as HitCircle);
+                    return new DrawableHitCircleDon(h as HitCircle);
+                }
+                else if ((h.Type & TaikoHitType.Katsu) > 0)
+                {
+                    if ((h.Type & TaikoHitType.Finisher) > 0)
+                        return new DrawableHitCircleKatsuFinisher(h as HitCircle);
+                    return new DrawableHitCircleKatsu(h as HitCircle);
                 }
             }
-
-            if (h is DrumRoll)
+            else if ((h.Type & TaikoHitType.DrumRoll) > 0)
             {
-                if (h.IsFinisher)
+                if ((h.Type & TaikoHitType.Finisher) > 0)
                     return new DrawableDrumRollFinisher(h as DrumRoll);
                 return new DrawableDrumRoll(h as DrumRoll);
             }
-
-            if (h is Bash)
+            else if ((h.Type & TaikoHitType.Bash) > 0)
                 return new DrawableBash(h as Bash);
 
             return null;

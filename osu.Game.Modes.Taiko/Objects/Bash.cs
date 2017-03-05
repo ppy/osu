@@ -29,5 +29,7 @@ namespace osu.Game.Modes.Taiko.Objects
 
             RequiredHits = (int)Math.Max(1, Length / 1000f * spinnerRotationRatio * spinner_ratio);
         }
+
+        public override TaikoHitType Type => TaikoHitType.Bash;
     }
 }

@@ -10,7 +10,7 @@ using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    public class TaikoHitObject : HitObject
+    public abstract class TaikoHitObject : HitObject
     {
         /// <summary>
         /// To be honest, I don't know why this is needed. Old osu! scaled the
@@ -27,8 +27,7 @@ namespace osu.Game.Modes.Taiko.Objects
         public float Scale = 1;
         public bool Kiai;
 
-        public TaikoHitType Type => ((Sample?.Type ?? SampleType.None) & (~SampleType.Finish & ~SampleType.Normal)) == 0 ? TaikoHitType.Don : TaikoHitType.Katsu;
-        public bool IsFinisher => ((Sample?.Type ?? SampleType.None) & SampleType.Finish) > 0;
+        public abstract TaikoHitType Type { get; }
 
         public override void SetDefaultsFromBeatmap(Beatmap beatmap)
         {
@@ -49,10 +48,17 @@ namespace osu.Game.Modes.Taiko.Objects
         }
     }
 
+    [Flags]
     public enum TaikoHitType
     {
-        None,
-        Don,
-        Katsu,
+        None = 0,
+        Don = (1 << 0),
+        Katsu = (1 << 1),
+        DrumRoll = (1 << 2),
+        DrumRollTick = (1 << 3),
+        Bash = (1 << 4),
+        Finisher = (1 << 5),
+
+        HitCircle = Don | Katsu
     }
 }

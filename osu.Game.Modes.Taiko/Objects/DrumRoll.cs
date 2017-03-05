@@ -91,5 +91,15 @@ namespace osu.Game.Modes.Taiko.Objects
                 }
             }
         }
+
+        public override TaikoHitType Type
+        {
+            get
+            {
+                SampleType st = Sample?.Type ?? SampleType.None;
+
+                return TaikoHitType.DrumRoll | ((st & SampleType.Finish) > 0 ? TaikoHitType.Finisher : TaikoHitType.None);
+            }
+        }
     }
 }

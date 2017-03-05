@@ -57,7 +57,7 @@ namespace osu.Game.Modes.Taiko
             hpIncreaseGood = hpMultiplierNormal * beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_hit_100 * 8, hp_hit_100, hp_hit_100, Mods.None) / 200.0;
             hpIncreaseMiss = beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, -6, -25, -40, Mods.None) / 200.0;
 
-            List<TaikoHitObject> finishers = objects.FindAll(o => (o as HitCircle)?.IsFinisher ?? false);
+            List<TaikoHitObject> finishers = objects.FindAll(o => (o.Type & (TaikoHitType.HitCircle | TaikoHitType.Finisher)) > 0);
             finisherScoreScale = -7d / 90d * MathHelper.Clamp(finishers.Count, 30, 120) + 111d / 9d;
 
             foreach (TaikoHitObject obj in objects)
@@ -68,7 +68,6 @@ namespace osu.Game.Modes.Taiko
                     {
                         Result = HitResult.Hit,
                         Score = TaikoScoreResult.Great,
-                        SecondHit = obj.IsFinisher
                     });
                 }
                 else if (obj is DrumRoll)
@@ -81,7 +80,7 @@ namespace osu.Game.Modes.Taiko
                         {
                             Result = HitResult.Hit,
                             Score = TaikoScoreResult.Great,
-                            SecondHit = obj.IsFinisher
+                            SecondHit = (obj.Type & TaikoHitType.Finisher) > 0
                         });
                     }
 
@@ -89,7 +88,7 @@ namespace osu.Game.Modes.Taiko
                     {
                         Result = HitResult.Hit,
                         Score = TaikoScoreResult.Great,
-                        SecondHit = obj.IsFinisher
+                        SecondHit = (obj.Type & TaikoHitType.Finisher) > 0
                     });
                 }
                 else if (obj is Bash)

@@ -16,5 +16,7 @@ namespace osu.Game.Modes.Taiko.Objects
         public bool FirstTick;
 
         public double TickTimeDistance;
+
+        public override TaikoHitType Type => TaikoHitType.DrumRollTick;
     }
 }
