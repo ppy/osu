@@ -12,12 +12,12 @@ namespace osu.Game.Modes.Osu
     {
         protected override bool ShouldFail => Health.Value == Health.MinValue;
 
-        public OsuScoreProcessor(int hitObjectCount)
-            : base(hitObjectCount)
+        public OsuScoreProcessor(Beatmap beatmap)
+            : base(beatmap)
         {
         }
 
-        public override void Initialize(Beatmap beatmap)
+        public override void CalculateFinalValues(Beatmap beatmap)
         {
             // Initialize HP + final values
         }

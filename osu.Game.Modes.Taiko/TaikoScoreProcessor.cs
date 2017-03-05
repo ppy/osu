@@ -42,12 +42,12 @@ namespace osu.Game.Modes.Taiko
         private int accurateHits;
         private int totalHits;
 
-        public TaikoScoreProcessor(int hitObjectCount)
-            : base(hitObjectCount)
+        public TaikoScoreProcessor(Beatmap beatmap)
+            : base(beatmap)
         {
         }
 
-        public override void Initialize(Beatmap beatmap)
+        public override void CalculateFinalValues(Beatmap beatmap)
         {
             List<TaikoHitObject> objects = new TaikoConverter().Convert(beatmap);
 

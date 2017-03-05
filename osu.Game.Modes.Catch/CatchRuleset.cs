@@ -21,7 +21,7 @@ namespace osu.Game.Modes.Catch
 
         public override FontAwesome Icon => FontAwesome.fa_osu_fruits_o;
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => null;
+        public override ScoreProcessor CreateScoreProcessor(Beatmap beatmap) => null;
 
         public override HitObjectParser CreateHitObjectParser() => new NullHitObjectParser();
 

@@ -38,7 +38,7 @@ namespace osu.Game.Modes.Osu
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => new OsuScoreProcessor(hitObjectCount);
+        public override ScoreProcessor CreateScoreProcessor(Beatmap beatmap) => new OsuScoreProcessor(beatmap);
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
 

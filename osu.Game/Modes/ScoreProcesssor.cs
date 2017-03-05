@@ -55,12 +55,19 @@ namespace osu.Game.Modes
         /// Initializes a new instance of the <see cref="ScoreProcessor"/> class.
         /// </summary>
         /// <param name="hitObjectCount">Number of HitObjects. It is used for specifying Judgements collection Capacity</param>
-        public ScoreProcessor(int hitObjectCount = 0)
+        public ScoreProcessor(Beatmap beatmap)
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
-            Judgements = new List<JudgementInfo>(hitObjectCount);
+            Judgements = new List<JudgementInfo>(beatmap.HitObjects.Count);
+
+            CalculateFinalValues(beatmap);
+            Reset();
         }
 
+        /// <summary>
+        /// Adds a judgement to this processor.
+        /// </summary>
+        /// <param name="judgement">The judgement to add.</param>
         public void AddJudgement(JudgementInfo judgement)
         {
             Judgements.Add(judgement);
@@ -73,13 +80,14 @@ namespace osu.Game.Modes
         }
 
         /// <summary>
-        /// Initialize final values by simulating an auto-play of the beatmap.
+        /// Calculates and stores final scoring values by simulating an auto-play of the beatmap.
         /// </summary>
         /// <param name="beatmap">The beatmap to initialize calculations with.</param>
-        public abstract void Initialize(Beatmap beatmap);
+        public abstract void CalculateFinalValues(Beatmap beatmap);
 
         /// <summary>
-        /// Rests the score processor to a stale state.
+        /// Rests the processor to a stale state. Should revert any variables changed through the
+        /// <see cref="CalculateFinalValues(Beatmap)"/> method.
         /// </summary>
         public virtual void Reset()
         {

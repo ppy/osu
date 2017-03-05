@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Taiko
 
         public override FontAwesome Icon => FontAwesome.fa_osu_taiko_o;
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => new TaikoScoreProcessor(hitObjectCount);
+        public override ScoreProcessor CreateScoreProcessor(Beatmap beatmap) => new TaikoScoreProcessor(beatmap);
 
         public override HitObjectParser CreateHitObjectParser() => new TaikoHitObjectParser();
 
