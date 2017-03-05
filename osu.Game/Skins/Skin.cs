@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps.IO;
 
 namespace osu.Game.Skins
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Skins
         public SkinInfo info;
         public TextureStore Textures { get; private set; }
 
-        private StorageResourceStore SkinsStore;
+        private ArchiveReader SkinsStore;
         private Storage storage;
 
         public Skin(SkinInfo info)
@@ -27,7 +28,7 @@ namespace osu.Game.Skins
             Textures = new TextureStore();
             if (info.Name != SkinManager.DEFAULT_SKIN.Name)
             {
-                Textures.AddStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(SkinsStore, Path.Combine("skins", info.Path))));
+                Textures.AddStore(new RawTextureLoaderStore(SkinsStore));
             }
             // TODO update audio component
         }
@@ -35,7 +36,7 @@ namespace osu.Game.Skins
         [BackgroundDependencyLoader]
         private void load(GameHost host) {
             storage = host.Storage;
-            SkinsStore = new StorageResourceStore(storage);
+            SkinsStore = ArchiveReader.GetReader(storage, info.Path);
             UpdateSkin();
         }
     }

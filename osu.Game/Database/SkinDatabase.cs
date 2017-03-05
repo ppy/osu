@@ -3,6 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
+using Ionic.Zip;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Skins;
@@ -48,10 +51,42 @@ namespace osu.Game.Database
             return conn;
         }
 
-        private void Import(IEnumerable<string> paths) { 
+        private SkinInfo getSkin(string path)
+        {
+            string hash = null;
+
+            if (File.Exists(path)) 
+            {
+                using (var md5 = MD5.Create())
+                using (var input = storage.GetStream(path)) 
+                {
+                    hash = BitConverter.ToString(md5.ComputeHash(input)).Replace("-","").ToLowerInvariant();
+                    input.Seek(0, SeekOrigin.Begin);
+                    path = Path.Combine(@"skins", hash.Remove(1), hash.Remove(2), hash);
+                    if (!storage.Exists(path))
+                    {
+                        using (var output = storage.GetStream(path, FileAccess.Write))
+                            input.CopyTo(output);
+                    }
+                }  
+            }
+
+            SkinInfo info = new SkinInfo
+            {
+                // TODO
+            };
+
         }
 
-        private void Import(string path)
+        public void Import(IEnumerable<string> paths) {
+            foreach (string path in paths) 
+            {
+                getSkin(path);
+            }
+            throw new NotImplementedException();
+        }
+
+        public void Import(string path)
         {
             Import(new [] { path });
         }
