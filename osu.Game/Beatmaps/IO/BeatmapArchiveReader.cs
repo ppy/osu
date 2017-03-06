@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
 
@@ -13,12 +14,15 @@ namespace osu.Game.Beatmaps.IO
 
         public static BeatmapArchiveReader GetBeatmapArchiveReader(Storage storage, string path)
         {
-            foreach (var reader in Readers)
+            try
             {
-                if (reader.Test(storage, path))
-                    return (BeatmapArchiveReader)Activator.CreateInstance(reader.Type, storage.GetStream(path));
+                return (BeatmapArchiveReader)GetReader(storage, path);
             }
-            throw new IOException(@"Unknown file format");
+            catch (InvalidCastException e)
+            {
+                Logger.Error(e, "A tricky ArchiveReader instance passed the test to be a BeatmapArhiveReader, but it's really not");
+                throw e;
+            }
         }
 
         /// <summary>
