@@ -19,7 +19,6 @@ namespace osu.Game.Modes.Taiko
     {
         public override string Description => @"The notes fade out before you hit them!";
         public override double ScoreMultiplier => 1.06;
-        public override Type[] IncompatibleMods => new Type[] { };
     }
 
     public class TaikoModHardRock : ModHardRock
@@ -56,7 +55,6 @@ namespace osu.Game.Modes.Taiko
     public class TaikoModFlashlight : ModFlashlight
     {
         public override double ScoreMultiplier => 1.12;
-        public override Type[] IncompatibleMods => new Type[] { };
     }
 
     public class TaikoModPerfect : ModPerfect

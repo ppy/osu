@@ -19,7 +19,6 @@ namespace osu.Game.Modes.Catch
     {
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
-        public override Type[] IncompatibleMods => new Type[] { };
     }
 
     public class CatchModHardRock : ModHardRock
@@ -56,7 +55,6 @@ namespace osu.Game.Modes.Catch
     public class CatchModFlashlight : ModFlashlight
     {
         public override double ScoreMultiplier => 1.12;
-        public override Type[] IncompatibleMods => new Type[] { };
     }
 
     public class CatchModPerfect : ModPerfect

@@ -184,7 +184,7 @@ namespace osu.Game.Overlays.Mods
         private void displayMod(Mod mod)
         {
             displayIcon.Icon = mod.Icon;
-            text.Text = mod.Name.GetDescription();
+            text.Text = mod.Name;
         }
 
         private void displaySelectedMod()
