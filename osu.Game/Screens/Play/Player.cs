@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                playerInputManager = new PlayerInputManager(game.Host)
+                playerInputManager = new PlayerInputManager
                 {
                     Clock = new InterpolatingFramedClock(sourceClock),
                     Children = new Drawable[]
