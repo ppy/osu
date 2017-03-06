@@ -32,8 +32,6 @@ namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
-        public virtual bool IsDeployedBuild => false;
-
         public Toolbar Toolbar;
 
         private ChatOverlay chat;
