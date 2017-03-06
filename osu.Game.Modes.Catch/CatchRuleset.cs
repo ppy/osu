@@ -73,6 +73,8 @@ namespace osu.Game.Modes.Catch
         }
 
         protected override PlayMode PlayMode => PlayMode.Catch;
+        
+        public override string Description => "osu!catch";
 
         public override FontAwesome Icon => FontAwesome.fa_osu_fruits_o;
 

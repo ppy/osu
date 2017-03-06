@@ -74,6 +74,8 @@ namespace osu.Game.Modes.Taiko
 
         protected override PlayMode PlayMode => PlayMode.Taiko;
 
+        public override string Description => "osu!taiko";
+
         public override FontAwesome Icon => FontAwesome.fa_osu_taiko_o;
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => null;

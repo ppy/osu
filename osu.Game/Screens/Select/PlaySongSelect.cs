@@ -1,35 +1,35 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
+using OpenTK.Input;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input;
+using osu.Framework.Screens;
+using osu.Framework.Threading;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
+using osu.Game.Database;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Modes;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
+using osu.Game.Screens.Backgrounds;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Select.Options;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
-using osu.Framework.Screens;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Primitives;
-using osu.Game.Beatmaps;
-using osu.Game.Database;
-using osu.Game.Modes;
-using osu.Game.Screens.Backgrounds;
-using OpenTK;
-using osu.Game.Screens.Play;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Graphics.Transforms;
-using osu.Game.Beatmaps.Drawables;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Framework.Input;
-using OpenTK.Input;
-using System.Collections.Generic;
-using osu.Framework.Threading;
-using osu.Game.Overlays.Mods;
-using osu.Game.Overlays;
-using osu.Game.Screens.Select.Options;
 
 namespace osu.Game.Screens.Select
 {

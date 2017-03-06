@@ -3,7 +3,6 @@
 
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
-using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Beatmaps
@@ -14,7 +13,7 @@ namespace osu.Game.Beatmaps
 
         protected double TimeRate = 1;
 
-        protected abstract double CalculateInternal(Dictionary<String, String> categoryDifficulty);
+        protected abstract double CalculateInternal(Dictionary<string, string> categoryDifficulty);
 
         private void loadTiming()
         {

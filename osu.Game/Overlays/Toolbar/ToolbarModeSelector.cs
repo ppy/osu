@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Toolbar
             };
 
             int amountButtons = 0;
-            foreach (PlayMode m in Enum.GetValues(typeof(PlayMode)))
+            foreach (PlayMode m in Ruleset.PlayModes)
             {
                 ++amountButtons;
 

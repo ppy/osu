@@ -1,13 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Game.Modes.Objects;
-using osu.Game.Modes.UI;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Modes.Objects;
+using osu.Game.Modes.UI;
+using System.Reflection;
+using System.IO;
+using System.Linq;
 
 namespace osu.Game.Modes
 {
@@ -21,6 +24,8 @@ namespace osu.Game.Modes
     public abstract class Ruleset
     {
         private static ConcurrentDictionary<PlayMode, Type> availableRulesets = new ConcurrentDictionary<PlayMode, Type>();
+
+        public static ICollection<PlayMode> PlayModes => availableRulesets.Keys;
 
         public abstract ScoreOverlay CreateScoreOverlay();
 
@@ -42,6 +47,8 @@ namespace osu.Game.Modes
 
         public virtual FontAwesome Icon => FontAwesome.fa_question_circle;
 
+        public abstract string Description { get; }
+
         public static Ruleset GetRuleset(PlayMode mode)
         {
             Type type;
@@ -50,6 +57,36 @@ namespace osu.Game.Modes
                 return null;
 
             return Activator.CreateInstance(type) as Ruleset;
+        }
+        
+        public static void LoadRulesetsFrom(string directory, string filter = "", AppDomain domain = null)
+        {
+            if (domain == null)
+            {
+                domain = AppDomain.CreateDomain("rulesetLoader");
+                LoadRulesetsFrom(directory, filter, domain);
+                AppDomain.Unload(domain);
+            }
+            else
+            {
+                foreach (string file in Directory.EnumerateFiles(directory))
+                {
+                    try
+                    {
+                        if (!(file.Contains(filter)&&file.EndsWith(".dll")))
+                            continue;
+                        
+                        var assembly = domain.Load(AssemblyName.GetAssemblyName(file));
+                        var rulesets = assembly.GetTypes().Where((Type t) => t.IsSubclassOf(typeof(Ruleset)));
+                        if (rulesets.Count() > 0)
+                            Assembly.LoadFile(file);
+
+                        foreach (Type rulesetType in rulesets)
+                            Register(Activator.CreateInstance(rulesetType) as Ruleset);
+                    }
+                    catch (Exception) { }
+                }
+            }
         }
     }
 }
