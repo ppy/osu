@@ -102,8 +102,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             double progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
-            int repeat = (int)(progress * slider.RepeatCount);
-            progress = (progress * slider.RepeatCount) % 1;
+            int repeat = slider.RepeatAt(progress);
+            progress = slider.CurveProgressAt(progress);
 
             if (repeat > currentRepeat)
             {
@@ -111,9 +111,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     PlaySample();
                 currentRepeat = repeat;
             }
-
-            if (repeat % 2 == 1)
-                progress = 1 - progress;
 
             bouncer2.Position = slider.Curve.PositionAt(body.SnakedEnd ?? 0);
 
