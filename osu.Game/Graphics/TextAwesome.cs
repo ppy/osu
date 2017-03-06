@@ -822,6 +822,7 @@ namespace osu.Game.Graphics
         fa_osu_mania_o = 0xe001,
         fa_osu_fruits_o = 0xe002,
         fa_osu_taiko_o = 0xe003,
+        fa_osu_vitaru_o = 0xe04b,
 
         // gamemode icons without circles
         fa_osu_filled_circle = 0xe004,
