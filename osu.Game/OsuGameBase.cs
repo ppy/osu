@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Diagnostics;
+using System.Reflection;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -36,6 +38,40 @@ namespace osu.Game
         public CursorContainer Cursor;
 
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+        protected AssemblyName AssemblyName => Assembly.GetEntryAssembly().GetName();
+
+        public bool IsDeployedBuild => AssemblyName.Version.Major > 0;
+
+        public bool IsDebug
+        {
+            get
+            {
+                bool isDebug = false;
+                Debug.Assert(isDebug = true);
+                return isDebug;
+            }
+        }
+
+        public string Version
+        {
+            get
+            {
+                bool isDebug = false;
+                Debug.Assert(isDebug = true);
+
+                if (!IsDeployedBuild)
+                    return @"local " + (isDebug ? @"debug" : @"release");
+
+                var assembly = AssemblyName;
+                return $@"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}";
+            }
+        }
+
+        public OsuGameBase()
+        {
+            Name = @"osu!lazer";
+        }
 
         [BackgroundDependencyLoader]
         private void load()

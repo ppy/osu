@@ -17,8 +17,6 @@ namespace osu.Desktop
     {
         private VersionManager versionManager;
 
-        public override bool IsDeployedBuild => versionManager.IsDeployedBuild;
-
         public OsuGameDesktop(string[] args = null)
             : base(args)
         {
@@ -44,7 +42,7 @@ namespace osu.Desktop
             if (desktopWindow != null)
             {
                 desktopWindow.Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
-                desktopWindow.Title = @"osu!lazer";
+                desktopWindow.Title = Name;
 
                 desktopWindow.DragEnter += dragEnter;
                 desktopWindow.DragDrop += dragDrop;

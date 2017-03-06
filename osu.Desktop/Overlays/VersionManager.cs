@@ -19,6 +19,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using System.Net.Http;
 using osu.Framework.Logging;
+using osu.Game;
 
 namespace osu.Desktop.Overlays
 {
@@ -27,16 +28,12 @@ namespace osu.Desktop.Overlays
         private UpdateManager updateManager;
         private NotificationManager notificationManager;
 
-        AssemblyName assembly = Assembly.GetEntryAssembly().GetName();
-
-        public bool IsDeployedBuild => assembly.Version.Major > 0;
-
         protected override bool HideOnEscape => false;
 
         public override bool HandleInput => false;
 
         [BackgroundDependencyLoader]
-        private void load(NotificationManager notification, OsuColour colours, TextureStore textures)
+        private void load(NotificationManager notification, OsuColour colours, TextureStore textures, OsuGameBase game)
         {
             notificationManager = notification;
 
@@ -44,17 +41,6 @@ namespace osu.Desktop.Overlays
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Alpha = 0;
-
-            bool isDebug = false;
-            Debug.Assert(isDebug = true);
-
-            string version;
-            if (!IsDeployedBuild)
-            {
-                version = @"local " + (isDebug ? @"debug" : @"release");
-            }
-            else
-                version = $@"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}";
 
             Children = new Drawable[]
             {
@@ -76,12 +62,12 @@ namespace osu.Desktop.Overlays
                                 new OsuSpriteText
                                 {
                                     Font = @"Exo2.0-Bold",
-                                    Text = $@"osu!lazer"
+                                    Text = game.Name
                                 },
                                 new OsuSpriteText
                                 {
-                                    Colour = isDebug ? colours.Red : Color4.White,
-                                    Text = version
+                                    Colour = game.IsDebug ? colours.Red : Color4.White,
+                                    Text = game.Version
                                 },
                             }
                         },
@@ -104,7 +90,7 @@ namespace osu.Desktop.Overlays
                 }
             };
 
-            if (IsDeployedBuild)
+            if (game.IsDeployedBuild)
                 checkForUpdateAsync();
         }
 
@@ -228,6 +214,7 @@ namespace osu.Desktop.Overlays
                     new TextAwesome
                     {
                         Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_upload,
                         Colour = Color4.White,
                     }
