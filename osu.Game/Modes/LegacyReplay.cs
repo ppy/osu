@@ -89,9 +89,6 @@ namespace osu.Game.Modes
                     if (!hasFrames)
                         return null;
 
-                    if (AtLastFrame)
-                        return CurrentFrame.Position;
-
                     return Interpolation.ValueAt(currentTime, CurrentFrame.Position, NextFrame.Position, CurrentFrame.Time, NextFrame.Time);
                 }
             }
