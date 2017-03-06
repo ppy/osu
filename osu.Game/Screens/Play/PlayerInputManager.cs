@@ -5,7 +5,6 @@ using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Input;
-using osu.Framework.Platform;
 using osu.Game.Configuration;
 using System.Linq;
 
@@ -13,11 +12,6 @@ namespace osu.Game.Screens.Play
 {
     class PlayerInputManager : UserInputManager
     {
-        public PlayerInputManager(GameHost host)
-            : base(host)
-        {
-        }
-
         bool leftViaKeyboard;
         bool rightViaKeyboard;
         Bindable<bool> mouseDisabled;
