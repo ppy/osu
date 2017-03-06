@@ -9,7 +9,6 @@ using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -23,10 +22,9 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModButton : FillFlowContainer
     {
-        private ModIcon[] icons;
-        private ModIcon displayIcon => icons[icons.Length - 1];
+        private ModIcon foregroundIcon { get; set; }
         private SpriteText text;
-        private Container iconsContainer;
+        private Container<ModIcon> iconsContainer;
         private SampleChannel sampleOn, sampleOff;
 
         public Action<Mod> Action; // Passed the selected mod or null if none
@@ -54,11 +52,7 @@ namespace osu.Game.Overlays.Mods
 
                 iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
                 iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
-                for (int i = 0; i < icons.Length; i++)
-                {
-                    if (Selected && i == icons.Length - 1) icons[i].Colour = SelectedColour;
-                    else icons[i].Colour = Colour;
-                }
+                foregroundIcon.Colour = Selected ? SelectedColour : Colour;
 
                 displaySelectedMod();
             }
@@ -77,7 +71,7 @@ namespace osu.Game.Overlays.Mods
             {
                 if (value == backgroundColour) return;
                 backgroundColour = value;
-                foreach (ModIcon icon in icons)
+                foreach (ModIcon icon in iconsContainer.Children)
                 {
                     icon.Colour = value;
                 }
@@ -95,7 +89,7 @@ namespace osu.Game.Overlays.Mods
             {
                 if (value == selectedColour) return;
                 selectedColour = value;
-                if (Selected) icons[0].Colour = value;
+                if (Selected) foregroundIcon.Colour = value;
             }
         }
 
@@ -156,29 +150,13 @@ namespace osu.Game.Overlays.Mods
 
         public void SelectNext()
         {
-            if (++selectedIndex == -1)
-            {
-                sampleOff.Play();
-            }
-            else
-            {
-                sampleOn.Play();
-            }
-
+            (++selectedIndex == -1 ? sampleOff : sampleOn).Play();
             Action?.Invoke(SelectedMod);
         }
 
         public void SelectPrevious()
         {
-            if (--selectedIndex == -1)
-            {
-                sampleOff.Play();
-            }
-            else
-            {
-                sampleOn.Play();
-            }
-
+            (--selectedIndex == -1 ? sampleOff : sampleOn).Play();
             Action?.Invoke(SelectedMod);
         }
 
@@ -189,26 +167,18 @@ namespace osu.Game.Overlays.Mods
 
         private void displayMod(Mod mod)
         {
-            displayIcon.Icon = mod.Icon;
+            foregroundIcon.Icon = mod.Icon;
             text.Text = mod.Name;
         }
 
-        private void displaySelectedMod()
-        {
-            var modIndex = selectedIndex;
-            if (modIndex <= -1)
-            {
-                modIndex = 0;
-            }
-
-            displayMod(Mods[modIndex]);
-        }
+        private void displaySelectedMod() => displayMod(SelectedMod ?? Mods[0]);
 
         private void createIcons()
         {
+            iconsContainer.Clear();
             if (Mods.Length > 1)
             {
-                iconsContainer.Add(icons = new ModIcon[]
+                iconsContainer.Add(new[]
                 {
                     new ModIcon
                     {
@@ -217,25 +187,22 @@ namespace osu.Game.Overlays.Mods
                         AutoSizeAxes = Axes.Both,
                         Position = new Vector2(1.5f),
                     },
-                    new ModIcon
+                    foregroundIcon = new ModIcon
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        AutoSizeAxes = Axes.Both,  
+                        AutoSizeAxes = Axes.Both,
                         Position = new Vector2(-1.5f),
                     },
                 });
             }
             else
             {
-                iconsContainer.Add(icons = new ModIcon[]
+                iconsContainer.Add(foregroundIcon = new ModIcon
                 {
-                    new ModIcon
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        AutoSizeAxes = Axes.Both,
-                    },
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
                 });
             }
         }
@@ -255,7 +222,7 @@ namespace osu.Game.Overlays.Mods
                     Anchor = Anchor.TopCentre,
                     Children = new Drawable[]
                     {
-                        iconsContainer = new Container
+                        iconsContainer = new Container<ModIcon>
                         {
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
