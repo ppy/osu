@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes
 {
@@ -31,7 +32,7 @@ namespace osu.Game.Modes
 
         public abstract ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0);
 
-        public abstract HitRenderer CreateHitRendererWith(Beatmap beatmap, InputManager input = null);
+        public abstract HitRenderer CreateHitRendererWith(Beatmap beatmap, PlayerInputManager input = null);
 
         public abstract HitObjectParser CreateHitObjectParser();
 
