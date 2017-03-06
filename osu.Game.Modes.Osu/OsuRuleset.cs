@@ -100,8 +100,8 @@ namespace osu.Game.Modes.Osu
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
 
-        protected override int PlayMode => Modes.PlayMode.Osu;
+        protected override PlayMode PlayMode => PlayMode.Osu;
 
-        protected override string Description => "osu!";
+        public override string Description => "osu!";
     }
 }

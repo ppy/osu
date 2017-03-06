@@ -29,12 +29,13 @@ using osu.Framework.Threading;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays;
 using osu.Game.Screens.Select.Options;
+using osu.Game.Modes;
 
 namespace osu.Game.Screens.Select
 {
     public class PlaySongSelect : OsuScreen
     {
-        private Bindable<int> playMode = new Bindable<int>();
+        private Bindable<PlayMode> playMode = new Bindable<PlayMode>();
         private BeatmapDatabase database;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 

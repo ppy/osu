@@ -14,7 +14,7 @@ namespace osu.Game.Modes.Osu
         private const double star_scaling_factor = 0.0675;
         private const double extreme_scaling_factor = 0.5;
 
-        protected override int PlayMode => Modes.PlayMode.Osu;
+        protected override PlayMode PlayMode => PlayMode.Osu;
 
         /// <summary>
         /// HitObjects are stored as a member variable.

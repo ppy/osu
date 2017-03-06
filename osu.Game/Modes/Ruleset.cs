@@ -4,11 +4,13 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
+using System.Reflection;
+using System.IO;
+using System.Linq;
 
 namespace osu.Game.Modes
 {
@@ -21,7 +23,9 @@ namespace osu.Game.Modes
 
     public abstract class Ruleset
     {
-        private static ConcurrentDictionary<int, Type> availableRulesets = new ConcurrentDictionary<int, Type>();
+        private static ConcurrentDictionary<PlayMode, Type> availableRulesets = new ConcurrentDictionary<PlayMode, Type>();
+
+        public static ICollection<PlayMode> PlayModes => availableRulesets.Keys;
 
         public abstract ScoreOverlay CreateScoreOverlay();
 
@@ -37,19 +41,15 @@ namespace osu.Game.Modes
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap);
 
-        public static void Register(Ruleset ruleset)
-        {
-            availableRulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
-            Modes.PlayMode.Description.Add(ruleset.PlayMode, ruleset.Description);
-        }
+        public static void Register(Ruleset ruleset) => availableRulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
 
-        protected abstract int PlayMode { get; }
+        protected abstract PlayMode PlayMode { get; }
 
         public virtual FontAwesome Icon => FontAwesome.fa_question_circle;
 
-        protected abstract string Description { get; }
+        public abstract string Description { get; }
 
-        public static Ruleset GetRuleset(int mode)
+        public static Ruleset GetRuleset(PlayMode mode)
         {
             Type type;
 
@@ -59,26 +59,36 @@ namespace osu.Game.Modes
             return Activator.CreateInstance(type) as Ruleset;
         }
         
-        [DebuggerNonUserCode]
-        public static void LoadRulesetsFrom(string directory)
+        public static void LoadRulesetsFrom(string directory, AppDomain domain = null)
         {
-            foreach (string subDirectory in Directory.EnumerateDirectories(directory))
-                loadRulesets(subDirectory);
-
-            foreach (string file in Directory.EnumerateFiles(directory))
+            if (domain == null)
             {
-                if (!file.EndsWith(".dll"))
-                    continue;
-                try
-                {
-                    var rulesets = Assembly.LoadFile(file).GetTypes().Where((Type t) => t.IsSubclassOf(typeof(Ruleset)));
-                    foreach (Type rulesetType in rulesets)
-                    {
-                        Ruleset.Register(Activator.CreateInstance(rulesetType) as Ruleset);
-                    }
+                domain = AppDomain.CreateDomain("rulesetLoader");
+                LoadRulesetsFrom(directory, domain);
+                AppDomain.Unload(domain);
+            }
+            else
+            {
+                foreach (string subDirectory in Directory.EnumerateDirectories(directory))
+                    LoadRulesetsFrom(subDirectory);
 
+                foreach (string file in Directory.EnumerateFiles(directory))
+                {
+                    try
+                    {
+                        if (!file.EndsWith(".dll"))
+                            continue;
+                        
+                        var assembly = domain.Load(AssemblyName.GetAssemblyName(file));
+                        var rulesets = assembly.GetTypes().Where((Type t) => t.IsSubclassOf(typeof(Ruleset)));
+                        if (rulesets.Count() > 0)
+                            Assembly.LoadFile(file);
+
+                        foreach (Type rulesetType in rulesets)
+                            Register(Activator.CreateInstance(rulesetType) as Ruleset);
+                    }
+                    catch (Exception) { }
                 }
-                catch (Exception e) { }
             }
         }
     }

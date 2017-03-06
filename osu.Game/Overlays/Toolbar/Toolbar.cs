@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
+using osu.Game.Modes;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.Toolbar
         public const float TOOLTIP_HEIGHT = 30;
 
         public Action OnHome;
-        public Action<int> OnPlayModeChange;
+        public Action<PlayMode> OnPlayModeChange;
 
         private ToolbarModeSelector modeSelector;
         private ToolbarUserArea userArea;
@@ -55,7 +56,7 @@ namespace osu.Game.Overlays.Toolbar
                         },
                         modeSelector = new ToolbarModeSelector
                         {
-                            OnPlayModeChange = (int mode) =>
+                            OnPlayModeChange = (PlayMode mode) =>
                             {
                                 OnPlayModeChange?.Invoke(mode);
                             }
@@ -128,7 +129,7 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
-        public void SetGameMode(int mode) => modeSelector.SetGameMode(mode);
+        public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
 
         protected override void PopIn()
         {

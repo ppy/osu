@@ -16,6 +16,7 @@ namespace osu.Desktop.VisualTests.Tests
         private BeatmapDatabase db, oldDb;
         private TestStorage storage;
         private PlaySongSelect songSelect;
+
         public override string Description => @"with fake data";
 
         public override void Reset()

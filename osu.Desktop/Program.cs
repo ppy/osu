@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
+using osu.Game;
 
 namespace osu.Desktop
 {
@@ -41,8 +42,6 @@ namespace osu.Desktop
                 }
                 else
                 {
-                    if (Debugger.IsAttached)
-                        cwd = Directory.GetParent(Directory.GetParent(cwd).FullName).FullName;
                     Ruleset.LoadRulesetsFrom(cwd);
 
                     host.Run(new OsuGameDesktop(args));

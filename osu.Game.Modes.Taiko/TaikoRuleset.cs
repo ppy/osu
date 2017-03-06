@@ -72,9 +72,9 @@ namespace osu.Game.Modes.Taiko
             }
         }
 
-        protected override int PlayMode => Modes.PlayMode.Taiko;
+        protected override PlayMode PlayMode => PlayMode.Taiko;
 
-        protected override string Description => "osu!taiko";
+        public override string Description => "osu!taiko";
 
         public override FontAwesome Icon => FontAwesome.fa_osu_taiko_o;
 

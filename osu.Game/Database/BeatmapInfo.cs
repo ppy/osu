@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Game.Beatmaps.Samples;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
+using osu.Game.Modes;
 
 namespace osu.Game.Database
 {
@@ -44,7 +45,7 @@ namespace osu.Game.Database
         public SampleSet SampleSet { get; set; }
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
-        public int Mode { get; set; }
+        public PlayMode Mode { get; set; }
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
 

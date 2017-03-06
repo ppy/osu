@@ -26,6 +26,7 @@ using osu.Framework.Graphics.Primitives;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Modes;
 
 namespace osu.Game
 {
@@ -58,7 +59,7 @@ namespace osu.Game
 
         private VolumeControl volume;
 
-        public Bindable<int> PlayMode;
+        public Bindable<PlayMode> PlayMode;
 
         string[] args;
 
@@ -88,7 +89,7 @@ namespace osu.Game
 
             Dependencies.Cache(this);
 
-            PlayMode = LocalConfig.GetBindable<int>(OsuConfig.PlayMode);
+            PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
         }
 
         protected async void ImportBeatmapsAsync(IEnumerable<string> paths)
@@ -167,7 +168,7 @@ namespace osu.Game
             {
                 Depth = -3,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
-                OnPlayModeChange = delegate (int m) { PlayMode.Value = m; },
+                OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
             }).LoadAsync(this, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };

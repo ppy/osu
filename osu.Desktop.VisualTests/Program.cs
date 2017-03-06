@@ -21,10 +21,7 @@ namespace osu.Desktop.VisualTests
 
             using (GameHost host = Host.GetSuitableHost(@"osu"))
             {
-                var cwd = Environment.CurrentDirectory;
-                if (Debugger.IsAttached)
-                    cwd = Directory.GetParent(Directory.GetParent(cwd).FullName).FullName;
-                Ruleset.LoadRulesetsFrom(cwd);
+                Ruleset.LoadRulesetsFrom(Environment.CurrentDirectory);
 
                 if (benchmark)
                     host.Run(new Benchmark());

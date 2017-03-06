@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Mods
 
         public readonly Bindable<Mod[]> SelectedMods = new Bindable<Mod[]>();
 
-        public readonly Bindable<int> PlayMode = new Bindable<int>();
+        public readonly Bindable<PlayMode> PlayMode = new Bindable<PlayMode>();
 
         private void modeChanged(object sender, EventArgs eventArgs)
         {

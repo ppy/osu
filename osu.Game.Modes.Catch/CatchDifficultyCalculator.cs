@@ -10,7 +10,7 @@ namespace osu.Game.Modes.Catch
 {
     public class CatchDifficultyCalculator : DifficultyCalculator<CatchBaseHit>
     {
-        protected override int PlayMode => Modes.PlayMode.Catch;
+        protected override PlayMode PlayMode => PlayMode.Catch;
 
         public CatchDifficultyCalculator(Beatmap beatmap) : base(beatmap)
         {
