@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        public void DeselectMod(Modes.Mods modName)
+        public void DeselectType(Type modType)
         {
             foreach (ModSection section in modSectionsContainer.Children)
             {
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Mods
                 {
                     foreach (Mod mod in button.Mods)
                     {
-                        if (mod.Name == modName)
+                        if (modType.IsInstanceOfType(mod))
                         {
                             button.Deselect();
                             return;
@@ -145,10 +145,8 @@ namespace osu.Game.Overlays.Mods
         {
             if (selectedMod != null)
             {
-                foreach (Modes.Mods disableMod in selectedMod.DisablesMods)
-                {
-                    DeselectMod(disableMod);
-                }
+                foreach (Type t in selectedMod.IncompatibleMods)
+                    DeselectType(t);
             }
 
             refreshSelectedMods();
