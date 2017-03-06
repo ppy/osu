@@ -33,7 +33,7 @@ namespace osu.Desktop.VisualTests.Tests
         protected override Player CreatePlayer(WorkingBeatmap beatmap)
         {
             var player = base.CreatePlayer(beatmap);
-            player.ReplayInputHandler = Ruleset.GetRuleset(beatmap.PlayMode).CreateAutoplayReplay(beatmap.Beatmap)?.Replay?.GetInputHandler();
+            player.ReplayInputHandler = Ruleset.GetRuleset(beatmap.PlayMode).CreateAutoplayScore(beatmap.Beatmap)?.Replay?.GetInputHandler();
             return player;
         }
     }

@@ -105,14 +105,10 @@ namespace osu.Game.Modes.Osu
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
 
-        public override Score CreateAutoplayReplay(Beatmap beatmap)
+        public override Score CreateAutoplayScore(Beatmap beatmap)
         {
-            var processor = CreateScoreProcessor();
-
-            var score = processor.GetScore();
-
+            var score = CreateScoreProcessor().GetScore();
             score.Replay = new OsuAutoReplay(beatmap);
-
             return score;
         }
 
