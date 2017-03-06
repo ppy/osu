@@ -176,6 +176,7 @@ namespace osu.Game.Overlays.Notifications
                     new TextAwesome
                     {
                         Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_times_circle,
                     }
                 };

@@ -51,6 +51,7 @@ namespace osu.Game.Overlays.Notifications
                 iconDrawable = new TextAwesome
                 {
                     Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Icon = icon,
                 }
             });

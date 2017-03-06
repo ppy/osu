@@ -34,6 +34,7 @@ namespace osu.Game.Beatmaps.Drawables
                 new TextAwesome
                 {
                     Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     TextSize = Size.X,
                     Colour = getColour(beatmap),
                     Icon = FontAwesome.fa_circle
@@ -41,6 +42,7 @@ namespace osu.Game.Beatmaps.Drawables
                 new TextAwesome
                 {
                     Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     TextSize = Size.X,
                     Colour = Color4.White,
                     Icon = Ruleset.GetRuleset(beatmap.Mode).Icon
