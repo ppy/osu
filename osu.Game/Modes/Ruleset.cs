@@ -59,12 +59,12 @@ namespace osu.Game.Modes
             return Activator.CreateInstance(type) as Ruleset;
         }
         
-        public static void LoadRulesetsFrom(string directory, AppDomain domain = null)
+        public static void LoadRulesetsFrom(string directory, string filter = ".dll", AppDomain domain = null)
         {
             if (domain == null)
             {
                 domain = AppDomain.CreateDomain("rulesetLoader");
-                LoadRulesetsFrom(directory, domain);
+                LoadRulesetsFrom(directory, filter, domain);
                 AppDomain.Unload(domain);
             }
             else
@@ -76,7 +76,7 @@ namespace osu.Game.Modes
                 {
                     try
                     {
-                        if (!file.EndsWith(".dll"))
+                        if (!file.Contains(filter))
                             continue;
                         
                         var assembly = domain.Load(AssemblyName.GetAssemblyName(file));
