@@ -142,7 +142,15 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            (args.Button == MouseButton.Right ? (Action)SelectPrevious : SelectNext)();
+            switch (args.Button)
+            {
+                case MouseButton.Left:
+                    SelectNext();
+                    break;
+                case MouseButton.Right:
+                    SelectPrevious();
+                    break;
+            }
             return true;
         }
 
