@@ -49,6 +49,7 @@ namespace osu.Game
             get
             {
                 bool isDebug = false;
+                // Debug.Assert conditions are only evaluated in debug mode
                 Debug.Assert(isDebug = true);
                 return isDebug;
             }
@@ -58,11 +59,8 @@ namespace osu.Game
         {
             get
             {
-                bool isDebug = false;
-                Debug.Assert(isDebug = true);
-
                 if (!IsDeployedBuild)
-                    return @"local " + (isDebug ? @"debug" : @"release");
+                    return @"local " + (IsDebug ? @"debug" : @"release");
 
                 var assembly = AssemblyName;
                 return $@"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}";
