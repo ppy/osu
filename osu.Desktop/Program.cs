@@ -43,34 +43,11 @@ namespace osu.Desktop
                 {
                     if (Debugger.IsAttached)
                         cwd = Directory.GetParent(Directory.GetParent(cwd).FullName).FullName;
-                    loadRulesets(cwd);
+                    Ruleset.LoadRulesetsFrom(cwd);
 
                     host.Run(new OsuGameDesktop(args));
                 }
                 return 0;
-            }
-        }
-
-        [DebuggerNonUserCode]
-        private static void loadRulesets(string cwd)
-        {
-            foreach (string dir in Directory.EnumerateDirectories(cwd))
-                loadRulesets(dir);
-            
-            foreach (string file in Directory.EnumerateFiles(cwd))
-            {
-                if (!file.EndsWith(".dll"))
-                    continue;
-                try
-                {
-                    var rulesets = Assembly.LoadFile(file).GetTypes().Where((Type t) => t.IsSubclassOf(typeof(Ruleset)));
-                    foreach (Type rulesetType in rulesets)
-                    {
-                        Ruleset.Register(Activator.CreateInstance(rulesetType) as Ruleset);
-                    }
-                    
-                }
-                catch (Exception e) { }
             }
         }
     }
