@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+
 namespace osu.Game.Modes.Taiko
 {
     public class TaikoModNoFail : ModNoFail
@@ -17,7 +19,7 @@ namespace osu.Game.Modes.Taiko
     {
         public override string Description => @"The notes fade out before you hit them!";
         public override double ScoreMultiplier => 1.06;
-        public override Mods[] DisablesMods => new Mods[] { };
+        public override Type[] IncompatibleMods => new Type[] { };
     }
 
     public class TaikoModHardRock : ModHardRock
@@ -54,7 +56,7 @@ namespace osu.Game.Modes.Taiko
     public class TaikoModFlashlight : ModFlashlight
     {
         public override double ScoreMultiplier => 1.12;
-        public override Mods[] DisablesMods => new Mods[] { };
+        public override Type[] IncompatibleMods => new Type[] { };
     }
 
     public class TaikoModPerfect : ModPerfect

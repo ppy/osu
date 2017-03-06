@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Mania
@@ -19,7 +20,7 @@ namespace osu.Game.Modes.Mania
     {
         public override string Description => @"The notes fade out before you hit them!";
         public override double ScoreMultiplier => 1.0;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Flashlight };
+        public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight) };
     }
 
     public class ManiaModHardRock : ModHardRock
@@ -51,7 +52,7 @@ namespace osu.Game.Modes.Mania
     public class ManiaModFlashlight : ModFlashlight
     {
         public override double ScoreMultiplier => 1.0;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Hidden };
+        public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
     }
 
     public class ManiaModPerfect : ModPerfect
@@ -66,7 +67,7 @@ namespace osu.Game.Modes.Mania
         public override string Description => @"";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Flashlight };
+        public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight) };
     }
 
     public class ManiaModRandom : Mod
@@ -76,7 +77,7 @@ namespace osu.Game.Modes.Mania
         public override string Description => @"Shuffle around the notes!";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => false;
-        public override Mods[] DisablesMods => new Mods[] { };
+        public override Type[] IncompatibleMods => new Type[] { };
     }
 
     public abstract class ManiaKeyMod : Mod
@@ -86,7 +87,7 @@ namespace osu.Game.Modes.Mania
         public override string Description => @"";
         public override double ScoreMultiplier => 1; // TODO: Implement the mania key mod score multiplier
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { };
+        public override Type[] IncompatibleMods => new Type[] { };
     }
 
     public class ManiaModKey1 : ManiaKeyMod
@@ -150,6 +151,6 @@ namespace osu.Game.Modes.Mania
         public override string Description => @"Double the key amount, double the fun!";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { };
+        public override Type[] IncompatibleMods => new Type[] { };
     }
 }
