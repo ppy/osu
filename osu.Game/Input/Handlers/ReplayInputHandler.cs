@@ -2,17 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
-using System.IO;
 using osu.Framework.Input.Handlers;
-using osu.Framework.MathUtils;
 using osu.Framework.Platform;
 using OpenTK;
-using osu.Framework.Input;
-using osu.Game.IO.Legacy;
-using OpenTK.Input;
-using KeyboardState = osu.Framework.Input.KeyboardState;
-using MouseState = osu.Framework.Input.MouseState;
 
 namespace osu.Game.Input.Handlers
 {
@@ -29,7 +21,7 @@ namespace osu.Game.Input.Handlers
         /// This is to ensure accurate playback of replay data.
         /// </summary>
         /// <param name="time">The time which we should use for finding the current frame.</param>
-        /// <returns>The usable time value. If null, we shouldn't be running components reliant on this data.</returns>
+        /// <returns>The usable time value. If null, we should not advance time as we do not have enough data.</returns>
         public abstract double? SetFrameFromTime(double time);
 
         public override bool Initialize(GameHost host) => true;
