@@ -11,11 +11,12 @@ namespace osu.Game.Modes.Osu.Objects
 {
     public abstract class OsuHitObject : HitObject
     {
-        public const double HITTABLE_RANGE = 300;
-        public const double HIT_WINDOW_50 = 150;
-        public const double HIT_WINDOW_100 = 80;
-        public const double HIT_WINDOW_300 = 30;
         public const double OBJECT_RADIUS = 64;
+
+        private const double hittable_range = 300;
+        private const double hit_window_50 = 150;
+        private const double hit_window_100 = 80;
+        private const double hit_window_300 = 30;
 
         public Vector2 Position { get; set; }
 
@@ -28,6 +29,8 @@ namespace osu.Game.Modes.Osu.Objects
         public virtual int StackHeight { get; set; }
 
         public Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
+
+        public double Radius => OBJECT_RADIUS * Scale;
 
         public float Scale { get; set; } = 1;
 
