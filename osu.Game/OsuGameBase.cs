@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using osu.Framework.Allocation;
@@ -39,7 +40,7 @@ namespace osu.Game
 
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        protected AssemblyName AssemblyName => Assembly.GetEntryAssembly().GetName();
+        protected AssemblyName AssemblyName => Assembly.GetEntryAssembly()?.GetName() ?? new AssemblyName() { Version = new Version() };
 
         public bool IsDeployedBuild => AssemblyName.Version.Major > 0;
 
