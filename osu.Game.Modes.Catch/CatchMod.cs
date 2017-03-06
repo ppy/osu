@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+
 namespace osu.Game.Modes.Catch
 {
     public class CatchModNoFail : ModNoFail
@@ -17,7 +19,6 @@ namespace osu.Game.Modes.Catch
     {
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
-        public override Mods[] DisablesMods => new Mods[] { };
     }
 
     public class CatchModHardRock : ModHardRock
@@ -54,7 +55,6 @@ namespace osu.Game.Modes.Catch
     public class CatchModFlashlight : ModFlashlight
     {
         public override double ScoreMultiplier => 1.12;
-        public override Mods[] DisablesMods => new Mods[] { };
     }
 
     public class CatchModPerfect : ModPerfect
