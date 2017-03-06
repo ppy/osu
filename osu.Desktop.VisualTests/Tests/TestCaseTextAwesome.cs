@@ -14,17 +14,15 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseTextAwesome : TestCase
     {
-        public override string Name => @"TextAwesome";
-
         public override string Description => @"Tests display of icons";
 
         public override void Reset()
         {
             base.Reset();
 
-            FlowContainer flow;
+            FillFlowContainer flow;
 
-            Add(flow = new FlowContainer()
+            Add(flow = new FillFlowContainer()
             {
                 RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(0.5f),

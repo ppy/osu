@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -121,11 +122,11 @@ namespace osu.Game.Screens.Select
                         },
                     },
                     // Text for beatmap info
-                    new FlowContainer
+                    new FillFlowContainer
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Direction = FlowDirections.Vertical,
+                        Direction = FillDirection.Vertical,
                         Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -144,10 +145,10 @@ namespace osu.Game.Screens.Select
                                 TextSize = 17,
                                 Shadow = true,
                             },
-                            new FlowContainer
+                            new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 10 },
-                                Direction = FlowDirections.Horizontal,
+                                Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
                                 Children = new []
                                 {
@@ -167,10 +168,10 @@ namespace osu.Game.Screens.Select
                                     },
                                 }
                             },
-                            new FlowContainer
+                            new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 20 },
-                                Spacing = new Vector2(40,0),
+                                Spacing = new Vector2(40, 0),
                                 AutoSizeAxes = Axes.Both,
                                 Children = labels
                             },

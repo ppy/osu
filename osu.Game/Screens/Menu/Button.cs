@@ -16,6 +16,7 @@ using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Menu
 {
@@ -114,7 +115,7 @@ namespace osu.Game.Screens.Menu
                         new OsuSpriteText
                         {
                             Shadow = true,
-                            Direction = FlowDirections.Horizontal,
+                            AllowMultiline = false,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             TextSize = 16,
@@ -257,7 +258,8 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Repeat) return false;
+            if (args.Repeat || state.Keyboard.ControlPressed || state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
+                return false;
 
             if (triggerKey == args.Key && triggerKey != Key.Unknown)
             {

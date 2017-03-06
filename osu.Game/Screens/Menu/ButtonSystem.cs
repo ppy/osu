@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -78,16 +77,16 @@ namespace osu.Game.Screens.Menu
                         },
                         buttonFlow = new FlowContainerWithOrigin
                         {
-                            Direction = FlowDirections.Horizontal,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(-WEDGE_WIDTH, 0),
                             Anchor = Anchor.Centre,
                             AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(-WEDGE_WIDTH, 0),
                             Children = new[]
                             {
                                 settingsButton = new Button(@"settings", @"options", FontAwesome.fa_gear, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
                                 backButton = new Button(@"back", @"back", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), onBack, -WEDGE_WIDTH),
                                 iconFacade = new Container //need a container to make the osu! icon flow properly.
-								{
+                                {
                                     Size = new Vector2(0, BUTTON_AREA_HEIGHT)
                                 }
                             },

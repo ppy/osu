@@ -131,12 +131,12 @@ namespace osu.Game.Screens.Play
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    new FlowContainer()
+                    new FillFlowContainer()
                     {
                         AutoSizeAxes = Axes.Both,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
-                        Direction = FlowDirections.Vertical,
+                        Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
                             new OsuSpriteText
