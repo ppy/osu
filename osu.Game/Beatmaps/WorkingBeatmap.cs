@@ -19,12 +19,12 @@ namespace osu.Game.Beatmaps
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
         /// <summary>
-        /// A play mode that is preferred for this beatmap. This allows for conversion between game modes where feasible,
-        /// but does not gurantee an outcome.
+        /// A play mode that is preferred for this beatmap. PlayMode will become this mode where conversion is feasible,
+        /// or otherwise to the beatmap's default.
         /// </summary>
-        public PlayMode PreferredPlayMode;
+        public PlayMode? PreferredPlayMode;
 
-        public PlayMode PlayMode => beatmap?.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode;
+        public PlayMode PlayMode => beatmap?.BeatmapInfo?.Mode > PlayMode.Osu || !PreferredPlayMode.HasValue ? beatmap.BeatmapInfo.Mode : PreferredPlayMode.Value;
 
         public readonly bool WithStoryboard;
 
