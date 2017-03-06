@@ -42,7 +42,7 @@ namespace osu.Desktop
                 }
                 else
                 {
-                    Ruleset.LoadRulesetsFrom(cwd /**, "Modes"**/);
+                    Ruleset.LoadRulesetsFrom(cwd , "Modes");
 
                     host.Run(new OsuGameDesktop(args));
                 }

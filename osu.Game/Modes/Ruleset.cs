@@ -69,9 +69,6 @@ namespace osu.Game.Modes
             }
             else
             {
-                foreach (string subDirectory in Directory.EnumerateDirectories(directory))
-                    LoadRulesetsFrom(subDirectory);
-
                 foreach (string file in Directory.EnumerateFiles(directory))
                 {
                     try
