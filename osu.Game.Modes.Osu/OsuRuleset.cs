@@ -81,7 +81,7 @@ namespace osu.Game.Modes.Osu
                         {
                             Mods = new Mod[]
                             {
-                                new OsuModeAutoplay(),
+                                new OsuModAutoplay(),
                                 new ModCinema(),
                             },
                         },
