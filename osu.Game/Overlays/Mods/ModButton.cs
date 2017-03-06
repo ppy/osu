@@ -186,6 +186,7 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Position = new Vector2(1.5f),
+                        Colour = this.Colour
                     },
                     foregroundIcon = new ModIcon
                     {
@@ -193,6 +194,7 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Position = new Vector2(-1.5f),
+                        Colour = this.Colour
                     },
                 });
             }
@@ -203,8 +205,16 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
+                    Colour = this.Colour
                 });
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            foreach (ModIcon icon in iconsContainer.Children)
+                icon.Colour = Colour;
         }
 
         public ModButton(Mod m)
