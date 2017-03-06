@@ -9,7 +9,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.IO
 {
-    public sealed class OszArchiveReader : ArchiveReader
+    public sealed class OszArchiveReader : BeatmapArchiveReader
     {
         public static void Register()
         {

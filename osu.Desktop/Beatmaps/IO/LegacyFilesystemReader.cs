@@ -13,7 +13,7 @@ namespace osu.Desktop.Beatmaps.IO
     /// <summary>
     /// Reads an extracted legacy beatmap from disk.
     /// </summary>
-    public class LegacyFilesystemReader : ArchiveReader
+    public class LegacyFilesystemReader : BeatmapArchiveReader
     {
         public static void Register() => AddReader<LegacyFilesystemReader>((storage, path) => Directory.Exists(path));
 
