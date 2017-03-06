@@ -14,21 +14,15 @@ using osu.Game.Modes;
 
 namespace osu.Game.Overlays.Mods
 {
-    class AlwaysPresentFlowContainer : FillFlowContainer
-    {
-        public override bool IsPresent => true;
-    }
-
-    public class ModSection : Container
+    public abstract class ModSection : Container
     {
         private OsuSpriteText headerLabel;
 
-        private AlwaysPresentFlowContainer buttonsContainer;
-        public FillFlowContainer ButtonsContainer => buttonsContainer;
+        public FillFlowContainer<ModButton> ButtonsContainer { get; }
 
         public Action<Mod> Action;
-        protected virtual Key[] ToggleKeys => new Key[] { };
-        
+        protected abstract Key[] ToggleKeys { get; }
+
         public string Header
         {
             get
@@ -41,7 +35,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private ModButton[] buttons = {};
+        private ModButton[] buttons = { };
         public ModButton[] Buttons
         {
             get
@@ -57,10 +51,10 @@ namespace osu.Game.Overlays.Mods
                 {
                     button.Colour = Colour;
                     button.SelectedColour = selectedColour;
-                    button.Action = buttonPressed;
+                    button.Action = this.Action;
                 }
 
-                buttonsContainer.Add(value);
+                ButtonsContainer.Children = value;
             }
         }
 
@@ -119,11 +113,6 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private void buttonPressed(Mod mod)
-        {
-            Action?.Invoke(mod);
-        }
-
         public ModSection()
         {
             AutoSizeAxes = Axes.Y;
@@ -137,7 +126,7 @@ namespace osu.Game.Overlays.Mods
                     Position = new Vector2(0f, 0f),
                     Font = @"Exo2.0-Bold"
                 },
-                buttonsContainer = new AlwaysPresentFlowContainer
+                ButtonsContainer = new FillFlowContainer<ModButton>
                 {
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.BottomLeft,
@@ -147,6 +136,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Top = 6,
                     },
+                    AlwaysPresent = true
                 },
             };
         }
