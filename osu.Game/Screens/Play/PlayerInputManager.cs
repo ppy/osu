@@ -8,6 +8,7 @@ using osu.Game.Configuration;
 using System.Linq;
 using osu.Framework.Input.Handlers;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using OpenTK.Input;
 using KeyboardState = osu.Framework.Input.KeyboardState;

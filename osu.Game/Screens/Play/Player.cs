@@ -17,6 +17,7 @@ using osu.Game.Configuration;
 using osu.Framework.Configuration;
 using System;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
@@ -66,6 +67,17 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
         {
+            var beatmap = Beatmap.Beatmap;
+
+            if (beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
+            {
+                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
+                Exit();
+                return;
+            }
+
+            Beatmap.Mods.Value.ForEach(m => m.PlayerLoading(this));
+
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
 
@@ -101,15 +113,6 @@ namespace osu.Game.Screens.Play
             {
                 sourceClock.Reset();
             });
-
-            var beatmap = Beatmap.Beatmap;
-
-            if (beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
-            {
-                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
-                Exit();
-                return;
-            }
 
             ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
 
