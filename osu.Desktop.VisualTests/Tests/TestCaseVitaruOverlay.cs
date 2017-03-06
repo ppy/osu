@@ -13,7 +13,6 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseVitaruOverlay : TestCase
     {
-        public override string Name => "Vitaru Overlay";
         public override string Description => "Vitaru Overlay";
 
         private PercentageCounter energy;

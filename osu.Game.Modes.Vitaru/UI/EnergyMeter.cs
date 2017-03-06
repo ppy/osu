@@ -7,6 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework.Graphics.Sprites;
+using OpenTK.Graphics;
+using OpenTK;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Modes.Osu.UI
 {
@@ -15,14 +19,32 @@ namespace osu.Game.Modes.Osu.UI
 
         private TextAwesome energyIcon;
 
+        private Box fill;
+
         public EnergyMeter()
         {
             DisplayedCountSpriteText.Margin = new MarginPadding() {Right = 30, Top = 2};
-            Add(energyIcon = new TextAwesome()
+            Add(new Container()
             {
-                Text = ((char)FontAwesome.fa_battery).ToString(),
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
+                AutoSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    energyIcon = new TextAwesome()
+                    {
+                        Text = ((char)FontAwesome.fa_battery_empty).ToString(),
+                    },
+                    fill = new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Margin = new MarginPadding() {Top = 5, Right = 5},
+                        Colour = Color4.White,
+                        Origin = Anchor.TopRight,
+                        Anchor = Anchor.TopRight,
+                        //Scale = new Vector2(0.75f),
+                    }
+                }
             });
         }
 
@@ -30,35 +52,14 @@ namespace osu.Game.Modes.Osu.UI
         {
             base.LoadComplete();
             energyIcon.TextSize = TextSize;
+            fill.Height = TextSize*0.475f;
         }
 
         protected override string FormatCount(float count)
         {
-            FontAwesome newIcon = FontAwesome.fa_battery_empty;
-            switch ((int)(count / 0.25f))
-            {
-                case 4:
-                    newIcon = FontAwesome.fa_battery_full;
-                    break;
-                case 3:
-                    newIcon = FontAwesome.fa_battery_three_quarters;
-                    break;
-                case 2:
-                    newIcon = FontAwesome.fa_battery_half;
-                    break;
-                case 1:
-                    newIcon = FontAwesome.fa_battery_quarter;
-                    break;
-            }
-            if(energyIcon != null)
-                energyIcon.Text = ((char)newIcon).ToString();
+            if(fill != null)
+                fill.Width = count*0.7f;
             return base.FormatCount(count);
-        }
-
-        protected override void TransformCount(float currentValue, float newValue)
-        {
-            base.TransformCount(currentValue, newValue);
-            
         }
     }
 }

@@ -46,10 +46,10 @@ namespace osu.Game.Modes.Vitaru
             Margin = new MarginPadding(10),
             Children = new KeyCounter[]
             {
-                new KeyCounterKeyboard(@"W", Key.W),
-                new KeyCounterKeyboard(@"A", Key.A),
-                new KeyCounterKeyboard(@"S", Key.S),
-                new KeyCounterKeyboard(@"D", Key.D),
+                new KeyCounterKeyboard(Key.W),
+                new KeyCounterKeyboard(Key.A),
+                new KeyCounterKeyboard(Key.S),
+                new KeyCounterKeyboard(Key.D),
             }
         };
     }
