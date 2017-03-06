@@ -78,10 +78,10 @@ namespace osu.Desktop
             if (isFile)
             {
                 var paths = ((object[])e.Data.GetData(DataFormats.FileDrop)).Select(f => f.ToString()).ToArray();
-                if (paths.Any(p => !allowed_extensions.Any(ext => p.EndsWith(ext))))
-                    e.Effect = DragDropEffects.None;
-                else
+                if (allowed_extensions.Any(ext => paths.All(p => p.EndsWith(ext))))
                     e.Effect = DragDropEffects.Copy;
+                else
+                    e.Effect = DragDropEffects.None;
             }
         }
     }
