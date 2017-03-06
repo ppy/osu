@@ -149,7 +149,7 @@ namespace osu.Game.Modes
             /// This is to ensure accurate playback of replay data.
             /// </summary>
             /// <param name="time">The time which we should use for finding the current frame.</param>
-            /// <returns>The usable time value. If null, we shouldn't be running components reliant on this data.</returns>
+            /// <returns>The usable time value. If null, we should not advance time as we do not have enough data.</returns>
             public override double? SetFrameFromTime(double time)
             {
                 currentDirection = time.CompareTo(currentTime);
