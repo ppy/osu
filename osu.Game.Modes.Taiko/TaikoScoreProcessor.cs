@@ -19,6 +19,12 @@ namespace osu.Game.Modes.Taiko
         private const double hp_hit_300 = 6;
         private const double hp_hit_100 = 2.2;
 
+        /// <summary>
+        /// Old osu! applied a scale factor to every HP increase at the very final stage while
+        /// it's getting added to the HP bar. I'm not sure why it does this, but let's replicate.
+        /// </summary>
+        private const double hp_scale_factor = 0.06;
+
         private const double hp_max = 200;
         private const double combo_portion_ratio = 0.2f;
         private const double accuracy_portion_ratio = 0.8f;
@@ -54,26 +60,28 @@ namespace osu.Game.Modes.Taiko
         {
             List<TaikoHitObject> objects = new TaikoConverter().Convert(beatmap);
 
-            double hpMultiplierNormal = 1 / (0.06 * objects.FindAll(o => o is HitCircle).Count * Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98, Mods.None));
-            hpIncreaseTick = 0.0001 / 200.0;
-            hpIncreaseGreat = hpMultiplierNormal * hp_hit_300 / 200.0;
-            hpIncreaseGood = hpMultiplierNormal * Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_hit_100 * 8, hp_hit_100, hp_hit_100, Mods.None) / 200.0;
-            hpIncreaseMiss = Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, -6, -25, -40, Mods.None) / 200.0;
+            double hpMultiplierNormal = 1 / (hp_scale_factor * hp_hit_300 * objects.FindAll(o => (o.Type & TaikoHitType.HitCircle) > 0).Count * Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98, Mods.None));
 
-            List<TaikoHitObject> finishers = objects.FindAll(o => (o.Type & (TaikoHitType.HitCircle | TaikoHitType.Finisher)) > 0);
+            hpIncreaseTick = 0.0001 / hp_max * hp_scale_factor;
+            hpIncreaseGreat = hpMultiplierNormal * hp_hit_300 * hp_scale_factor;
+            hpIncreaseGood = hpMultiplierNormal * Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_hit_100 * 8, hp_hit_100, hp_hit_100, Mods.None) * hp_scale_factor;
+            hpIncreaseMiss = Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, -6, -25, -40, Mods.None) / hp_max * hp_scale_factor;
+
+            List<TaikoHitObject> finishers = objects.FindAll(o => (o.Type & TaikoHitType.HitCircle) > 0 && (o.Type & TaikoHitType.Finisher) > 0);
             finisherScoreScale = -7d / 90d * MathHelper.Clamp(finishers.Count, 30, 120) + 111d / 9d;
 
             foreach (TaikoHitObject obj in objects)
             {
-                if (obj is HitCircle)
+                if ((obj.Type & TaikoHitType.HitCircle) > 0)
                 {
                     AddJudgement(new TaikoJudgementInfo()
                     {
                         Result = HitResult.Hit,
                         Score = TaikoScoreResult.Great,
+                        SecondHit = (obj.Type & TaikoHitType.Finisher) > 0
                     });
                 }
-                else if (obj is DrumRoll)
+                else if ((obj.Type & TaikoHitType.DrumRoll) > 0)
                 {
                     DrumRoll d = obj as DrumRoll;
 
@@ -94,7 +102,7 @@ namespace osu.Game.Modes.Taiko
                         SecondHit = (obj.Type & TaikoHitType.Finisher) > 0
                     });
                 }
-                else if (obj is Bash)
+                else if ((obj.Type & TaikoHitType.Bash) > 0)
                 {
                     AddJudgement(new TaikoJudgementInfo()
                     {
@@ -102,8 +110,6 @@ namespace osu.Game.Modes.Taiko
                         Score = TaikoScoreResult.Great
                     });
                 }
-
-                totalHits++;
             }
 
             maxTotalHits = totalHits;
@@ -119,30 +125,25 @@ namespace osu.Game.Modes.Taiko
             TaikoJudgementInfo tji = judgement as TaikoJudgementInfo;
 
             // Score calculations
-            switch (judgement.Result)
+            if (judgement.Result == HitResult.Hit)
             {
-                case HitResult.Hit:
-                    double baseValue = tji.ScoreValue;
+                double baseValue = tji.ScoreValue;
 
-                    if (tji.SecondHit)
-                        baseValue += baseValue * finisherScoreScale;
+                if (tji.SecondHit)
+                    baseValue += baseValue * finisherScoreScale;
 
-                    if (tji is TaikoDrumRollTickJudgementInfo)
-                        bonusScore += baseValue;
-                    else
-                    {
-                        Combo.Value++;
-                        accurateHits++;
+                if (tji is TaikoDrumRollTickJudgementInfo)
+                    bonusScore += baseValue;
+                else
+                {
+                    Combo.Value++;
+                    accurateHits++;
 
-                        comboPortion += baseValue * Math.Min(Math.Max(0.5, Math.Log(Combo.Value, combo_base)), Math.Log(400, combo_base));
-                    }
-
-                    break;
-                case HitResult.Miss:
-                    Health.Value += hpIncreaseMiss;
-                    break;
+                    comboPortion += baseValue * Math.Min(Math.Max(0.5, Math.Log(Combo.Value, combo_base)), Math.Log(400, combo_base));
+                }
             }
 
+            // Increment total hits counter
             if (!(tji is TaikoDrumRollTickJudgementInfo))
                 totalHits++;
 
@@ -168,18 +169,16 @@ namespace osu.Game.Modes.Taiko
                     break;
             }
 
-            // Todo: The following accuracy is wrong
             int score = 0;
             int maxScore = 0;
 
             foreach (TaikoJudgementInfo j in Judgements)
             {
-                score += j.ScoreValue;
-                maxScore += j.MaxScoreValue;
+                score += j.AccuracyScoreValue;
+                maxScore += j.MaxAccuracyScoreValue;
             }
 
             Accuracy.Value = (double)score / maxScore;
-
             TotalScore.Value = comboScore + accuracyScore + bonusScore;
         }
 

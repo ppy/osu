@@ -17,9 +17,15 @@ namespace osu.Game.Modes.Taiko.Objects
             switch (result)
             {
                 default:
+                    return 0;
                 case TaikoScoreResult.Great:
                     return 200;
             }
+        }
+
+        protected override int AccuracyScoreToInt(TaikoScoreResult result)
+        {
+            return 0;
         }
     }
 }

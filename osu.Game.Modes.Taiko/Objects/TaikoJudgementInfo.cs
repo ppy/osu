@@ -23,27 +23,43 @@ namespace osu.Game.Modes.Taiko.Objects
         public TaikoScoreResult MaxScore = TaikoScoreResult.Great;
 
         public int ScoreValue => ScoreToInt(Score);
+        public int AccuracyScoreValue => AccuracyScoreToInt(Score);
 
         public int MaxScoreValue => ScoreToInt(MaxScore);
+        public int MaxAccuracyScoreValue => AccuracyScoreToInt(MaxScore);
 
         public bool SecondHit;
 
+        /// <summary>
+        /// This is used to compute score for the score processor.
+        /// </summary>
         protected virtual int ScoreToInt(TaikoScoreResult result)
         {
-            int score = 0;
-
             switch (result)
             {
                 default:
+                    return 0;
                 case TaikoScoreResult.Good:
-                    score = 100;
-                    break;
+                    return 100;
                 case TaikoScoreResult.Great:
-                    score = 300;
-                    break;
+                    return 300;
             }
+        }
 
-            return score;
+        /// <summary>
+        /// This is used to compute the score for the accuracy percentage.
+        /// </summary>
+        protected virtual int AccuracyScoreToInt(TaikoScoreResult result)
+        {
+            switch (result)
+            {
+                default:
+                    return 0;
+                case TaikoScoreResult.Great:
+                    return 300;
+                case TaikoScoreResult.Good:
+                    return 150;
+            }
         }
     }
 }
