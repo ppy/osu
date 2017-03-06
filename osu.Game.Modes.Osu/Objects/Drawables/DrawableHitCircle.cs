@@ -73,7 +73,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > OsuHitObject.HIT_WINDOW_50)
+                if (Judgement.TimeOffset > HitObject.HitWindowFor(OsuScoreResult.Hit50))
                     Judgement.Result = HitResult.Miss;
                 return;
             }
@@ -82,7 +82,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             OsuJudgementInfo osuJudgement = Judgement as OsuJudgementInfo;
 
-            if (hitOffset < OsuHitObject.HIT_WINDOW_50)
+            if (hitOffset < HitObject.HitWindowFor(OsuScoreResult.Hit50))
             {
                 Judgement.Result = HitResult.Hit;
                 osuJudgement.Score = HitObject.ScoreResultForOffset(hitOffset);
