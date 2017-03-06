@@ -91,30 +91,21 @@ namespace osu.Game.Overlays.Mods
         public void DeselectAll()
         {
             foreach (ModSection section in modSectionsContainer.Children)
-            {
-                foreach (ModButton button in section.Buttons)
-                {
-                    button.Deselect();
-                }
-            }
+                section.DeselectAll();
         }
 
-        public void DeselectType(Type modType)
+        public void DeselectTypes(Type[] modTypes)
         {
+            if (modTypes.Length == 0) return;
             foreach (ModSection section in modSectionsContainer.Children)
-            {
                 foreach (ModButton button in section.Buttons)
                 {
-                    foreach (Mod mod in button.Mods)
-                    {
-                        if (modType.IsInstanceOfType(mod))
-                        {
+                    Mod selected = button.SelectedMod;
+                    if (selected == null) continue;
+                    foreach (Type type in modTypes)
+                        if (type.IsInstanceOfType(selected))
                             button.Deselect();
-                            return;
-                        }
-                    }
                 }
-            }
         }
 
         private void modButtonPressed(Mod selectedMod)
