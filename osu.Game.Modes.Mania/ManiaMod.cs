@@ -26,7 +26,6 @@ namespace osu.Game.Modes.Mania
     public class ManiaModHardRock : ModHardRock
     {
         public override double ScoreMultiplier => 1.0;
-        public override bool Ranked => false;
     }
 
     public class ManiaModSuddenDeath : ModSuddenDeath
@@ -62,9 +61,8 @@ namespace osu.Game.Modes.Mania
 
     public class ManiaModFadeIn : Mod
     {
-        public override Mods Name => Mods.FadeIn;
+        public override string Name => "FadeIn";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hidden;
-        public override string Description => @"";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight) };
@@ -72,85 +70,77 @@ namespace osu.Game.Modes.Mania
 
     public class ManiaModRandom : Mod
     {
-        public override Mods Name => Mods.Random;
-        public override FontAwesome Icon => FontAwesome.fa_close;
+        public override string Name => "Random";
         public override string Description => @"Shuffle around the notes!";
         public override double ScoreMultiplier => 1;
-        public override bool Ranked => false;
-        public override Type[] IncompatibleMods => new Type[] { };
     }
 
     public abstract class ManiaKeyMod : Mod
     {
         public abstract int KeyCount { get; }
-        public override FontAwesome Icon => FontAwesome.fa_close; // TODO: Add proper key icons
-        public override string Description => @"";
         public override double ScoreMultiplier => 1; // TODO: Implement the mania key mod score multiplier
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new Type[] { };
     }
 
     public class ManiaModKey1 : ManiaKeyMod
     {
         public override int KeyCount => 1;
-        public override Mods Name => Mods.Key1;
+        public override string Name => "1K";
     }
 
     public class ManiaModKey2 : ManiaKeyMod
     {
         public override int KeyCount => 2;
-        public override Mods Name => Mods.Key2;
+        public override string Name => "2K";
     }
 
     public class ManiaModKey3 : ManiaKeyMod
     {
         public override int KeyCount => 3;
-        public override Mods Name => Mods.Key3;
+        public override string Name => "3K";
     }
 
     public class ManiaModKey4 : ManiaKeyMod
     {
         public override int KeyCount => 4;
-        public override Mods Name => Mods.Key4;
+        public override string Name => "4K";
     }
 
     public class ManiaModKey5 : ManiaKeyMod
     {
         public override int KeyCount => 5;
-        public override Mods Name => Mods.Key5;
+        public override string Name => "5K";
     }
 
     public class ManiaModKey6 : ManiaKeyMod
     {
         public override int KeyCount => 6;
-        public override Mods Name => Mods.Key6;
+        public override string Name => "6K";
     }
 
     public class ManiaModKey7 : ManiaKeyMod
     {
         public override int KeyCount => 7;
-        public override Mods Name => Mods.Key7;
+        public override string Name => "7K";
     }
 
     public class ManiaModKey8 : ManiaKeyMod
     {
         public override int KeyCount => 8;
-        public override Mods Name => Mods.Key8;
+        public override string Name => "8K";
     }
 
     public class ManiaModKey9 : ManiaKeyMod
     {
         public override int KeyCount => 9;
-        public override Mods Name => Mods.Key9;
+        public override string Name => "9K";
     }
 
     public class ManiaModKeyCoop : Mod
     {
-        public override Mods Name => Mods.KeyCoop;
-        public override FontAwesome Icon => FontAwesome.fa_close;
+        public override string Name => "KeyCoop";
         public override string Description => @"Double the key amount, double the fun!";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new Type[] { };
     }
 }

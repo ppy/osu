@@ -21,7 +21,6 @@ namespace osu.Game.Modes.Osu
     {
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
-        public override Type[] IncompatibleMods => new Type[] { };
     }
 
     public class OsuModHardRock : ModHardRock
@@ -59,7 +58,6 @@ namespace osu.Game.Modes.Osu
     public class OsuModFlashlight : ModFlashlight
     {
         public override double ScoreMultiplier => 1.12;
-        public override Type[] IncompatibleMods => new Type[] { };
     }
 
     public class OsuModPerfect : ModPerfect
@@ -69,7 +67,7 @@ namespace osu.Game.Modes.Osu
 
     public class OsuModSpunOut : Mod
     {
-        public override Mods Name => Mods.SpunOut;
+        public override string Name => "Spun Out";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_spunout;
         public override string Description => @"Spinners will be automatically completed";
         public override double ScoreMultiplier => 0.9;
@@ -79,7 +77,7 @@ namespace osu.Game.Modes.Osu
 
     public class OsuModAutopilot : Mod
     {
-        public override Mods Name => Mods.Autopilot;
+        public override string Name => "Autopilot";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_autopilot;
         public override string Description => @"Automatic cursor movement - just follow the rhythm.";
         public override double ScoreMultiplier => 0;
@@ -94,11 +92,9 @@ namespace osu.Game.Modes.Osu
 
     public class OsuModTarget : Mod
     {
-        public override Mods Name => Mods.Target;
+        public override string Name => "Target";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_target;
         public override string Description => @"";
         public override double ScoreMultiplier => 1;
-        public override bool Ranked => false;
-        public override Type[] IncompatibleMods => new Type[] { };
     }
 }
