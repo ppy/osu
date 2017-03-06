@@ -29,16 +29,14 @@ namespace osu.Game.Overlays.Mods
         public Action<Mod> Action;
         protected virtual Key[] ToggleKeys => new Key[] { };
         
-        private string header;
         public string Header
         {
             get
             {
-                return header;
+                return headerLabel.Text;
             }
             set
             {
-                header = value;
                 headerLabel.Text = value;
             }
         }
@@ -137,8 +135,7 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.TopLeft,
                     Anchor = Anchor.TopLeft,
                     Position = new Vector2(0f, 0f),
-                    Font = @"Exo2.0-Bold",
-                    Text = Header,
+                    Font = @"Exo2.0-Bold"
                 },
                 buttonsContainer = new AlwaysPresentFlowContainer
                 {
