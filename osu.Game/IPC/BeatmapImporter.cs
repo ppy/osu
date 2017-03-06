@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using System.Threading.Tasks;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
 
@@ -13,7 +14,7 @@ namespace osu.Game.IPC
         private IpcChannel<BeatmapImportMessage> channel;
         private BeatmapDatabase beatmaps;
 
-        public BeatmapImporter(GameHost host,  BeatmapDatabase beatmaps = null)
+        public BeatmapImporter(GameHost host, BeatmapDatabase beatmaps = null)
         {
             this.beatmaps = beatmaps;
 
@@ -35,7 +36,7 @@ namespace osu.Game.IPC
         {
             Debug.Assert(beatmaps != null);
 
-            ImportAsync(msg.Path);
+            ImportAsync(msg.Path).ContinueWith(t => Logger.Error(t.Exception, @"error during async import"), TaskContinuationOptions.OnlyOnFaulted);
         }
     }
 
