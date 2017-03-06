@@ -209,12 +209,14 @@ namespace osu.Game.Screens.Select
                     new TextAwesome
                     {
                         Icon = FontAwesome.fa_square,
+                        Origin = Anchor.Centre,
                         Colour = new Color4(68, 17, 136, 255),
                         Rotation = 45
                     },
                     new TextAwesome
                     {
                         Icon = statistic.Icon,
+                        Origin = Anchor.Centre,
                         Colour = new Color4(255, 221, 85, 255),
                         Scale = new Vector2(0.8f)
                     },
