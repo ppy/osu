@@ -54,19 +54,22 @@ namespace osu.Game.Modes
         public class LegacyReplayInputHandler : ReplayInputHandler
         {
             private readonly List<LegacyReplayFrame> replayContent;
-            int currentFrameIndex;
 
             public LegacyReplayFrame CurrentFrame => !hasFrames ? null : replayContent[currentFrameIndex];
-            public LegacyReplayFrame NextFrame => !hasFrames ? null : replayContent[MathHelper.Clamp(currentDirection > 0 ? currentFrameIndex + 1 : currentFrameIndex - 1, 0, replayContent.Count - 1)];
+            public LegacyReplayFrame NextFrame => !hasFrames ? null : replayContent[nextFrameIndex];
+
+            int currentFrameIndex;
+
+            private int nextFrameIndex => MathHelper.Clamp(currentFrameIndex + (currentDirection > 0 ? 1 : -1), 0, replayContent.Count - 1);
 
             public LegacyReplayInputHandler(List<LegacyReplayFrame> replayContent)
             {
                 this.replayContent = replayContent;
             }
 
-            private bool nextFrame()
+            private bool advanceFrame()
             {
-                int newFrame = MathHelper.Clamp(currentFrameIndex + (currentDirection > 0 ? 1 : -1), 0, replayContent.Count - 1);
+                int newFrame = nextFrameIndex;
 
                 //ensure we aren't at an extent.
                 if (newFrame == currentFrameIndex) return false;
@@ -158,7 +161,7 @@ namespace osu.Game.Modes
                 if (hasFrames)
                 {
                     //if we changed frames, we want to execute once *exactly* on the frame's time.
-                    if (currentDirection == time.CompareTo(NextFrame.Time) && nextFrame())
+                    if (currentDirection == time.CompareTo(NextFrame.Time) && advanceFrame())
                         return currentTime = CurrentFrame.Time;
 
                     //if we didn't change frames, we need to ensure we are allowed to run frames in between, else return null.
