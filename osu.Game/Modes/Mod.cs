@@ -4,6 +4,8 @@
 using System;
 using System.ComponentModel;
 using osu.Game.Graphics;
+using osu.Game.Modes.UI;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes
 {
@@ -41,6 +43,12 @@ namespace osu.Game.Modes
         /// The mods this mod cannot be enabled with.
         /// </summary>
         public abstract Mods[] DisablesMods { get; }
+
+        /// <summary>
+        /// Direct access to the Player before load has run.
+        /// </summary>
+        /// <param name="player"></param>
+        public virtual void PlayerLoading(Player player) { }
     }
 
     public class MultiMod : Mod
@@ -150,6 +158,12 @@ namespace osu.Game.Modes
         public override double ScoreMultiplier => 0;
         public override bool Ranked => false;
         public override Mods[] DisablesMods => new Mods[] { Mods.Relax, Mods.Autopilot, Mods.SpunOut, Mods.SuddenDeath, Mods.Perfect };
+
+        public override void PlayerLoading(Player player)
+        {
+            base.PlayerLoading(player);
+            player.ReplayInputHandler = Ruleset.GetRuleset(player.Beatmap.PlayMode).CreateAutoplayScore(player.Beatmap.Beatmap)?.Replay?.GetInputHandler();
+        }
     }
 
     public abstract class ModPerfect : ModSuddenDeath

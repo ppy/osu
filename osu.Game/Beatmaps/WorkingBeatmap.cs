@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
@@ -25,6 +26,8 @@ namespace osu.Game.Beatmaps
         public PlayMode? PreferredPlayMode;
 
         public PlayMode PlayMode => beatmap?.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode ?? PlayMode.Osu;
+
+        public readonly Bindable<Mod[]> Mods = new Bindable<Mod[]>();
 
         public readonly bool WithStoryboard;
 

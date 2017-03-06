@@ -337,6 +337,8 @@ namespace osu.Game.Screens.Select
         {
             base.OnBeatmapChanged(beatmap);
 
+            beatmap.Mods.BindTo(modSelect.SelectedMods);
+
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
             carousel.SelectBeatmap(beatmap?.BeatmapInfo);
