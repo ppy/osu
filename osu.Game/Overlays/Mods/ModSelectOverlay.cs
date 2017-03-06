@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
@@ -33,7 +34,7 @@ namespace osu.Game.Overlays.Mods
 
         private FillFlowContainer<ModSection> modSectionsContainer;
 
-        public readonly Bindable<Mod[]> SelectedMods = new Bindable<Mod[]>();
+        public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 
         public readonly Bindable<PlayMode> PlayMode = new Bindable<PlayMode>();
 
