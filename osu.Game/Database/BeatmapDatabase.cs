@@ -176,7 +176,7 @@ namespace osu.Game.Database
 
             BeatmapMetadata metadata;
 
-            using (var reader = ArchiveReader.GetReader(storage, path))
+            using (var reader = BeatmapArchiveReader.GetBeatmapArchiveReader(storage, path))
                 metadata = reader.ReadMetadata();
 
             if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
@@ -216,7 +216,7 @@ namespace osu.Game.Database
                 Metadata = metadata
             };
 
-            using (var reader = ArchiveReader.GetReader(storage, path))
+            using (var reader = BeatmapArchiveReader.GetBeatmapArchiveReader(storage, path))
             {
                 string[] mapNames = reader.BeatmapFilenames;
                 foreach (var name in mapNames)
@@ -261,12 +261,12 @@ namespace osu.Game.Database
             BeatmapSetRemoved?.Invoke(beatmapSet);
         }
 
-        public ArchiveReader GetReader(BeatmapSetInfo beatmapSet)
+        public BeatmapArchiveReader GetReader(BeatmapSetInfo beatmapSet)
         {
             if (string.IsNullOrEmpty(beatmapSet.Path))
                 return null;
 
-            return ArchiveReader.GetReader(storage, beatmapSet.Path);
+            return BeatmapArchiveReader.GetBeatmapArchiveReader(storage, beatmapSet.Path);
         }
 
         public BeatmapSetInfo GetBeatmapSet(int id)
@@ -348,7 +348,7 @@ namespace osu.Game.Database
                 this.database = database;
             }
 
-            protected override ArchiveReader GetReader() => database?.GetReader(BeatmapSetInfo);
+            protected override BeatmapArchiveReader GetReader() => database?.GetReader(BeatmapSetInfo);
         }
     }
 }
