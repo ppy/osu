@@ -15,6 +15,10 @@ namespace osu.Game.Modes.Osu
 {
     public class OsuAutoReplay : LegacyReplay
     {
+        static readonly Vector2 spinner_centre = new Vector2(256, 192);
+
+        const float spin_radius = 50;
+
         private Beatmap beatmap;
 
         public OsuAutoReplay(Beatmap beatmap)
@@ -34,9 +38,9 @@ namespace osu.Game.Modes.Osu
 
         private static IComparer<LegacyReplayFrame> replayFrameComparer = new LegacyReplayFrameComparer();
 
-        private static int FindInsertionIndex(List<LegacyReplayFrame> replay, LegacyReplayFrame frame)
+        private int findInsertionIndex(LegacyReplayFrame frame)
         {
-            int index = replay.BinarySearch(frame, replayFrameComparer);
+            int index = Frames.BinarySearch(frame, replayFrameComparer);
 
             if (index < 0)
             {
@@ -45,7 +49,7 @@ namespace osu.Game.Modes.Osu
             else
             {
                 // Go to the first index which is actually bigger
-                while (index < replay.Count && frame.Time == replay[index].Time)
+                while (index < Frames.Count && frame.Time == Frames[index].Time)
                 {
                     ++index;
                 }
@@ -54,15 +58,12 @@ namespace osu.Game.Modes.Osu
             return index;
         }
 
-        private static void AddFrameToReplay(List<LegacyReplayFrame> replay, LegacyReplayFrame frame)
-        {
-            replay.Insert(FindInsertionIndex(replay, frame), frame);
-        }
+        private void addFrameToReplay(LegacyReplayFrame frame) => Frames.Insert(findInsertionIndex(frame), frame);
 
-        private static Vector2 CirclePosition(double t, double radius)
-        {
-            return new Vector2((float)(Math.Cos(t) * radius), (float)(Math.Sin(t) * radius));
-        }
+        private static Vector2 circlePosition(double t, double radius) => new Vector2((float)(Math.Cos(t) * radius), (float)(Math.Sin(t) * radius));
+
+        private double applyModsToTime(double v) => v;
+        private double applyModsToRate(double v) => v;
 
         private void createAutoReplay()
         {
@@ -71,14 +72,12 @@ namespace osu.Game.Modes.Osu
             bool delayedMovements = false;// ModManager.CheckActive(Mods.Relax2);
             EasingTypes preferredEasing = delayedMovements ? EasingTypes.InOutCubic : EasingTypes.Out;
 
-            AddFrameToReplay(Frames, new LegacyReplayFrame(-100000, 256, 500, LegacyButtonState.None));
-            AddFrameToReplay(Frames, new LegacyReplayFrame(beatmap.HitObjects[0].StartTime - 1500, 256, 500, LegacyButtonState.None));
-            AddFrameToReplay(Frames, new LegacyReplayFrame(beatmap.HitObjects[0].StartTime - 1000, 256, 192, LegacyButtonState.None));
+            addFrameToReplay(new LegacyReplayFrame(-100000, 256, 500, LegacyButtonState.None));
+            addFrameToReplay(new LegacyReplayFrame(beatmap.HitObjects[0].StartTime - 1500, 256, 500, LegacyButtonState.None));
+            addFrameToReplay(new LegacyReplayFrame(beatmap.HitObjects[0].StartTime - 1000, 256, 192, LegacyButtonState.None));
 
             // We are using ApplyModsToRate and not ApplyModsToTime to counteract the speed up / slow down from HalfTime / DoubleTime so that we remain at a constant framerate of 60 fps.
             float frameDelay = (float)applyModsToRate(1000.0 / 60.0);
-            Vector2 spinnerCentre = new Vector2(256, 192);
-            const float spinnerRadius = 50;
 
             // Already superhuman, but still somewhat realistic
             int reactionTime = (int)applyModsToRate(100);
@@ -103,18 +102,18 @@ namespace osu.Game.Modes.Osu
                     //Make the cursor stay at a hitObject as long as possible (mainly for autopilot).
                     if (h.StartTime - DrawableHitCircle.HITTABLE_RANGE > last.EndTime + DrawableHitCircle.HIT_WINDOW_50 + 50)
                     {
-                        if (!(last is Spinner) && h.StartTime - last.EndTime < 1000) AddFrameToReplay(Frames, new LegacyReplayFrame(last.EndTime + DrawableHitCircle.HIT_WINDOW_50, last.EndPosition.X, last.EndPosition.Y, LegacyButtonState.None));
-                        if (!(h is Spinner)) AddFrameToReplay(Frames, new LegacyReplayFrame(h.StartTime - DrawableHitCircle.HITTABLE_RANGE, h.Position.X, h.Position.Y, LegacyButtonState.None));
+                        if (!(last is Spinner) && h.StartTime - last.EndTime < 1000) addFrameToReplay(new LegacyReplayFrame(last.EndTime + DrawableHitCircle.HIT_WINDOW_50, last.EndPosition.X, last.EndPosition.Y, LegacyButtonState.None));
+                        if (!(h is Spinner)) addFrameToReplay(new LegacyReplayFrame(h.StartTime - DrawableHitCircle.HITTABLE_RANGE, h.Position.X, h.Position.Y, LegacyButtonState.None));
                     }
                     else if (h.StartTime - DrawableHitCircle.HIT_WINDOW_50 > last.EndTime + DrawableHitCircle.HIT_WINDOW_50 + 50)
                     {
-                        if (!(last is Spinner) && h.StartTime - last.EndTime < 1000) AddFrameToReplay(Frames, new LegacyReplayFrame(last.EndTime + DrawableHitCircle.HIT_WINDOW_50, last.EndPosition.X, last.EndPosition.Y, LegacyButtonState.None));
-                        if (!(h is Spinner)) AddFrameToReplay(Frames, new LegacyReplayFrame(h.StartTime - DrawableHitCircle.HIT_WINDOW_50, h.Position.X, h.Position.Y, LegacyButtonState.None));
+                        if (!(last is Spinner) && h.StartTime - last.EndTime < 1000) addFrameToReplay(new LegacyReplayFrame(last.EndTime + DrawableHitCircle.HIT_WINDOW_50, last.EndPosition.X, last.EndPosition.Y, LegacyButtonState.None));
+                        if (!(h is Spinner)) addFrameToReplay(new LegacyReplayFrame(h.StartTime - DrawableHitCircle.HIT_WINDOW_50, h.Position.X, h.Position.Y, LegacyButtonState.None));
                     }
                     else if (h.StartTime - DrawableHitCircle.HIT_WINDOW_100 > last.EndTime + DrawableHitCircle.HIT_WINDOW_100 + 50)
                     {
-                        if (!(last is Spinner) && h.StartTime - last.EndTime < 1000) AddFrameToReplay(Frames, new LegacyReplayFrame(last.EndTime + DrawableHitCircle.HIT_WINDOW_100, last.EndPosition.X, last.EndPosition.Y, LegacyButtonState.None));
-                        if (!(h is Spinner)) AddFrameToReplay(Frames, new LegacyReplayFrame(h.StartTime - DrawableHitCircle.HIT_WINDOW_100, h.Position.X, h.Position.Y, LegacyButtonState.None));
+                        if (!(last is Spinner) && h.StartTime - last.EndTime < 1000) addFrameToReplay(new LegacyReplayFrame(last.EndTime + DrawableHitCircle.HIT_WINDOW_100, last.EndPosition.X, last.EndPosition.Y, LegacyButtonState.None));
+                        if (!(h is Spinner)) addFrameToReplay(new LegacyReplayFrame(h.StartTime - DrawableHitCircle.HIT_WINDOW_100, h.Position.X, h.Position.Y, LegacyButtonState.None));
                     }
                 }
 
@@ -128,14 +127,14 @@ namespace osu.Game.Modes.Osu
                     targetPosition.X = Frames[Frames.Count - 1].MouseX;
                     targetPosition.Y = Frames[Frames.Count - 1].MouseY;
 
-                    Vector2 difference = spinnerCentre - targetPosition;
+                    Vector2 difference = spinner_centre - targetPosition;
 
                     float differenceLength = difference.Length;
-                    float newLength = (float)Math.Sqrt(differenceLength * differenceLength - spinnerRadius * spinnerRadius);
+                    float newLength = (float)Math.Sqrt(differenceLength * differenceLength - spin_radius * spin_radius);
 
-                    if (differenceLength > spinnerRadius)
+                    if (differenceLength > spin_radius)
                     {
-                        float angle = (float)Math.Asin(spinnerRadius / differenceLength);
+                        float angle = (float)Math.Asin(spin_radius / differenceLength);
 
                         if (angle > 0)
                         {
@@ -158,11 +157,11 @@ namespace osu.Game.Modes.Osu
                     }
                     else if (difference.Length > 0)
                     {
-                        targetPosition = spinnerCentre - difference * (spinnerRadius / difference.Length);
+                        targetPosition = spinner_centre - difference * (spin_radius / difference.Length);
                     }
                     else
                     {
-                        targetPosition = spinnerCentre + new Vector2(0, -spinnerRadius);
+                        targetPosition = spinner_centre + new Vector2(0, -spin_radius);
                     }
                 }
 
@@ -177,7 +176,7 @@ namespace osu.Game.Modes.Osu
                     if (waitTime > lastFrame.Time)
                     {
                         lastFrame = new LegacyReplayFrame(waitTime, lastFrame.MouseX, lastFrame.MouseY, lastFrame.ButtonState);
-                        AddFrameToReplay(Frames, lastFrame);
+                        addFrameToReplay(lastFrame);
                     }
 
                     Vector2 lastPosition = new Vector2(lastFrame.MouseX, lastFrame.MouseY);
@@ -193,7 +192,7 @@ namespace osu.Game.Modes.Osu
                         for (double time = lastFrame.Time + frameDelay; time < h.StartTime; time += frameDelay)
                         {
                             Vector2 currentPosition = Interpolation.ValueAt(time, lastPosition, targetPosition, lastFrame.Time, h.StartTime, easing);
-                            AddFrameToReplay(Frames, new LegacyReplayFrame((int)time, currentPosition.X, currentPosition.Y, lastFrame.ButtonState));
+                            addFrameToReplay(new LegacyReplayFrame((int)time, currentPosition.X, currentPosition.Y, lastFrame.ButtonState));
                         }
 
                         buttonIndex = 0;
@@ -205,19 +204,18 @@ namespace osu.Game.Modes.Osu
                 }
 
                 LegacyButtonState button = buttonIndex % 2 == 0 ? LegacyButtonState.Left1 : LegacyButtonState.Right1;
-                LegacyButtonState previousButton = LegacyButtonState.None;
 
                 LegacyReplayFrame newFrame = new LegacyReplayFrame(h.StartTime, targetPosition.X, targetPosition.Y, button);
                 LegacyReplayFrame endFrame = new LegacyReplayFrame(h.EndTime + endDelay, h.EndPosition.X, h.EndPosition.Y, LegacyButtonState.None);
 
                 // Decrement because we want the previous frame, not the next one
-                int index = FindInsertionIndex(Frames, newFrame) - 1;
+                int index = findInsertionIndex(newFrame) - 1;
 
                 // Do we have a previous frame? No need to check for < replay.Count since we decremented!
                 if (index >= 0)
                 {
                     LegacyReplayFrame previousFrame = Frames[index];
-                    previousButton = previousFrame.ButtonState;
+                    var previousButton = previousFrame.ButtonState;
 
                     // If a button is already held, then we simply alternate
                     if (previousButton != LegacyButtonState.None)
@@ -232,7 +230,7 @@ namespace osu.Game.Modes.Osu
                         }
 
                         // We always follow the most recent slider / spinner, so remove any other frames that occur while it exists.
-                        int endIndex = FindInsertionIndex(Frames, endFrame);
+                        int endIndex = findInsertionIndex(endFrame);
 
                         if (index < Frames.Count - 1)
                             Frames.RemoveRange(index + 1, Math.Max(0, endIndex - (index + 1)));
@@ -247,12 +245,12 @@ namespace osu.Game.Modes.Osu
                     }
                 }
 
-                AddFrameToReplay(Frames, newFrame);
+                addFrameToReplay(newFrame);
 
                 // We add intermediate frames for spinning / following a slider here.
                 if (h is Spinner)
                 {
-                    Vector2 difference = targetPosition - spinnerCentre;
+                    Vector2 difference = targetPosition - spinner_centre;
 
                     float radius = difference.Length;
                     float angle = radius == 0 ? 0 : (float)Math.Atan2(difference.Y, difference.X);
@@ -263,14 +261,14 @@ namespace osu.Game.Modes.Osu
                     {
                         t = applyModsToTime(j - h.StartTime) * spinnerDirection;
 
-                        Vector2 pos = spinnerCentre + CirclePosition(t / 20 + angle, spinnerRadius);
-                        AddFrameToReplay(Frames, new LegacyReplayFrame((int)j, pos.X, pos.Y, button));
+                        Vector2 pos = spinner_centre + circlePosition(t / 20 + angle, spin_radius);
+                        addFrameToReplay(new LegacyReplayFrame((int)j, pos.X, pos.Y, button));
                     }
 
                     t = applyModsToTime(h.EndTime - h.StartTime) * spinnerDirection;
-                    Vector2 endPosition = spinnerCentre + CirclePosition(t / 20 + angle, spinnerRadius);
+                    Vector2 endPosition = spinner_centre + circlePosition(t / 20 + angle, spin_radius);
 
-                    AddFrameToReplay(Frames, new LegacyReplayFrame(h.EndTime, endPosition.X, endPosition.Y, button));
+                    addFrameToReplay(new LegacyReplayFrame(h.EndTime, endPosition.X, endPosition.Y, button));
 
                     endFrame.MouseX = endPosition.X;
                     endFrame.MouseY = endPosition.Y;
@@ -292,21 +290,16 @@ namespace osu.Game.Modes.Osu
                     //    lastTime = t.Time1;
                     //}
 
-                    AddFrameToReplay(Frames, new LegacyReplayFrame(h.EndTime, s.EndPosition.X, s.EndPosition.Y, button));
+                    addFrameToReplay(new LegacyReplayFrame(h.EndTime, s.EndPosition.X, s.EndPosition.Y, button));
                 }
 
                 // We only want to let go of our button if we are at the end of the current replay. Otherwise something is still going on after us so we need to keep the button pressed!
                 if (Frames[Frames.Count - 1].Time <= endFrame.Time)
-                {
-                    AddFrameToReplay(Frames, endFrame);
-                }
+                    addFrameToReplay(endFrame);
             }
 
             //Player.currentScore.Replay = InputManager.ReplayScore.Replay;
             //Player.currentScore.PlayerName = "osu!";
         }
-
-        private double applyModsToTime(double v) => v;
-        private double applyModsToRate(double v) => v;
     }
 }
