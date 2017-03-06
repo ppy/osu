@@ -31,25 +31,25 @@ namespace osu.Game.Overlays.Mods
 
         public Action<Mod> Action; // Passed the selected mod or null if none
 
-        private int _selectedMod = -1;
-        private int selectedMod
+        private int _selectedIndex = -1;
+        private int selectedIndex
         {
             get
             {
-                return _selectedMod;
+                return _selectedIndex;
             }
             set
             {
-                if (value == _selectedMod) return;
-                _selectedMod = value;
+                if (value == _selectedIndex) return;
+                _selectedIndex = value;
 
                 if (value >= Mods.Length)
                 {
-                    _selectedMod = -1;
+                    _selectedIndex = -1;
                 }
                 else if (value <= -2)
                 {
-                    _selectedMod = Mods.Length - 1;
+                    _selectedIndex = Mods.Length - 1;
                 }
 
                 iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        public bool Selected => selectedMod != -1;
+        public bool Selected => selectedIndex != -1;
 
         private Color4 backgroundColour;
         public new Color4 Colour
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Mods
         private Mod[] mods;
         public Mod[] Mods => mods; // the mods from Mod, only multiple if Mod is a MultiMod
 
-        public Mod SelectedMod => Mods.ElementAtOrDefault(selectedMod);
+        public Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -148,8 +148,7 @@ namespace osu.Game.Overlays.Mods
 
         public void SelectNext()
         {
-            selectedMod++;
-            if (selectedMod == -1)
+            if (++selectedIndex == -1)
             {
                 sampleOff.Play();
             }
@@ -163,8 +162,7 @@ namespace osu.Game.Overlays.Mods
 
         public void SelectPrevious()
         {
-            selectedMod--;
-            if (selectedMod == -1)
+            if (--selectedIndex == -1)
             {
                 sampleOff.Play();
             }
@@ -178,7 +176,7 @@ namespace osu.Game.Overlays.Mods
 
         public void Deselect()
         {
-            selectedMod = -1;
+            selectedIndex = -1;
         }
 
         private void displayMod(Mod mod)
@@ -189,7 +187,7 @@ namespace osu.Game.Overlays.Mods
 
         private void displaySelectedMod()
         {
-            var modIndex = selectedMod;
+            var modIndex = selectedIndex;
             if (modIndex <= -1)
             {
                 modIndex = 0;
