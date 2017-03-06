@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Mods
 
         public Action<Mod> Action;
         protected abstract Key[] ToggleKeys { get; }
+        public abstract ModType ModType { get; }
 
         public string Header
         {

@@ -4,12 +4,14 @@
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
+using osu.Game.Modes;
 
 namespace osu.Game.Overlays.Mods
 {
     public class DifficultyReductionSection : ModSection
     {
         protected override Key[] ToggleKeys => new Key[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P };
+        public override ModType ModType => ModType.DifficultyReduction;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

@@ -41,34 +41,8 @@ namespace osu.Game.Overlays.Mods
         private void modeChanged(object sender, EventArgs eventArgs)
         {
             var ruleset = Ruleset.GetRuleset(PlayMode);
-
-            modSectionsContainer.Children = new ModSection[]
-            {
-                new DifficultyReductionSection
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
-                    Action = modButtonPressed,
-                    Buttons = ruleset.GetModsFor(ModType.DifficultyReduction).Select(m => new ModButton(m)).ToArray(),
-                },
-                new DifficultyIncreaseSection
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
-                    Action = modButtonPressed,
-                    Buttons = ruleset.GetModsFor(ModType.DifficultyIncrease).Select(m => new ModButton(m)).ToArray(),
-                },
-                new AssistedSection
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
-                    Action = modButtonPressed,
-                    Buttons = ruleset.GetModsFor(ModType.Special).Select(m => new ModButton(m)).ToArray(),
-                },
-            };
+            foreach (ModSection section in modSectionsContainer.Children)
+                section.Buttons = ruleset.GetModsFor(section.ModType).Select(m => new ModButton(m)).ToArray();
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -298,6 +272,30 @@ namespace osu.Game.Overlays.Mods
                             AutoSizeAxes = Axes.Y,
                             Spacing = new Vector2(0f, 10f),
                             Width = content_width,
+                            Children = new ModSection[]
+                            {
+                                new DifficultyReductionSection
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Action = modButtonPressed,
+                                },
+                                new DifficultyIncreaseSection
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Action = modButtonPressed,
+                                },
+                                new AssistedSection
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Action = modButtonPressed,
+                                },
+                            }
                         },
                         // Footer
                         new Container
