@@ -134,7 +134,7 @@ namespace osu.Game.Overlays
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Visible;
 
-            contentContainer.FadeIn(APPEAR_DURATION, EasingTypes.OutQuint);
+            FadeIn(100, EasingTypes.OutQuint);
             contentContainer.MoveToY(0, APPEAR_DURATION, EasingTypes.OutQuint);
         }
 
@@ -142,7 +142,7 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            contentContainer.FadeOut(DISAPPEAR_DURATION, EasingTypes.In);
+            FadeOut(DISAPPEAR_DURATION, EasingTypes.InQuint);
             contentContainer.MoveToY(DrawHeight * 2f, DISAPPEAR_DURATION, EasingTypes.In);
 
             foreach (var w in wavesContainer.Children)
