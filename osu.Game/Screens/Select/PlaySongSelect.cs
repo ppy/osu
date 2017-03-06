@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Select
 
                         (player = new PlayerLoader(new Player
                         {
-                            Beatmap = Beatmap, //eagerly set this so it's prsent before push.
+                            Beatmap = Beatmap, //eagerly set this so it's present before push.
                         })).LoadAsync(Game, l => Push(player));
                     }
                 },
