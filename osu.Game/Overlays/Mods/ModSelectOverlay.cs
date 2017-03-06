@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
@@ -71,7 +70,7 @@ namespace osu.Game.Overlays.Mods
             };
         }
 
-        [BackgroundDependencyLoader(permitNulls:true)]
+        [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuColour colours, OsuGame osu)
         {
             lowMultiplierColour = colours.Red;
@@ -189,17 +188,7 @@ namespace osu.Game.Overlays.Mods
 
         private void refreshSelectedMods()
         {
-            List<Mod> selectedMods = new List<Mod>();
-
-            foreach (ModSection section in modSectionsContainer.Children)
-            {
-                foreach (Mod mod in section.SelectedMods)
-                {
-                    selectedMods.Add(mod);
-                }
-            }
-
-            SelectedMods.Value = selectedMods.ToArray();
+            SelectedMods.Value = modSectionsContainer.Children.SelectMany(s => s.Buttons.Select(x => x.SelectedMod).Where(x => x != null)).ToArray();
         }
 
         public ModSelectOverlay()

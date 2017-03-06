@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -29,24 +28,7 @@ namespace osu.Game.Overlays.Mods
 
         public Action<Mod> Action;
         protected virtual Key[] ToggleKeys => new Key[] { };
-
-        public Mod[] SelectedMods
-        {
-            get
-            {
-                List<Mod> selectedMods = new List<Mod>();
-
-                foreach (ModButton button in Buttons)
-                {
-                    Mod selectedMod = button.SelectedMod;
-                    if (selectedMod != null)
-                        selectedMods.Add(selectedMod);
-                }
-
-                return selectedMods.ToArray();
-            }
-        }
-
+        
         private string header;
         public string Header
         {
