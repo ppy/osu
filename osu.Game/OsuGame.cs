@@ -192,7 +192,7 @@ namespace osu.Game
 
         private bool globalHotkeyPressed(InputState state, KeyDownEventArgs args)
         {
-            if (args.Repeat) return false;
+            if (args.Repeat || intro == null) return false;
 
             switch (args.Key)
             {
