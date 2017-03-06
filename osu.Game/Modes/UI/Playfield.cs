@@ -6,16 +6,25 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 
 namespace osu.Game.Modes.UI
 {
-    public abstract class Playfield : Container
+    public abstract class Playfield<T> : Container
+        where T : HitObject
     {
-        public HitObjectContainer HitObjects;
-        private Container<Drawable> scaledContent;
+        public HitObjectContainer<DrawableHitObject<T>> HitObjects;
 
-        public virtual void Add(DrawableHitObject h) => HitObjects.Add(h);
+        public virtual void Add(DrawableHitObject<T> h) => HitObjects.Add(h);
+
+        public class HitObjectContainer<U> : Container<U>
+            where U : Drawable
+        {
+            public override bool Contains(Vector2 screenSpacePos) => true;
+        }
+
+        private Container<Drawable> scaledContent;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
@@ -37,7 +46,7 @@ namespace osu.Game.Modes.UI
                 }
             });
 
-            Add(HitObjects = new HitObjectContainer
+            Add(HitObjects = new HitObjectContainer<DrawableHitObject<T>>
             {
                 RelativeSizeAxes = Axes.Both,
             });

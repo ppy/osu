@@ -48,6 +48,17 @@ namespace osu.Game.Modes.Osu.Objects
             }
         }
 
+        public OsuScoreResult ScoreResultForOffset(double offset)
+        {
+            if (offset < HitWindowFor(OsuScoreResult.Hit300))
+                return OsuScoreResult.Hit300;
+            if (offset < HitWindowFor(OsuScoreResult.Hit100))
+                return OsuScoreResult.Hit100;
+            if (offset < HitWindowFor(OsuScoreResult.Hit50))
+                return OsuScoreResult.Hit50;
+            return OsuScoreResult.Miss;
+        }
+
         public override void SetDefaultsFromBeatmap(Beatmap beatmap)
         {
             base.SetDefaultsFromBeatmap(beatmap);

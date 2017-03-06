@@ -7,7 +7,7 @@ using osu.Game.Modes.Objects.Drawables;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class DrawableOsuHitObject : DrawableHitObject
+    public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
         public const float TIME_PREEMPT = 600;
         public const float TIME_FADEIN = 400;

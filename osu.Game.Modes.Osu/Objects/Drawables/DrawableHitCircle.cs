@@ -85,13 +85,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             if (hitOffset < OsuHitObject.HIT_WINDOW_50)
             {
                 Judgement.Result = HitResult.Hit;
-
-                if (hitOffset < OsuHitObject.HIT_WINDOW_300)
-                    osuJudgement.Score = OsuScoreResult.Hit300;
-                else if (hitOffset < OsuHitObject.HIT_WINDOW_100)
-                    osuJudgement.Score = OsuScoreResult.Hit100;
-                else if (hitOffset < OsuHitObject.HIT_WINDOW_50)
-                    osuJudgement.Score = OsuScoreResult.Hit50;
+                osuJudgement.Score = HitObject.ScoreResultForOffset(hitOffset);
             }
             else
                 Judgement.Result = HitResult.Miss;

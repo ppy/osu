@@ -3,13 +3,15 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Modes.Mania.Objects;
+using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.UI;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Mania.UI
 {
-    public class ManiaPlayfield : Playfield
+    public class ManiaPlayfield : Playfield<ManiaBaseHit>
     {
         private readonly int columns;
 
