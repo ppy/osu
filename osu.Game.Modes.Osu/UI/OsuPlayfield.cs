@@ -11,10 +11,11 @@ using osu.Game.Modes.Osu.Objects.Drawables.Connections;
 using osu.Game.Modes.UI;
 using System.Linq;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Modes.Objects;
 
 namespace osu.Game.Modes.Osu.UI
 {
-    public class OsuPlayfield : Playfield
+    public class OsuPlayfield : Playfield<OsuHitObject>
     {
         private Container approachCircles;
         private Container judgementLayer;
@@ -59,7 +60,7 @@ namespace osu.Game.Modes.Osu.UI
             });
         }
 
-        public override void Add(DrawableHitObject h)
+        public override void Add(DrawableHitObject<OsuHitObject> h)
         {
             h.Depth = (float)h.HitObject.StartTime;
             IDrawableHitObjectWithProxiedApproach c = h as IDrawableHitObjectWithProxiedApproach;
@@ -80,9 +81,9 @@ namespace osu.Game.Modes.Osu.UI
                 .OrderBy(h => h.StartTime);
         }
 
-        private void judgement(DrawableHitObject h, JudgementInfo j)
+        private void judgement(DrawableHitObject<OsuHitObject> h, JudgementInfo j)
         {
-            HitExplosion explosion = new HitExplosion((OsuJudgementInfo)j, (OsuHitObject)h.HitObject);
+            HitExplosion explosion = new HitExplosion((OsuJudgementInfo)j, h.HitObject);
 
             judgementLayer.Add(explosion);
         }

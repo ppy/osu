@@ -4,12 +4,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Database;
 using osu.Game.Modes;
-using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using osu.Framework.Screens;
@@ -18,24 +16,18 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Configuration;
 using osu.Framework.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Logging;
-using osu.Framework.Input;
-using osu.Framework.Input.Handlers;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Handlers;
 
 namespace osu.Game.Screens.Play
 {
     public class Player : OsuScreen
     {
-        public bool Autoplay;
-
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
@@ -147,9 +139,6 @@ namespace osu.Game.Screens.Play
 
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
-
-            if (Autoplay)
-                hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Hit));
 
             Children = new Drawable[]
             {

@@ -13,6 +13,7 @@ using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Modes.Objects;
 using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
