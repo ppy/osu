@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface
         private float minStarAlpha => 0.5f;
 
         private const float star_size = 20;
-        private float star_spacing = 4;
+        private const float star_spacing = 4;
 
         private float count;
 
