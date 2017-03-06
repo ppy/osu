@@ -57,5 +57,28 @@ namespace osu.Game.Modes
 
             return Activator.CreateInstance(type) as Ruleset;
         }
+        
+        [DebuggerNonUserCode]
+        public static void LoadRulesetsFrom(string directory)
+        {
+            foreach (string subDirectory in Directory.EnumerateDirectories(directory))
+                loadRulesets(subDirectory);
+
+            foreach (string file in Directory.EnumerateFiles(directory))
+            {
+                if (!file.EndsWith(".dll"))
+                    continue;
+                try
+                {
+                    var rulesets = Assembly.LoadFile(file).GetTypes().Where((Type t) => t.IsSubclassOf(typeof(Ruleset)));
+                    foreach (Type rulesetType in rulesets)
+                    {
+                        Ruleset.Register(Activator.CreateInstance(rulesetType) as Ruleset);
+                    }
+
+                }
+                catch (Exception e) { }
+            }
+        }
     }
 }
