@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Options.Sections
 {
@@ -38,12 +39,20 @@ namespace osu.Game.Overlays.Options.Sections
                     RelativeSizeAxes = Axes.X,
                     Text = "Run osu! updater",
                 },
-                new OptionLabel
+                new Container
                 {
-                    Text = "TODO: osu version here",
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new[]
+                    {
+                        new OptionLabel
+                        {
+                            Text = "osu!lazer",
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        },
+                    }
+                }
             };
         }
     }

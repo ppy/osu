@@ -27,6 +27,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Music;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays
 {

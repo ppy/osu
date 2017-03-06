@@ -4,11 +4,11 @@
 using System;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
 
@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Select
         public Action OnBack;
         public Action OnStart;
 
-        private FlowContainer buttons;
+        private FillFlowContainer buttons;
 
         public OsuLogo StartButton;
 
@@ -91,21 +91,20 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.BottomLeft,
                     Action = () => OnBack?.Invoke(),
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Position = new Vector2(BackButton.SIZE_EXTENDED.X + padding, 0),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Direction = FlowDirections.Horizontal,
+                    Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(padding, 0),
                     Children = new Drawable[]
                     {
-
-                        buttons = new FlowContainer
+                        buttons = new FillFlowContainer
                         {
-                            Direction = FlowDirections.Horizontal,
+                            Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(0.2f, 0),
                             AutoSizeAxes = Axes.Both,
                         }

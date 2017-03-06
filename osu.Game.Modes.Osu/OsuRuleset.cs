@@ -34,6 +34,64 @@ namespace osu.Game.Modes.Osu
             }
         };
 
+        public override IEnumerable<Mod> GetModsFor(ModType type)
+        {
+            switch (type)
+            {
+                case ModType.DifficultyReduction:
+                    return new Mod[]
+                    {
+                        new OsuModEasy(),
+                        new OsuModNoFail(),
+                        new OsuModHalfTime(),
+                    };
+
+                case ModType.DifficultyIncrease:
+                    return new Mod[]
+                    {
+                        new OsuModHardRock(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new OsuModSuddenDeath(),
+                                new OsuModPerfect(),
+                            },
+                        },
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new OsuModDoubleTime(),
+                                new OsuModNightcore(),
+                            },
+                        },
+                        new OsuModHidden(),
+                        new OsuModFlashlight(),
+                    };
+
+                case ModType.Special:
+                    return new Mod[]
+                    {
+                        new OsuModRelax(),
+                        new OsuModAutopilot(),
+                        new OsuModTarget(),
+                        new OsuModSpunOut(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ModAutoplay(),
+                                new ModCinema(),
+                            },
+                        },
+                    };
+
+                default:
+                    return new Mod[] { };
+            }
+        }
+
         public override FontAwesome Icon => FontAwesome.fa_osu_osu_o;
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();

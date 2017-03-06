@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Notifications;
 using OpenTK.Graphics;
 
@@ -44,9 +43,9 @@ namespace osu.Game.Overlays
                     Margin = new MarginPadding { Top = Toolbar.Toolbar.HEIGHT },
                     Children = new[]
                     {
-                        sections = new FlowContainer<NotificationSection>
+                        sections = new FillFlowContainer<NotificationSection>
                         {
-                            Direction = FlowDirections.Vertical,
+                            Direction = FillDirection.Vertical,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                             Children = new []
