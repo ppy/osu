@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
@@ -27,7 +28,7 @@ namespace osu.Game.Beatmaps
 
         public PlayMode PlayMode => beatmap?.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode ?? PlayMode.Osu;
 
-        public readonly Bindable<Mod[]> Mods = new Bindable<Mod[]>();
+        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
 
         public readonly bool WithStoryboard;
 
