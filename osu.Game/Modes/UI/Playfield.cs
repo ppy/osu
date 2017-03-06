@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.UI
 {
@@ -55,7 +56,7 @@ namespace osu.Game.Modes.UI
         /// <summary>
         /// An optional inputManager to provide interactivity etc.
         /// </summary>
-        public InputManager InputManager;
+        public PlayerInputManager InputManager;
 
         [BackgroundDependencyLoader]
         private void load()

@@ -10,6 +10,7 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.Osu
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Modes.Osu
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap, InputManager input = null) => new OsuHitRenderer
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap, PlayerInputManager input = null) => new OsuHitRenderer
         {
             Beatmap = beatmap,
             InputManager = input

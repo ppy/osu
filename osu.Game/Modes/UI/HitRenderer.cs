@@ -11,6 +11,7 @@ using osu.Framework.Input;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.UI
 {
@@ -35,7 +36,7 @@ namespace osu.Game.Modes.UI
     {
         private List<TObject> objects;
 
-        public InputManager InputManager;
+        public PlayerInputManager InputManager;
 
         protected Playfield<TObject> Playfield;
 

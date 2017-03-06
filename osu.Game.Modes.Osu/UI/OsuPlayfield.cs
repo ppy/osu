@@ -11,7 +11,7 @@ using osu.Game.Modes.Osu.Objects.Drawables.Connections;
 using osu.Game.Modes.UI;
 using System.Linq;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Modes.Objects;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.UI
 {
@@ -56,8 +56,14 @@ namespace osu.Game.Modes.Osu.UI
                     RelativeSizeAxes = Axes.Both,
                     Depth = -1,
                 },
-                new OsuCursorContainer()
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            if (InputManager.ReplayInputHandler != null)
+                Add(new OsuCursorContainer { Colour = Color4.LightYellow });
         }
 
         public override void Add(DrawableHitObject<OsuHitObject> h)
