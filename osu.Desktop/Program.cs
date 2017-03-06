@@ -29,11 +29,15 @@ namespace osu.Desktop
             {
                 if (!host.IsPrimaryInstance)
                 {
-                    var importer = new BeatmapIPCChannel(host);
                     // Restore the cwd so relative paths given at the command line work correctly
                     Directory.SetCurrentDirectory(cwd);
                     foreach (var file in args)
                     {
+                        IImporter importer;
+                        if (Path.GetExtension(file) == ".osk")
+                            importer = new SkinIPCChannel(host);
+                        else
+                            importer = new BeatmapIPCChannel(host);
                         Console.WriteLine(@"Importing {0}", file);
                         if (!importer.ImportAsync(Path.GetFullPath(file)).Wait(3000))
                             throw new TimeoutException(@"IPC took too long to send");

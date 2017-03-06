@@ -8,7 +8,7 @@ using osu.Game.Database;
 
 namespace osu.Game.IPC
 {
-    public class BeatmapIPCChannel : IpcChannel<BeatmapImportMessage>
+    public class BeatmapIPCChannel : IpcChannel<BeatmapImportMessage>, IImporter
     {
         private BeatmapDatabase beatmaps;
 

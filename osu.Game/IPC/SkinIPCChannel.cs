@@ -8,7 +8,7 @@ using osu.Game.Database;
 
 namespace osu.Game.IPC
 {
-    public class SkinIPCChannel : IpcChannel<SkinImportMessage>
+    public class SkinIPCChannel : IpcChannel<SkinImportMessage>, IImporter
     {
         private SkinDatabase skins;
 
@@ -20,7 +20,6 @@ namespace osu.Game.IPC
             MessageReceived += (msg) =>
             {
                 Debug.Assert(skins != null);
-
                 ImportAsync(msg.Path);
             };
         }
