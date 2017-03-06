@@ -39,20 +39,6 @@ namespace osu.Game.Overlays.Options.Sections
                     RelativeSizeAxes = Axes.X,
                     Text = "Run osu! updater",
                 },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new[]
-                    {
-                        new OptionLabel
-                        {
-                            Text = "osu!lazer",
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        },
-                    }
-                }
             };
         }
     }
