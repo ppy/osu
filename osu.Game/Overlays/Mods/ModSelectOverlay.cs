@@ -43,6 +43,7 @@ namespace osu.Game.Overlays.Mods
             var ruleset = Ruleset.GetRuleset(PlayMode);
             foreach (ModSection section in modSectionsContainer.Children)
                 section.Buttons = ruleset.GetModsFor(section.ModType).Select(m => new ModButton(m)).ToArray();
+            refreshSelectedMods();
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -54,7 +55,7 @@ namespace osu.Game.Overlays.Mods
             if (osu != null)
                 PlayMode.BindTo(osu.PlayMode);
             PlayMode.ValueChanged += modeChanged;
-            PlayMode.TriggerChange();
+            modeChanged(null, null);
         }
 
         protected override void PopOut()
@@ -119,12 +120,13 @@ namespace osu.Game.Overlays.Mods
         private void modButtonPressed(Mod selectedMod)
         {
             if (selectedMod != null)
-            {
-                foreach (Type t in selectedMod.IncompatibleMods)
-                    DeselectType(t);
-            }
-
+                DeselectTypes(selectedMod.IncompatibleMods);
             refreshSelectedMods();
+        }
+
+        private void refreshSelectedMods()
+        {
+            SelectedMods.Value = modSectionsContainer.Children.SelectMany(s => s.Buttons.Select(x => x.SelectedMod).Where(x => x != null)).ToArray();
 
             double multiplier = 1.0;
             bool ranked = true;
@@ -132,9 +134,7 @@ namespace osu.Game.Overlays.Mods
             foreach (Mod mod in SelectedMods.Value)
             {
                 multiplier *= mod.ScoreMultiplier;
-
-                if (ranked)
-                    ranked = mod.Ranked;
+                ranked &= mod.Ranked;
             }
 
             // 1.00x
@@ -146,22 +146,11 @@ namespace osu.Game.Overlays.Mods
             rankedLabel.Text = $@"{rankedString}, Score Multiplier: ";
 
             if (multiplier > 1.0)
-            {
                 multiplierLabel.FadeColour(highMultiplierColour, 200);
-            }
             else if (multiplier < 1.0)
-            {
                 multiplierLabel.FadeColour(lowMultiplierColour, 200);
-            }
             else
-            {
                 multiplierLabel.FadeColour(Color4.White, 200);
-            }
-        }
-
-        private void refreshSelectedMods()
-        {
-            SelectedMods.Value = modSectionsContainer.Children.SelectMany(s => s.Buttons.Select(x => x.SelectedMod).Where(x => x != null)).ToArray();
         }
 
         public ModSelectOverlay()
