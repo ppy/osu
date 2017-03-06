@@ -324,7 +324,7 @@
     <Compile Include="Screens\Select\Options\BeatmapOptionsRemoveFromUnplayedButton.cs" />
     <Compile Include="Skins\SkinManager.cs" />
     <Compile Include="Skins\Skin.cs" />
-    <Compile Include="IPC\SkinImporter.cs" />
+    <Compile Include="IPC\SkinIPCChannel.cs" />
     <Compile Include="Database\SkinDatabase.cs" />
   </ItemGroup>
   <ItemGroup>
