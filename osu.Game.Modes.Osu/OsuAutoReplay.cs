@@ -276,19 +276,12 @@ namespace osu.Game.Modes.Osu
                 else if (h is Slider)
                 {
                     Slider s = h as Slider;
-                    int lastTime = 0;
 
-                    //foreach (
-                    //    Transformation t in
-                    //        s..Transformations.FindAll(
-                    //            tr => tr.Type == TransformationType.Movement))
-                    //{
-                    //    if (lastTime != 0 && t.Time1 - lastTime < frameDelay) continue;
-
-                    //    AddFrameToReplay(Frames, new LegacyReplayFrame(t.Time1, t.StartVector.X, t.StartVector.Y,
-                    //                                button));
-                    //    lastTime = t.Time1;
-                    //}
+                    for (double j = frameDelay; j < s.Duration; j += frameDelay)
+                    {
+                        Vector2 pos = s.PositionAt(j / s.Duration);
+                        addFrameToReplay(new LegacyReplayFrame(h.StartTime + j, pos.X, pos.Y, button));
+                    }
 
                     addFrameToReplay(new LegacyReplayFrame(h.EndTime, s.EndPosition.X, s.EndPosition.Y, button));
                 }
