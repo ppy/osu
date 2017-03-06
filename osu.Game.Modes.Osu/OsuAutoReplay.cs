@@ -100,20 +100,20 @@ namespace osu.Game.Modes.Osu
                     OsuHitObject last = beatmap.HitObjects[i - 1] as OsuHitObject;
 
                     //Make the cursor stay at a hitObject as long as possible (mainly for autopilot).
-                    if (h.StartTime - DrawableHitCircle.HITTABLE_RANGE > last.EndTime + DrawableHitCircle.HIT_WINDOW_50 + 50)
+                    if (h.StartTime - OsuHitObject.HITTABLE_RANGE > last.EndTime + OsuHitObject.HIT_WINDOW_50 + 50)
                     {
-                        if (!(last is Spinner) && h.StartTime - last.EndTime < 1000) addFrameToReplay(new LegacyReplayFrame(last.EndTime + DrawableHitCircle.HIT_WINDOW_50, last.EndPosition.X, last.EndPosition.Y, LegacyButtonState.None));
-                        if (!(h is Spinner)) addFrameToReplay(new LegacyReplayFrame(h.StartTime - DrawableHitCircle.HITTABLE_RANGE, h.Position.X, h.Position.Y, LegacyButtonState.None));
+                        if (!(last is Spinner) && h.StartTime - last.EndTime < 1000) addFrameToReplay(new LegacyReplayFrame(last.EndTime + OsuHitObject.HIT_WINDOW_50, last.EndPosition.X, last.EndPosition.Y, LegacyButtonState.None));
+                        if (!(h is Spinner)) addFrameToReplay(new LegacyReplayFrame(h.StartTime - OsuHitObject.HITTABLE_RANGE, h.Position.X, h.Position.Y, LegacyButtonState.None));
                     }
-                    else if (h.StartTime - DrawableHitCircle.HIT_WINDOW_50 > last.EndTime + DrawableHitCircle.HIT_WINDOW_50 + 50)
+                    else if (h.StartTime - OsuHitObject.HIT_WINDOW_50 > last.EndTime + OsuHitObject.HIT_WINDOW_50 + 50)
                     {
-                        if (!(last is Spinner) && h.StartTime - last.EndTime < 1000) addFrameToReplay(new LegacyReplayFrame(last.EndTime + DrawableHitCircle.HIT_WINDOW_50, last.EndPosition.X, last.EndPosition.Y, LegacyButtonState.None));
-                        if (!(h is Spinner)) addFrameToReplay(new LegacyReplayFrame(h.StartTime - DrawableHitCircle.HIT_WINDOW_50, h.Position.X, h.Position.Y, LegacyButtonState.None));
+                        if (!(last is Spinner) && h.StartTime - last.EndTime < 1000) addFrameToReplay(new LegacyReplayFrame(last.EndTime + OsuHitObject.HIT_WINDOW_50, last.EndPosition.X, last.EndPosition.Y, LegacyButtonState.None));
+                        if (!(h is Spinner)) addFrameToReplay(new LegacyReplayFrame(h.StartTime - OsuHitObject.HIT_WINDOW_50, h.Position.X, h.Position.Y, LegacyButtonState.None));
                     }
-                    else if (h.StartTime - DrawableHitCircle.HIT_WINDOW_100 > last.EndTime + DrawableHitCircle.HIT_WINDOW_100 + 50)
+                    else if (h.StartTime - OsuHitObject.HIT_WINDOW_100 > last.EndTime + OsuHitObject.HIT_WINDOW_100 + 50)
                     {
-                        if (!(last is Spinner) && h.StartTime - last.EndTime < 1000) addFrameToReplay(new LegacyReplayFrame(last.EndTime + DrawableHitCircle.HIT_WINDOW_100, last.EndPosition.X, last.EndPosition.Y, LegacyButtonState.None));
-                        if (!(h is Spinner)) addFrameToReplay(new LegacyReplayFrame(h.StartTime - DrawableHitCircle.HIT_WINDOW_100, h.Position.X, h.Position.Y, LegacyButtonState.None));
+                        if (!(last is Spinner) && h.StartTime - last.EndTime < 1000) addFrameToReplay(new LegacyReplayFrame(last.EndTime + OsuHitObject.HIT_WINDOW_100, last.EndPosition.X, last.EndPosition.Y, LegacyButtonState.None));
+                        if (!(h is Spinner)) addFrameToReplay(new LegacyReplayFrame(h.StartTime - OsuHitObject.HIT_WINDOW_100, h.Position.X, h.Position.Y, LegacyButtonState.None));
                     }
                 }
 
@@ -185,7 +185,7 @@ namespace osu.Game.Modes.Osu
 
                     // Only "snap" to hitcircles if they are far enough apart. As the time between hitcircles gets shorter the snapping threshold goes up.
                     if (timeDifference > 0 && // Sanity checks
-                        ((lastPosition - targetPosition).Length > DrawableHitCircle.CIRCLE_RADIUS * (1.5 + 100.0 / timeDifference) || // Either the distance is big enough
+                        ((lastPosition - targetPosition).Length > OsuHitObject.OBJECT_RADIUS * (1.5 + 100.0 / timeDifference) || // Either the distance is big enough
                         timeDifference >= 266)) // ... or the beats are slow enough to tap anyway.
                     {
                         // Perform eased movement

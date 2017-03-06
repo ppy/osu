@@ -69,18 +69,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             Size = circle.DrawSize;
         }
 
-        //todo: these aren't constants.
-        public const double HITTABLE_RANGE = 300;
-        public const double HIT_WINDOW_50 = 150;
-        public const double HIT_WINDOW_100 = 80;
-        public const double HIT_WINDOW_300 = 30;
-        public const double CIRCLE_RADIUS = 64;
-
         protected override void CheckJudgement(bool userTriggered)
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > HIT_WINDOW_50)
+                if (Judgement.TimeOffset > OsuHitObject.HIT_WINDOW_50)
                     Judgement.Result = HitResult.Miss;
                 return;
             }
@@ -89,15 +82,15 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             OsuJudgementInfo osuJudgement = Judgement as OsuJudgementInfo;
 
-            if (hitOffset < HIT_WINDOW_50)
+            if (hitOffset < OsuHitObject.HIT_WINDOW_50)
             {
                 Judgement.Result = HitResult.Hit;
 
-                if (hitOffset < HIT_WINDOW_300)
+                if (hitOffset < OsuHitObject.HIT_WINDOW_300)
                     osuJudgement.Score = OsuScoreResult.Hit300;
-                else if (hitOffset < HIT_WINDOW_100)
+                else if (hitOffset < OsuHitObject.HIT_WINDOW_100)
                     osuJudgement.Score = OsuScoreResult.Hit100;
-                else if (hitOffset < HIT_WINDOW_50)
+                else if (hitOffset < OsuHitObject.HIT_WINDOW_50)
                     osuJudgement.Score = OsuScoreResult.Hit50;
             }
             else
