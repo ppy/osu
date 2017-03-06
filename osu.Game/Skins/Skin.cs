@@ -15,27 +15,24 @@ namespace osu.Game.Skins
         public TextureStore Textures { get; private set; }
 
         private ArchiveReader skinsStore;
-        private Storage storage;
 
         public Skin(SkinInfo info)
         {
             Info = info;
         }
 
-        public void UpdateSkin() {
-            Textures = new TextureStore();
-            if (Info.Name != SkinManager.DefaultSkin.Name)
+        public void UpdateSkin(Storage storage) {
+            if (Info.Path != null)
             {
-                Textures.AddStore(new RawTextureLoaderStore(skinsStore));
-            }
-            // TODO update audio component
-        }
+                skinsStore = ArchiveReader.GetReader(storage, Info.Path);
 
-        [BackgroundDependencyLoader]
-        private void load(GameHost host) {
-            storage = host.Storage;
-            skinsStore = ArchiveReader.GetReader(storage, Info.Path);
-            UpdateSkin();
+                Textures = new TextureStore();
+                if (Info.Name != SkinManager.DefaultSkin.Name)
+                {
+                    Textures.AddStore(new RawTextureLoaderStore(skinsStore));
+                }
+                // TODO update audio component
+            }
         }
     }
 

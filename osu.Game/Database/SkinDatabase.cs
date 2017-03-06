@@ -40,14 +40,15 @@ namespace osu.Game.Database
 
 
         private SQLiteConnection prepareConnection() { 
-            SQLiteConnection conn = storage.GetDatabase(@"skins");
+            var conn = storage.GetDatabase(@"skins");
+
             try
             {
-                connection.CreateTable<SkinInfo>();
+                conn.CreateTable<SkinInfo>();
             }
             catch 
             {
-                connection.Close();
+                conn.Close();
                 throw;
             }
             return conn;
@@ -56,6 +57,7 @@ namespace osu.Game.Database
         private SkinInfo getSkin(string path)
         {
             string hash = null;
+            string outPath = null;
 
             if (File.Exists(path)) 
             {
@@ -64,10 +66,10 @@ namespace osu.Game.Database
                 {
                     hash = BitConverter.ToString(md5.ComputeHash(input)).Replace("-","").ToLowerInvariant();
                     input.Seek(0, SeekOrigin.Begin);
-                    path = Path.Combine(@"skins", hash.Remove(1), hash.Remove(2), hash);
-                    if (!storage.Exists(path))
+                    outPath = Path.Combine(@"skins", hash.Remove(1), hash.Remove(2), hash);
+                    if (!storage.Exists(outPath))
                     {
-                        using (var output = storage.GetStream(path, FileAccess.Write))
+                        using (var output = storage.GetStream(outPath, FileAccess.Write))
                             input.CopyTo(output);
                     }
                 }  
@@ -76,7 +78,8 @@ namespace osu.Game.Database
             SkinInfo info = new SkinInfo
             {
                 //Maybe name should be taken from the folder inside the osk, not the osk itself
-                Name = Path.GetFileName(path)
+                Name = Path.GetFileNameWithoutExtension(path),
+                Path = outPath,
             };
 
             return info;
@@ -107,6 +110,16 @@ namespace osu.Game.Database
         public void Import(string path)
         {
             Import(new [] { path });
+        }
+
+        public TableQuery<SkinInfo> GetSkins()
+        {
+            return Query<SkinInfo>();
+        }
+
+        private TableQuery<T> Query<T>() where T : class
+        {
+            return connection.Table<T>();
         }
     }
 }

@@ -3,18 +3,23 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps.IO;
 using osu.Game.Configuration;
+using osu.Game.Database;
 
 namespace osu.Game.Skins
 {
     public class SkinManager
     {
-        public static SkinInfo DefaultSkin = new SkinInfo {
+        public static SkinInfo DefaultSkin = new SkinInfo
+        {
             Name = @"default",
+            Path = null,
         };
+
+        public Action PostChangeSkin;
 
         private Bindable<SkinInfo> bindable;
 
@@ -24,13 +29,38 @@ namespace osu.Game.Skins
         private SkinInfo selected;
         private Skin selectedContents;
 
-        public SkinManager()
+        private Storage storage;
+
+        private SkinDatabase database;
+
+        public SkinManager(SkinDatabase database, Storage storage, OsuConfigManager config)
         {
             skins = new List<SkinInfo>();
             skinContents = new List<Skin>();
+
+            this.storage = storage;
+            this.database = database;
+
+            bindable = config.GetBindable<SkinInfo>(OsuConfig.Skin);
+            bindable.ValueChanged += changeSkinWrapper;
+            changeSkin();
+        }
+
+        private void updateSkins()
+        {
+            skins.Clear();
+            skins.Add(DefaultSkin);
+            skins.AddRange(database.GetSkins());
+
+            foreach (SkinInfo info in skins) 
+            {
+                skinContents.Add(new Skin(info));
+            } 
         }
 
         public List<KeyValuePair<string, SkinInfo>> UpdateItems() {
+            updateSkins();
+
             var list = new List<KeyValuePair<string, SkinInfo>>();
             foreach (SkinInfo skin in skins)
             {
@@ -39,23 +69,23 @@ namespace osu.Game.Skins
             return list;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private Skin getSkinContents(SkinInfo skin)
         {
-            bindable = config.GetBindable<SkinInfo>(OsuConfig.Skin);
-            bindable.ValueChanged += changedSkin;
-            skins.Add(DefaultSkin);
-            // TODO load skins
+            return skinContents.Find((x) => (x.Info.Path == skin.Path));
         }
 
-        private Skin getSkinContents(SkinInfo skin) => skinContents.Find((x) => (x.Info.Path == skin.Path));
+        private void changeSkinWrapper(object sender, EventArgs e) => changeSkin();
 
-        private void changedSkin(object sender, EventArgs e) {
-            foreach (SkinInfo skin in skins) {
+        private void changeSkin() 
+        {
+            updateSkins();
+            foreach (SkinInfo skin in skins)
+            {
                 if (skin.Path == bindable.Value.Path)
                     selected = skin;
             }
             selectedContents = getSkinContents(selected);
+            selectedContents.UpdateSkin(storage);
         }
     }
 }
