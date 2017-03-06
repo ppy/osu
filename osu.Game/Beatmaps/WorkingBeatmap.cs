@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public PlayMode? PreferredPlayMode;
 
-        public PlayMode PlayMode => beatmap?.BeatmapInfo?.Mode > PlayMode.Osu || !PreferredPlayMode.HasValue ? beatmap.BeatmapInfo.Mode : PreferredPlayMode.Value;
+        public PlayMode PlayMode => beatmap?.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode ?? PlayMode.Osu;
 
         public readonly bool WithStoryboard;
 
