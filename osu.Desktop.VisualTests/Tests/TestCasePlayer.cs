@@ -67,6 +67,15 @@ namespace osu.Desktop.VisualTests.Tests
                     HitObjects = objects,
                     BeatmapInfo = new BeatmapInfo
                     {
+                        BaseDifficulty = new BaseDifficulty
+                        {
+                            ApproachRate = 5,
+                            CircleSize = 5,
+                            DrainRate = 5,
+                            OverallDifficulty = 5,
+                            SliderMultiplier = 1.4,
+                            SliderTickRate = 1
+                        },
                         Metadata = new BeatmapMetadata
                         {
                             Artist = @"Unknown",
