@@ -28,6 +28,8 @@ namespace osu.Game
 
         protected BeatmapDatabase BeatmapDatabase;
 
+        protected ScoreDatabase ScoreDatabase;
+
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
         public APIAccess API;
@@ -79,6 +81,7 @@ namespace osu.Game
             Dependencies.Cache(this);
             Dependencies.Cache(LocalConfig);
             Dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, Host));
+            Dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, Host, BeatmapDatabase));
             Dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.

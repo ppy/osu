@@ -19,9 +19,9 @@ namespace osu.Game.Modes.Mania.UI
 
         protected override HitObjectConverter<ManiaBaseHit> Converter => new ManiaConverter(columns);
 
-        protected override Playfield CreatePlayfield() => new ManiaPlayfield(columns);
+        protected override Playfield<ManiaBaseHit> CreatePlayfield() => new ManiaPlayfield(columns);
 
-        protected override DrawableHitObject GetVisualRepresentation(ManiaBaseHit h)
+        protected override DrawableHitObject<ManiaBaseHit> GetVisualRepresentation(ManiaBaseHit h)
         {
             return null;
             //return new DrawableNote(h)

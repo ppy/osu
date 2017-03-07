@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 Assert.IsTrue(File.Exists(temp));
 
-                var importer = new BeatmapImporter(client);
+                var importer = new BeatmapIPCChannel(client);
                 if (!importer.ImportAsync(temp).Wait(1000))
                     Assert.Fail(@"IPC took too long to send");
 
