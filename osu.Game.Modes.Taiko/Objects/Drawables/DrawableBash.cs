@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
@@ -114,7 +115,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                         {
                             RelativeSizeAxes = Axes.Both,
 
-                            Alpha = 0.3f,
+                            Alpha = 0f,
                             AlwaysPresent = true
                         }
                     }
@@ -168,6 +169,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
                 userHits++;
 
+                innerRingBackground.FadeTo((float)userHits / spinner.RequiredHits, 250, EasingTypes.OutQuint);
                 bashInnerRing.ScaleTo(1f + (outer_ring_scale - 1) * userHits / spinner.RequiredHits, 50);
 
                 if (userHits == spinner.RequiredHits)
@@ -199,8 +201,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             base.UpdateState(state);
 
-            const double scale_out = 150;
-
             switch (State)
             {
                 case ArmedState.Idle:
@@ -208,11 +208,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 case ArmedState.Miss:
                     break;
                 case ArmedState.Hit:
-                    bodyPiece.ScaleTo(1.5f, scale_out);
-                    bodyPiece.FadeOut(scale_out);
+                    bodyPiece.ScaleTo(1.5f, 150, EasingTypes.OutQuint);
+                    bodyPiece.FadeOut(150);
 
-                    bashOuterRing.FadeOut(scale_out);
-                    bashInnerRing.FadeOut(scale_out);
+                    bashOuterRing.ScaleTo(1f, 100, EasingTypes.OutQuint);
+                    bashOuterRing.FadeOut(100);
+
+                    bashInnerRing.ScaleTo(1f, 100, EasingTypes.OutQuint);
+                    bashInnerRing.FadeOut(100);
                     break;
             }
         }

@@ -13,6 +13,7 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
@@ -132,10 +133,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 case ArmedState.Miss:
                     break;
                 case ArmedState.Hit:
-                    const double scale_out = 50;
-
-                    bodyPiece.ScaleTo(0, scale_out);
-
+                    bodyPiece.ScaleTo(0, 100, EasingTypes.OutQuint);
                     break;
             }
         }
