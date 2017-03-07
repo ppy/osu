@@ -213,11 +213,6 @@ namespace osu.Game.Modes.Taiko.UI
                 else if (tji.Score == TaikoScoreResult.Good)
                     ring = new ExplodingRing(dth.ExplodeColour, false);
             }
-            else
-            {
-                if (!(dth is DrawableDrumRollTick))
-                    hitTarget.Flash(missColour, false);
-            }
 
             if (ring != null)
                 explosionRingContainer.Add(ring);

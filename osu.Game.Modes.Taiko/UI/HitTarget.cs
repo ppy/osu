@@ -4,10 +4,12 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Modes.Taiko.Objects;
 
 namespace osu.Game.Modes.Taiko.UI
@@ -65,8 +67,6 @@ namespace osu.Game.Modes.Taiko.UI
 
                             RelativeSizeAxes = Axes.Both,
 
-                            Alpha = 0,
-
                             Children = new Drawable[]
                             {
                                 outerFlash = new Container
@@ -79,25 +79,16 @@ namespace osu.Game.Modes.Taiko.UI
                                     Masking = true,
                                     CornerRadius = 74.2f,
 
+                                    Alpha = 0,
+
                                     Children = new Drawable[]
                                     {
-                                        outerFlash = new Container
+                                        new Box()
                                         {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-
                                             RelativeSizeAxes = Axes.Both,
 
-                                            Masking = true,
-
-                                            Children = new[]
-                                            {
-                                                new Box()
-                                                {
-                                                    Alpha = 0,
-                                                    AlwaysPresent = true
-                                                }
-                                            }
+                                            Alpha = 0,
+                                            AlwaysPresent = true
                                         }
                                     }
                                 },
@@ -110,13 +101,15 @@ namespace osu.Game.Modes.Taiko.UI
 
                                     Masking = true,
 
+                                    Alpha = 0,
+
                                     Children = new[]
                                     {
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
 
-                                            Colour = Color4.White,
+                                            Colour = Color4.White.Opacity(0.85f),
                                         }
                                     },
                                 }
@@ -136,8 +129,6 @@ namespace osu.Game.Modes.Taiko.UI
 
         public void Flash(Color4 colour, bool showOuter = true)
         {
-            outerFlash.Alpha = showOuter ? 0.3f : 0;
-
             innerFlash.EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Glow,
@@ -152,8 +143,11 @@ namespace osu.Game.Modes.Taiko.UI
                 Radius = 250
             };
 
-            flashContainer.FadeIn(50);
-            flashContainer.Delay(50).FadeOut(100);
+            outerFlash.FadeTo(0.3f, 125, EasingTypes.OutQuint);
+            outerFlash.Delay(125).FadeOut(125);
+
+            innerFlash.FadeIn();
+            innerFlash.FadeOut(250, EasingTypes.OutQuint);
         }
     }
 }
