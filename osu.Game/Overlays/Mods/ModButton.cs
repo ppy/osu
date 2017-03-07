@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Mods
 
                 iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
                 iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
-                foregroundIcon.Colour = Selected ? SelectedColour : Colour;
+                foregroundIcon.Colour = Selected ? SelectedColour : ButtonColour;
 
                 displaySelectedMod();
             }
@@ -60,17 +60,17 @@ namespace osu.Game.Overlays.Mods
 
         public bool Selected => selectedIndex != -1;
 
-        private Color4 backgroundColour;
-        public new Color4 Colour
+        private Color4 buttonColour;
+        public Color4 ButtonColour
         {
             get
             {
-                return backgroundColour;
+                return buttonColour;
             }
             set
             {
-                if (value == backgroundColour) return;
-                backgroundColour = value;
+                if (value == buttonColour) return;
+                buttonColour = value;
                 foreach (ModIcon icon in iconsContainer.Children)
                 {
                     icon.Colour = value;
@@ -180,7 +180,7 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Position = new Vector2(1.5f),
-                        Colour = this.Colour
+                        Colour = this.ButtonColour
                     },
                     foregroundIcon = new ModIcon
                     {
@@ -188,7 +188,7 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Position = new Vector2(-1.5f),
-                        Colour = this.Colour
+                        Colour = this.ButtonColour
                     },
                 });
             }
@@ -199,7 +199,7 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Colour = this.Colour
+                    Colour = this.ButtonColour
                 });
             }
         }
@@ -208,7 +208,7 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
             foreach (ModIcon icon in iconsContainer.Children)
-                icon.Colour = Colour;
+                icon.Colour = ButtonColour;
         }
 
         public ModButton(Mod m)
