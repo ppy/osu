@@ -26,7 +26,7 @@ namespace osu.Game.Modes.Taiko
         private const double combo_portion_ratio = 0.2f;
         private const double accuracy_portion_ratio = 0.8f;
 
-        public override Score GetScore() => new TaikoScore()
+        public override Score GetScore() => new TaikoScore
         {
             TotalScore = TotalScore,
             Combo = Combo,
