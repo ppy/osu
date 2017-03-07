@@ -87,8 +87,6 @@ namespace osu.Game.Modes.Taiko.UI
                                     Masking = true,
                                     CornerRadius = 74.2f,
 
-                                    Alpha = 0.3f,
-
                                     Children = new Drawable[]
                                     {
                                         outerFlash = new Container()
@@ -144,8 +142,10 @@ namespace osu.Game.Modes.Taiko.UI
             inner.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
         }
 
-        public void Flash(Color4 colour)
+        public void Flash(Color4 colour, bool showOuter = true)
         {
+            outerFlash.Alpha = showOuter ? 0.3f : 0;
+
             innerFlash.EdgeEffect = new EdgeEffect()
             {
                 Type = EdgeEffectType.Glow,

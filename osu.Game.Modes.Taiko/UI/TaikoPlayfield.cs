@@ -14,6 +14,7 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Framework.MathUtils;
+using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -34,19 +35,25 @@ namespace osu.Game.Modes.Taiko.UI
         private Container<DrawableBarLine> barLineContainer;
         private Container<JudgementText> judgementContainer;
 
+        private Container leftBackgroundContainer;
+        private Box leftBackground;
+        private Container rightBackgroundContainer;
+        private Box rightBackground;
+
+        private Color4 missColour;
+
         public TaikoPlayfield()
         {
             RelativeSizeAxes = Axes.Both;
 
             // Right area under notes
-            AddInternal(new Container()
+            AddInternal(leftBackgroundContainer = new Container()
             {
                 RelativeSizeAxes = Axes.X,
                 RelativePositionAxes = Axes.X,
                 Position = new Vector2(left_area_size, 0),
                 Size = new Vector2(1f - left_area_size, PLAYFIELD_HEIGHT),
 
-                BorderColour = new Color4(17, 17, 17, 255),
                 BorderThickness = 2,
 
                 Depth = 1,
@@ -54,10 +61,11 @@ namespace osu.Game.Modes.Taiko.UI
                 Children = new Drawable[]
                 {
                     // Background
-                    new Box()
+                    leftBackground = new Box()
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = new Color4(0, 0, 0, 127)
+
+                        Alpha = 0.5f
                     },
                     // Hit target
                     new Container()
@@ -119,23 +127,21 @@ namespace osu.Game.Modes.Taiko.UI
             });
 
             // Left area above notes
-            AddInternal(new Container()
+            AddInternal(rightBackgroundContainer = new Container()
             {
                 RelativeSizeAxes = Axes.X,
                 Size = new Vector2(left_area_size, PLAYFIELD_HEIGHT),
 
                 Masking = true,
 
-                BorderColour = Color4.Black,
                 BorderThickness = 1,
 
                 Children = new Drawable[]
                 {
                     // Background
-                    new Box()
+                    rightBackground = new Box()
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = new Color4(17, 17, 17, 255)
                     },
                     new Container()
                     {
@@ -158,6 +164,18 @@ namespace osu.Game.Modes.Taiko.UI
                     }
                 }
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            leftBackgroundContainer.BorderColour = colours.Gray1;
+            leftBackground.Colour = colours.Gray0;
+
+            rightBackgroundContainer.BorderColour = colours.Gray0;
+            rightBackground.Colour = colours.Gray1;
+
+            missColour = colours.Red;
         }
 
         public override void Add(DrawableHitObject h)
@@ -185,24 +203,28 @@ namespace osu.Game.Modes.Taiko.UI
             // Add ring
             ExplodingRing ring = null;
 
-            if (tji.Score == TaikoScoreResult.Great)
+            if (tji.Result == HitResult.Hit)
             {
-                hitTarget.Flash(dth.ExplodeColour);
-                ring = new ExplodingRing(dth.ExplodeColour, true);
+                if (tji.Score == TaikoScoreResult.Great)
+                {
+                    hitTarget.Flash(dth.ExplodeColour);
+                    ring = new ExplodingRing(dth.ExplodeColour, true);
+                }
+                else if (tji.Score == TaikoScoreResult.Good)
+                    ring = new ExplodingRing(dth.ExplodeColour, false);
             }
-            else if (tji.Score == TaikoScoreResult.Good)
-                ring = new ExplodingRing(dth.ExplodeColour, false);
             else
-                hitTarget.Flash(Color4.Red);
+            {
+                if (!(dth is DrawableDrumRollTick))
+                    hitTarget.Flash(missColour, false);
+            }
 
             if (ring != null)
                 explosionRingContainer.Add(ring);
 
             // Add judgement
             string judgementString = "";
-            if (tji.Result == HitResult.Miss)
-                judgementString = "MISS";
-            else
+            if (tji.Result == HitResult.Hit)
             {
                 switch (tji.Score)
                 {
@@ -214,6 +236,8 @@ namespace osu.Game.Modes.Taiko.UI
                         break;
                 }
             }
+            else
+                judgementString = "MISS";
 
             if (!(dth is DrawableDrumRollTick))
             {

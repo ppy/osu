@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Game.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,7 +83,6 @@ namespace osu.Game.Modes.Taiko.UI
 
                         RelativeSizeAxes = Axes.Both,
 
-                        Colour = new Color4(102, 204, 255, 255),
                         Alpha = 0,
 
                         BlendingMode = BlendingMode.Additive
@@ -103,7 +103,6 @@ namespace osu.Game.Modes.Taiko.UI
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.7f),
 
-                        Colour = new Color4(255, 102, 194, 255),
                         Alpha = 0,
 
                         BlendingMode = BlendingMode.Additive
@@ -112,12 +111,15 @@ namespace osu.Game.Modes.Taiko.UI
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(TextureStore textures, OsuColour colours)
             {
                 outer.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer");
                 outerHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer-hit");
                 inner.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
                 innerHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner-hit");
+
+                outerHit.Colour = colours.Blue;
+                innerHit.Colour = colours.Pink;
             }
 
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
