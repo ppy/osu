@@ -43,6 +43,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         /// </summary>
         public bool Kiai;
 
+        private CircularContainer backingGlowContainer;
+        private CircularContainer backgroundContainer;
         private Box background;
 
         public DrumRollBodyPiece(float baseLength)
@@ -52,40 +54,75 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
             Origin = Anchor.Centre;
             Anchor = Anchor.Centre;
 
-            Masking = true;
-            BorderColour = Color4.White;
-            BorderThickness = 4;
-
-            Children = new Drawable[]
+            Children = new[]
             {
-                // Background
-                background = new Box
+                backingGlowContainer = new CircularContainer()
                 {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+
                     RelativeSizeAxes = Axes.Both,
+
+                    Children = new[]
+                    {
+                        new Box()
+                        {
+                            RelativeSizeAxes = Axes.Both,
+
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        }
+                    }
                 },
-                // Triangles
-                new Triangles
+                backgroundContainer = new CircularContainer()
                 {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+
                     RelativeSizeAxes = Axes.Both,
 
-                    Colour = Color4.Black,
-                    Alpha = 0.05f,
+                    BorderColour = Color4.White,
+                    BorderThickness = 4,
 
-                    TriangleScale = 1.5f
-                }
+                    Children = new Drawable[]
+                    {
+                        // Background
+                        background = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        // Triangles
+                        new Triangles
+                        {
+                            RelativeSizeAxes = Axes.Both,
+
+                            Colour = Color4.Black,
+                            Alpha = 0.5f,
+
+                            TriangleScale = 1.5f
+                        }
+                    }
+                },
             };
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.Yellow;
+            background.Colour = colours.YellowDark;
+
+            backingGlowContainer.EdgeEffect = new EdgeEffect
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = colours.YellowDark,
+                Radius = 8f
+            };
 
             if (Kiai)
             {
-                EdgeEffect = new EdgeEffect
+                backgroundContainer.EdgeEffect = new EdgeEffect
                 {
-                    Colour = new Color4(colours.Yellow.R, colours.Yellow.G, colours.Yellow.B, 0.75f),
+                    Colour = colours.YellowDark,
                     Radius = 50,
                     Type = EdgeEffectType.Glow,
                 };

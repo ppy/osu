@@ -27,7 +27,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            InnerColour = colours.Pink;
+            InnerColour = colours.PinkDarker;
         }
 
         protected override RingPiece CreateRing() => new DonRingPiece();
@@ -40,7 +40,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            InnerColour = colours.Blue;
+            InnerColour = colours.BlueDarker;
         }
 
         protected override RingPiece CreateRing() => new KatsuRingPiece();
@@ -53,7 +53,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            InnerColour = colours.Yellow;
+            InnerColour = colours.YellowDarker;
         }
 
         protected override RingPiece CreateRing() => new BashRingPiece();
@@ -117,7 +117,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                         {
                             RelativeSizeAxes = Axes.Both,
 
-                            Alpha = 0.1f,
+                            Alpha = 0.5f,
                             Colour = Color4.Black,
 
                             TriangleScale = 1.5f
@@ -139,14 +139,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
             {
                 Type = EdgeEffectType.Glow,
                 Colour = InnerColour,
-                Radius = 4f
+                Radius = 8f
             };
 
             if (Kiai)
             {
                 circle.EdgeEffect = new EdgeEffect
                 {
-                    Colour = new Color4(InnerColour.R, InnerColour.G, InnerColour.B, 0.75f),
+                    Colour = InnerColour,
                     Radius = 50,
                     Type = EdgeEffectType.Glow,
                 };

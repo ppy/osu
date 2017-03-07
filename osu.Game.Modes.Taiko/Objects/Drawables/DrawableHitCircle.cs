@@ -34,7 +34,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            ExplodeColour = colours.Pink;
+            ExplodeColour = colours.PinkDarker;
         }
 
         protected override CirclePiece CreateBody() => new DonCirclePiece();
@@ -54,7 +54,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            ExplodeColour = colours.Blue;
+            ExplodeColour = colours.BlueDarker;
         }
 
         protected override CirclePiece CreateBody() => new KatsuCirclePiece();

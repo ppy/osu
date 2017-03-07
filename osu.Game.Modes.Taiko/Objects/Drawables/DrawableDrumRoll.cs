@@ -60,7 +60,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            ExplodeColour = colours.Yellow;
+            ExplodeColour = colours.YellowDarker;
         }
 
         protected override void LoadComplete()
