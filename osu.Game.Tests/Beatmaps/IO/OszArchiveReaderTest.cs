@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 using (var stream = new StreamReader(
                     reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                 {
-                    Assert.AreEqual("osu file format v13", stream.ReadLine().Trim());
+                    Assert.AreEqual("osu file format v13", stream.ReadLine()?.Trim());
                 }
             }
         }

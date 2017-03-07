@@ -11,17 +11,16 @@ namespace osu.Game.Modes.UI
     public abstract class Playfield : Container
     {
         public HitObjectContainer HitObjects;
-        private Container<Drawable> content;
 
         public virtual void Add(DrawableHitObject h) => HitObjects.Add(h);
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
-        protected override Container<Drawable> Content => content;
+        protected override Container<Drawable> Content { get; }
 
-        public Playfield()
+        protected Playfield()
         {
-            AddInternal(content = new ScaledContainer()
+            AddInternal(Content = new ScaledContainer
             {
                 RelativeSizeAxes = Axes.Both,
             });

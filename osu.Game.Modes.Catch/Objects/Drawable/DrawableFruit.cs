@@ -10,7 +10,7 @@ using OpenTK;
 
 namespace osu.Game.Modes.Catch.Objects.Drawable
 {
-    class DrawableFruit : Sprite
+    internal class DrawableFruit : Sprite
     {
         private CatchBaseHit h;
 

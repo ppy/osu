@@ -17,10 +17,9 @@ namespace osu.Game.Modes.UI
 {
     public class HealthDisplay : Container
     {
-        private Box background;
         private Container fill;
 
-        public BindableDouble Current = new BindableDouble()
+        public BindableDouble Current = new BindableDouble
         {
             MinValue = 0,
             MaxValue = 1
@@ -30,7 +29,7 @@ namespace osu.Game.Modes.UI
         {
             Children = new Drawable[]
             {
-                background = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,

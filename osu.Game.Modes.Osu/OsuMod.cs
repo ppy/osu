@@ -71,7 +71,7 @@ namespace osu.Game.Modes.Osu
         public override string Description => @"Spinners will be automatically completed";
         public override double ScoreMultiplier => 0.9;
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Autoplay, Mods.Cinema, Mods.Autopilot };
+        public override Mods[] DisablesMods => new[] { Mods.Autoplay, Mods.Cinema, Mods.Autopilot };
     }
 
     public class OsuModAutopilot : Mod
@@ -81,7 +81,7 @@ namespace osu.Game.Modes.Osu
         public override string Description => @"Automatic cursor movement - just follow the rhythm.";
         public override double ScoreMultiplier => 0;
         public override bool Ranked => false;
-        public override Mods[] DisablesMods => new Mods[] { Mods.SpunOut, Mods.Relax, Mods.SuddenDeath, Mods.Perfect, Mods.NoFail, Mods.Autoplay, Mods.Cinema };
+        public override Mods[] DisablesMods => new[] { Mods.SpunOut, Mods.Relax, Mods.SuddenDeath, Mods.Perfect, Mods.NoFail, Mods.Autoplay, Mods.Cinema };
     }
 
     public class OsuModTarget : Mod
