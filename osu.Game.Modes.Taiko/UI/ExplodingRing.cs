@@ -6,6 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -26,7 +27,7 @@ namespace osu.Game.Modes.Taiko.UI
             BorderColour = Color4.White;
             BorderThickness = 1;
 
-            Alpha = 0.5f;
+            Alpha = 0.15f;
 
             Children = new[]
             {
@@ -34,7 +35,7 @@ namespace osu.Game.Modes.Taiko.UI
                 {
                     RelativeSizeAxes = Axes.Both,
 
-                    Alpha = fill ? 0.5f : 0,
+                    Alpha = fill ? 1f : 0,
                     Colour = fillColour,
 
                     AlwaysPresent = true
@@ -46,7 +47,7 @@ namespace osu.Game.Modes.Taiko.UI
         {
             base.LoadComplete();
 
-            ScaleTo(5f, 500);
+            ScaleTo(5f, 500, EasingTypes.OutQuint);
             FadeOut(500);
 
             Expire();
