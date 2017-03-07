@@ -62,8 +62,7 @@ namespace osu.Game.Modes.Osu.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            if (InputManager?.ReplayInputHandler != null)
-                Add(new OsuCursorContainer { Colour = Color4.LightYellow });
+            AddInternal(new OsuCursorContainer { Colour = Color4.LightYellow });
         }
 
         public override void Add(DrawableHitObject<OsuHitObject> h)
