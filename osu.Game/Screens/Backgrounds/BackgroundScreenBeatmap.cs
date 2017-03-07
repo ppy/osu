@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Backgrounds
 
         public override bool Equals(BackgroundScreen other)
         {
-            var otherBeatmapBackground = (BackgroundScreenBeatmap)other;
+            var otherBeatmapBackground = other as BackgroundScreenBeatmap;
             if (otherBeatmapBackground == null) return false;
 
             return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;

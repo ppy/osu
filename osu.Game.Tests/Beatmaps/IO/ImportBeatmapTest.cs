@@ -91,7 +91,8 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 Assert.IsTrue(File.Exists(temp));
 
-                osu.Dependencies.Get<BeatmapDatabase>().Import(temp);
+                using (File.OpenRead(temp))
+                    osu.Dependencies.Get<BeatmapDatabase>().Import(temp);
 
                 ensureLoaded(osu);
 
