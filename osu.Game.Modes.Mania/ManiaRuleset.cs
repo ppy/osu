@@ -8,7 +8,6 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.Mania
 {
@@ -16,10 +15,7 @@ namespace osu.Game.Modes.Mania
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap, PlayerInputManager input = null) => new ManiaHitRenderer(beatmap)
-        {
-            InputManager = input,
-        };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new ManiaHitRenderer(beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {

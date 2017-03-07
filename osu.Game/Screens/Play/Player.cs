@@ -126,10 +126,15 @@ namespace osu.Game.Screens.Play
                 OnQuit = Exit
             };
 
-            hitRenderer = ruleset.CreateHitRendererWith(beatmap, new PlayerInputManager
+            hitRenderer = ruleset.CreateHitRendererWith(beatmap);
+
+            if (ReplayInputHandler != null)
             {
-                ReplayInputHandler = ReplayInputHandler
-            });
+                ReplayInputHandler.ToScreenSpace = hitRenderer.MapPlayfieldToScreenSpace;
+                hitRenderer.InputManager.ReplayInputHandler = ReplayInputHandler;
+            }
+
+            scoreOverlay.BindHitRenderer(hitRenderer);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
@@ -230,8 +235,8 @@ namespace osu.Game.Screens.Play
 
                 if (!Push(newPlayer))
                 {
-                // Error(?)
-            }
+                    // Error(?)
+                }
             });
         }
 
