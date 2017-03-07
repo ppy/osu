@@ -69,6 +69,7 @@ namespace osu.Game.Modes
         public override string Description => "Reduces overall difficulty - larger circles, more forgiving HP drain, less accuracy required.";
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
+        public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
     }
 
     public abstract class ModHidden : Mod
