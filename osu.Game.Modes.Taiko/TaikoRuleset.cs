@@ -86,5 +86,12 @@ namespace osu.Game.Modes.Taiko
         public override HitObjectParser CreateHitObjectParser() => new TaikoHitObjectParser();
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new TaikoDifficultyCalculator(beatmap);
+
+        public override Score CreateAutoplayScore(Beatmap beatmap)
+        {
+            var score = CreateScoreProcessor(beatmap).GetScore();
+            score.Replay = new TaikoAutoReplay(new TaikoConverter().Convert(beatmap));
+            return score;
+        }
     }
 }

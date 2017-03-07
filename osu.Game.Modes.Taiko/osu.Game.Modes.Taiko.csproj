@@ -66,6 +66,7 @@
     <Compile Include="Objects\TaikoDrumRollJudgementInfo.cs" />
     <Compile Include="Objects\TaikoScoreResult.cs" />
     <Compile Include="Objects\TaikoJudgementInfo.cs" />
+    <Compile Include="TaikoAutoReplay.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
     <Compile Include="Objects\TaikoConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
