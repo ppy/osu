@@ -8,11 +8,11 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseDialogOverlay : TestCase
+    internal class TestCaseDialogOverlay : TestCase
     {
         public override string Description => @"Display dialogs";
 
-        DialogOverlay overlay;
+        private DialogOverlay overlay;
 
         public override void Reset()
         {

@@ -7,7 +7,7 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game.Screens
 {
-    class Loader : OsuScreen
+    internal class Loader : OsuScreen
     {
         internal override bool ShowOverlays => false;
 

@@ -8,7 +8,7 @@ using osu.Game.Overlays;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseChatDisplay : TestCase
+    internal class TestCaseChatDisplay : TestCase
     {
         private ScheduledDelegate messageRequest;
 
@@ -18,7 +18,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            Add(new ChatOverlay()
+            Add(new ChatOverlay
             {
                 State = Visibility.Visible
             });

@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace osu.Game.Modes.Osu.Objects
 {
-    class OsuHitObjectDifficulty
+    internal class OsuHitObjectDifficulty
     {
         /// <summary>
         /// Factor by how much speed / aim strain decays per second.
@@ -63,7 +63,7 @@ namespace osu.Game.Modes.Osu.Objects
                 MaxCombo += slider.Ticks.Count();
 
             // We will scale everything by this factor, so we can assume a uniform CircleSize among beatmaps.
-            scalingFactor = (52.0f / circleRadius);
+            scalingFactor = 52.0f / circleRadius;
             if (circleRadius < 30)
             {
                 float smallCircleBonus = Math.Min(30.0f - circleRadius, 5.0f) / 50.0f;
@@ -130,7 +130,7 @@ namespace osu.Game.Modes.Osu.Objects
                     else if (distance > almost_diameter)
                         return 1.2 + 0.4 * (distance - almost_diameter) / (stream_spacing_threshold - almost_diameter);
                     else if (distance > almost_diameter / 2)
-                        return 0.95 + 0.25 * (distance - (almost_diameter / 2)) / (almost_diameter / 2);
+                        return 0.95 + 0.25 * (distance - almost_diameter / 2) / (almost_diameter / 2);
                     else
                         return 0.95;
 

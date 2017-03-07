@@ -13,11 +13,11 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    class LoginOverlay : FocusedOverlayContainer
+    internal class LoginOverlay : FocusedOverlayContainer
     {
         private LoginOptions optionsSection;
 
-        const float transition_time = 400;
+        private const float transition_time = 400;
 
         public LoginOverlay()
         {

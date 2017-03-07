@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select
         private BeatmapOptionsOverlay beatmapOptions;
         private Footer footer;
 
-        OsuScreen player;
+        private OsuScreen player;
 
         private FilterControl filter;
         public FilterControl Filter
@@ -159,10 +159,11 @@ namespace osu.Game.Screens.Select
                         if (player != null || Beatmap == null)
                             return;
 
+                        Beatmap.PreferredPlayMode = playMode.Value;
+
                         (player = new PlayerLoader(new Player
                         {
-                            BeatmapInfo = carousel.SelectedGroup.SelectedPanel.Beatmap,
-                            PreferredPlayMode = playMode.Value
+                            Beatmap = Beatmap, //eagerly set this so it's present before push.
                         })).LoadAsync(Game, l => Push(player));
                     }
                 },
@@ -335,6 +336,8 @@ namespace osu.Game.Screens.Select
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
             base.OnBeatmapChanged(beatmap);
+
+            beatmap.Mods.BindTo(modSelect.SelectedMods);
 
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);

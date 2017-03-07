@@ -70,6 +70,7 @@
     <Compile Include="Objects\OsuHitObjectParser.cs" />
     <Compile Include="Objects\SliderCurve.cs" />
     <Compile Include="Objects\SliderTick.cs" />
+    <Compile Include="OsuAutoReplay.cs" />
     <Compile Include="OsuDifficultyCalculator.cs" />
     <Compile Include="OsuScore.cs" />
     <Compile Include="OsuScoreProcessor.cs" />

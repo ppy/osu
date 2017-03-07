@@ -51,7 +51,7 @@ namespace osu.Game.Modes.UI
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as ComboResultCounter).DisplayedCount = CurrentValue;
+                ((ComboResultCounter)d).DisplayedCount = CurrentValue;
             }
         }
     }

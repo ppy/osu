@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private Box fill;
 
-        const float border_width = 3;
+        private const float border_width = 3;
         private Color4 glowingColour, idleColour;
 
         public Nub()

@@ -21,7 +21,7 @@ namespace osu.Game.Screens
     {
         private BackButton popButton;
 
-        const int transition_time = 1000;
+        private const int transition_time = 1000;
 
         protected virtual IEnumerable<Type> PossibleChildren => null;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Screens
 
         protected override bool OnExiting(Screen next)
         {
-            textContainer.MoveTo(new Vector2((DrawSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2(DrawSize.X / 16, 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
 
             return base.OnExiting(next);

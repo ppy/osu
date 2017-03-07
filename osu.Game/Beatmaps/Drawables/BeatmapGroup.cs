@@ -10,7 +10,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class BeatmapGroup : IStateful<BeatmapGroupState>
+    internal class BeatmapGroup : IStateful<BeatmapGroupState>
     {
         public BeatmapPanel SelectedPanel;
 

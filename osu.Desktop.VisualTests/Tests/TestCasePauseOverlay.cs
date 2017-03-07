@@ -7,7 +7,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCasePauseOverlay : TestCase
+    internal class TestCasePauseOverlay : TestCase
     {
         public override string Description => @"Tests the pause overlay";
 

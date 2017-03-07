@@ -34,7 +34,7 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                fill = new Box()
+                fill = new Box
                 {
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,

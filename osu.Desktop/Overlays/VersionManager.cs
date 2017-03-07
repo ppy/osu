@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -11,7 +10,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using Squirrel;
-using System.Reflection;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
@@ -78,7 +76,7 @@ namespace osu.Desktop.Overlays
                             TextSize = 12,
                             Colour = colours.Yellow,
                             Font = @"Venera",
-                            Text = $@"Development Build"
+                            Text = @"Development Build"
                         },
                         new Sprite
                         {
@@ -189,7 +187,7 @@ namespace osu.Desktop.Overlays
         {
         }
 
-        class UpdateProgressNotification : ProgressNotification
+        private class UpdateProgressNotification : ProgressNotification
         {
             protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification(this)
             {
