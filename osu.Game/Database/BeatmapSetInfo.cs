@@ -12,7 +12,7 @@ namespace osu.Game.Database
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
 
-        public int? OnlineBeatmapSetID { get; set; } = null;
+        public int? OnlineBeatmapSetID { get; set; }
 
         [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BeatmapMetadata Metadata { get; set; }

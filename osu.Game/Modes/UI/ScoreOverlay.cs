@@ -50,7 +50,7 @@ namespace osu.Game.Modes.UI
             AccuracyCounter?.Set(AccuracyCounter.Count - 0.01f);
         }
 
-        public ScoreOverlay()
+        protected ScoreOverlay()
         {
             RelativeSizeAxes = Axes.Both;
 

@@ -10,11 +10,11 @@ using System.Linq;
 
 namespace osu.Game.Screens.Play
 {
-    class PlayerInputManager : UserInputManager
+    internal class PlayerInputManager : UserInputManager
     {
-        bool leftViaKeyboard;
-        bool rightViaKeyboard;
-        Bindable<bool> mouseDisabled;
+        private bool leftViaKeyboard;
+        private bool rightViaKeyboard;
+        private Bindable<bool> mouseDisabled;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

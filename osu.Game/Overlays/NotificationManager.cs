@@ -69,7 +69,7 @@ namespace osu.Game.Overlays
             };
         }
 
-        int runningDepth = 0;
+        private int runningDepth;
 
         public void Post(Notification notification)
         {

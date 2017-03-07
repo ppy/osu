@@ -29,7 +29,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             set { Disc.Colour = value; }
         }
 
-        Color4 completeColour;
+        private Color4 completeColour;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -37,7 +37,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             completeColour = colours.YellowLight.Opacity(0.8f);
         }
 
-        class SpinnerBorder : Container
+        private class SpinnerBorder : Container
         {
             public SpinnerBorder()
             {
@@ -116,7 +116,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             };
         }
 
-        bool tracking;
+        private bool tracking;
         public bool Tracking
         {
             get { return tracking; }
@@ -130,7 +130,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             }
         }
 
-        bool complete;
+        private bool complete;
         public bool Complete
         {
             get { return complete; }

@@ -46,12 +46,12 @@ namespace osu.Game.Overlays.Options
 
         private Bindable<T> bindable;
 
-        void bindable_ValueChanged(object sender, EventArgs e)
+        private void bindable_ValueChanged(object sender, EventArgs e)
         {
             dropdown.SelectedValue = bindable.Value;
         }
 
-        void dropdown_ValueChanged(object sender, EventArgs e)
+        private void dropdown_ValueChanged(object sender, EventArgs e)
         {
             bindable.Value = dropdown.SelectedValue;
         }

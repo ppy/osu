@@ -145,7 +145,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        class Star : Container
+        private class Star : Container
         {
             public TextAwesome Icon;
             public Star()

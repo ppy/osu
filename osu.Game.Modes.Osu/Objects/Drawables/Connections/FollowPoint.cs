@@ -17,7 +17,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
         public double EndTime;
         public Vector2 EndPosition;
 
-        const float width = 8;
+        private const float width = 8;
 
         public FollowPoint()
         {

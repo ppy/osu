@@ -17,7 +17,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
         }
 
-        public override JudgementInfo CreateJudgementInfo() => new OsuJudgementInfo { MaxScore = OsuScoreResult.Hit300 };
+        protected override JudgementInfo CreateJudgementInfo() => new OsuJudgementInfo { MaxScore = OsuScoreResult.Hit300 };
 
         protected override void UpdateState(ArmedState state)
         {

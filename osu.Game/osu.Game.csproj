@@ -194,7 +194,6 @@
     <Compile Include="Online\API\OAuth.cs" />
     <Compile Include="Online\API\OAuthToken.cs" />
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
-    <Compile Include="Online\API\SecurePassword.cs" />
     <Compile Include="Online\API\Requests\ListChannels.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\Drawables\DrawableChannel.cs" />

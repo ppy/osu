@@ -7,7 +7,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit
 {
-    class Editor : ScreenWhiteBox
+    internal class Editor : ScreenWhiteBox
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 

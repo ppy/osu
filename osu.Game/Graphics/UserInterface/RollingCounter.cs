@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
         /// Type of the Transform to use.
         /// </summary>
         /// <remarks>
-        /// Must be a subclass of Transform<T>
+        /// Must be a subclass of Transform(T)
         /// </remarks>
         protected virtual Type TransformType => typeof(Transform<T>);
 
@@ -107,7 +107,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             Children = new Drawable[]
             {
-                DisplayedCountSpriteText = new OsuSpriteText()
+                DisplayedCountSpriteText = new OsuSpriteText
                 {
                     Font = @"Venera"
                 },
