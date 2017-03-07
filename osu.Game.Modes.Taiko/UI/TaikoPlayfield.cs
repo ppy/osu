@@ -110,10 +110,10 @@ namespace osu.Game.Modes.Taiko.UI
             // Judgements
             AddInternal(judgementContainer = new Container<JudgementText>()
             {
-                Origin = Anchor.BottomCentre,
-
                 RelativePositionAxes = Axes.Both,
+                RelativeSizeAxes = HitObjects.RelativeSizeAxes,
                 Position = new Vector2(left_area_size + hit_target_offset * (1f - left_area_size), 0),
+                Size = HitObjects.Size,
 
                 BlendingMode = BlendingMode.Additive
             });
@@ -217,6 +217,9 @@ namespace osu.Game.Modes.Taiko.UI
 
             judgementContainer.Add(new JudgementText()
             {
+                RelativePositionAxes = Axes.X,
+                Position = new Vector2(h.Position.X, 0),
+
                 Text = judgementString,
                 GlowColour = dth.ExplodeColour
             });

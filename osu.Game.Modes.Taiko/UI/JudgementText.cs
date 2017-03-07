@@ -24,7 +24,6 @@ namespace osu.Game.Modes.Taiko.UI
 
         public JudgementText()
         {
-            Anchor = Anchor.Centre;
             Origin = Anchor.BottomCentre;
 
             AutoSizeAxes = Axes.Both;
