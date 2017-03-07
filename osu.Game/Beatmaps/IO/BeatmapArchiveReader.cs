@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.IO;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
