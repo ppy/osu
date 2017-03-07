@@ -9,7 +9,6 @@ using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -111,14 +110,7 @@ namespace osu.Game.Overlays.Mods
                 if (mod == value) return;
                 mod = value;
 
-                if (mod is MultiMod)
-                {
-                    Mods = ((MultiMod)mod).Mods;
-                }
-                else
-                {
-                    Mods = new[] { mod };
-                }
+                Mods = (mod as MultiMod)?.Mods ?? new[] { mod };
 
                 createIcons();
                 if (Mods.Length > 0)
@@ -185,7 +177,7 @@ namespace osu.Game.Overlays.Mods
         private void displayMod(Mod mod)
         {
             displayIcon.Icon = mod.Icon;
-            text.Text = mod.Name.GetDescription();
+            text.Text = mod.Name;
         }
 
         private void displaySelectedMod()
