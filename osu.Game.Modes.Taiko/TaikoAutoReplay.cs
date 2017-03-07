@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Modes.Taiko
 {
-    public class TaikoAutoReplay : LegacyReplay
+    public class TaikoAutoReplay : LegacyTaikoReplay
     {
         private List<TaikoHitObject> hitObjects;
 
