@@ -20,22 +20,27 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCasePlayer : TestCase
     {
-        private WorkingBeatmap beatmap;
+        protected Player Player;
+        private BeatmapDatabase db;
+
 
         public override string Description => @"Showing everything to play the game.";
 
         [BackgroundDependencyLoader]
         private void load(BeatmapDatabase db)
         {
-            // ReSharper disable once ReplaceWithSingleCallToFirstOrDefault (TableQuery doesn't have correct LINQ implementation for First/FirstOrDefault).
-            var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault();
-            if (beatmapInfo != null)
-                beatmap = db.GetWorkingBeatmap(beatmapInfo);
+            this.db = db;
         }
 
         public override void Reset()
         {
             base.Reset();
+
+            WorkingBeatmap beatmap = null;
+
+            var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault();
+            if (beatmapInfo != null)
+                beatmap = db.GetWorkingBeatmap(beatmapInfo);
 
             if (beatmap?.Track == null)
             {
@@ -82,14 +87,18 @@ namespace osu.Desktop.VisualTests.Tests
                 Colour = Color4.Black,
             });
 
-            Add(new PlayerLoader(new Player
-            {
-                PreferredPlayMode = PlayMode.Osu,
-                Beatmap = beatmap
-            })
+            Add(new PlayerLoader(Player = CreatePlayer(beatmap))
             {
                 Beatmap = beatmap
             });
+        }
+
+        protected virtual Player CreatePlayer(WorkingBeatmap beatmap)
+        {
+            return new Player
+            {
+                Beatmap = beatmap
+            };
         }
 
         private class TestWorkingBeatmap : WorkingBeatmap

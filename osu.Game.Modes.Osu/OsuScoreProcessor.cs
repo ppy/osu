@@ -8,7 +8,7 @@ namespace osu.Game.Modes.Osu
 {
     internal class OsuScoreProcessor : ScoreProcessor
     {
-        public OsuScoreProcessor(int hitObjectCount)
+        public OsuScoreProcessor(int hitObjectCount = 0)
             : base(hitObjectCount)
         {
             Health.Value = 1;

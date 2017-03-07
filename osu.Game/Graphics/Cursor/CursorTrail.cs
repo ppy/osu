@@ -31,7 +31,7 @@ namespace osu.Game.Graphics.Cursor
         private double timeOffset;
 
         private float time;
-        
+
         private TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
         private const int max_sprites = 2048;
 
@@ -74,6 +74,12 @@ namespace osu.Game.Graphics.Cursor
             shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.Texture);
             texture = textures.Get(@"Cursor/cursortrail");
             Scale = new Vector2(1 / texture.ScaleAdjust);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            resetTime();
         }
 
         protected override void Update()

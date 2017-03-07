@@ -185,10 +185,10 @@ namespace osu.Game.Modes.Osu.Objects
         }
 
         /// <summary>
-        /// Computes the position on the slider at a given progress that ranges from 0 (beginning of the slider)
-        /// to 1 (end of the slider).
+        /// Computes the position on the slider at a given progress that ranges from 0 (beginning of the curve)
+        /// to 1 (end of the curve).
         /// </summary>
-        /// <param name="progress">Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <param name="progress">Ranges from 0 (beginning of the curve) to 1 (end of the curve).</param>
         /// <returns></returns>
         public Vector2 PositionAt(double progress)
         {

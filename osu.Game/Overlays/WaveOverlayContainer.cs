@@ -136,6 +136,8 @@ namespace osu.Game.Overlays
 
             FadeIn(100, EasingTypes.OutQuint);
             contentContainer.MoveToY(0, APPEAR_DURATION, EasingTypes.OutQuint);
+
+            FadeIn(100, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
@@ -147,6 +149,8 @@ namespace osu.Game.Overlays
 
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Hidden;
+
+            FadeOut(DISAPPEAR_DURATION, EasingTypes.InQuint);
         }
 
         protected override void UpdateAfterChildren()

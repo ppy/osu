@@ -13,9 +13,9 @@ namespace osu.Game.Modes.Osu.UI
     {
         protected override HitObjectConverter<OsuHitObject> Converter => new OsuHitObjectConverter();
 
-        protected override Playfield CreatePlayfield() => new OsuPlayfield();
+        protected override Playfield<OsuHitObject> CreatePlayfield() => new OsuPlayfield();
 
-        protected override DrawableHitObject GetVisualRepresentation(OsuHitObject h)
+        protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {
             var circle = h as HitCircle;
             if (circle != null)

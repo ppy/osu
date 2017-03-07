@@ -23,9 +23,11 @@ using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
 using osu.Framework.Graphics.Primitives;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using osu.Framework.Threading;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Screens.Play;
 
 namespace osu.Game
 {
@@ -81,7 +83,7 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                ImportBeatmapsAsync(paths);
+                Task.Run(() => BeatmapDatabase.Import(paths));
             }
 
             Dependencies.Cache(this);
@@ -89,9 +91,41 @@ namespace osu.Game
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
         }
 
-        protected async void ImportBeatmapsAsync(IEnumerable<string> paths)
+        private ScheduledDelegate scoreLoad;
+
+        protected void LoadScore(Score s)
         {
-            await Task.Run(() => BeatmapDatabase.Import(paths));
+            scoreLoad?.Cancel();
+
+            var menu = intro.ChildScreen;
+
+            if (menu == null)
+            {
+                scoreLoad = Schedule(() => LoadScore(s));
+                return;
+            }
+
+            if (!menu.IsCurrentScreen)
+            {
+                menu.MakeCurrent();
+                Delay(500);
+                scoreLoad = Schedule(() => LoadScore(s));
+                return;
+            }
+
+            if (s.Beatmap == null)
+            {
+                notificationManager.Post(new SimpleNotification
+                {
+                    Text = @"Tried to load a score for a beatmap we don't have!",
+                    Icon = FontAwesome.fa_life_saver,
+                });
+                return;
+            }
+
+            Beatmap.Value = BeatmapDatabase.GetWorkingBeatmap(s.Beatmap);
+
+            menu.Push(new PlayerLoader(new Player { ReplayInputHandler = s.Replay.GetInputHandler() }));
         }
 
         protected override void LoadComplete()
