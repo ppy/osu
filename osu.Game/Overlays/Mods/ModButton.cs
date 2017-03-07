@@ -54,7 +54,8 @@ namespace osu.Game.Overlays.Mods
                 iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
                 foregroundIcon.Colour = Selected ? SelectedColour : ButtonColour;
 
-                displaySelectedMod();
+                if (mod != null)
+                    displayMod(SelectedMod ?? Mods[0]);
             }
         }
 
@@ -102,10 +103,18 @@ namespace osu.Game.Overlays.Mods
             }
             set
             {
-                if (mod == value) return;
                 mod = value;
 
-                Mods = (mod as MultiMod)?.Mods ?? new[] { mod };
+                if (mod == null)
+                {
+                    Mods = new Mod[0];
+                    Alpha = 0;
+                }
+                else
+                {
+                    Mods = (mod as MultiMod)?.Mods ?? new[] { mod };
+                    Alpha = 1;
+                }
 
                 createIcons();
                 if (Mods.Length > 0)
@@ -165,8 +174,6 @@ namespace osu.Game.Overlays.Mods
             text.Text = mod.Name;
         }
 
-        private void displaySelectedMod() => displayMod(SelectedMod ?? Mods[0]);
-
         private void createIcons()
         {
             iconsContainer.Clear();
@@ -216,6 +223,7 @@ namespace osu.Game.Overlays.Mods
             Direction = FillDirection.Vertical;
             Spacing = new Vector2(0f, -5f);
             Size = new Vector2(100f);
+            AlwaysPresent = true;
 
             Children = new Drawable[]
             {
