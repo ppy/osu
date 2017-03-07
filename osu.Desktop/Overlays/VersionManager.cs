@@ -76,7 +76,7 @@ namespace osu.Desktop.Overlays
                             TextSize = 12,
                             Colour = colours.Yellow,
                             Font = @"Venera",
-                            Text = $@"Development Build"
+                            Text = @"Development Build"
                         },
                         new Sprite
                         {
@@ -187,7 +187,7 @@ namespace osu.Desktop.Overlays
         {
         }
 
-        class UpdateProgressNotification : ProgressNotification
+        private class UpdateProgressNotification : ProgressNotification
         {
             protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification(this)
             {

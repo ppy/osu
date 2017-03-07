@@ -9,7 +9,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.Mania.Objects
 {
-    class ManiaConverter : HitObjectConverter<ManiaBaseHit>
+    internal class ManiaConverter : HitObjectConverter<ManiaBaseHit>
     {
         private readonly int columns;
 

@@ -292,7 +292,7 @@ namespace osu.Game.Screens.Menu
 
         public int ContractStyle;
 
-        ButtonState state;
+        private ButtonState state;
 
         public ButtonState State
         {

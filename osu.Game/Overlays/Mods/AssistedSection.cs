@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Mods
 {
     public class AssistedSection : ModSection
     {
-        protected override Key[] ToggleKeys => new Key[] { Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M };
+        protected override Key[] ToggleKeys => new[] { Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M };
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

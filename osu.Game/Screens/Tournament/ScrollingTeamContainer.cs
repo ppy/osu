@@ -296,7 +296,7 @@ namespace osu.Game.Screens.Tournament
             TransformFloatTo(speed, value, duration, easing, new TransformScrollSpeed());
         }
 
-        enum ScrollState
+        private enum ScrollState
         {
             None,
             Idle,

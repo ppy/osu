@@ -36,11 +36,11 @@ namespace osu.Game
 
         private RatioAdjust ratioContainer;
 
-        public CursorContainer Cursor;
+        protected CursorContainer Cursor;
 
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        protected AssemblyName AssemblyName => Assembly.GetEntryAssembly()?.GetName() ?? new AssemblyName() { Version = new Version() };
+        protected AssemblyName AssemblyName => Assembly.GetEntryAssembly()?.GetName() ?? new AssemblyName { Version = new Version() };
 
         public bool IsDeployedBuild => AssemblyName.Version.Major > 0;
 
@@ -51,6 +51,7 @@ namespace osu.Game
                 bool isDebug = false;
                 // Debug.Assert conditions are only evaluated in debug mode
                 Debug.Assert(isDebug = true);
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 return isDebug;
             }
         }

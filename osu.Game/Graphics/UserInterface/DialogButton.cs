@@ -100,7 +100,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Delay(click_duration);
             Schedule(delegate {
-                colourContainer.ResizeTo(new Vector2(0.8f, 1f), 0, EasingTypes.None);
+                colourContainer.ResizeTo(new Vector2(0.8f, 1f));
                 spriteText.Spacing = Vector2.Zero;
                 glowContainer.FadeOut();
             });

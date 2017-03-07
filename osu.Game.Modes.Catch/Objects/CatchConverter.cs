@@ -8,7 +8,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.Catch.Objects
 {
-    class CatchConverter : HitObjectConverter<CatchBaseHit>
+    internal class CatchConverter : HitObjectConverter<CatchBaseHit>
     {
         public override List<CatchBaseHit> Convert(Beatmap beatmap)
         {
