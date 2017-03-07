@@ -13,6 +13,7 @@ using OpenTK.Input;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
@@ -146,6 +147,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 case ArmedState.Idle:
                     break;
                 case ArmedState.Miss:
+                    bodyContainer.FadeColour(Color4.Red, 100, EasingTypes.OutQuint);
+                    bodyContainer.FadeOut(100);
                     break;
                 case ArmedState.Hit:
                     bodyContainer.ScaleTo(1.5f, 150, EasingTypes.OutQuint);

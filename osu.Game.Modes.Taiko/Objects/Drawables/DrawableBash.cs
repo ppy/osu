@@ -206,6 +206,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 case ArmedState.Idle:
                     break;
                 case ArmedState.Miss:
+                    bodyPiece.FadeColour(Color4.Red, 100, EasingTypes.OutQuint);
+                    bodyPiece.FadeOut(100);
+
+                    bashOuterRing.FadeColour(Color4.Red, 100, EasingTypes.OutQuint);
+                    bashOuterRing.FadeOut(100);
+
+                    bashInnerRing.FadeColour(Color4.Red, 100, EasingTypes.OutQuint);
+                    bashInnerRing.FadeOut(100);
                     break;
                 case ArmedState.Hit:
                     bodyPiece.ScaleTo(1.5f, 150, EasingTypes.OutQuint);
