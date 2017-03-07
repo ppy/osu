@@ -32,7 +32,7 @@ namespace osu.Game.Modes.Osu.UI
             }
         }
 
-        public OsuPlayfield()
+        public OsuPlayfield() : base(512)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -83,7 +83,7 @@ namespace osu.Game.Modes.Osu.UI
         public override void PostProcess()
         {
             connectionLayer.HitObjects = HitObjects.Children
-                .Select(d => (OsuHitObject)d.HitObject)
+                .Select(d => d.HitObject)
                 .OrderBy(h => h.StartTime);
         }
 
