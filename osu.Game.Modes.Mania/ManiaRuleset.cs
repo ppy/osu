@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Input;
 using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Game.Modes.Mania.UI;
@@ -98,7 +97,7 @@ namespace osu.Game.Modes.Mania
 
         public override FontAwesome Icon => FontAwesome.fa_osu_mania_o;
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => null;
+        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
 
         public override HitObjectParser CreateHitObjectParser() => new NullHitObjectParser();
 
