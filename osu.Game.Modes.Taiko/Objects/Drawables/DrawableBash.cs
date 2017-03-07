@@ -221,23 +221,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             }
         }
 
-        double lastAutoHitTime;
-        protected override void UpdateAuto()
-        {
-            Bash spinner = HitObject as Bash;
-            if (spinner.RequiredHits > 0 && (Time.Current - lastAutoHitTime) >= HitObject.Duration / spinner.RequiredHits)
-            {
-                UpdateJudgement(true);
-
-                lastAutoHitTime += HitObject.Duration / spinner.RequiredHits;
-            }
-        }
-
         protected override void Update()
         {
             MoveToOffset(Math.Min(Time.Current, HitObject.StartTime));
-
-            UpdateAuto();
         }
     }
 }

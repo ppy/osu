@@ -147,7 +147,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         protected override void Update()
         {
             // Drum roll ticks don't move
-            base.UpdateAuto();
         }
     }
 }
