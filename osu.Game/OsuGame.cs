@@ -27,6 +27,8 @@ using osu.Framework.Graphics.Primitives;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
 
 namespace osu.Game
 {
@@ -88,7 +90,12 @@ namespace osu.Game
             Dependencies.Cache(this);
 
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
+
+            wheelDisabled = LocalConfig.GetBindable<bool>(OsuConfig.MouseDisableWheel);
+
+            playing.ValueChanged += delegate { options.State = Visibility.Hidden; };
         }
+        
 
         protected async void ImportBeatmapsAsync(IEnumerable<string> paths)
         {
@@ -103,13 +110,17 @@ namespace osu.Game
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ActionRequested = delegate(InputState state) { volume.Adjust(state); }
+                    ActionRequested = delegate(InputState state) { volume.Adjust(state); },
+                    DisableWheel = playing,
                 },
                 mainContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                volume = new VolumeControl(),
+                volume = new VolumeControl()
+                {
+                    DisableWheel = playing,
+                },
                 overlayContent = new Container{ RelativeSizeAxes = Axes.Both },
                 new GlobalHotkeys //exists because UserInputManager is at a level below us.
                 {
@@ -207,7 +218,7 @@ namespace osu.Game
                     return true;
             }
 
-            if (state.Keyboard.ControlPressed)
+            if (state.Keyboard.ControlPressed && !playing)
             {
                 switch (args.Key)
                 {
@@ -275,16 +286,30 @@ namespace osu.Game
                 intro.ChildScreen.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
         }
 
+        //TODO: better name
+        private Bindable<bool> playing = new Bindable<bool>();
+
+        private Bindable<bool> wheelDisabled;
+
         private void screenAdded(Screen newScreen)
         {
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
+            
+            if (newScreen is Player && wheelDisabled)
+                playing.Value = true;
 
             modeChanged(newScreen);
         }
 
         private void screenRemoved(Screen newScreen)
         {
+            Screen scr = screenStack;
+            while (scr.ChildScreen != null)
+                scr = scr.ChildScreen;
+            if (scr is Player)
+                playing.Value = false;
+
             modeChanged(newScreen);
         }
     }

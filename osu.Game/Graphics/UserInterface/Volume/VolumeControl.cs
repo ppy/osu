@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -18,6 +19,16 @@ namespace osu.Game.Graphics.UserInterface.Volume
         private VolumeMeter volumeMeterMaster;
 
         protected override bool HideOnEscape => false;
+
+        public Bindable<bool> DisableWheel
+        {
+            set
+            {
+                volumeMeterMaster.WheelDisabled = value;
+                volumeMeterEffect.WheelDisabled = value;
+                volumeMeterMusic.WheelDisabled = value;
+            }
+        }
 
         private void volumeChanged(object sender, EventArgs e)
         {
@@ -57,6 +68,8 @@ namespace osu.Game.Graphics.UserInterface.Volume
             volumeMeterMaster.Bindable.ValueChanged += volumeChanged;
             volumeMeterEffect.Bindable.ValueChanged += volumeChanged;
             volumeMeterMusic.Bindable.ValueChanged += volumeChanged;
+
+
         }
 
         protected override void Dispose(bool isDisposing)

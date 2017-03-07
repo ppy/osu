@@ -17,6 +17,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
     {
         private Box meterFill;
         public BindableDouble Bindable { get; private set; } = new BindableDouble();
+        public Bindable<bool> WheelDisabled;
 
         public VolumeMeter(string meterName)
         {
@@ -79,7 +80,8 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         protected override bool OnWheel(InputState state)
         {
-            Volume += 0.05f * state.Mouse.WheelDelta;
+            if(WheelDisabled?.Value == false)
+                Volume += 0.05f * state.Mouse.WheelDelta;
             return true;
         }
 
