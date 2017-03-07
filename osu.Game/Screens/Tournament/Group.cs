@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Tournament
             return sb.ToString();
         }
 
-        class GroupTeam : Container
+        private class GroupTeam : Container
         {
             public Team Team;
 

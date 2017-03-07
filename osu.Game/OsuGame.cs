@@ -13,7 +13,6 @@ using osu.Game.Input;
 using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
-using osu.Game.Database;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Timing;
@@ -32,8 +31,6 @@ namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
-        public virtual bool IsDeployedBuild => false;
-
         public Toolbar Toolbar;
 
         private ChatOverlay chat;
@@ -61,7 +58,7 @@ namespace osu.Game
 
         public Bindable<PlayMode> PlayMode;
 
-        string[] args;
+        private string[] args;
 
         private OptionsOverlay options;
 
@@ -129,7 +126,7 @@ namespace osu.Game
             //overlay elements
             (chat = new ChatOverlay { Depth = 0 }).LoadAsync(this, overlayContent.Add);
             (options = new OptionsOverlay { Depth = -1 }).LoadAsync(this, overlayContent.Add);
-            (musicController = new MusicController()
+            (musicController = new MusicController
             {
                 Depth = -2,
                 Position = new Vector2(0, Toolbar.HEIGHT),
@@ -194,7 +191,7 @@ namespace osu.Game
 
         private bool globalHotkeyPressed(InputState state, KeyDownEventArgs args)
         {
-            if (args.Repeat) return false;
+            if (args.Repeat || intro == null) return false;
 
             switch (args.Key)
             {
@@ -203,9 +200,11 @@ namespace osu.Game
                     return true;
                 case Key.PageUp:
                 case Key.PageDown:
-                    var rate = ((Clock as ThrottledFrameClock).Source as StopwatchClock).Rate * (args.Key == Key.PageUp ? 1.1f : 0.9f);
-                    ((Clock as ThrottledFrameClock).Source as StopwatchClock).Rate = rate;
-                    Logger.Log($@"Adjusting game clock to {rate}", LoggingTarget.Debug);
+                    var swClock = (Clock as ThrottledFrameClock)?.Source as StopwatchClock;
+                    if (swClock == null) return false;
+
+                    swClock.Rate *= args.Key == Key.PageUp ? 1.1f : 0.9f;
+                    Logger.Log($@"Adjusting game clock to {swClock.Rate}", LoggingTarget.Debug);
                     return true;
             }
 

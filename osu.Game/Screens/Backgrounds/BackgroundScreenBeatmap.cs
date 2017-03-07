@@ -68,10 +68,13 @@ namespace osu.Game.Screens.Backgrounds
 
         public override bool Equals(BackgroundScreen other)
         {
-            return base.Equals(other) && beatmap == ((BackgroundScreenBeatmap)other).Beatmap;
+            var otherBeatmapBackground = other as BackgroundScreenBeatmap;
+            if (otherBeatmapBackground == null) return false;
+
+            return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
-        class BeatmapBackground : Background
+        private class BeatmapBackground : Background
         {
             private WorkingBeatmap beatmap;
 

@@ -12,7 +12,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class DifficultyIcon : Container
+    internal class DifficultyIcon : Container
     {
         private readonly BeatmapInfo beatmap;
         private OsuColour palette;
@@ -34,6 +34,7 @@ namespace osu.Game.Beatmaps.Drawables
                 new TextAwesome
                 {
                     Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     TextSize = Size.X,
                     Colour = getColour(beatmap),
                     Icon = FontAwesome.fa_circle
@@ -41,6 +42,7 @@ namespace osu.Game.Beatmaps.Drawables
                 new TextAwesome
                 {
                     Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     TextSize = Size.X,
                     Colour = Color4.White,
                     Icon = Ruleset.GetRuleset(beatmap.Mode).Icon
@@ -48,7 +50,7 @@ namespace osu.Game.Beatmaps.Drawables
             };
         }
 
-        enum DifficultyRating
+        private enum DifficultyRating
         {
             Easy,
             Normal,

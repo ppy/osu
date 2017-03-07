@@ -24,11 +24,11 @@ namespace osu.Game.Modes.Objects.Drawables
 
         public JudgementInfo Judgement;
 
-        public abstract JudgementInfo CreateJudgementInfo();
+        protected abstract JudgementInfo CreateJudgementInfo();
 
         public HitObject HitObject;
 
-        public DrawableHitObject(HitObject hitObject)
+        protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
         }
@@ -52,12 +52,15 @@ namespace osu.Game.Modes.Objects.Drawables
             }
         }
 
-        SampleChannel sample;
+        private SampleChannel sample;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            string hitType = ((HitObject.Sample?.Type ?? SampleType.None) == SampleType.None ? SampleType.Normal : HitObject.Sample.Type).ToString().ToLower();
+            SampleType type = HitObject.Sample?.Type ?? SampleType.None;
+            if (type == SampleType.None)
+                type = SampleType.Normal;
+            string hitType = type.ToString().ToLower();
             string sampleSet = (HitObject.Sample?.Set ?? SampleSet.Normal).ToString().ToLower();
 
             sample = audio.Sample.Get($@"Gameplay/{sampleSet}-hit{hitType}");
@@ -98,7 +101,6 @@ namespace osu.Game.Modes.Objects.Drawables
         /// <summary>
         /// Process a hit of this hitobject. Carries out judgement.
         /// </summary>
-        /// <param name="judgement">Preliminary judgement information provided by the hit source.</param>
         /// <returns>Whether a hit was processed.</returns>
         protected bool UpdateJudgement(bool userTriggered)
         {

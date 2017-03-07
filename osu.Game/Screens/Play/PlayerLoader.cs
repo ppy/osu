@@ -95,9 +95,9 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(next);
         }
 
-        class BeatmapMetadataDisplay : Container
+        private class BeatmapMetadataDisplay : Container
         {
-            class MetadataLine : Container
+            private class MetadataLine : Container
             {
                 public MetadataLine(string left, string right)
                 {
@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Play
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    new FillFlowContainer()
+                    new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
                         Origin = Anchor.TopCentre,

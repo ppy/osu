@@ -108,6 +108,7 @@ namespace osu.Game.Screens.Menu
                         {
                             Shadow = true,
                             Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             TextSize = 30,
                             Position = new Vector2(0, 0),
                             Icon = symbol
@@ -291,7 +292,7 @@ namespace osu.Game.Screens.Menu
 
         public int ContractStyle;
 
-        ButtonState state;
+        private ButtonState state;
 
         public ButtonState State
         {

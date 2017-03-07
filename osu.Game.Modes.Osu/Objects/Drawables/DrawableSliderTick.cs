@@ -26,7 +26,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         public override bool RemoveWhenNotAlive => false;
 
-        public override JudgementInfo CreateJudgementInfo() => new OsuJudgementInfo { MaxScore = OsuScoreResult.SliderTick };
+        protected override JudgementInfo CreateJudgementInfo() => new OsuJudgementInfo { MaxScore = OsuScoreResult.SliderTick };
 
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
@@ -71,7 +71,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void CheckJudgement(bool userTriggered)
         {
-            var j = Judgement as OsuJudgementInfo;
+            var j = (OsuJudgementInfo)Judgement;
 
             if (Judgement.TimeOffset >= 0)
             {

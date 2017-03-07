@@ -54,7 +54,7 @@ namespace osu.Game.Modes.UI
 
         protected virtual List<T> Convert(Beatmap beatmap) => Converter.Convert(beatmap);
 
-        public HitRenderer()
+        protected HitRenderer()
         {
             RelativeSizeAxes = Axes.Both;
         }

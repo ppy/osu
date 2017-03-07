@@ -13,11 +13,9 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Desktop
 {
-    class OsuGameDesktop : OsuGame
+    internal class OsuGameDesktop : OsuGame
     {
         private VersionManager versionManager;
-
-        public override bool IsDeployedBuild => versionManager.IsDeployedBuild;
 
         public OsuGameDesktop(string[] args = null)
             : base(args)
@@ -44,7 +42,7 @@ namespace osu.Desktop
             if (desktopWindow != null)
             {
                 desktopWindow.Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
-                desktopWindow.Title = @"osu!lazer";
+                desktopWindow.Title = Name;
 
                 desktopWindow.DragEnter += dragEnter;
                 desktopWindow.DragDrop += dragDrop;
@@ -66,10 +64,7 @@ namespace osu.Desktop
             if (isFile)
             {
                 var paths = (e.Data.GetData(DataFormats.FileDrop) as object[]).Select(f => f.ToString()).ToArray();
-                if (paths.Any(p => !p.EndsWith(".osz")))
-                    e.Effect = DragDropEffects.None;
-                else
-                    e.Effect = DragDropEffects.Copy;
+                e.Effect = paths.Any(p => !p.EndsWith(".osz")) ? DragDropEffects.None : DragDropEffects.Copy;
             }
         }
     }
