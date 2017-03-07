@@ -3,9 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects;
@@ -74,7 +71,7 @@ namespace osu.Game.Modes.Taiko
             {
                 if ((obj.Type & TaikoHitType.HitCircle) > 0)
                 {
-                    AddJudgement(new TaikoJudgementInfo()
+                    AddJudgement(new TaikoJudgementInfo
                     {
                         Result = HitResult.Hit,
                         Score = TaikoScoreResult.Great,
@@ -87,7 +84,7 @@ namespace osu.Game.Modes.Taiko
 
                     for (int i = 0; i < d.TotalTicks; i++)
                     {
-                        AddJudgement(new TaikoDrumRollTickJudgementInfo()
+                        AddJudgement(new TaikoDrumRollTickJudgementInfo
                         {
                             Result = HitResult.Hit,
                             Score = TaikoScoreResult.Great,
@@ -95,7 +92,7 @@ namespace osu.Game.Modes.Taiko
                         });
                     }
 
-                    AddJudgement(new TaikoJudgementInfo()
+                    AddJudgement(new TaikoJudgementInfo
                     {
                         Result = HitResult.Hit,
                         Score = TaikoScoreResult.Great,
@@ -104,7 +101,7 @@ namespace osu.Game.Modes.Taiko
                 }
                 else if ((obj.Type & TaikoHitType.Bash) > 0)
                 {
-                    AddJudgement(new TaikoJudgementInfo()
+                    AddJudgement(new TaikoJudgementInfo
                     {
                         Result = HitResult.Hit,
                         Score = TaikoScoreResult.Great
@@ -173,10 +170,12 @@ namespace osu.Game.Modes.Taiko
             int score = 0;
             int maxScore = 0;
 
-            foreach (TaikoJudgementInfo j in Judgements)
+            foreach (var judgementInfo in Judgements)
             {
-                score += j.AccuracyScoreValue;
-                maxScore += j.MaxAccuracyScoreValue;
+                TaikoJudgementInfo taikoJudgement = (TaikoJudgementInfo)judgementInfo;
+
+                score += taikoJudgement.AccuracyScoreValue;
+                maxScore += taikoJudgement.MaxAccuracyScoreValue;
             }
 
             Accuracy.Value = (double)score / maxScore;

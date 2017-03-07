@@ -20,7 +20,7 @@ namespace osu.Game.Modes.Taiko.UI
         public const float PLAYFIELD_BASE_HEIGHT = 242;
         public const float PLAYFIELD_SCALE = 0.65f;
 
-        public static float PLAYFIELD_HEIGHT => PLAYFIELD_BASE_HEIGHT * PLAYFIELD_SCALE;
+        public static float PlayfieldHeight => PLAYFIELD_BASE_HEIGHT * PLAYFIELD_SCALE;
 
         private static float left_area_size = 0.15f / PLAYFIELD_SCALE;
         private const float hit_target_offset = 0.1f;
@@ -42,12 +42,12 @@ namespace osu.Game.Modes.Taiko.UI
             RelativeSizeAxes = Axes.Both;
 
             // Right area under notes
-            AddInternal(leftBackgroundContainer = new Container()
+            AddInternal(leftBackgroundContainer = new Container
             {
                 RelativeSizeAxes = Axes.X,
                 RelativePositionAxes = Axes.X,
                 Position = new Vector2(left_area_size, 0),
-                Size = new Vector2(1f - left_area_size, PLAYFIELD_HEIGHT),
+                Size = new Vector2(1f - left_area_size, PlayfieldHeight),
 
                 BorderThickness = 2,
 
@@ -56,14 +56,14 @@ namespace osu.Game.Modes.Taiko.UI
                 Children = new Drawable[]
                 {
                     // Background
-                    leftBackground = new Box()
+                    leftBackground = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
 
                         Alpha = 0.5f
                     },
                     // Hit target
-                    new Container()
+                    new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         RelativePositionAxes = Axes.Both,
@@ -72,7 +72,7 @@ namespace osu.Game.Modes.Taiko.UI
 
                         Children = new Drawable[]
                         {
-                            explosionRingContainer = new Container<ExplodingRing>()
+                            explosionRingContainer = new Container<ExplodingRing>
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.Centre,
@@ -82,7 +82,7 @@ namespace osu.Game.Modes.Taiko.UI
 
                                 BlendingMode = BlendingMode.Additive
                             },
-                            hitTarget = new HitTarget()
+                            hitTarget = new HitTarget
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.Centre,
@@ -101,10 +101,10 @@ namespace osu.Game.Modes.Taiko.UI
             HitObjects.RelativePositionAxes = Axes.X;
             HitObjects.RelativeSizeAxes = Axes.X;
             HitObjects.Position = new Vector2(left_area_size + hit_target_offset * (1f - left_area_size), 0);
-            HitObjects.Size = new Vector2(1f - left_area_size - hit_target_offset * (1f - left_area_size), PLAYFIELD_HEIGHT);
+            HitObjects.Size = new Vector2(1f - left_area_size - hit_target_offset * (1f - left_area_size), PlayfieldHeight);
 
             // Bar lines
-            AddInternal(barLineContainer = new Container<DrawableBarLine>()
+            AddInternal(barLineContainer = new Container<DrawableBarLine>
             {
                 RelativePositionAxes = HitObjects.RelativePositionAxes,
                 RelativeSizeAxes = HitObjects.RelativeSizeAxes,
@@ -113,7 +113,7 @@ namespace osu.Game.Modes.Taiko.UI
             });
 
             // Judgements
-            AddInternal(judgementContainer = new Container<JudgementText>()
+            AddInternal(judgementContainer = new Container<JudgementText>
             {
                 RelativePositionAxes = Axes.Both,
                 RelativeSizeAxes = HitObjects.RelativeSizeAxes,
@@ -124,10 +124,10 @@ namespace osu.Game.Modes.Taiko.UI
             });
 
             // Left area above notes
-            AddInternal(rightBackgroundContainer = new Container()
+            AddInternal(rightBackgroundContainer = new Container
             {
                 RelativeSizeAxes = Axes.X,
-                Size = new Vector2(left_area_size, PLAYFIELD_HEIGHT),
+                Size = new Vector2(left_area_size, PlayfieldHeight),
 
                 Masking = true,
 
@@ -136,11 +136,11 @@ namespace osu.Game.Modes.Taiko.UI
                 Children = new Drawable[]
                 {
                     // Background
-                    rightBackground = new Box()
+                    rightBackground = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    new Container()
+                    new Container
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -150,7 +150,7 @@ namespace osu.Game.Modes.Taiko.UI
 
                         Children = new Drawable[]
                         {
-                            new InputDrum()
+                            new InputDrum
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -196,6 +196,9 @@ namespace osu.Game.Modes.Taiko.UI
         {
             TaikoJudgementInfo tji = j as TaikoJudgementInfo;
             DrawableTaikoHitObject dth = h as DrawableTaikoHitObject;
+
+            if (dth == null)
+                return;
 
             // Add ring
             ExplodingRing ring = null;
@@ -247,7 +250,7 @@ namespace osu.Game.Modes.Taiko.UI
                 return;
 
             // Add judgement
-            judgementContainer.Add(new JudgementText()
+            judgementContainer.Add(new JudgementText
             {
                 Anchor = tji.Result == HitResult.Hit ? Anchor.TopLeft : Anchor.BottomLeft,
                 Origin = tji.Result == HitResult.Hit ? Anchor.BottomCentre : Anchor.TopCentre,

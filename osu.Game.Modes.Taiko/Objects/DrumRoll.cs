@@ -1,13 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using osu.Game.Modes.Osu.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.Samples;
@@ -85,15 +81,14 @@ namespace osu.Game.Modes.Taiko.Objects
                 bool first = true;
                 for (double t = StartTime; t < EndTime + (int)TickTimeDistance; t += TickTimeDistance)
                 {
-                    yield return new DrumRollTick()
+                    yield return new DrumRollTick
                     {
                         FirstTick = first,
                         PreEmpt = PreEmpt,
                         TickTimeDistance = TickTimeDistance,
                         Colour = Colour,
                         StartTime = t,
-                        Scale = Scale,
-                        Sample = new HitSampleInfo()
+                        Sample = new HitSampleInfo
                         {
                             Type = SampleType.None,
                             Set = SampleSet.Soft

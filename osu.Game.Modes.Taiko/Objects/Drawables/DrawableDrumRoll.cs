@@ -4,22 +4,12 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Logging;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
-using osu.Game.Modes.Taiko.UI;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
@@ -74,7 +64,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 // The body will over-shoot by CircleRadius on both sides. This is intended
                 // as it means the first tick is positioned after the semi-circle.
                 body = CreateBody(Size.X),
-                ticks = new Container<DrawableDrumRollTick>()
+                ticks = new Container<DrawableDrumRollTick>
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

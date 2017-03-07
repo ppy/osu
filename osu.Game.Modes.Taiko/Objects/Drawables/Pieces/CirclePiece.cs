@@ -3,16 +3,8 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using osu.Framework.Input;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics;
@@ -20,7 +12,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 {
-    class DonCirclePiece : CirclePiece
+    internal class DonCirclePiece : CirclePiece
     {
         protected override Color4 InnerColour { get; set; }
 
@@ -33,7 +25,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         protected override RingPiece CreateRing() => new DonRingPiece();
     }
 
-    class KatsuCirclePiece : CirclePiece
+    internal class KatsuCirclePiece : CirclePiece
     {
         protected override Color4 InnerColour { get; set; }
 
@@ -46,7 +38,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         protected override RingPiece CreateRing() => new KatsuRingPiece();
     }
 
-    class BashCirclePiece : CirclePiece
+    internal class BashCirclePiece : CirclePiece
     {
         protected override Color4 InnerColour { get; set; }
 

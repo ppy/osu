@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
-using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.Taiko.UI;
 using osu.Game.Modes.UI;
 using osu.Game.Beatmaps;

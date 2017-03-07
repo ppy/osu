@@ -56,7 +56,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
             Children = new[]
             {
-                backingGlowContainer = new CircularContainer()
+                backingGlowContainer = new CircularContainer
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -65,7 +65,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
                     Children = new[]
                     {
-                        new Box()
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
 
@@ -74,7 +74,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                         }
                     }
                 },
-                backgroundContainer = new CircularContainer()
+                backgroundContainer = new CircularContainer
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,

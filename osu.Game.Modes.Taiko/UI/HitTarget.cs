@@ -5,16 +5,10 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Modes.Taiko.Objects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -31,12 +25,12 @@ namespace osu.Game.Modes.Taiko.UI
         {
             Children = new Drawable[]
             {
-                new Box()
+                new Box
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
 
-                    Size = new Vector2(5, TaikoPlayfield.PLAYFIELD_HEIGHT),
+                    Size = new Vector2(5, TaikoPlayfield.PlayfieldHeight),
 
                     Colour = Color4.Black
                 },
@@ -49,14 +43,14 @@ namespace osu.Game.Modes.Taiko.UI
 
                     Children = new Drawable[]
                     {
-                        outer = new Sprite()
+                        outer = new Sprite
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
 
                             RelativeSizeAxes = Axes.Both,
                         },
-                        inner = new Sprite()
+                        inner = new Sprite
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -64,7 +58,7 @@ namespace osu.Game.Modes.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Size = new Vector2(1 / 1.5f)
                         },
-                        flashContainer = new Container()
+                        flashContainer = new Container
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -75,7 +69,7 @@ namespace osu.Game.Modes.Taiko.UI
 
                             Children = new Drawable[]
                             {
-                                outerFlash = new Container()
+                                outerFlash = new Container
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -87,7 +81,7 @@ namespace osu.Game.Modes.Taiko.UI
 
                                     Children = new Drawable[]
                                     {
-                                        outerFlash = new Container()
+                                        outerFlash = new Container
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
@@ -107,7 +101,7 @@ namespace osu.Game.Modes.Taiko.UI
                                         }
                                     }
                                 },
-                                innerFlash = new CircularContainer()
+                                innerFlash = new CircularContainer
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -118,7 +112,7 @@ namespace osu.Game.Modes.Taiko.UI
 
                                     Children = new[]
                                     {
-                                        new Box()
+                                        new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
 
@@ -144,14 +138,14 @@ namespace osu.Game.Modes.Taiko.UI
         {
             outerFlash.Alpha = showOuter ? 0.3f : 0;
 
-            innerFlash.EdgeEffect = new EdgeEffect()
+            innerFlash.EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Glow,
                 Colour = colour,
                 Radius = 20
             };
 
-            outerFlash.EdgeEffect = new EdgeEffect()
+            outerFlash.EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Glow,
                 Colour = colour,

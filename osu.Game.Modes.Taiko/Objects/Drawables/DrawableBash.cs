@@ -7,16 +7,11 @@ using osu.Framework.Graphics;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Framework.Graphics.Containers;
 using OpenTK.Input;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -54,7 +49,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             Children = new Drawable[]
             {
                 // Outer ring (the one that the inner ring scales to)
-                bashOuterRing = new CircularContainer()
+                bashOuterRing = new CircularContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -68,7 +63,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
                     Children = new Drawable[]
                     {
-                        new Box()
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
 
@@ -76,7 +71,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                             AlwaysPresent = true
                         },
                         // Outer ring internal border
-                        new CircularContainer()
+                        new CircularContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -88,7 +83,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
                             Children = new[]
                             {
-                                new Box()
+                                new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
 
@@ -125,7 +120,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     }
                 },
                 // Inner circle
-                bodyPiece = new BashCirclePiece()
+                bodyPiece = new BashCirclePiece
                 {
                     Kiai = spinner.Kiai
                 },

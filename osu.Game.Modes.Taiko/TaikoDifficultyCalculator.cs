@@ -4,7 +4,6 @@
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Taiko.Objects;
-using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Modes.Taiko
@@ -19,7 +18,7 @@ namespace osu.Game.Modes.Taiko
 
         protected override HitObjectConverter<TaikoHitObject> Converter => new TaikoConverter();
 
-        protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
+        protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
         {
             return 0;
         }

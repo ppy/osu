@@ -6,15 +6,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
 using OpenTK.Graphics;
-using System.Diagnostics;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 
@@ -85,7 +81,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             Children = new Drawable[]
             {
-                bodyContainer = new Container()
+                bodyContainer = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -108,11 +104,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         protected override void CheckJudgement(bool userTriggered)
         {
-            TaikoHitObject tho = HitObject as TaikoHitObject;
-
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > tho.HitWindowGood)
+                if (Judgement.TimeOffset > HitObject.HitWindowGood)
                     Judgement.Result = HitResult.Miss;
                 return;
             }
@@ -120,18 +114,18 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             double hitOffset = Math.Abs(Judgement.TimeOffset);
 
             // Must be within great range to be hittable/missable
-            if (hitOffset > tho.HitWindowMiss)
+            if (hitOffset > HitObject.HitWindowMiss)
                 return;
 
             TaikoJudgementInfo tji = Judgement as TaikoJudgementInfo;
 
             if (!validKeyPressed)
                 Judgement.Result = HitResult.Miss;
-            else if (hitOffset < tho.HitWindowGood)
+            else if (hitOffset < HitObject.HitWindowGood)
             {
                 Judgement.Result = HitResult.Hit;
 
-                if (hitOffset < tho.HitWindowGreat)
+                if (hitOffset < HitObject.HitWindowGreat)
                     tji.Score = TaikoScoreResult.Great;
                 else
                     tji.Score = TaikoScoreResult.Good;

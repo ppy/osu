@@ -7,13 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
@@ -49,7 +45,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             RelativePositionAxes = Axes.X;
 
-            Size = new Vector2(24) * drumRollTick.Scale;
+            Size = new Vector2(24);
 
             Origin = Anchor.Centre;
             Anchor = Anchor.CentreLeft;

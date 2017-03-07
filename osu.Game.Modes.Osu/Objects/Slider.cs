@@ -4,7 +4,6 @@
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Samples;
-using osu.Game.Beatmaps.Timing;
 using System;
 using System.Collections.Generic;
 

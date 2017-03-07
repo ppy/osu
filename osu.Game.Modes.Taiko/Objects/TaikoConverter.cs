@@ -7,7 +7,6 @@ using osu.Game.Modes.Osu.Objects;
 using osu.Game.Beatmaps;
 using System;
 using osu.Game.Beatmaps.Timing;
-using OpenTK;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
@@ -30,7 +29,7 @@ namespace osu.Game.Modes.Taiko.Objects
 
                     if (o is Osu.Objects.HitCircle)
                     {
-                        h = new HitCircle()
+                        h = new HitCircle
                         {
                             StartTime = o.StartTime,
                             Sample = o.Sample,
@@ -70,7 +69,7 @@ namespace osu.Game.Modes.Taiko.Objects
                             {
                                 // Todo: This should generate circles with different sounds for when
                                 // beatmap object has multiple sound additions
-                                h = new HitCircle()
+                                h = new HitCircle
                                 {
                                     StartTime = j,
                                     Sample = slider.Sample,
@@ -84,7 +83,7 @@ namespace osu.Game.Modes.Taiko.Objects
                             continue;
                         }
 
-                        h = new DrumRoll()
+                        h = new DrumRoll
                         {
                             StartTime = o.StartTime,
                             Sample = o.Sample,
@@ -96,7 +95,7 @@ namespace osu.Game.Modes.Taiko.Objects
                     {
                         Spinner spinner = o as Osu.Objects.Spinner;
 
-                        h = new Bash()
+                        h = new Bash
                         {
                             StartTime = o.StartTime,
                             Sample = o.Sample,

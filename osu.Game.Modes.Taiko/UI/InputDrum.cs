@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,11 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Game.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -23,7 +18,7 @@ namespace osu.Game.Modes.Taiko.UI
     {
         public InputDrum()
         {
-            Size = new Vector2(TaikoPlayfield.PLAYFIELD_HEIGHT);
+            Size = new Vector2(TaikoPlayfield.PlayfieldHeight);
 
             Children = new Drawable[]
             {
@@ -69,14 +64,14 @@ namespace osu.Game.Modes.Taiko.UI
 
                 Children = new Drawable[]
                 {
-                    outer = new Sprite()
+                    outer = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
 
                         RelativeSizeAxes = Axes.Both
                     },
-                    outerHit = new Sprite()
+                    outerHit = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
@@ -87,7 +82,7 @@ namespace osu.Game.Modes.Taiko.UI
 
                         BlendingMode = BlendingMode.Additive
                     },
-                    inner = new Sprite()
+                    inner = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
@@ -95,7 +90,7 @@ namespace osu.Game.Modes.Taiko.UI
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.7f)
                     },
-                    innerHit = new Sprite()
+                    innerHit = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,

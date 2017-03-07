@@ -100,7 +100,7 @@ namespace osu.Game.Modes.Taiko.UI
 
                 if (time > current.Time || !current.OmitFirstBarLine)
                 {
-                    BarLine barLine = new BarLine()
+                    BarLine barLine = new BarLine
                     {
                         StartTime = time
                     };

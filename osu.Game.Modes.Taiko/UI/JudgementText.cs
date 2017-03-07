@@ -6,11 +6,6 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -30,7 +25,7 @@ namespace osu.Game.Modes.Taiko.UI
 
             Children = new Drawable[]
             {
-                new BufferedContainer()
+                new BufferedContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -45,7 +40,7 @@ namespace osu.Game.Modes.Taiko.UI
 
                     Children = new[]
                     {
-                        glowText = new OsuSpriteText()
+                        glowText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -55,7 +50,7 @@ namespace osu.Game.Modes.Taiko.UI
                         }
                     }
                 },
-                normalText = new OsuSpriteText()
+                normalText = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -74,7 +69,7 @@ namespace osu.Game.Modes.Taiko.UI
             glowText.Text = Text;
             normalText.Text = Text;
 
-            MoveToY(Direction * 50, 500);
+            MoveToY(Direction * 200, 2000);
             FadeOut(500);
             Expire();
         }
