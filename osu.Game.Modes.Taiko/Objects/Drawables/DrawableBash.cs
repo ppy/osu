@@ -135,8 +135,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            ExplodeColour = colours.Yellow;
-            bashOuterRing.BorderColour = colours.Yellow.Opacity(25);
+            ExplodeColour = colours.YellowDark;
+            bashOuterRing.BorderColour = colours.YellowDark.Opacity(25);
             innerRingBackground.Colour = colours.YellowDark;
         }
 

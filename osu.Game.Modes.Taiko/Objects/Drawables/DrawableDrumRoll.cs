@@ -83,6 +83,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 }
            };
 
+            body.Kiai = HitObject.Kiai;
+
             int tickIndex = 0;
             foreach (var tick in drumRoll.Ticks)
             {
@@ -122,7 +124,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             TaikoJudgementInfo taikoJudgement = Judgement as TaikoJudgementInfo;
 
-            int countHit = NestedHitObjects.Count(t => t.Judgement.Result.HasValue);
+            int countHit = NestedHitObjects.Count(t => t.Judgement.Result == HitResult.Hit);
 
             if (countHit > drumRoll.RequiredGoodHits)
             {

@@ -66,7 +66,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     Masking = true,
                     CornerRadius = Size.X / 2,
 
-                    BorderThickness = 3,
+                    BorderThickness = 6,
                     BorderColour = Color4.White,
 
                     Children = new[]

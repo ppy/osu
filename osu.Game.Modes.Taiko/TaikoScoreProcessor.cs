@@ -165,7 +165,8 @@ namespace osu.Game.Modes.Taiko
                     }
                     break;
                 case HitResult.Miss:
-                    Health.Value += hpIncreaseMiss;
+                    if (!(tji is TaikoDrumRollTickJudgementInfo))
+                        Health.Value += hpIncreaseMiss;
                     break;
             }
 

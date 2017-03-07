@@ -19,13 +19,13 @@ namespace osu.Game.Modes.Taiko.UI
         public Color4 GlowColour;
         public string Text;
 
+        public float Direction;
+
         private OsuSpriteText glowText;
         private OsuSpriteText normalText;
 
         public JudgementText()
         {
-            Origin = Anchor.BottomCentre;
-
             AutoSizeAxes = Axes.Both;
 
             Children = new Drawable[]
@@ -74,7 +74,7 @@ namespace osu.Game.Modes.Taiko.UI
             glowText.Text = Text;
             normalText.Text = Text;
 
-            MoveToY(-50, 500);
+            MoveToY(Direction * 50, 500);
             FadeOut(500);
             Expire();
         }

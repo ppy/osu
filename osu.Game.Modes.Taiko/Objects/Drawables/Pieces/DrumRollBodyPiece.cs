@@ -82,7 +82,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                     RelativeSizeAxes = Axes.Both,
 
                     BorderColour = Color4.White,
-                    BorderThickness = 4,
+                    BorderThickness = 8,
 
                     Children = new Drawable[]
                     {

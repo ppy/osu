@@ -77,7 +77,7 @@ namespace osu.Game.Modes.Taiko.UI
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.Centre,
                                 
-                                Size = new Vector2(128),
+                                Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
                                 Scale = new Vector2(PLAYFIELD_SCALE),
 
                                 BlendingMode = BlendingMode.Additive
@@ -85,7 +85,9 @@ namespace osu.Game.Modes.Taiko.UI
                             hitTarget = new HitTarget()
                             {
                                 Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.Centre
+                                Origin = Anchor.Centre,
+
+                                Scale = new Vector2(PLAYFIELD_SCALE)
                             }
                         }
                     },
@@ -234,17 +236,29 @@ namespace osu.Game.Modes.Taiko.UI
             else
                 judgementString = "MISS";
 
-            if (!(dth is DrawableDrumRollTick))
-            {
-                judgementContainer.Add(new JudgementText()
-                {
-                    RelativePositionAxes = Axes.X,
-                    Position = new Vector2(h.Position.X, 0),
+            float judgementOffset = tji.Result == HitResult.Hit ? h.Position.X : 0;
 
-                    Text = judgementString,
-                    GlowColour = dth.ExplodeColour
-                });
-            }
+            // Make drum roll judgements occur at 0 offset
+            if (dth is DrawableDrumRoll)
+                judgementOffset = 0;
+
+            // Drum roll ticks have no judgement
+            if (dth is DrawableDrumRollTick)
+                return;
+
+            // Add judgement
+            judgementContainer.Add(new JudgementText()
+            {
+                Anchor = tji.Result == HitResult.Hit ? Anchor.TopLeft : Anchor.BottomLeft,
+                Origin = tji.Result == HitResult.Hit ? Anchor.BottomCentre : Anchor.TopCentre,
+
+                RelativePositionAxes = Axes.X,
+                Position = new Vector2(judgementOffset, 0),
+
+                Text = judgementString,
+                GlowColour = dth.ExplodeColour,
+                Direction = tji.Result == HitResult.Hit ? -1 : 1
+            });
         }
     }
 }

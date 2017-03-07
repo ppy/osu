@@ -53,7 +53,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            InnerColour = colours.YellowDarker;
+            InnerColour = colours.YellowDark;
         }
 
         protected override RingPiece CreateRing() => new BashRingPiece();

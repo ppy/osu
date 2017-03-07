@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Modes.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,8 +29,6 @@ namespace osu.Game.Modes.Taiko.UI
 
         public HitTarget()
         {
-            AutoSizeAxes = Axes.Both;
-
             Children = new Drawable[]
             {
                 new Box()
@@ -46,8 +45,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
 
-                    Size = new Vector2(TaikoPlayfield.PLAYFIELD_HEIGHT),
-                    Scale = new Vector2(0.7f),
+                    Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2 * 1.5f),
 
                     Children = new Drawable[]
                     {
@@ -64,7 +62,7 @@ namespace osu.Game.Modes.Taiko.UI
                             Origin = Anchor.Centre,
 
                             RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.7f)
+                            Size = new Vector2(1 / 1.5f)
                         },
                         flashContainer = new Container()
                         {
