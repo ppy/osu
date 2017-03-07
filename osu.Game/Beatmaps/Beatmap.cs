@@ -90,6 +90,9 @@ namespace osu.Game.Beatmaps
         {
             overridePoint = null;
 
+            if (ControlPoints == null)
+                return ControlPoint.Default;
+
             ControlPoint timingPoint = null;
             foreach (var controlPoint in ControlPoints)
             {
