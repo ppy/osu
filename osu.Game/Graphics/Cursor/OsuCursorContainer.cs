@@ -17,7 +17,7 @@ using System;
 
 namespace osu.Game.Graphics.Cursor
 {
-    class OsuCursorContainer : CursorContainer
+    internal class OsuCursorContainer : CursorContainer
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 
@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.Cursor
             return base.OnMouseUp(state, args);
         }
 
-        class OsuCursor : Container
+        private class OsuCursor : Container
         {
             private Container cursorContainer;
             private Bindable<double> cursorScale;

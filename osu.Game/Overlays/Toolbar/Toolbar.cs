@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Toolbar
                     Children = new Drawable[]
                     {
                         new ToolbarSettingsButton(),
-                        new ToolbarHomeButton()
+                        new ToolbarHomeButton
                         {
                             Action = () => OnHome?.Invoke()
                         },
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Toolbar
             FadeOut(transition_time);
         }
 
-        class PassThroughFlowContainer : FillFlowContainer
+        private class PassThroughFlowContainer : FillFlowContainer
         {
             //needed to get input to the login overlay.
             public override bool Contains(Vector2 screenSpacePos) => true;

@@ -49,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as PercentageCounter).DisplayedCount = CurrentValue;
+                ((PercentageCounter)d).DisplayedCount = CurrentValue;
             }
         }
     }

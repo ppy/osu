@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Osu.UI
             Margin = new MarginPadding { Right = 5 },
         };
 
-        protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter()
+        protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter
         {
             Anchor = Anchor.TopCentre,
             Origin = Anchor.TopCentre,
@@ -31,7 +31,7 @@ namespace osu.Game.Modes.Osu.UI
             Margin = new MarginPadding { Right = 5 },
         };
 
-        protected override ComboCounter CreateComboCounter() => new OsuComboCounter()
+        protected override ComboCounter CreateComboCounter() => new OsuComboCounter
         {
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,

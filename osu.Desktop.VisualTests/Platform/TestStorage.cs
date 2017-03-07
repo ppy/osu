@@ -23,7 +23,7 @@ namespace osu.Desktop.VisualTests.Platform
                 platform = new SQLitePlatformWin32();
             else
                 platform = new SQLitePlatformGeneric();
-            return new SQLiteConnection(platform, $@":memory:");
+            return new SQLiteConnection(platform, @":memory:");
         }
     }
 }

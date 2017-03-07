@@ -27,7 +27,7 @@ namespace osu.Game.Modes.UI
         }
 
         private Color4 backgroundColour;
-        new public Color4 Colour
+        public new Color4 Colour
         {
             get
             {

@@ -18,7 +18,7 @@ using osu.Framework.Graphics.Primitives;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseScoreCounter : TestCase
+    internal class TestCaseScoreCounter : TestCase
     {
         public override string Description => @"Tests multiple counters";
 

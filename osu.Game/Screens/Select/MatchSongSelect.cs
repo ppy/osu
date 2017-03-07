@@ -5,7 +5,7 @@ using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Screens.Select
 {
-    class MatchSongSelect : ScreenWhiteBox
+    internal class MatchSongSelect : ScreenWhiteBox
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
     }

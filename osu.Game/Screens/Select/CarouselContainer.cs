@@ -18,7 +18,7 @@ using System.Diagnostics;
 
 namespace osu.Game.Screens.Select
 {
-    class CarouselContainer : ScrollContainer, IEnumerable<BeatmapGroup>
+    internal class CarouselContainer : ScrollContainer, IEnumerable<BeatmapGroup>
     {
         private Container<Panel> scrollableContent;
         private List<BeatmapGroup> groups = new List<BeatmapGroup>();
@@ -354,7 +354,7 @@ namespace osu.Game.Screens.Select
 
         public void SelectRandom()
         {
-            List<BeatmapGroup> visibleGroups = this.groups.Where((BeatmapGroup selectGroup) => selectGroup.State != BeatmapGroupState.Hidden).ToList();
+            List<BeatmapGroup> visibleGroups = groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden).ToList();
             if (visibleGroups.Count < 1)
                 return;
             BeatmapGroup group = visibleGroups[RNG.Next(visibleGroups.Count)];
