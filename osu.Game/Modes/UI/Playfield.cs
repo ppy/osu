@@ -2,12 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Play;
+using OpenTK;
 
 namespace osu.Game.Modes.UI
 {
@@ -18,22 +18,21 @@ namespace osu.Game.Modes.UI
 
         public virtual void Add(DrawableHitObject<T> h) => HitObjects.Add(h);
 
-        public class HitObjectContainer<U> : Container<U>
-            where U : Drawable
-        {
-            public override bool Contains(Vector2 screenSpacePos) => true;
-        }
-
         private Container<Drawable> scaledContent;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
         protected override Container<Drawable> Content { get; }
 
-        public Playfield()
+        /// <summary>
+        /// A container for keeping track of DrawableHitObjects.
+        /// </summary>
+        /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width.</param>
+        protected Playfield(float? customWidth = null)
         {
             AddInternal(scaledContent = new ScaledContainer
             {
+                CustomWidth = customWidth,
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
@@ -71,14 +70,16 @@ namespace osu.Game.Modes.UI
         {
         }
 
-        public class ScaledContainer : Container
+        private class ScaledContainer : Container
         {
-            protected override Vector2 DrawScale => new Vector2(DrawSize.X / 512);
+            public float? CustomWidth;
+
+            protected override Vector2 DrawScale => CustomWidth.HasValue ? new Vector2(DrawSize.X / CustomWidth.Value) : base.DrawScale;
 
             public override bool Contains(Vector2 screenSpacePos) => true;
         }
 
-        public class HitObjectContainer : Container<DrawableHitObject>
+        public class HitObjectContainer<U> : Container<U> where U : Drawable
         {
             public override bool Contains(Vector2 screenSpacePos) => true;
         }
