@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play
                         },
                         new OsuSpriteText
                         {
-                            Text = $" time{((value == 1) ? "" : "s")} in this session",
+                            Text = $" time{(value == 1 ? "" : "s")} in this session",
                             Shadow = true,
                             ShadowColour = new Color4(0, 0, 0, 0.25f),
                             TextSize = 18

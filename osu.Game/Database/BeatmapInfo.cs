@@ -15,9 +15,9 @@ namespace osu.Game.Database
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
 
-        public int? OnlineBeatmapID { get; set; } = null;
+        public int? OnlineBeatmapID { get; set; }
 
-        public int? OnlineBeatmapSetID { get; set; } = null;
+        public int? OnlineBeatmapSetID { get; set; }
 
         [ForeignKey(typeof(BeatmapSetInfo))]
         public int BeatmapSetInfoID { get; set; }
@@ -57,7 +57,7 @@ namespace osu.Game.Database
         {
             get
             {
-                return StoredBookmarks.Split(',').Select(b => int.Parse(b)).ToArray();
+                return StoredBookmarks.Split(',').Select(int.Parse).ToArray();
             }
             set
             {
@@ -77,7 +77,7 @@ namespace osu.Game.Database
         {
             get
             {
-                return (starDifficulty < 0) ? (BaseDifficulty?.OverallDifficulty ?? 5) : starDifficulty;
+                return starDifficulty < 0 ? (BaseDifficulty?.OverallDifficulty ?? 5) : starDifficulty;
             }
             
             set { starDifficulty = value; }

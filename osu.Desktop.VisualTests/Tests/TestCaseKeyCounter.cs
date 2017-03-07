@@ -15,7 +15,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseKeyCounter : TestCase
+    internal class TestCaseKeyCounter : TestCase
     {
         public override string Description => @"Tests key counter";
 

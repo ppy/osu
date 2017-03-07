@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Select.Options
             };
         }
 
-        class ButtonFlow : FillFlowContainer<BeatmapOptionsButton>
+        private class ButtonFlow : FillFlowContainer<BeatmapOptionsButton>
         {
             protected override IComparer<Drawable> DepthComparer => new ReverseCreationOrderDepthComparer();
             protected override IEnumerable<BeatmapOptionsButton> FlowingChildren => base.FlowingChildren.Reverse();

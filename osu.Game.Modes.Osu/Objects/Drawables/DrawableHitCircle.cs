@@ -49,7 +49,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                         return true;
                     },
                 },
-                number = new NumberPiece()
+                number = new NumberPiece
                 {
                     Text = h is Spinner ? "S" : (HitObject.ComboIndex + 1).ToString(),
                 },
@@ -59,7 +59,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 {
                     Colour = osuObject.Colour,
                 },
-                ApproachCircle = new ApproachCircle()
+                ApproachCircle = new ApproachCircle
                 {
                     Colour = osuObject.Colour,
                 }
@@ -69,9 +69,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             Size = circle.DrawSize;
         }
 
-        double hit50 = 150;
-        double hit100 = 80;
-        double hit300 = 30;
+        private double hit50 = 150;
+        private double hit100 = 80;
+        private double hit300 = 30;
 
         protected override void CheckJudgement(bool userTriggered)
         {
@@ -84,7 +84,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             double hitOffset = Math.Abs(Judgement.TimeOffset);
 
-            OsuJudgementInfo osuJudgement = Judgement as OsuJudgementInfo;
+            OsuJudgementInfo osuJudgement = (OsuJudgementInfo)Judgement;
 
             if (hitOffset < hit50)
             {

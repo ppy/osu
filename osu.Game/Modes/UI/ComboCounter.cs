@@ -260,7 +260,7 @@ namespace osu.Game.Modes.UI
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as ComboCounter).DisplayedCount = CurrentValue;
+                ((ComboCounter)d).DisplayedCount = CurrentValue;
             }
         }
 

@@ -120,7 +120,9 @@
     <Compile Include="Graphics\UserInterface\OsuDropDownHeader.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropDownMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropDownMenuItem.cs" />
+    <Compile Include="Overlays\Options\OptionsFooter.cs" />
     <Compile Include="Overlays\Options\Sections\DebugSection.cs" />
+    <Compile Include="Overlays\Options\Sections\Debug\GeneralOptions.cs" />
     <Compile Include="Overlays\Options\Sections\Debug\GCOptions.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarHomeButton.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarMusicButton.cs" />
@@ -192,7 +194,6 @@
     <Compile Include="Online\API\OAuth.cs" />
     <Compile Include="Online\API\OAuthToken.cs" />
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
-    <Compile Include="Online\API\SecurePassword.cs" />
     <Compile Include="Online\API\Requests\ListChannels.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\Drawables\DrawableChannel.cs" />

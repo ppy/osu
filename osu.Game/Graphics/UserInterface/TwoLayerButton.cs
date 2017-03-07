@@ -98,6 +98,7 @@ namespace osu.Game.Graphics.UserInterface
                         icon = new TextAwesome
                         {
                             Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             TextSize = 25,
                         },
                     }

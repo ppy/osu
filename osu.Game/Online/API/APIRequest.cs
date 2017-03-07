@@ -22,7 +22,7 @@ namespace osu.Game.Online.API
 
         private void onSuccess()
         {
-            Success?.Invoke((WebRequest as JsonWebRequest<T>).ResponseObject);
+            Success?.Invoke(((JsonWebRequest<T>)WebRequest).ResponseObject);
         }
 
         public new event APISuccessHandler<T> Success;
