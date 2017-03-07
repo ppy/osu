@@ -19,7 +19,7 @@ namespace osu.Game.Modes.Mania
     {
         public override string Description => @"The notes fade out before you hit them!";
         public override double ScoreMultiplier => 1.0;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Flashlight };
+        public override Mods[] DisablesMods => new[] { Mods.Flashlight };
     }
 
     public class ManiaModHardRock : ModHardRock
@@ -51,7 +51,7 @@ namespace osu.Game.Modes.Mania
     public class ManiaModFlashlight : ModFlashlight
     {
         public override double ScoreMultiplier => 1.0;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Hidden };
+        public override Mods[] DisablesMods => new[] { Mods.Hidden };
     }
 
     public class ManiaModPerfect : ModPerfect
@@ -66,7 +66,7 @@ namespace osu.Game.Modes.Mania
         public override string Description => @"";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Flashlight };
+        public override Mods[] DisablesMods => new[] { Mods.Flashlight };
     }
 
     public class ManiaModRandom : Mod

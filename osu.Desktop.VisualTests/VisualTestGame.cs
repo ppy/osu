@@ -7,13 +7,13 @@ using osu.Game.Screens.Backgrounds;
 
 namespace osu.Desktop.VisualTests
 {
-    class VisualTestGame : OsuGameBase
+    internal class VisualTestGame : OsuGameBase
     {
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            (new BackgroundScreenDefault() { Depth = 10 }).LoadAsync(this, AddInternal);
+            new BackgroundScreenDefault { Depth = 10 }.LoadAsync(this, AddInternal);
 
             // Have to construct this here, rather than in the constructor, because
             // we depend on some dependencies to be loaded within OsuGameBase.load().

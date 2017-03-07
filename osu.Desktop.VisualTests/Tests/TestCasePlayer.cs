@@ -18,7 +18,7 @@ using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCasePlayer : TestCase
+    internal class TestCasePlayer : TestCase
     {
         protected Player Player;
         private BeatmapDatabase db;
@@ -49,7 +49,7 @@ namespace osu.Desktop.VisualTests.Tests
                 int time = 1500;
                 for (int i = 0; i < 50; i++)
                 {
-                    objects.Add(new HitCircle()
+                    objects.Add(new HitCircle
                     {
                         StartTime = time,
                         Position = new Vector2(i % 4 == 0 || i % 4 == 2 ? 0 : 512,
@@ -101,7 +101,7 @@ namespace osu.Desktop.VisualTests.Tests
             };
         }
 
-        class TestWorkingBeatmap : WorkingBeatmap
+        private class TestWorkingBeatmap : WorkingBeatmap
         {
             public TestWorkingBeatmap(Beatmap beatmap)
                 : base(beatmap.BeatmapInfo, beatmap.BeatmapInfo.BeatmapSet)

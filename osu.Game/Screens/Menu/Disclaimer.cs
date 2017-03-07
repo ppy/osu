@@ -13,7 +13,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    class Disclaimer : OsuScreen
+    internal class Disclaimer : OsuScreen
     {
         private Intro intro;
         private TextAwesome icon;

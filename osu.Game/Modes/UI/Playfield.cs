@@ -29,7 +29,7 @@ namespace osu.Game.Modes.UI
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
-        protected override Container<Drawable> Content => content;
+        protected override Container<Drawable> Content { get; }
 
         private Container content;
 

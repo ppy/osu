@@ -3,7 +3,7 @@
 
 namespace osu.Game.Modes.Osu
 {
-    class OsuScore : Score
+    internal class OsuScore : Score
     {
     }
 }

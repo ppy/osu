@@ -17,8 +17,9 @@ namespace osu.Game.Beatmaps.Formats
 
         public static BeatmapDecoder GetDecoder(TextReader stream)
         {
-            var line = stream.ReadLine().Trim();
-            if (!decoders.ContainsKey(line))
+            var line = stream.ReadLine()?.Trim();
+
+            if (line == null || !decoders.ContainsKey(line))
                 throw new IOException(@"Unknown file format");
             return (BeatmapDecoder)Activator.CreateInstance(decoders[line]);
         }
