@@ -74,10 +74,10 @@ namespace osu.Game.Modes.Taiko.UI
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
 
-                                    Size = new Vector2(74.2f, 530),
+                                    Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2 * 1.5f, 680),
 
                                     Masking = true,
-                                    CornerRadius = 74.2f,
+                                    CornerRadius = TaikoHitObject.CIRCLE_RADIUS * 2 * 1.5f,
 
                                     Alpha = 0,
 
