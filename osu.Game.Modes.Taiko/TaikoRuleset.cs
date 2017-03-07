@@ -62,6 +62,8 @@ namespace osu.Game.Modes.Taiko
                     return new Mod[]
                     {
                         new TaikoModRelax(),
+                        null,
+                        null,
                         new MultiMod
                         {
                             Mods = new Mod[]
