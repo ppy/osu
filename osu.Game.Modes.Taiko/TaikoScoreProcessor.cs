@@ -26,6 +26,15 @@ namespace osu.Game.Modes.Taiko
         private const double combo_portion_ratio = 0.2f;
         private const double accuracy_portion_ratio = 0.8f;
 
+        public override Score GetScore() => new TaikoScore()
+        {
+            TotalScore = TotalScore,
+            Combo = Combo,
+            MaxCombo = HighestCombo,
+            Accuracy = Accuracy,
+            Health = Health,
+        };
+
         protected override bool ShouldFail => totalHits == maxTotalHits && Health.Value <= 0.5;
 
         private double comboScore => 1000000 * combo_portion_ratio * comboPortion / maxComboPortion;

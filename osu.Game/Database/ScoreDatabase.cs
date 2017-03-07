@@ -100,7 +100,7 @@ namespace osu.Game.Database
 
                     using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
                     using (var reader = new StreamReader(lzma))
-                        score.Replay = new LegacyReplay(reader);
+                        score.Replay = score.CreateLegacyReplayFrom(reader);
                 }
             }
             
