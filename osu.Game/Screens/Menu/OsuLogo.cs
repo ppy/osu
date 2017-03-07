@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Menu
                                     Origin = Anchor.Centre,
                                     Children = new Drawable[]
                                     {
-                                        ripple = new Sprite()
+                                        ripple = new Sprite
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,

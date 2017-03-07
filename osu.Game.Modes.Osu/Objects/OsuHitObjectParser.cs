@@ -30,11 +30,8 @@ namespace osu.Game.Modes.Osu.Objects
                     break;
                 case HitObjectType.Slider:
                     CurveTypes curveType = CurveTypes.Catmull;
-                    int repeatCount;
                     double length = 0;
-                    List<Vector2> points = new List<Vector2>();
-
-                    points.Add(new Vector2(int.Parse(split[0]), int.Parse(split[1])));
+                    List<Vector2> points = new List<Vector2> { new Vector2(int.Parse(split[0]), int.Parse(split[1])) };
 
                     string[] pointsplit = split[5].Split('|');
                     for (int i = 0; i < pointsplit.Length; i++)
@@ -67,12 +64,10 @@ namespace osu.Game.Modes.Osu.Objects
                         points.Add(v);
                     }
 
-                    repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
+                    int repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
 
                     if (repeatCount > 9000)
-                    {
-                        throw new ArgumentOutOfRangeException("wacky man");
-                    }
+                        throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
 
                     if (split.Length > 7)
                         length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);

@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.ComponentModel;
 using osu.Game.Graphics;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes
 {
@@ -41,6 +41,12 @@ namespace osu.Game.Modes
         /// The mods this mod cannot be enabled with.
         /// </summary>
         public virtual Type[] IncompatibleMods => new Type[] { };
+
+        /// <summary>
+        /// Direct access to the Player before load has run.
+        /// </summary>
+        /// <param name="player"></param>
+        public virtual void PlayerLoading(Player player) { }
     }
 
     public class MultiMod : Mod
@@ -69,6 +75,7 @@ namespace osu.Game.Modes
         public override string Description => "Reduces overall difficulty - larger circles, more forgiving HP drain, less accuracy required.";
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
+        public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
     }
 
     public abstract class ModHidden : Mod
@@ -144,6 +151,12 @@ namespace osu.Game.Modes
         public override string Description => "Watch a perfect automated play through the song";
         public override double ScoreMultiplier => 0;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModPerfect) };
+
+        public override void PlayerLoading(Player player)
+        {
+            base.PlayerLoading(player);
+            player.ReplayInputHandler = Ruleset.GetRuleset(player.Beatmap.PlayMode).CreateAutoplayScore(player.Beatmap.Beatmap)?.Replay?.GetInputHandler();
+        }
     }
 
     public abstract class ModPerfect : ModSuddenDeath

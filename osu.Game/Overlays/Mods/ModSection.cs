@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         private Color4 colour = Color4.White;
-        new public Color4 Colour
+        public new Color4 Colour
         {
             get
             {

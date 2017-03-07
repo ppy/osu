@@ -13,7 +13,7 @@ namespace osu.Game.Modes.Mania.UI
     /// </summary>
     public class ManiaComboCounter : TaikoComboCounter
     {
-        protected ushort KeysHeld = 0;
+        protected ushort KeysHeld;
 
         protected Color4 OriginalColour;
 
