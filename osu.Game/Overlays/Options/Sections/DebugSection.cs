@@ -16,6 +16,7 @@ namespace osu.Game.Overlays.Options.Sections
         {
             Children = new Drawable[]
             {
+                new GeneralOptions(),
                 new GCOptions(),
             };
         }

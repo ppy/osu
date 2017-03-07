@@ -16,22 +16,15 @@ namespace osu.Game.Modes.Objects.Drawables
 {
     public abstract class DrawableHitObject : Container, IStateful<ArmedState>
     {
-        public event Action<DrawableHitObject, JudgementInfo> OnJudgement;
-
         public override bool HandleInput => Interactive;
 
         public bool Interactive = true;
 
         public JudgementInfo Judgement;
 
-        public abstract JudgementInfo CreateJudgementInfo();
+        protected abstract JudgementInfo CreateJudgementInfo();
 
-        public HitObject HitObject;
-
-        public DrawableHitObject(HitObject hitObject)
-        {
-            HitObject = hitObject;
-        }
+        protected abstract void UpdateState(ArmedState state);
 
         private ArmedState state;
         public ArmedState State
@@ -52,20 +45,11 @@ namespace osu.Game.Modes.Objects.Drawables
             }
         }
 
-        SampleChannel sample;
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            string hitType = ((HitObject.Sample?.Type ?? SampleType.None) == SampleType.None ? SampleType.Normal : HitObject.Sample.Type).ToString().ToLower();
-            string sampleSet = (HitObject.Sample?.Set ?? SampleSet.Normal).ToString().ToLower();
-
-            sample = audio.Sample.Get($@"Gameplay/{sampleSet}-hit{hitType}");
-        }
+        protected SampleChannel Sample;
 
         protected virtual void PlaySample()
         {
-            sample?.Play();
+            Sample?.Play();
         }
 
         protected override void LoadComplete()
@@ -81,24 +65,23 @@ namespace osu.Game.Modes.Objects.Drawables
 
             Expire(true);
         }
+    }
 
-        private List<DrawableHitObject> nestedHitObjects;
+    public abstract class DrawableHitObject<HitObjectType> : DrawableHitObject
+        where HitObjectType : HitObject
+    {
+        public event Action<DrawableHitObject<HitObjectType>, JudgementInfo> OnJudgement;
 
-        protected IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects;
+        public HitObjectType HitObject;
 
-        protected void AddNested(DrawableHitObject h)
+        public DrawableHitObject(HitObjectType hitObject)
         {
-            if (nestedHitObjects == null)
-                nestedHitObjects = new List<DrawableHitObject>();
-
-            h.OnJudgement += (d, j) => { OnJudgement?.Invoke(d, j); } ;
-            nestedHitObjects.Add(h);
+            HitObject = hitObject;
         }
 
         /// <summary>
         /// Process a hit of this hitobject. Carries out judgement.
         /// </summary>
-        /// <param name="judgement">Preliminary judgement information provided by the hit source.</param>
         /// <returns>Whether a hit was processed.</returns>
         protected bool UpdateJudgement(bool userTriggered)
         {
@@ -143,7 +126,27 @@ namespace osu.Game.Modes.Objects.Drawables
             UpdateJudgement(false);
         }
 
-        protected abstract void UpdateState(ArmedState state);
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            string hitType = ((HitObject.Sample?.Type ?? SampleType.None) == SampleType.None ? SampleType.Normal : HitObject.Sample.Type).ToString().ToLower();
+            string sampleSet = (HitObject.Sample?.Set ?? SampleSet.Normal).ToString().ToLower();
+
+            Sample = audio.Sample.Get($@"Gameplay/{sampleSet}-hit{hitType}");
+        }
+
+        private List<DrawableHitObject<HitObjectType>> nestedHitObjects;
+
+        protected IEnumerable<DrawableHitObject<HitObjectType>> NestedHitObjects => nestedHitObjects;
+
+        protected void AddNested(DrawableHitObject<HitObjectType> h)
+        {
+            if (nestedHitObjects == null)
+                nestedHitObjects = new List<DrawableHitObject<HitObjectType>>();
+
+            h.OnJudgement += (d, j) => { OnJudgement?.Invoke(d, j); } ;
+            nestedHitObjects.Add(h);
+        }
     }
 
     public enum ArmedState

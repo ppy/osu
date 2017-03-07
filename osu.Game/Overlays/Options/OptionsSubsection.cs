@@ -11,8 +11,7 @@ namespace osu.Game.Overlays.Options
 {
     public abstract class OptionsSubsection : FillFlowContainer
     {
-        private Container<Drawable> content;
-        protected override Container<Drawable> Content => content;
+        protected override Container<Drawable> Content { get; }
 
         protected abstract string Header { get; }
 
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays.Options
                     Margin = new MarginPadding { Bottom = 10 },
                     Font = @"Exo2.0-Black",
                 },
-                content = new FillFlowContainer
+                Content = new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 5),

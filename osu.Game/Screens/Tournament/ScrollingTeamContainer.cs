@@ -121,10 +121,10 @@ namespace osu.Game.Screens.Tournament
                                 continue;
                             }
 
-                            float offset = Math.Abs(c.Position.X + c.DrawWidth / 2f - DrawWidth / 2f);
+                            float o = Math.Abs(c.Position.X + c.DrawWidth / 2f - DrawWidth / 2f);
                             float lastOffset = Math.Abs(closest.Position.X + closest.DrawWidth / 2f - DrawWidth / 2f);
 
-                            if (offset < lastOffset)
+                            if (o < lastOffset)
                                 closest = c;
                         }
 
@@ -296,7 +296,7 @@ namespace osu.Game.Screens.Tournament
             TransformFloatTo(speed, value, duration, easing, new TransformScrollSpeed());
         }
 
-        enum ScrollState
+        private enum ScrollState
         {
             None,
             Idle,

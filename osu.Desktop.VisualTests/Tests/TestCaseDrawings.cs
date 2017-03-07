@@ -2,22 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Platform;
 using osu.Framework.Screens.Testing;
 using osu.Game.Screens.Tournament;
 using osu.Game.Screens.Tournament.Teams;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseDrawings : TestCase
+    internal class TestCaseDrawings : TestCase
     {
         public override string Description => "Tournament drawings";
-
-        [BackgroundDependencyLoader]
-        private void load(Storage storage)
-        {
-        }
 
         public override void Reset()
         {
@@ -29,7 +22,7 @@ namespace osu.Desktop.VisualTests.Tests
             });
         }
 
-        class TestTeamList : ITeamList
+        private class TestTeamList : ITeamList
         {
             public IEnumerable<Team> Teams { get; } = new[]
             {

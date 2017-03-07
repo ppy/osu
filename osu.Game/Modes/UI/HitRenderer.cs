@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.UI
 {
@@ -19,24 +20,28 @@ namespace osu.Game.Modes.UI
 
         public event Action OnAllJudged;
 
+        public abstract bool AllObjectsJudged { get; }
+
         protected void TriggerOnJudgement(JudgementInfo j)
         {
             OnJudgement?.Invoke(j);
             if (AllObjectsJudged)
                 OnAllJudged?.Invoke();
         }
-
-        protected Playfield Playfield;
-
-        public bool AllObjectsJudged => Playfield.HitObjects.Children.First()?.Judgement.Result != null; //reverse depth sort means First() instead of Last().
-
-        public IEnumerable<DrawableHitObject> DrawableObjects => Playfield.HitObjects.Children;
     }
 
-    public abstract class HitRenderer<T> : HitRenderer
-        where T : HitObject
+    public abstract class HitRenderer<TObject> : HitRenderer
+        where TObject : HitObject
     {
-        private List<T> objects;
+        private List<TObject> objects;
+
+        public PlayerInputManager InputManager;
+
+        protected Playfield<TObject> Playfield;
+
+        public override bool AllObjectsJudged => Playfield.HitObjects.Children.First()?.Judgement.Result != null; //reverse depth sort means First() instead of Last().
+
+        public IEnumerable<DrawableHitObject> DrawableObjects => Playfield.HitObjects.Children;
 
         public Beatmap Beatmap
         {
@@ -48,13 +53,13 @@ namespace osu.Game.Modes.UI
             }
         }
 
-        protected abstract Playfield CreatePlayfield();
+        protected abstract Playfield<TObject> CreatePlayfield();
 
-        protected abstract HitObjectConverter<T> Converter { get; }
+        protected abstract HitObjectConverter<TObject> Converter { get; }
 
-        protected virtual List<T> Convert(Beatmap beatmap) => Converter.Convert(beatmap);
+        protected virtual List<TObject> Convert(Beatmap beatmap) => Converter.Convert(beatmap);
 
-        public HitRenderer()
+        protected HitRenderer()
         {
             RelativeSizeAxes = Axes.Both;
         }
@@ -62,10 +67,10 @@ namespace osu.Game.Modes.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
-            {
-                Playfield = CreatePlayfield()
-            };
+            Playfield = CreatePlayfield();
+            Playfield.InputManager = InputManager;
+
+            Add(Playfield);
 
             loadObjects();
         }
@@ -73,9 +78,9 @@ namespace osu.Game.Modes.UI
         private void loadObjects()
         {
             if (objects == null) return;
-            foreach (T h in objects)
+            foreach (TObject h in objects)
             {
-                var drawableObject = GetVisualRepresentation(h);
+                DrawableHitObject<TObject> drawableObject = GetVisualRepresentation(h);
 
                 if (drawableObject == null) continue;
 
@@ -86,8 +91,8 @@ namespace osu.Game.Modes.UI
             Playfield.PostProcess();
         }
 
-        private void onJudgement(DrawableHitObject o, JudgementInfo j) => TriggerOnJudgement(j);
+        private void onJudgement(DrawableHitObject<TObject> o, JudgementInfo j) => TriggerOnJudgement(j);
 
-        protected abstract DrawableHitObject GetVisualRepresentation(T h);
+        protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
     }
 }
