@@ -5,6 +5,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Modes.Taiko.UI
@@ -69,8 +70,13 @@ namespace osu.Game.Modes.Taiko.UI
             glowText.Text = Text;
             normalText.Text = Text;
 
-            MoveToY(Direction * 200, 2000);
-            FadeOut(500);
+            ScaleTo(1.5f, 250, EasingTypes.OutQuint);
+            MoveToY(Direction * 100, 500);
+
+            Delay(250);
+            ScaleTo(0.75f, 250);
+            FadeOut(250);
+
             Expire();
         }
     }
