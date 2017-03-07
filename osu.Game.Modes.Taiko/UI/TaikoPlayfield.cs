@@ -215,14 +215,17 @@ namespace osu.Game.Modes.Taiko.UI
                 }
             }
 
-            judgementContainer.Add(new JudgementText()
+            if (!(dth is DrawableDrumRollTick))
             {
-                RelativePositionAxes = Axes.X,
-                Position = new Vector2(h.Position.X, 0),
+                judgementContainer.Add(new JudgementText()
+                {
+                    RelativePositionAxes = Axes.X,
+                    Position = new Vector2(h.Position.X, 0),
 
-                Text = judgementString,
-                GlowColour = dth.ExplodeColour
-            });
+                    Text = judgementString,
+                    GlowColour = dth.ExplodeColour
+                });
+            }
         }
     }
 }
