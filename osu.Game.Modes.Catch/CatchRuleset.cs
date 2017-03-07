@@ -62,6 +62,8 @@ namespace osu.Game.Modes.Catch
                     return new Mod[]
                     {
                         new CatchModRelax(),
+                        null,
+                        null,
                         new MultiMod
                         {
                             Mods = new Mod[]
