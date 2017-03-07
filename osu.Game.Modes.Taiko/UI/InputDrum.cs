@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using System.Collections.Generic;
@@ -125,13 +126,13 @@ namespace osu.Game.Modes.Taiko.UI
                 if (args.Key == Keys[0])
                 {
                     innerHit.FadeIn();
-                    innerHit.Delay(20).FadeOut(20);
+                    innerHit.FadeOut(500, EasingTypes.OutQuint);
                 }
 
                 if (args.Key == Keys[1])
                 {
                     outerHit.FadeIn();
-                    outerHit.Delay(20).FadeOut(20);
+                    outerHit.FadeOut(500, EasingTypes.OutQuint);
                 }
 
                 return false;
