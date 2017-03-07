@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Tournament.Teams
                     {
                         while (sr.Peek() != -1)
                         {
-                            string line = sr.ReadLine().Trim();
+                            string line = sr.ReadLine()?.Trim();
 
                             if (string.IsNullOrEmpty(line))
                                 continue;
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Tournament.Teams
                             string acronym = split.Length >= 3 ? split[2].Trim() : teamName;
                             acronym = acronym.Substring(0, Math.Min(3, acronym.Length));
 
-                            teams.Add(new Team()
+                            teams.Add(new Team
                             {
                                 FlagName = flagName,
                                 FullName = teamName,

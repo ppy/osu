@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select
         private BeatmapOptionsOverlay beatmapOptions;
         private Footer footer;
 
-        OsuScreen player;
+        private OsuScreen player;
 
         private FilterControl filter;
         public FilterControl Filter

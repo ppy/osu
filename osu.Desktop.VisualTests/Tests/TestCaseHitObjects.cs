@@ -18,12 +18,12 @@ using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseHitObjects : TestCase
+    internal class TestCaseHitObjects : TestCase
     {
         private StopwatchClock rateAdjustClock;
         private FramedClock framedClock;
 
-        bool auto = false;
+        private bool auto;
 
         public TestCaseHitObjects()
         {
@@ -32,9 +32,9 @@ namespace osu.Desktop.VisualTests.Tests
             playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
         }
 
-        HitObjectType mode = HitObjectType.Slider;
+        private HitObjectType mode = HitObjectType.Slider;
 
-        BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
+        private BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
         private Container playfieldContainer;
         private Container approachContainer;
 
@@ -62,7 +62,7 @@ namespace osu.Desktop.VisualTests.Tests
                     add(new DrawableSlider(new Slider
                     {
                         StartTime = framedClock.CurrentTime + 600,
-                        ControlPoints = new List<Vector2>()
+                        ControlPoints = new List<Vector2>
                         {
                             new Vector2(-200, 0),
                             new Vector2(400, 0),
@@ -94,7 +94,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton(@"slider", () => load(HitObjectType.Slider));
             AddButton(@"spinner", () => load(HitObjectType.Spinner));
 
-            AddToggle(@"auto", (state) => { auto = state; load(mode); });
+            AddToggle(@"auto", state => { auto = state; load(mode); });
 
             ButtonsContainer.Add(new SpriteText { Text = "Playback Speed" });
             ButtonsContainer.Add(new BasicSliderBar<double>
@@ -123,8 +123,9 @@ namespace osu.Desktop.VisualTests.Tests
             load(mode);
         }
 
-        int depth;
-        void add(DrawableHitObject h)
+        private int depth;
+
+        private void add(DrawableHitObject h)
         {
             h.Anchor = Anchor.Centre;
             h.Depth = depth++;

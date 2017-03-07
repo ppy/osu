@@ -21,11 +21,12 @@ namespace osu.Game.Database
 {
     public class BeatmapDatabase
     {
-        private SQLiteConnection connection { get; set; }
+        private SQLiteConnection connection { get; }
         private Storage storage;
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
+        // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private BeatmapIPCChannel ipc;
 
         public BeatmapDatabase(Storage storage, IIpcHost importHost = null)
@@ -74,7 +75,7 @@ namespace osu.Game.Database
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $@"Could not delete beatmap {b.ToString()}");
+                    Logger.Error(e, $@"Could not delete beatmap {b}");
                 }
             }
 
@@ -150,7 +151,7 @@ namespace osu.Game.Database
                 catch (Exception e)
                 {
                     e = e.InnerException ?? e;
-                    Logger.Error(e, $@"Could not import beatmap set");
+                    Logger.Error(e, @"Could not import beatmap set");
                 }
 
             // Batch commit with multiple sets to database
@@ -325,8 +326,7 @@ namespace osu.Game.Database
             return item;
         }
 
-        readonly Type[] validTypes = new[]
-        {
+        private readonly Type[] validTypes = {
             typeof(BeatmapSetInfo),
             typeof(BeatmapInfo),
             typeof(BeatmapMetadata),
@@ -336,7 +336,7 @@ namespace osu.Game.Database
         public void Update<T>(T record, bool cascade = true) where T : class
         {
             if (validTypes.All(t => t != typeof(T)))
-                throw new ArgumentException(nameof(T), "Must be a type managed by BeatmapDatabase");
+                throw new ArgumentException("Must be a type managed by BeatmapDatabase", nameof(T));
             if (cascade)
                 connection.UpdateWithChildren(record);
             else

@@ -11,7 +11,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCasePlaySongSelect : TestCase
+    internal class TestCasePlaySongSelect : TestCase
     {
         private BeatmapDatabase db, oldDb;
         private TestStorage storage;

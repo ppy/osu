@@ -11,7 +11,7 @@ namespace osu.Game.Modes.Osu.UI
     /// </summary>
     public class OsuComboCounter : ComboCounter
     {
-        protected uint ScheduledPopOutCurrentId = 0;
+        protected uint ScheduledPopOutCurrentId;
 
         protected virtual float PopOutSmallScale => 1.1f;
         protected virtual bool CanPopOutWhileRolling => false;

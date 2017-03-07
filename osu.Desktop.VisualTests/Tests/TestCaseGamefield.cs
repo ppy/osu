@@ -18,7 +18,7 @@ using OpenTK;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseGamefield : TestCase
+    internal class TestCaseGamefield : TestCase
     {
         public override string Description => @"Showing hitobjects and what not.";
 
@@ -31,7 +31,7 @@ namespace osu.Desktop.VisualTests.Tests
             int time = 500;
             for (int i = 0; i < 100; i++)
             {
-                objects.Add(new HitCircle()
+                objects.Add(new HitCircle
                 {
                     StartTime = time,
                     Position = new Vector2(RNG.Next(0, 512), RNG.Next(0, 384)),

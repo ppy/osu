@@ -24,7 +24,7 @@ using osu.Game.Modes;
 
 namespace osu.Game.Screens.Select
 {
-    class BeatmapInfoWedge : Container
+    internal class BeatmapInfoWedge : Container
     {
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
 
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Select
 
         public void UpdateBeatmap(WorkingBeatmap beatmap)
         {
-            if (beatmap == null)
+            if (beatmap?.BeatmapInfo == null)
                 return;
 
             var lastContainer = beatmapInfoContainer;

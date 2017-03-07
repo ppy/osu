@@ -70,7 +70,7 @@ namespace osu.Game.Modes
         public override string Description => @"You can't fail, no matter what.";
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Relax, Mods.Autopilot, Mods.SuddenDeath, Mods.Perfect };
+        public override Mods[] DisablesMods => new[] { Mods.Relax, Mods.Autopilot, Mods.SuddenDeath, Mods.Perfect };
     }
 
     public abstract class ModEasy : Mod
@@ -80,7 +80,7 @@ namespace osu.Game.Modes
         public override string Description => @"Reduces overall difficulty - larger circles, more forgiving HP drain, less accuracy required.";
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.HardRock };
+        public override Mods[] DisablesMods => new[] { Mods.HardRock };
     }
 
     public abstract class ModHidden : Mod
@@ -95,7 +95,7 @@ namespace osu.Game.Modes
         public override Mods Name => Mods.HardRock;
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hardrock;
         public override string Description => @"Everything just got a bit harder...";
-        public override Mods[] DisablesMods => new Mods[] { Mods.Easy };
+        public override Mods[] DisablesMods => new[] { Mods.Easy };
     }
 
     public abstract class ModSuddenDeath : Mod
@@ -105,7 +105,7 @@ namespace osu.Game.Modes
         public override string Description => @"Miss a note and fail.";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.NoFail, Mods.Relax, Mods.Autopilot, Mods.Autoplay, Mods.Cinema };
+        public override Mods[] DisablesMods => new[] { Mods.NoFail, Mods.Relax, Mods.Autopilot, Mods.Autoplay, Mods.Cinema };
     }
 
     public abstract class ModDoubleTime : Mod
@@ -114,7 +114,7 @@ namespace osu.Game.Modes
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_doubletime;
         public override string Description => @"Zoooooooooom";
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.HalfTime };
+        public override Mods[] DisablesMods => new[] { Mods.HalfTime };
     }
 
     public abstract class ModRelax : Mod
@@ -123,7 +123,7 @@ namespace osu.Game.Modes
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_relax;
         public override double ScoreMultiplier => 0;
         public override bool Ranked => false;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Autopilot, Mods.Autoplay, Mods.Cinema, Mods.NoFail, Mods.SuddenDeath, Mods.Perfect };
+        public override Mods[] DisablesMods => new[] { Mods.Autopilot, Mods.Autoplay, Mods.Cinema, Mods.NoFail, Mods.SuddenDeath, Mods.Perfect };
     }
 
     public abstract class ModHalfTime : Mod
@@ -132,7 +132,7 @@ namespace osu.Game.Modes
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_halftime;
         public override string Description => @"Less zoom";
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.DoubleTime, Mods.Nightcore };
+        public override Mods[] DisablesMods => new[] { Mods.DoubleTime, Mods.Nightcore };
     }
 
     public abstract class ModNightcore : ModDoubleTime
@@ -157,7 +157,7 @@ namespace osu.Game.Modes
         public override string Description => @"Watch a perfect automated play through the song";
         public override double ScoreMultiplier => 0;
         public override bool Ranked => false;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Relax, Mods.Autopilot, Mods.SpunOut, Mods.SuddenDeath, Mods.Perfect };
+        public override Mods[] DisablesMods => new[] { Mods.Relax, Mods.Autopilot, Mods.SpunOut, Mods.SuddenDeath, Mods.Perfect };
 
         public override void PlayerLoading(Player player)
         {

@@ -15,7 +15,7 @@ using osu.Game.Modes;
 
 namespace osu.Game.Overlays.Mods
 {
-    class AlwaysPresentFlowContainer : FillFlowContainer
+    internal class AlwaysPresentFlowContainer : FillFlowContainer
     {
         public override bool IsPresent => true;
     }
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         private Color4 colour = Color4.White;
-        new public Color4 Colour
+        public new Color4 Colour
         {
             get
             {

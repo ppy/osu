@@ -36,10 +36,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void UpdateContentHeight()
         {
-            if (State == DropDownMenuState.Opened)
-                ContentContainer.ResizeTo(new Vector2(1, ContentHeight), 300, EasingTypes.OutQuint);
-            else
-                ContentContainer.ResizeTo(new Vector2(1, 0), 300, EasingTypes.OutQuint);
+            ContentContainer.ResizeTo(State == DropDownMenuState.Opened ? new Vector2(1, ContentHeight) : new Vector2(1, 0), 300, EasingTypes.OutQuint);
         }
     }
 }

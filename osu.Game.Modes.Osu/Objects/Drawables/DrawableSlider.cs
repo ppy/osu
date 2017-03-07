@@ -21,10 +21,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         private Container<DrawableSliderTick> ticks;
 
-        SliderBody body;
-        SliderBall ball;
+        private SliderBody body;
+        private SliderBall ball;
 
-        SliderBouncer bouncer1, bouncer2;
+        private SliderBouncer bouncer1, bouncer2;
 
         public DrawableSlider(Slider s) : base(s)
         {
@@ -94,7 +94,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         // pass all input through.
         public override bool Contains(Vector2 screenSpacePos) => true;
 
-        int currentRepeat;
+        private int currentRepeat;
 
         protected override void Update()
         {
