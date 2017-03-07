@@ -5,7 +5,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    class ToolbarHomeButton : ToolbarButton
+    internal class ToolbarHomeButton : ToolbarButton
     {
         public ToolbarHomeButton()
         {

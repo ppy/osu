@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select
         private BeatmapOptionsOverlay beatmapOptions;
         private Footer footer;
 
-        OsuScreen player;
+        private OsuScreen player;
 
         private FilterControl filter;
         public FilterControl Filter
@@ -443,8 +443,19 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (args.Repeat) return false;
+
             switch (args.Key)
             {
+                case Key.F1:
+                    modSelect.ToggleVisibility();
+                    return true;
+                case Key.F2:
+                    carousel.SelectRandom();
+                    return true;
+                case Key.F3:
+                    beatmapOptions.ToggleVisibility();
+                    return true;
                 case Key.Enter:
                     footer.StartButton.TriggerClick();
                     return true;

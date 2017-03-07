@@ -6,7 +6,6 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
 using System;
 using System.Collections.Concurrent;
-using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Screens.Play;

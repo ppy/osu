@@ -9,7 +9,6 @@ using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -111,25 +110,19 @@ namespace osu.Game.Overlays.Mods
                 if (mod == value) return;
                 mod = value;
 
-                if (mod is MultiMod)
-                {
-                    mods = ((MultiMod)mod).Mods;
-                }
-                else
-                {
-                    mods = new Mod[] { mod };
-                }
+                Mods = (mod as MultiMod)?.Mods ?? new[] { mod };
 
                 createIcons();
-                if (mods.Length > 0)
+                if (Mods.Length > 0)
                 {
-                    displayMod(mods[0]);
+                    displayMod(Mods[0]);
                 }
             }
         }
 
-        private Mod[] mods;
-        public Mod[] Mods => mods; // the mods from Mod, only multiple if Mod is a MultiMod
+        public Mod[] Mods { get; private set; }
+
+        // the mods from Mod, only multiple if Mod is a MultiMod
 
         public Mod SelectedMod => Mods.ElementAtOrDefault(selectedMod);
 
@@ -184,7 +177,7 @@ namespace osu.Game.Overlays.Mods
         private void displayMod(Mod mod)
         {
             displayIcon.Icon = mod.Icon;
-            text.Text = mod.Name.GetDescription();
+            text.Text = mod.Name;
         }
 
         private void displaySelectedMod()
@@ -202,7 +195,7 @@ namespace osu.Game.Overlays.Mods
         {
             if (Mods.Length > 1)
             {
-                iconsContainer.Add(icons = new ModIcon[]
+                iconsContainer.Add(icons = new[]
                 {
                     new ModIcon
                     {
@@ -222,7 +215,7 @@ namespace osu.Game.Overlays.Mods
             }
             else
             {
-                iconsContainer.Add(icons = new ModIcon[]
+                iconsContainer.Add(icons = new[]
                 {
                     new ModIcon
                     {

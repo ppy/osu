@@ -123,7 +123,7 @@ namespace osu.Game.Modes
 
             public Vector2 Size => new Vector2(512, 384);
 
-            private const double sixty_frame_time = 1000 / 60;
+            private const double sixty_frame_time = 1000.0 / 60;
 
             double currentTime;
             int currentDirection;

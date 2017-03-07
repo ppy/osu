@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Objects.Drawables
 
         public JudgementInfo Judgement;
 
-        public abstract JudgementInfo CreateJudgementInfo();
+        protected abstract JudgementInfo CreateJudgementInfo();
 
         protected abstract void UpdateState(ArmedState state);
 
@@ -82,7 +82,6 @@ namespace osu.Game.Modes.Objects.Drawables
         /// <summary>
         /// Process a hit of this hitobject. Carries out judgement.
         /// </summary>
-        /// <param name="judgement">Preliminary judgement information provided by the hit source.</param>
         /// <returns>Whether a hit was processed.</returns>
         protected bool UpdateJudgement(bool userTriggered)
         {

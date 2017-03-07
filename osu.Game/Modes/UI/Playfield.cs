@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Play;
@@ -29,9 +28,7 @@ namespace osu.Game.Modes.UI
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
-        protected override Container<Drawable> Content => content;
-
-        private Container content;
+        protected override Container<Drawable> Content { get; }
 
         public Playfield()
         {
@@ -40,7 +37,7 @@ namespace osu.Game.Modes.UI
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    content = new Container
+                    Content = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                     }
@@ -64,9 +61,9 @@ namespace osu.Game.Modes.UI
             if (InputManager != null)
             {
                 //if we've been provided an InputManager, we want it to sit inside the scaledcontainer 
-                scaledContent.Remove(content);
+                scaledContent.Remove(Content);
                 scaledContent.Add(InputManager);
-                InputManager.Add(content);
+                InputManager.Add(Content);
             }
         }
 

@@ -48,7 +48,7 @@ namespace osu.Game.Online.API
             try
             {
                 string[] parts = value.Split('/');
-                return new OAuthToken()
+                return new OAuthToken
                 {
                     AccessToken = parts[0],
                     AccessTokenExpiry = long.Parse(parts[1], NumberFormatInfo.InvariantInfo),

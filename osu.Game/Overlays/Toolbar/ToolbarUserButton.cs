@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    class ToolbarUserButton : ToolbarButton, IOnlineComponent
+    internal class ToolbarUserButton : ToolbarButton, IOnlineComponent
     {
         private Avatar avatar;
 

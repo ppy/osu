@@ -35,21 +35,14 @@ namespace osu.Game.Screens.Play
 
         public BeatmapInfo BeatmapInfo;
 
-        private bool isPaused;
-        public bool IsPaused
-        {
-            get
-            {
-                return isPaused;
-            }
-        }
+        public bool IsPaused { get; private set; }
 
         public int RestartCount;
 
         private double pauseCooldown = 1000;
-        private double lastPauseActionTime = 0;
+        private double lastPauseActionTime;
 
-        private bool canPause => Time.Current >= (lastPauseActionTime + pauseCooldown);
+        private bool canPause => Time.Current >= lastPauseActionTime + pauseCooldown;
 
         private IAdjustableClock sourceClock;
         private IFrameBasedClock interpolatedSourceClock;
@@ -199,11 +192,11 @@ namespace osu.Game.Screens.Play
                 pauseOverlay.Retries = RestartCount;
                 pauseOverlay.Show();
                 sourceClock.Stop();
-                isPaused = true;
+                IsPaused = true;
             }
             else
             {
-                isPaused = false;
+                IsPaused = false;
             }
         }
 
@@ -213,12 +206,12 @@ namespace osu.Game.Screens.Play
             scoreOverlay.KeyCounter.IsCounting = true;
             pauseOverlay.Hide();
             sourceClock.Start();
-            isPaused = false;
+            IsPaused = false;
         }
 
         public void TogglePaused()
         {
-            isPaused = !IsPaused;
+            IsPaused = !IsPaused;
             if (IsPaused) Pause(); else Resume();
         }
 
@@ -332,6 +325,6 @@ namespace osu.Game.Screens.Play
 
         public ReplayInputHandler ReplayInputHandler;
 
-        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !isPaused;
+        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !IsPaused;
     }
 }

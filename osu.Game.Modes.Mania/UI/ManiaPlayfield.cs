@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Modes.Mania.Objects;
-using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.UI;
 using OpenTK;
 using OpenTK.Graphics;
@@ -13,11 +12,8 @@ namespace osu.Game.Modes.Mania.UI
 {
     public class ManiaPlayfield : Playfield<ManiaBaseHit>
     {
-        private readonly int columns;
-
         public ManiaPlayfield(int columns)
         {
-            this.columns = columns;
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(columns / 20f, 1f);
             Anchor = Anchor.BottomCentre;
@@ -26,7 +22,7 @@ namespace osu.Game.Modes.Mania.UI
             Add(new Box { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
 
             for (int i = 0; i < columns; i++)
-                Add(new Box()
+                Add(new Box
                 {
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(2, 1),

@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Modes.Catch.UI;
 using osu.Game.Modes.Objects;
@@ -82,7 +81,7 @@ namespace osu.Game.Modes.Catch
 
         public override FontAwesome Icon => FontAwesome.fa_osu_fruits_o;
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => null;
+        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
 
         public override HitObjectParser CreateHitObjectParser() => new NullHitObjectParser();
 

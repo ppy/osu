@@ -2,9 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.ComponentModel;
 using osu.Game.Graphics;
-using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes
@@ -17,17 +15,17 @@ namespace osu.Game.Modes
         /// <summary>
         /// The name of this mod.
         /// </summary>
-        public abstract Mods Name { get; }
+        public abstract string Name { get; }
 
         /// <summary>
         /// The icon of this mod.
         /// </summary>
-        public abstract FontAwesome Icon { get; }
+        public virtual FontAwesome Icon => FontAwesome.fa_question;
 
         /// <summary>
         /// The user readable description of this mod.
         /// </summary>
-        public abstract string Description { get; }
+        public virtual string Description => string.Empty;
 
         /// <summary>
         /// The score multiplier of this mod.
@@ -37,12 +35,12 @@ namespace osu.Game.Modes
         /// <summary>
         /// Returns if this mod is ranked.
         /// </summary>
-        public abstract bool Ranked { get; }
+        public virtual bool Ranked => false;
 
         /// <summary>
         /// The mods this mod cannot be enabled with.
         /// </summary>
-        public abstract Mods[] DisablesMods { get; }
+        public virtual Type[] IncompatibleMods => new Type[] { };
 
         /// <summary>
         /// Direct access to the Player before load has run.
@@ -53,111 +51,106 @@ namespace osu.Game.Modes
 
     public class MultiMod : Mod
     {
-        public override Mods Name => Modes.Mods.None;
-        public override FontAwesome Icon => FontAwesome.fa_close;
-        public override string Description => @"";
+        public override string Name => string.Empty;
+        public override string Description => string.Empty;
         public override double ScoreMultiplier => 0.0;
-        public override bool Ranked => false;
-        public override Mods[] DisablesMods => new Mods[] { };
 
         public Mod[] Mods;
     }
 
     public abstract class ModNoFail : Mod
     {
-        public override Mods Name => Mods.NoFail;
+        public override string Name => "NoFail";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_nofail;
-        public override string Description => @"You can't fail, no matter what.";
+        public override string Description => "You can't fail, no matter what.";
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Relax, Mods.Autopilot, Mods.SuddenDeath, Mods.Perfect };
+        public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModPerfect) };
     }
 
     public abstract class ModEasy : Mod
     {
-        public override Mods Name => Mods.Easy;
+        public override string Name => "Easy";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_easy;
-        public override string Description => @"Reduces overall difficulty - larger circles, more forgiving HP drain, less accuracy required.";
+        public override string Description => "Reduces overall difficulty - larger circles, more forgiving HP drain, less accuracy required.";
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.HardRock };
+        public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
     }
 
     public abstract class ModHidden : Mod
     {
-        public override Mods Name => Mods.Hidden;
+        public override string Name => "Hidden";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hidden;
         public override bool Ranked => true;
     }
 
     public abstract class ModHardRock : Mod
     {
-        public override Mods Name => Mods.HardRock;
+        public override string Name => "Hard Rock";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hardrock;
-        public override string Description => @"Everything just got a bit harder...";
-        public override Mods[] DisablesMods => new Mods[] { Mods.Easy };
+        public override string Description => "Everything just got a bit harder...";
+        public override Type[] IncompatibleMods => new[] { typeof(ModEasy) };
     }
 
     public abstract class ModSuddenDeath : Mod
     {
-        public override Mods Name => Mods.SuddenDeath;
+        public override string Name => "Sudden Death";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_suddendeath;
-        public override string Description => @"Miss a note and fail.";
+        public override string Description => "Miss a note and fail.";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.NoFail, Mods.Relax, Mods.Autopilot, Mods.Autoplay, Mods.Cinema };
+        public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay), typeof(ModCinema) };
     }
 
     public abstract class ModDoubleTime : Mod
     {
-        public override Mods Name => Mods.DoubleTime;
+        public override string Name => "Double Time";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_doubletime;
-        public override string Description => @"Zoooooooooom";
+        public override string Description => "Zoooooooooom";
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.HalfTime };
+        public override Type[] IncompatibleMods => new[] { typeof(ModHalfTime) };
     }
 
     public abstract class ModRelax : Mod
     {
-        public override Mods Name => Mods.Relax;
+        public override string Name => "Relax";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_relax;
         public override double ScoreMultiplier => 0;
-        public override bool Ranked => false;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Autopilot, Mods.Autoplay, Mods.Cinema, Mods.NoFail, Mods.SuddenDeath, Mods.Perfect };
+        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModCinema), typeof(ModNoFail), typeof(ModSuddenDeath), typeof(ModPerfect) };
     }
 
     public abstract class ModHalfTime : Mod
     {
-        public override Mods Name => Mods.HalfTime;
+        public override string Name => "Half Time";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_halftime;
-        public override string Description => @"Less zoom";
+        public override string Description => "Less zoom";
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new Mods[] { Mods.DoubleTime, Mods.Nightcore };
+        public override Type[] IncompatibleMods => new[] { typeof(ModDoubleTime), typeof(ModNightcore) };
     }
 
     public abstract class ModNightcore : ModDoubleTime
     {
-        public override Mods Name => Mods.Nightcore;
+        public override string Name => "Nightcore";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_nightcore;
-        public override string Description => @"uguuuuuuuu";
+        public override string Description => "uguuuuuuuu";
     }
 
     public abstract class ModFlashlight : Mod
     {
-        public override Mods Name => Mods.Flashlight;
+        public override string Name => "Flashlight";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_flashlight;
-        public override string Description => @"Restricted view area.";
+        public override string Description => "Restricted view area.";
         public override bool Ranked => true;
     }
 
     public class ModAutoplay : Mod
     {
-        public override Mods Name => Mods.Autoplay;
+        public override string Name => "Autoplay";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_auto;
-        public override string Description => @"Watch a perfect automated play through the song";
+        public override string Description => "Watch a perfect automated play through the song";
         public override double ScoreMultiplier => 0;
-        public override bool Ranked => false;
-        public override Mods[] DisablesMods => new Mods[] { Mods.Relax, Mods.Autopilot, Mods.SpunOut, Mods.SuddenDeath, Mods.Perfect };
+        public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModPerfect) };
 
         public override void PlayerLoading(Player player)
         {
@@ -168,113 +161,14 @@ namespace osu.Game.Modes
 
     public abstract class ModPerfect : ModSuddenDeath
     {
-        public override Mods Name => Mods.Perfect;
-        public override FontAwesome Icon => FontAwesome.fa_close;
-        public override string Description => @"SS or quit.";
+        public override string Name => "Perfect";
+        public override string Description => "SS or quit.";
     }
 
     public class ModCinema : ModAutoplay
     {
-        public override Mods Name => Mods.Cinema;
+        public override string Name => "Cinema";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_cinema;
-    }
-
-    [Flags]
-    public enum Mods
-    {
-        None = 0,
-
-        [Description(@"No Fail")]
-        NoFail = 1 << 0,
-
-        [Description(@"Easy")]
-        Easy = 1 << 1,
-
-        //NoVideo = 1 << 2,
-
-        [Description(@"Hidden")]
-        Hidden = 1 << 3,
-
-        [Description(@"Hard Rock")]
-        HardRock = 1 << 4,
-
-        [Description(@"Sudden Death")]
-        SuddenDeath = 1 << 5,
-
-        [Description(@"Double Time")]
-        DoubleTime = 1 << 6,
-
-        [Description(@"Relax")]
-        Relax = 1 << 7,
-
-        [Description(@"Halftime")]
-        HalfTime = 1 << 8,
-
-        [Description(@"Nightcore")]
-        Nightcore = 1 << 9,
-
-        [Description(@"Flashlight")]
-        Flashlight = 1 << 10,
-
-        [Description(@"Auto")]
-        Autoplay = 1 << 11,
-
-        [Description(@"Spun Out")]
-        SpunOut = 1 << 12,
-
-        [Description(@"Autopilot")]
-        Autopilot = 1 << 13,
-
-        [Description(@"Perfect")]
-        Perfect = 1 << 14,
-
-        [Description(@"4K")]
-        Key4 = 1 << 15,
-
-        [Description(@"5K")]
-        Key5 = 1 << 16,
-
-        [Description(@"6K")]
-        Key6 = 1 << 17,
-
-        [Description(@"7K")]
-        Key7 = 1 << 18,
-
-        [Description(@"8K")]
-        Key8 = 1 << 19,
-
-        [Description(@"Fade In")]
-        FadeIn = 1 << 20,
-
-        [Description(@"Random")]
-        Random = 1 << 21,
-
-        [Description(@"Cinema")]
-        Cinema = 1 << 22,
-
-        [Description(@"Target Practice")]
-        Target = 1 << 23,
-
-        [Description(@"9K")]
-        Key9 = 1 << 24,
-
-        [Description(@"Co-Op")]
-        KeyCoop = 1 << 25,
-
-        [Description(@"1K")]
-        Key1 = 1 << 26,
-
-        [Description(@"3K")]
-        Key3 = 1 << 27,
-
-        [Description(@"2K")]
-        Key2 = 1 << 28,
-
-        LastMod = 1 << 29,
-
-        KeyMod = Key1 | Key2 | Key3 | Key4 | Key5 | Key6 | Key7 | Key8 | Key9 | KeyCoop,
-        FreeModAllowed = NoFail | Easy | Hidden | HardRock | SuddenDeath | Flashlight | FadeIn | Relax | Autopilot | SpunOut | KeyMod,
-        ScoreIncreaseMods = Hidden | HardRock | DoubleTime | Flashlight | FadeIn
     }
 
     public enum ModType
