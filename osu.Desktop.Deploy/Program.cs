@@ -342,9 +342,11 @@ namespace osu.Desktop.Deploy
             };
 
             Process p = Process.Start(psi);
-            if (p == null || p.ExitCode == 0) return true;
+            if (p == null) return false;
 
             string output = p.StandardOutput.ReadToEnd();
+
+            if (p.ExitCode == 0) return true;
 
             write(output);
             error($"Command {command} {args} failed!");
