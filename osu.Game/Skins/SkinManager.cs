@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps.IO;
 using osu.Game.Configuration;
 using osu.Game.Database;
 

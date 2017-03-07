@@ -9,7 +9,6 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Skins;
 using SQLite.Net;
-using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Database
 {
@@ -114,10 +113,10 @@ namespace osu.Game.Database
 
         public TableQuery<SkinInfo> GetSkins()
         {
-            return Query<SkinInfo>();
+            return query<SkinInfo>();
         }
 
-        private TableQuery<T> Query<T>() where T : class
+        private TableQuery<T> query<T>() where T : class
         {
             return connection.Table<T>();
         }
