@@ -47,9 +47,13 @@ namespace osu.Game.Modes.UI
 
         public override bool AllObjectsJudged => Playfield.HitObjects.Children.First()?.Judgement.Result != null; //reverse depth sort means First() instead of Last().
 
+        protected override Container<Drawable> Content => content;
+
         protected abstract HitObjectConverter<TObject> Converter { get; }
 
         protected virtual List<TObject> Convert(Beatmap beatmap) => Converter.Convert(beatmap);
+
+        private Container content;
 
         private Beatmap beatmap;
 
@@ -72,10 +76,6 @@ namespace osu.Game.Modes.UI
         }
 
         protected abstract Playfield<TObject> CreatePlayfield();
-        
-        protected override Container<Drawable> Content => content;
-
-        private Container content;
 
         [BackgroundDependencyLoader]
         private void load()
