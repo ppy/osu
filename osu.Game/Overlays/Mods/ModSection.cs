@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Mods
 
                 foreach (ModButton button in value)
                 {
-                    button.Colour = Colour;
+                    button.ButtonColour = BottonColour;
                     button.SelectedColour = selectedColour;
                     button.Action = this.Action;
                 }
@@ -59,21 +59,21 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private Color4 colour = Color4.White;
-        public new Color4 Colour
+        private Color4 buttonsBolour = Color4.White;
+        public Color4 BottonColour
         {
             get
             {
-                return colour;
+                return buttonsBolour;
             }
             set
             {
-                if (value == colour) return;
-                colour = value;
+                if (value == buttonsBolour) return;
+                buttonsBolour = value;
 
                 foreach (ModButton button in buttons)
                 {
-                    button.Colour = value;
+                    button.ButtonColour = value;
                 }
             }
         }
