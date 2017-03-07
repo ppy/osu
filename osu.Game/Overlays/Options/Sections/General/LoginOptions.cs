@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Options.Sections.General
             }
         }
 
-        class LoginForm : FillFlowContainer
+        private class LoginForm : FillFlowContainer
         {
             private TextBox username;
             private TextBox password;

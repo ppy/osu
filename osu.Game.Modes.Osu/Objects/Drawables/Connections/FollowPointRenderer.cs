@@ -74,13 +74,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
                     for (int d = (int)(PointDistance * 1.5); d < distance - PointDistance; d += PointDistance)
                     {
-                        float fraction = ((float)d / distance);
+                        float fraction = (float)d / distance;
                         Vector2 pointStartPosition = startPosition + (fraction - 0.1f) * distanceVector;
                         Vector2 pointEndPosition = startPosition + fraction * distanceVector;
                         double fadeOutTime = startTime + fraction * duration;
                         double fadeInTime = fadeOutTime - PreEmpt;
 
-                        Add(new FollowPoint()
+                        Add(new FollowPoint
                         {
                             StartTime = fadeInTime,
                             EndTime = fadeOutTime,

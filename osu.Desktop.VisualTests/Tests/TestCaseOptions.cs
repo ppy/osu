@@ -6,7 +6,7 @@ using osu.Game.Overlays;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseOptions : TestCase
+    internal class TestCaseOptions : TestCase
     {
         public override string Description => @"Tests the options overlay";
 

@@ -26,11 +26,6 @@ namespace osu.Game.Graphics
                 Text = ((char)icon).ToString();
             }
         }
-
-        public TextAwesome()
-        {
-            Origin = Framework.Graphics.Anchor.Centre;
-        }
     }
 
     public enum FontAwesome

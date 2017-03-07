@@ -100,7 +100,8 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.X,
                                     Direction = FillDirection.Vertical,
                                     Children = sections,
-                                }
+                                },
+                                new OptionsFooter()
                             }
                         }
                     }

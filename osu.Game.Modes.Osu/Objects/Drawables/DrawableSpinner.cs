@@ -75,7 +75,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             if (Time.Current < HitObject.StartTime) return;
 
-            var j = Judgement as OsuJudgementInfo;
+            var j = (OsuJudgementInfo)Judgement;
 
             disc.ScaleTo(Interpolation.ValueAt(Math.Sqrt(Progress), scaleToCircle, Vector2.One, 0, 1), 100);
 
@@ -108,9 +108,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             }
         }
 
-        private Vector2 scaleToCircle => (circle.Scale * circle.DrawWidth / DrawWidth) * 0.95f;
+        private Vector2 scaleToCircle => circle.Scale * circle.DrawWidth / DrawWidth * 0.95f;
 
-        private float spinsPerMinuteNeeded = 100 + (5 * 15); //TODO: read per-map OD and place it on the 5
+        private float spinsPerMinuteNeeded = 100 + 5 * 15; //TODO: read per-map OD and place it on the 5
 
         private float rotationsNeeded => (float)(spinsPerMinuteNeeded * (spinner.EndTime - spinner.StartTime) / 60000f);
 

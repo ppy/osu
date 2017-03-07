@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class BeatmapSetHeader : Panel
+    internal class BeatmapSetHeader : Panel
     {
         public Action<BeatmapSetHeader> GainedSelection;
         private SpriteText title, artist;
@@ -96,7 +96,7 @@ namespace osu.Game.Beatmaps.Drawables
             base.Dispose(isDisposing);
         }
 
-        class PanelBackground : BufferedContainer
+        private class PanelBackground : BufferedContainer
         {
             private readonly WorkingBeatmap working;
 
@@ -160,7 +160,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fill,
-                }.LoadAsync(game, (bg) =>
+                }.LoadAsync(game, bg =>
                 {
                     Add(bg);
                     ForceRedraw();

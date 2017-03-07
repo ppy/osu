@@ -4,9 +4,9 @@
 using osu.Framework.Screens.Testing;
 using osu.Game.Screens.Select.Options;
 
-namespace osu.Desktop.VisualTests
+namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseBeatmapOptionsOverlay : TestCase
+    internal class TestCaseBeatmapOptionsOverlay : TestCase
     {
         public override string Description => @"Beatmap options in song select";
 

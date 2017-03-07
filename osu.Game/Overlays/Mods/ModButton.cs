@@ -105,25 +105,19 @@ namespace osu.Game.Overlays.Mods
                 if (mod == value) return;
                 mod = value;
 
-                if (mod is MultiMod)
-                {
-                    mods = ((MultiMod)mod).Mods;
-                }
-                else
-                {
-                    mods = new Mod[] { mod };
-                }
+                Mods = (mod as MultiMod)?.Mods ?? new[] { mod };
 
                 createIcons();
-                if (mods.Length > 0)
+                if (Mods.Length > 0)
                 {
-                    displayMod(mods[0]);
+                    displayMod(Mods[0]);
                 }
             }
         }
 
-        private Mod[] mods;
-        public Mod[] Mods => mods; // the mods from Mod, only multiple if Mod is a MultiMod
+        public Mod[] Mods { get; private set; }
+
+        // the mods from Mod, only multiple if Mod is a MultiMod
 
         public Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
 
@@ -178,7 +172,7 @@ namespace osu.Game.Overlays.Mods
             iconsContainer.Clear();
             if (Mods.Length > 1)
             {
-                iconsContainer.Add(new[]
+                iconsContainer.Add(new ModIcon[]
                 {
                     new ModIcon
                     {

@@ -9,6 +9,7 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.Osu
 {
@@ -16,7 +17,11 @@ namespace osu.Game.Modes.Osu
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new OsuHitRenderer { Beatmap = beatmap };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap, PlayerInputManager input = null) => new OsuHitRenderer
+        {
+            Beatmap = beatmap,
+            InputManager = input
+        };
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
         {
@@ -81,7 +86,7 @@ namespace osu.Game.Modes.Osu
                         {
                             Mods = new Mod[]
                             {
-                                new OsuModeAutoplay(),
+                                new OsuModAutoplay(),
                                 new ModCinema(),
                             },
                         },
@@ -96,9 +101,16 @@ namespace osu.Game.Modes.Osu
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount) => new OsuScoreProcessor(hitObjectCount);
+        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => new OsuScoreProcessor(hitObjectCount);
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
+
+        public override Score CreateAutoplayScore(Beatmap beatmap)
+        {
+            var score = CreateScoreProcessor().GetScore();
+            score.Replay = new OsuAutoReplay(beatmap);
+            return score;
+        }
 
         protected override PlayMode PlayMode => PlayMode.Osu;
     }

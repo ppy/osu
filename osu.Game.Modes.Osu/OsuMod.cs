@@ -85,7 +85,7 @@ namespace osu.Game.Modes.Osu
         public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModPerfect), typeof(ModNoFail), typeof(ModAutoplay), typeof(ModCinema) };
     }
 
-    public class OsuModeAutoplay : ModAutoplay
+    public class OsuModAutoplay : ModAutoplay
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
     }
