@@ -32,7 +32,7 @@ namespace osu.Game.Modes.Osu.UI
             }
         }
 
-        public OsuPlayfield()
+        public OsuPlayfield() : base(512)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -62,7 +62,7 @@ namespace osu.Game.Modes.Osu.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            if (InputManager.ReplayInputHandler != null)
+            if (InputManager?.ReplayInputHandler != null)
                 Add(new OsuCursorContainer { Colour = Color4.LightYellow });
         }
 
@@ -83,7 +83,7 @@ namespace osu.Game.Modes.Osu.UI
         public override void PostProcess()
         {
             connectionLayer.HitObjects = HitObjects.Children
-                .Select(d => (OsuHitObject)d.HitObject)
+                .Select(d => d.HitObject)
                 .OrderBy(h => h.StartTime);
         }
 
