@@ -15,36 +15,65 @@ using osu.Framework.Input;
 using OpenTK.Input;
 using OpenTK.Graphics;
 using System.Diagnostics;
+using osu.Game.Graphics;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableHitCircleDon : DrawableHitCircle
     {
-        public override Color4 ExplodeColour => new Color4(187, 17, 119, 255);
+        public override Color4 ExplodeColour { get; protected set; }
+
+        protected override List<Key> Keys { get; } = new List<Key>(new[] { Key.F, Key.J });
 
         public DrawableHitCircleDon(HitCircle hitCircle)
             : base(hitCircle)
         {
         }
 
-        protected override HitCirclePiece CreateBody() => new DonPiece();
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            ExplodeColour = colours.Pink;
+        }
+
+        protected override CirclePiece CreateBody() => new DonCirclePiece();
     }
 
     public class DrawableHitCircleKatsu : DrawableHitCircle
     {
-        public override Color4 ExplodeColour => new Color4(17, 136, 170, 255);
+        public override Color4 ExplodeColour { get; protected set; }
+
+        protected override List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.K });
 
         public DrawableHitCircleKatsu(HitCircle hitCircle)
             : base(hitCircle)
         {
         }
 
-        protected override HitCirclePiece CreateBody() => new KatsuPiece();
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            ExplodeColour = colours.Blue;
+        }
+
+        protected override CirclePiece CreateBody() => new KatsuCirclePiece();
     }
 
     public abstract class DrawableHitCircle : DrawableTaikoHitObject
     {
-        private HitCirclePiece bodyPiece;
+        /// <summary>
+        /// A list of keys which this HitObject will accept.
+        /// </summary>
+        protected abstract List<Key> Keys { get; }
+
+        /// <summary>
+        /// A list of keys which this HitObject will accept. These are the standard Taiko keys for now.
+        /// These should be moved to bindings later.
+        /// </summary>
+        private List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
+
+        private CirclePiece bodyPiece;
         private Container bodyContainer;
 
         private bool validKeyPressed = true;
@@ -52,7 +81,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         public DrawableHitCircle(HitCircle hitCircle)
             : base(hitCircle)
         {
-            Size = new Vector2(64);
+            Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2);
 
             Children = new Drawable[]
             {
@@ -69,20 +98,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             };
 
             bodyPiece.Kiai = hitCircle.Kiai;
-            bodyPiece.Hit += ProcessHit;
         }
 
-        protected abstract HitCirclePiece CreateBody();
-
-        protected virtual bool ProcessHit(bool validKey)
-        {
-            if (Judgement.Result.HasValue)
-                return false;
-
-            validKeyPressed = validKey;
-
-            return UpdateJudgement(true);
-        }
+        /// <summary>
+        /// Creates a body circle of this HitCircle.
+        /// </summary>
+        /// <returns>The body circle.</returns>
+        protected abstract CirclePiece CreateBody();
 
         protected override void CheckJudgement(bool userTriggered)
         {
@@ -142,15 +164,38 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         protected override void Update()
         {
+            // If the HitCircle was hit, make it stop moving
             if (State != ArmedState.Hit)
                 base.Update();
         }
 
-        protected override void Dispose(bool isDisposing)
+        /// <summary>
+        /// Handles a valid taiko keypress.
+        /// </summary>
+        /// <param name="key">The key that was pressed.</param>
+        /// <returns>The </returns>
+        protected virtual bool HandleKeyPress(Key key)
         {
-            base.Dispose(isDisposing);
+            if (Judgement.Result.HasValue)
+                return false;
 
-            bodyPiece.Hit -= ProcessHit;
+            validKeyPressed = Keys.Contains(key);
+
+            return UpdateJudgement(true);
+        }
+
+        protected sealed override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            // Don't handle held-down keyes
+            if (args.Repeat)
+                return false;
+
+            // Check if we've pressed a valid taiko key
+            if (!validKeys.Contains(args.Key))
+                return false;
+
+            // Handle it!
+            return HandleKeyPress(args.Key);
         }
     }
 }

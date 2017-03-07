@@ -16,12 +16,22 @@ namespace osu.Game.Modes.Taiko.Objects
 {
     public class DrumRoll : TaikoHitObject
     {
-        public override double EndTime => StartTime + RepeatCount * Length / Velocity;
+        public override double EndTime => StartTime + Length / Velocity;
 
+        /// <summary>
+        /// Raw length of the drum roll in distance units.
+        /// </summary>
         public double Length;
-        public int RepeatCount = 1;
 
+        /// <summary>
+        /// Velocity of the drum roll in distance units.
+        /// </summary>
         public double Velocity;
+
+        /// <summary>
+        /// The distance between ticks of this drumroll.
+        /// <para>Half of this value is the hit window of the ticks.</para>
+        /// </summary>
         public double TickTimeDistance;
 
         /// <summary>

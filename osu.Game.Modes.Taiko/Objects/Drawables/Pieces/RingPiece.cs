@@ -30,7 +30,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
                 Children = new[]
                 {
-                    new Box()
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
 
@@ -57,7 +57,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
                 Children = new[]
                 {
-                    new Box()
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
 
@@ -69,11 +69,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         }
     }
 
-    public class SpinnerRingPiece : RingPiece
+    public class BashRingPiece : RingPiece
     {
         protected override Drawable CreateInnerPiece()
         {
-            return new TextAwesome()
+            return new TextAwesome
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -84,11 +84,15 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         }
     }
 
+    /// <summary>
+    /// The circle ring, containing both the outer and inner "rings".
+    /// <para>The inner ring overridable and is piece-dependent.</para>
+    /// </summary>
     public abstract class RingPiece : CircularContainer
     {
         public RingPiece()
         {
-            Size = new Vector2(128);
+            Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -98,7 +102,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
             Children = new[]
             {
-                new Box()
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
 
@@ -109,6 +113,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
             };
         }
 
+        /// <summary>
+        /// Creates the inner "ring".
+        /// </summary>
+        /// <returns>The inner ring.</returns>
         protected abstract Drawable CreateInnerPiece();
     }
 }

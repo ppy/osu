@@ -21,6 +21,7 @@ namespace osu.Game.Modes.Taiko.Objects
         /// have to replicate that here anywhere slider length/slider multipliers are used :(
         /// </summary>
         public const double SLIDER_FUDGE_FACTOR = 1.4;
+        public const float CIRCLE_RADIUS = 64;
         
         public double HitWindowGreat;
         public double HitWindowGood;

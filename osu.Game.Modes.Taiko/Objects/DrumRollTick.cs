@@ -14,10 +14,13 @@ namespace osu.Game.Modes.Taiko.Objects
     {
         /// <summary>
         /// Whether this is the first (initial) tick of the slider.
-        /// Determines whether the tick is filled or not.
         /// </summary>
         public bool FirstTick;
 
+        /// <summary>
+        /// The distance between this tick and the next in milliseconds.
+        /// <para>Half of this value is the hit window of the tick.</para>
+        /// </summary>
         public double TickTimeDistance;
 
         public override TaikoHitType Type => TaikoHitType.DrumRollTick;

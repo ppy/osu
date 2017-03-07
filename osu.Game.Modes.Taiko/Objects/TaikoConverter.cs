@@ -89,17 +89,18 @@ namespace osu.Game.Modes.Taiko.Objects
                             StartTime = o.StartTime,
                             Sample = o.Sample,
                             NewCombo = o.NewCombo,
-                            Length = (o as Osu.Objects.Slider).Length,
-                            RepeatCount = (o as Osu.Objects.Slider).RepeatCount
+                            Length = slider.Length * slider.RepeatCount,
                         };
                     }
                     else if (o is Osu.Objects.Spinner)
                     {
+                        Spinner spinner = o as Osu.Objects.Spinner;
+
                         h = new Bash()
                         {
                             StartTime = o.StartTime,
                             Sample = o.Sample,
-                            Length = (o as Osu.Objects.Spinner).Length
+                            Length = spinner.Length
                         };
                     }
                 }

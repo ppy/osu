@@ -87,7 +87,7 @@ namespace osu.Game.Modes.Taiko.UI
                                     Masking = true,
                                     CornerRadius = 74.2f,
 
-                                    Alpha = 0.2f,
+                                    Alpha = 0.3f,
 
                                     Children = new Drawable[]
                                     {

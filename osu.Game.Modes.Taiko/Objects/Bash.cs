@@ -27,9 +27,7 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.SetDefaultsFromBeatmap(beatmap);
 
-            // Todo: Diff range
-            float spinnerRotationRatio = 5;
-
+            double spinnerRotationRatio = Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 3, 5, 7.5, Mods.None);
             RequiredHits = (int)Math.Max(1, Length / 1000f * spinnerRotationRatio * spinner_ratio);
         }
 

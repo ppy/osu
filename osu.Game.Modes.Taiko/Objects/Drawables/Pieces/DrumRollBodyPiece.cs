@@ -3,18 +3,19 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 {
+    /// <summary>
+    /// The internal coloured "bar" of a finisher drum roll.
+    /// This overshoots the expected length by corner radius on both sides.
+    /// </summary>
     public class DrumRollFinisherBodyPiece : DrumRollBodyPiece
     {
         public override float CornerRadius => base.CornerRadius * 1.5f;
@@ -22,20 +23,31 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         public DrumRollFinisherBodyPiece(float baseLength)
             : base(baseLength)
         {
+            Size *= new Vector2(1, 1.5f);
         }
     }
 
+    /// <summary>
+    /// The internal coloured "bar" of a drum roll.
+    /// This overshoots the expected length by corner radius on both sides.
+    /// </summary>
     public class DrumRollBodyPiece : Container
     {
-        private static Color4 yellow_colour = new Color4(238, 170, 0, 255);
+        /// <summary>
+        /// Half the default (128) height.
+        /// </summary>
+        public override float CornerRadius => TaikoHitObject.CIRCLE_RADIUS;
 
-        public override float CornerRadius => 64;
-
+        /// <summary>
+        /// Whether the drum roll is in Kiai time.
+        /// </summary>
         public bool Kiai;
+
+        private Box background;
 
         public DrumRollBodyPiece(float baseLength)
         {
-            Size = new Vector2(baseLength + CornerRadius * 2, CornerRadius * 2);
+            Size = new Vector2(baseLength + TaikoHitObject.CIRCLE_RADIUS * 2, TaikoHitObject.CIRCLE_RADIUS * 2);
 
             Origin = Anchor.Centre;
             Anchor = Anchor.Centre;
@@ -46,30 +58,34 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                new Box()
+                // Background
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = yellow_colour
                 },
-                new DrumRollTrianglesPiece()
+                // Triangles
+                new Triangles
                 {
                     RelativeSizeAxes = Axes.Both,
 
                     Colour = Color4.Black,
                     Alpha = 0.05f,
+
+                    TriangleScale = 1.5f
                 }
             };
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            base.LoadComplete();
+            background.Colour = colours.Yellow;
 
             if (Kiai)
             {
-                EdgeEffect = new EdgeEffect()
+                EdgeEffect = new EdgeEffect
                 {
-                    Colour = new Color4(yellow_colour.R, yellow_colour.G, yellow_colour.B, 0.75f),
+                    Colour = new Color4(colours.Yellow.R, colours.Yellow.G, colours.Yellow.B, 0.75f),
                     Radius = 50,
                     Type = EdgeEffectType.Glow,
                 };

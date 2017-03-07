@@ -15,6 +15,8 @@ using OpenTK.Input;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
@@ -30,7 +32,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
     public class DrawableDrumRollTick : DrawableTaikoHitObject
     {
-        public override Color4 ExplodeColour => new Color4(238, 170, 0, 255);
+        public override Color4 ExplodeColour { get; protected set; }
 
         protected virtual List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
 
@@ -79,6 +81,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            ExplodeColour = Color4.White;
         }
 
         public override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollTickJudgementInfo() { MaxScore = TaikoScoreResult.Great };
@@ -138,6 +146,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         protected override void Update()
         {
+            // Drum roll ticks don't move
             base.UpdateAuto();
         }
     }

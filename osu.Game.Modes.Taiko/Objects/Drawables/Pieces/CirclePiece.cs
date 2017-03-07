@@ -2,46 +2,161 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OpenTK.Graphics;
+using osu.Framework.Input;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 {
-    class CirclePiece : CircularContainer
+    class DonCirclePiece : CirclePiece
     {
-        private TrianglesPiece triangles;
+        protected override Color4 InnerColour { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            InnerColour = colours.Pink;
+        }
+
+        protected override RingPiece CreateRing() => new DonRingPiece();
+    }
+
+    class KatsuCirclePiece : CirclePiece
+    {
+        protected override Color4 InnerColour { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            InnerColour = colours.Blue;
+        }
+
+        protected override RingPiece CreateRing() => new KatsuRingPiece();
+    }
+
+    class BashCirclePiece : CirclePiece
+    {
+        protected override Color4 InnerColour { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            InnerColour = colours.Yellow;
+        }
+
+        protected override RingPiece CreateRing() => new BashRingPiece();
+    }
+
+    /// <summary>
+    /// The HitObject circle piece, containing the outer glow, the inner circle, and the ring.
+    /// </summary>
+    public abstract class CirclePiece : Container
+    {
+        /// <summary>
+        /// Whether the HitObject is in kiai time.
+        /// </summary>
+        public bool Kiai;
+
+        /// <summary>
+        /// The colour of the inner circle and glows.
+        /// </summary>
+        protected abstract Color4 InnerColour { get; set; }
+
+        private CircularContainer backingGlowContainer;
+        private CircularContainer circle;
+        private RingPiece ring;
 
         public CirclePiece()
         {
-            Size = new Vector2(128);
+            Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             Children = new Drawable[]
             {
-                new Box()
+                // The faint glow around the HitObject
+                backingGlowContainer = new CircularContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 1
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+
+                    RelativeSizeAxes = Axes.Both
                 },
-                triangles = new TrianglesPiece()
+                // The inner circle 
+                circle = new CircularContainer
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.1f,
-                    Colour = Color4.Black
+
+                    Children = new Drawable[]
+                    {
+                        // Background
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+
+                            Alpha = 1
+                        },
+                        // Triangles
+                        new Triangles
+                        {
+                            RelativeSizeAxes = Axes.Both,
+
+                            Alpha = 0.1f,
+                            Colour = Color4.Black,
+
+                            TriangleScale = 1.5f
+                        },
+                    }
                 },
+                // The ring
+                ring = CreateRing()
             };
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            circle.Colour = InnerColour;
+
+            backingGlowContainer.EdgeEffect = new EdgeEffect
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = InnerColour,
+                Radius = 4f
+            };
+
+            if (Kiai)
+            {
+                circle.EdgeEffect = new EdgeEffect
+                {
+                    Colour = new Color4(InnerColour.R, InnerColour.G, InnerColour.B, 0.75f),
+                    Radius = 50,
+                    Type = EdgeEffectType.Glow,
+                };
+            }
+        }
+
+        /// <summary>
+        /// Creates the outer + inner ring piece.
+        /// </summary>
+        /// <returns>The ring piece.</returns>
+        protected abstract RingPiece CreateRing();
     }
 }

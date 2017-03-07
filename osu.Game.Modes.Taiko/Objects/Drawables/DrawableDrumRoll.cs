@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
@@ -39,7 +40,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
     public class DrawableDrumRoll : DrawableTaikoHitObject
     {
-        public override Color4 ExplodeColour => new Color4(238, 170, 0, 255);
+        public override Color4 ExplodeColour { get; protected set; }
 
         private DrumRoll drumRoll;
 
@@ -52,16 +53,26 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             this.drumRoll = drumRoll;
 
             Origin = Anchor.CentreLeft;
+
+            Size = new Vector2(1, TaikoHitObject.CIRCLE_RADIUS * 2);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            ExplodeColour = colours.Yellow;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Size = new Vector2((float)(HitObject.Duration / drumRoll.PreEmpt) * Parent.DrawSize.X * (1f / Scale.X), 128);
+            Size = new Vector2((float)(HitObject.Duration / drumRoll.PreEmpt) * Parent.DrawSize.X * (1f / Scale.X), Size.Y);
 
             Children = new Drawable[]
             {
+                // The body will over-shoot by CircleRadius on both sides. This is intended
+                // as it means the first tick is positioned after the semi-circle.
                 body = CreateBody(Size.X),
                 ticks = new Container<DrawableDrumRollTick>()
                 {
@@ -85,9 +96,20 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 tickIndex++;
             }
         }
-
+        
+        /// <summary>
+        /// Creates a drawable tick from the base tick.
+        /// </summary>
+        /// <param name="drumRoll">The drum roll that contains the tick.</param>
+        /// <param name="tick">The base tick.</param>
+        /// <returns>The drawable tick.</returns>
         protected virtual DrawableDrumRollTick CreateTick(DrumRoll drumRoll, DrumRollTick tick) => new DrawableDrumRollTick(drumRoll, tick);
 
+        /// <summary>
+        /// Creates the body piece of the drum roll.
+        /// </summary>
+        /// <param name="length">The raw length of the body piece, before CornerRadius.</param>
+        /// <returns>The body piece.</returns>
         protected virtual DrumRollBodyPiece CreateBody(float length) => new DrumRollBodyPiece(length);
 
         protected override void CheckJudgement(bool userTriggered)

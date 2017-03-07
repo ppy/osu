@@ -17,7 +17,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public abstract class DrawableTaikoHitObject : DrawableHitObject
     {
-        public abstract Color4 ExplodeColour { get; }
+        /// <summary>
+        /// The colour to be shown when this HitObject is hit.
+        /// </summary>
+        public abstract Color4 ExplodeColour { get; protected set; }
 
         public override bool ExpireOnStateChange => false;
 

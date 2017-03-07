@@ -22,16 +22,30 @@ namespace osu.Game.Modes.Taiko.Objects
         /// </summary>
         public TaikoScoreResult MaxScore = TaikoScoreResult.Great;
 
+        /// <summary>
+        /// Returns the score value of this judgement.
+        /// </summary>
         public int ScoreValue => ScoreToInt(Score);
-        public int AccuracyScoreValue => AccuracyScoreToInt(Score);
 
+        /// <summary>
+        /// Returns the accuracy score value of this judgement.
+        /// </summary>
+        public int AccuracyScoreValue => AccuracyScoreToInt(Score);
+        
+        /// <summary>
+        /// Returns the maximum score value of this judgement.
+        /// </summary>
         public int MaxScoreValue => ScoreToInt(MaxScore);
+
+        /// <summary>
+        /// Returns the maximum accuracy score value of this judgement.
+        /// </summary>
         public int MaxAccuracyScoreValue => AccuracyScoreToInt(MaxScore);
 
         public bool SecondHit;
 
         /// <summary>
-        /// This is used to compute score for the score processor.
+        /// Converts the score value to a raw score.
         /// </summary>
         protected virtual int ScoreToInt(TaikoScoreResult result)
         {
@@ -47,7 +61,8 @@ namespace osu.Game.Modes.Taiko.Objects
         }
 
         /// <summary>
-        /// This is used to compute the score for the accuracy percentage.
+        /// Converts the accuracy score value to a raw accuracy score.
+        /// <para>This is used specifically to compute the accuracy percentage.</para>
         /// </summary>
         protected virtual int AccuracyScoreToInt(TaikoScoreResult result)
         {
@@ -55,10 +70,10 @@ namespace osu.Game.Modes.Taiko.Objects
             {
                 default:
                     return 0;
-                case TaikoScoreResult.Great:
-                    return 300;
                 case TaikoScoreResult.Good:
                     return 150;
+                case TaikoScoreResult.Great:
+                    return 300;
             }
         }
     }

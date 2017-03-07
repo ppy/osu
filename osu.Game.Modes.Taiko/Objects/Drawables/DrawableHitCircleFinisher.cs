@@ -13,36 +13,62 @@ using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Game.Modes.Objects.Drawables;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableHitCircleDonFinisher : DrawableHitCircleFinisher
     {
-        public override Color4 ExplodeColour => new Color4(187, 17, 119, 255);
+        public override Color4 ExplodeColour { get; protected set; }
+
+        protected override List<Key> Keys { get; } = new List<Key>(new[] { Key.F, Key.J });
 
         public DrawableHitCircleDonFinisher(HitCircle hitCircle)
             : base(hitCircle)
         {
         }
 
-        protected override HitCirclePiece CreateBody() => new DonFinisherPiece();
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            ExplodeColour = colours.Pink;
+        }
+
+        protected override CirclePiece CreateBody() => new DonCirclePiece
+        {
+            Scale = new Vector2(1.5f)
+        };
     }
 
     public class DrawableHitCircleKatsuFinisher : DrawableHitCircleFinisher
     {
-        public override Color4 ExplodeColour => new Color4(17, 136, 170, 255);
+        public override Color4 ExplodeColour { get; protected set; }
+
+        protected override List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.K });
 
         public DrawableHitCircleKatsuFinisher(HitCircle hitCircle)
             : base(hitCircle)
         {
         }
 
-        protected override HitCirclePiece CreateBody() => new KatsuFinisherPiece();
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            ExplodeColour = colours.Blue;
+        }
+
+        protected override CirclePiece CreateBody() => new KatsuCirclePiece
+        {
+            Scale = new Vector2(1.5f)
+        };
     }
 
     public abstract class DrawableHitCircleFinisher : DrawableHitCircle
     {
         private const double second_hit_window = 30;
+
+        private List<Key> pressedKeys = new List<Key>();
 
         private bool validKeyPressed;
 
@@ -53,19 +79,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         }
 
         public override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo() { MaxScore = TaikoScoreResult.Great, SecondHit = true };
-
-        protected override bool ProcessHit(bool validKey)
-        {
-            TaikoJudgementInfo tji = Judgement as TaikoJudgementInfo;
-
-            if (!tji.Result.HasValue)
-                return base.ProcessHit(validKey);
-
-            validKeyPressed = validKey;
-
-            CheckJudgement(true);
-            return true;
-        }
 
         protected override void CheckJudgement(bool userTriggered)
         {
@@ -97,6 +110,21 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             TaikoJudgementInfo tji = Judgement as TaikoJudgementInfo;
             if (!tji.SecondHit && Time.Current >= HitObject.EndTime)
                 base.UpdateAuto();
+        }
+
+        protected override bool HandleKeyPress(Key key)
+        {
+            // Don't handle re-presses of the same key
+            if (pressedKeys.Contains(key))
+                return false;
+
+            bool handled = base.HandleKeyPress(key);
+
+            // Only add to list if this HitObject handled the keypress
+            if (handled)
+                pressedKeys.Add(key);
+
+            return handled;
         }
     }
 }

@@ -18,32 +18,41 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Allocation;
+using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableBash : DrawableTaikoHitObject
     {
-        private const float outer_scale = 5f;
+        /// <summary>
+        /// Scale of the outer ring.
+        /// </summary>
+        private const float outer_ring_scale = 5f;
 
-        public override Color4 ExplodeColour => new Color4(237, 171, 0, 255);
+        public override Color4 ExplodeColour { get; protected set; }
 
-        protected virtual List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
+        /// <summary>
+        /// A list of keys which this HitObject will accept. These are the standard Taiko keys for now.
+        /// These should be moved to bindings later.
+        /// </summary>
+        private List<Key> validKeys { get; } = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
 
-        private HitCirclePiece bodyPiece;
+        private CirclePiece bodyPiece;
 
         private Container bashInnerRing;
-        private Container bashOuterRing;
+        private CircularContainer bashOuterRing;
+        private Box innerRingBackground;
 
         private int userHits;
-        private bool ringsVisible;
 
         public DrawableBash(Bash spinner)
             : base(spinner)
         {
-            Size = new Vector2(128);
+            Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2);
 
             Children = new Drawable[]
             {
+                // Outer ring (the one that the inner ring scales to)
                 bashOuterRing = new CircularContainer()
                 {
                     Anchor = Anchor.Centre,
@@ -51,11 +60,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
                     RelativeSizeAxes = Axes.Both,
 
-                    Scale = new Vector2(outer_scale),
+                    Scale = new Vector2(outer_ring_scale),
                     Alpha = 0f,
 
                     BorderThickness = 4,
-                    BorderColour = new Color4(237, 171, 0, 25),
 
                     Children = new Drawable[]
                     {
@@ -66,6 +74,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                             Alpha = 0,
                             AlwaysPresent = true
                         },
+                        // Outer ring internal border
                         new CircularContainer()
                         {
                             Anchor = Anchor.Centre,
@@ -89,6 +98,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                         }
                     }
                 },
+                // Inner ring (the one that scales up)
                 bashInnerRing = new CircularContainer()
                 {
                     Anchor = Anchor.Centre,
@@ -103,21 +113,38 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
                     Children = new[]
                     {
-                        new Box()
+                        // Inner ring background
+                        innerRingBackground = new Box()
                         {
                             RelativeSizeAxes = Axes.Both,
 
-                            Colour = new Color4(204, 102, 0, 255),
                             Alpha = 0.3f,
                             AlwaysPresent = true
                         }
                     }
                 },
-                bodyPiece = new SpinnerPiece()
+                // Inner circle
+                bodyPiece = new BashCirclePiece()
                 {
                     Kiai = spinner.Kiai
                 },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            ExplodeColour = colours.Yellow;
+            bashOuterRing.BorderColour = colours.Yellow.Opacity(25);
+            innerRingBackground.Colour = colours.YellowDark;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            bashOuterRing.Delay(HitObject.StartTime - Time.Current).FadeIn(200);
+            bashInnerRing.Delay(HitObject.StartTime - Time.Current).FadeIn(200);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -125,10 +152,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             if (Judgement.Result.HasValue)
                 return false;
 
-            if (!Keys.Contains(args.Key))
-                return false;
-
-            if (Time.Current < HitObject.StartTime)
+            if (!validKeys.Contains(args.Key))
                 return false;
 
             UpdateJudgement(true);
@@ -148,7 +172,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
                 userHits++;
 
-                bashInnerRing.ScaleTo(1f + (outer_scale - 1) * userHits / spinner.RequiredHits, 50);
+                bashInnerRing.ScaleTo(1f + (outer_ring_scale - 1) * userHits / spinner.RequiredHits, 50);
 
                 if (userHits == spinner.RequiredHits)
                 {
@@ -214,13 +238,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             MoveToOffset(Math.Min(Time.Current, HitObject.StartTime));
 
             UpdateAuto();
-
-            if (Time.Current >= HitObject.StartTime && !ringsVisible)
-            {
-                bashOuterRing.FadeIn(200);
-                bashInnerRing.FadeIn(200);
-                ringsVisible = true;
-            }
         }
     }
 }
