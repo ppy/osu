@@ -10,7 +10,7 @@ using OpenTK;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
-    class DrawableTaikoHit : Sprite
+    internal class DrawableTaikoHit : Sprite
     {
         private TaikoBaseHit h;
 

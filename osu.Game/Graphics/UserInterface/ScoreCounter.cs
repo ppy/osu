@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as ScoreCounter).DisplayedCount = CurrentValue;
+                ((ScoreCounter)d).DisplayedCount = CurrentValue;
             }
         }
     }

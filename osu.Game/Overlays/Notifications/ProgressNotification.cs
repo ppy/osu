@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.Notifications
         /// </summary>
         public Func<bool> CompletionClickAction;
 
-        class ProgressBar : Container
+        private class ProgressBar : Container
         {
             private Box box;
 

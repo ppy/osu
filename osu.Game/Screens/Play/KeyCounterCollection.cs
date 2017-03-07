@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private int fadeTime = 0;
+        private int fadeTime;
         public int FadeTime
         {
             get { return fadeTime; }

@@ -12,8 +12,8 @@ namespace osu.Game.Modes.Catch.UI
     {
         protected override HitObjectConverter<CatchBaseHit> Converter => new CatchConverter();
 
-        protected override Playfield CreatePlayfield() => new CatchPlayfield();
+        protected override Playfield<CatchBaseHit> CreatePlayfield() => new CatchPlayfield();
 
-        protected override DrawableHitObject GetVisualRepresentation(CatchBaseHit h) => null;// new DrawableFruit(h);
+        protected override DrawableHitObject<CatchBaseHit> GetVisualRepresentation(CatchBaseHit h) => null;// new DrawableFruit(h);
     }
 }
