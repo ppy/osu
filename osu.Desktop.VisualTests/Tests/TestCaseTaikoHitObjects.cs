@@ -26,8 +26,6 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseTaikoHitObjects : TestCase
     {
-        public override string Name => @"Hit Objects (Taiko)";
-
         private StopwatchClock rateAdjustClock;
         private FramedClock framedClock;
 
@@ -147,7 +145,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton(@"drum roll finisher", () => load(HitObjectType.DrumRollFinisher));
             AddButton(@"spinner", () => load(HitObjectType.Spinner));
 
-            AddToggle(@"auto", () => { auto = !auto; load(mode); });
+            AddToggle(@"auto", state => { auto = !auto; load(mode); });
 
             ButtonsContainer.Add(new SpriteText { Text = "Playback Speed" });
             ButtonsContainer.Add(new BasicSliderBar<double>

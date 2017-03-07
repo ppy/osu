@@ -3,10 +3,8 @@
 
 namespace osu.Game.Beatmaps.Timing
 {
-    class TimingChange : ControlPoint
+    internal class TimingChange : ControlPoint
     {
-        public double BeatLength;
-
         public TimingChange(double beatLength)
         {
             BeatLength = beatLength;

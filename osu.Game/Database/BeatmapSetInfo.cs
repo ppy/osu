@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
@@ -13,7 +12,7 @@ namespace osu.Game.Database
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
 
-        public int? OnlineBeatmapSetID { get; set; } = null;
+        public int? OnlineBeatmapSetID { get; set; }
 
         [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BeatmapMetadata Metadata { get; set; }
@@ -23,6 +22,8 @@ namespace osu.Game.Database
 
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<BeatmapInfo> Beatmaps { get; set; }
+
+        public bool DeletePending { get; set; }
 
         public string Hash { get; set; }
 

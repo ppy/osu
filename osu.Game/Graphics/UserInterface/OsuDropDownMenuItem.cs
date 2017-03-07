@@ -2,11 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 
@@ -20,9 +20,9 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new[]
             {
-                new FlowContainer
+                new FillFlowContainer
                 {
-                    Direction = FlowDirections.Horizontal,
+                    Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]

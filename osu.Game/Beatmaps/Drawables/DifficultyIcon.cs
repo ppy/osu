@@ -1,10 +1,8 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -14,7 +12,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class DifficultyIcon : Container
+    internal class DifficultyIcon : Container
     {
         private readonly BeatmapInfo beatmap;
         private OsuColour palette;
@@ -36,6 +34,7 @@ namespace osu.Game.Beatmaps.Drawables
                 new TextAwesome
                 {
                     Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     TextSize = Size.X,
                     Colour = getColour(beatmap),
                     Icon = FontAwesome.fa_circle
@@ -43,6 +42,7 @@ namespace osu.Game.Beatmaps.Drawables
                 new TextAwesome
                 {
                     Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     TextSize = Size.X,
                     Colour = Color4.White,
                     Icon = Ruleset.GetRuleset(beatmap.Mode).Icon
@@ -50,7 +50,7 @@ namespace osu.Game.Beatmaps.Drawables
             };
         }
 
-        enum DifficultyRating
+        private enum DifficultyRating
         {
             Easy,
             Normal,

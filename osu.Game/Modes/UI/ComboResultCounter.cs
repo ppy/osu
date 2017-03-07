@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics.UserInterface;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Modes.UI
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as ComboResultCounter).DisplayedCount = CurrentValue;
+                ((ComboResultCounter)d).DisplayedCount = CurrentValue;
             }
         }
     }

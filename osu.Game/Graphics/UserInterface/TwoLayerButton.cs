@@ -4,13 +4,13 @@
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.UserInterface
         private Container c1;
         private Container c2;
 
-        public Color4 Colour
+        public Color4 BackgroundColour
         {
             set
             {
@@ -57,10 +57,7 @@ namespace osu.Game.Graphics.UserInterface
                 c1.Origin = c1.Anchor = (value & Anchor.x2) > 0 ? Anchor.TopLeft : Anchor.TopRight;
                 c2.Origin = c2.Anchor = (value & Anchor.x2) > 0 ? Anchor.TopRight : Anchor.TopLeft;
 
-                Margin = new MarginPadding
-                {
-                    Right = (value & Anchor.x2) > 0 ? -SIZE_RETRACTED.X * shear * 0.5f : 0
-                };
+                X = (value & Anchor.x2) > 0 ? SIZE_RETRACTED.X * shear * 0.5f : 0;
 
                 c1.Depth = (value & Anchor.x2) > 0 ? 0 : 1;
                 c2.Depth = (value & Anchor.x2) > 0 ? 1 : 0;
@@ -101,6 +98,7 @@ namespace osu.Game.Graphics.UserInterface
                         icon = new TextAwesome
                         {
                             Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             TextSize = 25,
                         },
                     }
@@ -164,7 +162,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(InputState state)
         {
-            icon.ClearTransformations();
+            icon.ClearTransforms();
 
             ResizeTo(SIZE_EXTENDED, transform_time, EasingTypes.OutElastic);
 
@@ -193,7 +191,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(InputState state)
         {
-            icon.ClearTransformations();
+            icon.ClearTransforms();
 
             ResizeTo(SIZE_RETRACTED, transform_time, EasingTypes.OutElastic);
 

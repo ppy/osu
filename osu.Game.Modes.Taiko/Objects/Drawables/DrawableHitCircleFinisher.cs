@@ -78,7 +78,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             Size *= 1.5f;
         }
 
-        public override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo() { MaxScore = TaikoScoreResult.Great, SecondHit = true };
+        protected override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo() { MaxScore = TaikoScoreResult.Great, SecondHit = true };
 
         protected override void CheckJudgement(bool userTriggered)
         {

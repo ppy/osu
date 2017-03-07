@@ -19,6 +19,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {

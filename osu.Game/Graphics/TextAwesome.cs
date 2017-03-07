@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics.Sprites;
-using OpenTK;
 
 namespace osu.Game.Graphics
 {
@@ -26,11 +25,6 @@ namespace osu.Game.Graphics
                 icon = value;
                 Text = ((char)icon).ToString();
             }
-        }
-
-        public TextAwesome()
-        {
-            Origin = Framework.Graphics.Anchor.Centre;
         }
     }
 
@@ -903,6 +897,6 @@ namespace osu.Game.Graphics
         fa_osu_mod_spunout = 0xe046,
         fa_osu_mod_suddendeath = 0xe047,
         fa_osu_mod_target = 0xe048,
-        fa_osu_mod_bg = 0xe049,
+        fa_osu_mod_bg = 0xe04a,
     }
 }

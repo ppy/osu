@@ -2,33 +2,27 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Framework;
 using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using OpenTK;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Modes;
 using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseHitObjects : TestCase
+    internal class TestCaseHitObjects : TestCase
     {
-        public override string Name => @"Hit Objects";
-
         private StopwatchClock rateAdjustClock;
         private FramedClock framedClock;
 
-        bool auto = false;
+        private bool auto;
 
         public TestCaseHitObjects()
         {
@@ -37,9 +31,9 @@ namespace osu.Desktop.VisualTests.Tests
             playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
         }
 
-        HitObjectType mode = HitObjectType.Slider;
+        private HitObjectType mode = HitObjectType.Slider;
 
-        BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
+        private BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
         private Container playfieldContainer;
         private Container approachContainer;
 
@@ -67,7 +61,7 @@ namespace osu.Desktop.VisualTests.Tests
                     add(new DrawableSlider(new Slider
                     {
                         StartTime = framedClock.CurrentTime + 600,
-                        ControlPoints = new List<Vector2>()
+                        ControlPoints = new List<Vector2>
                         {
                             new Vector2(-200, 0),
                             new Vector2(400, 0),
@@ -99,7 +93,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton(@"slider", () => load(HitObjectType.Slider));
             AddButton(@"spinner", () => load(HitObjectType.Spinner));
 
-            AddToggle(@"auto", () => { auto = !auto; load(mode); });
+            AddToggle(@"auto", state => { auto = state; load(mode); });
 
             ButtonsContainer.Add(new SpriteText { Text = "Playback Speed" });
             ButtonsContainer.Add(new BasicSliderBar<double>
@@ -128,8 +122,9 @@ namespace osu.Desktop.VisualTests.Tests
             load(mode);
         }
 
-        int depth;
-        void add(DrawableHitObject h)
+        private int depth;
+
+        private void add(DrawableHitObject h)
         {
             h.Anchor = Anchor.Centre;
             h.Depth = depth++;

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -61,8 +59,8 @@ namespace osu.Game.Online.Chat.Drawables
             return username_colours[message.UserId % username_colours.Length];
         }
 
-        const float padding = 200;
-        const float text_size = 20;
+        private const float padding = 200;
+        private const float text_size = 20;
 
         public ChatLine(Message message)
         {

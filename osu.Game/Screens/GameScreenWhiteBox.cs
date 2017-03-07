@@ -7,7 +7,7 @@ using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Backgrounds;
@@ -21,11 +21,11 @@ namespace osu.Game.Screens
     {
         private BackButton popButton;
 
-        const int transition_time = 1000;
+        private const int transition_time = 1000;
 
         protected virtual IEnumerable<Type> PossibleChildren => null;
 
-        private FlowContainer childModeButtons;
+        private FillFlowContainer childModeButtons;
         private Container textContainer;
         private Box box;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Screens
 
         protected override bool OnExiting(Screen next)
         {
-            textContainer.MoveTo(new Vector2((DrawSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2(DrawSize.X / 16, 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
 
             return base.OnExiting(next);
@@ -124,9 +124,9 @@ namespace osu.Game.Screens
                         Exit();
                     }
                 },
-                childModeButtons = new FlowContainer
+                childModeButtons = new FillFlowContainer
                 {
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Vertical,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Both,

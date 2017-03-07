@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenTK, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>..\packages\ppy.OpenTK.2.0.50727.1339\lib\net45\OpenTK.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.2.0.50727.1340\lib\net45\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -79,6 +79,7 @@
     <Compile Include="UI\TaikoPlayfield.cs" />
     <Compile Include="TaikoRuleset.cs" />
     <Compile Include="UI\TaikoScoreOverlay.cs" />
+    <Compile Include="TaikoMod.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\osu.licenseheader">
@@ -101,7 +102,6 @@
       <Name>osu.Game</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

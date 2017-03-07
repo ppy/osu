@@ -14,7 +14,32 @@ namespace osu.Game.Modes.Osu.Objects
     {
         public override double EndTime => StartTime + RepeatCount * Curve.Length / Velocity;
 
-        public override Vector2 EndPosition => RepeatCount % 2 == 0 ? Position : Curve.PositionAt(1);
+        public override Vector2 EndPosition => PositionAt(1);
+
+        /// <summary>
+        /// Computes the position on the slider at a given progress that ranges from 0 (beginning of the slider)
+        /// to 1 (end of the slider). This includes repeat logic.
+        /// </summary>
+        /// <param name="progress">Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <returns></returns>
+        public Vector2 PositionAt(double progress) => Curve.PositionAt(CurveProgressAt(progress));
+
+        /// <summary>
+        /// Find the current progress along the curve, accounting for repeat logic.
+        /// </summary>
+        public double CurveProgressAt(double progress)
+        {
+            var p = progress * RepeatCount % 1;
+            if (RepeatAt(progress) % 2 == 1)
+                p = 1 - p;
+            return p;
+        }
+
+        /// <summary>
+        /// Determine which repeat of the slider we are on at a given progress.
+        /// Range is 0..RepeatCount where 0 is the first run.
+        /// </summary>
+        public int RepeatAt(double progress) => (int)(progress * RepeatCount);
 
         private int stackHeight;
         public override int StackHeight

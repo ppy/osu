@@ -37,6 +37,13 @@ namespace osu.Game.Graphics.Backgrounds
 
         private float triangleScale = 1;
 
+        /// <summary>
+        /// Whether we should drop-off alpha values of triangles more quickly to improve
+        /// the visual appearance of fading. This defaults to on as it is generally more
+        /// aesthetically pleasing, but should be turned off in <see cref="BufferedContainer{T}"/>s.
+        /// </summary>
+        public bool HideAlphaDiscrepancies = true;
+
         public float TriangleScale
         {
             get { return triangleScale; }
@@ -63,8 +70,14 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.Update();
 
+            float adjustedAlpha = HideAlphaDiscrepancies ?
+                // Cubically scale alpha to make it drop off more sharply.
+                (float)Math.Pow(DrawInfo.Colour.AverageColour.Linear.A, 3) :
+                1;
+
             foreach (var t in Children)
             {
+                t.Alpha = adjustedAlpha;
                 t.Position -= new Vector2(0, (float)(t.Scale.X * (50 / DrawHeight) * (Time.Elapsed / 950)) / triangleScale);
                 if (ExpireOffScreenTriangles && t.DrawPosition.Y + t.DrawSize.Y * t.Scale.Y < 0)
                     t.Expire();
@@ -104,7 +117,7 @@ namespace osu.Game.Graphics.Backgrounds
         private void addTriangle(bool randomY)
         {
             var sprite = CreateTriangle();
-            float triangleHeight = (sprite.DrawHeight / DrawHeight);
+            float triangleHeight = sprite.DrawHeight / DrawHeight;
             sprite.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() * (1 + triangleHeight) - triangleHeight : 1);
             Add(sprite);
         }

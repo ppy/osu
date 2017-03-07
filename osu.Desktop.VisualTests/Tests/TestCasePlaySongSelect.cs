@@ -4,18 +4,19 @@
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Platform;
 using osu.Framework.Screens.Testing;
+using osu.Framework.MathUtils;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Select;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCasePlaySongSelect : TestCase
+    internal class TestCasePlaySongSelect : TestCase
     {
         private BeatmapDatabase db, oldDb;
         private TestStorage storage;
+        private PlaySongSelect songSelect;
 
-        public override string Name => @"Song Select";
         public override string Description => @"with fake data";
 
         public override void Reset()
@@ -35,9 +36,15 @@ namespace osu.Desktop.VisualTests.Tests
 
                 db.Import(sets);
             }
-            Add(new PlaySongSelect());
+
+            Add(songSelect = new PlaySongSelect());
+
+            AddButton(@"Sort by Artist", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Artist; });
+            AddButton(@"Sort by Title", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Title; });
+            AddButton(@"Sort by Author", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Author; });
+            AddButton(@"Sort by Difficulty", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Difficulty; });
         }
-        
+
         protected override void Dispose(bool isDisposing)
         {
             if (oldDb != null)
@@ -59,9 +66,10 @@ namespace osu.Desktop.VisualTests.Tests
                 Metadata = new BeatmapMetadata
                 {
                     OnlineBeatmapSetID = 1234 + i,
-                    Artist = "MONACA",
-                    Title = "Black Song",
-                    Author = "Some Guy",
+                    // Create random metadata, then we can check if sorting works based on these
+                    Artist = "MONACA " + RNG.Next(0, 9),
+                    Title = "Black Song " + RNG.Next(0, 9),
+                    Author = "Some Guy " + RNG.Next(0, 9),
                 },
                 Beatmaps = new List<BeatmapInfo>(new[]
                 {

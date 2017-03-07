@@ -6,16 +6,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -23,8 +21,8 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays
 {
@@ -45,7 +43,7 @@ namespace osu.Game.Overlays
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
-        private BaseGame game;
+        private Framework.Game game;
 
         private Container dragContainer;
 
@@ -61,7 +59,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnDrag(InputState state)
         {
-            Vector2 change = (state.Mouse.Position - state.Mouse.PositionMouseDown.Value);
+            Vector2 change = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
 
             // Diminish the drag distance as we go further to simulate "rubber band" feeling.
             change *= (float)Math.Pow(change.Length, 0.7f) / change.Length;
@@ -77,9 +75,10 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, OsuConfigManager config, BeatmapDatabase beatmaps, AudioManager audio,
-            TextureStore textures, OsuColour colours)
+        private void load(OsuGameBase osuGame, OsuConfigManager config, BeatmapDatabase beatmaps, OsuColour colours)
         {
+            game = osuGame;
+
             unicodeString = config.GetUnicodeString;
 
             Children = new Drawable[]
@@ -247,23 +246,25 @@ namespace osu.Game.Overlays
             }
         }
 
-        void preferUnicode_changed(object sender, EventArgs e)
+        private void preferUnicode_changed(object sender, EventArgs e)
         {
             updateDisplay(current, TransformDirection.None);
         }
 
         private void workingChanged(object sender = null, EventArgs e = null)
         {
-            progress.IsEnabled = (beatmapSource.Value != null);
+            progress.IsEnabled = beatmapSource.Value != null;
             if (beatmapSource.Value == current) return;
-            bool audioEquals = current?.BeatmapInfo.AudioEquals(beatmapSource.Value.BeatmapInfo) ?? false;
+            bool audioEquals = current?.BeatmapInfo?.AudioEquals(beatmapSource?.Value?.BeatmapInfo) ?? false;
             current = beatmapSource.Value;
             updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Next);
-            appendToHistory(current.BeatmapInfo);
+            appendToHistory(current?.BeatmapInfo);
         }
 
         private void appendToHistory(BeatmapInfo beatmap)
         {
+            if (beatmap == null) return;
+
             if (playHistoryIndex >= 0)
             {
                 if (beatmap.AudioEquals(playHistory[playHistoryIndex]))
@@ -322,13 +323,7 @@ namespace osu.Game.Overlays
             updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
-        protected override void PerformLoad(BaseGame game)
-        {
-            this.game = game;
-            base.PerformLoad(game);
-        }
-
-        Action pendingBeatmapSwitch;
+        private Action pendingBeatmapSwitch;
 
         private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
         {
@@ -349,7 +344,7 @@ namespace osu.Game.Overlays
 
                 MusicControllerBackground newBackground;
 
-                (newBackground = new MusicControllerBackground(beatmap)).Preload(game, delegate
+                (newBackground = new MusicControllerBackground(beatmap)).LoadAsync(game, delegate
                 {
 
                     dragContainer.Add(newBackground);
@@ -389,7 +384,7 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        const float transition_length = 800;
+        private const float transition_length = 800;
 
         protected override void PopIn()
         {

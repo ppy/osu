@@ -9,13 +9,14 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Menu
 {
@@ -107,6 +108,7 @@ namespace osu.Game.Screens.Menu
                         {
                             Shadow = true,
                             Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             TextSize = 30,
                             Position = new Vector2(0, 0),
                             Icon = symbol
@@ -114,7 +116,7 @@ namespace osu.Game.Screens.Menu
                         new OsuSpriteText
                         {
                             Shadow = true,
-                            Direction = FlowDirections.Horizontal,
+                            AllowMultiline = false,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             TextSize = 16,
@@ -138,7 +140,7 @@ namespace osu.Game.Screens.Menu
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
             if (duration == 0) duration = 250;
 
-            icon.ClearTransformations();
+            icon.ClearTransforms();
 
             icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
 
@@ -219,7 +221,7 @@ namespace osu.Game.Screens.Menu
 
         protected override void OnHoverLost(InputState state)
         {
-            icon.ClearTransformations();
+            icon.ClearTransforms();
             icon.RotateTo(0, 500, EasingTypes.Out);
             icon.MoveTo(Vector2.Zero, 500, EasingTypes.Out);
             icon.ScaleTo(0.7f, 500, EasingTypes.OutElasticHalf);
@@ -257,7 +259,8 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Repeat) return false;
+            if (args.Repeat || state.Keyboard.ControlPressed || state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
+                return false;
 
             if (triggerKey == args.Key && triggerKey != Key.Unknown)
             {
@@ -274,7 +277,7 @@ namespace osu.Game.Screens.Menu
 
             clickAction?.Invoke();
 
-            boxHoverLayer.ClearTransformations();
+            boxHoverLayer.ClearTransforms();
             boxHoverLayer.Alpha = 0.9f;
             boxHoverLayer.FadeOut(800, EasingTypes.OutExpo);
         }
@@ -289,7 +292,7 @@ namespace osu.Game.Screens.Menu
 
         public int ContractStyle;
 
-        ButtonState state;
+        private ButtonState state;
 
         public ButtonState State
         {

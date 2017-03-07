@@ -2,25 +2,44 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
+using osu.Game.Modes;
 
 namespace osu.Game.Beatmaps
 {
-    public class WorkingBeatmap : IDisposable
+    public abstract class WorkingBeatmap : IDisposable
     {
         public readonly BeatmapInfo BeatmapInfo;
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
-        private readonly BeatmapDatabase database;
+
+        /// <summary>
+        /// A play mode that is preferred for this beatmap. PlayMode will become this mode where conversion is feasible,
+        /// or otherwise to the beatmap's default.
+        /// </summary>
+        public PlayMode? PreferredPlayMode;
+
+        public PlayMode PlayMode => beatmap?.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode ?? PlayMode.Osu;
+
+        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
 
         public readonly bool WithStoryboard;
 
-        private ArchiveReader getReader() => database?.GetReader(BeatmapSetInfo);
+        protected abstract ArchiveReader GetReader();
+
+        protected WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, bool withStoryboard = false)
+        {
+            BeatmapInfo = beatmapInfo;
+            BeatmapSetInfo = beatmapSetInfo;
+            WithStoryboard = withStoryboard;
+        }
 
         private Texture background;
         private object backgroundLock = new object();
@@ -36,7 +55,7 @@ namespace osu.Game.Beatmaps
 
                     try
                     {
-                        using (var reader = getReader())
+                        using (var reader = GetReader())
                             background = new TextureStore(new RawTextureLoaderStore(reader), false).Get(BeatmapInfo.Metadata.BackgroundFile);
                     }
                     catch { }
@@ -59,7 +78,7 @@ namespace osu.Game.Beatmaps
 
                     try
                     {
-                        using (var reader = getReader())
+                        using (var reader = GetReader())
                         {
                             BeatmapDecoder decoder;
                             using (var stream = new StreamReader(reader.GetStream(BeatmapInfo.Path)))
@@ -95,7 +114,7 @@ namespace osu.Game.Beatmaps
                     try
                     {
                         //store a reference to the reader as we may continue accessing the stream in the background.
-                        trackReader = getReader();
+                        trackReader = GetReader();
                         var trackData = trackReader?.GetStream(BeatmapInfo.Metadata.AudioFile);
                         if (trackData != null)
                             track = new TrackBass(trackData);
@@ -109,19 +128,6 @@ namespace osu.Game.Beatmaps
         }
 
         public bool TrackLoaded => track != null;
-
-        public WorkingBeatmap(Beatmap beatmap)
-        {
-            this.beatmap = beatmap;
-        }
-
-        public WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, BeatmapDatabase database, bool withStoryboard = false)
-        {
-            BeatmapInfo = beatmapInfo;
-            BeatmapSetInfo = beatmapSetInfo;
-            this.database = database;
-            this.WithStoryboard = withStoryboard;
-        }
 
         private bool isDisposed;
 

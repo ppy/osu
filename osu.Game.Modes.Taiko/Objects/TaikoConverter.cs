@@ -11,7 +11,7 @@ using OpenTK;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    class TaikoConverter : HitObjectConverter<TaikoHitObject>
+    internal class TaikoConverter : HitObjectConverter<TaikoHitObject>
     {
         public override List<TaikoHitObject> Convert(Beatmap beatmap)
         {

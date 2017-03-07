@@ -3,7 +3,7 @@
 
 using osu.Framework.Allocation;
 using OpenTK;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
 
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Backgrounds
                     else
                         newBackground = new BeatmapBackground(beatmap);
 
-                    newBackground.Preload(Game, delegate
+                    newBackground.LoadAsync(Game, delegate
                     {
                         float newDepth = 0;
                         if (background != null)
@@ -60,18 +60,21 @@ namespace osu.Game.Screens.Backgrounds
             Beatmap = beatmap;
         }
 
-        public void BlurTo(Vector2 sigma, double duration)
+        public void BlurTo(Vector2 sigma, double duration, EasingTypes easing = EasingTypes.None)
         {
-            background?.BlurTo(sigma, duration, EasingTypes.OutExpo);
+            background?.BlurTo(sigma, duration, easing);
             blurTarget = sigma;
         }
 
         public override bool Equals(BackgroundScreen other)
         {
-            return base.Equals(other) && beatmap == ((BackgroundScreenBeatmap)other).Beatmap;
+            var otherBeatmapBackground = other as BackgroundScreenBeatmap;
+            if (otherBeatmapBackground == null) return false;
+
+            return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
-        class BeatmapBackground : Background
+        private class BeatmapBackground : Background
         {
             private WorkingBeatmap beatmap;
 

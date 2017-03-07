@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
         /// Type of the Transform to use.
         /// </summary>
         /// <remarks>
-        /// Must be a subclass of Transform<T>
+        /// Must be a subclass of Transform(T)
         /// </remarks>
         protected virtual Type TransformType => typeof(Transform<T>);
 
@@ -107,7 +107,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             Children = new Drawable[]
             {
-                DisplayedCountSpriteText = new OsuSpriteText()
+                DisplayedCountSpriteText = new OsuSpriteText
                 {
                     Font = @"Venera"
                 },

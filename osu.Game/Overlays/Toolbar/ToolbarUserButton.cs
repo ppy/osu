@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -10,11 +11,10 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Online.API;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    class ToolbarUserButton : ToolbarButton, IOnlineComponent
+    internal class ToolbarUserButton : ToolbarButton, IOnlineComponent
     {
         private Avatar avatar;
 
@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Toolbar
 
                     newSprite.FillMode = FillMode.Fit;
 
-                    newSprite.Preload(game, s =>
+                    newSprite.LoadAsync(game, s =>
                     {
                         Sprite?.FadeOut();
                         Sprite?.Expire();
@@ -120,7 +120,6 @@ namespace osu.Game.Overlays.Toolbar
             public class OnlineSprite : Sprite
             {
                 private readonly string url;
-                private readonly int userId;
 
                 public OnlineSprite(string url)
                 {

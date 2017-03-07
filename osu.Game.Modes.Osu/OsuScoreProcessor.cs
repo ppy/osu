@@ -8,7 +8,7 @@ using osu.Game.Modes.Osu.Objects.Drawables;
 
 namespace osu.Game.Modes.Osu
 {
-    class OsuScoreProcessor : ScoreProcessor
+    internal class OsuScoreProcessor : ScoreProcessor
     {
         protected override bool ShouldFail => Health.Value == Health.MinValue;
 
@@ -27,6 +27,7 @@ namespace osu.Game.Modes.Osu
             base.Reset();
 
             Health.Value = 1;
+            Accuracy.Value = 1;
         }
 
         protected override void UpdateCalculations(JudgementInfo judgement)
@@ -49,8 +50,9 @@ namespace osu.Game.Modes.Osu
             int score = 0;
             int maxScore = 0;
 
-            foreach (OsuJudgementInfo j in Judgements)
+            foreach (var judgementInfo in Judgements)
             {
+                var j = (OsuJudgementInfo)judgementInfo;
                 score += j.ScoreValue;
                 maxScore += j.MaxScoreValue;
             }

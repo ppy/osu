@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +12,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionSlider<T> : FlowContainer where T : struct
+    public class OptionSlider<T> : FillFlowContainer where T : struct
     {
         private SliderBar<T> slider;
         private SpriteText text;
@@ -41,7 +40,6 @@ namespace osu.Game.Overlays.Options
 
         public OptionSlider()
         {
-            Direction = FlowDirections.Vertical;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = 5 };

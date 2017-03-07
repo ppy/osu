@@ -18,10 +18,10 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
             Children = new Drawable[]
             {
                 new OptionLabel { Text = "Resolution: TODO dropdown" },
-                new OsuCheckbox
+                new OptionEnumDropDown<WindowMode>
                 {
-                    LabelText = "Fullscreen mode",
-                    Bindable = config.GetBindable<bool>(FrameworkConfig.Fullscreen),
+                    LabelText = "Screen mode",
+                    Bindable = config.GetBindable<WindowMode>(FrameworkConfig.WindowMode),
                 },
                 new OsuCheckbox
                 {

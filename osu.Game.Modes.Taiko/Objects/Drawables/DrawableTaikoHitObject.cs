@@ -8,14 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using osu.Game.Modes.Objects;
-using osu.Framework.Graphics.Transformations;
 using OpenTK;
 using osu.Framework.Graphics;
 using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public abstract class DrawableTaikoHitObject : DrawableHitObject
+    public abstract class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject>
     {
         /// <summary>
         /// The colour to be shown when this HitObject is hit.
@@ -33,7 +32,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             RelativePositionAxes = Axes.X;
         }
 
-        public override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo { MaxScore = TaikoScoreResult.Great };
+        protected override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo { MaxScore = TaikoScoreResult.Great };
 
         /// <summary>
         /// Todo: Remove

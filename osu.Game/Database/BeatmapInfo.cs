@@ -5,10 +5,8 @@ using System;
 using System.Linq;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes;
-using osu.Game.Screens.Play;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
-using osu.Game.Beatmaps;
 
 namespace osu.Game.Database
 {
@@ -17,9 +15,9 @@ namespace osu.Game.Database
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
 
-        public int? OnlineBeatmapID { get; set; } = null;
+        public int? OnlineBeatmapID { get; set; }
 
-        public int? OnlineBeatmapSetID { get; set; } = null;
+        public int? OnlineBeatmapSetID { get; set; }
 
         [ForeignKey(typeof(BeatmapSetInfo))]
         public int BeatmapSetInfoID { get; set; }
@@ -41,6 +39,8 @@ namespace osu.Game.Database
 
         public string Path { get; set; }
 
+        public string Hash { get; set; }
+
         // General
         public int AudioLeadIn { get; set; }
         public bool Countdown { get; set; }
@@ -59,13 +59,14 @@ namespace osu.Game.Database
         {
             get
             {
-                return StoredBookmarks.Split(',').Select(b => int.Parse(b)).ToArray();
+                return StoredBookmarks.Split(',').Select(int.Parse).ToArray();
             }
             set
             {
                 StoredBookmarks = string.Join(",", value);
             }
         }
+
         public double DistanceSpacing { get; set; }
         public int BeatDivisor { get; set; }
         public int GridSize { get; set; }
@@ -74,22 +75,15 @@ namespace osu.Game.Database
         // Metadata
         public string Version { get; set; }
 
-        //todo: background threaded computation of this
         private float starDifficulty = -1;
         public float StarDifficulty
         {
             get
             {
-                return (starDifficulty < 0) ? (BaseDifficulty?.OverallDifficulty ?? 5) : starDifficulty;
+                return starDifficulty < 0 ? (BaseDifficulty?.OverallDifficulty ?? 5) : starDifficulty;
             }
             
             set { starDifficulty = value; }
-        }
-
-        internal void ComputeDifficulty(BeatmapDatabase database)
-        {
-            WorkingBeatmap wb = new WorkingBeatmap(this, BeatmapSet, database);
-            StarDifficulty = (float)Ruleset.GetRuleset(Mode).CreateDifficultyCalculator(wb.Beatmap).GetDifficulty();
         }
 
         public bool Equals(BeatmapInfo other)
@@ -97,7 +91,7 @@ namespace osu.Game.Database
             return ID == other?.ID;
         }
 
-        public bool AudioEquals(BeatmapInfo other) => other != null &&
+        public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
             BeatmapSet.Path == other.BeatmapSet.Path &&
             (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
     }

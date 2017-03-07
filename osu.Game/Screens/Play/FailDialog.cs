@@ -3,18 +3,14 @@
 
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    class FailDialog : OsuScreen
+    internal class FailDialog : OsuScreen
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 

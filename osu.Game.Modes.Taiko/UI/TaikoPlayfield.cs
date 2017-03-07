@@ -4,28 +4,23 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
+using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.UI;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables;
-using osu.Game.Modes.Taiko.Objects;
-using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Taiko.UI
 {
-    public class TaikoPlayfield : Playfield
+    public class TaikoPlayfield : Playfield<TaikoHitObject>
     {
         public const float PLAYFIELD_BASE_HEIGHT = 242;
         public const float PLAYFIELD_SCALE = 0.65f;
 
         public static float PLAYFIELD_HEIGHT => PLAYFIELD_BASE_HEIGHT * PLAYFIELD_SCALE;
-
-        protected override Container<Drawable> Content => this;
 
         private static float left_area_size = 0.15f / PLAYFIELD_SCALE;
         private const float hit_target_offset = 0.1f;
@@ -178,7 +173,7 @@ namespace osu.Game.Modes.Taiko.UI
             missColour = colours.Red;
         }
 
-        public override void Add(DrawableHitObject h)
+        public override void Add(DrawableHitObject<TaikoHitObject> h)
         {
             h.Depth = (float)h.HitObject.StartTime;
             h.Scale = new Vector2(PLAYFIELD_SCALE);

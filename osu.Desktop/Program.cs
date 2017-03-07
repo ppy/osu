@@ -3,14 +3,9 @@
 
 using System;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using osu.Desktop.Beatmaps.IO;
-using osu.Framework;
 using osu.Framework.Desktop;
 using osu.Framework.Desktop.Platform;
-using osu.Framework.Platform;
-using osu.Game;
 using osu.Game.IPC;
 using osu.Game.Modes;
 using osu.Game.Modes.Catch;
@@ -34,13 +29,13 @@ namespace osu.Desktop
             {
                 if (!host.IsPrimaryInstance)
                 {
-                    var importer = new BeatmapImporter(host);
+                    var importer = new BeatmapIPCChannel(host);
                     // Restore the cwd so relative paths given at the command line work correctly
                     Directory.SetCurrentDirectory(cwd);
                     foreach (var file in args)
                     {
                         Console.WriteLine(@"Importing {0}", file);
-                        if (!importer.Import(Path.GetFullPath(file)).Wait(3000))
+                        if (!importer.ImportAsync(Path.GetFullPath(file)).Wait(3000))
                             throw new TimeoutException(@"IPC took too long to send");
                     }
                 }
@@ -51,9 +46,7 @@ namespace osu.Desktop
                     Ruleset.Register(new ManiaRuleset());
                     Ruleset.Register(new CatchRuleset());
 
-                    BaseGame osu = new OsuGameDesktop(args);
-                    host.Add(osu);
-                    host.Run();
+                    host.Run(new OsuGameDesktop(args));
                 }
                 return 0;
             }

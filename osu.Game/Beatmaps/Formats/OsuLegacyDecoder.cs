@@ -2,17 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using OpenTK.Graphics;
-using osu.Game.Database;
 using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
-using osu.Game.Screens.Play;
 using OpenTK;
 
 namespace osu.Game.Beatmaps.Formats
@@ -236,15 +233,18 @@ namespace osu.Game.Beatmaps.Formats
                 throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {val}");
             byte r, g, b;
             if (!byte.TryParse(split[0], out r) || !byte.TryParse(split[1], out g) || !byte.TryParse(split[2], out b))
-                throw new InvalidOperationException($@"Color must be specified with 8-bit integer components");
+                throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
             // Note: the combo index specified in the beatmap is discarded
-            beatmap.ComboColors.Add(new Color4
+            if (key.StartsWith(@"Combo"))
             {
-                R = r / 255f,
-                G = g / 255f,
-                B = b / 255f,
-                A = 1f,
-            });
+                beatmap.ComboColors.Add(new Color4
+                {
+                    R = r / 255f,
+                    G = g / 255f,
+                    B = b / 255f,
+                    A = 1f,
+                });
+            }
         }
 
         protected override void ParseFile(TextReader stream, Beatmap beatmap)
@@ -252,10 +252,9 @@ namespace osu.Game.Beatmaps.Formats
             HitObjectParser parser = null;
 
             var section = Section.None;
-            string line;
             while (true)
             {
-                line = stream.ReadLine();
+                var line = stream.ReadLine();
                 if (line == null)
                     break;
                 if (string.IsNullOrEmpty(line))

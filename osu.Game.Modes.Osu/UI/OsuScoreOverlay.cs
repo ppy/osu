@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Osu.UI
             Margin = new MarginPadding { Right = 5 },
         };
 
-        protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter()
+        protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter
         {
             Anchor = Anchor.TopCentre,
             Origin = Anchor.TopCentre,
@@ -31,7 +31,7 @@ namespace osu.Game.Modes.Osu.UI
             Margin = new MarginPadding { Right = 5 },
         };
 
-        protected override ComboCounter CreateComboCounter() => new OsuComboCounter()
+        protected override ComboCounter CreateComboCounter() => new OsuComboCounter
         {
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
@@ -46,10 +46,10 @@ namespace osu.Game.Modes.Osu.UI
             Margin = new MarginPadding(10),
             Children = new KeyCounter[]
             {
-                new KeyCounterKeyboard(@"Z", Key.Z),
-                new KeyCounterKeyboard(@"X", Key.X),
-                new KeyCounterMouse(@"M1", MouseButton.Left),
-                new KeyCounterMouse(@"M2", MouseButton.Right),
+                new KeyCounterKeyboard(Key.Z),
+                new KeyCounterKeyboard(Key.X),
+                new KeyCounterMouse(MouseButton.Left),
+                new KeyCounterMouse(MouseButton.Right),
             }
         };
     }

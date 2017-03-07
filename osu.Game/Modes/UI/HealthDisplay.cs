@@ -1,13 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
@@ -16,10 +17,9 @@ namespace osu.Game.Modes.UI
 {
     public class HealthDisplay : Container
     {
-        private Box background;
         private Container fill;
 
-        public BindableDouble Current = new BindableDouble()
+        public BindableDouble Current = new BindableDouble
         {
             MinValue = 0,
             MaxValue = 1
@@ -29,7 +29,7 @@ namespace osu.Game.Modes.UI
         {
             Children = new Drawable[]
             {
-                background = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,

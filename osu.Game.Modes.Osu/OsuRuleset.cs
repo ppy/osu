@@ -9,6 +9,7 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.Osu
 {
@@ -16,7 +17,10 @@ namespace osu.Game.Modes.Osu
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new OsuHitRenderer(beatmap);
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap, PlayerInputManager input = null) => new OsuHitRenderer(beatmap)
+        {
+            InputManager = input
+        };
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
         {
@@ -34,13 +38,78 @@ namespace osu.Game.Modes.Osu
             }
         };
 
+        public override IEnumerable<Mod> GetModsFor(ModType type)
+        {
+            switch (type)
+            {
+                case ModType.DifficultyReduction:
+                    return new Mod[]
+                    {
+                        new OsuModEasy(),
+                        new OsuModNoFail(),
+                        new OsuModHalfTime(),
+                    };
+
+                case ModType.DifficultyIncrease:
+                    return new Mod[]
+                    {
+                        new OsuModHardRock(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new OsuModSuddenDeath(),
+                                new OsuModPerfect(),
+                            },
+                        },
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new OsuModDoubleTime(),
+                                new OsuModNightcore(),
+                            },
+                        },
+                        new OsuModHidden(),
+                        new OsuModFlashlight(),
+                    };
+
+                case ModType.Special:
+                    return new Mod[]
+                    {
+                        new OsuModRelax(),
+                        new OsuModAutopilot(),
+                        new OsuModTarget(),
+                        new OsuModSpunOut(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new OsuModAutoplay(),
+                                new ModCinema(),
+                            },
+                        },
+                    };
+
+                default:
+                    return new Mod[] { };
+            }
+        }
+
         public override FontAwesome Icon => FontAwesome.fa_osu_osu_o;
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
 
-        public override ScoreProcessor CreateScoreProcessor(Beatmap beatmap) => new OsuScoreProcessor(beatmap);
+        public override ScoreProcessor CreateScoreProcessor(Beatmap beatmap = null) => new OsuScoreProcessor(beatmap);
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
+
+        public override Score CreateAutoplayScore(Beatmap beatmap)
+        {
+            var score = CreateScoreProcessor(beatmap).GetScore();
+            score.Replay = new OsuAutoReplay(beatmap);
+            return score;
+        }
 
         protected override PlayMode PlayMode => PlayMode.Osu;
     }

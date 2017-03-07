@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps
 
         protected double TimeRate = 1;
 
-        protected abstract double ComputeDifficulty(Dictionary<String, String> categoryDifficulty);
+        protected abstract double CalculateInternal(Dictionary<String, String> categoryDifficulty);
 
         private void loadTiming()
         {
@@ -23,10 +23,10 @@ namespace osu.Game.Beatmaps
             TimeRate = audioRate / 100.0;
         }
 
-        public double GetDifficulty(Dictionary<string, string> categoryDifficulty = null)
+        public double Calculate(Dictionary<string, string> categoryDifficulty = null)
         {
             loadTiming();
-            double difficulty = ComputeDifficulty(categoryDifficulty);
+            double difficulty = CalculateInternal(categoryDifficulty);
             return difficulty;
         }
     }
@@ -37,7 +37,7 @@ namespace osu.Game.Beatmaps
 
         protected abstract HitObjectConverter<T> Converter { get; }
 
-        public DifficultyCalculator(Beatmap beatmap)
+        protected DifficultyCalculator(Beatmap beatmap)
         {
             Objects = Converter.Convert(beatmap);
             PreprocessHitObjects();

@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Desktop;
-using osu.Framework.Desktop.Platform;
 using osu.Framework.Platform;
 using osu.Game.Modes;
 using osu.Game.Modes.Catch;
@@ -20,7 +19,7 @@ namespace osu.Desktop.VisualTests
         {
             bool benchmark = args.Length > 0 && args[0] == @"-benchmark";
 
-            using (BasicGameHost host = Host.GetSuitableHost(@"osu"))
+            using (GameHost host = Host.GetSuitableHost(@"osu"))
             {
                 Ruleset.Register(new OsuRuleset());
                 Ruleset.Register(new TaikoRuleset());
@@ -28,10 +27,9 @@ namespace osu.Desktop.VisualTests
                 Ruleset.Register(new CatchRuleset());
 
                 if (benchmark)
-                    host.Add(new Benchmark());
+                    host.Run(new Benchmark());
                 else
-                    host.Add(new VisualTestGame());
-                host.Run();
+                    host.Run(new VisualTestGame());
             }
         }
     }

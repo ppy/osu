@@ -3,7 +3,6 @@
 
 using osu.Game.Modes.UI;
 using OpenTK;
-using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Modes.Osu.UI
 {
@@ -12,7 +11,7 @@ namespace osu.Game.Modes.Osu.UI
     /// </summary>
     public class OsuComboCounter : ComboCounter
     {
-        protected uint ScheduledPopOutCurrentId = 0;
+        protected uint ScheduledPopOutCurrentId;
 
         protected virtual float PopOutSmallScale => 1.1f;
         protected virtual bool CanPopOutWhileRolling => false;

@@ -6,19 +6,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Options.Sections.General;
-using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    class LoginOverlay : FocusedOverlayContainer
+    internal class LoginOverlay : FocusedOverlayContainer
     {
         private LoginOptions optionsSection;
 
-        const float transition_time = 400;
+        private const float transition_time = 400;
 
         public LoginOverlay()
         {

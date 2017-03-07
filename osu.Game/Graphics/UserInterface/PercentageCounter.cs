@@ -1,15 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
-using osu.Framework.Timing;
+using osu.Framework.Graphics.Transforms;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -32,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
         public PercentageCounter()
         {
             DisplayedCountSpriteText.FixedWidth = true;
-            Count = 1.0f;
+            Count = DisplayedCount = 1.0f;
         }
 
         protected override string FormatCount(float count)
@@ -55,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as PercentageCounter).DisplayedCount = CurrentValue;
+                ((PercentageCounter)d).DisplayedCount = CurrentValue;
             }
         }
     }

@@ -40,7 +40,7 @@ namespace osu.Desktop.Deploy
         /// <summary>
         /// How many previous build deltas we want to keep when publishing.
         /// </summary>
-        const int keep_delta_count = 3;
+        private const int keep_delta_count = 3;
 
         private static string codeSigningCmd => string.IsNullOrEmpty(codeSigningPassword) ? "" : $"-n \"/a /f {codeSigningCertPath} /p {codeSigningPassword} /t http://timestamp.comodoca.com/authenticode\"";
 
@@ -74,7 +74,7 @@ namespace osu.Desktop.Deploy
             refreshDirectory(StagingFolder);
 
             //increment build number until we have a unique one.
-            string verBase = DateTime.Now.ToString("yyyy.Md.");
+            string verBase = DateTime.Now.ToString("yyyy.Mdd.");
             int increment = 0;
             while (Directory.GetFiles(ReleasesFolder, $"*{verBase}{increment}*").Any())
                 increment++;
@@ -172,10 +172,10 @@ namespace osu.Desktop.Deploy
             }
 
             //remove excess deltas
-            var deltas = releaseLines.Where(l => l.Filename.Contains("-delta"));
-            if (deltas.Count() > keep_delta_count)
+            var deltas = releaseLines.Where(l => l.Filename.Contains("-delta")).ToArray();
+            if (deltas.Length > keep_delta_count)
             {
-                foreach (var l in deltas.Take(deltas.Count() - keep_delta_count))
+                foreach (var l in deltas.Take(deltas.Length - keep_delta_count))
                 {
                     write($"- Removing old delta {l.Filename}", ConsoleColor.Yellow);
                     File.Delete(Path.Combine(ReleasesFolder, l.Filename));
@@ -342,8 +342,9 @@ namespace osu.Desktop.Deploy
             };
 
             Process p = Process.Start(psi);
+            if (p == null || p.ExitCode == 0) return true;
+
             string output = p.StandardOutput.ReadToEnd();
-            if (p.ExitCode == 0) return true;
 
             write(output);
             error($"Command {command} {args} failed!");

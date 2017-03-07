@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
@@ -13,13 +13,15 @@ using osu.Game.Screens.Direct;
 using osu.Game.Screens.Multiplayer;
 using OpenTK;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Tournament;
+using osu.Framework.Input;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
     public class MainMenu : OsuScreen
     {
         private ButtonSystem buttons;
-        public override string Name => @"Main Menu";
 
         internal override bool ShowOverlays => buttons.State != MenuState.Initial;
 
@@ -56,7 +58,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(OsuGame game)
         {
-            background.Preload(game);
+            background.LoadAsync(game);
 
             buttons.OnSettings = game.ToggleOptions;
         }
@@ -96,6 +98,17 @@ namespace osu.Game.Screens.Menu
             buttons.State = MenuState.Exit;
             Content.FadeOut(3000);
             return base.OnExiting(next);
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (!args.Repeat && state.Keyboard.ControlPressed && state.Keyboard.ShiftPressed && args.Key == Key.D)
+            {
+                Push(new Drawings());
+                return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
     }
 }

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes
 {
@@ -26,9 +27,11 @@ namespace osu.Game.Modes
 
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
-        public abstract ScoreProcessor CreateScoreProcessor(Beatmap beatmap);
+        public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
-        public abstract HitRenderer CreateHitRendererWith(Beatmap beatmap);
+        public abstract ScoreProcessor CreateScoreProcessor(Beatmap beatmap = null);
+
+        public abstract HitRenderer CreateHitRendererWith(Beatmap beatmap, PlayerInputManager input = null);
 
         public abstract HitObjectParser CreateHitObjectParser();
 
@@ -40,6 +43,8 @@ namespace osu.Game.Modes
 
         public virtual FontAwesome Icon => FontAwesome.fa_question_circle;
 
+        public virtual Score CreateAutoplayScore(Beatmap beatmap) => null;
+
         public static Ruleset GetRuleset(PlayMode mode)
         {
             Type type;
@@ -49,5 +54,6 @@ namespace osu.Game.Modes
 
             return Activator.CreateInstance(type) as Ruleset;
         }
+
     }
 }

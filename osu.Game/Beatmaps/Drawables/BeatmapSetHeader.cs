@@ -11,21 +11,20 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class BeatmapSetHeader : Panel
+    internal class BeatmapSetHeader : Panel
     {
         public Action<BeatmapSetHeader> GainedSelection;
         private SpriteText title, artist;
         private OsuConfigManager config;
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap beatmap;
-        private FlowContainer difficultyIcons;
+        private FillFlowContainer difficultyIcons;
 
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
@@ -37,9 +36,9 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Vertical,
                     Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
@@ -53,13 +52,12 @@ namespace osu.Game.Beatmaps.Drawables
                         },
                         artist = new OsuSpriteText
                         {
-                            Margin = new MarginPadding { Top = -1 },
                             Font = @"Exo2.0-SemiBoldItalic",
                             Text = beatmap.BeatmapSetInfo.Metadata.Artist,
                             TextSize = 17,
                             Shadow = true,
                         },
-                        difficultyIcons = new FlowContainer
+                        difficultyIcons = new FillFlowContainer
                         {
                             Margin = new MarginPadding { Top = 5 },
                             AutoSizeAxes = Axes.Both,
@@ -98,7 +96,7 @@ namespace osu.Game.Beatmaps.Drawables
             base.Dispose(isDisposing);
         }
 
-        class PanelBackground : BufferedContainer
+        private class PanelBackground : BufferedContainer
         {
             private readonly WorkingBeatmap working;
 
@@ -110,10 +108,10 @@ namespace osu.Game.Beatmaps.Drawables
 
                 Children = new[]
                 {
-                    new FlowContainer
+                    new FillFlowContainer
                     {
                         Depth = -1,
-                        Direction = FlowDirections.Horizontal,
+                        Direction = FillDirection.Horizontal,
                         RelativeSizeAxes = Axes.Both,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),
@@ -162,7 +160,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fill,
-                }.Preload(game, (bg) =>
+                }.LoadAsync(game, bg =>
                 {
                     Add(bg);
                     ForceRedraw();

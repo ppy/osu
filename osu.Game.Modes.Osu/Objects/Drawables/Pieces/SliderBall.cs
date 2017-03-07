@@ -4,9 +4,8 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
-using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
@@ -16,7 +15,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         private readonly Slider slider;
         private Box follow;
 
-        const float width = 128;
+        private const float width = 128;
 
         public SliderBall(Slider slider)
         {
@@ -82,7 +81,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             return base.OnMouseMove(state);
         }
 
-        bool tracking;
+        private bool tracking;
         public bool Tracking
         {
             get { return tracking; }

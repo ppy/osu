@@ -47,10 +47,10 @@ namespace osu.Game.Modes.Taiko.UI
             Margin = new MarginPadding(10),
             Children = new KeyCounter[]
             {
-                new KeyCounterKeyboard(@"D", Key.D),
-                new KeyCounterKeyboard(@"F", Key.F),
-                new KeyCounterKeyboard(@"J", Key.J),
-                new KeyCounterKeyboard(@"K", Key.K),
+                new KeyCounterKeyboard(Key.D),
+                new KeyCounterKeyboard(Key.F),
+                new KeyCounterKeyboard(Key.J),
+                new KeyCounterKeyboard(Key.K),
             }
         };
     }

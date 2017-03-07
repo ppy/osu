@@ -1,15 +1,13 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -38,10 +36,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void UpdateContentHeight()
         {
-            if (State == DropDownMenuState.Opened)
-                ContentContainer.ResizeTo(new Vector2(1, ContentHeight), 300, EasingTypes.OutQuint);
-            else
-                ContentContainer.ResizeTo(new Vector2(1, 0), 300, EasingTypes.OutQuint);
+            ContentContainer.ResizeTo(State == DropDownMenuState.Opened ? new Vector2(1, ContentHeight) : new Vector2(1, 0), 300, EasingTypes.OutQuint);
         }
     }
 }

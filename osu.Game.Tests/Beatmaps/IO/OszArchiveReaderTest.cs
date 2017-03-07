@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.IO;
 using NUnit.Framework;
 using osu.Game.Beatmaps.IO;
@@ -78,7 +77,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 using (var stream = new StreamReader(
                     reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                 {
-                    Assert.AreEqual("osu file format v13", stream.ReadLine().Trim());
+                    Assert.AreEqual("osu file format v13", stream.ReadLine()?.Trim());
                 }
             }
         }

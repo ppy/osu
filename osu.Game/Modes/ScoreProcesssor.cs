@@ -3,9 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Framework.Configuration;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Beatmaps;
@@ -14,7 +11,7 @@ namespace osu.Game.Modes
 {
     public abstract class ScoreProcessor
     {
-        public virtual Score GetScore() => new Score()
+        public virtual Score GetScore() => new Score
         {
             TotalScore = TotalScore,
             Combo = Combo,
@@ -55,13 +52,17 @@ namespace osu.Game.Modes
         /// Initializes a new instance of the <see cref="ScoreProcessor"/> class.
         /// </summary>
         /// <param name="hitObjectCount">Number of HitObjects. It is used for specifying Judgements collection Capacity</param>
-        public ScoreProcessor(Beatmap beatmap)
+        protected ScoreProcessor(Beatmap beatmap = null)
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
-            Judgements = new List<JudgementInfo>(beatmap.HitObjects.Count);
 
-            CalculateFinalValues(beatmap);
-            Reset();
+            if (beatmap != null)
+            {
+                Judgements = new List<JudgementInfo>(beatmap.HitObjects.Count);
+
+                CalculateFinalValues(beatmap);
+                Reset();
+            }
         }
 
         /// <summary>

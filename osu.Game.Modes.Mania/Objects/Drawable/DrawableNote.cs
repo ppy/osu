@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics;
 using OpenTK;
 
@@ -26,8 +26,8 @@ namespace osu.Game.Modes.Mania.Objects.Drawable
         {
             Texture = textures.Get(@"Menu/logo");
 
-            Transforms.Add(new TransformPositionY() { StartTime = note.StartTime - 200, EndTime = note.StartTime, StartValue = -0.1f, EndValue = 0.9f });
-            Transforms.Add(new TransformAlpha() { StartTime = note.StartTime + note.Duration + 200, EndTime = note.StartTime + note.Duration + 400, StartValue = 1, EndValue = 0 });
+            Transforms.Add(new TransformPositionY { StartTime = note.StartTime - 200, EndTime = note.StartTime, StartValue = -0.1f, EndValue = 0.9f });
+            Transforms.Add(new TransformAlpha { StartTime = note.StartTime + note.Duration + 200, EndTime = note.StartTime + note.Duration + 400, StartValue = 1, EndValue = 0 });
             Expire(true);
         }
     }

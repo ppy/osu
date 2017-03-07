@@ -2,18 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Screens.Testing;
-using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
-using OpenTK.Input;
 using osu.Game.Overlays;
-using osu.Framework.Graphics.Containers;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseOptions : TestCase
+    internal class TestCaseOptions : TestCase
     {
-        public override string Name => @"Options";
-
         public override string Description => @"Tests the options overlay";
 
         private OptionsOverlay options;

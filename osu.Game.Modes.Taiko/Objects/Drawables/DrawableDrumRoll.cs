@@ -31,7 +31,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             Size *= new Vector2(1, 1.5f);
         }
 
-        public override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo() { MaxScore = TaikoScoreResult.Great, SecondHit = true };
+        protected override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo() { MaxScore = TaikoScoreResult.Great, SecondHit = true };
 
         protected override DrawableDrumRollTick CreateTick(DrumRoll drumRoll, DrumRollTick tick) => new DrawableDrumRollFinisherTick(drumRoll, tick);
 

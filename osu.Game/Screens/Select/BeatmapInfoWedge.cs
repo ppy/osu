@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework;
 using osu.Framework.Allocation;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -19,17 +19,16 @@ using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 
 namespace osu.Game.Screens.Select
 {
-    class BeatmapInfoWedge : Container
+    internal class BeatmapInfoWedge : Container
     {
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
 
-        private Container beatmapInfoContainer;
+        private BufferedContainer beatmapInfoContainer;
 
         private OsuGameBase game;
 
@@ -56,15 +55,15 @@ namespace osu.Game.Screens.Select
 
         public void UpdateBeatmap(WorkingBeatmap beatmap)
         {
-            if (beatmap == null)
+            if (beatmap?.BeatmapInfo == null)
                 return;
 
             var lastContainer = beatmapInfoContainer;
 
             float newDepth = lastContainer?.Depth + 1 ?? 0;
 
-            BeatmapSetInfo beatmapSetInfo = beatmap.BeatmapSetInfo;
             BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
+            BeatmapMetadata metadata = beatmap.BeatmapInfo?.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
             List<InfoLabel> labels = new List<InfoLabel>();
 
@@ -123,11 +122,11 @@ namespace osu.Game.Screens.Select
                         },
                     },
                     // Text for beatmap info
-                    new FlowContainer
+                    new FillFlowContainer
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Direction = FlowDirections.Vertical,
+                        Direction = FillDirection.Vertical,
                         Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -135,7 +134,7 @@ namespace osu.Game.Screens.Select
                             new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
-                                Text = beatmapSetInfo.Metadata.Artist + " -- " + beatmapSetInfo.Metadata.Title,
+                                Text = metadata.Artist + " -- " + metadata.Title,
                                 TextSize = 28,
                                 Shadow = true,
                             },
@@ -146,10 +145,10 @@ namespace osu.Game.Screens.Select
                                 TextSize = 17,
                                 Shadow = true,
                             },
-                            new FlowContainer
+                            new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 10 },
-                                Direction = FlowDirections.Horizontal,
+                                Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
                                 Children = new []
                                 {
@@ -163,23 +162,23 @@ namespace osu.Game.Screens.Select
                                     new OsuSpriteText
                                     {
                                         Font = @"Exo2.0-Bold",
-                                        Text = beatmapSetInfo.Metadata.Author,
+                                        Text = metadata.Author,
                                         TextSize = 15,
                                         Shadow = true,
                                     },
                                 }
                             },
-                            new FlowContainer
+                            new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 20 },
-                                Spacing = new Vector2(40,0),
+                                Spacing = new Vector2(40, 0),
                                 AutoSizeAxes = Axes.Both,
                                 Children = labels
                             },
                         }
                     },
                 }
-            }).Preload(game, delegate (Drawable d)
+            }).LoadAsync(game, delegate (Drawable d)
             {
                 FadeIn(250);
 
@@ -210,12 +209,14 @@ namespace osu.Game.Screens.Select
                     new TextAwesome
                     {
                         Icon = FontAwesome.fa_square,
+                        Origin = Anchor.Centre,
                         Colour = new Color4(68, 17, 136, 255),
                         Rotation = 45
                     },
                     new TextAwesome
                     {
                         Icon = statistic.Icon,
+                        Origin = Anchor.Centre,
                         Colour = new Color4(255, 221, 85, 255),
                         Scale = new Vector2(0.8f)
                     },

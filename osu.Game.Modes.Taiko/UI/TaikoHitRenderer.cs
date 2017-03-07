@@ -33,13 +33,13 @@ namespace osu.Game.Modes.Taiko.UI
             computeBarLines();
         }
 
-        protected override Playfield CreatePlayfield() => new TaikoPlayfield()
+        protected override Playfield<TaikoHitObject> CreatePlayfield() => new TaikoPlayfield()
         {
             RelativePositionAxes = Axes.Y,
             Position = new Vector2(0, 0.4f)
         };
 
-        protected override DrawableHitObject GetVisualRepresentation(TaikoHitObject h)
+        protected override DrawableHitObject<TaikoHitObject> GetVisualRepresentation(TaikoHitObject h)
         {
             if ((h.Type & TaikoHitType.HitCircle) > 0)
             {

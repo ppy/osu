@@ -3,7 +3,7 @@
 
 namespace osu.Game.Screens.Charts
 {
-    class ChartInfo : ScreenWhiteBox
+    internal class ChartInfo : ScreenWhiteBox
     {
     }
 }

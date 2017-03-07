@@ -4,12 +4,11 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Screens.Testing;
-using osu.Framework.MathUtils;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using OpenTK;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
@@ -19,24 +18,29 @@ using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCasePlayer : TestCase
+    internal class TestCasePlayer : TestCase
     {
-        private WorkingBeatmap beatmap;
-        public override string Name => @"Player";
+        protected Player Player;
+        private BeatmapDatabase db;
+
 
         public override string Description => @"Showing everything to play the game.";
 
         [BackgroundDependencyLoader]
         private void load(BeatmapDatabase db)
         {
-            var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault();
-            if (beatmapInfo != null)
-                beatmap = db.GetWorkingBeatmap(beatmapInfo);
+            this.db = db;
         }
 
         public override void Reset()
         {
             base.Reset();
+
+            WorkingBeatmap beatmap = null;
+
+            var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault();
+            if (beatmapInfo != null)
+                beatmap = db.GetWorkingBeatmap(beatmapInfo);
 
             if (beatmap?.Track == null)
             {
@@ -45,7 +49,7 @@ namespace osu.Desktop.VisualTests.Tests
                 int time = 1500;
                 for (int i = 0; i < 50; i++)
                 {
-                    objects.Add(new HitCircle()
+                    objects.Add(new HitCircle
                     {
                         StartTime = time,
                         Position = new Vector2(i % 4 == 0 || i % 4 == 2 ? 0 : 512,
@@ -60,12 +64,21 @@ namespace osu.Desktop.VisualTests.Tests
 
                 Beatmap b = new Beatmap
                 {
-                    HitObjects = objects
+                    HitObjects = objects,
+                    BeatmapInfo = new BeatmapInfo
+                    {
+                        Metadata = new BeatmapMetadata
+                        {
+                            Artist = @"Unknown",
+                            Title = @"Sample Beatmap",
+                            Author = @"peppy",
+                        }
+                    }
                 };
 
                 decoder.Process(b);
 
-                beatmap = new WorkingBeatmap(b);
+                beatmap = new TestWorkingBeatmap(b);
             }
 
             Add(new Box
@@ -74,11 +87,29 @@ namespace osu.Desktop.VisualTests.Tests
                 Colour = Color4.Black,
             });
 
-            Add(new Player
+            Add(new PlayerLoader(Player = CreatePlayer(beatmap))
             {
-                PreferredPlayMode = PlayMode.Taiko,
                 Beatmap = beatmap
             });
+        }
+
+        protected virtual Player CreatePlayer(WorkingBeatmap beatmap)
+        {
+            return new Player
+            {
+                Beatmap = beatmap
+            };
+        }
+
+        private class TestWorkingBeatmap : WorkingBeatmap
+        {
+            public TestWorkingBeatmap(Beatmap beatmap)
+                : base(beatmap.BeatmapInfo, beatmap.BeatmapInfo.BeatmapSet)
+            {
+                Beatmap = beatmap;
+            }
+
+            protected override ArchiveReader GetReader() => null;
         }
     }
 }

@@ -1,11 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,7 +13,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    class Disclaimer : OsuScreen
+    internal class Disclaimer : OsuScreen
     {
         private Intro intro;
         private TextAwesome icon;
@@ -32,12 +27,12 @@ namespace osu.Game.Screens.Menu
 
             Children = new Drawable[]
             {
-                new FlowContainer
+                new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 2),
                     Children = new Drawable[]
                     {
@@ -93,7 +88,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(OsuGame game, OsuColour colours)
         {
-            (intro = new Intro()).Preload(game);
+            (intro = new Intro()).LoadAsync(game);
 
             iconColour = colours.Yellow;
         }

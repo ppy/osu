@@ -34,7 +34,7 @@ namespace osu.Game.Modes.Osu
                     ((Slider)h).Curve.Calculate();
         }
 
-        protected override double ComputeDifficulty(Dictionary<String, String> categoryDifficulty)
+        protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
         {
             // Fill our custom DifficultyHitObject class, that carries additional information
             DifficultyHitObjects.Clear();
@@ -100,22 +100,23 @@ namespace osu.Game.Modes.Osu
         protected bool CalculateStrainValues()
         {
             // Traverse hitObjects in pairs to calculate the strain value of NextHitObject from the strain value of CurrentHitObject and environment.
-            List<OsuHitObjectDifficulty>.Enumerator hitObjectsEnumerator = DifficultyHitObjects.GetEnumerator();
-
-            if (!hitObjectsEnumerator.MoveNext()) return false;
-
-            OsuHitObjectDifficulty currentHitObject = hitObjectsEnumerator.Current;
-            OsuHitObjectDifficulty nextHitObject;
-
-            // First hitObject starts at strain 1. 1 is the default for strain values, so we don't need to set it here. See DifficultyHitObject.
-            while (hitObjectsEnumerator.MoveNext())
+            using (List<OsuHitObjectDifficulty>.Enumerator hitObjectsEnumerator = DifficultyHitObjects.GetEnumerator())
             {
-                nextHitObject = hitObjectsEnumerator.Current;
-                nextHitObject.CalculateStrains(currentHitObject, TimeRate);
-                currentHitObject = nextHitObject;
-            }
 
-            return true;
+                if (!hitObjectsEnumerator.MoveNext()) return false;
+
+                OsuHitObjectDifficulty current = hitObjectsEnumerator.Current;
+
+                // First hitObject starts at strain 1. 1 is the default for strain values, so we don't need to set it here. See DifficultyHitObject.
+                while (hitObjectsEnumerator.MoveNext())
+                {
+                    var next = hitObjectsEnumerator.Current;
+                    next?.CalculateStrains(current, TimeRate);
+                    current = next;
+                }
+
+                return true;
+            }
         }
 
         /// <summary>
@@ -184,7 +185,7 @@ namespace osu.Game.Modes.Osu
         }
 
         // Those values are used as array indices. Be careful when changing them!
-        public enum DifficultyType : int
+        public enum DifficultyType
         {
             Speed = 0,
             Aim,
