@@ -1,13 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Linq;
 using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Osu
 {
     public class OsuModNoFail : ModNoFail
     {
-        
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
     }
 
     public class OsuModEasy : ModEasy
@@ -19,7 +21,6 @@ namespace osu.Game.Modes.Osu
     {
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
-        public override Mods[] DisablesMods => new Mods[] { };
     }
 
     public class OsuModHardRock : ModHardRock
@@ -30,7 +31,7 @@ namespace osu.Game.Modes.Osu
 
     public class OsuModSuddenDeath : ModSuddenDeath
     {
-        
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
     }
 
     public class OsuModDoubleTime : ModDoubleTime
@@ -41,6 +42,7 @@ namespace osu.Game.Modes.Osu
     public class OsuModRelax : ModRelax
     {
         public override string Description => "You don't need to click.\nGive your clicking/tapping finger a break from the heat of things.";
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
     }
 
     public class OsuModHalfTime : ModHalfTime
@@ -56,41 +58,43 @@ namespace osu.Game.Modes.Osu
     public class OsuModFlashlight : ModFlashlight
     {
         public override double ScoreMultiplier => 1.12;
-        public override Mods[] DisablesMods => new Mods[] { };
     }
 
     public class OsuModPerfect : ModPerfect
     {
-        
+
     }
 
     public class OsuModSpunOut : Mod
     {
-        public override Mods Name => Mods.SpunOut;
+        public override string Name => "Spun Out";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_spunout;
         public override string Description => @"Spinners will be automatically completed";
         public override double ScoreMultiplier => 0.9;
         public override bool Ranked => true;
-        public override Mods[] DisablesMods => new[] { Mods.Autoplay, Mods.Cinema, Mods.Autopilot };
+        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModCinema), typeof(OsuModAutopilot) };
     }
 
     public class OsuModAutopilot : Mod
     {
-        public override Mods Name => Mods.Autopilot;
+        public override string Name => "Autopilot";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_autopilot;
         public override string Description => @"Automatic cursor movement - just follow the rhythm.";
         public override double ScoreMultiplier => 0;
         public override bool Ranked => false;
-        public override Mods[] DisablesMods => new[] { Mods.SpunOut, Mods.Relax, Mods.SuddenDeath, Mods.Perfect, Mods.NoFail, Mods.Autoplay, Mods.Cinema };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModPerfect), typeof(ModNoFail), typeof(ModAutoplay), typeof(ModCinema) };
+    }
+
+    public class OsuModAutoplay : ModAutoplay
+    {
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
     }
 
     public class OsuModTarget : Mod
     {
-        public override Mods Name => Mods.Target;
+        public override string Name => "Target";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_target;
         public override string Description => @"";
         public override double ScoreMultiplier => 1;
-        public override bool Ranked => false;
-        public override Mods[] DisablesMods => new Mods[] { };
     }
 }
