@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.UI;
 using OpenTK;

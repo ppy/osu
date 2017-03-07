@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Modes.Catch.Objects;
-using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.UI;
 using OpenTK;
 

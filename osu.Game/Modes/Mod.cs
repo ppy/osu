@@ -4,7 +4,6 @@
 using System;
 using System.ComponentModel;
 using osu.Game.Graphics;
-using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes
