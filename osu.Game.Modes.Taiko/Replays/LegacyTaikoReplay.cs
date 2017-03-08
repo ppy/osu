@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Taiko.Replays
 
         public override ReplayInputHandler GetInputHandler() => new LegacyTaikoInputHandler(Frames);
 
-        class LegacyTaikoInputHandler : LegacyReplayInputHandler
+        private class LegacyTaikoInputHandler : LegacyReplayInputHandler
         {
             public LegacyTaikoInputHandler(List<LegacyReplayFrame> replayContent)
                 : base(replayContent)

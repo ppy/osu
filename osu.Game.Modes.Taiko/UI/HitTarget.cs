@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Taiko.UI
 {
-    class HitTarget : Container
+    internal class HitTarget : Container
     {
         private Sprite outer;
         private Sprite inner;

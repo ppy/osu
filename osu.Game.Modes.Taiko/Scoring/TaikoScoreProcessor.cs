@@ -10,7 +10,7 @@ using OpenTK;
 
 namespace osu.Game.Modes.Taiko.Scoring
 {
-    class TaikoScoreProcessor : ScoreProcessor
+    internal class TaikoScoreProcessor : ScoreProcessor
     {
         private const double combo_base = 4;
         private const double hp_hit_300 = 6;

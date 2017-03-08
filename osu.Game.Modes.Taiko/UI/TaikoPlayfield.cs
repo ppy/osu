@@ -13,7 +13,6 @@ using osu.Game.Modes.Taiko.Objects.Drawables.BarLines;
 using osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls;
 using osu.Game.Modes.UI;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -36,8 +35,6 @@ namespace osu.Game.Modes.Taiko.UI
         private Box leftBackground;
         private Container rightBackgroundContainer;
         private Box rightBackground;
-
-        private Color4 missColour;
 
         public TaikoPlayfield()
         {
@@ -173,8 +170,6 @@ namespace osu.Game.Modes.Taiko.UI
 
             rightBackgroundContainer.BorderColour = colours.Gray0;
             rightBackground.Colour = colours.Gray1;
-
-            missColour = colours.Red;
         }
 
         public override void Add(DrawableHitObject<TaikoHitObject> h)
@@ -195,34 +190,34 @@ namespace osu.Game.Modes.Taiko.UI
 
         private void onJudgement(DrawableHitObject h, JudgementInfo j)
         {
-            TaikoJudgementInfo tji = j as TaikoJudgementInfo;
-            DrawableTaikoHitObject dth = h as DrawableTaikoHitObject;
+            TaikoJudgementInfo taikoJudgement = (TaikoJudgementInfo)j;
+            DrawableTaikoHitObject taikoObject = (DrawableTaikoHitObject)h;
 
-            if (dth == null)
+            if (taikoObject == null)
                 return;
 
             // Add ring
             ExplodingRing ring = null;
 
-            if (tji.Result == HitResult.Hit)
+            if (taikoJudgement.Result == HitResult.Hit)
             {
-                if (tji.Score == TaikoScoreResult.Great)
+                if (taikoJudgement.Score == TaikoScoreResult.Great)
                 {
-                    hitTarget.Flash(dth.ExplodeColour);
-                    ring = new ExplodingRing(dth.ExplodeColour, true);
+                    hitTarget.Flash(taikoObject.ExplodeColour);
+                    ring = new ExplodingRing(taikoObject.ExplodeColour, true);
                 }
-                else if (tji.Score == TaikoScoreResult.Good)
-                    ring = new ExplodingRing(dth.ExplodeColour, false);
+                else if (taikoJudgement.Score == TaikoScoreResult.Good)
+                    ring = new ExplodingRing(taikoObject.ExplodeColour, false);
             }
 
             if (ring != null)
                 explosionRingContainer.Add(ring);
 
             // Add judgement
-            string judgementString = "";
-            if (tji.Result == HitResult.Hit)
+            string judgementString = string.Empty;
+            if (taikoJudgement.Result == HitResult.Hit)
             {
-                switch (tji.Score)
+                switch (taikoJudgement.Score)
                 {
                     case TaikoScoreResult.Good:
                         judgementString = "GOOD";
@@ -235,28 +230,28 @@ namespace osu.Game.Modes.Taiko.UI
             else
                 judgementString = "MISS";
 
-            float judgementOffset = tji.Result == HitResult.Hit ? h.Position.X : 0;
+            float judgementOffset = taikoJudgement.Result == HitResult.Hit ? h.Position.X : 0;
 
             // Make drum roll judgements occur at 0 offset
-            if (dth is DrawableDrumRoll)
+            if (taikoObject is DrawableDrumRoll)
                 judgementOffset = 0;
 
             // Drum roll ticks have no judgement
-            if (dth is DrawableDrumRollTick)
+            if (taikoObject is DrawableDrumRollTick)
                 return;
 
             // Add judgement
             judgementContainer.Add(new JudgementText
             {
-                Anchor = tji.Result == HitResult.Hit ? Anchor.TopLeft : Anchor.BottomLeft,
-                Origin = tji.Result == HitResult.Hit ? Anchor.BottomCentre : Anchor.TopCentre,
+                Anchor = taikoJudgement.Result == HitResult.Hit ? Anchor.TopLeft : Anchor.BottomLeft,
+                Origin = taikoJudgement.Result == HitResult.Hit ? Anchor.BottomCentre : Anchor.TopCentre,
 
                 RelativePositionAxes = Axes.X,
                 Position = new Vector2(judgementOffset, 0),
 
                 Text = judgementString,
-                GlowColour = dth.ExplodeColour,
-                Direction = tji.Result == HitResult.Hit ? -1 : 1
+                GlowColour = taikoObject.ExplodeColour,
+                Direction = taikoJudgement.Result == HitResult.Hit ? -1 : 1
             });
         }
     }

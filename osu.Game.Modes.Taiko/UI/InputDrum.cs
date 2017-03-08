@@ -15,7 +15,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.UI
 {
-    class InputDrum : Container
+    internal class InputDrum : Container
     {
         public InputDrum()
         {
@@ -46,7 +46,7 @@ namespace osu.Game.Modes.Taiko.UI
             };
         }
 
-        class TaikoHalfDrum : Container
+        private class TaikoHalfDrum : Container
         {
             /// <summary>
             /// Keys[0] -> Inner key
