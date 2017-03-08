@@ -54,7 +54,7 @@ namespace osu.Game.Modes.Taiko.Objects
             ControlPoint overridePoint;
             ControlPoint timingPoint = beatmap.TimingPointAt(StartTime, out overridePoint);
             var velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
-            var baseVelocity = 100 * baseDifficulty.SliderMultiplier * SLIDER_FUDGE_FACTOR / velocityAdjustment;
+            var baseVelocity = 100 * baseDifficulty.SliderMultiplier / velocityAdjustment;
 
             Velocity = baseVelocity / timingPoint.BeatLength;
 

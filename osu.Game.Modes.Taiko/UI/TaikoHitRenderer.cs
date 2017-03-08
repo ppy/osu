@@ -34,7 +34,7 @@ namespace osu.Game.Modes.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            computeBarLines();
+            loadBarLines();
         }
 
         protected override Playfield<TaikoHitObject> CreatePlayfield() => new TaikoPlayfield()
@@ -72,74 +72,16 @@ namespace osu.Game.Modes.Taiko.UI
             return null;
         }
 
-        private void computeBarLines()
+        private void loadBarLines()
         {
-            double lastHitTime = beatmap.HitObjects[beatmap.HitObjects.Count - 1].EndTime + 1;
-
-            List<ControlPoint> timingPoints = beatmap.ControlPoints?.FindAll(cp => cp.TimingChange);
-
-            if (timingPoints == null || timingPoints.Count == 0)
-                return;
-
-            int currentIndex = 0;
-
-            while (currentIndex < timingPoints.Count && timingPoints[currentIndex].BeatLength == 0)
-                currentIndex++;
-
-            double time = timingPoints[currentIndex].Time;
-            double measureLength = timingPoints[currentIndex].BeatLength * (int)timingPoints[currentIndex].TimeSignature;
-
-            // Find the bar line time closest to 0
-            time -= measureLength * (int)(time / measureLength);
-
-            // Always start barlines from a positive time
-            while (time < 0)
-                time += measureLength;
-
-            double lastBeatLength = timingPoints[currentIndex].BeatLength;
-            int currentBeat = 0;
-            while (time <= lastHitTime)
+            foreach (BarLine line in new TaikoConverter().ConvertBarLines(beatmap))
             {
-                ControlPoint current = timingPoints[currentIndex];
-
-                if (time > current.Time || !current.OmitFirstBarLine)
-                {
-                    BarLine barLine = new BarLine
-                    {
-                        StartTime = time
-                    };
-
-                    barLine.SetDefaultsFromBeatmap(beatmap);
-
-                    addBarLine(barLine, currentBeat % (int)current.TimeSignature == 0);
-
-                    currentBeat++;
-                }
-
-                double bl = current.BeatLength;
-
-                if (bl < 800)
-                    bl *= (int)current.TimeSignature;
-
-                time += bl;
-
-                if (currentIndex + 1 < timingPoints.Count && time >= timingPoints[currentIndex + 1].Time)
-                {
-                    currentIndex++;
-                    time = timingPoints[currentIndex].Time;
-
-                    currentBeat = 0;
-                }
+                TaikoPlayfield tp = Playfield as TaikoPlayfield;
+                if (line.IsMajor)
+                    tp.AddBarLine(new DrawableMajorBarLine(line));
+                else
+                    tp.AddBarLine(new DrawableBarLine(line));
             }
-        }
-
-        private void addBarLine(BarLine barLine, bool major)
-        {
-            TaikoPlayfield tp = Playfield as TaikoPlayfield;
-            if (major)
-                tp.AddBarLine(new DrawableMajorBarLine(barLine));
-            else
-                tp.AddBarLine(new DrawableBarLine(barLine));
         }
     }
 }
