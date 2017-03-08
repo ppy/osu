@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+
 namespace osu.Game.Beatmaps.Timing
 {
     public class ControlPoint
@@ -16,46 +18,22 @@ namespace osu.Game.Beatmaps.Timing
         public double Time;
         public double BeatLength;
 
-        /// <summary>
-        /// This should only be used for Taiko conversion. Use <see cref="VelocityAdjustment"/> instead.
-        /// </summary>
-        public float FloatVelocityAdjustment;
         public double VelocityAdjustment;
 
         public bool TimingChange;
 
         public EffectFlags EffectFlags;
         
-        public bool KiaiMode
-        {
-            get { return (EffectFlags & EffectFlags.Kiai) > 0; }
-            set
-            {
-                if (value)
-                    EffectFlags |= EffectFlags.Kiai;
-                else
-                    EffectFlags &= ~EffectFlags.Kiai;
-            }
-        }
-
-        public bool OmitFirstBarLine
-        {
-            get { return (EffectFlags & EffectFlags.OmitFirstBarLine) > 0; }
-            set
-            {
-                if (value)
-                    EffectFlags |= EffectFlags.OmitFirstBarLine;
-                else
-                    EffectFlags &= ~EffectFlags.OmitFirstBarLine;
-            }
-        }
+        public bool KiaiMode => (EffectFlags & EffectFlags.Kiai) > 0;
     }
 
+    [Flags]
     public enum EffectFlags
     {
         None = 0,
         Kiai = 1,
-        OmitFirstBarLine = 8
+        OmitFirstBarLine = 8,
+        PostProcessed = 16384,
     }
 
     public enum TimeSignatures

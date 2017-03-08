@@ -13,14 +13,17 @@ namespace osu.Game.Modes.Taiko.Objects
     internal class TaikoConverter : HitObjectConverter<TaikoHitObject>
     {
         // osu-stable adds a scale factor of 1.4 to all taiko slider velocities.
-        private const double slider_fudge_factor = 1.4;
+        private const double scale_factor = 1.4;
 
         public override List<TaikoHitObject> Convert(Beatmap beatmap)
         {
             foreach (var c in beatmap.Timing.ControlPoints)
             {
-                c.VelocityAdjustment /= slider_fudge_factor;
-                c.FloatVelocityAdjustment /= (float)slider_fudge_factor;
+                if ((c.EffectFlags & EffectFlags.PostProcessed) > 0)
+                    continue;
+
+                c.VelocityAdjustment /= scale_factor;
+                c.EffectFlags |= EffectFlags.PostProcessed;
             }
 
             var converted = new List<TaikoHitObject>();
@@ -74,18 +77,18 @@ namespace osu.Game.Modes.Taiko.Objects
                 ControlPoint overridePoint;
                 beatmap.Timing.TimingPointAt(slider.StartTime, out overridePoint);
                 double origBeatLength = beatmap.Timing.BeatLengthAt(slider.StartTime);
-                float origVelocityAdjustment = overridePoint?.FloatVelocityAdjustment ?? 1;
+                double origVelocityAdjustment = overridePoint?.VelocityAdjustment * scale_factor ?? 1;
 
                 double scoringDistance = 100 * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
 
                 double newSv;
                 if (origBeatLength > 0)
-                    newSv = scoringDistance * 1000 / origBeatLength / origVelocityAdjustment;
+                    newSv = scoringDistance * 1000 / origBeatLength / (float)origVelocityAdjustment;
                 else
                     newSv = scoringDistance;
 
-                double l = slider.Length * slider.RepeatCount * slider_fudge_factor;
-                double v = newSv * slider_fudge_factor;
+                double l = slider.Length * slider.RepeatCount * scale_factor;
+                double v = newSv * scale_factor;
                 double bl = beatmap.Timing.BeatLengthAt(slider.StartTime);
 
                 double skipPeriod = Math.Min(bl / beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate, slider.Duration / slider.RepeatCount);
@@ -111,7 +114,6 @@ namespace osu.Game.Modes.Taiko.Objects
                         StartTime = o.StartTime,
                         Sample = o.Sample,
                         NewCombo = o.NewCombo,
-                        // Don't add the fudge factor just yet
                         Length = slider.Length * slider.RepeatCount,
                     };
                 }
@@ -160,7 +162,7 @@ namespace osu.Game.Modes.Taiko.Objects
             {
                 ControlPoint current = timingPoints[currentIndex];
 
-                if (time > current.Time || !current.OmitFirstBarLine)
+                if (time > current.Time || (current.EffectFlags & EffectFlags.OmitFirstBarLine) > 0)
                 {
                     BarLine barLine = new BarLine
                     {
