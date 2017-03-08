@@ -158,7 +158,6 @@ namespace osu.Game.Modes.Taiko.Objects
             while (time < 0)
                 time += measureLength;
 
-            double lastBeatLength = timingPoints[currentIndex].BeatLength;
             int currentBeat = 0;
             while (time <= lastHitTime)
             {

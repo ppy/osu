@@ -26,10 +26,10 @@ namespace osu.Game.Modes.Taiko.Objects
                     result = new TaikoHitObject();
                     break;
                 case HitObjectType.Slider:
-                    int repeatCount = repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
+                    int repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
 
                     if (repeatCount > 9000)
-                        throw new ArgumentOutOfRangeException("wacky man");
+                        throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
 
                     result = new DrumRoll
                     {

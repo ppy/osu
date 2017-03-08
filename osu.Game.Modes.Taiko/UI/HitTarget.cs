@@ -19,7 +19,6 @@ namespace osu.Game.Modes.Taiko.UI
         private Sprite outer;
         private Sprite inner;
 
-        private Container flashContainer;
         private Container innerFlash;
         private Container outerFlash;
 
@@ -60,7 +59,7 @@ namespace osu.Game.Modes.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Size = new Vector2(1 / 1.5f)
                         },
-                        flashContainer = new Container
+                        new Container
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,

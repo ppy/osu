@@ -28,9 +28,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Circle
 
         private CircularContainer backingGlowContainer;
         private CircularContainer circle;
-        private RingPiece ring;
 
-        public CirclePiece()
+        protected CirclePiece()
         {
             Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2);
 
@@ -77,7 +76,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Circle
                     }
                 },
                 // The ring
-                ring = CreateRing()
+                CreateRing()
             };
         }
 

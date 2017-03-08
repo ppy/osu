@@ -14,9 +14,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
 
         private List<Key> pressedKeys = new List<Key>();
 
-        private bool validKeyPressed;
-
-        public DrawableHitFinisher(TaikoHitObject hitObject)
+        protected DrawableHitFinisher(TaikoHitObject hitObject)
             : base(hitObject)
         {
             Size *= 1.5f;
@@ -26,25 +24,22 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
 
         protected override void CheckJudgement(bool userTriggered)
         {
-            TaikoJudgementInfo tji = Judgement as TaikoJudgementInfo;
+            TaikoJudgementInfo taikoJudgement = (TaikoJudgementInfo)Judgement;
 
-            if (!tji.Result.HasValue)
+            if (!taikoJudgement.Result.HasValue)
             {
                 base.CheckJudgement(userTriggered);
                 return;
             }
 
             double timeOffset = Time.Current - HitObject.EndTime;
-            double hitOffset = Math.Abs(timeOffset - tji.TimeOffset);
+            double hitOffset = Math.Abs(timeOffset - taikoJudgement.TimeOffset);
 
             if (!userTriggered)
                 return;
 
-            if (!validKeyPressed)
-                return;
-
             if (hitOffset < 30)
-                tji.SecondHit = true;
+                taikoJudgement.SecondHit = true;
         }
 
         protected override bool HandleKeyPress(Key key)

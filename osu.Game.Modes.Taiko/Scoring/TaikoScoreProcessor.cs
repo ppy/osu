@@ -89,7 +89,7 @@ namespace osu.Game.Modes.Taiko.Scoring
                 }
                 else if ((obj.Type & TaikoHitType.DrumRoll) > 0)
                 {
-                    DrumRoll d = obj as DrumRoll;
+                    DrumRoll d = (DrumRoll)obj;
 
                     for (int i = 0; i < d.TotalTicks; i++)
                     {
@@ -128,7 +128,7 @@ namespace osu.Game.Modes.Taiko.Scoring
             if (judgement == null)
                 return;
 
-            TaikoJudgementInfo tji = judgement as TaikoJudgementInfo;
+            TaikoJudgementInfo tji = (TaikoJudgementInfo)judgement;
 
             // Score calculations
             if (judgement.Result == HitResult.Hit)

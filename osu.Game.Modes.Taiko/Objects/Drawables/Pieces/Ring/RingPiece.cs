@@ -15,7 +15,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Ring
     /// </summary>
     public abstract class RingPiece : CircularContainer
     {
-        public RingPiece()
+        protected RingPiece()
         {
             Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2);
 
