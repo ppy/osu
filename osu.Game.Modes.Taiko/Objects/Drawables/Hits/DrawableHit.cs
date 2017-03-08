@@ -72,7 +72,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
 
             double hitOffset = Math.Abs(Judgement.TimeOffset);
 
-            // Must be within great range to be hittable/missable
             if (hitOffset > HitObject.HitWindowMiss)
                 return;
 
