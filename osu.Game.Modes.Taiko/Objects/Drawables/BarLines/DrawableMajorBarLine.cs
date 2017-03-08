@@ -5,6 +5,7 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.BarLines
 {
@@ -25,24 +26,22 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.BarLines
                 Children = new[]
                 {
                     // Top
-                    new Triangle
+                    new EquilateralTriangle
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Position = new Vector2(0, -10),
                         EdgeSmoothness = new Vector2(1),
-                        // Scaling height by 0.866 results in equiangular triangles (== 60° and equal side length)
-                        Size = new Vector2(20, 0.866f * -20),
+                        Size = new Vector2(20, -20),
                     },
                     // Bottom
-                    new Triangle
+                    new EquilateralTriangle
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.TopCentre,
                         Position = new Vector2(0, 10),
                         EdgeSmoothness = new Vector2(1),
-                        // Scaling height by 0.866 results in equiangular triangles (== 60° and equal side length)
-                        Size = new Vector2(20, 0.866f * 20),
+                        Size = new Vector2(20),
                     }
                 }
             });

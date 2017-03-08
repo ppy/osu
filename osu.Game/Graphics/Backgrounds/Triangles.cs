@@ -10,6 +10,7 @@ using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -99,15 +100,14 @@ namespace osu.Game.Graphics.Backgrounds
 
             const float size = 100;
 
-            return new Triangle
+            return new EquilateralTriangle
             {
                 Origin = Anchor.TopCentre,
                 RelativePositionAxes = Axes.Both,
                 Scale = new Vector2(scale),
                 EdgeSmoothness = new Vector2(1),
                 Colour = GetTriangleShade(),
-                // Scaling height by 0.866 results in equiangular triangles (== 60° and equal side length)
-                Size = new Vector2(size, 0.866f * size),
+                Size = new Vector2(size),
                 Depth = scale,
             };
         }
