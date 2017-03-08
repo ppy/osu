@@ -192,9 +192,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleTimingPoints(Beatmap beatmap, string val)
         {
-            ControlPoint cp = null;
+            ControlPoint cp;
 
-            string[] split = val.Split(',');
+            var split = val.Split(',');
 
             if (split.Length > 2)
             {
@@ -213,17 +213,15 @@ namespace osu.Game.Beatmaps.Formats
             }
             else
             {
-                double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
                 cp = new ControlPoint
                 {
                     Time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo),
-                    BeatLength = beatLength > 0 ? beatLength : 0,
+                    BeatLength = Math.Max(0, double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo)),
                     TimingChange = true
                 };
             }
 
-            if (cp != null)
-                beatmap.ControlPoints.Add(cp);
+            beatmap.Timing.ControlPoints.Add(cp);
         }
 
         private void handleColours(Beatmap beatmap, string key, string val)

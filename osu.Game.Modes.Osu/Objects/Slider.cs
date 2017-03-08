@@ -79,8 +79,8 @@ namespace osu.Game.Modes.Osu.Objects
             var baseDifficulty = beatmap.BeatmapInfo.BaseDifficulty;
             var scoringDistance = 100 * baseDifficulty.SliderMultiplier;
 
-            Velocity = scoringDistance / beatmap.BeatDistanceAt(StartTime);
-            TickDistance = scoringDistance / (baseDifficulty.SliderTickRate * beatmap.BPMMultiplierAt(StartTime));
+            Velocity = scoringDistance / beatmap.Timing.BeatDistanceAt(StartTime);
+            TickDistance = scoringDistance / (baseDifficulty.SliderTickRate * beatmap.Timing.BPMMultiplierAt(StartTime));
         }
 
         public int RepeatCount = 1;

@@ -52,7 +52,7 @@ namespace osu.Game.Modes.Taiko.Objects
             var baseDifficulty = beatmap.BeatmapInfo.BaseDifficulty;
 
             ControlPoint overridePoint;
-            ControlPoint timingPoint = beatmap.TimingPointAt(StartTime, out overridePoint);
+            ControlPoint timingPoint = beatmap.Timing.TimingPointAt(StartTime, out overridePoint);
             var velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
             var baseVelocity = 100 * baseDifficulty.SliderMultiplier / velocityAdjustment;
 

@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps.Formats
             var beatmap = new Beatmap
             {
                 HitObjects = new List<HitObject>(),
-                ControlPoints = new List<ControlPoint>(),
+                Timing = new TimingInfo(),
                 ComboColors = new List<Color4>(),
                 BeatmapInfo = new BeatmapInfo
                 {

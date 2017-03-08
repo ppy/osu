@@ -65,7 +65,7 @@ namespace osu.Game.Modes.Taiko.Objects
             PreEmpt = 600 / beatmap.SliderVelocityAt(StartTime) * 1000;
 
             ControlPoint overridePoint;
-            Kiai = beatmap.TimingPointAt(StartTime, out overridePoint).KiaiMode;
+            Kiai = beatmap.Timing.TimingPointAt(StartTime, out overridePoint).KiaiMode;
 
             if (overridePoint != null)
                 Kiai |= overridePoint.KiaiMode;

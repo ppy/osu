@@ -12,124 +12,121 @@ namespace osu.Game.Modes.Taiko.Objects
 {
     internal class TaikoConverter : HitObjectConverter<TaikoHitObject>
     {
-        /// <summary>
-        /// To be honest, I don't know why this is needed. Old osu! scaled the
-        /// slider multiplier by this factor, seemingly randomly, but now we unfortunately
-        /// have to replicate that here anywhere slider length/slider multipliers are used :(
-        /// </summary>
+        // osu-stable adds a scale factor of 1.4 to all taiko slider velocities.
         private const double slider_fudge_factor = 1.4;
 
         public override List<TaikoHitObject> Convert(Beatmap beatmap)
         {
-            List<TaikoHitObject> output = new List<TaikoHitObject>();
-
-            foreach (HitObject i in beatmap.HitObjects)
+            foreach (var c in beatmap.Timing.ControlPoints)
             {
-                TaikoHitObject h = i as TaikoHitObject;
-
-                if (h == null)
-                {
-                    OsuHitObject o = i as OsuHitObject;
-
-                    if (o == null)
-                        break;
-
-                    if (o is HitCircle)
-                    {
-                        h = new TaikoHitObject
-                        {
-                            StartTime = o.StartTime,
-                            Sample = o.Sample,
-                            NewCombo = o.NewCombo,
-                        };
-                    }
-                    else if (o is Slider)
-                    {
-                        Slider slider = o as Slider;
-
-                        // We compute slider velocity ourselves since we use double VelocityAdjustment here, whereas
-                        // the old osu! used float. This creates a veeeeeeeeeeery tiny (on the order of 2.4092825810839713E-05) offset
-                        // to slider velocity, that results in triggering the below conditional in some incorrect cases. This doesn't
-                        // seem fixable by Precision.AlmostBigger(), because the error is extremely small (and is also dependent on float precision).
-                        ControlPoint overridePoint;
-                        beatmap.TimingPointAt(slider.StartTime, out overridePoint);
-                        double origBeatLength = beatmap.BeatLengthAt(slider.StartTime);
-                        float origVelocityAdjustment = overridePoint?.FloatVelocityAdjustment ?? 1;
-
-                        double scoringDistance = 100 * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
-
-                        double newSv;
-                        if (origBeatLength > 0)
-                            newSv = scoringDistance * 1000 / origBeatLength / origVelocityAdjustment;
-                        else
-                            newSv = scoringDistance;
-
-                        double l = slider.Length * slider.RepeatCount * slider_fudge_factor;
-                        double v = newSv * slider_fudge_factor;
-                        double bl = beatmap.BeatLengthAt(slider.StartTime);
-
-                        double skipPeriod = Math.Min(bl / beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate, slider.Duration / slider.RepeatCount);
-
-                        if (skipPeriod > 0 && l / v * 1000 < 2 * bl)
-                        {
-                            for (double j = slider.StartTime; j <= slider.EndTime + skipPeriod / 8; j += skipPeriod)
-                            {
-                                // Todo: This should generate circles with different sounds for when
-                                // beatmap object has multiple sound additions
-                                h = new TaikoHitObject
-                                {
-                                    StartTime = j,
-                                    Sample = slider.Sample,
-                                    NewCombo = false
-                                };
-
-                                h.SetDefaultsFromBeatmap(beatmap);
-                                output.Add(h);
-                            }
-
-                            continue;
-                        }
-
-                        h = new DrumRoll
-                        {
-                            StartTime = o.StartTime,
-                            Sample = o.Sample,
-                            NewCombo = o.NewCombo,
-                            // Don't add the fudge factor just yet
-                            Length = slider.Length * slider.RepeatCount,
-                        };
-                    }
-                    else if (o is Spinner)
-                    {
-                        Spinner spinner = o as Spinner;
-
-                        h = new Bash
-                        {
-                            StartTime = o.StartTime,
-                            Sample = o.Sample,
-                            Length = spinner.Length
-                        };
-                    }
-                }
-
-                if (h == null)
-                    throw new HitObjectConvertException(@"Taiko", i);
-
-                h.SetDefaultsFromBeatmap(beatmap);
-
-                // Post-process fudge factor
-                h.PreEmpt /= slider_fudge_factor;
-                DrumRoll d = h as DrumRoll;
-                if (d != null)
-                {
-                    d.Velocity *= slider_fudge_factor;
-                    d.Length *= slider_fudge_factor;
-                }
-
-                output.Add(h);
+                c.VelocityAdjustment /= slider_fudge_factor;
+                c.FloatVelocityAdjustment /= (float)slider_fudge_factor;
             }
 
-            return output;
+            var converted = new List<TaikoHitObject>();
+
+            Action<TaikoHitObject> addConverted = h =>
+            {
+                converted.Add(h);
+                h.SetDefaultsFromBeatmap(beatmap);
+            };
+
+            foreach (HitObject h in beatmap.HitObjects)
+            {
+                TaikoHitObject taikoObject = h as TaikoHitObject;
+
+                if (taikoObject == null)
+                {
+                    foreach (var c in convert(h, beatmap))
+                        addConverted(c);
+                }
+                else
+                    addConverted(taikoObject);
+            }
+
+            return converted;
+        }
+
+        private IEnumerable<TaikoHitObject> convert(HitObject h, Beatmap beatmap)
+        {
+            OsuHitObject o = h as OsuHitObject;
+
+            if (o == null)
+                throw new HitObjectConvertException(@"Taiko", h);
+
+            if (o is HitCircle)
+            {
+                yield return new TaikoHitObject
+                {
+                    StartTime = o.StartTime,
+                    Sample = o.Sample,
+                    NewCombo = o.NewCombo,
+                };
+            }
+            else if (o is Slider)
+            {
+                Slider slider = o as Slider;
+
+                // We compute slider velocity ourselves since we use double VelocityAdjustment here, whereas
+                // the old osu! used float. This creates a veeeeeeeeeeery tiny (on the order of 2.4092825810839713E-05) offset
+                // to slider velocity, that results in triggering the below conditional in some incorrect cases. This doesn't
+                // seem fixable by Precision.AlmostBigger(), because the error is extremely small (and is also dependent on float precision).
+                ControlPoint overridePoint;
+                beatmap.Timing.TimingPointAt(slider.StartTime, out overridePoint);
+                double origBeatLength = beatmap.Timing.BeatLengthAt(slider.StartTime);
+                float origVelocityAdjustment = overridePoint?.FloatVelocityAdjustment ?? 1;
+
+                double scoringDistance = 100 * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
+
+                double newSv;
+                if (origBeatLength > 0)
+                    newSv = scoringDistance * 1000 / origBeatLength / origVelocityAdjustment;
+                else
+                    newSv = scoringDistance;
+
+                double l = slider.Length * slider.RepeatCount * slider_fudge_factor;
+                double v = newSv * slider_fudge_factor;
+                double bl = beatmap.Timing.BeatLengthAt(slider.StartTime);
+
+                double skipPeriod = Math.Min(bl / beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate, slider.Duration / slider.RepeatCount);
+
+                if (skipPeriod > 0 && l / v * 1000 < 2 * bl)
+                {
+                    for (double j = slider.StartTime; j <= slider.EndTime + skipPeriod / 8; j += skipPeriod)
+                    {
+                        // Todo: This should generate circles with different sounds for when
+                        // beatmap object has multiple sound additions
+                        yield return new TaikoHitObject
+                        {
+                            StartTime = j,
+                            Sample = slider.Sample,
+                            NewCombo = false
+                        };
+                    }
+                }
+                else
+                {
+                    yield return new DrumRoll
+                    {
+                        StartTime = o.StartTime,
+                        Sample = o.Sample,
+                        NewCombo = o.NewCombo,
+                        // Don't add the fudge factor just yet
+                        Length = slider.Length * slider.RepeatCount,
+                    };
+                }
+            }
+            else if (o is Spinner)
+            {
+                Spinner spinner = o as Spinner;
+
+                yield return new Bash
+                {
+                    StartTime = o.StartTime,
+                    Sample = o.Sample,
+                    Length = spinner.Length
+                };
+            }
         }
 
         public List<BarLine> ConvertBarLines(Beatmap beatmap)
@@ -138,7 +135,7 @@ namespace osu.Game.Modes.Taiko.Objects
 
             double lastHitTime = beatmap.HitObjects[beatmap.HitObjects.Count - 1].EndTime + 1;
 
-            List<ControlPoint> timingPoints = beatmap.ControlPoints?.FindAll(cp => cp.TimingChange);
+            List<ControlPoint> timingPoints = beatmap.Timing?.ControlPoints.FindAll(cp => cp.TimingChange);
 
             if (timingPoints == null || timingPoints.Count == 0)
                 return new List<BarLine>();
@@ -172,9 +169,6 @@ namespace osu.Game.Modes.Taiko.Objects
                     };
 
                     barLine.SetDefaultsFromBeatmap(beatmap);
-
-                    // Add fudge factor
-                    barLine.PreEmpt /= slider_fudge_factor;
 
                     output.Add(barLine);
 
