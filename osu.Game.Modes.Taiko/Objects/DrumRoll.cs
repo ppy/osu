@@ -49,8 +49,6 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.SetDefaultsFromBeatmap(beatmap);
 
-            Length *= SLIDER_FUDGE_FACTOR;
-
             var baseDifficulty = beatmap.BeatmapInfo.BaseDifficulty;
 
             ControlPoint overridePoint;

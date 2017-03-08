@@ -57,7 +57,7 @@ namespace osu.Game.Modes.Taiko.Objects
                         else
                             newSv = scoringDistance;
 
-                        double l = slider.Length * TaikoHitObject.SLIDER_FUDGE_FACTOR * slider.RepeatCount;
+                        double l = slider.Length * slider.RepeatCount * TaikoHitObject.SLIDER_FUDGE_FACTOR;
                         double v = newSv * TaikoHitObject.SLIDER_FUDGE_FACTOR;
                         double bl = beatmap.BeatLengthAt(slider.StartTime);
 
@@ -88,7 +88,7 @@ namespace osu.Game.Modes.Taiko.Objects
                             StartTime = o.StartTime,
                             Sample = o.Sample,
                             NewCombo = o.NewCombo,
-                            Length = slider.Length * slider.RepeatCount,
+                            Length = l,
                         };
                     }
                     else if (o is Osu.Objects.Spinner)
