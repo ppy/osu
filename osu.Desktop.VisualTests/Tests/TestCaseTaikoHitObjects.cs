@@ -174,7 +174,7 @@ namespace osu.Desktop.VisualTests.Tests
         }
 
         int depth;
-        void add(DrawableHitObject h)
+        void add(DrawableHitObject<TaikoHitObject> h)
         {
             h.Depth = depth++;
 

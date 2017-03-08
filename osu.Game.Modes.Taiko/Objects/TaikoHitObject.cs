@@ -26,17 +26,17 @@ namespace osu.Game.Modes.Taiko.Objects
         /// <summary>
         /// The hit window that results in a "GREAT" hit.
         /// </summary>
-        public double HitWindowGreat;
+        public double HitWindowGreat = 35;
 
         /// <summary>
         /// The hit window that results in a "GOOD" hit.
         /// </summary>
-        public double HitWindowGood;
+        public double HitWindowGood = 80;
 
         /// <summary>
         /// The hit window that results in a "MISS".
         /// </summary>
-        public double HitWindowMiss;
+        public double HitWindowMiss = 95;
 
         /// <summary>
         /// The time to scroll in the HitObject.
