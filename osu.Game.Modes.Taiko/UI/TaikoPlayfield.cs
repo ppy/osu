@@ -84,12 +84,12 @@ namespace osu.Game.Modes.Taiko.UI
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Margin = new MarginPadding { Left = left_area_size },
+                    Padding = new MarginPadding { Left = left_area_size },
                     Children = new Drawable[]
                     {
                         new Container
                         {
-                            Margin = new MarginPadding { Left = hit_target_offset },
+                            Padding = new MarginPadding { Left = hit_target_offset },
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
