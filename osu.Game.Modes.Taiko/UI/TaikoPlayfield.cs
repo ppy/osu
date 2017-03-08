@@ -50,6 +50,7 @@ namespace osu.Game.Modes.Taiko.UI
         private Container leftBackgroundContainer;
         private Box leftBackground;
         private Container hitObjectContainer;
+        private Container topLevelHitContainer;
 
         public TaikoPlayfield()
         {
@@ -154,6 +155,10 @@ namespace osu.Game.Modes.Taiko.UI
                             }
                         }
                     }
+                },
+                topLevelHitContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
                 }
             });
         }
@@ -197,6 +202,10 @@ namespace osu.Game.Modes.Taiko.UI
 
             if (taikoJudgement.Result == HitResult.Hit)
             {
+                if (h.X >= -0.05f)
+                    //if we're far enough away from the left stage, we should bring outselves in front of it.
+                    topLevelHitContainer.Add(h.CreateProxy());
+
                 if (taikoJudgement.Score == TaikoScoreResult.Great)
                 {
                     hitTarget.Flash(taikoObject.ExplodeColour);
