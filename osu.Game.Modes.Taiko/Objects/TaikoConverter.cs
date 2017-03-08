@@ -12,6 +12,13 @@ namespace osu.Game.Modes.Taiko.Objects
 {
     internal class TaikoConverter : HitObjectConverter<TaikoHitObject>
     {
+        /// <summary>
+        /// To be honest, I don't know why this is needed. Old osu! scaled the
+        /// slider multiplier by this factor, seemingly randomly, but now we unfortunately
+        /// have to replicate that here anywhere slider length/slider multipliers are used :(
+        /// </summary>
+        private const double slider_fudge_factor = 1.4;
+
         public override List<TaikoHitObject> Convert(Beatmap beatmap)
         {
             List<TaikoHitObject> output = new List<TaikoHitObject>();
@@ -57,8 +64,8 @@ namespace osu.Game.Modes.Taiko.Objects
                         else
                             newSv = scoringDistance;
 
-                        double l = slider.Length * slider.RepeatCount * TaikoHitObject.SLIDER_FUDGE_FACTOR;
-                        double v = newSv * TaikoHitObject.SLIDER_FUDGE_FACTOR;
+                        double l = slider.Length * slider.RepeatCount * slider_fudge_factor;
+                        double v = newSv * slider_fudge_factor;
                         double bl = beatmap.BeatLengthAt(slider.StartTime);
 
                         double skipPeriod = Math.Min(bl / beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate, slider.Duration / slider.RepeatCount);
@@ -88,7 +95,8 @@ namespace osu.Game.Modes.Taiko.Objects
                             StartTime = o.StartTime,
                             Sample = o.Sample,
                             NewCombo = o.NewCombo,
-                            Length = l,
+                            // Don't add the fudge factor just yet
+                            Length = slider.Length * slider.RepeatCount,
                         };
                     }
                     else if (o is Spinner)
@@ -105,7 +113,86 @@ namespace osu.Game.Modes.Taiko.Objects
                 }
 
                 h.SetDefaultsFromBeatmap(beatmap);
+
+                // Post-process fudge factor
+                h.PreEmpt /= slider_fudge_factor;
+                DrumRoll d = h as DrumRoll;
+                if (d != null)
+                {
+                    d.Velocity *= slider_fudge_factor;
+                    d.Length *= slider_fudge_factor;
+                }
+
                 output.Add(h);
+            }
+
+            return output;
+        }
+
+        public List<BarLine> ConvertBarLines(Beatmap beatmap)
+        {
+            List<BarLine> output = new List<BarLine>();
+
+            double lastHitTime = beatmap.HitObjects[beatmap.HitObjects.Count - 1].EndTime + 1;
+
+            List<ControlPoint> timingPoints = beatmap.ControlPoints?.FindAll(cp => cp.TimingChange);
+
+            if (timingPoints == null || timingPoints.Count == 0)
+                return new List<BarLine>();
+
+            int currentIndex = 0;
+
+            while (currentIndex < timingPoints.Count && timingPoints[currentIndex].BeatLength == 0)
+                currentIndex++;
+
+            double time = timingPoints[currentIndex].Time;
+            double measureLength = timingPoints[currentIndex].BeatLength * (int)timingPoints[currentIndex].TimeSignature;
+
+            // Find the bar line time closest to 0
+            time -= measureLength * (int)(time / measureLength);
+
+            // Always start barlines from a positive time
+            while (time < 0)
+                time += measureLength;
+
+            double lastBeatLength = timingPoints[currentIndex].BeatLength;
+            int currentBeat = 0;
+            while (time <= lastHitTime)
+            {
+                ControlPoint current = timingPoints[currentIndex];
+
+                if (time > current.Time || !current.OmitFirstBarLine)
+                {
+                    BarLine barLine = new BarLine
+                    {
+                        StartTime = time,
+                        IsMajor = currentBeat % (int)current.TimeSignature == 0
+                    };
+
+                    barLine.SetDefaultsFromBeatmap(beatmap);
+
+                    // Add fudge factor
+                    barLine.PreEmpt /= slider_fudge_factor;
+
+                    output.Add(barLine);
+
+                    currentBeat++;
+                }
+
+                double bl = current.BeatLength;
+
+                if (bl < 800)
+                    bl *= (int)current.TimeSignature;
+
+                time += bl;
+
+                if (currentIndex + 1 < timingPoints.Count && time >= timingPoints[currentIndex + 1].Time)
+                {
+                    currentIndex++;
+                    time = timingPoints[currentIndex].Time;
+
+                    currentBeat = 0;
+                }
             }
 
             return output;
