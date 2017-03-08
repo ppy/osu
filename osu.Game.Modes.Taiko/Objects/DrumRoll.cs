@@ -45,6 +45,21 @@ namespace osu.Game.Modes.Taiko.Objects
         /// </summary>
         public int TotalTicks;
 
+        /// <summary>
+        /// Initializes the drum roll ticks if not initialized and returns them.
+        /// </summary>
+        public IEnumerable<DrumRollTick> Ticks
+        {
+            get
+            {
+                if (ticks == null)
+                    createTicks();
+                return ticks;
+            }
+        }
+
+        private List<DrumRollTick> ticks;
+
         public override void SetDefaultsFromBeatmap(Beatmap beatmap)
         {
             base.SetDefaultsFromBeatmap(beatmap);
@@ -70,31 +85,31 @@ namespace osu.Game.Modes.Taiko.Objects
             RequiredGreatHits = (int)(TotalTicks * Math.Min(0.30, 0.10 + 0.20 / 6 * beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty));
         }
 
-        public IEnumerable<DrumRollTick> Ticks
+        private void createTicks()
         {
-            get
+            ticks = new List<DrumRollTick>();
+
+            if (TickTimeDistance == 0)
+                return;
+
+            bool first = true;
+            for (double t = StartTime; t < EndTime + (int)TickTimeDistance; t += TickTimeDistance)
             {
-                if (TickTimeDistance == 0) yield break;
-
-                bool first = true;
-                for (double t = StartTime; t < EndTime + (int)TickTimeDistance; t += TickTimeDistance)
+                ticks.Add(new DrumRollTick
                 {
-                    yield return new DrumRollTick
+                    FirstTick = first,
+                    PreEmpt = PreEmpt,
+                    TickTimeDistance = TickTimeDistance,
+                    Colour = Colour,
+                    StartTime = t,
+                    Sample = new HitSampleInfo
                     {
-                        FirstTick = first,
-                        PreEmpt = PreEmpt,
-                        TickTimeDistance = TickTimeDistance,
-                        Colour = Colour,
-                        StartTime = t,
-                        Sample = new HitSampleInfo
-                        {
-                            Type = SampleType.None,
-                            Set = SampleSet.Soft
-                        }
-                    };
+                        Type = SampleType.None,
+                        Set = SampleSet.Soft
+                    }
+                });
 
-                    first = false;
-                }
+                first = false;
             }
         }
 

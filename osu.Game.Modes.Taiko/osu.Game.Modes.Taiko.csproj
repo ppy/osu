@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Objects\TaikoHitType.cs" />
     <Compile Include="Replays\LegacyTaikoReplay.cs" />
     <Compile Include="Objects\BarLine.cs" />
     <Compile Include="Objects\Drawables\BarLines\DrawableBarLine.cs" />

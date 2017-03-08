@@ -12,9 +12,6 @@ namespace osu.Game.Modes.Taiko.UI
 {
     internal class ExplodingRing : CircularContainer
     {
-        private const float offset_min = -0.5f;
-        private const float offset_max = 0.5f;
-
         public ExplodingRing(Color4 fillColour, bool fill)
         {
             Size = new Vector2(128);
