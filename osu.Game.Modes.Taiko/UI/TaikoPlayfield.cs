@@ -179,7 +179,6 @@ namespace osu.Game.Modes.Taiko.UI
 
         public override void Add(DrawableHitObject<TaikoHitObject> h)
         {
-            h.Depth = (float)h.HitObject.StartTime;
             h.Scale = new Vector2(PLAYFIELD_SCALE);
 
             h.OnJudgement += onJudgement;
