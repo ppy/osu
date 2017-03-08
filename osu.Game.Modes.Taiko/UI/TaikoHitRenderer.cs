@@ -72,14 +72,9 @@ namespace osu.Game.Modes.Taiko.UI
 
         private void loadBarLines()
         {
+            //todo: this function should not be here.
             foreach (BarLine line in new TaikoConverter().ConvertBarLines(beatmap))
-            {
-                TaikoPlayfield tp = Playfield as TaikoPlayfield;
-                if (line.IsMajor)
-                    tp.AddBarLine(new DrawableMajorBarLine(line));
-                else
-                    tp.AddBarLine(new DrawableBarLine(line));
-            }
+                ((TaikoPlayfield)Playfield).AddBarLine(line.IsMajor ? new DrawableMajorBarLine(line) : new DrawableBarLine(line));
         }
     }
 }
