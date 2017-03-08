@@ -10,7 +10,6 @@ using osu.Framework.Input;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Circle;
 using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
