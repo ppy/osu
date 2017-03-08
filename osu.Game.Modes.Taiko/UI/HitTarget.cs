@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -11,6 +9,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Modes.Taiko.Objects;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -83,7 +83,7 @@ namespace osu.Game.Modes.Taiko.UI
 
                                     Children = new Drawable[]
                                     {
-                                        new Box()
+                                        new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
 

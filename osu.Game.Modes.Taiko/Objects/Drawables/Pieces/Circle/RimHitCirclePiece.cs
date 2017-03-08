@@ -2,10 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Ring;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Circle
 {

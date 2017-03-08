@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Circle;
-using System.Collections.Generic;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
 {

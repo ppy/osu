@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using OpenTK.Input;
 using osu.Game.Modes.Objects.Drawables;
+using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
 {
@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
             Size *= 1.5f;
         }
 
-        protected override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo() { MaxScore = TaikoScoreResult.Great, SecondHit = true };
+        protected override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo { MaxScore = TaikoScoreResult.Great, SecondHit = true };
 
         protected override void CheckJudgement(bool userTriggered)
         {

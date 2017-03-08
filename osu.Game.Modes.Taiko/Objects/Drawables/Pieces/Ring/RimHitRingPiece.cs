@@ -2,11 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Ring
 {
@@ -14,7 +14,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Ring
     {
         protected override Drawable CreateInnerPiece()
         {
-            return new CircularContainer()
+            return new CircularContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

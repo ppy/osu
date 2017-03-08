@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using OpenTK;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.BarLines
 {
@@ -15,7 +15,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.BarLines
         public DrawableMajorBarLine(BarLine barLine)
             : base(barLine)
         {
-            Add(arrows = new Container()
+            Add(arrows = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

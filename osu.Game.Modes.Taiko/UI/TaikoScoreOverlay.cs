@@ -2,13 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
+using osu.Game.Screens.Play;
 using OpenTK;
 using OpenTK.Input;
-using osu.Framework.Graphics.Primitives;
-using osu.Game.Screens.Play;
-using osu.Game.Modes.Osu.UI;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -23,7 +23,7 @@ namespace osu.Game.Modes.Taiko.UI
             Margin = new MarginPadding { Right = 5 },
         };
 
-        protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter()
+        protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter
         {
             Anchor = Anchor.TopCentre,
             Origin = Anchor.TopCentre,
@@ -32,7 +32,7 @@ namespace osu.Game.Modes.Taiko.UI
             Margin = new MarginPadding { Right = 5 },
         };
 
-        protected override ComboCounter CreateComboCounter() => new OsuComboCounter()
+        protected override ComboCounter CreateComboCounter() => new OsuComboCounter
         {
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,

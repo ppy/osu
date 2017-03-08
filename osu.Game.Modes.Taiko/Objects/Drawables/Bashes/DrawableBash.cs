@@ -1,21 +1,21 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using osu.Game.Modes.Objects.Drawables;
-using osu.Framework.Graphics.Containers;
-using OpenTK.Input;
-using osu.Framework.Input;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input;
+using osu.Game.Graphics;
+using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Circle;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Bashes
 {
@@ -96,7 +96,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Bashes
                     }
                 },
                 // Inner ring (the one that scales up)
-                bashInnerRing = new CircularContainer()
+                bashInnerRing = new CircularContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -111,7 +111,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Bashes
                     Children = new[]
                     {
                         // Inner ring background
-                        innerRingBackground = new Box()
+                        innerRingBackground = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
 

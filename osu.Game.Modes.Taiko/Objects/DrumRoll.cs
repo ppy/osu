@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.Samples;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Modes.Taiko.Objects
 {

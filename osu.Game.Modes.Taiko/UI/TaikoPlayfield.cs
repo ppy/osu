@@ -3,17 +3,17 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects;
+using osu.Game.Modes.Taiko.Objects.Drawables;
+using osu.Game.Modes.Taiko.Objects.Drawables.BarLines;
+using osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls;
 using osu.Game.Modes.UI;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Modes.Taiko.Objects.Drawables;
-using osu.Game.Graphics;
-using osu.Game.Modes.Taiko.Objects.Drawables.BarLines;
-using osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls;
 
 namespace osu.Game.Modes.Taiko.UI
 {

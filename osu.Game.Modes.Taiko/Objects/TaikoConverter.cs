@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
-using osu.Game.Beatmaps;
-using System;
-using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
@@ -27,7 +27,7 @@ namespace osu.Game.Modes.Taiko.Objects
                     if (o == null)
                         throw new HitObjectConvertException(@"Taiko", i);
 
-                    if (o is Osu.Objects.HitCircle)
+                    if (o is HitCircle)
                     {
                         h = new TaikoHitObject
                         {
@@ -36,9 +36,9 @@ namespace osu.Game.Modes.Taiko.Objects
                             NewCombo = o.NewCombo,
                         };
                     }
-                    else if (o is Osu.Objects.Slider)
+                    else if (o is Slider)
                     {
-                        Slider slider = o as Osu.Objects.Slider;
+                        Slider slider = o as Slider;
 
                         // We compute slider velocity ourselves since we use double VelocityAdjustment here, whereas
                         // the old osu! used float. This creates a veeeeeeeeeeery tiny (on the order of 2.4092825810839713E-05) offset
@@ -91,9 +91,9 @@ namespace osu.Game.Modes.Taiko.Objects
                             Length = l,
                         };
                     }
-                    else if (o is Osu.Objects.Spinner)
+                    else if (o is Spinner)
                     {
-                        Spinner spinner = o as Osu.Objects.Spinner;
+                        Spinner spinner = o as Spinner;
 
                         h = new Bash
                         {

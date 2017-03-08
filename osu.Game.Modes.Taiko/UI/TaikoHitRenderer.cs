@@ -36,7 +36,7 @@ namespace osu.Game.Modes.Taiko.UI
             computeBarLines();
         }
 
-        protected override Playfield<TaikoHitObject> CreatePlayfield() => new TaikoPlayfield()
+        protected override Playfield<TaikoHitObject> CreatePlayfield() => new TaikoPlayfield
         {
             RelativePositionAxes = Axes.Y,
             Position = new Vector2(0, 0.4f)
@@ -52,7 +52,8 @@ namespace osu.Game.Modes.Taiko.UI
                         return new DrawableCentreHitFinisher(h);
                     return new DrawableCentreHit(h);
                 }
-                else if ((h.Type & TaikoHitType.RimHit) > 0)
+
+                if ((h.Type & TaikoHitType.RimHit) > 0)
                 {
                     if ((h.Type & TaikoHitType.Finisher) > 0)
                         return new DrawableRimHitFinisher(h);

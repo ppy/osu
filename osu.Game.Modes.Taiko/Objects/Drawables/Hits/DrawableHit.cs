@@ -1,17 +1,17 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
-using osu.Game.Modes.Objects.Drawables;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
-using OpenTK.Input;
-using OpenTK.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input;
+using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Circle;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
 {

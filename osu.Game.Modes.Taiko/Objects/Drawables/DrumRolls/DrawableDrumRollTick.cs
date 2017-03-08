@@ -1,19 +1,19 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
-using osu.Framework.Input;
-using OpenTK.Input;
-using osu.Game.Modes.Objects.Drawables;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input;
+using osu.Game.Graphics;
+using osu.Game.Modes.Objects.Drawables;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 {
@@ -43,7 +43,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 
             Children = new Drawable[]
             {
-                bodyPiece = new Container()
+                bodyPiece = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -58,7 +58,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 
                     Children = new[]
                     {
-                        new Box()
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.White,
@@ -76,7 +76,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
             ExplodeColour = Color4.White;
         }
 
-        protected override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollTickJudgementInfo() { MaxScore = TaikoScoreResult.Great };
+        protected override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollTickJudgementInfo { MaxScore = TaikoScoreResult.Great };
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {

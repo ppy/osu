@@ -13,6 +13,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
         {
         }
 
-        protected override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollTickJudgementInfo() { MaxScore = TaikoScoreResult.Great, SecondHit = true };
+        protected override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollTickJudgementInfo { MaxScore = TaikoScoreResult.Great, SecondHit = true };
     }
 }

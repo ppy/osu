@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 
-using OpenTK;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces.DrumRoll;
+using OpenTK;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 {
@@ -16,7 +16,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
             Size *= new Vector2(1, 1.5f);
         }
 
-        protected override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo() { MaxScore = TaikoScoreResult.Great, SecondHit = true };
+        protected override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo { MaxScore = TaikoScoreResult.Great, SecondHit = true };
 
         protected override DrawableDrumRollTick CreateTick(DrumRoll drumRoll, DrumRollTick tick) => new DrawableDrumRollFinisherTick(drumRoll, tick);
 

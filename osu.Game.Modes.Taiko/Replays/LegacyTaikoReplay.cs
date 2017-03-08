@@ -35,7 +35,7 @@ namespace osu.Game.Modes.Taiko.Replays
                 {
                     new InputState
                     {
-                        Keyboard = new ReplayKeyboardState(new List<Key>(new Key[]
+                        Keyboard = new ReplayKeyboardState(new List<Key>(new[]
                         {
                             CurrentFrame?.MouseRight1 == true ? Key.F : Key.Unknown,
                             CurrentFrame?.MouseRight2 == true ? Key.J : Key.Unknown,
