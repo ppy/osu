@@ -104,21 +104,18 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
                 case ArmedState.Idle:
                     break;
                 case ArmedState.Miss:
-                    bodyContainer.FadeColour(Color4.Red, 100, EasingTypes.OutQuint);
                     bodyContainer.FadeOut(100);
                     break;
                 case ArmedState.Hit:
-                    bodyContainer.ScaleTo(1.5f, 150, EasingTypes.OutQuint);
-                    bodyContainer.FadeOut(150);
+                    bodyContainer.ScaleTo(0.8f, 400, EasingTypes.OutQuad);
+
+                    bodyContainer.FadeOut(600, EasingTypes.OutQuint);
+
+                    bodyContainer.MoveToY(-200, 250, EasingTypes.Out);
+                    bodyContainer.Delay(250);
+                    bodyContainer.MoveToY(0, 500, EasingTypes.In);
                     break;
             }
-        }
-
-        protected override void Update()
-        {
-            // If the HitCircle was hit, make it stop moving
-            if (State != ArmedState.Hit)
-                base.Update();
         }
 
         /// <summary>
