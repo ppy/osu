@@ -1,65 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using System;
 using System.Collections.Generic;
 using OpenTK.Input;
 using osu.Game.Modes.Objects.Drawables;
-using OpenTK.Graphics;
-using osu.Framework.Allocation;
-using osu.Game.Graphics;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawables
+namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
 {
-    public class DrawableHitCircleDonFinisher : DrawableHitCircleFinisher
-    {
-        public override Color4 ExplodeColour { get; protected set; }
-
-        protected override List<Key> Keys { get; } = new List<Key>(new[] { Key.F, Key.J });
-
-        public DrawableHitCircleDonFinisher(HitCircle hitCircle)
-            : base(hitCircle)
-        {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            ExplodeColour = colours.Pink;
-        }
-
-        protected override CirclePiece CreateBody() => new DonCirclePiece
-        {
-            Scale = new Vector2(1.5f)
-        };
-    }
-
-    public class DrawableHitCircleKatsuFinisher : DrawableHitCircleFinisher
-    {
-        public override Color4 ExplodeColour { get; protected set; }
-
-        protected override List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.K });
-
-        public DrawableHitCircleKatsuFinisher(HitCircle hitCircle)
-            : base(hitCircle)
-        {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            ExplodeColour = colours.Blue;
-        }
-
-        protected override CirclePiece CreateBody() => new KatsuCirclePiece
-        {
-            Scale = new Vector2(1.5f)
-        };
-    }
-
-    public abstract class DrawableHitCircleFinisher : DrawableHitCircle
+    public abstract class DrawableHitFinisher : DrawableHit
     {
         private const double second_hit_window = 30;
 
@@ -67,8 +16,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         private bool validKeyPressed;
 
-        public DrawableHitCircleFinisher(HitCircle hitCircle)
-            : base(hitCircle)
+        public DrawableHitFinisher(TaikoHitObject hitObject)
+            : base(hitObject)
         {
             Size *= 1.5f;
         }

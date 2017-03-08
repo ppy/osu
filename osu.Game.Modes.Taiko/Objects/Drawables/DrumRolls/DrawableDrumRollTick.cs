@@ -15,18 +15,8 @@ using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Transforms;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawables
+namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 {
-    public class DrawableDrumRollFinisherTick : DrawableDrumRollTick
-    {
-        public DrawableDrumRollFinisherTick(DrumRoll drumRoll, DrumRollTick drumRollTick)
-            : base(drumRoll, drumRollTick)
-        {
-        }
-
-        protected override JudgementInfo CreateJudgementInfo() => new TaikoDrumRollTickJudgementInfo() { MaxScore = TaikoScoreResult.Great, SecondHit = true };
-    }
-
     public class DrawableDrumRollTick : DrawableTaikoHitObject
     {
         public override Color4 ExplodeColour { get; protected set; }

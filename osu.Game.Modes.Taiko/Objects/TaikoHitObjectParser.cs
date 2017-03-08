@@ -23,7 +23,7 @@ namespace osu.Game.Modes.Taiko.Objects
             switch (type)
             {
                 case HitObjectType.Circle:
-                    result = new HitCircle();
+                    result = new TaikoHitObject();
                     break;
                 case HitObjectType.Slider:
                     int repeatCount = repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);

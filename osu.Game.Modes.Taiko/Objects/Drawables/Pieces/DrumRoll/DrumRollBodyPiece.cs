@@ -10,23 +10,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
+namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces.DrumRoll
 {
-    /// <summary>
-    /// The internal coloured "bar" of a finisher drum roll.
-    /// This overshoots the expected length by corner radius on both sides.
-    /// </summary>
-    public class DrumRollFinisherBodyPiece : DrumRollBodyPiece
-    {
-        public override float CornerRadius => base.CornerRadius * 1.5f;
-
-        public DrumRollFinisherBodyPiece(float baseLength)
-            : base(baseLength)
-        {
-            Size *= new Vector2(1, 1.5f);
-        }
-    }
-
     /// <summary>
     /// The internal coloured "bar" of a drum roll.
     /// This overshoots the expected length by corner radius on both sides.

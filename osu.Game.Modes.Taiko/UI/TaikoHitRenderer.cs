@@ -12,6 +12,10 @@ using osu.Game.Beatmaps;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps.Timing;
 using System.Collections.Generic;
+using osu.Game.Modes.Taiko.Objects.Drawables.Hits;
+using osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls;
+using osu.Game.Modes.Taiko.Objects.Drawables.Bashes;
+using osu.Game.Modes.Taiko.Objects.Drawables.BarLines;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -41,19 +45,19 @@ namespace osu.Game.Modes.Taiko.UI
 
         protected override DrawableHitObject<TaikoHitObject> GetVisualRepresentation(TaikoHitObject h)
         {
-            if ((h.Type & TaikoHitType.HitCircle) > 0)
+            if ((h.Type & TaikoHitType.Hit) > 0)
             {
-                if ((h.Type & TaikoHitType.Don) > 0)
+                if ((h.Type & TaikoHitType.CentreHit) > 0)
                 {
                     if ((h.Type & TaikoHitType.Finisher) > 0)
-                        return new DrawableHitCircleDonFinisher(h as HitCircle);
-                    return new DrawableHitCircleDon(h as HitCircle);
+                        return new DrawableCentreHitFinisher(h);
+                    return new DrawableCentreHit(h);
                 }
-                else if ((h.Type & TaikoHitType.Katsu) > 0)
+                else if ((h.Type & TaikoHitType.RimHit) > 0)
                 {
                     if ((h.Type & TaikoHitType.Finisher) > 0)
-                        return new DrawableHitCircleKatsuFinisher(h as HitCircle);
-                    return new DrawableHitCircleKatsu(h as HitCircle);
+                        return new DrawableRimHitFinisher(h);
+                    return new DrawableRimHit(h);
                 }
             }
             else if ((h.Type & TaikoHitType.DrumRoll) > 0)

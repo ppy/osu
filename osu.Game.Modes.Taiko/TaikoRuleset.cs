@@ -8,6 +8,7 @@ using osu.Game.Modes.Taiko.UI;
 using osu.Game.Modes.UI;
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Taiko.Objects;
+using osu.Game.Modes.Taiko.Replays;
 
 namespace osu.Game.Modes.Taiko
 {
@@ -85,7 +86,7 @@ namespace osu.Game.Modes.Taiko
         public override Score CreateAutoplayScore(Beatmap beatmap)
         {
             var score = CreateScoreProcessor(beatmap).GetScore();
-            score.Replay = new TaikoAutoReplay(new TaikoConverter().Convert(beatmap));
+            score.Replay = new AutoReplay(new TaikoConverter().Convert(beatmap));
             return score;
         }
     }

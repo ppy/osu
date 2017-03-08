@@ -3,7 +3,6 @@
 
 using OpenTK;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using System;
 using System.Collections.Generic;
 using osu.Game.Modes.Objects.Drawables;
@@ -11,53 +10,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
 using OpenTK.Graphics;
-using osu.Game.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.Transforms;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Circle;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawables
+namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
 {
-    public class DrawableHitCircleDon : DrawableHitCircle
-    {
-        public override Color4 ExplodeColour { get; protected set; }
-
-        protected override List<Key> Keys { get; } = new List<Key>(new[] { Key.F, Key.J });
-
-        public DrawableHitCircleDon(HitCircle hitCircle)
-            : base(hitCircle)
-        {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            ExplodeColour = colours.PinkDarker;
-        }
-
-        protected override CirclePiece CreateBody() => new DonCirclePiece();
-    }
-
-    public class DrawableHitCircleKatsu : DrawableHitCircle
-    {
-        public override Color4 ExplodeColour { get; protected set; }
-
-        protected override List<Key> Keys { get; } = new List<Key>(new[] { Key.D, Key.K });
-
-        public DrawableHitCircleKatsu(HitCircle hitCircle)
-            : base(hitCircle)
-        {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            ExplodeColour = colours.BlueDarker;
-        }
-
-        protected override CirclePiece CreateBody() => new KatsuCirclePiece();
-    }
-
-    public abstract class DrawableHitCircle : DrawableTaikoHitObject
+    public abstract class DrawableHit : DrawableTaikoHitObject
     {
         /// <summary>
         /// A list of keys which this HitObject will accept.
@@ -75,8 +33,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         private bool validKeyPressed = true;
 
-        public DrawableHitCircle(HitCircle hitCircle)
-            : base(hitCircle)
+        public DrawableHit(TaikoHitObject hitObject)
+            : base(hitObject)
         {
             Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2);
 
@@ -94,7 +52,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                 }
             };
 
-            bodyPiece.Kiai = hitCircle.Kiai;
+            bodyPiece.Kiai = hitObject.Kiai;
         }
 
         /// <summary>

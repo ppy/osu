@@ -8,7 +8,7 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects;
 using OpenTK;
 
-namespace osu.Game.Modes.Taiko
+namespace osu.Game.Modes.Taiko.Scoring
 {
     class TaikoScoreProcessor : ScoreProcessor
     {
@@ -66,19 +66,19 @@ namespace osu.Game.Modes.Taiko
         {
             List<TaikoHitObject> objects = new TaikoConverter().Convert(beatmap);
 
-            double hpMultiplierNormal = 1 / (hp_scale_factor * hp_hit_300 * objects.FindAll(o => (o.Type & TaikoHitType.HitCircle) > 0).Count * Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98, Mods.None));
+            double hpMultiplierNormal = 1 / (hp_scale_factor * hp_hit_300 * objects.FindAll(o => (o.Type & TaikoHitType.Hit) > 0).Count * Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98, Mods.None));
 
             hpIncreaseTick = 0.0001 / hp_max * hp_scale_factor;
             hpIncreaseGreat = hpMultiplierNormal * hp_hit_300 * hp_scale_factor;
             hpIncreaseGood = hpMultiplierNormal * Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_hit_100 * 8, hp_hit_100, hp_hit_100, Mods.None) * hp_scale_factor;
             hpIncreaseMiss = Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, -6, -25, -40, Mods.None) / hp_max * hp_scale_factor;
 
-            List<TaikoHitObject> finishers = objects.FindAll(o => (o.Type & TaikoHitType.HitCircle) > 0 && (o.Type & TaikoHitType.Finisher) > 0);
+            List<TaikoHitObject> finishers = objects.FindAll(o => (o.Type & TaikoHitType.Hit) > 0 && (o.Type & TaikoHitType.Finisher) > 0);
             finisherScoreScale = -7d / 90d * MathHelper.Clamp(finishers.Count, 30, 120) + 111d / 9d;
 
             foreach (TaikoHitObject obj in objects)
             {
-                if ((obj.Type & TaikoHitType.HitCircle) > 0)
+                if ((obj.Type & TaikoHitType.Hit) > 0)
                 {
                     AddJudgement(new TaikoJudgementInfo
                     {

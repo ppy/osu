@@ -29,7 +29,7 @@ namespace osu.Game.Modes.Taiko.Objects
 
                     if (o is Osu.Objects.HitCircle)
                     {
-                        h = new HitCircle
+                        h = new TaikoHitObject
                         {
                             StartTime = o.StartTime,
                             Sample = o.Sample,
@@ -69,7 +69,7 @@ namespace osu.Game.Modes.Taiko.Objects
                             {
                                 // Todo: This should generate circles with different sounds for when
                                 // beatmap object has multiple sound additions
-                                h = new HitCircle
+                                h = new TaikoHitObject
                                 {
                                     StartTime = j,
                                     Sample = slider.Sample,

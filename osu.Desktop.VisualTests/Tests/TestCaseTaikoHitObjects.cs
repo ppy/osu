@@ -14,6 +14,9 @@ using OpenTK.Graphics;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.UI;
+using osu.Game.Modes.Taiko.Objects.Drawables.Hits;
+using osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls;
+using osu.Game.Modes.Taiko.Objects.Drawables.Bashes;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -31,7 +34,7 @@ namespace osu.Desktop.VisualTests.Tests
             playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
         }
 
-        HitObjectType mode = HitObjectType.Spinner;
+        HitObjectType mode = HitObjectType.Bash;
 
         BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
         private TaikoPlayfield playfield;
@@ -42,54 +45,54 @@ namespace osu.Desktop.VisualTests.Tests
 
             switch (mode)
             {
-                case HitObjectType.Don:
+                case HitObjectType.CentreHit:
                     const int count = 10;
 
                     for (int i = 0; i < count; i++)
                     {
-                        var h = new HitCircle
+                        var h = new TaikoHitObject
                         {
                             StartTime = framedClock.CurrentTime + 600 + i * 80,
                             PreEmpt = 500
                         };
 
-                        add(new DrawableHitCircleDon(h));
+                        add(new DrawableCentreHit(h));
                     }
                     break;
-                case HitObjectType.Katsu:
+                case HitObjectType.RimHit:
                     for (int i = 0; i < count; i++)
                     {
-                        var h = new HitCircle
+                        var h = new TaikoHitObject
                         {
                             StartTime = framedClock.CurrentTime + 600 + i * 80,
                             PreEmpt = 500
                         };
 
-                        add(new DrawableHitCircleKatsu(h));
+                        add(new DrawableRimHit(h));
                     }
                     break;
-                case HitObjectType.DonFinisher:
+                case HitObjectType.CentreHitFinisher:
                     for (int i = 0; i < count; i++)
                     {
-                        var h = new HitCircle
+                        var h = new TaikoHitObject
                         {
                             StartTime = framedClock.CurrentTime + 600 + i * 80,
                             PreEmpt = 500
                         };
 
-                        add(new DrawableHitCircleDonFinisher(h));
+                        add(new DrawableCentreHitFinisher(h));
                     }
                     break;
-                case HitObjectType.KatsuFinisher:
+                case HitObjectType.RimHitFinisher:
                     for (int i = 0; i < count; i++)
                     {
-                        var h = new HitCircle
+                        var h = new TaikoHitObject
                         {
                             StartTime = framedClock.CurrentTime + 600 + i * 80,
                             PreEmpt = 500
                         };
 
-                        add(new DrawableHitCircleKatsuFinisher(h));
+                        add(new DrawableRimHitFinisher(h));
                     }
                     break;
                 case HitObjectType.DrumRoll:
@@ -112,7 +115,7 @@ namespace osu.Desktop.VisualTests.Tests
                         PreEmpt = 500
                     }));
                     break;
-                case HitObjectType.Spinner:
+                case HitObjectType.Bash:
                     add(new DrawableBash(new Bash
                     {
                         StartTime = framedClock.CurrentTime + 600,
@@ -130,13 +133,13 @@ namespace osu.Desktop.VisualTests.Tests
 
             playbackSpeed.TriggerChange();
 
-            AddButton(@"dons", () => load(HitObjectType.Don));
-            AddButton(@"don finishers", () => load(HitObjectType.DonFinisher));
-            AddButton(@"katsus", () => load(HitObjectType.Katsu));
-            AddButton(@"katsu finishers", () => load(HitObjectType.KatsuFinisher));
+            AddButton(@"centre hits", () => load(HitObjectType.CentreHit));
+            AddButton(@"centre hit finishers", () => load(HitObjectType.CentreHitFinisher));
+            AddButton(@"rim hits", () => load(HitObjectType.RimHit));
+            AddButton(@"rim hit finishers", () => load(HitObjectType.RimHitFinisher));
             AddButton(@"drum roll", () => load(HitObjectType.DrumRoll));
             AddButton(@"drum roll finisher", () => load(HitObjectType.DrumRollFinisher));
-            AddButton(@"spinner", () => load(HitObjectType.Spinner));
+            AddButton(@"bash", () => load(HitObjectType.Bash));
 
             AddToggle(@"auto", state => { auto = !auto; load(mode); });
 
@@ -186,13 +189,13 @@ namespace osu.Desktop.VisualTests.Tests
 
         enum HitObjectType
         {
-            Don,
-            Katsu,
-            DonFinisher,
-            KatsuFinisher,
+            CentreHit,
+            RimHit,
+            CentreHitFinisher,
+            RimHitFinisher,
             DrumRoll,
             DrumRollFinisher,
-            Spinner
+            Bash
         }
     }
 }

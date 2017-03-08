@@ -5,10 +5,11 @@ using osu.Game.Modes.Objects;
 using System;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Beatmaps.Samples;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    public abstract class TaikoHitObject : HitObject
+    public class TaikoHitObject : HitObject
     {
         /// <summary>
         /// To be honest, I don't know why this is needed. Old osu! scaled the
@@ -50,7 +51,19 @@ namespace osu.Game.Modes.Taiko.Objects
         /// <summary>
         /// The type of HitObject.
         /// </summary>
-        public abstract TaikoHitType Type { get; }
+        public virtual TaikoHitType Type
+        {
+            get
+            {
+                SampleType st = Sample?.Type ?? SampleType.None;
+
+                return
+                    // Centre/Rim
+                    ((st & ~(SampleType.Finish | SampleType.Normal)) == 0 ? TaikoHitType.CentreHit : TaikoHitType.RimHit)
+                    // Finisher
+                    | ((st & SampleType.Finish) > 0 ? TaikoHitType.Finisher : TaikoHitType.None);
+            }
+        }
 
         public override void SetDefaultsFromBeatmap(Beatmap beatmap)
         {
@@ -74,13 +87,13 @@ namespace osu.Game.Modes.Taiko.Objects
     public enum TaikoHitType
     {
         None = 0,
-        Don = 1 << 0,
-        Katsu = 1 << 1,
+        CentreHit = 1 << 0,
+        RimHit = 1 << 1,
         DrumRoll = 1 << 2,
         DrumRollTick = 1 << 3,
         Bash = 1 << 4,
         Finisher = 1 << 5,
 
-        HitCircle = Don | Katsu
+        Hit = CentreHit | RimHit
     }
 }

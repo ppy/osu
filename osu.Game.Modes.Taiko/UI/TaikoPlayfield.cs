@@ -12,6 +12,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Graphics;
+using osu.Game.Modes.Taiko.Objects.Drawables.BarLines;
+using osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls;
 
 namespace osu.Game.Modes.Taiko.UI
 {

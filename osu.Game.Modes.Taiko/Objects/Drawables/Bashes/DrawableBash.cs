@@ -4,7 +4,6 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using System;
 using System.Collections.Generic;
 using osu.Game.Modes.Objects.Drawables;
@@ -16,8 +15,9 @@ using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Transforms;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Circle;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawables
+namespace osu.Game.Modes.Taiko.Objects.Drawables.Bashes
 {
     public class DrawableBash : DrawableTaikoHitObject
     {

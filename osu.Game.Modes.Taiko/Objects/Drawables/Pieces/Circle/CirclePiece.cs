@@ -7,50 +7,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics;
-using osu.Framework.Allocation;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Ring;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
+namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces.Circle
 {
-    internal class DonCirclePiece : CirclePiece
-    {
-        protected override Color4 InnerColour { get; set; }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            InnerColour = colours.PinkDarker;
-        }
-
-        protected override RingPiece CreateRing() => new DonRingPiece();
-    }
-
-    internal class KatsuCirclePiece : CirclePiece
-    {
-        protected override Color4 InnerColour { get; set; }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            InnerColour = colours.BlueDarker;
-        }
-
-        protected override RingPiece CreateRing() => new KatsuRingPiece();
-    }
-
-    internal class BashCirclePiece : CirclePiece
-    {
-        protected override Color4 InnerColour { get; set; }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            InnerColour = colours.YellowDark;
-        }
-
-        protected override RingPiece CreateRing() => new BashRingPiece();
-    }
-
     /// <summary>
     /// The HitObject circle piece, containing the outer glow, the inner circle, and the ring.
     /// </summary>

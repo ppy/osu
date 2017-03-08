@@ -4,13 +4,13 @@
 using osu.Game.Modes.Taiko.Objects;
 using System.Collections.Generic;
 
-namespace osu.Game.Modes.Taiko
+namespace osu.Game.Modes.Taiko.Replays
 {
-    public class TaikoAutoReplay : LegacyTaikoReplay
+    public class AutoReplay : LegacyTaikoReplay
     {
         private List<TaikoHitObject> hitObjects;
 
-        public TaikoAutoReplay(List<TaikoHitObject> hitObjects)
+        public AutoReplay(List<TaikoHitObject> hitObjects)
         {
             this.hitObjects = hitObjects;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Modes.Taiko
                 }
                 else
                 {
-                    if ((h.Type & TaikoHitType.Don) > 0)
+                    if ((h.Type & TaikoHitType.CentreHit) > 0)
                     {
                         if ((h.Type & TaikoHitType.Finisher) > 0)
                             button = LegacyButtonState.Right1 | LegacyButtonState.Right2;
