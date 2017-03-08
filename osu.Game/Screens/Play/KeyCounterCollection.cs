@@ -1,10 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -92,6 +94,38 @@ namespace osu.Game.Screens.Play
                         child.KeyUpTextColor = value;
                 }
             }
+        }
+
+        public override bool HandleInput => receptor?.IsAlive != true;
+
+        private Receptor receptor;
+
+        public Receptor GetReceptor()
+        {
+            return receptor ?? (receptor = new Receptor(this));
+        }
+
+        public class Receptor : Drawable
+        {
+            private KeyCounterCollection target;
+
+            public Receptor(KeyCounterCollection target)
+            {
+                RelativeSizeAxes = Axes.Both;
+                this.target = target;
+            }
+
+            public override bool Contains(Vector2 screenSpacePos) => true;
+
+            public override bool HandleInput => true;
+
+            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => target.Children.Any(c => c.TriggerKeyDown(state, args));
+
+            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => target.Children.Any(c => c.TriggerKeyUp(state, args));
+
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => target.Children.Any(c => c.TriggerMouseDown(state, args));
+
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => target.Children.Any(c => c.TriggerMouseUp(state, args));
         }
     }
 }
