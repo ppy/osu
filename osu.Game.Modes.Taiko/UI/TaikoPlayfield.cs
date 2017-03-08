@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -14,6 +15,7 @@ using osu.Game.Modes.Taiko.Objects.Drawables.BarLines;
 using osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls;
 using osu.Game.Modes.UI;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -59,29 +61,32 @@ namespace osu.Game.Modes.Taiko.UI
 
             AddInternal(new Drawable[]
             {
+                rightBackgroundContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    BorderThickness = 2,
+                    Masking = true,
+                    EdgeEffect = new EdgeEffect
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = Color4.Black.Opacity(0.2f),
+                        Radius = 5,
+                    },
+                    Children = new Drawable[]
+                    {
+                        rightBackground = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0.6f
+                        },
+                    }
+                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Margin = new MarginPadding { Left = left_area_size },
                     Children = new Drawable[]
                     {
-                        rightBackgroundContainer = new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            RelativePositionAxes = Axes.X,
-                            Position = Vector2.Zero,
-                            Size = new Vector2(1f, PlayfieldHeight),
-                            BorderThickness = 2,
-                            Depth = 1,
-                            Children = new Drawable[]
-                            {
-                                rightBackground = new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0.6f
-                                },
-                            }
-                        },
                         new Container
                         {
                             Margin = new MarginPadding { Left = hit_target_offset },
@@ -112,7 +117,6 @@ namespace osu.Game.Modes.Taiko.UI
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,
-                                    Alpha = 1,
                                 },
                                 hitObjectContainer = new Container
                                 {
@@ -130,7 +134,6 @@ namespace osu.Game.Modes.Taiko.UI
                 leftBackgroundContainer = new Container
                 {
                     Size = new Vector2(left_area_size, PlayfieldHeight),
-                    Masking = true,
                     BorderThickness = 1,
                     Children = new Drawable[]
                     {
@@ -153,7 +156,14 @@ namespace osu.Game.Modes.Taiko.UI
                                     Scale = new Vector2(0.9f)
                                 },
                             }
-                        }
+                        },
+                        new Box
+                        {
+                            Anchor = Anchor.TopRight,
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 10,
+                            ColourInfo = Framework.Graphics.Colour.ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.6f), Color4.Black.Opacity(0)),
+                        },
                     }
                 },
                 topLevelHitContainer = new Container
