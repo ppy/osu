@@ -16,12 +16,12 @@ namespace osu.Game.Modes.Osu
         {
         }
 
-        public override void CalculateFinalValues(Beatmap beatmap)
+        protected override void CalculateFinalValues(Beatmap beatmap)
         {
             // Initialize HP + final values
         }
 
-        public override void Reset()
+        protected override void Reset()
         {
             base.Reset();
 

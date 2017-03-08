@@ -9,6 +9,7 @@ using osu.Game.Modes.UI;
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.Taiko.Replays;
+using osu.Game.Modes.Taiko.Scoring;
 
 namespace osu.Game.Modes.Taiko
 {

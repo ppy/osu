@@ -62,7 +62,7 @@ namespace osu.Game.Modes.Taiko.Scoring
         {
         }
 
-        public override void CalculateFinalValues(Beatmap beatmap)
+        protected override void CalculateFinalValues(Beatmap beatmap)
         {
             List<TaikoHitObject> objects = new TaikoConverter().Convert(beatmap);
 
@@ -191,7 +191,7 @@ namespace osu.Game.Modes.Taiko.Scoring
             TotalScore.Value = comboScore + accuracyScore + bonusScore;
         }
 
-        public override void Reset()
+        protected override void Reset()
         {
             base.Reset();
 

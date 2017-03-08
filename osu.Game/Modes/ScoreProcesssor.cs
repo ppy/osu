@@ -84,13 +84,13 @@ namespace osu.Game.Modes
         /// Calculates and stores final scoring values by simulating an auto-play of the beatmap.
         /// </summary>
         /// <param name="beatmap">The beatmap to initialize calculations with.</param>
-        public abstract void CalculateFinalValues(Beatmap beatmap);
+        protected abstract void CalculateFinalValues(Beatmap beatmap);
 
         /// <summary>
         /// Rests the processor to a stale state. Should revert any variables changed through the
         /// <see cref="CalculateFinalValues(Beatmap)"/> method.
         /// </summary>
-        public virtual void Reset()
+        protected virtual void Reset()
         {
             Judgements.Clear();
 
@@ -111,13 +111,16 @@ namespace osu.Game.Modes
         /// <summary>
         /// Checks if the player has failed.
         /// </summary>
-        public void CheckFailed()
+        /// <returns>Whether the player has failed.</returns>
+        public bool CheckFailed()
         {
             if (!hasFailed && ShouldFail)
             {
                 hasFailed = true;
                 Failed?.Invoke();
             }
+
+            return hasFailed;
         }
     }
 }
