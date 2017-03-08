@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -11,7 +12,7 @@ using osu.Framework.Graphics.UserInterface.Tab;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK.Graphics;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select.Tab
 {
@@ -90,16 +91,21 @@ namespace osu.Game.Screens.Select.Tab
             };
         }
 
-        // TODO: Remove this (for debugging)
-        public override string ToString() {
-            return Value.ToString();
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            fadeColour = colours.Blue;
-            text.Colour = colours.Blue;
+            if (typeof(T) == typeof(SortMode))
+            {
+                fadeColour = colours.GreenLight;
+                if (!Active)
+                    text.Colour = colours.GreenLight;
+            }
+            else
+            {
+                fadeColour = colours.Blue;
+                if (!Active)
+                    text.Colour = colours.Blue;
+            }
         }
     }
 }
