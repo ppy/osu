@@ -32,7 +32,7 @@ namespace osu.Game.Modes.Taiko.Objects
                     OsuHitObject o = i as OsuHitObject;
 
                     if (o == null)
-                        throw new HitObjectConvertException(@"Taiko", i);
+                        break;
 
                     if (o is HitCircle)
                     {
@@ -52,7 +52,7 @@ namespace osu.Game.Modes.Taiko.Objects
                         // to slider velocity, that results in triggering the below conditional in some incorrect cases. This doesn't
                         // seem fixable by Precision.AlmostBigger(), because the error is extremely small (and is also dependent on float precision).
                         ControlPoint overridePoint;
-                        ControlPoint controlPoint = beatmap.TimingPointAt(slider.StartTime, out overridePoint);
+                        beatmap.TimingPointAt(slider.StartTime, out overridePoint);
                         double origBeatLength = beatmap.BeatLengthAt(slider.StartTime);
                         float origVelocityAdjustment = overridePoint?.FloatVelocityAdjustment ?? 1;
 
@@ -111,6 +111,9 @@ namespace osu.Game.Modes.Taiko.Objects
                         };
                     }
                 }
+
+                if (h == null)
+                    throw new HitObjectConvertException(@"Taiko", i);
 
                 h.SetDefaultsFromBeatmap(beatmap);
 
