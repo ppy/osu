@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using OpenTK.Graphics;
 using osu.Game.Modes.Taiko.Objects;
-using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.UI;
 using osu.Game.Modes.Taiko.Objects.Drawables.Hits;
 using osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls;
