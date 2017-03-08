@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using OpenTK;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.BarLines
 {
@@ -22,6 +22,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.BarLines
 
                 Children = new[]
                 {
+                    // Top
                     new Triangle
                     {
                         Anchor = Anchor.TopCentre,
@@ -31,6 +32,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.BarLines
                         // Scaling height by 0.866 results in equiangular triangles (== 60° and equal side length)
                         Size = new Vector2(20, 0.866f * -20),
                     },
+                    // Bottom
                     new Triangle
                     {
                         Anchor = Anchor.BottomCentre,

@@ -8,15 +8,21 @@ namespace osu.Game.Modes.Taiko.Objects
 {
     public class Bash : TaikoHitObject
     {
+        public override double EndTime => StartTime + Length;
+
         /// <summary>
         /// Old osu! constant that increases number of "spins" required.
         /// </summary>
         private const double spinner_ratio = 1.65;
 
+        /// <summary>
+        /// The length of the bash in time units.
+        /// </summary>
         public double Length;
 
-        public override double EndTime => StartTime + Length;
-
+        /// <summary>
+        /// The number of hits required to complete the bash successfully.
+        /// </summary>
         public int RequiredHits;
 
         public override void SetDefaultsFromBeatmap(Beatmap beatmap)

@@ -21,10 +21,11 @@ namespace osu.Desktop.VisualTests.Tests
     internal class TestCasePlayer : TestCase
     {
         protected Player Player;
-        private BeatmapDatabase db;
-
 
         public override string Description => @"Showing everything to play the game.";
+
+        private BeatmapDatabase db;
+        private PlayMode mode;
 
         [BackgroundDependencyLoader]
         private void load(BeatmapDatabase db)
@@ -38,7 +39,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             WorkingBeatmap beatmap = null;
 
-            var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault();
+            var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == mode).FirstOrDefault();
             if (beatmapInfo != null)
                 beatmap = db.GetWorkingBeatmap(beatmapInfo);
 
@@ -67,6 +68,7 @@ namespace osu.Desktop.VisualTests.Tests
                     HitObjects = objects,
                     BeatmapInfo = new BeatmapInfo
                     {
+                        Mode = mode,
                         BaseDifficulty = new BaseDifficulty
                         {
                             ApproachRate = 5,
@@ -99,6 +101,18 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new PlayerLoader(Player = CreatePlayer(beatmap))
             {
                 Beatmap = beatmap
+            });
+
+            AddButton("osu!", () =>
+            {
+                mode = PlayMode.Osu;
+                Reset();
+            });
+
+            AddButton("osu!taiko", () =>
+            {
+                mode = PlayMode.Taiko;
+                Reset();
             });
         }
 
