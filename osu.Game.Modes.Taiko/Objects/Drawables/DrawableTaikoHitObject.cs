@@ -39,9 +39,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             // Very naive, but should be enough, given that notes scroll more than 50% of the stage
             // before start time, so they should scroll off the screen before start time + preempt
-            TaikoHitObject tho = HitObject as TaikoHitObject;
-            LifetimeStart = HitObject.StartTime - tho.PreEmpt * 2;
-            LifetimeEnd = HitObject.EndTime + tho.PreEmpt;
+            LifetimeStart = HitObject.StartTime - HitObject.PreEmpt * 2;
+            LifetimeEnd = HitObject.EndTime + HitObject.PreEmpt;
         }
 
         protected override void UpdateState(ArmedState state)
@@ -49,15 +48,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             if (!IsLoaded)
                 return;
 
-            TaikoHitObject tho = HitObject as TaikoHitObject;
-
             Flush();
         }
 
         protected virtual void MoveToOffset(double time)
         {
-            TaikoHitObject tho = HitObject as TaikoHitObject;
-            MoveToX((float)((tho.StartTime - time) / tho.PreEmpt));
+            MoveToX((float)((HitObject.StartTime - time) / HitObject.PreEmpt));
         }
 
         protected override void Update()
