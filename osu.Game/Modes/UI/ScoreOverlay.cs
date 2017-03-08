@@ -81,11 +81,17 @@ namespace osu.Game.Modes.UI
 
         public void BindProcessor(ScoreProcessor processor)
         {
-            //bind processor bindables to combocounter, score display etc.   
+            //bind processor bindables to combocounter, score display etc.
+            //TODO: these should be bindable binds, not events!
             processor.TotalScore.ValueChanged += delegate { ScoreCounter?.Set((ulong)processor.TotalScore.Value); };
             processor.Accuracy.ValueChanged += delegate { AccuracyCounter?.Set((float)processor.Accuracy.Value); };
             processor.Combo.ValueChanged += delegate { ComboCounter?.Set((ulong)processor.Combo.Value); };
             HealthDisplay?.Current.BindTo(processor.Health);
+        }
+
+        public void BindHitRenderer(HitRenderer hitRenderer)
+        {
+            hitRenderer.InputManager.Add(KeyCounter.GetReceptor());
         }
     }
 }

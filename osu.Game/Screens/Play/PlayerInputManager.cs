@@ -35,10 +35,7 @@ namespace osu.Game.Screens.Play
                 UseParentState = replayInputHandler == null;
 
                 if (replayInputHandler != null)
-                {
-                    replayInputHandler.ToScreenSpace = ToScreenSpace;
                     AddHandler(replayInputHandler);
-                }
             }
         }
 
