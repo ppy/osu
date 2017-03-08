@@ -53,8 +53,12 @@ namespace osu.Game.Modes.UI
 
         private class ScaledContainer : Container
         {
+            /// <summary>
+            /// A value (in game pixels that we should scale our content to match).
+            /// </summary>
             public float? CustomWidth;
 
+            //dividing by the customwidth will effectively scale our content to the required container size.
             protected override Vector2 DrawScale => CustomWidth.HasValue ? new Vector2(DrawSize.X / CustomWidth.Value) : base.DrawScale;
 
             public override bool Contains(Vector2 screenSpacePos) => true;
