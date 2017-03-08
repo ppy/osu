@@ -19,9 +19,19 @@ namespace osu.Game.Modes.Taiko.UI
 {
     public class TaikoPlayfield : Playfield<TaikoHitObject>
     {
+        /// <summary>
+        /// The default play field height.
+        /// </summary>
         public const float PLAYFIELD_BASE_HEIGHT = 242;
+
+        /// <summary>
+        /// The play field height scale.
+        /// </summary>
         public const float PLAYFIELD_SCALE = 0.65f;
 
+        /// <summary>
+        /// The play field height after scaling.
+        /// </summary>
         public static float PlayfieldHeight => PLAYFIELD_BASE_HEIGHT * PLAYFIELD_SCALE;
 
         private static float left_area_size = 0.15f / PLAYFIELD_SCALE;

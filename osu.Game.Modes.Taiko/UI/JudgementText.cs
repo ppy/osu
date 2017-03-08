@@ -12,9 +12,19 @@ namespace osu.Game.Modes.Taiko.UI
 {
     public class JudgementText : Container
     {
+        /// <summary>
+        /// The colour of the backing glow of the text.
+        /// </summary>
         public Color4 GlowColour;
+
+        /// <summary>
+        /// The judgement text.
+        /// </summary>
         public string Text;
 
+        /// <summary>
+        /// The direction to move in.
+        /// </summary>
         public float Direction;
 
         private OsuSpriteText glowText;

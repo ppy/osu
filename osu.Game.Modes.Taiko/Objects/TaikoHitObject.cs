@@ -82,18 +82,4 @@ namespace osu.Game.Modes.Taiko.Objects
             HitWindowMiss = Beatmap.MapDifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 135, 95, 70, Mods.None);
         }
     }
-
-    [Flags]
-    public enum TaikoHitType
-    {
-        None = 0,
-        CentreHit = 1 << 0,
-        RimHit = 1 << 1,
-        DrumRoll = 1 << 2,
-        DrumRollTick = 1 << 3,
-        Bash = 1 << 4,
-        Finisher = 1 << 5,
-
-        Hit = CentreHit | RimHit
-    }
 }

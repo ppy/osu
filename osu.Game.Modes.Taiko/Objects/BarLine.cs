@@ -7,7 +7,14 @@ namespace osu.Game.Modes.Taiko.Objects
 {
     public class BarLine
     {
+        /// <summary>
+        /// The start time of the bar linee.
+        /// </summary>
         public double StartTime;
+
+        /// <summary>
+        /// The time to scroll in the HitObject.
+        /// </summary>
         public double PreEmpt;
 
         public void SetDefaultsFromBeatmap(Beatmap beatmap)

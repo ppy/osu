@@ -3,7 +3,6 @@
 
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.UI;
 using osu.Framework.Graphics;
