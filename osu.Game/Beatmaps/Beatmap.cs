@@ -15,7 +15,7 @@ namespace osu.Game.Beatmaps
         public BeatmapInfo BeatmapInfo { get; set; }
         public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
         public List<HitObject> HitObjects { get; set; }
-        public TimingInfo Timing { get; set; }
+        public readonly TimingInfo Timing = new TimingInfo();
         public List<Color4> ComboColors { get; set; }
 
         public double CalculateStarDifficulty() => Ruleset.GetRuleset(BeatmapInfo.Mode).CreateDifficultyCalculator(this).Calculate();
