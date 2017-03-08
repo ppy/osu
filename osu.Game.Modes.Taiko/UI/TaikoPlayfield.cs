@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects.Drawables;
@@ -33,139 +34,124 @@ namespace osu.Game.Modes.Taiko.UI
         /// </summary>
         public static float PlayfieldHeight => PLAYFIELD_BASE_HEIGHT * PLAYFIELD_SCALE;
 
-        private static float left_area_size = 0.15f / PLAYFIELD_SCALE;
-        private const float hit_target_offset = 0.1f;
+        protected override Container<Drawable> Content => hitObjectContainer;
+
+        private const float hit_target_offset = 80;
+
+        private static float left_area_size = 240;
 
         private HitTarget hitTarget;
         private Container<ExplodingRing> explosionRingContainer;
         private Container<DrawableBarLine> barLineContainer;
         private Container<JudgementText> judgementContainer;
 
-        private Container leftBackgroundContainer;
-        private Box leftBackground;
         private Container rightBackgroundContainer;
         private Box rightBackground;
+        private Container leftBackgroundContainer;
+        private Box leftBackground;
+        private Container hitObjectContainer;
 
         public TaikoPlayfield()
         {
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            Height = PlayfieldHeight;
 
-            // Right area under notes
-            AddInternal(leftBackgroundContainer = new Container
+            AddInternal(new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                RelativePositionAxes = Axes.X,
-                Position = new Vector2(left_area_size, 0),
-                Size = new Vector2(1f - left_area_size, PlayfieldHeight),
-
-                BorderThickness = 2,
-
-                Depth = 1,
-
-                Children = new Drawable[]
+                new Container
                 {
-                    // Background
-                    leftBackground = new Box
+                    RelativeSizeAxes = Axes.Both,
+                    Margin = new MarginPadding { Left = left_area_size },
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-
-                        Alpha = 0.5f
-                    },
-                    // Hit target
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        RelativePositionAxes = Axes.Both,
-
-                        Position = new Vector2(hit_target_offset, 0),
-
-                        Children = new Drawable[]
+                        rightBackgroundContainer = new Container
                         {
-                            explosionRingContainer = new Container<ExplodingRing>
+                            RelativeSizeAxes = Axes.X,
+                            RelativePositionAxes = Axes.X,
+                            Position = Vector2.Zero,
+                            Size = new Vector2(1f, PlayfieldHeight),
+                            BorderThickness = 2,
+                            Depth = 1,
+                            Children = new Drawable[]
                             {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.Centre,
-                                
-                                Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
-                                Scale = new Vector2(PLAYFIELD_SCALE),
-
-                                BlendingMode = BlendingMode.Additive
-                            },
-                            hitTarget = new HitTarget
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.Centre,
-
-                                Scale = new Vector2(PLAYFIELD_SCALE)
+                                rightBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0.6f
+                                },
                             }
-                        }
-                    },
-                }
-            });
-
-            // Notes
-            HitObjects.Anchor = Anchor.TopLeft;
-            HitObjects.Origin = Anchor.TopLeft;
-
-            HitObjects.RelativePositionAxes = Axes.X;
-            HitObjects.RelativeSizeAxes = Axes.X;
-            HitObjects.Position = new Vector2(left_area_size + hit_target_offset * (1f - left_area_size), 0);
-            HitObjects.Size = new Vector2(1f - left_area_size - hit_target_offset * (1f - left_area_size), PlayfieldHeight);
-
-            // Bar lines
-            AddInternal(barLineContainer = new Container<DrawableBarLine>
-            {
-                RelativePositionAxes = HitObjects.RelativePositionAxes,
-                RelativeSizeAxes = HitObjects.RelativeSizeAxes,
-                Position = HitObjects.Position,
-                Size = HitObjects.Size
-            });
-
-            // Judgements
-            AddInternal(judgementContainer = new Container<JudgementText>
-            {
-                RelativePositionAxes = Axes.Both,
-                RelativeSizeAxes = HitObjects.RelativeSizeAxes,
-                Position = new Vector2(left_area_size + hit_target_offset * (1f - left_area_size), 0),
-                Size = HitObjects.Size,
-
-                BlendingMode = BlendingMode.Additive
-            });
-
-            // Left area above notes
-            AddInternal(rightBackgroundContainer = new Container
-            {
-                RelativeSizeAxes = Axes.X,
-                Size = new Vector2(left_area_size, PlayfieldHeight),
-
-                Masking = true,
-
-                BorderThickness = 1,
-
-                Children = new Drawable[]
-                {
-                    // Background
-                    rightBackground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    new Container
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-
-                        RelativePositionAxes = Axes.X,
-                        Position = new Vector2(0.10f, 0),
-
-                        Children = new Drawable[]
+                        },
+                        new Container
                         {
-                            new InputDrum
+                            Margin = new MarginPadding { Left = hit_target_offset },
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-
-                                Scale = new Vector2(0.9f)
+                                new Container
+                                {
+                                    Name = @"Hit target",
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        explosionRingContainer = new Container<ExplodingRing>
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.Centre,
+                                            Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
+                                            Scale = new Vector2(PLAYFIELD_SCALE),
+                                            BlendingMode = BlendingMode.Additive
+                                        },
+                                    }
+                                },
+                                barLineContainer = new Container<DrawableBarLine>
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                hitTarget = new HitTarget
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.Centre,
+                                    Alpha = 1,
+                                },
+                                hitObjectContainer = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                judgementContainer = new Container<JudgementText>
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    BlendingMode = BlendingMode.Additive
+                                },
                             },
+                        },
+                    }
+                },
+                leftBackgroundContainer = new Container
+                {
+                    Size = new Vector2(left_area_size, PlayfieldHeight),
+                    Masking = true,
+                    BorderThickness = 1,
+                    Children = new Drawable[]
+                    {
+                        leftBackground = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new Container
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativePositionAxes = Axes.X,
+                            Position = new Vector2(0.10f, 0),
+                            Children = new Drawable[]
+                            {
+                                new InputDrum
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Scale = new Vector2(0.9f)
+                                },
+                            }
                         }
                     }
                 }
@@ -175,11 +161,11 @@ namespace osu.Game.Modes.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            leftBackgroundContainer.BorderColour = colours.Gray1;
-            leftBackground.Colour = colours.Gray0;
+            leftBackgroundContainer.BorderColour = colours.Gray0;
+            leftBackground.Colour = colours.Gray1;
 
-            rightBackgroundContainer.BorderColour = colours.Gray0;
-            rightBackground.Colour = colours.Gray1;
+            rightBackgroundContainer.BorderColour = colours.Gray1;
+            rightBackground.Colour = colours.Gray0;
         }
 
         public override void Add(DrawableHitObject<TaikoHitObject> h)

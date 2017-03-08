@@ -41,6 +41,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Origin = Anchor.Centre,
 
                     Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2 * 1.5f),
+                    Scale = new Vector2(TaikoPlayfield.PLAYFIELD_SCALE),
 
                     Children = new Drawable[]
                     {
