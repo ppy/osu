@@ -7,10 +7,12 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.UserInterface.Tab;
 using osu.Game.Graphics;
+using osu.Game.Screens.Select.Filter;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -18,6 +20,9 @@ namespace osu.Game.Screens.Select.Tab
 {
     public class FilterTabDropDownMenu<T> : TabDropDownMenu<T>
     {
+        public override float HeaderWidth => 14;
+        public override float HeaderHeight => 24;
+
         protected override BasicDropDownHeader CreateHeader() => new FilterTabDropDownHeader();
 
         protected override IEnumerable<DropDownMenuItem<T>> GetDropDownItems(IEnumerable<KeyValuePair<string, T>> values)
@@ -25,9 +30,11 @@ namespace osu.Game.Screens.Select.Tab
 
         public FilterTabDropDownMenu()
         {
-            ContentContainer.CornerRadius = 4;
             MaxDropDownHeight = int.MaxValue;
-            ContentBackground.Colour = Color4.Black.Opacity(0.5f);
+            ContentContainer.CornerRadius = 4;
+            ContentBackground.Colour = Color4.Black.Opacity(0.9f);
+            ScrollContainer.ScrollDraggerVisible = false;
+            DropDownItemsContainer.Padding = new MarginPadding { Left = 5, Bottom = 7, Right = 5, Top = 7 };
 
             if (!typeof(T).IsEnum)
                 throw new InvalidOperationException("TabControl only supports enums as the generic type argument");
@@ -62,9 +69,12 @@ namespace osu.Game.Screens.Select.Tab
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours) {
-            //Colour = colours.White;
-            //SelectedItem.Colour = colours.Blue;
+        private void load(OsuColour colours)
+        {
+            if (typeof(T) == typeof(SortMode))
+                Header.Colour = colours.GreenLight;
+            else
+                Header.Colour = colours.Blue;
         }
     }
 }

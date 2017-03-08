@@ -93,16 +93,12 @@ namespace osu.Game.Screens.Select
         {
             private TabControl<GroupMode> groupTabs;
             private TabControl<SortMode> sortTabs;
+            private OsuSpriteText spriteText;
 
             public GroupSortTabs()
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
                 Children = new Drawable[]
                 {
                     new Box
@@ -114,29 +110,42 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.TopLeft,
                         Position = new Vector2(0, 23)
                     },
-                    groupTabs = new FilterTabControl<GroupMode>
+                    groupTabs = new FilterTabControl<GroupMode>(GroupMode.All, GroupMode.RecentlyPlayed)
                     {
-                        Width = 210
+                        Width = 230,
+                        AutoSort = true
                     },
-                    sortTabs = new FilterTabControl<SortMode>
+                    new Container
                     {
-                        Width = 180,
+                        AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight
+                        Origin = Anchor.TopRight,
+                        Children = new Drawable[]
+                        {
+                            spriteText = new OsuSpriteText
+                            {
+                                Font = @"Exo2.0-Bold",
+                                Text = "Sort results by",
+                                TextSize = 14,
+                                Margin = new MarginPadding
+                                {
+                                    Top = 5,
+                                    Bottom = 5
+                                },
+                            },
+                            sortTabs = new FilterTabControl<SortMode>(87)
+                            {
+                                Width = 191,
+                                AutoSort = true
+                            }
+                        }
                     }
                 };
-                sortTabs.Prefix.Children = new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Font = @"Exo2.0-Bold",
-                        Text = "Sort results by",
-                        TextSize = 14,
-                        Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                    }
-                };
-                groupTabs.Pin(GroupMode.All);
-                groupTabs.Pin(GroupMode.RecentlyPlayed);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours) {
+                spriteText.Colour = colours.GreenLight;
             }
         }
     }

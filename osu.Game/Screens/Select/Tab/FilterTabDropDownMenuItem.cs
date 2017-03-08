@@ -9,6 +9,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using OpenTK.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select.Tab
 {
@@ -16,9 +17,11 @@ namespace osu.Game.Screens.Select.Tab
     {
         public FilterTabDropDownMenuItem(string text, T value) : base(text, value)
         {
-            Foreground.Padding = new MarginPadding(5);
-            Background.Colour = Color4.Red;
+            Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4 };
             Foreground.Margin = new MarginPadding { Left = 7 };
+
+            Masking = true;
+            CornerRadius = 6;
             Foreground.Add(new OsuSpriteText
             {
                 Text = text,
@@ -30,10 +33,20 @@ namespace osu.Game.Screens.Select.Tab
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BackgroundColour = Color4.Black.Opacity(0.8f);
-            BackgroundColourHover = new Color4(124, 200, 253, 255);
-            BackgroundColourSelected = new Color4(124, 200, 253, 255);
-            //BackgroundColourSelected = new Color4(163, 196, 36, 255); // Green
+            BackgroundColour = Color4.Black.Opacity(0f);
+            ForegroundColourHover = Color4.Black;
+            ForegroundColourSelected = Color4.Black;
+
+            if (typeof(T) == typeof(SortMode))
+            {
+                BackgroundColourHover = new Color4(163, 196, 36, 255);
+                BackgroundColourSelected = new Color4(163, 196, 36, 255);
+            }
+            else
+            {
+                BackgroundColourHover = new Color4(124, 200, 253, 255);
+                BackgroundColourSelected = new Color4(124, 200, 253, 255);
+            }
         }
     }
 }
