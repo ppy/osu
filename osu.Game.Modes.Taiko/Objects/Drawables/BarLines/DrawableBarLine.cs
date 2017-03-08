@@ -23,12 +23,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.BarLines
             Origin = Anchor.Centre;
 
             RelativePositionAxes = Axes.X;
-            Size = new Vector2(1, TaikoPlayfield.PLAYFIELD_BASE_HEIGHT);
+            Size = new Vector2(2, TaikoPlayfield.PLAYFIELD_BASE_HEIGHT);
 
             Children = new[]
             {
                 Tracker = new Box
                 {
+                    EdgeSmoothness = new Vector2(0.5f, 0),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
 
