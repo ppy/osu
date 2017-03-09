@@ -127,7 +127,7 @@ namespace osu.Game.Modes.Taiko.UI
             inner.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
         }
 
-        public void Flash(Color4 colour, bool showOuter = true)
+        public void Flash(Color4 colour)
         {
             innerFlash.EdgeEffect = new EdgeEffect
             {

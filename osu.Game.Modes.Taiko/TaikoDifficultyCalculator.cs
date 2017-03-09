@@ -20,6 +20,7 @@ namespace osu.Game.Modes.Taiko
 
         protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
         {
+            //TODO: implement
             return 0;
         }
     }

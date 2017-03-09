@@ -51,16 +51,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.BarLines
             FadeOut(100 * BarLine.PreEmpt / 1000);
         }
 
-        protected virtual void MoveToOffset(double time)
-        {
-            MoveToX((float)((BarLine.StartTime - time) / BarLine.PreEmpt));
-        }
+        private void moveToTimeOffset(double time) => MoveToX((float)((BarLine.StartTime - time) / BarLine.PreEmpt));
 
         protected override void Update()
         {
             base.Update();
-
-            MoveToOffset(Time.Current);
+            moveToTimeOffset(Time.Current);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace osu.Game.Modes.Taiko.UI
 
         private const float hit_target_offset = 80;
 
-        private static float left_area_size = 240;
+        private const float left_area_size = 240;
 
         private HitTarget hitTarget;
         private Container<ExplodingRing> explosionRingContainer;
@@ -229,7 +229,6 @@ namespace osu.Game.Modes.Taiko.UI
             if (ring != null)
                 explosionRingContainer.Add(ring);
 
-            // Add judgement
             string judgementString = string.Empty;
             if (taikoJudgement.Result == HitResult.Hit)
             {
@@ -256,7 +255,6 @@ namespace osu.Game.Modes.Taiko.UI
             if (taikoObject is DrawableDrumRollTick)
                 return;
 
-            // Add judgement
             judgementContainer.Add(new JudgementText
             {
                 Anchor = taikoJudgement.Result == HitResult.Hit ? Anchor.TopLeft : Anchor.BottomLeft,
