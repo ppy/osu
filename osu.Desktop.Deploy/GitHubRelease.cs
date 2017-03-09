@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace osu.Desktop.Deploy
 {
-    internal class GitHubRelease
+    public class GitHubRelease
     {
         [JsonProperty(@"id")]
         public int Id;

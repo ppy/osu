@@ -73,13 +73,16 @@ namespace osu.Game.IO.Legacy
             }
         }
 
-        /// <summary> Writes a DateTime to the buffer. <summary>
+        /// <summary>
+        /// Writes DateTime to the buffer.
+        /// </summary>
+        /// <param name="dt"></param>
         public void Write(DateTime dt)
         {
             Write(dt.ToUniversalTime().Ticks);
         }
 
-        /// <summary> Writes a generic ICollection (such as an IList<T>) to the buffer. </summary>
+        /// <summary> Writes a generic ICollection (such as an IList(T)) to the buffer.</summary>
         public void Write<T>(List<T> c) where T : ILegacySerializable
         {
             if (c == null)
@@ -212,9 +215,11 @@ namespace osu.Game.IO.Legacy
 
                     default:
                         Write((byte)ObjType.otherType);
-                        BinaryFormatter b = new BinaryFormatter();
-                        b.AssemblyFormat = FormatterAssemblyStyle.Simple;
-                        b.TypeFormat = FormatterTypeStyle.TypesWhenNeeded;
+                        BinaryFormatter b = new BinaryFormatter
+                        {
+                            AssemblyFormat = FormatterAssemblyStyle.Simple,
+                            TypeFormat = FormatterTypeStyle.TypesWhenNeeded
+                        };
                         b.Serialize(BaseStream, obj);
                         break;
                 } // switch

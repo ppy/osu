@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play
         private PauseOverlay pauseOverlay;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
         {
             var beatmap = Beatmap.Beatmap;
 

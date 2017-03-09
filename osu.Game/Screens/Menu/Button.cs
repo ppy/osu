@@ -234,9 +234,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleClick = audio.Sample.Get($@"Menu/menu-{internalName}-click");
-            if (sampleClick == null)
-                sampleClick = audio.Sample.Get(internalName.Contains(@"back") ? @"Menu/menuback" : @"Menu/menuhit");
+            sampleClick = audio.Sample.Get($@"Menu/menu-{internalName}-click") ?? audio.Sample.Get(internalName.Contains(@"back") ? @"Menu/menuback" : @"Menu/menuhit");
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)

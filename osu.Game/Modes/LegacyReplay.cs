@@ -253,7 +253,7 @@ namespace osu.Game.Modes
 
             public void ReadFromStream(SerializationReader sr)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             public void WriteToStream(SerializationWriter sw)

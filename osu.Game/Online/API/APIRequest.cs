@@ -89,5 +89,5 @@ namespace osu.Game.Online.API
 
     public delegate void APIFailureHandler(Exception e);
     public delegate void APISuccessHandler();
-    public delegate void APISuccessHandler<T>(T content);
+    public delegate void APISuccessHandler<in T>(T content);
 }
