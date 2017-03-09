@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.IO.Legacy;
 using osu.Game.IPC;
@@ -18,6 +19,7 @@ namespace osu.Game.Database
 
         private const string replay_folder = @"replays";
 
+        // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ScoreIPCChannel ipc;
 
         public ScoreDatabase(Storage storage, IIpcHost importHost = null, BeatmapDatabase beatmaps = null)
@@ -45,7 +47,7 @@ namespace osu.Game.Database
                 var version = sr.ReadInt32();
                 /* score.FileChecksum = */
                 var beatmapHash = sr.ReadString();
-                score.Beatmap = beatmaps.Query<BeatmapInfo>().Where(b => b.Hash == beatmapHash).FirstOrDefault();
+                score.Beatmap = beatmaps.Query<BeatmapInfo>().FirstOrDefault(b => b.Hash == beatmapHash);
                 /* score.PlayerName = */
                 sr.ReadString();
                 /* var localScoreChecksum = */
