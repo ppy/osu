@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Mods
 {
     public class DifficultyIncreaseSection : ModSection
     {
-        protected override Key[] ToggleKeys => new Key[] { Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.J, Key.K, Key.L };
+        protected override Key[] ToggleKeys => new[] { Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.J, Key.K, Key.L };
         public override ModType ModType => ModType.DifficultyIncrease;
 
         [BackgroundDependencyLoader]
