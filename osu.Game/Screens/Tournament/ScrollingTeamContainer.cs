@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -109,7 +110,11 @@ namespace osu.Game.Screens.Tournament
                         break;
                     case ScrollState.Stopped:
                         // Find closest to center
+                        if (!Children.Any())
+                            break;
+
                         Drawable closest = null;
+
                         foreach (var c in Children)
                         {
                             if (!(c is ScrollingTeam))
@@ -127,6 +132,8 @@ namespace osu.Game.Screens.Tournament
                             if (o < lastOffset)
                                 closest = c;
                         }
+
+                        Trace.Assert(closest != null, "closest != null");
 
                         offset += DrawWidth / 2f - (closest.Position.X + closest.DrawWidth / 2f);
 
@@ -263,9 +270,9 @@ namespace osu.Game.Screens.Tournament
 
         private void addFlags()
         {
-            for (int i = 0; i < availableTeams.Count; i++)
+            foreach (Team t in availableTeams)
             {
-                Add(new ScrollingTeam(availableTeams[i])
+                Add(new ScrollingTeam(t)
                 {
                     X = leftPos + DrawWidth
                 });
@@ -310,7 +317,7 @@ namespace osu.Game.Screens.Tournament
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as ScrollingTeamContainer).speed = CurrentValue;
+                ((ScrollingTeamContainer)d).speed = CurrentValue;
             }
         }
 

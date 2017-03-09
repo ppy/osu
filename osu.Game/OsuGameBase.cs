@@ -50,6 +50,7 @@ namespace osu.Game
         {
             get
             {
+                // ReSharper disable once RedundantAssignment
                 bool isDebug = false;
                 // Debug.Assert conditions are only evaluated in debug mode
                 Debug.Assert(isDebug = true);

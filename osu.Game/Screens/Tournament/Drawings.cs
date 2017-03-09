@@ -267,10 +267,7 @@ namespace osu.Game.Screens.Tournament
                 }
             };
 
-            if (writeOp == null)
-                writeOp = Task.Run(writeAction);
-            else
-                writeOp = writeOp.ContinueWith(t => { writeAction(); });
+            writeOp = writeOp?.ContinueWith(t => { writeAction(); }) ?? Task.Run(writeAction);
         }
 
         private void reloadTeams()

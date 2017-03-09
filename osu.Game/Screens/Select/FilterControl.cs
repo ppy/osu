@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -60,7 +59,7 @@ namespace osu.Game.Screens.Select
                     {
                         searchTextBox = new SearchTextBox {
                             RelativeSizeAxes = Axes.X,
-                            OnChange = (TextBox sender, bool newText) =>
+                            OnChange = (sender, newText) =>
                             {
                                 if (newText)
                                     FilterChanged?.Invoke();

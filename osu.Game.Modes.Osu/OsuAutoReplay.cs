@@ -15,9 +15,9 @@ namespace osu.Game.Modes.Osu
 {
     public class OsuAutoReplay : LegacyReplay
     {
-        static readonly Vector2 spinner_centre = new Vector2(256, 192);
+        private static readonly Vector2 spinner_centre = new Vector2(256, 192);
 
-        const float spin_radius = 50;
+        private const float spin_radius = 50;
 
         private Beatmap beatmap;
 
@@ -65,12 +65,13 @@ namespace osu.Game.Modes.Osu
         private double applyModsToTime(double v) => v;
         private double applyModsToRate(double v) => v;
 
+        public bool DelayedMovements; // ModManager.CheckActive(Mods.Relax2);
+
         private void createAutoReplay()
         {
             int buttonIndex = 0;
 
-            bool delayedMovements = false;// ModManager.CheckActive(Mods.Relax2);
-            EasingTypes preferredEasing = delayedMovements ? EasingTypes.InOutCubic : EasingTypes.Out;
+            EasingTypes preferredEasing = DelayedMovements ? EasingTypes.InOutCubic : EasingTypes.Out;
 
             addFrameToReplay(new LegacyReplayFrame(-100000, 256, 500, LegacyButtonState.None));
             addFrameToReplay(new LegacyReplayFrame(beatmap.HitObjects[0].StartTime - 1500, 256, 500, LegacyButtonState.None));
@@ -85,7 +86,7 @@ namespace osu.Game.Modes.Osu
 
             for (int i = 0; i < beatmap.HitObjects.Count; i++)
             {
-                OsuHitObject h = beatmap.HitObjects[i] as OsuHitObject;
+                OsuHitObject h = (OsuHitObject)beatmap.HitObjects[i];
 
                 //if (h.EndTime < InputManager.ReplayStartTime)
                 //{
@@ -95,9 +96,9 @@ namespace osu.Game.Modes.Osu
 
                 int endDelay = h is Spinner ? 1 : 0;
 
-                if (delayedMovements && i > 0)
+                if (DelayedMovements && i > 0)
                 {
-                    OsuHitObject last = beatmap.HitObjects[i - 1] as OsuHitObject;
+                    OsuHitObject last = (OsuHitObject)beatmap.HitObjects[i - 1];
 
                     //Make the cursor stay at a hitObject as long as possible (mainly for autopilot).
                     if (h.StartTime - h.HitWindowFor(OsuScoreResult.Miss) > last.EndTime + h.HitWindowFor(OsuScoreResult.Hit50) + 50)
