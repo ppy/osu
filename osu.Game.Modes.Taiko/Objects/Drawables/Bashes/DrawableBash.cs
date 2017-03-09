@@ -159,8 +159,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Bashes
 
         protected override void CheckJudgement(bool userTriggered)
         {
-            Bash spinner = HitObject as Bash;
-            TaikoJudgementInfo taikoJudgement = Judgement as TaikoJudgementInfo;
+            Bash bash = (Bash)HitObject;
+            TaikoJudgementInfo taikoJudgement = (TaikoJudgementInfo)Judgement;
 
             if (userTriggered)
             {
@@ -169,12 +169,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Bashes
 
                 userHits++;
 
-                innerRingBackground.FadeTo((float)userHits / spinner.RequiredHits, 250, EasingTypes.OutQuint);
-                bashInnerRing.ScaleTo(1f + (outer_ring_scale - 1) * userHits / spinner.RequiredHits, 50);
+                innerRingBackground.FadeTo((float)userHits / bash.RequiredHits, 250, EasingTypes.OutQuint);
+                bashInnerRing.ScaleTo(1f + (outer_ring_scale - 1) * userHits / bash.RequiredHits, 50);
 
-                if (userHits == spinner.RequiredHits)
+                if (userHits == bash.RequiredHits)
                 {
-                    Judgement.Result = HitResult.Hit;
+                    taikoJudgement.Result = HitResult.Hit;
                     taikoJudgement.Score = TaikoScoreResult.Great;
                 }
 
@@ -184,7 +184,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Bashes
                 if (Judgement.TimeOffset < 0)
                     return;
 
-                if (userHits > spinner.RequiredHits / 2)
+                if (userHits > bash.RequiredHits / 2)
                 {
                     Judgement.Result = HitResult.Hit;
                     taikoJudgement.Score = TaikoScoreResult.Good;

@@ -50,8 +50,8 @@ namespace osu.Game.Modes
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScoreProcessor"/> class.
+        /// <param name="beatmap">The current beatmap.</param>
         /// </summary>
-        /// <param name="hitObjectCount">Number of HitObjects. It is used for specifying Judgements collection Capacity</param>
         protected ScoreProcessor(Beatmap beatmap = null)
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };

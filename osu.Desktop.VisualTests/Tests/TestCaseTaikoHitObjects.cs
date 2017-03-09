@@ -19,23 +19,22 @@ using osu.Game.Modes.Taiko.UI;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseTaikoHitObjects : TestCase
+    internal class TestCaseTaikoHitObjects : TestCase
     {
-        private StopwatchClock rateAdjustClock;
         private FramedClock framedClock;
 
-        bool auto = false;
+        private bool auto;
 
         public TestCaseTaikoHitObjects()
         {
-            rateAdjustClock = new StopwatchClock(true);
+            var rateAdjustClock = new StopwatchClock(true);
             framedClock = new FramedClock(rateAdjustClock);
             playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
         }
 
-        HitObjectType mode = HitObjectType.Bash;
+        private HitObjectType mode = HitObjectType.Bash;
 
-        BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
+        private BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
         private TaikoPlayfield playfield;
 
         private void load(HitObjectType mode)
@@ -172,8 +171,9 @@ namespace osu.Desktop.VisualTests.Tests
             load(mode);
         }
 
-        int depth;
-        void add(DrawableHitObject<TaikoHitObject> h)
+        private int depth;
+
+        private void add(DrawableHitObject<TaikoHitObject> h)
         {
             h.Depth = depth++;
 
@@ -186,7 +186,7 @@ namespace osu.Desktop.VisualTests.Tests
             playfield.Add(h);
         }
 
-        enum HitObjectType
+        private enum HitObjectType
         {
             CentreHit,
             RimHit,

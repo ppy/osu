@@ -59,6 +59,7 @@ namespace osu.Game.Beatmaps
         /// <param name="min">Minimum of the resulting range which will be achieved by a difficulty value of 0.</param>
         /// <param name="mid">Midpoint of the resulting range which will be achieved by a difficulty value of 5.</param>
         /// <param name="max">Maximum of the resulting range which will be achieved by a difficulty value of 10.</param>
+        /// <param name="mods">Applicable mods.</param>
         /// <returns>Value to which the difficulty value maps in the specified range.</returns>
         public static double MapDifficultyRange(double difficulty, double min, double mid, double max, Mods mods)
         {

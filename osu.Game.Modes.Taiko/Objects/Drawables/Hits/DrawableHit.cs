@@ -27,14 +27,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
         /// </summary>
         private List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
 
-        private CirclePiece bodyPiece;
         private Container bodyContainer;
 
         private bool validKeyPressed = true;
 
-        public DrawableHit(TaikoHitObject hitObject)
-            : base(hitObject)
+        protected DrawableHit(TaikoHitObject hitObject) : base(hitObject)
         {
+            CirclePiece bodyPiece;
             Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2);
 
             Children = new Drawable[]
@@ -43,7 +42,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    
+
                     Children = new[]
                     {
                         bodyPiece = CreateBody()
@@ -62,33 +61,29 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Hits
 
         protected override void CheckJudgement(bool userTriggered)
         {
+            TaikoJudgementInfo taikoJudgement = (TaikoJudgementInfo)Judgement;
+
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > HitObject.HitWindowGood)
-                    Judgement.Result = HitResult.Miss;
+                if (taikoJudgement.TimeOffset > HitObject.HitWindowGood)
+                    taikoJudgement.Result = HitResult.Miss;
                 return;
             }
 
-            double hitOffset = Math.Abs(Judgement.TimeOffset);
+            double hitOffset = Math.Abs(taikoJudgement.TimeOffset);
 
             if (hitOffset > HitObject.HitWindowMiss)
                 return;
 
-            TaikoJudgementInfo tji = Judgement as TaikoJudgementInfo;
-
             if (!validKeyPressed)
-                Judgement.Result = HitResult.Miss;
+                taikoJudgement.Result = HitResult.Miss;
             else if (hitOffset < HitObject.HitWindowGood)
             {
-                Judgement.Result = HitResult.Hit;
-
-                if (hitOffset < HitObject.HitWindowGreat)
-                    tji.Score = TaikoScoreResult.Great;
-                else
-                    tji.Score = TaikoScoreResult.Good;
+                taikoJudgement.Result = HitResult.Hit;
+                taikoJudgement.Score = hitOffset < HitObject.HitWindowGreat ? TaikoScoreResult.Great : TaikoScoreResult.Good;
             }
             else
-                Judgement.Result = HitResult.Miss;
+                taikoJudgement.Result = HitResult.Miss;
         }
 
         protected override void UpdateState(ArmedState state)

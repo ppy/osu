@@ -16,8 +16,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         public override bool ExpireOnStateChange => false;
 
-        public DrawableTaikoHitObject(TaikoHitObject hitObject)
-            : base(hitObject)
+        protected DrawableTaikoHitObject(TaikoHitObject hitObject) : base(hitObject)
         {
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Centre;

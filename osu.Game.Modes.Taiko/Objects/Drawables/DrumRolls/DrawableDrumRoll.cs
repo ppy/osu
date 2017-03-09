@@ -19,16 +19,15 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 
         private DrumRoll drumRoll;
 
-        private DrumRollBodyPiece body;
-        private Container<DrawableDrumRollTick> ticks;
-
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
+            Container<DrawableDrumRollTick> ticks;
+            DrumRollBodyPiece body;
+
             this.drumRoll = drumRoll;
 
             Origin = Anchor.CentreLeft;
-
             RelativeSizeAxes = Axes.X;
 
             Children = new Drawable[]
@@ -80,7 +79,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
         /// <param name="drumRoll">The drum roll that contains the tick.</param>
         /// <param name="tick">The base tick.</param>
         /// <returns>The drawable tick.</returns>
-        protected virtual DrawableDrumRollTick CreateTick(DrumRoll drumRoll, DrumRollTick tick) => new DrawableDrumRollTick(drumRoll, tick);
+        protected virtual DrawableDrumRollTick CreateTick(DrumRoll drumRoll, DrumRollTick tick) => new DrawableDrumRollTick(tick);
 
         /// <summary>
         /// Creates the body piece of the drum roll.
@@ -96,21 +95,17 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
             if (Judgement.TimeOffset < 0)
                 return;
 
-            TaikoJudgementInfo taikoJudgement = Judgement as TaikoJudgementInfo;
+            TaikoJudgementInfo taikoJudgement = (TaikoJudgementInfo)Judgement;
 
             int countHit = NestedHitObjects.Count(t => t.Judgement.Result == HitResult.Hit);
 
             if (countHit > drumRoll.RequiredGoodHits)
             {
-                Judgement.Result = HitResult.Hit;
-
-                if (countHit >= drumRoll.RequiredGreatHits)
-                    taikoJudgement.Score = TaikoScoreResult.Great;
-                else
-                    taikoJudgement.Score = TaikoScoreResult.Good;
+                taikoJudgement.Result = HitResult.Hit;
+                taikoJudgement.Score = countHit >= drumRoll.RequiredGreatHits ? TaikoScoreResult.Great : TaikoScoreResult.Good;
             }
             else
-                Judgement.Result = HitResult.Miss;
+                taikoJudgement.Result = HitResult.Miss;
         }
     }
 }

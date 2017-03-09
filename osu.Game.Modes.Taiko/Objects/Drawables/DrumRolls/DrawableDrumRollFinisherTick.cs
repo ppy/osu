@@ -8,8 +8,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 {
     public class DrawableDrumRollFinisherTick : DrawableDrumRollTick
     {
-        public DrawableDrumRollFinisherTick(DrumRoll drumRoll, DrumRollTick drumRollTick)
-            : base(drumRoll, drumRollTick)
+        public DrawableDrumRollFinisherTick(DrumRollTick drumRollTick)
+            : base(drumRollTick)
         {
         }
 

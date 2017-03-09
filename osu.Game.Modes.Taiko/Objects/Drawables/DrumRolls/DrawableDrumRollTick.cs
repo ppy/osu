@@ -3,13 +3,11 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
-using osu.Game.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
@@ -25,13 +23,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 
         private Container bodyPiece;
 
-        private DrumRoll drumRoll;
         private DrumRollTick drumRollTick;
 
-        public DrawableDrumRollTick(DrumRoll drumRoll, DrumRollTick drumRollTick)
+        public DrawableDrumRollTick(DrumRollTick drumRollTick)
             : base(drumRollTick)
         {
-            this.drumRoll = drumRoll;
             this.drumRollTick = drumRollTick;
 
             RelativePositionAxes = Axes.X;
@@ -68,11 +64,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
                     }
                 }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
             ExplodeColour = Color4.White;
         }
 
@@ -100,11 +92,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 
             double hitOffset = Math.Abs(Judgement.TimeOffset);
 
-            TaikoJudgementInfo taikoJudgement = Judgement as TaikoJudgementInfo;
-            
+            TaikoJudgementInfo taikoJudgement = (TaikoJudgementInfo)Judgement;
+
             if (hitOffset < drumRollTick.TickTimeDistance / 2)
             {
-                Judgement.Result = HitResult.Hit;
+                taikoJudgement.Result = HitResult.Hit;
                 taikoJudgement.Score = TaikoScoreResult.Great;
             }
         }
