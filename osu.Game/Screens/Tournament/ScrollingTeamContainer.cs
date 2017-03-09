@@ -263,9 +263,9 @@ namespace osu.Game.Screens.Tournament
 
         private void addFlags()
         {
-            for (int i = 0; i < availableTeams.Count; i++)
+            foreach (Team t in availableTeams)
             {
-                Add(new ScrollingTeam(availableTeams[i])
+                Add(new ScrollingTeam(t)
                 {
                     X = leftPos + DrawWidth
                 });

@@ -25,7 +25,6 @@ namespace osu.Game.Screens
 
         protected virtual IEnumerable<Type> PossibleChildren => null;
 
-        private FillFlowContainer childModeButtons;
         private Container textContainer;
         private Box box;
 
@@ -80,6 +79,8 @@ namespace osu.Game.Screens
 
         public ScreenWhiteBox()
         {
+            FillFlowContainer childModeButtons;
+
             Children = new Drawable[]
             {
                 box = new Box

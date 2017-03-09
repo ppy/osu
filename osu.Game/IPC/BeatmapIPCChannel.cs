@@ -16,7 +16,7 @@ namespace osu.Game.IPC
             : base(host)
         {
             this.beatmaps = beatmaps;
-            MessageReceived += (msg) =>
+            MessageReceived += msg =>
             {
                 Debug.Assert(beatmaps != null);
                 ImportAsync(msg.Path);

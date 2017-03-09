@@ -31,7 +31,7 @@ namespace osu.Game.Modes.Mania.UI
 
             PopOutCount.Anchor = Anchor.BottomCentre;
             PopOutCount.Origin = Anchor.Centre;
-            PopOutCount.FadeColour(PopOutColor, 0);
+            PopOutCount.FadeColour(PopOutColor);
             OriginalColour = DisplayedCountSpriteText.Colour;
         }
 

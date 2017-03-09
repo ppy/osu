@@ -341,7 +341,7 @@ namespace osu.Game.Screens.Select
 
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
-            carousel.SelectBeatmap(beatmap?.BeatmapInfo);
+            carousel.SelectBeatmap(beatmap.BeatmapInfo);
         }
 
         /// <summary>

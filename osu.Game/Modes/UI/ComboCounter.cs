@@ -135,18 +135,10 @@ namespace osu.Game.Modes.UI
         }
 
         /// <summary>
-        /// Animates roll-back to 0.
-        /// </summary>
-        public void Roll()
-        {
-            Roll(0);
-        }
-
-        /// <summary>
         /// Animates roll-up/roll-back to an specific value.
         /// </summary>
         /// <param name="newValue">Target value.</param>
-        public virtual void Roll(ulong newValue)
+        public virtual void Roll(ulong newValue = 0)
         {
             updateCount(newValue, true);
         }
