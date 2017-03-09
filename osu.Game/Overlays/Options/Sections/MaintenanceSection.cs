@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using OpenTK;
 
 namespace osu.Game.Overlays.Options.Sections
@@ -18,22 +17,22 @@ namespace osu.Game.Overlays.Options.Sections
             FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
-                new OsuButton
+                new OptionButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Delete all unranked maps",
                 },
-                new OsuButton
+                new OptionButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Repair folder permissions",
                 },
-                new OsuButton
+                new OptionButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Mark all maps as played",
                 },
-                new OsuButton
+                new OptionButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Run osu! updater",

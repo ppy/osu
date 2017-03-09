@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Graphics
 {
@@ -17,42 +16,42 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
         {
             Children = new Drawable[]
             {
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Snaking in sliders",
                     Bindable = config.GetBindable<bool>(OsuConfig.SnakingInSliders)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Snaking out sliders",
                     Bindable = config.GetBindable<bool>(OsuConfig.SnakingOutSliders)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Background video",
                     Bindable = config.GetBindable<bool>(OsuConfig.Video)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Storyboards",
                     Bindable = config.GetBindable<bool>(OsuConfig.ShowStoryboard)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Combo bursts",
                     Bindable = config.GetBindable<bool>(OsuConfig.ComboBurst)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Hit lighting",
                     Bindable = config.GetBindable<bool>(OsuConfig.HitLighting)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Shaders",
                     Bindable = config.GetBindable<bool>(OsuConfig.Bloom)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Softening filter",
                     Bindable = config.GetBindable<bool>(OsuConfig.BloomSoftening)

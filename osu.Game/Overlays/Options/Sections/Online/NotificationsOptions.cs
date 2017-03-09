@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Online
 {
@@ -17,32 +16,32 @@ namespace osu.Game.Overlays.Options.Sections.Online
         {
             Children = new Drawable[]
             {
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Enable chat ticker",
                     Bindable = config.GetBindable<bool>(OsuConfig.Ticker)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Show a notification popup when someone says your name",
                     Bindable = config.GetBindable<bool>(OsuConfig.ChatHighlightName)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Show chat message notifications",
                     Bindable = config.GetBindable<bool>(OsuConfig.ChatMessageNotification)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Play a sound when someone says your name",
                     Bindable = config.GetBindable<bool>(OsuConfig.ChatAudibleHighlight)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Show notification popups instantly during gameplay",
                     Bindable = config.GetBindable<bool>(OsuConfig.PopupDuringGameplay)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Show notification popups when friends change status",
                     Bindable = config.GetBindable<bool>(OsuConfig.NotifyFriends)

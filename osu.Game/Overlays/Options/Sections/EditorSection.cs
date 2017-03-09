@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using OpenTK;
 
 namespace osu.Game.Overlays.Options.Sections
@@ -21,32 +20,32 @@ namespace osu.Game.Overlays.Options.Sections
             FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Background video",
                     Bindable = config.GetBindable<bool>(OsuConfig.VideoEditor)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Always use default skin",
                     Bindable = config.GetBindable<bool>(OsuConfig.EditorDefaultSkin)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Snaking sliders",
                     Bindable = config.GetBindable<bool>(OsuConfig.EditorSnakingSliders)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Hit animations",
                     Bindable = config.GetBindable<bool>(OsuConfig.EditorHitAnimations)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Follow points",
                     Bindable = config.GetBindable<bool>(OsuConfig.EditorFollowPoints)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Stacking",
                     Bindable = config.GetBindable<bool>(OsuConfig.EditorStacking)

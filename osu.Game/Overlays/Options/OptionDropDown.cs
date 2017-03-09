@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionDropDown<T> : FillFlowContainer
+    public class OptionDropDown<T> : FillFlowContainer, ISearchable
     {
         private DropDownMenu<T> dropdown;
         private SpriteText text;
@@ -27,6 +27,8 @@ namespace osu.Game.Overlays.Options
                 text.Text = value;
             }
         }
+
+        public string[] Keywords => new[] { LabelText };
 
         public Bindable<T> Bindable
         {

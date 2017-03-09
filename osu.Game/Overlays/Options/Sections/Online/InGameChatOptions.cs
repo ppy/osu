@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Online
 {
@@ -17,22 +16,22 @@ namespace osu.Game.Overlays.Options.Sections.Online
         {
             Children = new Drawable[]
             {
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Filter offensive words",
                     Bindable = config.GetBindable<bool>(OsuConfig.ChatFilter)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Filter foreign characters",
                     Bindable = config.GetBindable<bool>(OsuConfig.ChatRemoveForeign)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Log private messages",
                     Bindable = config.GetBindable<bool>(OsuConfig.LogPrivateMessages)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Block private messages from non-friends",
                     Bindable = config.GetBindable<bool>(OsuConfig.BlockNonFriendPM)

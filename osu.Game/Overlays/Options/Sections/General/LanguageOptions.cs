@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.General
 {
@@ -18,12 +17,12 @@ namespace osu.Game.Overlays.Options.Sections.General
             Children = new Drawable[]
             {
                 new OptionLabel { Text = "TODO: Dropdown" },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Prefer metadata in original language",
                     Bindable = config.GetBindable<bool>(OsuConfig.ShowUnicode)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Use alternative font for chat display",
                     Bindable = config.GetBindable<bool>(OsuConfig.AlternativeChatFont)

@@ -6,12 +6,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
+using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Options
 {
-    public abstract class OptionsSubsection : FillFlowContainer
+    public abstract class OptionsSubsection : FillFlowContainer, ISearchableChildren
     {
         protected override Container<Drawable> Content { get; }
+
+        public string[] Keywords => new[] { Header };
+        public Action AfterSearch => null;
+        public IEnumerable<Drawable> SearchableChildren => Children;
 
         protected abstract string Header { get; }
 

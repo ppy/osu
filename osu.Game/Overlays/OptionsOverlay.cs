@@ -14,6 +14,8 @@ using System;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Options.Sections;
+using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
@@ -26,7 +28,7 @@ namespace osu.Game.Overlays
         public const float SIDEBAR_WIDTH = Sidebar.DEFAULT_WIDTH;
 
         private const float width = 400;
-        
+
         private const float sidebar_padding = 10;
 
         private ScrollContainer scrollContainer;
@@ -34,6 +36,7 @@ namespace osu.Game.Overlays
         private SidebarButton[] sidebarButtons;
         private OptionsSection[] sections;
         private float lastKnownScroll;
+        private SearchContainer searchContainer;
 
         public OptionsOverlay()
         {
@@ -94,12 +97,30 @@ namespace osu.Game.Overlays
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
                                 },
-                                new FillFlowContainer
+                                new OptionTextBox()
+                                {
+                                    Width = width - CONTENT_MARGINS * 2,
+                                    OnChange = (TextBox sender, bool newText) => searchContainer.Filter = sender.Text,
+                                    Margin = new MarginPadding { Left = CONTENT_MARGINS },
+                                    PlaceholderText = "Search for osu! options",
+                                },
+                                searchContainer = new SearchContainer
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                    Direction = FillDirection.Vertical,
-                                    Children = sections,
+                                    Children = new []
+                                    {
+                                        new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                            Direction = FillDirection.Vertical,
+                                            Children = sections,
+                                        },
+                                    },
+                                    SearchableContent = sections,
+                                    OnMatch = onMatch,
+                                    OnMismatch = onMismatch,
                                 },
                                 new OptionsFooter()
                             }
@@ -119,8 +140,18 @@ namespace osu.Game.Overlays
                     ).ToArray()
                 }
             };
-        
+
             scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
+        }
+
+        private void onMatch(Drawable drawable)
+        {
+            drawable.Colour = Color4.White;
+        }
+
+        private void onMismatch(Drawable drawable)
+        {
+            drawable.Colour = Color4.Red;
         }
 
         protected override void Update()

@@ -14,12 +14,12 @@ namespace osu.Game.Overlays.Options.Sections.Input
         {
             Children = new Drawable[]
             {
-                new OsuButton
+                new OptionButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Change keyboard bindings"
                 },
-                new OsuButton
+                new OptionButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "osu!mania layout"

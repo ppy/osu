@@ -10,13 +10,19 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Options
 {
-    public abstract class OptionsSection : Container
+    public abstract class OptionsSection : Container, ISearchableChildren
     {
         protected FillFlowContainer FlowContent;
         protected override Container<Drawable> Content => FlowContent;
+
+        public string[] Keywords => new[] { Header };
+        public Action AfterSearch => null;
+        public IEnumerable<Drawable> SearchableChildren => Children;
 
         public abstract FontAwesome Icon { get; }
         public abstract string Header { get; }

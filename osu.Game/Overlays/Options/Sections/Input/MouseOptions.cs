@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Input
 {
@@ -23,12 +22,12 @@ namespace osu.Game.Overlays.Options.Sections.Input
                     LabelText = "Sensitivity",
                     Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.MouseSpeed),
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Raw input",
                     Bindable = config.GetBindable<bool>(OsuConfig.RawInput)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Map absolute raw input to the osu! window",
                     Bindable = config.GetBindable<bool>(OsuConfig.AbsoluteToOsuWindow)
@@ -38,17 +37,17 @@ namespace osu.Game.Overlays.Options.Sections.Input
                     LabelText = "Confine mouse cursor",
                     Bindable = config.GetBindable<ConfineMouseMode>(OsuConfig.ConfineMouse),
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Disable mouse wheel in play mode",
                     Bindable = config.GetBindable<bool>(OsuConfig.MouseDisableWheel)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Disable mouse buttons in play mode",
                     Bindable = config.GetBindable<bool>(OsuConfig.MouseDisableButtons)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Cursor ripples",
                     Bindable = config.GetBindable<bool>(OsuConfig.CursorRipple)

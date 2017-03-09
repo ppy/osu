@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Online
 {
@@ -17,12 +16,12 @@ namespace osu.Game.Overlays.Options.Sections.Online
         {
             Children = new Drawable[]
             {
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Share your city location with others",
                     Bindable = config.GetBindable<bool>(OsuConfig.DisplayCityLocation)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Allow multiplayer game invites from all users",
                     Bindable = config.GetBindable<bool>(OsuConfig.AllowPublicInvites)

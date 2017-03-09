@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Graphics
 {
@@ -25,17 +24,17 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                     LabelText = "Frame limiter",
                     Bindable = config.GetBindable<FrameSync>(FrameworkConfig.FrameSync)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Show FPS counter",
                     Bindable = osuConfig.GetBindable<bool>(OsuConfig.FpsCounter),
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Reduce dropped frames",
                     Bindable = osuConfig.GetBindable<bool>(OsuConfig.ForceFrameFlush),
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Detect performance issues",
                     Bindable = osuConfig.GetBindable<bool>(OsuConfig.DetectPerformanceIssues),

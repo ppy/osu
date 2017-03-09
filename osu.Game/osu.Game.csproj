@@ -127,6 +127,8 @@
     <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
     <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
+    <Compile Include="Overlays\Options\OptionButton.cs" />
+    <Compile Include="Overlays\Options\OptionCheckbox.cs" />
     <Compile Include="Overlays\Options\OptionDropDown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropDownHeader.cs" />
