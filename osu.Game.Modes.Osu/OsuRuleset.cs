@@ -78,7 +78,6 @@ namespace osu.Game.Modes.Osu
                     {
                         new OsuModRelax(),
                         new OsuModAutopilot(),
-                        new OsuModTarget(),
                         new OsuModSpunOut(),
                         new MultiMod
                         {
@@ -88,6 +87,7 @@ namespace osu.Game.Modes.Osu
                                 new ModCinema(),
                             },
                         },
+                        new OsuModTarget(),
                     };
 
                 default:
