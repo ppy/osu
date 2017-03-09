@@ -52,7 +52,14 @@ namespace osu.Game.Modes.Mania
                                 new ManiaModNightcore(),
                             },
                         },
-                        new ManiaModHidden(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ManiaModFadeIn(),
+                                new ManiaModHidden(),
+                            }
+                        },
                         new ManiaModFlashlight(),
                     };
 
@@ -74,8 +81,8 @@ namespace osu.Game.Modes.Mania
                                 new ManiaModKey3(),
                             },
                         },
-                        new ManiaModKeyCoop(),
                         new ManiaModRandom(),
+                        new ManiaModKeyCoop(),
                         new MultiMod
                         {
                             Mods = new Mod[]
