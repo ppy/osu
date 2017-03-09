@@ -20,7 +20,7 @@ namespace osu.Game.Beatmaps.IO
             catch (InvalidCastException e)
             {
                 Logger.Error(e, "A tricky ArchiveReader instance passed the test to be a BeatmapArhiveReader, but it's really not");
-                throw e;
+                throw;
             }
         }
 
