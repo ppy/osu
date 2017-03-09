@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool BlockPassThroughInput => false;
 
-        private const int transition_time = 500;
+        private const double transition_time = 500;
 
         private const float alpha_hovering = 0.8f;
         private const float alpha_normal = 0.6f;
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Toolbar
                         },
                         modeSelector = new ToolbarModeSelector
                         {
-                            OnPlayModeChange = (PlayMode mode) =>
+                            OnPlayModeChange = mode =>
                             {
                                 OnPlayModeChange?.Invoke(mode);
                             }

@@ -74,7 +74,7 @@ namespace osu.Game.Modes.Objects.Drawables
 
         public HitObjectType HitObject;
 
-        public DrawableHitObject(HitObjectType hitObject)
+        protected DrawableHitObject(HitObjectType hitObject)
         {
             HitObject = hitObject;
         }
@@ -129,10 +129,13 @@ namespace osu.Game.Modes.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            string hitType = ((HitObject.Sample?.Type ?? SampleType.None) == SampleType.None ? SampleType.Normal : HitObject.Sample.Type).ToString().ToLower();
-            string sampleSet = (HitObject.Sample?.Set ?? SampleSet.Normal).ToString().ToLower();
+            SampleType type = HitObject.Sample?.Type ?? SampleType.None;
+            if (type == SampleType.None)
+                type = SampleType.Normal;
 
-            Sample = audio.Sample.Get($@"Gameplay/{sampleSet}-hit{hitType}");
+            SampleSet sampleSet = HitObject.Sample?.Set ?? SampleSet.Normal;
+
+            Sample = audio.Sample.Get($@"Gameplay/{sampleSet.ToString().ToLower()}-hit{type.ToString().ToLower()}");
         }
 
         private List<DrawableHitObject<HitObjectType>> nestedHitObjects;

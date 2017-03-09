@@ -41,7 +41,7 @@ namespace osu.Game.Online.API
             set { authentication.Token = string.IsNullOrEmpty(value) ? null : OAuthToken.Parse(value); }
         }
 
-        protected bool HasLogin => Token != null || (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password));
+        protected bool HasLogin => Token != null || !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password);
 
         // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (should dispose of this or at very least keep a reference).
         private Thread thread;

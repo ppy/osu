@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Options
                 bindable.ValueChanged += bindable_ValueChanged;
                 bindable_ValueChanged(null, null);
 
-                if (bindable?.Disabled ?? true)
+                if (bindable.Disabled)
                     Alpha = 0.3f;
             }
         }

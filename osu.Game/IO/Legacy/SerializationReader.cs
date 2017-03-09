@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -17,7 +18,7 @@ namespace osu.Game.IO.Legacy
     /// handle null strings and simplify use with ISerializable. </summary>
     public class SerializationReader : BinaryReader
     {
-        Stream stream;
+        private Stream stream;
 
         public SerializationReader(Stream s)
             : base(s, Encoding.UTF8)
@@ -173,15 +174,20 @@ namespace osu.Game.IO.Legacy
             private static void initialize()
             {
                 versionBinder = new VersionConfigToNamespaceAssemblyObjectBinder();
-                formatter = new BinaryFormatter();
-                formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
-                formatter.Binder = versionBinder;
+                formatter = new BinaryFormatter
+                {
+                    AssemblyFormat = FormatterAssemblyStyle.Simple,
+                    Binder = versionBinder
+                };
             }
 
             public static object Deserialize(Stream stream)
             {
                 if (formatter == null)
                     initialize();
+
+                Debug.Assert(formatter != null, "formatter != null");
+
                 return formatter.Deserialize(stream);
             }
 
@@ -201,46 +207,39 @@ namespace osu.Game.IO.Legacy
                     List<Type> tmpTypes = new List<Type>();
                     Type genType = null;
 
-                    try
+                    if (typeName.Contains("System.Collections.Generic") && typeName.Contains("[["))
                     {
-                        if (typeName.Contains("System.Collections.Generic") && typeName.Contains("[["))
-                        {
-                            string[] splitTyps = typeName.Split('[');
+                        string[] splitTyps = typeName.Split('[');
 
-                            foreach (string typ in splitTyps)
+                        foreach (string typ in splitTyps)
+                        {
+                            if (typ.Contains("Version"))
                             {
-                                if (typ.Contains("Version"))
-                                {
-                                    string asmTmp = typ.Substring(typ.IndexOf(',') + 1);
-                                    string asmName = asmTmp.Remove(asmTmp.IndexOf(']')).Trim();
-                                    string typName = typ.Remove(typ.IndexOf(','));
-                                    tmpTypes.Add(BindToType(asmName, typName));
-                                }
-                                else if (typ.Contains("Generic"))
-                                {
-                                    genType = BindToType(assemblyName, typ);
-                                }
+                                string asmTmp = typ.Substring(typ.IndexOf(',') + 1);
+                                string asmName = asmTmp.Remove(asmTmp.IndexOf(']')).Trim();
+                                string typName = typ.Remove(typ.IndexOf(','));
+                                tmpTypes.Add(BindToType(asmName, typName));
                             }
-                            if (genType != null && tmpTypes.Count > 0)
+                            else if (typ.Contains("Generic"))
                             {
-                                return genType.MakeGenericType(tmpTypes.ToArray());
+                                genType = BindToType(assemblyName, typ);
                             }
                         }
-
-                        string toAssemblyName = assemblyName.Split(',')[0];
-                        Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                        foreach (Assembly a in assemblies)
+                        if (genType != null && tmpTypes.Count > 0)
                         {
-                            if (a.FullName.Split(',')[0] == toAssemblyName)
-                            {
-                                typeToDeserialize = a.GetType(typeName);
-                                break;
-                            }
+                            return genType.MakeGenericType(tmpTypes.ToArray());
                         }
                     }
-                    catch (Exception exception)
+
+                    string toAssemblyName = assemblyName.Split(',')[0];
+                    Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                    foreach (Assembly a in assemblies)
                     {
-                        throw exception;
+                        if (a.FullName.Split(',')[0] == toAssemblyName)
+                        {
+                            typeToDeserialize = a.GetType(typeName);
+                            break;
+                        }
                     }
 
                     cache.Add(assemblyName + typeName, typeToDeserialize);
