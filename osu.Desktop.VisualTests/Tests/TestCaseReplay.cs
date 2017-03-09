@@ -13,7 +13,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseReplay : TestCasePlayer
+    internal class TestCaseReplay : TestCasePlayer
     {
         private WorkingBeatmap beatmap;
 

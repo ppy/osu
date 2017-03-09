@@ -15,9 +15,9 @@ namespace osu.Game.Modes.Osu
 {
     public class OsuAutoReplay : LegacyReplay
     {
-        static readonly Vector2 spinner_centre = new Vector2(256, 192);
+        private static readonly Vector2 spinner_centre = new Vector2(256, 192);
 
-        const float spin_radius = 50;
+        private const float spin_radius = 50;
 
         private Beatmap beatmap;
 

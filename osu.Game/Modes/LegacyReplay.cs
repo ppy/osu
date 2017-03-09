@@ -58,7 +58,7 @@ namespace osu.Game.Modes
             public LegacyReplayFrame CurrentFrame => !hasFrames ? null : replayContent[currentFrameIndex];
             public LegacyReplayFrame NextFrame => !hasFrames ? null : replayContent[nextFrameIndex];
 
-            int currentFrameIndex;
+            private int currentFrameIndex;
 
             private int nextFrameIndex => MathHelper.Clamp(currentFrameIndex + (currentDirection > 0 ? 1 : -1), 0, replayContent.Count - 1);
 
@@ -125,8 +125,8 @@ namespace osu.Game.Modes
 
             private const double sixty_frame_time = 1000.0 / 60;
 
-            double currentTime;
-            int currentDirection;
+            private double currentTime;
+            private int currentDirection;
 
             /// <summary>
             /// When set, we will ensure frames executed by nested drawables are frame-accurate to replay data.
@@ -136,7 +136,7 @@ namespace osu.Game.Modes
 
             private bool hasFrames => replayContent.Count > 0;
 
-            bool inImportantSection =>
+            private bool inImportantSection =>
                 FrameAccuratePlayback &&
                 //a button is in a pressed state
                 (currentDirection > 0 ? CurrentFrame : NextFrame)?.ButtonState > LegacyButtonState.None &&

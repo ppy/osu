@@ -17,7 +17,7 @@ namespace osu.Game.IO.Legacy
     /// handle null strings and simplify use with ISerializable. </summary>
     public class SerializationReader : BinaryReader
     {
-        Stream stream;
+        private Stream stream;
 
         public SerializationReader(Stream s)
             : base(s, Encoding.UTF8)
