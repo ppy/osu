@@ -64,7 +64,7 @@ namespace osu.Game.Modes.Taiko.Objects
             base.SetDefaultsFromBeatmap(beatmap);
 
             Velocity = beatmap.SliderVelocityAt(StartTime) / 1000;
-            TickTimeDistance = beatmap.Timing.BeatLengthAt(StartTime) / beatmap.Timing.BeatVelocityAt(StartTime);
+            TickTimeDistance = beatmap.Timing.BeatLengthAt(StartTime);
 
             if (beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate == 3)
                 TickTimeDistance /= 3;
