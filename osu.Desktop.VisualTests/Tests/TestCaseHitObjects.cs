@@ -19,14 +19,13 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseHitObjects : TestCase
     {
-        private StopwatchClock rateAdjustClock;
         private FramedClock framedClock;
 
         private bool auto;
 
         public TestCaseHitObjects()
         {
-            rateAdjustClock = new StopwatchClock(true);
+            var rateAdjustClock = new StopwatchClock(true);
             framedClock = new FramedClock(rateAdjustClock);
             playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
         }

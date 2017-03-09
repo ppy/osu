@@ -1,12 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using osu.Game.Modes.Osu.Objects.Drawables.Connections;
 using System;
 using System.Collections.Generic;
+using OpenTK;
 
-namespace osu.Game.Modes.Osu.Objects.Drawables
+namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
 {
     public class FollowPointRenderer : ConnectionRenderer<OsuHitObject>
     {

@@ -59,7 +59,7 @@ namespace osu.Game.Modes.Osu.Objects
                         break;
 
                     if (Vector2.Distance(stackBaseObject.Position, objectN.Position) < stackDistance ||
-                        (stackBaseObject is Slider && Vector2.Distance(stackBaseObject.EndPosition, objectN.Position) < stackDistance))
+                        stackBaseObject is Slider && Vector2.Distance(stackBaseObject.EndPosition, objectN.Position) < stackDistance)
                     {
                         stackBaseIndex = n;
 

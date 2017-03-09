@@ -16,10 +16,13 @@ namespace osu.Game.IPC
             : base(host)
         {
             this.scores = scores;
-            MessageReceived += (msg) =>
+            MessageReceived += msg =>
             {
                 Debug.Assert(scores != null);
-                ImportAsync(msg.Path);
+                ImportAsync(msg.Path).ContinueWith(t =>
+                {
+                    if (t.Exception != null) throw t.Exception;
+                }, TaskContinuationOptions.OnlyOnFaulted);
             };
         }
 
