@@ -86,14 +86,14 @@ namespace osu.Game.Database
                 {
                     byte[] properties = new byte[5];
                     if (replayInStream.Read(properties, 0, 5) != 5)
-                        throw (new Exception("input .lzma is too short"));
+                        throw new Exception("input .lzma is too short");
                     long outSize = 0;
                     for (int i = 0; i < 8; i++)
                     {
                         int v = replayInStream.ReadByte();
                         if (v < 0)
-                            throw (new Exception("Can't Read 1"));
-                        outSize |= ((long)(byte)v) << (8 * i);
+                            throw new Exception("Can't Read 1");
+                        outSize |= (long)(byte)v << (8 * i);
                     }
 
                     long compressedSize = replayInStream.Length - replayInStream.Position;
