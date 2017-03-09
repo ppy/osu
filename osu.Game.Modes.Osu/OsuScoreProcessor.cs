@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables;
 
@@ -8,9 +9,22 @@ namespace osu.Game.Modes.Osu
 {
     internal class OsuScoreProcessor : ScoreProcessor
     {
-        public OsuScoreProcessor(int hitObjectCount = 0)
-            : base(hitObjectCount)
+        protected override bool ShouldFail => Health.Value == Health.MinValue;
+
+        public OsuScoreProcessor(Beatmap beatmap)
+            : base(beatmap)
         {
+        }
+
+        protected override void CalculateFinalValues(Beatmap beatmap)
+        {
+            // Initialize HP + final values
+        }
+
+        protected override void Reset()
+        {
+            base.Reset();
+
             Health.Value = 1;
             Accuracy.Value = 1;
         }

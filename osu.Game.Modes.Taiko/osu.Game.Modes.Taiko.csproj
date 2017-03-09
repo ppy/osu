@@ -47,15 +47,55 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Objects\TaikoHitType.cs" />
+    <Compile Include="Replays\LegacyTaikoReplay.cs" />
+    <Compile Include="Objects\BarLine.cs" />
+    <Compile Include="Objects\Drawables\BarLines\DrawableBarLine.cs" />
+    <Compile Include="Objects\Drawables\Hits\DrawableCentreHit.cs" />
+    <Compile Include="Objects\Drawables\Hits\DrawableCentreHitFinisher.cs" />
+    <Compile Include="Objects\Drawables\DrumRolls\DrawableDrumRollFinisher.cs" />
+    <Compile Include="Objects\Drawables\DrumRolls\DrawableDrumRollFinisherTick.cs" />
+    <Compile Include="Objects\Drawables\DrumRolls\DrawableDrumRollTick.cs" />
+    <Compile Include="Objects\Drawables\Bashes\DrawableBash.cs" />
+    <Compile Include="Objects\Drawables\BarLines\DrawableMajorBarLine.cs" />
+    <Compile Include="Objects\Drawables\Hits\DrawableRimHit.cs" />
+    <Compile Include="Objects\Drawables\Hits\DrawableRimHitFinisher.cs" />
+    <Compile Include="Objects\Drawables\DrawableTaikoHitObject.cs" />
+    <Compile Include="Objects\Drawables\Hits\DrawableHit.cs" />
+    <Compile Include="Objects\Drawables\Hits\DrawableHitCircleFinisher.cs" />
+    <Compile Include="Objects\Drawables\DrumRolls\DrawableDrumRoll.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Circle\BashCirclePiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Ring\BashRingPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Circle\CentreHitCirclePiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Ring\CentreHitRingPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\DrumRoll\DrumRollBodyPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Circle\CirclePiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\DrumRoll\DrumRollFinisherBodyPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Circle\RimHitCirclePiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Ring\RimHitRingPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Ring\RingPiece.cs" />
+    <Compile Include="Objects\DrumRoll.cs" />
+    <Compile Include="Objects\DrumRollTick.cs" />
+    <Compile Include="Objects\Bash.cs" />
+    <Compile Include="Objects\TaikoHitObject.cs" />
+    <Compile Include="Objects\TaikoDrumRollJudgementInfo.cs" />
+    <Compile Include="Objects\TaikoScoreResult.cs" />
+    <Compile Include="Objects\TaikoJudgementInfo.cs" />
+    <Compile Include="Replays\AutoReplay.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
-    <Compile Include="Objects\Drawable\DrawableTaikoHit.cs" />
-    <Compile Include="Objects\TaikoBaseHit.cs" />
     <Compile Include="Objects\TaikoConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\TaikoComboCounter.cs" />
+    <Compile Include="Objects\TaikoHitObjectParser.cs" />
+    <Compile Include="Scoring\TaikoScore.cs" />
+    <Compile Include="Scoring\TaikoScoreProcessor.cs" />
+    <Compile Include="UI\ExplodingRing.cs" />
+    <Compile Include="UI\HitTarget.cs" />
+    <Compile Include="UI\InputDrum.cs" />
+    <Compile Include="UI\JudgementText.cs" />
     <Compile Include="UI\TaikoHitRenderer.cs" />
     <Compile Include="UI\TaikoPlayfield.cs" />
     <Compile Include="TaikoRuleset.cs" />
+    <Compile Include="UI\TaikoScoreOverlay.cs" />
     <Compile Include="TaikoMod.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +119,7 @@
       <Name>osu.Game</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

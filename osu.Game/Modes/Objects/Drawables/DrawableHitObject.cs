@@ -18,6 +18,8 @@ namespace osu.Game.Modes.Objects.Drawables
     {
         public override bool HandleInput => Interactive;
 
+        public virtual bool ExpireOnStateChange => true;
+
         public bool Interactive = true;
 
         public JudgementInfo Judgement;
@@ -37,7 +39,7 @@ namespace osu.Game.Modes.Objects.Drawables
                 state = value;
 
                 UpdateState(state);
-                if (IsLoaded)
+                if (IsLoaded && ExpireOnStateChange)
                     Expire();
 
                 if (State == ArmedState.Hit)
@@ -63,7 +65,8 @@ namespace osu.Game.Modes.Objects.Drawables
             //force application of the state that was set before we loaded.
             UpdateState(State);
 
-            Expire(true);
+            if (ExpireOnStateChange)
+                Expire(true);
         }
     }
 

@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Database;
+using System.IO;
 
 namespace osu.Game.Modes
 {
@@ -15,5 +16,7 @@ namespace osu.Game.Modes
 
         public Replay Replay;
         public BeatmapInfo Beatmap;
+
+        public virtual Replay CreateLegacyReplayFrom(StreamReader reader) => new LegacyReplay(reader);
     }
 }

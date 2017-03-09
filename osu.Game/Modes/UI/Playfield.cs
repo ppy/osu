@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects;
@@ -16,7 +17,7 @@ namespace osu.Game.Modes.UI
 
         public virtual void Add(DrawableHitObject<T> h) => HitObjects.Add(h);
 
-        internal Container<Drawable> ScaledContent;
+        protected internal Container<Drawable> ScaledContent;
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
@@ -43,10 +44,16 @@ namespace osu.Game.Modes.UI
                 }
             });
 
-            Add(HitObjects = new HitObjectContainer<DrawableHitObject<T>>
+            HitObjects = new HitObjectContainer<DrawableHitObject<T>>
             {
                 RelativeSizeAxes = Axes.Both,
-            });
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Add(HitObjects);
         }
 
         public virtual void PostProcess()

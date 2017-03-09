@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Game.Modes.Objects;
 using OpenTK.Graphics;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Formats
@@ -53,7 +52,6 @@ namespace osu.Game.Beatmaps.Formats
             var beatmap = new Beatmap
             {
                 HitObjects = new List<HitObject>(),
-                ControlPoints = new List<ControlPoint>(),
                 ComboColors = new List<Color4>(),
                 BeatmapInfo = new BeatmapInfo
                 {

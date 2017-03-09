@@ -1,15 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Taiko.Objects;
-using System;
-using System.Collections.Generic;
 
 namespace osu.Game.Modes.Taiko
 {
-    public class TaikoDifficultyCalculator : DifficultyCalculator<TaikoBaseHit>
+    public class TaikoDifficultyCalculator : DifficultyCalculator<TaikoHitObject>
     {
         protected override PlayMode PlayMode => PlayMode.Taiko;
 
@@ -17,10 +16,11 @@ namespace osu.Game.Modes.Taiko
         {
         }
 
-        protected override HitObjectConverter<TaikoBaseHit> Converter => new TaikoConverter();
+        protected override HitObjectConverter<TaikoHitObject> Converter => new TaikoConverter();
 
-        protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
+        protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
         {
+            //TODO: implement
             return 0;
         }
     }

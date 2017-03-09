@@ -41,34 +41,26 @@ namespace osu.Game.Modes.UI
     public abstract class HitRenderer<TObject> : HitRenderer
         where TObject : HitObject
     {
-        private List<TObject> objects;
-
         protected Playfield<TObject> Playfield;
 
         public override Func<Vector2, Vector2> MapPlayfieldToScreenSpace => Playfield.ScaledContent.ToScreenSpace;
 
-        public override bool AllObjectsJudged => Playfield.HitObjects.Children.First()?.Judgement.Result != null; //reverse depth sort means First() instead of Last().
+        public override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
 
-        public IEnumerable<DrawableHitObject> DrawableObjects => Playfield.HitObjects.Children;
-
-        public Beatmap Beatmap
-        {
-            set
-            {
-                objects = Convert(value);
-                if (IsLoaded)
-                    loadObjects();
-            }
-        }
-
-        protected abstract Playfield<TObject> CreatePlayfield();
+        protected override Container<Drawable> Content => content;
 
         protected abstract HitObjectConverter<TObject> Converter { get; }
 
         protected virtual List<TObject> Convert(Beatmap beatmap) => Converter.Convert(beatmap);
 
-        protected HitRenderer()
+        private Container content;
+
+        private Beatmap beatmap;
+
+        protected HitRenderer(Beatmap beatmap)
         {
+            this.beatmap = beatmap;
+
             RelativeSizeAxes = Axes.Both;
 
             InputManager.Add(content = new Container
@@ -83,9 +75,7 @@ namespace osu.Game.Modes.UI
             AddInternal(InputManager);
         }
 
-        protected override Container<Drawable> Content => content;
-
-        private Container content;
+        protected abstract Playfield<TObject> CreatePlayfield();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -95,17 +85,18 @@ namespace osu.Game.Modes.UI
 
         private void loadObjects()
         {
-            if (objects == null) return;
-            foreach (TObject h in objects)
+            foreach (TObject h in Convert(beatmap))
             {
                 DrawableHitObject<TObject> drawableObject = GetVisualRepresentation(h);
 
-                if (drawableObject == null) continue;
+                if (drawableObject == null)
+                    continue;
 
                 drawableObject.OnJudgement += onJudgement;
 
                 Playfield.Add(drawableObject);
             }
+
             Playfield.PostProcess();
         }
 

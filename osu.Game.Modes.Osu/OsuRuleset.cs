@@ -16,10 +16,7 @@ namespace osu.Game.Modes.Osu
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new OsuHitRenderer
-        {
-            Beatmap = beatmap,
-        };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new OsuHitRenderer(beatmap);
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
         {
@@ -99,13 +96,13 @@ namespace osu.Game.Modes.Osu
 
         public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => new OsuScoreProcessor(hitObjectCount);
+        public override ScoreProcessor CreateScoreProcessor(Beatmap beatmap = null) => new OsuScoreProcessor(beatmap);
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
 
         public override Score CreateAutoplayScore(Beatmap beatmap)
         {
-            var score = CreateScoreProcessor().GetScore();
+            var score = CreateScoreProcessor(beatmap).GetScore();
             score.Replay = new OsuAutoReplay(beatmap);
             return score;
         }

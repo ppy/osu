@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Play
         {
             var beatmap = Beatmap.Beatmap;
 
-            if (beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
+            if (beatmap.BeatmapInfo?.Mode > PlayMode.Taiko)
             {
                 //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
                 Exit();
@@ -112,8 +112,10 @@ namespace osu.Game.Screens.Play
 
             ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
 
+            scoreProcessor = ruleset.CreateScoreProcessor(beatmap);
+
             scoreOverlay = ruleset.CreateScoreOverlay();
-            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
+            scoreOverlay.BindProcessor(scoreProcessor);
 
             pauseOverlay = new PauseOverlay
             {
@@ -139,7 +141,7 @@ namespace osu.Game.Screens.Play
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
-            hitRenderer.OnAllJudged += onPass;
+            hitRenderer.OnAllJudged += onCompletion;
 
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
@@ -241,11 +243,20 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private void onPass()
+        private void onCompletion()
         {
             Delay(1000);
             Schedule(delegate
             {
+                // Force a final check to see if the player has failed
+                // Some game modes (e.g. taiko) fail at the end of the map
+                if (scoreProcessor.CheckFailed())
+                {
+                    // If failed, onFail will be called that will push a new screen
+                    // Let's not push the completion screen in this case
+                    return;
+                }
+
                 ValidForResume = false;
                 Push(new Results
                 {

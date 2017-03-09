@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Ranking
                         new OsuSpriteText
                         {
                             TextSize = 40,
-                            Text = $@"Score: {s.TotalScore}",
+                            Text = $@"Score: {(int)s.TotalScore}",
                         },
                         new OsuSpriteText
                         {

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Catch.UI;
@@ -15,6 +14,8 @@ using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.Taiko.UI;
 using OpenTK;
+using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -26,25 +27,48 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            List<HitObject> objects = new List<HitObject>();
+            var objects = new List<HitObject>();
 
-            int time = 500;
+            int time = 1500;
             for (int i = 0; i < 100; i++)
             {
                 objects.Add(new HitCircle
                 {
                     StartTime = time,
-                    Position = new Vector2(RNG.Next(0, 512), RNG.Next(0, 384)),
-                    Scale = RNG.NextSingle(0.5f, 1.0f),
+                    Position = new Vector2(i % 4 == 0 || i % 4 == 2 ? 0 : 512,
+                    i % 4 < 2 ? 0 : 384),
+                    NewCombo = i % 4 == 0
                 });
 
-                time += RNG.Next(50, 500);
+                time += 500;
             }
+
+            var decoder = new ConstructableBeatmapDecoder();
 
             Beatmap beatmap = new Beatmap
             {
-                HitObjects = objects
+                HitObjects = objects,
+                BeatmapInfo = new BeatmapInfo
+                {
+                    BaseDifficulty = new BaseDifficulty
+                    {
+                        ApproachRate = 5,
+                        CircleSize = 5,
+                        DrainRate = 5,
+                        OverallDifficulty = 5,
+                        SliderMultiplier = 1.4,
+                        SliderTickRate = 1
+                    },
+                    Metadata = new BeatmapMetadata
+                    {
+                        Artist = @"Unknown",
+                        Title = @"Sample Beatmap",
+                        Author = @"peppy",
+                    }
+                }
             };
+
+            decoder.Process(beatmap);
 
             Add(new Drawable[]
             {
@@ -55,30 +79,26 @@ namespace osu.Desktop.VisualTests.Tests
                     Clock = new FramedClock(),
                     Children = new Drawable[]
                     {
-                        new OsuHitRenderer
+                        new OsuHitRenderer(beatmap)
                         {
-                            Beatmap = beatmap,
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft
                         },
-                        new TaikoHitRenderer
+                        new TaikoHitRenderer(beatmap)
                         {
-                            Beatmap = beatmap,
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight
                         },
-                        new CatchHitRenderer
+                        new CatchHitRenderer(beatmap)
                         {
-                            Beatmap = beatmap,
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft
                         },
-                        new ManiaHitRenderer
+                        new ManiaHitRenderer(beatmap)
                         {
-                            Beatmap = beatmap,
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight

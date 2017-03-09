@@ -2,23 +2,22 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
-using osu.Game.Modes.Osu.UI;
+using osu.Game.Modes.Taiko.Objects;
+using osu.Game.Modes.Taiko.Replays;
+using osu.Game.Modes.Taiko.Scoring;
 using osu.Game.Modes.Taiko.UI;
 using osu.Game.Modes.UI;
-using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.Taiko
 {
     public class TaikoRuleset : Ruleset
     {
-        public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
+        public override ScoreOverlay CreateScoreOverlay() => new TaikoScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new TaikoHitRenderer
-        {
-            Beatmap = beatmap,
-        };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new TaikoHitRenderer(beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
@@ -81,10 +80,17 @@ namespace osu.Game.Modes.Taiko
 
         public override FontAwesome Icon => FontAwesome.fa_osu_taiko_o;
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
+        public override ScoreProcessor CreateScoreProcessor(Beatmap beatmap = null) => new TaikoScoreProcessor(beatmap);
 
-        public override HitObjectParser CreateHitObjectParser() => new NullHitObjectParser();
+        public override HitObjectParser CreateHitObjectParser() => new TaikoHitObjectParser();
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new TaikoDifficultyCalculator(beatmap);
+
+        public override Score CreateAutoplayScore(Beatmap beatmap)
+        {
+            var score = CreateScoreProcessor(beatmap).GetScore();
+            score.Replay = new AutoReplay(new TaikoConverter().Convert(beatmap));
+            return score;
+        }
     }
 }

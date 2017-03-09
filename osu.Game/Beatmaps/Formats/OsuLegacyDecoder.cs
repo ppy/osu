@@ -1,15 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Globalization;
-using System.IO;
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
+using System;
+using System.Globalization;
+using System.IO;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -191,25 +192,35 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleTimingPoints(Beatmap beatmap, string val)
         {
-            ControlPoint cp = null;
+            ControlPoint cp;
 
-            string[] split = val.Split(',');
+            var split = val.Split(',');
 
             if (split.Length > 2)
             {
-                //int kiaiFlags = split.Length > 7 ? Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : 0;
+                EffectFlags effectFlags = split.Length > 7 ? (EffectFlags)Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : EffectFlags.None;
                 double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
                 cp = new ControlPoint
                 {
                     Time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo),
                     BeatLength = beatLength > 0 ? beatLength : 0,
-                    VelocityAdjustment = beatLength < 0 ? -beatLength / 100.0 : 1,
+                    VelocityAdjustment = beatLength < 0 ? MathHelper.Clamp(-beatLength, 10, 1000) / 100.0 : 1,
+                    TimeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)int.Parse(split[2]),
                     TimingChange = split.Length <= 6 || split[6][0] == '1',
+                    EffectFlags = effectFlags
+                };
+            }
+            else
+            {
+                cp = new ControlPoint
+                {
+                    Time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo),
+                    BeatLength = Math.Max(0, double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo)),
+                    TimingChange = true
                 };
             }
 
-            if (cp != null)
-                beatmap.ControlPoints.Add(cp);
+            beatmap.Timing.ControlPoints.Add(cp);
         }
 
         private void handleColours(Beatmap beatmap, string key, string val)

@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
+    <Compile Include="Beatmaps\TimingInfo.cs" />
     <Compile Include="Database\ScoreDatabase.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />

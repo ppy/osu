@@ -13,8 +13,8 @@ namespace osu.Game.Database
         public float CircleSize { get; set; }
         public float OverallDifficulty { get; set; }
         public float ApproachRate { get; set; }
-        public float SliderMultiplier { get; set; }
-        public float SliderTickRate { get; set; }
+        public double SliderMultiplier { get; set; }
+        public double SliderTickRate { get; set; }
     }
 }
 

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes
 {
@@ -28,11 +29,9 @@ namespace osu.Game.Modes
         public readonly BindableInt Combo = new BindableInt();
 
         /// <summary>
-        /// Are we allowed to fail?
+        /// Whether the player is in a failable state.
         /// </summary>
-        protected bool CanFail => true;
-
-        protected bool HasFailed { get; private set; }
+        protected abstract bool ShouldFail { get; }
 
         /// <summary>
         /// Called when we reach a failing health of zero.
@@ -47,16 +46,29 @@ namespace osu.Game.Modes
 
         public readonly List<JudgementInfo> Judgements;
 
+        private bool hasFailed;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ScoreProcessor"/> class.
+        /// <param name="beatmap">The current beatmap.</param>
         /// </summary>
-        /// <param name="hitObjectCount">Number of HitObjects. It is used for specifying Judgements collection Capacity</param>
-        protected ScoreProcessor(int hitObjectCount = 0)
+        protected ScoreProcessor(Beatmap beatmap = null)
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
-            Judgements = new List<JudgementInfo>(hitObjectCount);
+
+            if (beatmap != null)
+            {
+                Judgements = new List<JudgementInfo>(beatmap.HitObjects.Count);
+
+                CalculateFinalValues(beatmap);
+                Reset();
+            }
         }
 
+        /// <summary>
+        /// Adds a judgement to this processor.
+        /// </summary>
+        /// <param name="judgement">The judgement to add.</param>
         public void AddJudgement(JudgementInfo judgement)
         {
             Judgements.Add(judgement);
@@ -64,11 +76,30 @@ namespace osu.Game.Modes
             UpdateCalculations(judgement);
 
             judgement.ComboAtHit = (ulong)Combo.Value;
-            if (Health.Value == Health.MinValue && !HasFailed)
-            {
-                HasFailed = true;
-                Failed?.Invoke();
-            }
+
+            CheckFailed();
+        }
+
+        /// <summary>
+        /// Calculates and stores final scoring values by simulating an auto-play of the beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to initialize calculations with.</param>
+        protected abstract void CalculateFinalValues(Beatmap beatmap);
+
+        /// <summary>
+        /// Rests the processor to a stale state. Should revert any variables changed through the
+        /// <see cref="CalculateFinalValues(Beatmap)"/> method.
+        /// </summary>
+        protected virtual void Reset()
+        {
+            Judgements.Clear();
+
+            hasFailed = false;
+            TotalScore.Value = 0;
+            Accuracy.Value = 0;
+            Health.Value = 0;
+            Combo.Value = 0;
+            HighestCombo.Value = 0;
         }
 
         /// <summary>
@@ -76,5 +107,20 @@ namespace osu.Game.Modes
         /// </summary>
         /// <param name="newJudgement">A new JudgementInfo that triggered this calculation. May be null.</param>
         protected abstract void UpdateCalculations(JudgementInfo newJudgement);
+
+        /// <summary>
+        /// Checks if the player has failed.
+        /// </summary>
+        /// <returns>Whether the player has failed.</returns>
+        public bool CheckFailed()
+        {
+            if (!hasFailed && ShouldFail)
+            {
+                hasFailed = true;
+                Failed?.Invoke();
+            }
+
+            return hasFailed;
+        }
     }
 }

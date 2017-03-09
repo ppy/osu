@@ -4,7 +4,6 @@
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Samples;
-using osu.Game.Beatmaps.Timing;
 using System;
 using System.Collections.Generic;
 
@@ -78,14 +77,10 @@ namespace osu.Game.Modes.Osu.Objects
             base.SetDefaultsFromBeatmap(beatmap);
 
             var baseDifficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            var scoringDistance = 100 * baseDifficulty.SliderMultiplier;
 
-            ControlPoint overridePoint;
-            ControlPoint timingPoint = beatmap.TimingPointAt(StartTime, out overridePoint);
-            var velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
-            var baseVelocity = 100 * baseDifficulty.SliderMultiplier / velocityAdjustment;
-
-            Velocity = baseVelocity / timingPoint.BeatLength;
-            TickDistance = baseVelocity / baseDifficulty.SliderTickRate;
+            Velocity = scoringDistance / beatmap.Timing.BeatDistanceAt(StartTime);
+            TickDistance = scoringDistance / (baseDifficulty.SliderTickRate * beatmap.Timing.BPMMultiplierAt(StartTime));
         }
 
         public int RepeatCount = 1;

@@ -15,10 +15,7 @@ namespace osu.Game.Modes.Mania
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new ManiaHitRenderer
-        {
-            Beatmap = beatmap,
-        };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new ManiaHitRenderer(beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
@@ -102,7 +99,7 @@ namespace osu.Game.Modes.Mania
 
         public override FontAwesome Icon => FontAwesome.fa_osu_mania_o;
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
+        public override ScoreProcessor CreateScoreProcessor(Beatmap beatmap = null) => null;
 
         public override HitObjectParser CreateHitObjectParser() => new NullHitObjectParser();
 

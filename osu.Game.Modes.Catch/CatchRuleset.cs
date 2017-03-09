@@ -15,10 +15,7 @@ namespace osu.Game.Modes.Catch
     {
         public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
 
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new CatchHitRenderer
-        {
-            Beatmap = beatmap,
-        };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new CatchHitRenderer(beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
@@ -81,7 +78,7 @@ namespace osu.Game.Modes.Catch
 
         public override FontAwesome Icon => FontAwesome.fa_osu_fruits_o;
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
+        public override ScoreProcessor CreateScoreProcessor(Beatmap beatmap = null) => null;
 
         public override HitObjectParser CreateHitObjectParser() => new NullHitObjectParser();
 
