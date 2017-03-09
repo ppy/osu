@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Screens.Testing;
 using osu.Game.Beatmaps;
@@ -39,7 +40,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             WorkingBeatmap beatmap = null;
 
-            var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == mode).FirstOrDefault();
+            var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.Mode == mode);
             if (beatmapInfo != null)
                 beatmap = db.GetWorkingBeatmap(beatmapInfo);
 

@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.IO.Legacy;
 using osu.Game.IPC;
@@ -18,6 +19,7 @@ namespace osu.Game.Database
 
         private const string replay_folder = @"replays";
 
+        // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ScoreIPCChannel ipc;
 
         public ScoreDatabase(Storage storage, IIpcHost importHost = null, BeatmapDatabase beatmaps = null)
@@ -45,7 +47,7 @@ namespace osu.Game.Database
                 var version = sr.ReadInt32();
                 /* score.FileChecksum = */
                 var beatmapHash = sr.ReadString();
-                score.Beatmap = beatmaps.Query<BeatmapInfo>().Where(b => b.Hash == beatmapHash).FirstOrDefault();
+                score.Beatmap = beatmaps.Query<BeatmapInfo>().FirstOrDefault(b => b.Hash == beatmapHash);
                 /* score.PlayerName = */
                 sr.ReadString();
                 /* var localScoreChecksum = */
@@ -86,14 +88,14 @@ namespace osu.Game.Database
                 {
                     byte[] properties = new byte[5];
                     if (replayInStream.Read(properties, 0, 5) != 5)
-                        throw (new Exception("input .lzma is too short"));
+                        throw new Exception("input .lzma is too short");
                     long outSize = 0;
                     for (int i = 0; i < 8; i++)
                     {
                         int v = replayInStream.ReadByte();
                         if (v < 0)
-                            throw (new Exception("Can't Read 1"));
-                        outSize |= ((long)(byte)v) << (8 * i);
+                            throw new Exception("Can't Read 1");
+                        outSize |= (long)(byte)v << (8 * i);
                     }
 
                     long compressedSize = replayInStream.Length - replayInStream.Position;

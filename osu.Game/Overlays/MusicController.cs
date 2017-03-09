@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays
     {
         private MusicControllerBackground backgroundSprite;
         private DragBar progress;
-        private TextAwesome playButton, listButton;
+        private TextAwesome playButton;
         private SpriteText title, artist;
 
         private List<BeatmapSetInfo> playList;
@@ -59,6 +60,8 @@ namespace osu.Game.Overlays
 
         protected override bool OnDrag(InputState state)
         {
+            Trace.Assert(state.Mouse.PositionMouseDown != null, "state.Mouse.PositionMouseDown != null");
+
             Vector2 change = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
 
             // Diminish the drag distance as we go further to simulate "rubber band" feeling.
@@ -187,7 +190,7 @@ namespace osu.Game.Overlays
                             Position = new Vector2(20, -30),
                             Children = new Drawable[]
                             {
-                                listButton = new TextAwesome
+                                new TextAwesome
                                 {
                                     TextSize = 15,
                                     Icon = FontAwesome.fa_bars,

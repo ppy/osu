@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Select
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Position = new Vector2(BackButton.SIZE_EXTENDED.X + padding, 0),
+                    Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, 0),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,

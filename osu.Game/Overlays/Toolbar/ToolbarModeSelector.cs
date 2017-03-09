@@ -64,11 +64,8 @@ namespace osu.Game.Overlays.Toolbar
                 }
             };
 
-            int amountButtons = 0;
             foreach (PlayMode m in Enum.GetValues(typeof(PlayMode)))
             {
-                ++amountButtons;
-
                 var localMode = m;
                 modeButtons.Add(new ToolbarModeButton
                 {

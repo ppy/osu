@@ -65,7 +65,7 @@ namespace osu.Game.Modes
         public override string Description => "You can't fail, no matter what.";
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModPerfect) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModAutoplay) };
     }
 
     public abstract class ModEasy : Mod
@@ -100,7 +100,7 @@ namespace osu.Game.Modes
         public override string Description => "Miss a note and fail.";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay), typeof(ModCinema) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
     }
 
     public abstract class ModDoubleTime : Mod
@@ -117,7 +117,7 @@ namespace osu.Game.Modes
         public override string Name => "Relax";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_relax;
         public override double ScoreMultiplier => 0;
-        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModCinema), typeof(ModNoFail), typeof(ModSuddenDeath), typeof(ModPerfect) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModNoFail), typeof(ModSuddenDeath) };
     }
 
     public abstract class ModHalfTime : Mod
@@ -126,7 +126,7 @@ namespace osu.Game.Modes
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_halftime;
         public override string Description => "Less zoom";
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModDoubleTime), typeof(ModNightcore) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModDoubleTime) };
     }
 
     public abstract class ModNightcore : ModDoubleTime
@@ -150,7 +150,7 @@ namespace osu.Game.Modes
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_auto;
         public override string Description => "Watch a perfect automated play through the song";
         public override double ScoreMultiplier => 0;
-        public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModPerfect) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail) };
 
         public override void PlayerLoading(Player player)
         {
