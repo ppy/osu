@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Options
 
         protected abstract string Header { get; }
 
-        public OptionsSubsection()
+        protected OptionsSubsection()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

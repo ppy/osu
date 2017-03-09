@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Options
 
         private SpriteText headerLabel;
 
-        public OptionsSection()
+        protected OptionsSection()
         {
             Margin = new MarginPadding { Top = 20 };
             AutoSizeAxes = Axes.Y;
