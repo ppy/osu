@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Play
                                 {
                                     new Sprite
                                     {
-                                        Texture = beatmap.Background,
+                                        Texture = beatmap?.Background,
                                         Origin = Anchor.Centre,
                                         Anchor = Anchor.Centre,
                                         FillMode = FillMode.Fill,
@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Play
                             },
                             new OsuSpriteText
                             {
-                                Text = beatmap.BeatmapInfo?.Version,
+                                Text = beatmap?.BeatmapInfo?.Version,
                                 TextSize = 26,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,

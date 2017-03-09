@@ -20,7 +20,9 @@ namespace osu.Game.Modes.UI
 
         public override bool Contains(Vector2 screenSpacePos) => true;
 
-        protected override Container<Drawable> Content { get; }
+        protected override Container<Drawable> Content => content;
+
+        private Container<Drawable> content;
 
         /// <summary>
         /// A container for keeping track of DrawableHitObjects.
@@ -34,7 +36,7 @@ namespace osu.Game.Modes.UI
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    Content = new Container
+                    content = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                     }

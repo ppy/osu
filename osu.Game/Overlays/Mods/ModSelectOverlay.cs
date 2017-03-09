@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.Mods
             // 1.05x
             // 1.20x
 
-            multiplierLabel.Text = string.Format("{0:N2}x", multiplier);
+            multiplierLabel.Text = $"{multiplier:N2}x";
             string rankedString = ranked ? "Ranked" : "Unranked";
             rankedLabel.Text = $@"{rankedString}, Score Multiplier: ";
 

@@ -30,11 +30,7 @@ namespace osu.Game.Screens.Backgrounds
 
                 Schedule(() =>
                 {
-                    Background newBackground;
-                    if (beatmap == null)
-                        newBackground = new Background(@"Backgrounds/bg1");
-                    else
-                        newBackground = new BeatmapBackground(beatmap);
+                    var newBackground = beatmap == null ? new Background(@"Backgrounds/bg1") : new BeatmapBackground(beatmap);
 
                     newBackground.LoadAsync(Game, delegate
                     {
