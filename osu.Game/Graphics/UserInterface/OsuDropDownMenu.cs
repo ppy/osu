@@ -11,7 +11,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuDropDownMenu<U> : DropDownMenu<U>
     {
-        protected override BasicDropDownHeader CreateHeader() => new OsuDropDownHeader();
+        protected override DropDownHeader CreateHeader() => new OsuDropDownHeader();
 
         public OsuDropDownMenu()
         {

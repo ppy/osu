@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Select.Tab
         public override float HeaderWidth => 14;
         public override float HeaderHeight => 24;
 
-        protected override BasicDropDownHeader CreateHeader() => new FilterTabDropDownHeader();
+        protected override DropDownHeader CreateHeader() => new FilterTabDropDownHeader();
 
         protected override IEnumerable<DropDownMenuItem<T>> GetDropDownItems(IEnumerable<KeyValuePair<string, T>> values)
             => values.Select(v => new FilterTabDropDownMenuItem<T>(v.Key, v.Value));

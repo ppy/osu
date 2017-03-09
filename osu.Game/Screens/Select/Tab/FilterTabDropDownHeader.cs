@@ -8,16 +8,19 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select.Tab
 {
-    public class FilterTabDropDownHeader : BasicDropDownHeader
+    public class FilterTabDropDownHeader : DropDownHeader
     {
         protected override string Label { get; set; }
 
         private TextAwesome ellipses;
 
-        public FilterTabDropDownHeader()
-        {
+        public FilterTabDropDownHeader() {
+            Background.Hide(); // don't need a background
+            RelativeSizeAxes = Axes.None;
             AutoSizeAxes = Axes.Both;
-            Children = new Drawable[]
+            Foreground.RelativeSizeAxes = Axes.None;
+            Foreground.AutoSizeAxes = Axes.Both;
+            Foreground.Children = new Drawable[]
             {
                 ellipses = new TextAwesome
                 {
