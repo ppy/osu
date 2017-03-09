@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Mods
                 {
                     button.ButtonColour = ButtonColour;
                     button.SelectedColour = selectedColour;
-                    button.Action = this.Action;
+                    button.Action = Action;
                 }
 
                 ButtonsContainer.Children = value;
@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        public ModSection()
+        protected ModSection()
         {
             AutoSizeAxes = Axes.Y;
 
