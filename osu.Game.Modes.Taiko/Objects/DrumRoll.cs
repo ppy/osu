@@ -32,12 +32,12 @@ namespace osu.Game.Modes.Taiko.Objects
         /// <summary>
         /// Number of drum roll ticks required for a "Good" hit.
         /// </summary>
-        public int RequiredGoodHits;
+        public double RequiredGoodHits;
 
         /// <summary>
         /// Number of drum roll ticks required for a "Great" hit.
         /// </summary>
-        public int RequiredGreatHits;
+        public double RequiredGreatHits;
 
         /// <summary>
         /// Total number of drum roll ticks.
@@ -72,8 +72,8 @@ namespace osu.Game.Modes.Taiko.Objects
                 TickTimeDistance /= 4;
 
             TotalTicks = Ticks.Count();
-            RequiredGoodHits = (int)(TotalTicks * Math.Min(0.15, 0.05 + 0.10 / 6 * beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty));
-            RequiredGreatHits = (int)(TotalTicks * Math.Min(0.30, 0.10 + 0.20 / 6 * beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty));
+            RequiredGoodHits = TotalTicks * Math.Min(0.15, 0.05 + 0.10 / 6 * beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            RequiredGreatHits = TotalTicks * Math.Min(0.30, 0.10 + 0.20 / 6 * beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
         }
 
         private void createTicks()
