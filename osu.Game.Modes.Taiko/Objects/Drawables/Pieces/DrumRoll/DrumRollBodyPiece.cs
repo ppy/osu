@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
-using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces.DrumRoll
 {
@@ -32,9 +32,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces.DrumRoll
         private CircularContainer backgroundContainer;
         private Box background;
 
-        public DrumRollBodyPiece(float baseLength)
+        public DrumRollBodyPiece()
         {
-            Size = new Vector2(baseLength + TaikoHitObject.CIRCLE_RADIUS * 2, TaikoHitObject.CIRCLE_RADIUS * 2);
+            RelativeSizeAxes = Axes.X;
 
             Origin = Anchor.Centre;
             Anchor = Anchor.Centre;
@@ -112,6 +112,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces.DrumRoll
                     Type = EdgeEffectType.Glow,
                 };
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Size = new Vector2(1 + TaikoHitObject.CIRCLE_RADIUS / Parent.DrawSize.X * 2, TaikoHitObject.CIRCLE_RADIUS * 2);
         }
     }
 }

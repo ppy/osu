@@ -1,9 +1,9 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps.Timing;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Beatmaps
 {
@@ -28,9 +28,9 @@ namespace osu.Game.Beatmaps
         public double BPMMultiplierAt(double time)
         {
             ControlPoint overridePoint;
-            TimingPointAt(time, out overridePoint);
+            ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
 
-            return overridePoint?.VelocityAdjustment ?? 1;
+            return overridePoint?.VelocityAdjustment ?? timingPoint?.VelocityAdjustment ?? 1;
         }
 
         /// <summary>
@@ -54,9 +54,9 @@ namespace osu.Game.Beatmaps
         public double BeatVelocityAt(double time)
         {
             ControlPoint overridePoint;
-            TimingPointAt(time, out overridePoint);
+            ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
 
-            return overridePoint?.VelocityAdjustment ?? 1;
+            return overridePoint?.VelocityAdjustment ?? timingPoint?.VelocityAdjustment ?? 1;
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps
             ControlPoint overridePoint;
             ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
 
-            return timingPoint.BeatLength * (overridePoint?.VelocityAdjustment ?? 1);
+            return timingPoint.BeatLength * (overridePoint?.VelocityAdjustment ?? timingPoint?.VelocityAdjustment ?? 1);
         }
 
         /// <summary>

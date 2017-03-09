@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -14,8 +16,6 @@ using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables.BarLines;
 using osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls;
 using osu.Game.Modes.UI;
-using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -185,6 +185,7 @@ namespace osu.Game.Modes.Taiko.UI
 
         public override void Add(DrawableHitObject<TaikoHitObject> h)
         {
+            h.Depth = (float)h.HitObject.StartTime;
             h.Scale = new Vector2(PLAYFIELD_SCALE);
 
             h.OnJudgement += onJudgement;

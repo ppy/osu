@@ -14,8 +14,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces.DrumRoll
     {
         public override float CornerRadius => base.CornerRadius * 1.5f;
 
-        public DrumRollFinisherBodyPiece(float baseLength)
-            : base(baseLength)
+        public DrumRollFinisherBodyPiece()
         {
             Size *= new Vector2(1, 1.5f);
         }

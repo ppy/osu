@@ -1,16 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Globalization;
-using System.IO;
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
-using OpenTK;
+using System;
+using System.Globalization;
+using System.IO;
 
 namespace osu.Game.Beatmaps.Formats
 {

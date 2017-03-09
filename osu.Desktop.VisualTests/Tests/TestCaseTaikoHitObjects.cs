@@ -1,21 +1,21 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Screens.Testing;
-using osu.Framework.Graphics;
-using osu.Framework.Timing;
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Configuration;
-using osu.Game.Modes.Objects.Drawables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using OpenTK.Graphics;
+using osu.Framework.Screens.Testing;
+using osu.Framework.Timing;
+using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects;
-using osu.Game.Modes.Taiko.UI;
-using osu.Game.Modes.Taiko.Objects.Drawables.Hits;
-using osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls;
 using osu.Game.Modes.Taiko.Objects.Drawables.Bashes;
+using osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls;
+using osu.Game.Modes.Taiko.Objects.Drawables.Hits;
+using osu.Game.Modes.Taiko.UI;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -98,7 +98,7 @@ namespace osu.Desktop.VisualTests.Tests
                     add(new DrawableDrumRoll(new DrumRoll
                     {
                         StartTime = framedClock.CurrentTime + 600,
-                        Length = 100 * (1000 / 500) - 10,
+                        Length = 1600,
                         Velocity = 1,
                         TickTimeDistance = 50,
                         PreEmpt = 500

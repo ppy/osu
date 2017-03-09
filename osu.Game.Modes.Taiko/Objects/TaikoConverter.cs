@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
+using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
@@ -17,10 +17,15 @@ namespace osu.Game.Modes.Taiko.Objects
 
         public override List<TaikoHitObject> Convert(Beatmap beatmap)
         {
+            bool alreadyPostProcessed = false;
+
             foreach (var c in beatmap.Timing.ControlPoints)
             {
                 if ((c.EffectFlags & EffectFlags.PostProcessed) > 0)
+                {
+                    alreadyPostProcessed = true;
                     continue;
+                }
 
                 c.VelocityAdjustment /= scale_factor;
                 c.EffectFlags |= EffectFlags.PostProcessed;
@@ -30,6 +35,13 @@ namespace osu.Game.Modes.Taiko.Objects
 
             Action<TaikoHitObject> addConverted = h =>
             {
+                if (!alreadyPostProcessed)
+                {
+                    DrumRoll d = h as DrumRoll;
+                    if (d != null)
+                        d.Length *= scale_factor;
+                }
+
                 converted.Add(h);
                 h.SetDefaultsFromBeatmap(beatmap);
             };

@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 
+using OpenTK;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces.DrumRoll;
-using OpenTK;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 {
@@ -20,6 +20,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 
         protected override DrawableDrumRollTick CreateTick(DrumRoll drumRoll, DrumRollTick tick) => new DrawableDrumRollFinisherTick(drumRoll, tick);
 
-        protected override DrumRollBodyPiece CreateBody(float length) => new DrumRollFinisherBodyPiece(length);
+        protected override DrumRollBodyPiece CreateBody() => new DrumRollFinisherBodyPiece();
     }
 }

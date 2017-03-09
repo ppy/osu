@@ -1,12 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Samples;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Samples;
-using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
@@ -64,18 +63,10 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.SetDefaultsFromBeatmap(beatmap);
 
-            var baseDifficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            Velocity = beatmap.SliderVelocityAt(StartTime) / 1000;
+            TickTimeDistance = beatmap.Timing.BeatLengthAt(StartTime) / beatmap.Timing.BeatVelocityAt(StartTime);
 
-            ControlPoint overridePoint;
-            ControlPoint timingPoint = beatmap.Timing.TimingPointAt(StartTime, out overridePoint);
-            var velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
-            var baseVelocity = 100 * baseDifficulty.SliderMultiplier / velocityAdjustment;
-
-            Velocity = baseVelocity / timingPoint.BeatLength;
-
-            TickTimeDistance = timingPoint.BeatLength;
-
-            if (baseDifficulty.SliderTickRate == 3)
+            if (beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate == 3)
                 TickTimeDistance /= 3;
             else
                 TickTimeDistance /= 4;

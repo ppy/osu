@@ -1,15 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Objects.Drawables.Pieces.DrumRoll;
-using OpenTK;
-using OpenTK.Graphics;
+using System.Linq;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 {
@@ -29,26 +29,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 
             Origin = Anchor.CentreLeft;
 
-            Size = new Vector2(1, TaikoHitObject.CIRCLE_RADIUS * 2);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            ExplodeColour = colours.YellowDarker;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Size = new Vector2((float)(HitObject.Duration / drumRoll.PreEmpt) * Parent.DrawSize.X * (1f / Scale.X), Size.Y);
+            RelativeSizeAxes = Axes.X;
 
             Children = new Drawable[]
             {
                 // The body will over-shoot by CircleRadius on both sides. This is intended
                 // as it means the first tick is positioned after the semi-circle.
-                body = CreateBody(Size.X),
+                body = CreateBody(),
                 ticks = new Container<DrawableDrumRollTick>
                 {
                     Anchor = Anchor.Centre,
@@ -56,7 +43,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 
                     RelativeSizeAxes = Axes.Both
                 }
-           };
+            };
 
             body.Kiai = HitObject.Kiai;
 
@@ -73,7 +60,20 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
                 tickIndex++;
             }
         }
-        
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            ExplodeColour = colours.YellowDarker;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Size = new Vector2((float)(HitObject.Duration / drumRoll.PreEmpt) * (1f / Scale.X), TaikoHitObject.CIRCLE_RADIUS * 2);
+        }
+
         /// <summary>
         /// Creates a drawable tick from the base tick.
         /// </summary>
@@ -85,9 +85,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
         /// <summary>
         /// Creates the body piece of the drum roll.
         /// </summary>
-        /// <param name="length">The raw length of the body piece, before CornerRadius.</param>
         /// <returns>The body piece.</returns>
-        protected virtual DrumRollBodyPiece CreateBody(float length) => new DrumRollBodyPiece(length);
+        protected virtual DrumRollBodyPiece CreateBody() => new DrumRollBodyPiece();
 
         protected override void CheckJudgement(bool userTriggered)
         {

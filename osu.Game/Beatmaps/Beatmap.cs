@@ -1,12 +1,12 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using OpenTK.Graphics;
 using osu.Game.Database;
-using osu.Game.Modes.Objects;
 using osu.Game.Modes;
+using osu.Game.Modes.Objects;
 using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Beatmaps
 {
@@ -21,10 +21,10 @@ namespace osu.Game.Beatmaps
         public double CalculateStarDifficulty() => Ruleset.GetRuleset(BeatmapInfo.Mode).CreateDifficultyCalculator(this).Calculate();
 
         /// <summary>
-        /// Finds the slider velocity at a time.
+        /// Finds the slider velocity (in distance units per second) at a time.
         /// </summary>
         /// <param name="time">The time.</param>
-        /// <returns>The slider velocity</returns>
+        /// <returns>The slider velocity.</returns>
         public double SliderVelocityAt(double time)
         {
             double scoringDistance = 100 * BeatmapInfo.BaseDifficulty.SliderMultiplier;
