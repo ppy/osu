@@ -11,6 +11,7 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Play;
+using OpenTK;
 
 namespace osu.Game.Modes.UI
 {
@@ -19,6 +20,13 @@ namespace osu.Game.Modes.UI
         public event Action<JudgementInfo> OnJudgement;
 
         public event Action OnAllJudged;
+
+        internal readonly PlayerInputManager InputManager = new PlayerInputManager();
+
+        /// <summary>
+        /// A function to convert coordinates from gamefield to screen space.
+        /// </summary>
+        public abstract Func<Vector2, Vector2> MapPlayfieldToScreenSpace { get; }
 
         public abstract bool AllObjectsJudged { get; }
 
@@ -35,9 +43,9 @@ namespace osu.Game.Modes.UI
     {
         private List<TObject> objects;
 
-        public PlayerInputManager InputManager;
-
         protected Playfield<TObject> Playfield;
+
+        public override Func<Vector2, Vector2> MapPlayfieldToScreenSpace => Playfield.ScaledContent.ToScreenSpace;
 
         public override bool AllObjectsJudged => Playfield.HitObjects.Children.First()?.Judgement.Result != null; //reverse depth sort means First() instead of Last().
 
@@ -62,16 +70,26 @@ namespace osu.Game.Modes.UI
         protected HitRenderer()
         {
             RelativeSizeAxes = Axes.Both;
+
+            InputManager.Add(content = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new[]
+                {
+                    Playfield = CreatePlayfield(),
+                }
+            });
+
+            AddInternal(InputManager);
         }
+
+        protected override Container<Drawable> Content => content;
+
+        private Container content;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Playfield = CreatePlayfield();
-            Playfield.InputManager = InputManager;
-
-            Add(Playfield);
-
             loadObjects();
         }
 
