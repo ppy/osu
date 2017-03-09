@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Notifications
 
         public virtual bool Read { get; set; }
 
-        public Notification()
+        protected Notification()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
