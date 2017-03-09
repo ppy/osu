@@ -67,7 +67,7 @@ namespace osu.Desktop
                 });
         }
 
-        static readonly string[] allowed_extensions = { @".osz", @".osr" };
+        private static readonly string[] allowed_extensions = { @".osz", @".osr" };
 
         private void dragEnter(DragEventArgs e)
         {
