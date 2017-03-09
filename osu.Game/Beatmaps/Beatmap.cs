@@ -73,6 +73,7 @@ namespace osu.Game.Beatmaps
         }
     }
 
+    [Flags]
     public enum Mods
     {
         None,

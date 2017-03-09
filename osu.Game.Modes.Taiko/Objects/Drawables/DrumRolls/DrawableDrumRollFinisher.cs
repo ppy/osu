@@ -18,7 +18,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.DrumRolls
 
         protected override JudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo { MaxScore = TaikoScoreResult.Great, SecondHit = true };
 
-        protected override DrawableDrumRollTick CreateTick(DrumRoll drumRoll, DrumRollTick tick) => new DrawableDrumRollFinisherTick(drumRoll, tick);
+        protected override DrawableDrumRollTick CreateTick(DrumRoll drumRoll, DrumRollTick tick) => new DrawableDrumRollFinisherTick(tick);
 
         protected override DrumRollBodyPiece CreateBody() => new DrumRollFinisherBodyPiece();
     }
