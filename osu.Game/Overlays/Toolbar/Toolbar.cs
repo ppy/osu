@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Toolbar
                         },
                         modeSelector = new ToolbarModeSelector
                         {
-                            OnPlayModeChange = (PlayMode mode) =>
+                            OnPlayModeChange = mode =>
                             {
                                 OnPlayModeChange?.Invoke(mode);
                             }
