@@ -81,6 +81,9 @@ namespace osu.Game.Screens.Play
 
                 if ((Beatmap?.Beatmap?.HitObjects.Count ?? 0) == 0)
                     throw new Exception("No valid objects were found!");
+
+                if (Beatmap == null)
+                    throw new Exception("Beatmap was not loaded");
             }
             catch (Exception e)
             {

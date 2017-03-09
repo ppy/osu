@@ -19,7 +19,10 @@ namespace osu.Game.IPC
             MessageReceived += msg =>
             {
                 Debug.Assert(beatmaps != null);
-                ImportAsync(msg.Path);
+                ImportAsync(msg.Path).ContinueWith(t =>
+                {
+                    if (t.Exception != null) throw t.Exception;
+                }, TaskContinuationOptions.OnlyOnFaulted);
             };
         }
 
