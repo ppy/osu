@@ -17,8 +17,8 @@ namespace osu.Game.Overlays.Toolbar
             set
             {
                 mode = value;
-                TooltipMain = mode.GetDescription();
-                TooltipSub = $"Play some {mode.GetDescription()}";
+                TooltipMain = Ruleset.GetRuleset(mode).Description;
+                TooltipSub = $"Play some {Ruleset.GetRuleset(mode).Description}";
                 Icon = Ruleset.GetRuleset(mode).Icon;
             }
         }
