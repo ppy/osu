@@ -24,10 +24,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         private SliderBody body;
         private SliderBall ball;
 
-        private SliderBouncer bouncer1, bouncer2;
+        private SliderBouncer bouncer2;
 
         public DrawableSlider(Slider s) : base(s)
         {
+            SliderBouncer bouncer1;
             slider = s;
 
             Children = new Drawable[]
@@ -124,8 +125,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void CheckJudgement(bool userTriggered)
         {
-            var j = Judgement as OsuJudgementInfo;
-            var sc = initialCircle.Judgement as OsuJudgementInfo;
+            var j = (OsuJudgementInfo)Judgement;
+            var sc = (OsuJudgementInfo)initialCircle.Judgement;
 
             if (!userTriggered && Time.Current >= HitObject.EndTime)
             {

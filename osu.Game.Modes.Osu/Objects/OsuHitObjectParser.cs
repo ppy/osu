@@ -34,11 +34,11 @@ namespace osu.Game.Modes.Osu.Objects
                     List<Vector2> points = new List<Vector2> { new Vector2(int.Parse(split[0]), int.Parse(split[1])) };
 
                     string[] pointsplit = split[5].Split('|');
-                    for (int i = 0; i < pointsplit.Length; i++)
+                    foreach (string t in pointsplit)
                     {
-                        if (pointsplit[i].Length == 1)
+                        if (t.Length == 1)
                         {
-                            switch (pointsplit[i])
+                            switch (t)
                             {
                                 case @"C":
                                     curveType = CurveTypes.Catmull;
@@ -56,7 +56,7 @@ namespace osu.Game.Modes.Osu.Objects
                             continue;
                         }
 
-                        string[] temp = pointsplit[i].Split(':');
+                        string[] temp = t.Split(':');
                         Vector2 v = new Vector2(
                             (int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture),
                             (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)

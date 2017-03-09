@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Options.Sections.General
                         PlaceholderText = "Password",
                         RelativeSizeAxes = Axes.X,
                         TabbableContentContainer = this,
-                        OnCommit = (TextBox sender, bool newText) => performLogin()
+                        OnCommit = (sender, newText) => performLogin()
                     },
                     new OsuCheckbox
                     {
