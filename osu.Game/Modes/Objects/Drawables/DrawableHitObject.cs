@@ -74,7 +74,7 @@ namespace osu.Game.Modes.Objects.Drawables
 
         public HitObjectType HitObject;
 
-        public DrawableHitObject(HitObjectType hitObject)
+        protected DrawableHitObject(HitObjectType hitObject)
         {
             HitObject = hitObject;
         }
