@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Modes.Objects;
 using osu.Game.Screens.Play;
 using System;
 using System.Collections.Generic;
@@ -29,23 +28,6 @@ namespace osu.Game.Modes.UI
         protected abstract PercentageCounter CreateAccuracyCounter();
         protected abstract ScoreCounter CreateScoreCounter();
         protected abstract HealthDisplay CreateHealthDisplay();
-
-        public virtual void OnHit(HitObject h)
-        {
-            ComboCounter?.Increment();
-            ScoreCounter?.Increment(300);
-
-            if (AccuracyCounter != null)
-                AccuracyCounter.Current.Value = Math.Min(1, AccuracyCounter.Current + 0.01f);
-        }
-
-        public virtual void OnMiss(HitObject h)
-        {
-            ComboCounter?.Roll();
-
-            if (AccuracyCounter != null)
-                AccuracyCounter.Current.Value = AccuracyCounter.Current - 0.01f;
-        }
 
         protected HudOverlay(Ruleset ruleset)
         {
