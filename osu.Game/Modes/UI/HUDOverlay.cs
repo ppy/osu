@@ -38,7 +38,7 @@ namespace osu.Game.Modes.UI
 
         public virtual void OnMiss(HitObject h)
         {
-            ComboCounter?.Roll();
+            ComboCounter.Current.Value = 0;
             AccuracyCounter?.Set(AccuracyCounter.Count - 0.01f);
         }
 

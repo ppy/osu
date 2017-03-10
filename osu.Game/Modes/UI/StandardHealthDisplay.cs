@@ -55,6 +55,6 @@ namespace osu.Game.Modes.UI
             };
         }
 
-        protected override void SetHP(float value) => fill.ScaleTo(new Vector2(value, 1), 200, EasingTypes.OutQuint);
+        protected override void SetHealth(float value) => fill.ScaleTo(new Vector2(value, 1), 200, EasingTypes.OutQuint);
     }
 }
