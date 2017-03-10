@@ -40,7 +40,7 @@ namespace osu.Desktop.VisualTests.Tests
             };
             Add(score);
 
-            BaseComboCounter comboCounter = new ComboCounter
+            ComboCounter comboCounter = new StandardComboCounter
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,

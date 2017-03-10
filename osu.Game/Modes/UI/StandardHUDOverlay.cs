@@ -26,10 +26,17 @@ namespace osu.Game.Modes.UI
             Margin = new MarginPadding { Right = 5 },
         };
 
-        protected override BaseComboCounter CreateComboCounter() => new ComboCounter
+        protected override ComboCounter CreateComboCounter() => new StandardComboCounter
         {
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
+        };
+
+        protected override HealthDisplay CreateHealthDisplay() => new StandardHealthDisplay
+        {
+            Size = new Vector2(1, 5),
+            RelativeSizeAxes = Axes.X,
+            Margin = new MarginPadding { Top = 20 }
         };
 
         protected override KeyCounterCollection CreateKeyCounter(KeyCounter[] keyCounters) => new KeyCounterCollection
