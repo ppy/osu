@@ -14,11 +14,11 @@ namespace osu.Game.Modes.UI
             MaxValue = 1
         };
 
-        public HealthDisplay()
+        protected HealthDisplay()
         {
-            Current.ValueChanged += (s, e) => setHP((float)Current);
+            Current.ValueChanged += (s, e) => SetHP((float)Current);
         }
 
-        protected abstract void setHP(float value);
+        protected abstract void SetHP(float value);
     }
 }
