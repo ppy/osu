@@ -112,6 +112,8 @@ namespace osu.Game.Modes.Osu
 
         protected override PlayMode PlayMode => PlayMode.Osu;
 
+        public override string Description => "osu!";
+
         public override KeyCounter[] GameplayKeys => new KeyCounter[]
         {
             new KeyCounterKeyboard(Key.Z),
