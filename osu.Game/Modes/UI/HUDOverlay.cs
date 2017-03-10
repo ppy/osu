@@ -1,24 +1,24 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using OpenTK;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Modes.Objects;
-using OpenTK;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Screens.Play;
-using osu.Framework.Allocation;
-using osu.Game.Configuration;
-using osu.Framework.Configuration;
+using System;
 
 namespace osu.Game.Modes.UI
 {
-    public abstract class ScoreOverlay : Container
+    internal abstract class HUDOverlay : Container
     {
         public KeyCounterCollection KeyCounter;
-        public ComboCounter ComboCounter;
+        public BaseComboCounter ComboCounter;
         public ScoreCounter ScoreCounter;
         public PercentageCounter AccuracyCounter;
         public HealthDisplay HealthDisplay;
@@ -26,8 +26,8 @@ namespace osu.Game.Modes.UI
 
         private Bindable<bool> showKeyCounter;
 
-        protected abstract KeyCounterCollection CreateKeyCounter();
-        protected abstract ComboCounter CreateComboCounter();
+        protected abstract KeyCounterCollection CreateKeyCounter(KeyCounter[] keyCounters);
+        protected abstract BaseComboCounter CreateComboCounter();
         protected abstract PercentageCounter CreateAccuracyCounter();
         protected abstract ScoreCounter CreateScoreCounter();
         protected virtual HealthDisplay CreateHealthDisplay() => new HealthDisplay
@@ -50,12 +50,13 @@ namespace osu.Game.Modes.UI
             AccuracyCounter?.Set(AccuracyCounter.Count - 0.01f);
         }
 
-        protected ScoreOverlay()
+        protected HUDOverlay(Ruleset ruleset)
         {
             RelativeSizeAxes = Axes.Both;
 
-            Children = new Drawable[] {
-                KeyCounter = CreateKeyCounter(),
+            Children = new Drawable[]
+            {
+                KeyCounter = CreateKeyCounter(ruleset.GameplayKeys),
                 ComboCounter = CreateComboCounter(),
                 ScoreCounter = CreateScoreCounter(),
                 AccuracyCounter = CreateAccuracyCounter(),
