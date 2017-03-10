@@ -44,7 +44,7 @@ namespace osu.Game.Modes.UI
         }
 
         [BackgroundDependencyLoader]
-        private void laod(OsuColour colours)
+        private void load(OsuColour colours)
         {
             fill.Colour = colours.BlueLighter;
             fill.EdgeEffect = new EdgeEffect
