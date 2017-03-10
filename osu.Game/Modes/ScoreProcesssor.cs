@@ -25,7 +25,7 @@ namespace osu.Game.Modes
 
         public readonly BindableDouble Health = new BindableDouble { MinValue = 0, MaxValue = 1 };
 
-        public readonly BindableLong Combo = new BindableLong();
+        public readonly BindableInt Combo = new BindableInt();
 
         /// <summary>
         /// Are we allowed to fail?
@@ -43,7 +43,7 @@ namespace osu.Game.Modes
         /// Keeps track of the highest combo ever achieved in this play.
         /// This is handled automatically by ScoreProcessor.
         /// </summary>
-        public readonly BindableLong HighestCombo = new BindableLong();
+        public readonly BindableInt HighestCombo = new BindableInt();
 
         public readonly List<JudgementInfo> Judgements;
 
