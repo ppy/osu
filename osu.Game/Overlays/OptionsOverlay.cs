@@ -117,8 +117,8 @@ namespace osu.Game.Overlays
                                         },
                                     },
                                     SearchableContent = sections,
-                                    OnMatch = (drawable) => drawable.FadeIn(250),
-                                    OnMismatch = (drawable) => drawable.FadeOut(250),
+                                    OnMatch = drawable => drawable.FadeIn(250),
+                                    OnMismatch = drawable => drawable.FadeOut(250),
                                     RematchDelay = 300,
                                 },
                                 new OptionsFooter()
