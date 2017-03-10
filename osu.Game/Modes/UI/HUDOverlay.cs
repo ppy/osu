@@ -10,6 +10,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Modes.Objects;
 using osu.Game.Screens.Play;
 using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Modes.UI
 {
@@ -23,7 +24,7 @@ namespace osu.Game.Modes.UI
 
         private Bindable<bool> showKeyCounter;
 
-        protected abstract KeyCounterCollection CreateKeyCounter(KeyCounter[] keyCounters);
+        protected abstract KeyCounterCollection CreateKeyCounter(IEnumerable<KeyCounter> keyCounters);
         protected abstract ComboCounter CreateComboCounter();
         protected abstract PercentageCounter CreateAccuracyCounter();
         protected abstract ScoreCounter CreateScoreCounter();
@@ -48,7 +49,7 @@ namespace osu.Game.Modes.UI
 
             Children = new Drawable[]
             {
-                KeyCounter = CreateKeyCounter(ruleset.GameplayKeys),
+                KeyCounter = CreateKeyCounter(ruleset.CreateGameplayKeys),
                 ComboCounter = CreateComboCounter(),
                 ScoreCounter = CreateScoreCounter(),
                 AccuracyCounter = CreateAccuracyCounter(),

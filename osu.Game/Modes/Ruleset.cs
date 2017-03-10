@@ -21,7 +21,7 @@ namespace osu.Game.Modes
 
     public abstract class Ruleset
     {
-        public abstract KeyCounter[] GameplayKeys { get; }
+        public abstract KeyCounter[] CreateGameplayKeys { get; }
 
         private static ConcurrentDictionary<PlayMode, Type> availableRulesets = new ConcurrentDictionary<PlayMode, Type>();
 
