@@ -82,16 +82,13 @@ namespace osu.Game.Modes.Taiko
 
         public override FontAwesome Icon => FontAwesome.fa_osu_taiko_o;
 
-        public override IEnumerable<KeyCounter> CreateGameplayKeys()
+        public override IEnumerable<KeyCounter> CreateGameplayKeys() => new KeyCounter[]
         {
-            return new KeyCounter[]
-            {
-                new KeyCounterKeyboard(Key.D),
-                new KeyCounterKeyboard(Key.F),
-                new KeyCounterKeyboard(Key.J),
-                new KeyCounterKeyboard(Key.K)
-            };
-        }
+            new KeyCounterKeyboard(Key.D),
+            new KeyCounterKeyboard(Key.F),
+            new KeyCounterKeyboard(Key.J),
+            new KeyCounterKeyboard(Key.K)
+        };
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
 
