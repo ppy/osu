@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -13,10 +14,12 @@ namespace osu.Game.Modes.UI
 {
     public abstract class ComboCounter : Container
     {
-        public bool IsRolling
+        public BindableLong Current = new BindableLong
         {
-            get; protected set;
-        }
+            MinValue = 0,
+        };
+
+        public bool IsRolling { get; protected set; }
 
         protected SpriteText PopOutCount;
 
@@ -37,60 +40,9 @@ namespace osu.Game.Modes.UI
         /// </summary>
         protected EasingTypes RollingEasing => EasingTypes.None;
 
-        private ulong displayedCount;
-
-        /// <summary>
-        /// Value shown at the current moment.
-        /// </summary>
-        public virtual ulong DisplayedCount
-        {
-            get
-            {
-                return displayedCount;
-            }
-            protected set
-            {
-                if (displayedCount.Equals(value))
-                    return;
-                updateDisplayedCount(displayedCount, value, IsRolling);
-            }
-        }
-
-        private ulong count;
-
-        /// <summary>
-        /// Actual value of counter.
-        /// </summary>
-        public virtual ulong Count
-        {
-            get
-            {
-                return count;
-            }
-            set
-            {
-                updateCount(value);
-            }
-        }
-
-        public void Increment(ulong amount = 1)
-        {
-            Count = Count + amount;
-        }
-
         protected SpriteText DisplayedCountSpriteText;
 
-        private float textSize;
-        public float TextSize
-        {
-            get { return textSize; }
-            set
-            {
-                textSize = value;
-                DisplayedCountSpriteText.TextSize = TextSize;
-                PopOutCount.TextSize = TextSize;
-            }
-        }
+        private long previousValue;
 
         /// <summary>
         /// Base of all combo counters.
@@ -113,17 +65,63 @@ namespace osu.Game.Modes.UI
             };
 
             TextSize = 80;
+
+            Current.ValueChanged += comboChanged;
+        }
+
+        private void comboChanged(object sender, System.EventArgs e)
+        {
+            if (Current.Value == 0)
+                Roll();
+            else
+                updateCount(Current);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            DisplayedCountSpriteText.Text = FormatCount(Count);
+            DisplayedCountSpriteText.Text = FormatCount(Current);
             DisplayedCountSpriteText.Anchor = Anchor;
             DisplayedCountSpriteText.Origin = Origin;
 
             StopRolling();
+        }
+
+        private long displayedCount;
+        /// <summary>
+        /// Value shown at the current moment.
+        /// </summary>
+        public virtual long DisplayedCount
+        {
+            get { return displayedCount; }
+            protected set
+            {
+                if (displayedCount.Equals(value))
+                    return;
+                updateDisplayedCount(displayedCount, value, IsRolling);
+            }
+        }
+
+        private float textSize;
+        public float TextSize
+        {
+            get { return textSize; }
+            set
+            {
+                textSize = value;
+                DisplayedCountSpriteText.TextSize = TextSize;
+                PopOutCount.TextSize = TextSize;
+            }
+        }
+
+        /// <summary>
+        /// Increments the combo by an amount.
+        /// </summary>
+        /// <param name="amount"></param>
+        public void Increment(long amount = 1)
+        {
+            Current.Value = Current + amount;
         }
 
         /// <summary>
@@ -131,14 +129,14 @@ namespace osu.Game.Modes.UI
         /// </summary>
         public void StopRolling()
         {
-            updateCount(Count);
+            updateCount(Current);
         }
 
         /// <summary>
         /// Animates roll-up/roll-back to an specific value.
         /// </summary>
         /// <param name="newValue">Target value.</param>
-        public virtual void Roll(ulong newValue = 0)
+        public virtual void Roll(long newValue = 0)
         {
             updateCount(newValue, true);
         }
@@ -151,37 +149,33 @@ namespace osu.Game.Modes.UI
             updateCount(0);
         }
 
-        protected virtual string FormatCount(ulong count)
+        protected virtual string FormatCount(long count)
         {
             return count.ToString();
         }
 
-        protected abstract void OnDisplayedCountRolling(ulong currentValue, ulong newValue);
-        protected abstract void OnDisplayedCountIncrement(ulong newValue);
-        protected abstract void OnDisplayedCountChange(ulong newValue);
-
-        protected virtual void OnCountRolling(ulong currentValue, ulong newValue)
+        protected virtual void OnCountRolling(long currentValue, long newValue)
         {
             transformRoll(new TransformComboRoll(), currentValue, newValue);
         }
 
-        protected virtual void OnCountIncrement(ulong currentValue, ulong newValue)
+        protected virtual void OnCountIncrement(long currentValue, long newValue)
         {
             DisplayedCount = newValue;
         }
 
-        protected virtual void OnCountChange(ulong currentValue, ulong newValue)
+        protected virtual void OnCountChange(long currentValue, long newValue)
         {
             DisplayedCount = newValue;
         }
 
-        private double getProportionalDuration(ulong currentValue, ulong newValue)
+        private double getProportionalDuration(long currentValue, long newValue)
         {
             double difference = currentValue > newValue ? currentValue - newValue : newValue - currentValue;
             return difference * RollingDuration;
         }
 
-        private void updateDisplayedCount(ulong currentValue, ulong newValue, bool rolling)
+        private void updateDisplayedCount(long currentValue, long newValue, bool rolling)
         {
             displayedCount = newValue;
             if (rolling)
@@ -192,10 +186,10 @@ namespace osu.Game.Modes.UI
                 OnDisplayedCountChange(newValue);
         }
 
-        private void updateCount(ulong value, bool rolling = false)
+        private void updateCount(long value, bool rolling = false)
         {
-            ulong prevCount = count;
-            count = value;
+            long prev = previousValue;
+            previousValue = Current.Value;
 
             if (!IsLoaded)
                 return;
@@ -204,27 +198,27 @@ namespace osu.Game.Modes.UI
             {
                 Flush(false, typeof(TransformComboRoll));
                 IsRolling = false;
-                DisplayedCount = prevCount;
+                DisplayedCount = prev;
 
-                if (prevCount + 1 == count)
-                    OnCountIncrement(prevCount, count);
+                if (prev + 1 == Current)
+                    OnCountIncrement(prev, Current);
                 else
-                    OnCountChange(prevCount, count);
+                    OnCountChange(prev, Current);
             }
             else
             {
-                OnCountRolling(displayedCount, count);
+                OnCountRolling(displayedCount, Current);
                 IsRolling = true;
             }
         }
 
-        private void transformRoll(TransformComboRoll transform, ulong currentValue, ulong newValue)
+        private void transformRoll(TransformComboRoll transform, long currentValue, long newValue)
         {
             Flush(false, typeof(TransformComboRoll));
 
             if (RollingDuration < 1)
             {
-                DisplayedCount = Count;
+                DisplayedCount = Current;
                 return;
             }
 
@@ -237,9 +231,9 @@ namespace osu.Game.Modes.UI
             Transforms.Add(transform);
         }
 
-        protected class TransformComboRoll : Transform<ulong>
+        protected class TransformComboRoll : Transform<long>
         {
-            protected override ulong CurrentValue
+            protected override long CurrentValue
             {
                 get
                 {
@@ -247,7 +241,7 @@ namespace osu.Game.Modes.UI
                     if (time < StartTime) return StartValue;
                     if (time >= EndTime) return EndValue;
 
-                    return (ulong)Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+                    return (long)Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
                 }
             }
 
@@ -258,12 +252,8 @@ namespace osu.Game.Modes.UI
             }
         }
 
-        public void Set(ulong value)
-        {
-            if (value == 0)
-                Roll();
-            else
-                Count = value;
-        }
+        protected abstract void OnDisplayedCountRolling(long currentValue, long newValue);
+        protected abstract void OnDisplayedCountIncrement(long newValue);
+        protected abstract void OnDisplayedCountChange(long newValue);
     }
 }
