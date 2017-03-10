@@ -1,15 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Modes.UI;
 using OpenTK;
 
-namespace osu.Game.Modes.Osu.UI
+namespace osu.Game.Modes.UI
 {
     /// <summary>
-    /// Uses the 'x' symbol and has a pop-out effect while rolling over. Used in osu! standard.
+    /// Uses the 'x' symbol and has a pop-out effect while rolling over.
     /// </summary>
-    public class OsuComboCounter : ComboCounter
+    public class StandardComboCounter : ComboCounter
     {
         protected uint ScheduledPopOutCurrentId;
 
@@ -26,12 +25,12 @@ namespace osu.Game.Modes.Osu.UI
             PopOutCount.Anchor = Anchor;
         }
 
-        protected override string FormatCount(ulong count)
+        protected override string FormatCount(int count)
         {
             return $@"{count}x";
         }
 
-        protected virtual void TransformPopOut(ulong newValue)
+        protected virtual void TransformPopOut(int newValue)
         {
             PopOutCount.Text = FormatCount(newValue);
 
@@ -44,19 +43,19 @@ namespace osu.Game.Modes.Osu.UI
             PopOutCount.MoveTo(DisplayedCountSpriteText.Position, PopOutDuration, PopOutEasing);
         }
 
-        protected virtual void TransformPopOutRolling(ulong newValue)
+        protected virtual void TransformPopOutRolling(int newValue)
         {
             TransformPopOut(newValue);
             TransformPopOutSmall(newValue);
         }
 
-        protected virtual void TransformNoPopOut(ulong newValue)
+        protected virtual void TransformNoPopOut(int newValue)
         {
             DisplayedCountSpriteText.Text = FormatCount(newValue);
             DisplayedCountSpriteText.ScaleTo(1);
         }
 
-        protected virtual void TransformPopOutSmall(ulong newValue)
+        protected virtual void TransformPopOutSmall(int newValue)
         {
             DisplayedCountSpriteText.Text = FormatCount(newValue);
             DisplayedCountSpriteText.ScaleTo(PopOutSmallScale);
@@ -72,7 +71,7 @@ namespace osu.Game.Modes.Osu.UI
             DisplayedCount++;
         }
 
-        protected override void OnCountRolling(ulong currentValue, ulong newValue)
+        protected override void OnCountRolling(int currentValue, int newValue)
         {
             ScheduledPopOutCurrentId++;
 
@@ -83,7 +82,7 @@ namespace osu.Game.Modes.Osu.UI
             base.OnCountRolling(currentValue, newValue);
         }
 
-        protected override void OnCountIncrement(ulong currentValue, ulong newValue)
+        protected override void OnCountIncrement(int currentValue, int newValue)
         {
             ScheduledPopOutCurrentId++;
 
@@ -93,7 +92,7 @@ namespace osu.Game.Modes.Osu.UI
             DisplayedCountSpriteText.Show();
 
             TransformPopOut(newValue);
-            
+
             uint newTaskId = ScheduledPopOutCurrentId;
             Scheduler.AddDelayed(delegate
             {
@@ -101,7 +100,7 @@ namespace osu.Game.Modes.Osu.UI
             }, PopOutDuration);
         }
 
-        protected override void OnCountChange(ulong currentValue, ulong newValue)
+        protected override void OnCountChange(int currentValue, int newValue)
         {
             ScheduledPopOutCurrentId++;
 
@@ -111,7 +110,7 @@ namespace osu.Game.Modes.Osu.UI
             base.OnCountChange(currentValue, newValue);
         }
 
-        protected override void OnDisplayedCountRolling(ulong currentValue, ulong newValue)
+        protected override void OnDisplayedCountRolling(int currentValue, int newValue)
         {
             if (newValue == 0)
                 DisplayedCountSpriteText.FadeOut(FadeOutDuration);
@@ -124,14 +123,14 @@ namespace osu.Game.Modes.Osu.UI
                 TransformNoPopOut(newValue);
         }
 
-        protected override void OnDisplayedCountChange(ulong newValue)
+        protected override void OnDisplayedCountChange(int newValue)
         {
             DisplayedCountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
 
             TransformNoPopOut(newValue);
         }
 
-        protected override void OnDisplayedCountIncrement(ulong newValue)
+        protected override void OnDisplayedCountIncrement(int newValue)
         {
             DisplayedCountSpriteText.Show();
 

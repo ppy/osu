@@ -1,20 +1,18 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Modes.Mania.UI;
 using osu.Game.Modes.Objects;
-using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
-using osu.Game.Beatmaps;
+using osu.Game.Screens.Play;
+using System.Collections.Generic;
 
 namespace osu.Game.Modes.Mania
 {
     public class ManiaRuleset : Ruleset
     {
-        public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
-
         public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new ManiaHitRenderer
         {
             Beatmap = beatmap,
@@ -103,6 +101,8 @@ namespace osu.Game.Modes.Mania
         public override string Description => "osu!mania";
 
         public override FontAwesome Icon => FontAwesome.fa_osu_mania_o;
+
+        public override IEnumerable<KeyCounter> CreateGameplayKeys() => new KeyCounter[] { /* Todo: Should be keymod specific */ };
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
 
