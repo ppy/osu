@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play
         private Bindable<int> dimLevel;
         private SkipButton skipButton;
 
-        private HUDOverlay hudOverlay;
+        private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
 
         [BackgroundDependencyLoader]
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Play
 
             ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
 
-            hudOverlay = new StandardHUDOverlay(ruleset);
+            hudOverlay = new StandardHudOverlay(ruleset);
             hudOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
 
             pauseOverlay = new PauseOverlay

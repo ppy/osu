@@ -14,7 +14,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Modes.UI
 {
-    class StandardHealthDisplay : HealthDisplay
+    internal class StandardHealthDisplay : HealthDisplay
     {
         private Container fill;
 
@@ -55,6 +55,6 @@ namespace osu.Game.Modes.UI
             };
         }
 
-        protected override void setHP(float value) => fill.ScaleTo(new Vector2(value, 1), 200, EasingTypes.OutQuint);
+        protected override void SetHP(float value) => fill.ScaleTo(new Vector2(value, 1), 200, EasingTypes.OutQuint);
     }
 }

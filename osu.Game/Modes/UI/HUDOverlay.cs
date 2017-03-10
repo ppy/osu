@@ -13,7 +13,7 @@ using System;
 
 namespace osu.Game.Modes.UI
 {
-    internal abstract class HUDOverlay : Container
+    internal abstract class HudOverlay : Container
     {
         public readonly KeyCounterCollection KeyCounter;
         public readonly ComboCounter ComboCounter;
@@ -42,7 +42,7 @@ namespace osu.Game.Modes.UI
             AccuracyCounter?.Set(AccuracyCounter.Count - 0.01f);
         }
 
-        protected HUDOverlay(Ruleset ruleset)
+        protected HudOverlay(Ruleset ruleset)
         {
             RelativeSizeAxes = Axes.Both;
 

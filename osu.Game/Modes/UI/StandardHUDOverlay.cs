@@ -10,9 +10,9 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.UI
 {
-    internal class StandardHUDOverlay : HUDOverlay
+    internal class StandardHudOverlay : HudOverlay
     {
-        public StandardHUDOverlay(Ruleset ruleset)
+        public StandardHudOverlay(Ruleset ruleset)
             : base(ruleset)
         {
         }
