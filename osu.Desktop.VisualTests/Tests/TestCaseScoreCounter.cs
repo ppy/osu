@@ -2,19 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Modes.Catch.UI;
-using osu.Game.Modes.Mania.UI;
 using osu.Game.Modes.Osu.UI;
-using osu.Game.Modes.Taiko.UI;
 using osu.Game.Modes.UI;
-using System;
 
 namespace osu.Desktop.VisualTests.Tests
 {
