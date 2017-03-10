@@ -79,7 +79,7 @@ namespace osu.Game.Modes.UI
                 KeyCounter.Hide();
         }
 
-        public void BindProcessor(ScoreProcessor processor)
+        public virtual void BindProcessor(ScoreProcessor processor)
         {
             //bind processor bindables to combocounter, score display etc.
             //TODO: these should be bindable binds, not events!

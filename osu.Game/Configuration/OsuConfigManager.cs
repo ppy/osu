@@ -35,6 +35,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.MenuParallax, true);
 
             Set(OsuConfig.KeyOverlay, false);
+            Set(OsuConfig.ComboFire, false);
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
@@ -55,7 +56,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.ChatRemoveForeign, false).Disabled = true;
             //Set(OsuConfig.ChatSortMode, UserSortMode.Rank).Disabled = true;
             Set(OsuConfig.ComboBurst, true).Disabled = true;
-            Set(OsuConfig.ComboFire, false).Disabled = true;
             Set(OsuConfig.ComboFireHeight, 3).Disabled = true;
             Set(OsuConfig.ConfirmExit, false).Disabled = true;
             Set(OsuConfig.AutoSendNowPlaying, true).Disabled = true;
