@@ -80,7 +80,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddButton(@"Hit! :D", delegate
             {
-                score.Current.Value += 300 + (ulong)(300.0 * (comboCounter.Count > 0 ? comboCounter.Count - 1 : 0) / 25.0);
+                score.Current.Value += 300 + (ulong)(300.0 * (comboCounter.Current > 0 ? comboCounter.Current - 1 : 0) / 25.0);
                 comboCounter.Increment();
                 numerator++; denominator++;
                 accuracyCounter.SetFraction(numerator, denominator);
