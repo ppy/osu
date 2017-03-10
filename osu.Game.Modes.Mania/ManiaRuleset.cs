@@ -102,7 +102,10 @@ namespace osu.Game.Modes.Mania
 
         public override FontAwesome Icon => FontAwesome.fa_osu_mania_o;
 
-        public override KeyCounter[] CreateGameplayKeys => new KeyCounter[] { /* Todo: Should be keymod specific */ };
+        public override IEnumerable<KeyCounter> CreateGameplayKeys()
+        {
+            return new KeyCounter[] { /* Todo: Should be keymod specific */ };
+        }
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
 

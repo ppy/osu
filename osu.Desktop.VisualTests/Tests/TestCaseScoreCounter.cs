@@ -38,7 +38,6 @@ namespace osu.Desktop.VisualTests.Tests
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 Margin = new MarginPadding(10),
-                Count = 0,
                 TextSize = 40,
             };
             Add(comboCounter);
@@ -72,7 +71,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton(@"Reset all", delegate
             {
                 score.Current.Value = 0;
-                comboCounter.Count = 0;
+                comboCounter.Current.Value = 0;
                 numerator = denominator = 0;
                 accuracyCounter.SetFraction(0, 0);
                 stars.Count = 0;
@@ -82,14 +81,14 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton(@"Hit! :D", delegate
             {
                 score.Current.Value += 300 + (ulong)(300.0 * (comboCounter.Count > 0 ? comboCounter.Count - 1 : 0) / 25.0);
-                comboCounter.Count++;
+                comboCounter.Increment();
                 numerator++; denominator++;
                 accuracyCounter.SetFraction(numerator, denominator);
             });
 
             AddButton(@"miss...", delegate
             {
-                comboCounter.Roll();
+                comboCounter.Current.Value = 0;
                 denominator++;
                 accuracyCounter.SetFraction(numerator, denominator);
             });

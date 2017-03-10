@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Modes.UI
 {
-    internal abstract class HealthDisplay : Container
+    public abstract class HealthDisplay : Container
     {
         public readonly BindableDouble Current = new BindableDouble
         {
@@ -16,9 +16,9 @@ namespace osu.Game.Modes.UI
 
         protected HealthDisplay()
         {
-            Current.ValueChanged += (s, e) => SetHP((float)Current);
+            Current.ValueChanged += (s, e) => SetHealth((float)Current);
         }
 
-        protected abstract void SetHP(float value);
+        protected abstract void SetHealth(float value);
     }
 }

@@ -14,7 +14,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Modes.UI
 {
-    internal class StandardHealthDisplay : HealthDisplay
+    public class StandardHealthDisplay : HealthDisplay
     {
         private Container fill;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Modes.UI
         }
 
         [BackgroundDependencyLoader]
-        private void laod(OsuColour colours)
+        private void load(OsuColour colours)
         {
             fill.Colour = colours.BlueLighter;
             fill.EdgeEffect = new EdgeEffect
@@ -55,6 +55,6 @@ namespace osu.Game.Modes.UI
             };
         }
 
-        protected override void SetHP(float value) => fill.ScaleTo(new Vector2(value, 1), 200, EasingTypes.OutQuint);
+        protected override void SetHealth(float value) => fill.ScaleTo(new Vector2(value, 1), 200, EasingTypes.OutQuint);
     }
 }

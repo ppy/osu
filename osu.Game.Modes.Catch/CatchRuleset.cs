@@ -82,13 +82,15 @@ namespace osu.Game.Modes.Catch
 
         public override FontAwesome Icon => FontAwesome.fa_osu_fruits_o;
 
-
-        public override KeyCounter[] CreateGameplayKeys => new KeyCounter[]
+        public override IEnumerable<KeyCounter> CreateGameplayKeys()
         {
-            new KeyCounterKeyboard(Key.ShiftLeft),
-            new KeyCounterMouse(MouseButton.Left),
-            new KeyCounterMouse(MouseButton.Right)
-        };
+            return new KeyCounter[]
+            {
+                new KeyCounterKeyboard(Key.ShiftLeft),
+                new KeyCounterMouse(MouseButton.Left),
+                new KeyCounterMouse(MouseButton.Right)
+            };
+        }
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
 
