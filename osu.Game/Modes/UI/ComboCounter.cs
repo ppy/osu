@@ -1,267 +1,140 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.MathUtils;
-using osu.Game.Graphics.Sprites;
+using OpenTK;
 
 namespace osu.Game.Modes.UI
 {
-    public abstract class ComboCounter : Container
+    /// <summary>
+    /// Uses the 'x' symbol and has a pop-out effect while rolling over.
+    /// </summary>
+    public class ComboCounter : BaseComboCounter
     {
-        public bool IsRolling
-        {
-            get; protected set;
-        }
+        protected uint ScheduledPopOutCurrentId;
 
-        protected SpriteText PopOutCount;
+        protected virtual float PopOutSmallScale => 1.1f;
+        protected virtual bool CanPopOutWhileRolling => false;
 
-        protected virtual double PopOutDuration => 150;
-        protected virtual float PopOutScale => 2.0f;
-        protected virtual EasingTypes PopOutEasing => EasingTypes.None;
-        protected virtual float PopOutInitialAlpha => 0.75f;
-
-        protected virtual double FadeOutDuration => 100;
-
-        /// <summary>
-        /// Duration in milliseconds for the counter roll-up animation for each element.
-        /// </summary>
-        protected virtual double RollingDuration => 20;
-
-        /// <summary>
-        /// Easing for the counter rollover animation.
-        /// </summary>
-        protected EasingTypes RollingEasing => EasingTypes.None;
-
-        private ulong displayedCount;
-
-        /// <summary>
-        /// Value shown at the current moment.
-        /// </summary>
-        public virtual ulong DisplayedCount
-        {
-            get
-            {
-                return displayedCount;
-            }
-            protected set
-            {
-                if (displayedCount.Equals(value))
-                    return;
-                updateDisplayedCount(displayedCount, value, IsRolling);
-            }
-        }
-
-        private ulong count;
-
-        /// <summary>
-        /// Actual value of counter.
-        /// </summary>
-        public virtual ulong Count
-        {
-            get
-            {
-                return count;
-            }
-            set
-            {
-                updateCount(value);
-            }
-        }
-
-        public void Increment(ulong amount = 1)
-        {
-            Count = Count + amount;
-        }
-
-        protected SpriteText DisplayedCountSpriteText;
-
-        private float textSize;
-        public float TextSize
-        {
-            get { return textSize; }
-            set
-            {
-                textSize = value;
-                DisplayedCountSpriteText.TextSize = TextSize;
-                PopOutCount.TextSize = TextSize;
-            }
-        }
-
-        /// <summary>
-        /// Base of all combo counters.
-        /// </summary>
-        protected ComboCounter()
-        {
-            AutoSizeAxes = Axes.Both;
-
-            Children = new Drawable[]
-            {
-                DisplayedCountSpriteText = new OsuSpriteText
-                {
-                    Alpha = 0,
-                },
-                PopOutCount = new OsuSpriteText
-                {
-                    Alpha = 0,
-                    Margin = new MarginPadding(0.05f),
-                }
-            };
-
-            TextSize = 80;
-        }
+        public new Vector2 PopOutScale = new Vector2(1.6f);
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            DisplayedCountSpriteText.Text = FormatCount(Count);
-            DisplayedCountSpriteText.Anchor = Anchor;
-            DisplayedCountSpriteText.Origin = Origin;
-
-            StopRolling();
+            PopOutCount.Origin = Origin;
+            PopOutCount.Anchor = Anchor;
         }
 
-        /// <summary>
-        /// Stops rollover animation, forcing the displayed count to be the actual count.
-        /// </summary>
-        public void StopRolling()
+        protected override string FormatCount(ulong count)
         {
-            updateCount(Count);
+            return $@"{count}x";
         }
 
-        /// <summary>
-        /// Animates roll-up/roll-back to an specific value.
-        /// </summary>
-        /// <param name="newValue">Target value.</param>
-        public virtual void Roll(ulong newValue = 0)
+        protected virtual void TransformPopOut(ulong newValue)
         {
-            updateCount(newValue, true);
+            PopOutCount.Text = FormatCount(newValue);
+
+            PopOutCount.ScaleTo(PopOutScale);
+            PopOutCount.FadeTo(PopOutInitialAlpha);
+            PopOutCount.MoveTo(Vector2.Zero);
+
+            PopOutCount.ScaleTo(1, PopOutDuration, PopOutEasing);
+            PopOutCount.FadeOut(PopOutDuration, PopOutEasing);
+            PopOutCount.MoveTo(DisplayedCountSpriteText.Position, PopOutDuration, PopOutEasing);
         }
 
-        /// <summary>
-        /// Resets count to default value.
-        /// </summary>
-        public virtual void ResetCount()
+        protected virtual void TransformPopOutRolling(ulong newValue)
         {
-            updateCount(0);
+            TransformPopOut(newValue);
+            TransformPopOutSmall(newValue);
         }
 
-        protected virtual string FormatCount(ulong count)
+        protected virtual void TransformNoPopOut(ulong newValue)
         {
-            return count.ToString();
+            DisplayedCountSpriteText.Text = FormatCount(newValue);
+            DisplayedCountSpriteText.ScaleTo(1);
         }
 
-        protected abstract void OnDisplayedCountRolling(ulong currentValue, ulong newValue);
-        protected abstract void OnDisplayedCountIncrement(ulong newValue);
-        protected abstract void OnDisplayedCountChange(ulong newValue);
-
-        protected virtual void OnCountRolling(ulong currentValue, ulong newValue)
+        protected virtual void TransformPopOutSmall(ulong newValue)
         {
-            transformRoll(new TransformComboRoll(), currentValue, newValue);
+            DisplayedCountSpriteText.Text = FormatCount(newValue);
+            DisplayedCountSpriteText.ScaleTo(PopOutSmallScale);
+            DisplayedCountSpriteText.ScaleTo(1, PopOutDuration, PopOutEasing);
         }
 
-        protected virtual void OnCountIncrement(ulong currentValue, ulong newValue) {
-            DisplayedCount = newValue;
-        }
-
-        protected virtual void OnCountChange(ulong currentValue, ulong newValue) {
-            DisplayedCount = newValue;
-        }
-
-        private double getProportionalDuration(ulong currentValue, ulong newValue)
+        protected virtual void ScheduledPopOutSmall(uint id)
         {
-            double difference = currentValue > newValue ? currentValue - newValue : newValue - currentValue;
-            return difference * RollingDuration;
-        }
-
-        private void updateDisplayedCount(ulong currentValue, ulong newValue, bool rolling)
-        {
-            displayedCount = newValue;
-            if (rolling)
-                OnDisplayedCountRolling(currentValue, newValue);
-            else if (currentValue + 1 == newValue)
-                OnDisplayedCountIncrement(newValue);
-            else
-                OnDisplayedCountChange(newValue);
-        }
-
-        private void updateCount(ulong value, bool rolling = false)
-        {
-            ulong prevCount = count;
-            count = value;
-
-            if (!IsLoaded)
+            // Too late; scheduled task invalidated
+            if (id != ScheduledPopOutCurrentId)
                 return;
 
-            if (!rolling)
-            {
-                Flush(false, typeof(TransformComboRoll));
-                IsRolling = false;
-                DisplayedCount = prevCount;
+            DisplayedCount++;
+        }
 
-                if (prevCount + 1 == count)
-                    OnCountIncrement(prevCount, count);
-                else
-                    OnCountChange(prevCount, count);
-            }
+        protected override void OnCountRolling(ulong currentValue, ulong newValue)
+        {
+            ScheduledPopOutCurrentId++;
+
+            // Hides displayed count if was increasing from 0 to 1 but didn't finish
+            if (currentValue == 0 && newValue == 0)
+                DisplayedCountSpriteText.FadeOut(FadeOutDuration);
+
+            base.OnCountRolling(currentValue, newValue);
+        }
+
+        protected override void OnCountIncrement(ulong currentValue, ulong newValue)
+        {
+            ScheduledPopOutCurrentId++;
+
+            if (DisplayedCount < currentValue)
+                DisplayedCount++;
+
+            DisplayedCountSpriteText.Show();
+
+            TransformPopOut(newValue);
+
+            uint newTaskId = ScheduledPopOutCurrentId;
+            Scheduler.AddDelayed(delegate
+            {
+                ScheduledPopOutSmall(newTaskId);
+            }, PopOutDuration);
+        }
+
+        protected override void OnCountChange(ulong currentValue, ulong newValue)
+        {
+            ScheduledPopOutCurrentId++;
+
+            if (newValue == 0)
+                DisplayedCountSpriteText.FadeOut();
+
+            base.OnCountChange(currentValue, newValue);
+        }
+
+        protected override void OnDisplayedCountRolling(ulong currentValue, ulong newValue)
+        {
+            if (newValue == 0)
+                DisplayedCountSpriteText.FadeOut(FadeOutDuration);
             else
-            {
-                OnCountRolling(displayedCount, count);
-                IsRolling = true;
-            }
-        }
+                DisplayedCountSpriteText.Show();
 
-        private void transformRoll(TransformComboRoll transform, ulong currentValue, ulong newValue)
-        {
-            Flush(false, typeof(TransformComboRoll));
-
-            if (RollingDuration < 1)
-            {
-                DisplayedCount = Count;
-                return;
-            }
-
-            transform.StartTime = Time.Current;
-            transform.EndTime = Time.Current + getProportionalDuration(currentValue, newValue);
-            transform.StartValue = currentValue;
-            transform.EndValue = newValue;
-            transform.Easing = RollingEasing;
-
-            Transforms.Add(transform);
-        }
-
-        protected class TransformComboRoll : Transform<ulong>
-        {
-            protected override ulong CurrentValue
-            {
-                get
-                {
-                    double time = Time?.Current ?? 0;
-                    if (time < StartTime) return StartValue;
-                    if (time >= EndTime) return EndValue;
-
-                    return (ulong)Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
-                }
-            }
-
-            public override void Apply(Drawable d)
-            {
-                base.Apply(d);
-                ((ComboCounter)d).DisplayedCount = CurrentValue;
-            }
-        }
-
-        public void Set(ulong value)
-        {
-            if (value == 0)
-                Roll();
+            if (CanPopOutWhileRolling)
+                TransformPopOutRolling(newValue);
             else
-                Count = value;
+                TransformNoPopOut(newValue);
+        }
+
+        protected override void OnDisplayedCountChange(ulong newValue)
+        {
+            DisplayedCountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
+
+            TransformNoPopOut(newValue);
+        }
+
+        protected override void OnDisplayedCountIncrement(ulong newValue)
+        {
+            DisplayedCountSpriteText.Show();
+
+            TransformPopOutSmall(newValue);
         }
     }
 }

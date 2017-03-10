@@ -167,6 +167,8 @@
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
+    <Compile Include="Modes\UI\ComboCounter.cs" />
+    <Compile Include="Modes\UI\StandardHUDOverlay.cs" />
     <Compile Include="Screens\Select\CarouselContainer.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameScreen.cs" />
@@ -181,9 +183,9 @@
     <Compile Include="Screens\Select\PlaySongSelect.cs" />
     <Compile Include="Modes\UI\HitRenderer.cs" />
     <Compile Include="Modes\UI\Playfield.cs" />
-    <Compile Include="Modes\UI\ScoreOverlay.cs" />
+    <Compile Include="Modes\UI\HUDOverlay.cs" />
     <Compile Include="Screens\Select\EditSongSelect.cs" />
-    <Compile Include="Modes\UI\ComboCounter.cs" />
+    <Compile Include="Modes\UI\BaseComboCounter.cs" />
     <Compile Include="Modes\UI\ComboResultCounter.cs" />
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
