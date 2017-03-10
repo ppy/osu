@@ -80,7 +80,7 @@ namespace osu.Game.Modes.Taiko
 
         public override FontAwesome Icon => FontAwesome.fa_osu_taiko_o;
 
-        public override KeyCounter[] GameplayKeys => new KeyCounter[]
+        public override KeyCounter[] CreateGameplayKeys => new KeyCounter[]
         {
             new KeyCounterKeyboard(Key.D),
             new KeyCounterKeyboard(Key.F),

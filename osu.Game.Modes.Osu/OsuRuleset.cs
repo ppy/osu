@@ -112,7 +112,7 @@ namespace osu.Game.Modes.Osu
 
         protected override PlayMode PlayMode => PlayMode.Osu;
 
-        public override KeyCounter[] GameplayKeys => new KeyCounter[]
+        public override KeyCounter[] CreateGameplayKeys => new KeyCounter[]
         {
             new KeyCounterKeyboard(Key.Z),
             new KeyCounterKeyboard(Key.X),

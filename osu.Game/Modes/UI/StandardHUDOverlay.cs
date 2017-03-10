@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
+using System.Collections.Generic;
 
 namespace osu.Game.Modes.UI
 {
@@ -39,7 +40,7 @@ namespace osu.Game.Modes.UI
             Margin = new MarginPadding { Top = 20 }
         };
 
-        protected override KeyCounterCollection CreateKeyCounter(KeyCounter[] keyCounters) => new KeyCounterCollection
+        protected override KeyCounterCollection CreateKeyCounter(IEnumerable<KeyCounter> keyCounters) => new KeyCounterCollection
         {
             IsCounting = true,
             FadeTime = 50,
