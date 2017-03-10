@@ -14,7 +14,6 @@ using System;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Options.Sections;
-using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
@@ -99,7 +98,7 @@ namespace osu.Game.Overlays
                                 new OptionTextBox()
                                 {
                                     Width = width - CONTENT_MARGINS * 2,
-                                    OnChange = (TextBox sender, bool newText) => searchContainer.Filter = sender.Text,
+                                    OnChange = (sender, newText) => searchContainer.Filter = sender.Text,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS },
                                     PlaceholderText = "Type to search!",
                                 },
@@ -118,8 +117,8 @@ namespace osu.Game.Overlays
                                         },
                                     },
                                     SearchableContent = sections,
-                                    OnMatch = (Drawable drawable) => drawable.FadeIn(250),
-                                    OnMismatch = (Drawable drawable) => drawable.FadeOut(250),
+                                    OnMatch = (drawable) => drawable.FadeIn(250),
+                                    OnMismatch = (drawable) => drawable.FadeOut(250),
                                     RematchDelay = 300,
                                 },
                                 new OptionsFooter()
