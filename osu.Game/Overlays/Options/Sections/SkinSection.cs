@@ -6,7 +6,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using OpenTK;
 
 namespace osu.Game.Overlays.Options.Sections
@@ -24,37 +23,37 @@ namespace osu.Game.Overlays.Options.Sections
             {
                 new OptionLabel { Text = "TODO: Skin preview textures" },
                 new OptionLabel { Text = "Current skin: TODO dropdown" },
-                new OsuButton
+                new OptionButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Preview gameplay",
                 },
-                new OsuButton
+                new OptionButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Open skin folder",
                 },
-                new OsuButton
+                new OptionButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Export as .osk",
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Ignore all beatmap skins",
                     Bindable = config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSkins)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Use skin's sound samples",
                     Bindable = config.GetBindable<bool>(OsuConfig.SkinSamples)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Use Taiko skin for Taiko mode",
                     Bindable = config.GetBindable<bool>(OsuConfig.UseTaikoSkin)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Always use skin cursor",
                     Bindable = config.GetBindable<bool>(OsuConfig.UseSkinCursor)
@@ -64,7 +63,7 @@ namespace osu.Game.Overlays.Options.Sections
                     LabelText = "Cursor size",
                     Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.CursorSize)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Automatic cursor size",
                     Bindable = config.GetBindable<bool>(OsuConfig.AutomaticCursorSizing)

@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Options
         public OptionDropDown()
         {
             Items = new KeyValuePair<string, T>[0];
-
+            
             Direction = FillDirection.Vertical;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
