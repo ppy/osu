@@ -123,7 +123,7 @@ namespace osu.Game.Graphics.UserInterface
             if (value <= i)
                 return minStarScale;
 
-            return i + 1 <= value ? 1.0f : Interpolation.ValueAt(value, minStarScale, 1.0f, i, i + 1);
+            return i + 1 <= value ? 1.0f : (float)Interpolation.ValueAt(value, minStarScale, 1.0f, i, i + 1);
         }
 
         private void transformCount(float newValue)
