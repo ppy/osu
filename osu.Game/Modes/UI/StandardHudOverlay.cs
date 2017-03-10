@@ -6,17 +6,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
-using System.Collections.Generic;
 
 namespace osu.Game.Modes.UI
 {
     public class StandardHudOverlay : HudOverlay
     {
-        public StandardHudOverlay(Ruleset ruleset)
-            : base(ruleset)
-        {
-        }
-
         protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter
         {
             Anchor = Anchor.TopCentre,
@@ -39,14 +33,13 @@ namespace osu.Game.Modes.UI
             Margin = new MarginPadding { Top = 20 }
         };
 
-        protected override KeyCounterCollection CreateKeyCounter(IEnumerable<KeyCounter> keyCounters) => new KeyCounterCollection
+        protected override KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
         {
             IsCounting = true,
             FadeTime = 50,
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
-            Children = keyCounters
         };
 
         protected override ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
