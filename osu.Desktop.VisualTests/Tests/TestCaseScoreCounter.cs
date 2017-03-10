@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
 
 namespace osu.Desktop.VisualTests.Tests
