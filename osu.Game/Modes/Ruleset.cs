@@ -22,6 +22,8 @@ namespace osu.Game.Modes
     {
         private static ConcurrentDictionary<PlayMode, Type> availableRulesets = new ConcurrentDictionary<PlayMode, Type>();
 
+        public static IEnumerable<PlayMode> PlayModes => availableRulesets.Keys;
+
         public abstract ScoreOverlay CreateScoreOverlay();
 
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
@@ -41,6 +43,8 @@ namespace osu.Game.Modes
         protected abstract PlayMode PlayMode { get; }
 
         public virtual FontAwesome Icon => FontAwesome.fa_question_circle;
+
+        public abstract string Description { get; }
 
         public virtual Score CreateAutoplayScore(Beatmap beatmap) => null;
 
