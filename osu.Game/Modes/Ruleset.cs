@@ -27,6 +27,7 @@ namespace osu.Game.Modes
 
         public static IEnumerable<PlayMode> PlayModes => availableRulesets.Keys;
 
+
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);

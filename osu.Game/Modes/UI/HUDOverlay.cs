@@ -39,7 +39,7 @@ namespace osu.Game.Modes.UI
 
         public virtual void OnMiss(HitObject h)
         {
-            ComboCounter?.Roll();
+            ComboCounter.Current.Value = 0;
             AccuracyCounter?.Set(AccuracyCounter.Count - 0.01f);
         }
 
@@ -79,7 +79,7 @@ namespace osu.Game.Modes.UI
             //TODO: these should be bindable binds, not events!
             processor.TotalScore.ValueChanged += delegate { ScoreCounter?.Set((ulong)processor.TotalScore.Value); };
             processor.Accuracy.ValueChanged += delegate { AccuracyCounter?.Set((float)processor.Accuracy.Value); };
-            processor.Combo.ValueChanged += delegate { ComboCounter?.Set((ulong)processor.Combo.Value); };
+            ComboCounter?.Current.BindTo(processor.Combo);
             HealthDisplay?.Current.BindTo(processor.Health);
         }
 
