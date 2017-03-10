@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -90,7 +89,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddButton(@"miss...", delegate
             {
-                comboCounter.Roll();
+                comboCounter.Current.Value = 0;
                 denominator++;
                 accuracyCounter.SetFraction(numerator, denominator);
             });

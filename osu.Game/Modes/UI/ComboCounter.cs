@@ -71,10 +71,7 @@ namespace osu.Game.Modes.UI
 
         private void comboChanged(object sender, System.EventArgs e)
         {
-            if (Current.Value == 0)
-                Roll();
-            else
-                updateCount(Current);
+            updateCount(Current.Value == 0);
         }
 
         protected override void LoadComplete()
@@ -129,24 +126,7 @@ namespace osu.Game.Modes.UI
         /// </summary>
         public void StopRolling()
         {
-            updateCount(Current);
-        }
-
-        /// <summary>
-        /// Animates roll-up/roll-back to an specific value.
-        /// </summary>
-        /// <param name="newValue">Target value.</param>
-        public virtual void Roll(long newValue = 0)
-        {
-            updateCount(newValue, true);
-        }
-
-        /// <summary>
-        /// Resets count to default value.
-        /// </summary>
-        public virtual void ResetCount()
-        {
-            updateCount(0);
+            updateCount(false);
         }
 
         protected virtual string FormatCount(long count)
@@ -186,10 +166,10 @@ namespace osu.Game.Modes.UI
                 OnDisplayedCountChange(newValue);
         }
 
-        private void updateCount(long value, bool rolling = false)
+        private void updateCount(bool rolling)
         {
             long prev = previousValue;
-            previousValue = Current.Value;
+            previousValue = Current;
 
             if (!IsLoaded)
                 return;
