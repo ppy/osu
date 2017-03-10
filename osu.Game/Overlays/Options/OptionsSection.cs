@@ -21,8 +21,16 @@ namespace osu.Game.Overlays.Options
         protected override Container<Drawable> Content => FlowContent;
 
         public string[] Keywords => new[] { Header };
-        public Action AfterSearch => null;
+        public bool LastMatch { get; set; }
         public IEnumerable<Drawable> SearchableChildren => Children;
+        public override bool RemoveWhenNotAlive => false;
+        public Action AfterSearch => delegate
+        {
+            if (LastMatch)
+                FadeIn(250);
+            else
+                FadeOut(250);
+        };
 
         public abstract FontAwesome Icon { get; }
         public abstract string Header { get; }

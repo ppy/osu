@@ -9,5 +9,6 @@ namespace osu.Game.Overlays.Options
     class OptionCheckbox : OsuCheckbox, ISearchable
     {
         public string[] Keywords => new[] { LabelText };
+        public bool LastMatch { get; set; }
     }
 }

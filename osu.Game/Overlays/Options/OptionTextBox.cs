@@ -5,11 +5,15 @@ using System;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionTextBox : OsuTextBox
+    public class OptionTextBox : OsuTextBox, ISearchable
     {
+        public string[] Keywords => new[] { PlaceholderText };
+        public bool LastMatch { get; set; }
+
         private Bindable<string> bindable;
 
         public Bindable<string> Bindable

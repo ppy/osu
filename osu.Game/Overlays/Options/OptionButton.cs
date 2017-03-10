@@ -9,5 +9,6 @@ namespace osu.Game.Overlays.Options
     class OptionButton : OsuButton, ISearchable
     {
         public string[] Keywords => new[] { Text };
+        public bool LastMatch { get; set; }
     }
 }

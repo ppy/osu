@@ -14,7 +14,6 @@ using System;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Options.Sections;
-using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
@@ -102,7 +101,7 @@ namespace osu.Game.Overlays
                                     Width = width - CONTENT_MARGINS * 2,
                                     OnChange = (TextBox sender, bool newText) => searchContainer.Filter = sender.Text,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS },
-                                    PlaceholderText = "Search for osu! options",
+                                    PlaceholderText = "Type to search!",
                                 },
                                 searchContainer = new SearchContainer
                                 {
@@ -119,8 +118,9 @@ namespace osu.Game.Overlays
                                         },
                                     },
                                     SearchableContent = sections,
-                                    OnMatch = onMatch,
-                                    OnMismatch = onMismatch,
+                                    OnMatch = (Drawable drawable) => drawable.FadeIn(250),
+                                    OnMismatch = (Drawable drawable) => drawable.FadeOut(250),
+                                    RematchDelay = 300,
                                 },
                                 new OptionsFooter()
                             }
@@ -142,16 +142,6 @@ namespace osu.Game.Overlays
             };
 
             scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
-        }
-
-        private void onMatch(Drawable drawable)
-        {
-            drawable.Colour = Color4.White;
-        }
-
-        private void onMismatch(Drawable drawable)
-        {
-            drawable.Colour = Color4.Red;
         }
 
         protected override void Update()
