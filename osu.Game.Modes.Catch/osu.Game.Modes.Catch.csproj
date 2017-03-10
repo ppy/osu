@@ -54,7 +54,6 @@
     <Compile Include="Objects\Droplet.cs" />
     <Compile Include="Objects\Fruit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\CatchComboCounter.cs" />
     <Compile Include="UI\CatchHitRenderer.cs" />
     <Compile Include="UI\CatchPlayfield.cs" />
     <Compile Include="CatchRuleset.cs" />
