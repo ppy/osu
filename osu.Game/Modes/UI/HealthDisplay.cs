@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Modes.UI
 {
-    internal abstract class HealthDisplay : Container
+    public abstract class HealthDisplay : Container
     {
         public readonly BindableDouble Current = new BindableDouble
         {

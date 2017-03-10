@@ -14,7 +14,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Modes.UI
 {
-    internal class StandardHealthDisplay : HealthDisplay
+    public class StandardHealthDisplay : HealthDisplay
     {
         private Container fill;
 

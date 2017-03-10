@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Modes.UI
 {
-    internal abstract class HudOverlay : Container
+    public abstract class HudOverlay : Container
     {
         public readonly KeyCounterCollection KeyCounter;
         public readonly ComboCounter ComboCounter;
@@ -49,7 +49,7 @@ namespace osu.Game.Modes.UI
 
             Children = new Drawable[]
             {
-                KeyCounter = CreateKeyCounter(ruleset.CreateGameplayKeys),
+                KeyCounter = CreateKeyCounter(ruleset.CreateGameplayKeys()),
                 ComboCounter = CreateComboCounter(),
                 ScoreCounter = CreateScoreCounter(),
                 AccuracyCounter = CreateAccuracyCounter(),
