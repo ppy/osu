@@ -1,12 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Modes.Objects;
@@ -17,25 +15,19 @@ namespace osu.Game.Modes.UI
 {
     internal abstract class HUDOverlay : Container
     {
-        public KeyCounterCollection KeyCounter;
-        public BaseComboCounter ComboCounter;
-        public ScoreCounter ScoreCounter;
-        public PercentageCounter AccuracyCounter;
-        public HealthDisplay HealthDisplay;
-        public Score Score { get; set; }
+        public readonly KeyCounterCollection KeyCounter;
+        public readonly ComboCounter ComboCounter;
+        public readonly ScoreCounter ScoreCounter;
+        public readonly PercentageCounter AccuracyCounter;
+        public readonly HealthDisplay HealthDisplay;
 
         private Bindable<bool> showKeyCounter;
 
         protected abstract KeyCounterCollection CreateKeyCounter(KeyCounter[] keyCounters);
-        protected abstract BaseComboCounter CreateComboCounter();
+        protected abstract ComboCounter CreateComboCounter();
         protected abstract PercentageCounter CreateAccuracyCounter();
         protected abstract ScoreCounter CreateScoreCounter();
-        protected virtual HealthDisplay CreateHealthDisplay() => new HealthDisplay
-        {
-            Size = new Vector2(1, 5),
-            RelativeSizeAxes = Axes.X,
-            Margin = new MarginPadding { Top = 20 }
-        };
+        protected abstract HealthDisplay CreateHealthDisplay();
 
         public virtual void OnHit(HitObject h)
         {
