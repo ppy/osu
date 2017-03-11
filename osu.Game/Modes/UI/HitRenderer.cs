@@ -11,6 +11,7 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Play;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Modes.UI
 {
@@ -27,38 +28,25 @@ namespace osu.Game.Modes.UI
         public abstract Func<Vector2, Vector2> MapPlayfieldToScreenSpace { get; }
 
         /// <summary>
-        /// The number of Judgements required to be triggered
-        /// before the game enters post-play routines.
+        /// Whether all the HitObjects have been judged.
         /// </summary>
-        protected abstract int JudgementCount { get; }
+        protected abstract bool AllObjectsJudged { get; }
 
         /// <summary>
         /// The beatmap this HitRenderer is initialized with.
         /// </summary>
         protected readonly Beatmap Beatmap;
 
-        private int maxJudgements;
-        private int countJudgements;
-
         protected HitRenderer(Beatmap beatmap)
         {
             Beatmap = beatmap;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            maxJudgements = JudgementCount;
-        }
-
         protected void TriggerOnJudgement(JudgementInfo j)
         {
-            countJudgements++;
-
             OnJudgement?.Invoke(j);
 
-            if (countJudgements == maxJudgements)
+            if (AllObjectsJudged)
                 OnAllJudged?.Invoke();
         }
     }
@@ -73,9 +61,7 @@ namespace osu.Game.Modes.UI
         protected virtual List<TObject> Convert(Beatmap beatmap) => Converter.Convert(beatmap);
 
         protected override Container<Drawable> Content => content;
-
-        private int judgementCount;
-        protected override int JudgementCount => judgementCount;
+        protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
 
         protected Playfield<TObject> Playfield;
 
@@ -117,8 +103,6 @@ namespace osu.Game.Modes.UI
                 drawableObject.OnJudgement += onJudgement;
 
                 Playfield.Add(drawableObject);
-
-                judgementCount++;
             }
 
             Playfield.PostProcess();
