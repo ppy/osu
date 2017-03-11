@@ -8,19 +8,19 @@ namespace osu.Game.Modes.Vitaru.UI
 {
     public class VitaruComboCounter : ComboCounter
     {
-        protected override void OnDisplayedCountChange(ulong newValue)
+        protected override void OnDisplayedCountChange(int newValue)
         {
-            
+            throw new NotImplementedException();
         }
 
-        protected override void OnDisplayedCountIncrement(ulong newValue)
+        protected override void OnDisplayedCountIncrement(int newValue)
         {
-            
+            throw new NotImplementedException();
         }
 
-        protected override void OnDisplayedCountRolling(ulong currentValue, ulong newValue)
+        protected override void OnDisplayedCountRolling(int currentValue, int newValue)
         {
-            
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using osu.Game.Graphics;
-
+﻿
 namespace osu.Game.Modes.Vitaru
 {
     public class VitaruModNoFail : ModNoFail
@@ -16,7 +15,6 @@ namespace osu.Game.Modes.Vitaru
     {
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
-        public override Mods[] DisablesMods => new Mods[] { };
     }
 
     public class VitaruModHardRock : ModHardRock
@@ -53,6 +51,5 @@ namespace osu.Game.Modes.Vitaru
     public class VitaruModDoubleTrouble : ModDoubleTrouble
     {
         public override double ScoreMultiplier => 1.18;
-        public override Mods[] DisablesMods => new Mods[] { };
     }
 }

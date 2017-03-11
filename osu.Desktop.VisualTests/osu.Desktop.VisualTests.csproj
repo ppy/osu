@@ -186,7 +186,6 @@
   <ItemGroup>
     <Compile Include="Benchmark.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Tests\TestCaseVitaruOverlay.cs" />
     <Compile Include="Tests\TestCaseChatDisplay.cs" />
     <Compile Include="Tests\TestCaseDrawings.cs" />
     <Compile Include="Tests\TestCaseGamefield.cs" />

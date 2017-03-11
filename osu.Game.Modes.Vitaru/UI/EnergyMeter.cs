@@ -2,14 +2,8 @@
 using osu.Game.Graphics;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 using OpenTK.Graphics;
-using OpenTK;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Modes.Osu.UI
@@ -55,10 +49,10 @@ namespace osu.Game.Modes.Osu.UI
             fill.Height = TextSize*0.475f;
         }
 
-        protected override string FormatCount(float count)
+        protected override string FormatCount(double count)
         {
             if(fill != null)
-                fill.Width = count*0.7f;
+                fill.Width = (float)count*0.7f;
             return base.FormatCount(count);
         }
     }

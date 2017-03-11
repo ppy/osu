@@ -146,7 +146,7 @@ namespace osu.Game.Modes
 
     public abstract class ModDoubleTrouble : Mod
     {
-        public override Mods Name => Mods.DoubleTrouble;
+        public override string Name => "DoubleTrouble";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_perfect; //FontAwesome.fa_osu_mod_doubleTrouble;
         public override string Description => @"Twice as many Bosses";
         public override bool Ranked => true;

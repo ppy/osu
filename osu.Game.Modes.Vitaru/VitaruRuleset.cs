@@ -8,13 +8,13 @@ using osu.Game.Modes.Vitaru.UI;
 using System;
 using osu.Game.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Play;
+using OpenTK.Input;
 
 namespace osu.Game.Modes.Vitaru
 {
     public class VitaruRuleset : Ruleset
     {
-        public override ScoreOverlay CreateScoreOverlay() => new VitaruScoreOverlay();
-
         public override HitObjectParser CreateHitObjectParser() => new VitaruObjectParser();
 
         public ScoreProcessor CreateScoreProcessor() => new VitaruScoreProcessor();
@@ -85,8 +85,20 @@ namespace osu.Game.Modes.Vitaru
             }
         }
 
+        public override IEnumerable<KeyCounter> CreateGameplayKeys() => new[]
+            {
+                new KeyCounterKeyboard(Key.W),
+                new KeyCounterKeyboard(Key.A),
+                new KeyCounterKeyboard(Key.S),
+                new KeyCounterKeyboard(Key.D),
+            };
+
         public override FontAwesome Icon => FontAwesome.fa_osu_vitaru_o;
 
-        protected override PlayMode PlayMode => PlayMode.Vitaru;
+        public const PlayMode Vitaru = (PlayMode)4;
+
+        protected override PlayMode PlayMode => Vitaru;
+
+        public override string Description => "osu!vitaru";
     }
 }
