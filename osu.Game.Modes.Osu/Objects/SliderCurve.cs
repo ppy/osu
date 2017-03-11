@@ -59,10 +59,9 @@ namespace osu.Game.Modes.Osu.Objects
                 if (i == ControlPoints.Count - 1 || ControlPoints[i] == ControlPoints[i + 1])
                 {
                     List<Vector2> subpath = calculateSubpath(subControlPoints);
-                    for (int j = 0; j < subpath.Count; ++j)
-                        // Only add those vertices that add a new segment to the path.
-                        if (calculatedPath.Count == 0 || calculatedPath.Last() != subpath[j])
-                            calculatedPath.Add(subpath[j]);
+                    foreach (Vector2 t in subpath)
+                        if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
+                            calculatedPath.Add(t);
 
                     subControlPoints.Clear();
                 }
@@ -175,7 +174,7 @@ namespace osu.Game.Modes.Osu.Objects
             path.Clear();
 
             int i = 0;
-            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i) ;
+            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i) { }
 
             path.Add(interpolateVertices(i, d0) + Offset);
 
@@ -186,10 +185,10 @@ namespace osu.Game.Modes.Osu.Objects
         }
 
         /// <summary>
-        /// Computes the position on the slider at a given progress that ranges from 0 (beginning of the slider)
-        /// to 1 (end of the slider).
+        /// Computes the position on the slider at a given progress that ranges from 0 (beginning of the curve)
+        /// to 1 (end of the curve).
         /// </summary>
-        /// <param name="progress">Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <param name="progress">Ranges from 0 (beginning of the curve) to 1 (end of the curve).</param>
         /// <returns></returns>
         public Vector2 PositionAt(double progress)
         {

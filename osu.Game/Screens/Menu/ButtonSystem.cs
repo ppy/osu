@@ -19,7 +19,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class ButtonSystem : Container, IStateful<MenuState>
+    public class ButtonSystem : Container, IStateful<MenuState>
     {
         public Action OnEdit;
         public Action OnExit;
@@ -49,8 +49,8 @@ namespace osu.Game.Screens.Menu
         private Button backButton;
         private Button settingsButton;
 
-        List<Button> buttonsTopLevel = new List<Button>();
-        List<Button> buttonsPlay = new List<Button>();
+        private List<Button> buttonsTopLevel = new List<Button>();
+        private List<Button> buttonsPlay = new List<Button>();
 
         public ButtonSystem()
         {
@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        MenuState state;
+        private MenuState state;
 
         public override bool HandleInput => state != MenuState.Exit;
 

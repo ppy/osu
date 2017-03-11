@@ -49,7 +49,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                         return true;
                     },
                 },
-                number = new NumberPiece()
+                number = new NumberPiece
                 {
                     Text = h is Spinner ? "S" : (HitObject.ComboIndex + 1).ToString(),
                 },
@@ -59,7 +59,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 {
                     Colour = osuObject.Colour,
                 },
-                ApproachCircle = new ApproachCircle()
+                ApproachCircle = new ApproachCircle
                 {
                     Colour = osuObject.Colour,
                 }
@@ -69,33 +69,23 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             Size = circle.DrawSize;
         }
 
-        double hit50 = 150;
-        double hit100 = 80;
-        double hit300 = 30;
-
         protected override void CheckJudgement(bool userTriggered)
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > hit50)
+                if (Judgement.TimeOffset > HitObject.HitWindowFor(OsuScoreResult.Hit50))
                     Judgement.Result = HitResult.Miss;
                 return;
             }
 
             double hitOffset = Math.Abs(Judgement.TimeOffset);
 
-            OsuJudgementInfo osuJudgement = Judgement as OsuJudgementInfo;
+            OsuJudgementInfo osuJudgement = (OsuJudgementInfo)Judgement;
 
-            if (hitOffset < hit50)
+            if (hitOffset < HitObject.HitWindowFor(OsuScoreResult.Hit50))
             {
                 Judgement.Result = HitResult.Hit;
-
-                if (hitOffset < hit300)
-                    osuJudgement.Score = OsuScoreResult.Hit300;
-                else if (hitOffset < hit100)
-                    osuJudgement.Score = OsuScoreResult.Hit100;
-                else if (hitOffset < hit50)
-                    osuJudgement.Score = OsuScoreResult.Hit50;
+                osuJudgement.Score = HitObject.ScoreResultForOffset(hitOffset);
             }
             else
                 Judgement.Result = HitResult.Miss;

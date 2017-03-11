@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play
                         },
                         new OsuSpriteText
                         {
-                            Text = String.Format("{0:n0}", value),
+                            Text = $"{value:n0}",
                             Font = @"Exo2.0-Bold",
                             Shadow = true,
                             ShadowColour = new Color4(0, 0, 0, 0.25f),
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play
                         },
                         new OsuSpriteText
                         {
-                            Text = $" time{((value == 1) ? "" : "s")} in this session",
+                            Text = $" time{(value == 1 ? "" : "s")} in this session",
                             Shadow = true,
                             ShadowColour = new Color4(0, 0, 0, 0.25f),
                             TextSize = 18

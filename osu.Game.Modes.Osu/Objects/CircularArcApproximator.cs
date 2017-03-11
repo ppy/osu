@@ -79,12 +79,9 @@ namespace osu.Game.Modes.Osu.Objects
             // We select the amount of points for the approximation by requiring the discrete curvature
             // to be smaller than the provided tolerance. The exact angle required to meet the tolerance
             // is: 2 * Math.Acos(1 - TOLERANCE / r)
-            if (2 * r <= tolerance)
-                // This special case is required for extremely short sliders where the radius is smaller than
-                // the tolerance. This is a pathological rather than a realistic case.
-                amountPoints = 2;
-            else
-                amountPoints = Math.Max(2, (int)Math.Ceiling(thetaRange / (2 * Math.Acos(1 - tolerance / r))));
+            // The special case is required for extremely short sliders where the radius is smaller than
+            // the tolerance. This is a pathological rather than a realistic case.
+            amountPoints = 2 * r <= tolerance ? 2 : Math.Max(2, (int)Math.Ceiling(thetaRange / (2 * Math.Acos(1 - tolerance / r))));
 
             List<Vector2> output = new List<Vector2>(amountPoints);
 

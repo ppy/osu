@@ -18,7 +18,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class BeatmapPanel : Panel
+    internal class BeatmapPanel : Panel
     {
         public BeatmapInfo Beatmap;
         private Sprite background;

@@ -13,16 +13,21 @@ namespace osu.Game.Modes.Osu.UI
     {
         protected override HitObjectConverter<OsuHitObject> Converter => new OsuHitObjectConverter();
 
-        protected override Playfield CreatePlayfield() => new OsuPlayfield();
+        protected override Playfield<OsuHitObject> CreatePlayfield() => new OsuPlayfield();
 
-        protected override DrawableHitObject GetVisualRepresentation(OsuHitObject h)
+        protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {
-            if (h is HitCircle)
-                return new DrawableHitCircle(h as HitCircle);
-            if (h is Slider)
-                return new DrawableSlider(h as Slider);
-            if (h is Spinner)
-                return new DrawableSpinner(h as Spinner);
+            var circle = h as HitCircle;
+            if (circle != null)
+                return new DrawableHitCircle(circle);
+
+            var slider = h as Slider;
+            if (slider != null)
+                return new DrawableSlider(slider);
+
+            var spinner = h as Spinner;
+            if (spinner != null)
+                return new DrawableSpinner(spinner);
             return null;
         }
     }

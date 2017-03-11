@@ -8,7 +8,7 @@ using osu.Game.Modes;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseModSelectOverlay : TestCase
+    internal class TestCaseModSelectOverlay : TestCase
     {
         public override string Description => @"Tests the mod select overlay";
 
