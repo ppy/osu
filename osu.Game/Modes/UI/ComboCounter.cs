@@ -14,7 +14,7 @@ namespace osu.Game.Modes.UI
 {
     public abstract class ComboCounter : Container
     {
-        public BindableLong Current = new BindableLong
+        public BindableInt Current = new BindableInt
         {
             MinValue = 0,
         };
@@ -42,7 +42,7 @@ namespace osu.Game.Modes.UI
 
         protected SpriteText DisplayedCountSpriteText;
 
-        private long previousValue;
+        private int previousValue;
 
         /// <summary>
         /// Base of all combo counters.
@@ -85,11 +85,11 @@ namespace osu.Game.Modes.UI
             StopRolling();
         }
 
-        private long displayedCount;
+        private int displayedCount;
         /// <summary>
         /// Value shown at the current moment.
         /// </summary>
-        public virtual long DisplayedCount
+        public virtual int DisplayedCount
         {
             get { return displayedCount; }
             protected set
@@ -116,7 +116,7 @@ namespace osu.Game.Modes.UI
         /// Increments the combo by an amount.
         /// </summary>
         /// <param name="amount"></param>
-        public void Increment(long amount = 1)
+        public void Increment(int amount = 1)
         {
             Current.Value = Current + amount;
         }
@@ -129,33 +129,33 @@ namespace osu.Game.Modes.UI
             updateCount(false);
         }
 
-        protected virtual string FormatCount(long count)
+        protected virtual string FormatCount(int count)
         {
             return count.ToString();
         }
 
-        protected virtual void OnCountRolling(long currentValue, long newValue)
+        protected virtual void OnCountRolling(int currentValue, int newValue)
         {
             transformRoll(new TransformComboRoll(), currentValue, newValue);
         }
 
-        protected virtual void OnCountIncrement(long currentValue, long newValue)
+        protected virtual void OnCountIncrement(int currentValue, int newValue)
         {
             DisplayedCount = newValue;
         }
 
-        protected virtual void OnCountChange(long currentValue, long newValue)
+        protected virtual void OnCountChange(int currentValue, int newValue)
         {
             DisplayedCount = newValue;
         }
 
-        private double getProportionalDuration(long currentValue, long newValue)
+        private double getProportionalDuration(int currentValue, int newValue)
         {
             double difference = currentValue > newValue ? currentValue - newValue : newValue - currentValue;
             return difference * RollingDuration;
         }
 
-        private void updateDisplayedCount(long currentValue, long newValue, bool rolling)
+        private void updateDisplayedCount(int currentValue, int newValue, bool rolling)
         {
             displayedCount = newValue;
             if (rolling)
@@ -168,7 +168,7 @@ namespace osu.Game.Modes.UI
 
         private void updateCount(bool rolling)
         {
-            long prev = previousValue;
+            int prev = previousValue;
             previousValue = Current;
 
             if (!IsLoaded)
@@ -192,7 +192,7 @@ namespace osu.Game.Modes.UI
             }
         }
 
-        private void transformRoll(TransformComboRoll transform, long currentValue, long newValue)
+        private void transformRoll(TransformComboRoll transform, int currentValue, int newValue)
         {
             Flush(false, typeof(TransformComboRoll));
 
@@ -211,9 +211,9 @@ namespace osu.Game.Modes.UI
             Transforms.Add(transform);
         }
 
-        protected class TransformComboRoll : Transform<long>
+        protected class TransformComboRoll : Transform<int>
         {
-            protected override long CurrentValue
+            protected override int CurrentValue
             {
                 get
                 {
@@ -221,7 +221,7 @@ namespace osu.Game.Modes.UI
                     if (time < StartTime) return StartValue;
                     if (time >= EndTime) return EndValue;
 
-                    return (long)Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+                    return (int)Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
                 }
             }
 
@@ -232,8 +232,8 @@ namespace osu.Game.Modes.UI
             }
         }
 
-        protected abstract void OnDisplayedCountRolling(long currentValue, long newValue);
-        protected abstract void OnDisplayedCountIncrement(long newValue);
-        protected abstract void OnDisplayedCountChange(long newValue);
+        protected abstract void OnDisplayedCountRolling(int currentValue, int newValue);
+        protected abstract void OnDisplayedCountIncrement(int newValue);
+        protected abstract void OnDisplayedCountChange(int newValue);
     }
 }

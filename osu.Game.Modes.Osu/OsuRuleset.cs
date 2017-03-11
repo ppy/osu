@@ -114,15 +114,12 @@ namespace osu.Game.Modes.Osu
 
         public override string Description => "osu!";
 
-        public override IEnumerable<KeyCounter> CreateGameplayKeys()
+        public override IEnumerable<KeyCounter> CreateGameplayKeys() => new KeyCounter[]
         {
-            return new KeyCounter[]
-            {
-                new KeyCounterKeyboard(Key.Z),
-                new KeyCounterKeyboard(Key.X),
-                new KeyCounterMouse(MouseButton.Left),
-                new KeyCounterMouse(MouseButton.Right)
-            };
-        }
+            new KeyCounterKeyboard(Key.Z),
+            new KeyCounterKeyboard(Key.X),
+            new KeyCounterMouse(MouseButton.Left),
+            new KeyCounterMouse(MouseButton.Right)
+        };
     }
 }

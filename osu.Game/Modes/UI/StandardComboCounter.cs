@@ -25,12 +25,12 @@ namespace osu.Game.Modes.UI
             PopOutCount.Anchor = Anchor;
         }
 
-        protected override string FormatCount(long count)
+        protected override string FormatCount(int count)
         {
             return $@"{count}x";
         }
 
-        protected virtual void TransformPopOut(long newValue)
+        protected virtual void TransformPopOut(int newValue)
         {
             PopOutCount.Text = FormatCount(newValue);
 
@@ -43,19 +43,19 @@ namespace osu.Game.Modes.UI
             PopOutCount.MoveTo(DisplayedCountSpriteText.Position, PopOutDuration, PopOutEasing);
         }
 
-        protected virtual void TransformPopOutRolling(long newValue)
+        protected virtual void TransformPopOutRolling(int newValue)
         {
             TransformPopOut(newValue);
             TransformPopOutSmall(newValue);
         }
 
-        protected virtual void TransformNoPopOut(long newValue)
+        protected virtual void TransformNoPopOut(int newValue)
         {
             DisplayedCountSpriteText.Text = FormatCount(newValue);
             DisplayedCountSpriteText.ScaleTo(1);
         }
 
-        protected virtual void TransformPopOutSmall(long newValue)
+        protected virtual void TransformPopOutSmall(int newValue)
         {
             DisplayedCountSpriteText.Text = FormatCount(newValue);
             DisplayedCountSpriteText.ScaleTo(PopOutSmallScale);
@@ -71,7 +71,7 @@ namespace osu.Game.Modes.UI
             DisplayedCount++;
         }
 
-        protected override void OnCountRolling(long currentValue, long newValue)
+        protected override void OnCountRolling(int currentValue, int newValue)
         {
             ScheduledPopOutCurrentId++;
 
@@ -82,7 +82,7 @@ namespace osu.Game.Modes.UI
             base.OnCountRolling(currentValue, newValue);
         }
 
-        protected override void OnCountIncrement(long currentValue, long newValue)
+        protected override void OnCountIncrement(int currentValue, int newValue)
         {
             ScheduledPopOutCurrentId++;
 
@@ -100,7 +100,7 @@ namespace osu.Game.Modes.UI
             }, PopOutDuration);
         }
 
-        protected override void OnCountChange(long currentValue, long newValue)
+        protected override void OnCountChange(int currentValue, int newValue)
         {
             ScheduledPopOutCurrentId++;
 
@@ -110,7 +110,7 @@ namespace osu.Game.Modes.UI
             base.OnCountChange(currentValue, newValue);
         }
 
-        protected override void OnDisplayedCountRolling(long currentValue, long newValue)
+        protected override void OnDisplayedCountRolling(int currentValue, int newValue)
         {
             if (newValue == 0)
                 DisplayedCountSpriteText.FadeOut(FadeOutDuration);
@@ -123,14 +123,14 @@ namespace osu.Game.Modes.UI
                 TransformNoPopOut(newValue);
         }
 
-        protected override void OnDisplayedCountChange(long newValue)
+        protected override void OnDisplayedCountChange(int newValue)
         {
             DisplayedCountSpriteText.FadeTo(newValue == 0 ? 0 : 1);
 
             TransformNoPopOut(newValue);
         }
 
-        protected override void OnDisplayedCountIncrement(long newValue)
+        protected override void OnDisplayedCountIncrement(int newValue)
         {
             DisplayedCountSpriteText.Show();
 
