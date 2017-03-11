@@ -32,18 +32,8 @@ namespace osu.Game.Modes.UI
         /// </summary>
         protected abstract int JudgementCount { get; }
 
-        /// <summary>
-        /// The beatmap this HitRenderer is initialized with.
-        /// </summary>
-        protected readonly Beatmap Beatmap;
-
         private int maxJudgements;
         private int countJudgements;
-
-        protected HitRenderer(Beatmap beatmap)
-        {
-            Beatmap = beatmap;
-        }
 
         protected override void LoadComplete()
         {
@@ -69,9 +59,6 @@ namespace osu.Game.Modes.UI
         public override Func<Vector2, Vector2> MapPlayfieldToScreenSpace => Playfield.ScaledContent.ToScreenSpace;
         public IEnumerable<DrawableHitObject> DrawableObjects => Playfield.HitObjects.Children;
 
-        protected abstract HitObjectConverter<TObject> Converter { get; }
-        protected virtual List<TObject> Convert(Beatmap beatmap) => Converter.Convert(beatmap);
-
         protected override Container<Drawable> Content => content;
 
         private int judgementCount;
@@ -79,11 +66,14 @@ namespace osu.Game.Modes.UI
 
         protected Playfield<TObject> Playfield;
 
+        protected Beatmap<TObject> Beatmap;
+
         private Container content;
 
         protected HitRenderer(Beatmap beatmap)
-            : base(beatmap)
         {
+            Beatmap = beatmap.ConvertTo<TObject>();
+
             RelativeSizeAxes = Axes.Both;
 
             InputManager.Add(content = new Container
@@ -107,7 +97,7 @@ namespace osu.Game.Modes.UI
 
         private void loadObjects()
         {
-            foreach (TObject h in Convert(Beatmap))
+            foreach (TObject h in Beatmap.HitObjects)
             {
                 DrawableHitObject<TObject> drawableObject = GetVisualRepresentation(h);
 

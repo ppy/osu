@@ -3,7 +3,6 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Catch.Objects;
-using osu.Game.Modes.Objects;
 using System;
 using System.Collections.Generic;
 
@@ -16,8 +15,6 @@ namespace osu.Game.Modes.Catch
         public CatchDifficultyCalculator(Beatmap beatmap) : base(beatmap)
         {
         }
-
-        protected override HitObjectConverter<CatchBaseHit> Converter => new CatchConverter();
 
         protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
         {

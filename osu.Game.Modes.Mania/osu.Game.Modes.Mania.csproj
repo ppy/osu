@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Beatmaps\ManiaBeatmapConverter.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
     <Compile Include="Objects\Drawable\DrawableNote.cs" />
     <Compile Include="Objects\HoldNote.cs" />
@@ -85,6 +86,7 @@
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

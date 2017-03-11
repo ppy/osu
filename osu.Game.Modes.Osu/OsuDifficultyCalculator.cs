@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Modes.Osu.Objects;
 using System;
 using System.Collections.Generic;
-using osu.Game.Modes.Objects;
 
 namespace osu.Game.Modes.Osu
 {
@@ -24,8 +23,6 @@ namespace osu.Game.Modes.Osu
         public OsuDifficultyCalculator(Beatmap beatmap) : base(beatmap)
         {
         }
-
-        protected override HitObjectConverter<OsuHitObject> Converter => new OsuHitObjectConverter();
 
         protected override void PreprocessHitObjects()
         {

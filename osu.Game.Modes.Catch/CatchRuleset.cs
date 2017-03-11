@@ -4,6 +4,7 @@
 using OpenTK.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Modes.Catch.Beatmaps;
 using osu.Game.Modes.Catch.UI;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
@@ -91,5 +92,10 @@ namespace osu.Game.Modes.Catch
         public override HitObjectParser CreateHitObjectParser() => new NullHitObjectParser();
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new CatchDifficultyCalculator(beatmap);
+
+        public override IBeatmapConverter<CatchBaseHit> CreateBeatmapConverter<CatchBaseHit>()
+        {
+            return (IBeatmapConverter<CatchBaseHit>)new CatchBeatmapConverter();
+        }
     }
 }
