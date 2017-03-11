@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Modes;
@@ -11,47 +10,21 @@ using System.Linq;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapBase
-    {
-        private BeatmapBase original;
-
-        public BeatmapBase(BeatmapBase original = null)
-        {
-            this.original = original;
-        }
-
-        private BeatmapInfo beatmapInfo;
-        public BeatmapInfo BeatmapInfo
-        {
-            get { return beatmapInfo ?? original?.BeatmapInfo; }
-            set { beatmapInfo = value; }
-        }
-
-        private List<ControlPoint> controlPoints;
-        public List<ControlPoint> ControlPoints
-        {
-            get { return controlPoints ?? original?.ControlPoints; }
-            set { controlPoints = value; }
-        }
-
-        private List<Color4> comboColors;
-        public List<Color4> ComboColors
-        {
-            get { return comboColors ?? original?.ComboColors; }
-            set { comboColors = value; }
-        }
-
-        public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
-    }
-
     /// <summary>
-    /// A generic beatmap that does not contain HitObjects.
+    /// A Beatmap containing HitObjects.
     /// </summary>
     public class Beatmap<T> : BeatmapBase
         where T : HitObject
     {
+        /// <summary>
+        /// The HitObjects this Beatmap contains.
+        /// </summary>
         public List<T> HitObjects;
 
+        /// <summary>
+        /// Constructs a new Beatmap containing HitObjects.
+        /// </summary>
+        /// <param name="original">If this Beatmap is a convert, the original Beatmap to use the properties of.</param>
         public Beatmap(BeatmapBase original = null)
             : base(original)
         {
@@ -99,15 +72,22 @@ namespace osu.Game.Beatmaps
         }
     }
 
+    /// <summary>
+    /// A Beatmap containing un-converted HitObjects.
+    /// </summary>
     public class Beatmap : Beatmap<HitObject>
     {
-        public Beatmap(BeatmapBase original = null)
-            : base(original)
-        {
-        }
-
+        /// <summary>
+        /// Calculates the star difficulty for this Beatmap.
+        /// </summary>
+        /// <returns>The star difficulty.</returns>
         public double CalculateStarDifficulty() => Ruleset.GetRuleset(BeatmapInfo.Mode).CreateDifficultyCalculator(this).Calculate();
 
+        /// <summary>
+        /// Converts this Beatmap to a <see cref="Beatmap{T}"/> containing another type of <see cref="HitObject"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of HitObject the new Beatmap should contain.</typeparam>
+        /// <returns></returns>
         public Beatmap<T> ConvertTo<T>() where T : HitObject
         {
             return Ruleset.GetRuleset(BeatmapInfo.Mode).CreateBeatmapConverter<T>().Convert(this);
