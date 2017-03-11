@@ -93,9 +93,9 @@ namespace osu.Game.Modes.Catch
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new CatchDifficultyCalculator(beatmap);
 
-        public override IBeatmapConverter<CatchBaseHit> CreateBeatmapConverter<CatchBaseHit>()
+        public override IBeatmapConverter<T> CreateBeatmapConverter<T>()
         {
-            return (IBeatmapConverter<CatchBaseHit>)new CatchBeatmapConverter();
+            return (IBeatmapConverter<T>)new CatchBeatmapConverter();
         }
     }
 }

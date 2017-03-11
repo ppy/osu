@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
 using System.Collections.Generic;

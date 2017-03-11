@@ -108,9 +108,9 @@ namespace osu.Game.Modes.Mania
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new ManiaDifficultyCalculator(beatmap);
 
-        public override IBeatmapConverter<ManiaBaseHit> CreateBeatmapConverter<ManiaBaseHit>()
+        public override IBeatmapConverter<T> CreateBeatmapConverter<T>()
         {
-            return (IBeatmapConverter<ManiaBaseHit>)new ManiaBeatmapConverter();
+            return (IBeatmapConverter<T>)new ManiaBeatmapConverter();
         }
     }
 }

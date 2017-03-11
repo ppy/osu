@@ -12,11 +12,9 @@ namespace osu.Game.Modes.Mania
     {
         protected override PlayMode PlayMode => PlayMode.Mania;
 
-        private int columns;
-
-        public ManiaDifficultyCalculator(Beatmap beatmap, int columns = 5) : base(beatmap)
+        public ManiaDifficultyCalculator(Beatmap beatmap)
+            : base(beatmap)
         {
-            this.columns = columns;
         }
 
         protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)

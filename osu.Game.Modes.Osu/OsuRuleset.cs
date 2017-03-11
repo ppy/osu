@@ -120,9 +120,9 @@ namespace osu.Game.Modes.Osu
             new KeyCounterMouse(MouseButton.Right)
         };
 
-        public override IBeatmapConverter<OsuHitObject> CreateBeatmapConverter<OsuHitObject>()
+        public override IBeatmapConverter<T> CreateBeatmapConverter<T>()
         {
-            return (IBeatmapConverter<OsuHitObject>)new OsuBeatmapConverter();
+            return (IBeatmapConverter<T>)new OsuBeatmapConverter();
         }
     }
 }

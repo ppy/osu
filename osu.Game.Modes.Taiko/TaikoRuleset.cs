@@ -94,9 +94,9 @@ namespace osu.Game.Modes.Taiko
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new TaikoDifficultyCalculator(beatmap);
 
-        public override IBeatmapConverter<TaikoBaseHit> CreateBeatmapConverter<TaikoBaseHit>()
+        public override IBeatmapConverter<T> CreateBeatmapConverter<T>()
         {
-            return (IBeatmapConverter<TaikoBaseHit>)new TaikoBeatmapConverter();
+            return (IBeatmapConverter<T>)new TaikoBeatmapConverter();
         }
     }
 }
