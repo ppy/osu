@@ -29,7 +29,7 @@ namespace osu.Game.Modes.UI
         protected abstract ScoreCounter CreateScoreCounter();
         protected abstract HealthDisplay CreateHealthDisplay();
 
-        protected HudOverlay(Ruleset ruleset)
+        protected HudOverlay()
         {
             RelativeSizeAxes = Axes.Both;
 
