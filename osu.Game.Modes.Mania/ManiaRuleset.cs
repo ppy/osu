@@ -5,16 +5,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Modes.Mania.UI;
 using osu.Game.Modes.Objects;
-using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
+using osu.Game.Screens.Play;
 using System.Collections.Generic;
 
 namespace osu.Game.Modes.Mania
 {
     public class ManiaRuleset : Ruleset
     {
-        public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
-
         public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new ManiaHitRenderer(beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -100,6 +98,8 @@ namespace osu.Game.Modes.Mania
         public override string Description => "osu!mania";
 
         public override FontAwesome Icon => FontAwesome.fa_osu_mania_o;
+
+        public override IEnumerable<KeyCounter> CreateGameplayKeys() => new KeyCounter[] { /* Todo: Should be keymod specific */ };
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
 

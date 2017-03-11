@@ -9,9 +9,9 @@ namespace osu.Game.Modes
     {
         public double TotalScore { get; set; }
         public double Accuracy { get; set; }
-        public double Combo { get; set; }
-        public double MaxCombo { get; set; }
         public double Health { get; set; }
+        public int MaxCombo { get; set; }
+        public int Combo { get; set; }
 
         public Replay Replay;
         public BeatmapInfo Beatmap;

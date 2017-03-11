@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -35,23 +34,22 @@ namespace osu.Desktop.VisualTests.Tests
             };
             Add(score);
 
-            ComboCounter standardCombo = new OsuComboCounter
+            ComboCounter comboCounter = new StandardComboCounter
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 Margin = new MarginPadding(10),
-                Count = 0,
                 TextSize = 40,
             };
-            Add(standardCombo);
+            Add(comboCounter);
 
-            PercentageCounter accuracyCombo = new PercentageCounter
+            PercentageCounter accuracyCounter = new PercentageCounter
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
                 Position = new Vector2(-20, 60),
             };
-            Add(accuracyCombo);
+            Add(accuracyCounter);
 
             StarCounter stars = new StarCounter
             {
@@ -74,26 +72,26 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton(@"Reset all", delegate
             {
                 score.Count = 0;
-                standardCombo.Count = 0;
+                comboCounter.Current.Value = 0;
                 numerator = denominator = 0;
-                accuracyCombo.SetFraction(0, 0);
+                accuracyCounter.SetFraction(0, 0);
                 stars.Count = 0;
                 starsLabel.Text = stars.Count.ToString("0.00");
             });
 
             AddButton(@"Hit! :D", delegate
             {
-                score.Count += 300 + (ulong)(300.0 * (standardCombo.Count > 0 ? standardCombo.Count - 1 : 0) / 25.0);
-                standardCombo.Count++;
+                score.Count += 300 + (ulong)(300.0 * (comboCounter.Current > 0 ? comboCounter.Current - 1 : 0) / 25.0);
+                comboCounter.Increment();
                 numerator++; denominator++;
-                accuracyCombo.SetFraction(numerator, denominator);
+                accuracyCounter.SetFraction(numerator, denominator);
             });
 
             AddButton(@"miss...", delegate
             {
-                standardCombo.Roll();
+                comboCounter.Current.Value = 0;
                 denominator++;
-                accuracyCombo.SetFraction(numerator, denominator);
+                accuracyCounter.SetFraction(numerator, denominator);
             });
 
             AddButton(@"Alter stars", delegate
@@ -105,8 +103,8 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton(@"Stop counters", delegate
             {
                 score.StopRolling();
-                standardCombo.StopRolling();
-                accuracyCombo.StopRolling();
+                comboCounter.StopRolling();
+                accuracyCounter.StopRolling();
                 stars.StopAnimation();
             });
         }
