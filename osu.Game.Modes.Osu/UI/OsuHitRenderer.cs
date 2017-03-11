@@ -16,6 +16,8 @@ namespace osu.Game.Modes.Osu.UI
         {
         }
 
+        protected override PlayMode PlayMode => PlayMode.Osu;
+
         protected override Playfield<OsuHitObject> CreatePlayfield() => new OsuPlayfield();
 
         protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)

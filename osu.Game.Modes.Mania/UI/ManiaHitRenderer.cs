@@ -18,6 +18,8 @@ namespace osu.Game.Modes.Mania.UI
             this.columns = columns;
         }
 
+        protected override PlayMode PlayMode => PlayMode.Mania;
+
         protected override Playfield<ManiaBaseHit> CreatePlayfield() => new ManiaPlayfield(columns);
 
         protected override DrawableHitObject<ManiaBaseHit> GetVisualRepresentation(ManiaBaseHit h)

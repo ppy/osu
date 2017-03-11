@@ -37,7 +37,7 @@ namespace osu.Game.Beatmaps
 
         protected DifficultyCalculator(Beatmap beatmap)
         {
-            Objects = beatmap.ConvertTo<T>().HitObjects;
+            Objects = beatmap.ConvertTo<T>(PlayMode).HitObjects;
             PreprocessHitObjects();
         }
 

@@ -50,15 +50,16 @@ namespace osu.Game.Modes.UI
         protected override Container<Drawable> Content => content;
         protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
 
-        protected Playfield<TObject> Playfield;
+        protected abstract PlayMode PlayMode { get; }
 
+        protected Playfield<TObject> Playfield;
         protected Beatmap<TObject> Beatmap;
 
         private Container content;
 
         protected HitRenderer(Beatmap beatmap)
         {
-            Beatmap = beatmap.ConvertTo<TObject>();
+            Beatmap = beatmap.ConvertTo<TObject>(PlayMode);
 
             RelativeSizeAxes = Axes.Both;
 
