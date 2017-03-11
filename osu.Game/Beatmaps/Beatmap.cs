@@ -87,9 +87,9 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <typeparam name="T">The type of HitObject the new Beatmap should contain.</typeparam>
         /// <returns></returns>
-        public Beatmap<T> ConvertTo<T>() where T : HitObject
+        public Beatmap<T> ConvertTo<T>(PlayMode playMode) where T : HitObject
         {
-            return Ruleset.GetRuleset(BeatmapInfo.Mode).CreateBeatmapConverter<T>().Convert(this);
+            return Ruleset.GetRuleset(playMode).CreateBeatmapConverter<T>().Convert(this);
         }
     }
 }
