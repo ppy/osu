@@ -35,11 +35,9 @@ namespace osu.Game.Beatmaps
     {
         protected List<T> Objects;
 
-        protected abstract HitObjectConverter<T> Converter { get; }
-
         protected DifficultyCalculator(Beatmap beatmap)
         {
-            Objects = Converter.Convert(beatmap);
+            Objects = beatmap.ConvertTo<T>().HitObjects;
             PreprocessHitObjects();
         }
 

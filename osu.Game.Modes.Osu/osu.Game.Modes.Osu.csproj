@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Beatmaps\OsuBeatmapConverter.cs" />
     <Compile Include="Objects\BezierApproximator.cs" />
     <Compile Include="Objects\CircularArcApproximator.cs" />
     <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
@@ -80,7 +81,6 @@
     <Compile Include="Objects\HitCircle.cs" />
     <Compile Include="Objects\Drawables\DrawableHitCircle.cs" />
     <Compile Include="Objects\OsuHitObject.cs" />
-    <Compile Include="Objects\OsuHitObjectConverter.cs" />
     <Compile Include="Objects\Slider.cs" />
     <Compile Include="Objects\Spinner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

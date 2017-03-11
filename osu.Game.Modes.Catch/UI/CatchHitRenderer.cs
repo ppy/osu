@@ -3,7 +3,6 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Catch.Objects;
-using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.UI;
 
@@ -15,8 +14,6 @@ namespace osu.Game.Modes.Catch.UI
             : base(beatmap)
         {
         }
-
-        protected override HitObjectConverter<CatchBaseHit> Converter => new CatchConverter();
 
         protected override Playfield<CatchBaseHit> CreatePlayfield() => new CatchPlayfield();
 

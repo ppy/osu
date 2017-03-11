@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
-using osu.Game.Modes.Objects;
 using osu.Game.Modes.Taiko.Objects;
 using System;
 using System.Collections.Generic;
@@ -16,8 +15,6 @@ namespace osu.Game.Modes.Taiko
         public TaikoDifficultyCalculator(Beatmap beatmap) : base(beatmap)
         {
         }
-
-        protected override HitObjectConverter<TaikoBaseHit> Converter => new TaikoConverter();
 
         protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
         {

@@ -3,7 +3,6 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Mania.Objects;
-using osu.Game.Modes.Objects;
 using System;
 using System.Collections.Generic;
 
@@ -19,8 +18,6 @@ namespace osu.Game.Modes.Mania
         {
             this.columns = columns;
         }
-
-        protected override HitObjectConverter<ManiaBaseHit> Converter => new ManiaConverter(columns);
 
         protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
         {

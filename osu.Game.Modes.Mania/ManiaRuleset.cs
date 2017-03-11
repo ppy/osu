@@ -3,6 +3,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Modes.Mania.Beatmaps;
 using osu.Game.Modes.Mania.UI;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
@@ -106,5 +107,10 @@ namespace osu.Game.Modes.Mania
         public override HitObjectParser CreateHitObjectParser() => new NullHitObjectParser();
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new ManiaDifficultyCalculator(beatmap);
+
+        public override IBeatmapConverter<ManiaBaseHit> CreateBeatmapConverter<ManiaBaseHit>()
+        {
+            return (IBeatmapConverter<ManiaBaseHit>)new ManiaBeatmapConverter();
+        }
     }
 }

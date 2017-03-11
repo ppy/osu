@@ -1,23 +1,62 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using System.Linq;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
-using osu.Game.Modes.Objects;
 using osu.Game.Modes;
+using osu.Game.Modes.Objects;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Beatmaps
 {
-    public class Beatmap
+    public class BeatmapBase
     {
-        public BeatmapInfo BeatmapInfo { get; set; }
+        private BeatmapBase original;
+
+        public BeatmapBase(BeatmapBase original = null)
+        {
+            this.original = original;
+        }
+
+        private BeatmapInfo beatmapInfo;
+        public BeatmapInfo BeatmapInfo
+        {
+            get { return beatmapInfo ?? original?.BeatmapInfo; }
+            set { beatmapInfo = value; }
+        }
+
+        private List<ControlPoint> controlPoints;
+        public List<ControlPoint> ControlPoints
+        {
+            get { return controlPoints ?? original?.ControlPoints; }
+            set { controlPoints = value; }
+        }
+
+        private List<Color4> comboColors;
+        public List<Color4> ComboColors
+        {
+            get { return comboColors ?? original?.ComboColors; }
+            set { comboColors = value; }
+        }
+
         public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
-        public List<HitObject> HitObjects { get; set; }
-        public List<ControlPoint> ControlPoints { get; set; }
-        public List<Color4> ComboColors { get; set; }
+    }
+
+    /// <summary>
+    /// A generic beatmap that does not contain HitObjects.
+    /// </summary>
+    public class Beatmap<T> : BeatmapBase
+        where T : HitObject
+    {
+        public List<T> HitObjects;
+
+        public Beatmap(BeatmapBase original = null)
+            : base(original)
+        {
+        }
+
         public double BPMMaximum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderBy(c => c.BeatLength).FirstOrDefault() ?? ControlPoint.Default).BeatLength;
         public double BPMMinimum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? ControlPoint.Default).BeatLength;
         public double BPMMode => BPMAt(ControlPoints.Where(c => c.BeatLength != 0).GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).First().First().Time);
@@ -58,7 +97,20 @@ namespace osu.Game.Beatmaps
 
             return timingPoint ?? ControlPoint.Default;
         }
+    }
+
+    public class Beatmap : Beatmap<HitObject>
+    {
+        public Beatmap(BeatmapBase original = null)
+            : base(original)
+        {
+        }
 
         public double CalculateStarDifficulty() => Ruleset.GetRuleset(BeatmapInfo.Mode).CreateDifficultyCalculator(this).Calculate();
+
+        public Beatmap<T> ConvertTo<T>() where T : HitObject
+        {
+            return Ruleset.GetRuleset(BeatmapInfo.Mode).CreateBeatmapConverter<T>().Convert(this);
+        }
     }
 }
