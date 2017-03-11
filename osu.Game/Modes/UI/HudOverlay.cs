@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Modes.Objects;
 using osu.Game.Screens.Play;
 using System;
 
@@ -28,19 +27,6 @@ namespace osu.Game.Modes.UI
         protected abstract PercentageCounter CreateAccuracyCounter();
         protected abstract ScoreCounter CreateScoreCounter();
         protected abstract HealthDisplay CreateHealthDisplay();
-
-        public virtual void OnHit(HitObject h)
-        {
-            ComboCounter?.Increment();
-            ScoreCounter?.Increment(300);
-            AccuracyCounter?.Set(Math.Min(1, AccuracyCounter.Count + 0.01f));
-        }
-
-        public virtual void OnMiss(HitObject h)
-        {
-            ComboCounter.Current.Value = 0;
-            AccuracyCounter?.Set(AccuracyCounter.Count - 0.01f);
-        }
 
         protected HudOverlay()
         {
@@ -76,8 +62,8 @@ namespace osu.Game.Modes.UI
         {
             //bind processor bindables to combocounter, score display etc.
             //TODO: these should be bindable binds, not events!
-            processor.TotalScore.ValueChanged += delegate { ScoreCounter?.Set((ulong)processor.TotalScore.Value); };
-            processor.Accuracy.ValueChanged += delegate { AccuracyCounter?.Set((float)processor.Accuracy.Value); };
+            ScoreCounter?.Current.BindTo(processor.TotalScore);
+            AccuracyCounter?.Current.BindTo(processor.Accuracy);
             ComboCounter?.Current.BindTo(processor.Combo);
             HealthDisplay?.Current.BindTo(processor.Health);
         }
