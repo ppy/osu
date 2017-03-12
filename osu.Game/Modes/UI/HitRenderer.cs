@@ -50,8 +50,6 @@ namespace osu.Game.Modes.UI
         protected override Container<Drawable> Content => content;
         protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
 
-        protected abstract PlayMode PlayMode { get; }
-
         protected Playfield<TObject> Playfield;
         protected Beatmap<TObject> Beatmap;
 
@@ -59,7 +57,7 @@ namespace osu.Game.Modes.UI
 
         protected HitRenderer(Beatmap beatmap)
         {
-            Beatmap = beatmap.ConvertTo<TObject>(PlayMode);
+            Beatmap = CreateBeatmapConverter().Convert(beatmap);
 
             RelativeSizeAxes = Axes.Both;
 
@@ -103,5 +101,6 @@ namespace osu.Game.Modes.UI
 
         protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
         protected abstract Playfield<TObject> CreatePlayfield();
+        protected abstract IBeatmapConverter<TObject> CreateBeatmapConverter();
     }
 }

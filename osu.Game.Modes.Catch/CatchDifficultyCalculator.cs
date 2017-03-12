@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Catch.Beatmaps;
 using osu.Game.Modes.Catch.Objects;
 using System;
 using System.Collections.Generic;
@@ -10,15 +11,15 @@ namespace osu.Game.Modes.Catch
 {
     public class CatchDifficultyCalculator : DifficultyCalculator<CatchBaseHit>
     {
-        protected override PlayMode PlayMode => PlayMode.Catch;
-
         public CatchDifficultyCalculator(Beatmap beatmap) : base(beatmap)
         {
         }
 
-        protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
+        protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
         {
             return 0;
         }
+
+        protected override IBeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
     }
 }
