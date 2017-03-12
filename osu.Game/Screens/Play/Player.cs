@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play
                 OnQuit = Exit
             };
 
-            hitRenderer = ruleset.CreateHitRendererWith(beatmap);
+            hitRenderer = ruleset.CreateHitRendererWith(Beatmap);
 
             if (ReplayInputHandler != null)
             {

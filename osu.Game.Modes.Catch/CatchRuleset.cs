@@ -15,7 +15,7 @@ namespace osu.Game.Modes.Catch
 {
     public class CatchRuleset : Ruleset
     {
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new CatchHitRenderer(beatmap);
+        public override HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap) => new CatchHitRenderer(beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {

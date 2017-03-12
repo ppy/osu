@@ -14,7 +14,7 @@ namespace osu.Game.Modes.Mania
 {
     public class ManiaRuleset : Ruleset
     {
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new ManiaHitRenderer(beatmap);
+        public override HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap) => new ManiaHitRenderer(beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
