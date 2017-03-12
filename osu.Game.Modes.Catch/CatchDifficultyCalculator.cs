@@ -4,7 +4,6 @@
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Catch.Beatmaps;
 using osu.Game.Modes.Catch.Objects;
-using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Modes.Catch
