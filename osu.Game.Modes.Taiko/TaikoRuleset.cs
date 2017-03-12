@@ -4,8 +4,10 @@
 using OpenTK.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Modes.Mods;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Taiko.Beatmaps;
+using osu.Game.Modes.Taiko.Mods;
 using osu.Game.Modes.Taiko.UI;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;

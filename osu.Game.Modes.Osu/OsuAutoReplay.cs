@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using OpenTK;
+using osu.Framework.Graphics.Transforms;
+using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Osu.Objects;
-using OpenTK;
-using System;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Modes.Osu.Objects.Drawables;
-using osu.Framework.MathUtils;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace osu.Game.Modes.Osu
@@ -19,9 +19,9 @@ namespace osu.Game.Modes.Osu
 
         private const float spin_radius = 50;
 
-        private Beatmap beatmap;
+        private Beatmap<OsuHitObject> beatmap;
 
-        public OsuAutoReplay(Beatmap beatmap)
+        public OsuAutoReplay(Beatmap<OsuHitObject> beatmap)
         {
             this.beatmap = beatmap;
 
@@ -86,7 +86,7 @@ namespace osu.Game.Modes.Osu
 
             for (int i = 0; i < beatmap.HitObjects.Count; i++)
             {
-                OsuHitObject h = (OsuHitObject)beatmap.HitObjects[i];
+                OsuHitObject h = beatmap.HitObjects[i];
 
                 //if (h.EndTime < InputManager.ReplayStartTime)
                 //{
@@ -98,7 +98,7 @@ namespace osu.Game.Modes.Osu
 
                 if (DelayedMovements && i > 0)
                 {
-                    OsuHitObject last = (OsuHitObject)beatmap.HitObjects[i - 1];
+                    OsuHitObject last = beatmap.HitObjects[i - 1];
 
                     //Make the cursor stay at a hitObject as long as possible (mainly for autopilot).
                     if (h.StartTime - h.HitWindowFor(OsuScoreResult.Miss) > last.EndTime + h.HitWindowFor(OsuScoreResult.Hit50) + 50)

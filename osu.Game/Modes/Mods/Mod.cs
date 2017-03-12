@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Game.Graphics;
-using osu.Game.Screens.Play;
+using osu.Game.Modes.UI;
+using System;
 
-namespace osu.Game.Modes
+namespace osu.Game.Modes.Mods
 {
     /// <summary>
     /// The base class for gameplay modifiers.
@@ -41,12 +41,6 @@ namespace osu.Game.Modes
         /// The mods this mod cannot be enabled with.
         /// </summary>
         public virtual Type[] IncompatibleMods => new Type[] { };
-
-        /// <summary>
-        /// Direct access to the Player before load has run.
-        /// </summary>
-        /// <param name="player"></param>
-        public virtual void PlayerLoading(Player player) { }
     }
 
     public class MultiMod : Mod
@@ -152,10 +146,23 @@ namespace osu.Game.Modes
         public override double ScoreMultiplier => 0;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail) };
 
-        public override void PlayerLoading(Player player)
+        /// <summary>
+        /// Attaches a replay score to a HitRenderer.
+        /// </summary>
+        /// <param name="hitRenderer">The HitRenderer to attach the score to.</param>
+        /// <param name="score">The score to attach.</param>
+        protected void Attach(HitRenderer hitRenderer, Score score)
         {
-            base.PlayerLoading(player);
-            player.ReplayInputHandler = Ruleset.GetRuleset(player.Beatmap.PlayMode).CreateAutoplayScore(player.Beatmap.Beatmap)?.Replay?.GetInputHandler();
+            hitRenderer.InputManager.ReplayInputHandler = score?.Replay?.GetInputHandler();
+        }
+
+        /// <summary>
+        /// Detaches the active replay score from a HitRenderer.
+        /// </summary>
+        /// <param name="hitRenderer">The HitRenderer to detach the score from.</param>
+        protected void Detach(HitRenderer hitRenderer)
+        {
+            hitRenderer.InputManager.ReplayInputHandler = null;
         }
     }
 
@@ -169,12 +176,5 @@ namespace osu.Game.Modes
     {
         public override string Name => "Cinema";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_cinema;
-    }
-
-    public enum ModType
-    {
-        DifficultyReduction,
-        DifficultyIncrease,
-        Special,
     }
 }
