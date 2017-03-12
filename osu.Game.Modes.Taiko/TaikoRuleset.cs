@@ -14,10 +14,7 @@ namespace osu.Game.Modes.Taiko
 {
     public class TaikoRuleset : Ruleset
     {
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new TaikoHitRenderer
-        {
-            Beatmap = beatmap,
-        };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new TaikoHitRenderer(beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
