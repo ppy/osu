@@ -5,7 +5,6 @@ using OpenTK.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
-using osu.Game.Modes.Osu.Beatmaps;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
@@ -119,10 +118,5 @@ namespace osu.Game.Modes.Osu
             new KeyCounterMouse(MouseButton.Left),
             new KeyCounterMouse(MouseButton.Right)
         };
-
-        public override IBeatmapConverter<T> CreateBeatmapConverter<T>()
-        {
-            return (IBeatmapConverter<T>)new OsuBeatmapConverter();
-        }
     }
 }
