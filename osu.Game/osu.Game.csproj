@@ -91,6 +91,8 @@
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
     <Compile Include="Modes\LegacyReplay.cs" />
+    <Compile Include="Modes\Mods\IApplyableMod.cs" />
+    <Compile Include="Modes\Mods\ModType.cs" />
     <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Modes\Objects\NullHitObjectParser.cs" />
@@ -306,7 +308,7 @@
     <Compile Include="Screens\Play\Pause\RetryButton.cs" />
     <Compile Include="Screens\Play\Pause\QuitButton.cs" />
     <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
-    <Compile Include="Modes\Mod.cs" />
+    <Compile Include="Modes\Mods\Mod.cs" />
     <Compile Include="Overlays\Mods\ModButton.cs" />
     <Compile Include="Modes\UI\ModIcon.cs" />
     <Compile Include="Overlays\Mods\ModSection.cs" />

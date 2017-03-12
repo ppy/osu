@@ -1,11 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Graphics;
+using osu.Game.Modes.Mods;
+using osu.Game.Modes.Osu.Objects;
+using osu.Game.Modes.UI;
 using System;
 using System.Linq;
-using osu.Game.Graphics;
 
-namespace osu.Game.Modes.Osu
+namespace osu.Game.Modes.Osu.Mods
 {
     public class OsuModNoFail : ModNoFail
     {
@@ -85,9 +88,22 @@ namespace osu.Game.Modes.Osu
         public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail), typeof(ModAutoplay) };
     }
 
-    public class OsuModAutoplay : ModAutoplay
+    public class OsuModAutoplay : ModAutoplay, IApplyableOsuMod
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
+
+        public void Apply(HitRenderer<OsuHitObject> hitRenderer)
+        {
+            Attach(hitRenderer, new Score
+            {
+                Replay = new OsuAutoReplay(hitRenderer.Beatmap)
+            });
+        }
+
+        public void Revert(HitRenderer<OsuHitObject> hitRenderer)
+        {
+            Detach(hitRenderer);
+        }
     }
 
     public class OsuModTarget : Mod
