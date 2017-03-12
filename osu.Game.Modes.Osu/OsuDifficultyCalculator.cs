@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Osu.Beatmaps;
 using osu.Game.Modes.Osu.Objects;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,6 @@ namespace osu.Game.Modes.Osu
     {
         private const double star_scaling_factor = 0.0675;
         private const double extreme_scaling_factor = 0.5;
-
-        protected override PlayMode PlayMode => PlayMode.Osu;
 
         /// <summary>
         /// HitObjects are stored as a member variable.
@@ -31,7 +30,7 @@ namespace osu.Game.Modes.Osu
                     ((Slider)h).Curve.Calculate();
         }
 
-        protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
+        protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
         {
             // Fill our custom DifficultyHitObject class, that carries additional information
             DifficultyHitObjects.Clear();
@@ -180,6 +179,8 @@ namespace osu.Game.Modes.Osu
 
             return difficulty;
         }
+
+        protected override IBeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
 
         // Those values are used as array indices. Be careful when changing them!
         public enum DifficultyType

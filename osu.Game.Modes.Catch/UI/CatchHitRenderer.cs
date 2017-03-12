@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Catch.Beatmaps;
 using osu.Game.Modes.Catch.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.UI;
@@ -15,7 +16,7 @@ namespace osu.Game.Modes.Catch.UI
         {
         }
 
-        protected override PlayMode PlayMode => PlayMode.Catch;
+        protected override IBeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
 
         protected override Playfield<CatchBaseHit> CreatePlayfield() => new CatchPlayfield();
 

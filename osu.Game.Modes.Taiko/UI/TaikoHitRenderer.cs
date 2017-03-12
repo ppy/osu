@@ -3,6 +3,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Taiko.Beatmaps;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.UI;
 
@@ -15,7 +16,7 @@ namespace osu.Game.Modes.Taiko.UI
         {
         }
 
-        protected override PlayMode PlayMode => PlayMode.Taiko;
+        protected override IBeatmapConverter<TaikoBaseHit> CreateBeatmapConverter() => new TaikoBeatmapConverter();
 
         protected override Playfield<TaikoBaseHit> CreatePlayfield() => new TaikoPlayfield();
 
