@@ -3,9 +3,7 @@
 
 using osu.Framework.Input.Handlers;
 using osu.Game.Beatmaps;
-using osu.Game.Modes;
 using osu.Game.Modes.Mods;
-using osu.Game.Modes.Osu;
 using osu.Game.Modes.Osu.Mods;
 using osu.Game.Screens.Play;
 using System;

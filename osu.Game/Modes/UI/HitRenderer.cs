@@ -104,10 +104,9 @@ namespace osu.Game.Modes.UI
 
             foreach (var mod in mods)
             {
-                var applyable = mod as IApplyableMod<HitRenderer<TObject>>;
+                var applyable = mod as IApplyableMod<TObject>;
 
-                if (applyable != null)
-                    applyable.Apply(this);
+                applyable?.Apply(this);
             }
         }
 
