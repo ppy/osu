@@ -6,7 +6,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Modes.Mods;
 using osu.Game.Modes.Objects;
-using osu.Game.Modes.Osu.Beatmaps;
 using osu.Game.Modes.Osu.Mods;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
@@ -114,10 +113,5 @@ namespace osu.Game.Modes.Osu
             new KeyCounterMouse(MouseButton.Left),
             new KeyCounterMouse(MouseButton.Right)
         };
-
-        public override IBeatmapConverter<T> CreateBeatmapConverter<T>()
-        {
-            return (IBeatmapConverter<T>)new OsuBeatmapConverter();
-        }
     }
 }
