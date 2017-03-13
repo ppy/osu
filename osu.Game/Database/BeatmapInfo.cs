@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Linq;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
+using System;
+using System.Linq;
 
 namespace osu.Game.Database
 {
@@ -82,7 +82,7 @@ namespace osu.Game.Database
             {
                 return starDifficulty < 0 ? (BaseDifficulty?.OverallDifficulty ?? 5) : starDifficulty;
             }
-            
+
             set { starDifficulty = value; }
         }
 
