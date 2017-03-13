@@ -1,27 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Modes.UI;
 using OpenTK;
-using OpenTK.Input;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
 
-namespace osu.Game.Modes.Osu.UI
+namespace osu.Game.Modes.UI
 {
-    public class OsuScoreOverlay : ScoreOverlay
+    public class StandardHudOverlay : HudOverlay
     {
-        protected override ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
-        {
-            Anchor = Anchor.TopCentre,
-            Origin = Anchor.TopCentre,
-            TextSize = 40,
-            Position = new Vector2(0, 30),
-            Margin = new MarginPadding { Right = 5 },
-        };
-
         protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter
         {
             Anchor = Anchor.TopCentre,
@@ -31,10 +20,17 @@ namespace osu.Game.Modes.Osu.UI
             Margin = new MarginPadding { Right = 5 },
         };
 
-        protected override ComboCounter CreateComboCounter() => new OsuComboCounter
+        protected override ComboCounter CreateComboCounter() => new StandardComboCounter
         {
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
+        };
+
+        protected override HealthDisplay CreateHealthDisplay() => new StandardHealthDisplay
+        {
+            Size = new Vector2(1, 5),
+            RelativeSizeAxes = Axes.X,
+            Margin = new MarginPadding { Top = 20 }
         };
 
         protected override KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
@@ -44,13 +40,15 @@ namespace osu.Game.Modes.Osu.UI
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
-            Children = new KeyCounter[]
-            {
-                new KeyCounterKeyboard(Key.Z),
-                new KeyCounterKeyboard(Key.X),
-                new KeyCounterMouse(MouseButton.Left),
-                new KeyCounterMouse(MouseButton.Right),
-            }
+        };
+
+        protected override ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
+        {
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
+            TextSize = 40,
+            Position = new Vector2(0, 30),
+            Margin = new MarginPadding { Right = 5 },
         };
     }
 }

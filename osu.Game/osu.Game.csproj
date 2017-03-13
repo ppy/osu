@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
+    <Compile Include="Beatmaps\IBeatmapCoverter.cs" />
     <Compile Include="Database\ScoreDatabase.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
@@ -97,6 +98,9 @@
     <Compile Include="Modes\Score.cs" />
     <Compile Include="Modes\ScoreProcesssor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />
+    <Compile Include="Modes\UI\HudOverlay.cs" />
+    <Compile Include="Modes\UI\StandardHealthDisplay.cs" />
+    <Compile Include="Modes\UI\StandardHudOverlay.cs" />
     <Compile Include="Online\API\IOnlineComponent.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
@@ -167,6 +171,7 @@
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
+    <Compile Include="Modes\UI\StandardComboCounter.cs" />
     <Compile Include="Screens\Select\CarouselContainer.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameScreen.cs" />
@@ -181,7 +186,6 @@
     <Compile Include="Screens\Select\PlaySongSelect.cs" />
     <Compile Include="Modes\UI\HitRenderer.cs" />
     <Compile Include="Modes\UI\Playfield.cs" />
-    <Compile Include="Modes\UI\ScoreOverlay.cs" />
     <Compile Include="Screens\Select\EditSongSelect.cs" />
     <Compile Include="Modes\UI\ComboCounter.cs" />
     <Compile Include="Modes\UI\ComboResultCounter.cs" />

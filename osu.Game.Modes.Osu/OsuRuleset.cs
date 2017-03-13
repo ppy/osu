@@ -1,25 +1,22 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using System.Linq;
+using OpenTK.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
+using osu.Game.Screens.Play;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Modes.Osu
 {
     public class OsuRuleset : Ruleset
     {
-        public override ScoreOverlay CreateScoreOverlay() => new OsuScoreOverlay();
-
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new OsuHitRenderer
-        {
-            Beatmap = beatmap,
-        };
+        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new OsuHitRenderer(beatmap);
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
         {
@@ -111,5 +108,15 @@ namespace osu.Game.Modes.Osu
         }
 
         protected override PlayMode PlayMode => PlayMode.Osu;
+
+        public override string Description => "osu!";
+
+        public override IEnumerable<KeyCounter> CreateGameplayKeys() => new KeyCounter[]
+        {
+            new KeyCounterKeyboard(Key.Z),
+            new KeyCounterKeyboard(Key.X),
+            new KeyCounterMouse(MouseButton.Left),
+            new KeyCounterMouse(MouseButton.Right)
+        };
     }
 }
