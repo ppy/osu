@@ -10,6 +10,7 @@ namespace osu.Game.Beatmaps.IO
 {
     public abstract class BeatmapArchiveReader : ArchiveReader
     {
+        public const string OszExtension = @".osz";
 
         public static BeatmapArchiveReader GetBeatmapArchiveReader(Storage storage, string path)
         {
@@ -19,7 +20,7 @@ namespace osu.Game.Beatmaps.IO
             }
             catch (InvalidCastException e)
             {
-                Logger.Error(e, "A tricky ArchiveReader instance passed the test to be a BeatmapArhiveReader, but it's really not");
+                Logger.Error(e, "A tricky  " + $@"{nameof(ArchiveReader)}" + " instance passed the test to be a " + $@"{nameof(BeatmapArchiveReader)}" + ", but it's really not");
                 throw;
             }
         }
