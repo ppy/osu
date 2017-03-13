@@ -239,7 +239,7 @@
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
-    <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
+    <Compile Include="Beatmaps\IO\BeatmapArchiveReader.cs" />
     <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
@@ -327,6 +327,7 @@
     <Compile Include="Screens\Select\Options\BeatmapOptionsEditButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsRemoveFromUnplayedButton.cs" />
+    <Compile Include="IO\ArchiveReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

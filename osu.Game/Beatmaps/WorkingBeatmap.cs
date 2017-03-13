@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps
 
         public readonly bool WithStoryboard;
 
-        protected abstract ArchiveReader GetReader();
+        protected abstract BeatmapArchiveReader GetReader();
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, bool withStoryboard = false)
         {
@@ -100,7 +100,7 @@ namespace osu.Game.Beatmaps
             set { lock (beatmapLock) beatmap = value; }
         }
 
-        private ArchiveReader trackReader;
+        private BeatmapArchiveReader trackReader;
         private Track track;
         private object trackLock = new object();
         public Track Track
