@@ -5,15 +5,13 @@ using OpenTK;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Allocation;
 using osu.Framework.MathUtils;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Modes;
 using osu.Game.Users;
+using osu.Game.Modes.Osu;
 
 namespace osu.Desktop.VisualTests
 {
@@ -25,30 +23,181 @@ namespace osu.Desktop.VisualTests
 
         private void newScores()
         {
-            var scores = new List<Score>();
-            for (int i = 0; i < 10; i++)
+            var scores = new[]
             {
-                scores.Add(new Score
+                new Score
                 {
-                    Accuracy = Math.Round(RNG.NextDouble(0, 100), 2),
-                    MaxCombo = RNG.Next(0, 3000),
-                    TotalScore = RNG.Next(1, 1000000),
-                    Mods = Ruleset.GetRuleset(PlayMode.Osu).GetModsFor(ModType.DifficultyIncrease).ToArray(),
-                    User = new Game.Users.User
+                    Accuracy = 100,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    User = new User
                     {
-                        Id = 2,
-                        Username = @"peppy",
+                        Id = 6602580,
+                        Username = @"waaiiru",
                         Region = new Region
                         {
-                            FullName = @"Australia",
-                            Acronym = @"AUS",
-                            FlagName = @"AU",
+                            FullName = @"Spain",
+                            FlagName = @"ES",
                         },
                     },
-                });
-            }
+                },
+                new Score
+                {
+                    Accuracy = 100,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    User = new User
+                    {
+                        Id = 4608074,
+                        Username = @"Skycries",
+                        Region = new Region
+                        {
+                            FullName = @"Brazil",
+                            FlagName = @"BR",
+                        },
+                    },
+                },
+                new Score
+                {
+                    Accuracy = 100,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    User = new User
+                    {
+                        Id = 1014222,
+                        Username = @"eLy",
+                        Region = new Region
+                        {
+                            FullName = @"Japan",
+                            FlagName = @"JP",
+                        },
+                    },
+                },
+                new Score
+                {
+                    Accuracy = 100,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    User = new User
+                    {
+                        Id = 1541390,
+                        Username = @"Toukai",
+                        Region = new Region
+                        {
+                            FullName = @"Canada",
+                            FlagName = @"CA",
+                        },
+                    },
+                },
+                new Score
+                {
+                    Accuracy = 100,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    User = new User
+                    {
+                        Id = 2243452,
+                        Username = @"Satoruu",
+                        Region = new Region
+                        {
+                            FullName = @"Venezuela",
+                            FlagName = @"VE",
+                        },
+                    },
+                },
+                new Score
+                {
+                    Accuracy = 100,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    User = new User
+                    {
+                        Id = 2705430,
+                        Username = @"Mooha",
+                        Region = new Region
+                        {
+                            FullName = @"France",
+                            FlagName = @"FR",
+                        },
+                    },
+                },
+                new Score
+                {
+                    Accuracy = 100,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    User = new User
+                    {
+                        Id = 7151382,
+                        Username = @"Mayuri Hana",
+                        Region = new Region
+                        {
+                            FullName = @"Thailand",
+                            FlagName = @"TH",
+                        },
+                    },
+                },
+                new Score
+                {
+                    Accuracy = 100,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    User = new User
+                    {
+                        Id = 2051389,
+                        Username = @"FunOrange",
+                        Region = new Region
+                        {
+                            FullName = @"Canada",
+                            FlagName = @"CA",
+                        },
+                    },
+                },
+                new Score
+                {
+                    Accuracy = 100,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    User = new User
+                    {
+                        Id = 6169483,
+                        Username = @"-Hebel-",
+                        Region = new Region
+                        {
+                            FullName = @"Mexico",
+                            FlagName = @"MX",
+                        },
+                    },
+                },
+                new Score
+                {
+                    Accuracy = 100,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    User = new User
+                    {
+                        Id = 6702666,
+                        Username = @"prhtnsm",
+                        Region = new Region
+                        {
+                            FullName = @"Germany",
+                            FlagName = @"DE",
+                        },
+                    },
+                },
+            };
 
-            leaderboard.Scores = scores.ToArray();
+            leaderboard.Scores = scores;
         }
 
         public override void Reset()

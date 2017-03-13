@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Toolbar
                 Masking = true;
             }
 
-            [BackgroundDependencyLoader]
+            [BackgroundDependencyLoader(permitNulls:true)]
             private void load(OsuGame game, TextureStore textures)
             {
                 this.game = game;
@@ -98,18 +98,21 @@ namespace osu.Game.Overlays.Toolbar
 
                     newSprite.FillMode = FillMode.Fit;
 
-                    newSprite.LoadAsync(game, s =>
+                    if (game != null)
                     {
-                        Sprite?.FadeOut();
-                        Sprite?.Expire();
-                        Sprite = s;
+                        newSprite.LoadAsync(game, s =>
+                        {
+                            Sprite?.FadeOut();
+                            Sprite?.Expire();
+                            Sprite = s;
 
-                        Add(s);
+                            Add(s);
 
-                        //todo: fix this... clock dependencies are a pain
-                        if (s.Clock != null)
-                            s.FadeInFromZero(200);
-                    });
+                            //todo: fix this... clock dependencies are a pain
+                            if (s.Clock != null)
+                                s.FadeInFromZero(200);
+                        });
+                    }
                 }
             }
 

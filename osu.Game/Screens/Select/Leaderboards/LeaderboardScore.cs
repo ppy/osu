@@ -34,18 +34,16 @@ namespace osu.Game.Screens.Select.Leaderboards
         };
 
         private Box background;
-        private Container content;
-        private Sprite avatar;
+        private Container content, avatarContainer;
+        private Sprite scoreLetter;
+        private OsuSpriteText nameLabel;
+        private GlowingSpriteText scoreLabel;
+        private ScoreComponentLabel maxCombo, accuracy;
+        private Container flagBadgeContainer;
         private FillFlowContainer<ScoreModIcon> modsContainer;
 
         private readonly int index;
         public readonly Score Score;
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            avatar.Texture = textures.Get($@"https://a.ppy.sh/{Score.User.Id}") ?? textures.Get(@"Online/avatar-guest");
-        }
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
@@ -63,14 +61,51 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             base.LoadComplete();
 
-            // TODO: This is hacky, find a better way
+            // TODO: This fade to 0.01 is hacky, find a better way
             FadeTo(0.01f);
-            content.MoveToX(DrawSize.X);
+
+            foreach (Drawable d in new Drawable[] { avatarContainer, nameLabel, scoreLabel, scoreLetter, flagBadgeContainer, maxCombo, accuracy, modsContainer, })
+            {
+                d.FadeOut();
+            }
+
+            content.MoveToY(75);
+            avatarContainer.MoveToX(75);
+            nameLabel.MoveToX(150);
+
             Delay(index * 50);
             Schedule(() =>
             {
-                FadeInFromZero(200);
-                content.MoveToX(0, 500, EasingTypes.OutQuint);
+                FadeIn(200);
+                content.MoveToY(0, 400, EasingTypes.OutQuint);
+
+                Delay(100);
+                Schedule(() =>
+                {
+                    avatarContainer.FadeIn(300, EasingTypes.OutQuint);
+                    nameLabel.FadeIn(350, EasingTypes.OutQuint);
+
+                    avatarContainer.MoveToX(0, 300, EasingTypes.OutQuint);
+                    nameLabel.MoveToX(0, 350, EasingTypes.OutQuint);
+
+                    Delay(250);
+                    Schedule(() =>
+                    {
+                        scoreLabel.FadeIn(200);
+                        scoreLetter.FadeIn(200);
+
+                        Delay(50);
+                        Schedule(() =>
+                        {
+                            var drawables = new Drawable[] { flagBadgeContainer, maxCombo, accuracy, modsContainer, };
+
+                            for (int i = 0; i < drawables.Length; i++)
+                            {
+                                drawables[i].FadeIn(200 + (i * 50));
+                            }
+                        });
+                    });
+                });
             });
         }
 
@@ -131,7 +166,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Padding = new MarginPadding(edge_margin),
                             Children = new Drawable[]
                             {
-                                new Container
+                                avatarContainer = new Container
                                 {
                                     Size = new Vector2(height - edge_margin * 2, height - edge_margin * 2),
                                     CornerRadius = corner_radius,
@@ -139,9 +174,11 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     EdgeEffect = imageShadow,
                                     Children = new Drawable[]
                                     {
-                                        avatar = new Sprite
+                                        new Overlays.Toolbar.ToolbarUserButton.Avatar
                                         {
                                             RelativeSizeAxes = Axes.Both,
+                                            UserId = Score.User.Id,
+                                            Masking = false,
                                         },
                                     },
                                 },
@@ -152,7 +189,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     Position = new Vector2(height - edge_margin, 0f),
                                     Children = new Drawable[]
                                     {
-                                        new OsuSpriteText
+                                        nameLabel = new OsuSpriteText
                                         {
                                             Text = Score.User?.Username,
                                             Font = @"Exo2.0-BoldItalic",
@@ -167,7 +204,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                             Spacing = new Vector2(10f, 0f),
                                             Children = new Drawable[]
                                             {
-                                                new Container
+                                                flagBadgeContainer = new Container
                                                 {
                                                     Size = new Vector2(87f, 20f),
                                                     Masking = true,
@@ -184,21 +221,21 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Margin = new MarginPadding { Left = 10, },
                                                     Children = new Drawable[]
                                                     {
-                                                        new ScoreComponentLabel(FontAwesome.fa_circle_o, Score.MaxCombo.ToString()),
-                                                        new ScoreComponentLabel(FontAwesome.fa_circle_o, Score.Accuracy.ToString()),
+                                                        maxCombo = new ScoreComponentLabel(FontAwesome.fa_circle_o, Score.MaxCombo.ToString()),
+                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_circle_o, Score.Accuracy.ToString()),
                                                     },
                                                 },
                                             },
                                         },
                                     },
                                 },
-                                new Sprite
+                                scoreLetter = new Sprite
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Size = new Vector2(score_letter_size),
                                 },
-                                new GlowingSpriteText(string.Format("{0:n0}", Score.TotalScore), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa"))
+                                scoreLabel = new GlowingSpriteText(string.Format("{0:n0}", Score.TotalScore), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa"))
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
@@ -313,6 +350,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 {
                     new TextAwesome
                     {
+                        Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_square,
                         Colour = OsuColour.FromHex(@"3087ac"),
                         Rotation = 45,
@@ -320,6 +358,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     },
                     new TextAwesome
                     {
+                        Origin = Anchor.Centre,
                         Icon = icon,
                         Colour = OsuColour.FromHex(@"a4edff"),
                         Scale = new Vector2(0.8f),
