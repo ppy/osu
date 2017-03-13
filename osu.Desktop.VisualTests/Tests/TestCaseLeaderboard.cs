@@ -19,7 +19,6 @@ namespace osu.Desktop.VisualTests
 {
     class TestCaseLeaderboard : TestCase
     {
-        public override string Name => @"Leaderboard";
         public override string Description => @"From song select";
 
         private Leaderboard leaderboard;

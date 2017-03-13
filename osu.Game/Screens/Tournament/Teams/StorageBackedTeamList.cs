@@ -53,11 +53,7 @@ namespace osu.Game.Screens.Tournament.Teams
                             string acronym = split.Length >= 3 ? split[2].Trim() : teamName;
                             acronym = acronym.Substring(0, Math.Min(3, acronym.Length));
 
-<<<<<<< HEAD
-                            teams.Add(new Region()
-=======
-                            teams.Add(new Team
->>>>>>> 6f20473e65960e059727dee5dc075fc356d07c1b
+                            teams.Add(new Region
                             {
                                 FlagName = flagName,
                                 FullName = teamName,
