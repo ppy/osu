@@ -7,6 +7,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens.Testing;
 using osu.Game.Screens.Tournament;
 using osu.Game.Screens.Tournament.Teams;
+using osu.Game.Users;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -32,57 +33,57 @@ namespace osu.Desktop.VisualTests.Tests
 
         class TestTeamList : ITeamList
         {
-            public IEnumerable<Team> Teams { get; } = new[]
+            public IEnumerable<Region> Teams { get; } = new[]
             {
-                new Team
+                new Region
                 {
                     FlagName = "GB",
                     FullName = "United Kingdom",
                     Acronym = "UK"
                 },
-                new Team
+                new Region
                 {
                     FlagName = "FR",
                     FullName = "France",
                     Acronym = "FRA"
                 },
-                new Team
+                new Region
                 {
                     FlagName = "CN",
                     FullName = "China",
                     Acronym = "CHN"
                 },
-                new Team
+                new Region
                 {
                     FlagName = "AU",
                     FullName = "Australia",
                     Acronym = "AUS"
                 },
-                new Team
+                new Region
                 {
                     FlagName = "JP",
                     FullName = "Japan",
                     Acronym = "JPN"
                 },
-                new Team
+                new Region
                 {
                     FlagName = "RO",
                     FullName = "Romania",
                     Acronym = "ROM"
                 },
-                new Team
+                new Region
                 {
                     FlagName = "IT",
                     FullName = "Italy",
                     Acronym = "PIZZA"
                 },
-                new Team
+                new Region
                 {
                     FlagName = "VE",
                     FullName = "Venezuela",
                     Acronym = "VNZ"
                 },
-                new Team
+                new Region
                 {
                     FlagName = "US",
                     FullName = "United States of America",

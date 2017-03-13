@@ -217,7 +217,6 @@
     <Compile Include="Screens\Tournament\GroupContainer.cs" />
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
-    <Compile Include="Screens\Tournament\Teams\Team.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
@@ -311,7 +310,10 @@
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsRemoveFromUnplayedButton.cs" />
     <Compile Include="Screens\Select\Leaderboards\Leaderboard.cs" />
-    <Compile Include="Screens\Select\Leaderboards\LeaderboardScoreDisplay.cs" />
+    <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
+    <Compile Include="Graphics\UserInterface\IHasDrawableRepresentation.cs" />
+    <Compile Include="Users\Region.cs" />
+    <Compile Include="Users\Badge.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

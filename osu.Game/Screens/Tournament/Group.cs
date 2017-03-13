@@ -14,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -73,7 +74,7 @@ namespace osu.Game.Screens.Tournament
             };
         }
 
-        public void AddTeam(Team team)
+        public void AddTeam(Region team)
         {
             GroupTeam gt = new GroupTeam(team);
 
@@ -91,7 +92,7 @@ namespace osu.Game.Screens.Tournament
             return allTeams.Any(t => t.Team.FullName == fullName);
         }
 
-        public bool RemoveTeam(Team team)
+        public bool RemoveTeam(Region team)
         {
             allTeams.RemoveAll(gt => gt.Team == team);
 
@@ -122,12 +123,12 @@ namespace osu.Game.Screens.Tournament
 
         class GroupTeam : Container
         {
-            public Team Team;
+            public Region Team;
 
             private FillFlowContainer innerContainer;
             private Sprite flagSprite;
 
-            public GroupTeam(Team team)
+            public GroupTeam(Region team)
             {
                 Team = team;
 

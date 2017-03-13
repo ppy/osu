@@ -13,15 +13,16 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Allocation;
+using System.Linq;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public class LeaderboardScoreDisplay : Container
+    public class LeaderboardScore : Container
     {
         private const float height = 70;
         private const float corner_radius = 5;
         private const float edge_margin = 10;
-        private const float background_opacity = 0.25f;
+        private const float background_alpha = 0.25f;
         private const float score_letter_size = 20f;
 
         private readonly EdgeEffect imageShadow = new EdgeEffect
@@ -33,7 +34,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private Box background;
         private Container content;
-        private Sprite avatar, flag;
+        private Sprite avatar;
         private FillFlowContainer<ScoreModIcon> modsContainer;
 
         private readonly int index;
@@ -43,18 +44,17 @@ namespace osu.Game.Screens.Select.Leaderboards
         private void load(TextureStore textures)
         {
             avatar.Texture = textures.Get($@"https://a.ppy.sh/{Score.User.Id}") ?? textures.Get(@"Online/avatar-guest");
-            flag.Texture = textures.Get($@"Flags/{Score.User.FlagName}");
         }
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            background.FadeColour(Color4.Black.Opacity(0.5f), 300, EasingTypes.OutQuint);
+            background.FadeTo(0.5f, 300, EasingTypes.OutQuint);
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(Framework.Input.InputState state)
         {
-            background.FadeColour(Color4.Black.Opacity(background_opacity), 200, EasingTypes.OutQuint);
+            background.FadeTo(background_alpha, 200, EasingTypes.OutQuint);
             base.OnHoverLost(state);
         }
 
@@ -73,13 +73,17 @@ namespace osu.Game.Screens.Select.Leaderboards
             });
         }
 
-        public LeaderboardScoreDisplay(Score score, int i)
+        public LeaderboardScore(Score score, int i)
         {
             Score = score;
             index = i;
 
             RelativeSizeAxes = Axes.X;
             Height = height;
+
+            var flag = Score.User.Region.CreateDrawable();
+            flag.Width = 30;
+            flag.RelativeSizeAxes = Axes.Y;
 
             Children = new Drawable[]
             {
@@ -115,7 +119,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black.Opacity(background_opacity),
+                                    Colour = Color4.Black,
+                                    Alpha = background_alpha,
                                 },
                             },
                         },
@@ -167,18 +172,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        flag = new Sprite
-                                                        {
-                                                            RelativeSizeAxes = Axes.Y,
-                                                            Width = 30f,
-                                                        },
-                                                        new Sprite
-                                                        {
-                                                            Origin = Anchor.BottomRight,
-                                                            Anchor = Anchor.BottomRight,
-                                                            RelativeSizeAxes = Axes.Y,
-                                                            Width = 50f,
-                                                        },
+                                                        flag,
                                                     },
                                                 },
                                                 new FillFlowContainer
