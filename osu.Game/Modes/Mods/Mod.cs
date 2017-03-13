@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
 using System;
 
@@ -145,24 +147,16 @@ namespace osu.Game.Modes.Mods
         public override string Description => "Watch a perfect automated play through the song";
         public override double ScoreMultiplier => 0;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail) };
+    }
 
-        /// <summary>
-        /// Attaches a replay score to a HitRenderer.
-        /// </summary>
-        /// <param name="hitRenderer">The HitRenderer to attach the score to.</param>
-        /// <param name="score">The score to attach.</param>
-        protected void Attach(HitRenderer hitRenderer, Score score)
-        {
-            hitRenderer.InputManager.ReplayInputHandler = score?.Replay?.GetInputHandler();
-        }
+    public abstract class ModAutoplay<T> : ModAutoplay, IApplyableMod<T>
+        where T : HitObject
+    {
+        protected abstract Score CreateReplayScore(Beatmap<T> beatmap);
 
-        /// <summary>
-        /// Detaches the active replay score from a HitRenderer.
-        /// </summary>
-        /// <param name="hitRenderer">The HitRenderer to detach the score from.</param>
-        protected void Detach(HitRenderer hitRenderer)
+        public void Apply(HitRenderer<T> hitRenderer)
         {
-            hitRenderer.InputManager.ReplayInputHandler = null;
+            hitRenderer.InputManager.ReplayInputHandler = CreateReplayScore(hitRenderer.Beatmap)?.Replay?.GetInputHandler();
         }
     }
 

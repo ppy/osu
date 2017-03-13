@@ -19,11 +19,5 @@ namespace osu.Game.Modes.Mods
         /// </summary>
         /// <param name="hitRenderer">The HitRenderer to apply the mod to.</param>
         void Apply(HitRenderer<TObject> hitRenderer);
-
-        /// <summary>
-        /// Reverts any changes applied to a HitRenderer through <see cref="Apply(HitRenderer{TObject})"/>.
-        /// </summary>
-        /// <param name="hitRenderer">The HitRenderer to revert from.</param>
-        void Revert(HitRenderer<TObject> hitRenderer);
     }
 }
