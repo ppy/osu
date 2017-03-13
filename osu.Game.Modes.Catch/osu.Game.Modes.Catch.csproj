@@ -76,10 +76,6 @@
       <Project>{C92A607B-1FDD-4954-9F92-03FF547D9080}</Project>
       <Name>osu.Game.Modes.Osu</Name>
     </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Modes.Taiko\osu.Game.Modes.Taiko.csproj">
-      <Project>{F167E17A-7DE6-4AF5-B920-A5112296C695}</Project>
-      <Name>osu.Game.Modes.Taiko</Name>
-    </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
       <Project>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</Project>
       <Name>osu.Game</Name>
