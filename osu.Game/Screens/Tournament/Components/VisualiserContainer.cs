@@ -1,28 +1,18 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL;
-using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
-using osu.Framework.Timing;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Screens.Tournament.Components
 {
-    class VisualiserContainer : Container
+    internal class VisualiserContainer : Container
     {
         /// <summary>
         /// Number of lines in the visualiser.
@@ -46,7 +36,7 @@ namespace osu.Game.Screens.Tournament.Components
 
         private void addLine()
         {
-            VisualiserLine newLine = new VisualiserLine()
+            VisualiserLine newLine = new VisualiserLine
             {
                 RelativeSizeAxes = Axes.Both,
 
@@ -69,7 +59,7 @@ namespace osu.Game.Screens.Tournament.Components
             allLines.Remove(allLines.First());
         }
 
-        class VisualiserLine : Container
+        private class VisualiserLine : Container
         {
             /// <summary>
             /// Time offset.
@@ -82,7 +72,7 @@ namespace osu.Game.Screens.Tournament.Components
 
             private Texture texture;
 
-            private int expiredCount = 0;
+            private int expiredCount;
 
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
@@ -116,7 +106,7 @@ namespace osu.Game.Screens.Tournament.Components
 
             private void addLine()
             {
-                Add(new Sprite()
+                Add(new Sprite
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,

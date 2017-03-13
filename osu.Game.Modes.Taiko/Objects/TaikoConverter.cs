@@ -8,7 +8,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    class TaikoConverter : HitObjectConverter<TaikoBaseHit>
+    internal class TaikoConverter : HitObjectConverter<TaikoBaseHit>
     {
         public override List<TaikoBaseHit> Convert(Beatmap beatmap)
         {

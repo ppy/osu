@@ -22,9 +22,11 @@ namespace osu.Game.Screens.Select
 
         public BeatmapDeleteDialog(WorkingBeatmap beatmap)
         {
+            if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
+
             Icon = FontAwesome.fa_trash_o;
             HeaderText = @"Confirm deletion of";
-            BodyText = $@"{beatmap?.Beatmap?.Metadata?.Artist} - {beatmap?.Beatmap?.Metadata?.Title}";
+            BodyText = $@"{beatmap.Beatmap?.Metadata?.Artist} - {beatmap.Beatmap?.Metadata?.Title}";
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton

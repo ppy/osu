@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Play
     public class KeyCounterKeyboard : KeyCounter
     {
         public Key Key { get; }
-        public KeyCounterKeyboard(string name, Key key) : base(name)
+        public KeyCounterKeyboard(Key key) : base(key.ToString())
         {
             Key = key;
         }

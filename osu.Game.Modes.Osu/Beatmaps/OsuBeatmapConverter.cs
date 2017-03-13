@@ -1,35 +1,45 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Game.Modes.Objects;
-using osu.Game.Beatmaps;
-using osu.Game.Modes.Osu.Objects.Drawables;
-using OpenTK;
 
-namespace osu.Game.Modes.Osu.Objects
+using OpenTK;
+using osu.Game.Beatmaps;
+using osu.Game.Modes.Objects;
+using osu.Game.Modes.Osu.Objects;
+using osu.Game.Modes.Osu.Objects.Drawables;
+using System.Collections.Generic;
+
+namespace osu.Game.Modes.Osu.Beatmaps
 {
-    public class OsuHitObjectConverter : HitObjectConverter<OsuHitObject>
+    internal class OsuBeatmapConverter : IBeatmapConverter<OsuHitObject>
     {
-        public override List<OsuHitObject> Convert(Beatmap beatmap)
+        public Beatmap<OsuHitObject> Convert(Beatmap original)
         {
-            List<OsuHitObject> output = new List<OsuHitObject>();
+            return new Beatmap<OsuHitObject>(original)
+            {
+                HitObjects = convertHitObject(original.HitObjects, original.BeatmapInfo?.StackLeniency ?? 0.7f)
+            };
+        }
+
+        private List<OsuHitObject> convertHitObject(List<HitObject> hitObjects, float stackLeniency)
+        {
+            List<OsuHitObject> converted = new List<OsuHitObject>();
 
             int combo = 0;
-            foreach (HitObject h in beatmap.HitObjects)
+            foreach (HitObject h in hitObjects)
             {
                 if (h.NewCombo) combo = 0;
 
                 h.ComboIndex = combo++;
-                output.Add(h as OsuHitObject);
+                converted.Add(h as OsuHitObject);
             }
 
-            UpdateStacking(output, beatmap.BeatmapInfo?.StackLeniency ?? 0.7f);
+            updateStacking(converted, stackLeniency);
 
-            return output;
+            return converted;
         }
 
-        public static void UpdateStacking(List<OsuHitObject> hitObjects, float stackLeniency, int startIndex = 0, int endIndex = -1)
+        private void updateStacking(List<OsuHitObject> hitObjects, float stackLeniency, int startIndex = 0, int endIndex = -1)
         {
             if (endIndex == -1)
                 endIndex = hitObjects.Count - 1;
@@ -59,7 +69,7 @@ namespace osu.Game.Modes.Osu.Objects
                         break;
 
                     if (Vector2.Distance(stackBaseObject.Position, objectN.Position) < stackDistance ||
-                        (stackBaseObject is Slider && Vector2.Distance(stackBaseObject.EndPosition, objectN.Position) < stackDistance))
+                        stackBaseObject is Slider && Vector2.Distance(stackBaseObject.EndPosition, objectN.Position) < stackDistance)
                     {
                         stackBaseIndex = n;
 
@@ -171,6 +181,5 @@ namespace osu.Game.Modes.Osu.Objects
                 }
             }
         }
-
     }
 }

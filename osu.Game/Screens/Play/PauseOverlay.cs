@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -49,7 +50,7 @@ namespace osu.Game.Screens.Play
                         },
                         new OsuSpriteText
                         {
-                            Text = String.Format("{0:n0}", value),
+                            Text = $"{value:n0}",
                             Font = @"Exo2.0-Bold",
                             Shadow = true,
                             ShadowColour = new Color4(0, 0, 0, 0.25f),
@@ -57,7 +58,7 @@ namespace osu.Game.Screens.Play
                         },
                         new OsuSpriteText
                         {
-                            Text = $" time{((value == 1) ? "" : "s")} in this session",
+                            Text = $" time{(value == 1 ? "" : "s")} in this session",
                             Shadow = true,
                             ShadowColour = new Color4(0, 0, 0, 0.25f),
                             TextSize = 18
