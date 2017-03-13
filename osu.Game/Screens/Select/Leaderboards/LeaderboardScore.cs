@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Allocation;
 using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -24,7 +25,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private const float corner_radius = 5;
         private const float edge_margin = 10;
         private const float background_alpha = 0.25f;
-        private const float score_letter_size = 20f;
+        private const float score_rank_size = 30f;
 
         private readonly EdgeEffect imageShadow = new EdgeEffect
         {
@@ -35,7 +36,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private Box background;
         private Container content, avatarContainer;
-        private Sprite scoreLetter;
+        private Sprite scoreRank;
         private OsuSpriteText nameLabel;
         private GlowingSpriteText scoreLabel;
         private ScoreComponentLabel maxCombo, accuracy;
@@ -57,6 +58,12 @@ namespace osu.Game.Screens.Select.Leaderboards
             base.OnHoverLost(state);
         }
 
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
+        {
+            scoreRank.Texture = textures.Get($@"Badges/ScoreRanks/{Score.Rank.GetDescription()}");
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -64,7 +71,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             // TODO: This fade to 0.01 is hacky, find a better way
             FadeTo(0.01f);
 
-            foreach (Drawable d in new Drawable[] { avatarContainer, nameLabel, scoreLabel, scoreLetter, flagBadgeContainer, maxCombo, accuracy, modsContainer, })
+            foreach (Drawable d in new Drawable[] { avatarContainer, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, maxCombo, accuracy, modsContainer, })
             {
                 d.FadeOut();
             }
@@ -92,7 +99,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     Schedule(() =>
                     {
                         scoreLabel.FadeIn(200);
-                        scoreLetter.FadeIn(200);
+                        scoreRank.FadeIn(200);
 
                         Delay(50);
                         Schedule(() =>
@@ -229,17 +236,18 @@ namespace osu.Game.Screens.Select.Leaderboards
                                         },
                                     },
                                 },
-                                scoreLetter = new Sprite
+                                scoreRank = new Sprite
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    Size = new Vector2(score_letter_size),
+                                    Size = new Vector2(score_rank_size),
+                                    Position = new Vector2(0f, -5f),
                                 },
                                 scoreLabel = new GlowingSpriteText(string.Format("{0:n0}", Score.TotalScore), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa"))
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    Position = new Vector2(-score_letter_size - 5f, 0f),
+                                    Position = new Vector2(-score_rank_size - 5f, 0f),
                                 },
                                 modsContainer = new FillFlowContainer<ScoreModIcon>
                                 {
