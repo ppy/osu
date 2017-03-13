@@ -97,8 +97,6 @@ namespace osu.Game.Overlays
             if (!string.IsNullOrEmpty(postText))
             {
                 //todo: actually send to server
-
-
                 careChannels.FirstOrDefault()?.AddNewMessages(new[]
                             {
                                 new Message
