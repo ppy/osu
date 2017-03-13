@@ -16,7 +16,7 @@ namespace osu.Game.Beatmaps.IO
             AddReader<OszArchiveReader>((storage, path) =>
             {
                 using (var stream = storage.GetStream(path))
-                    return Path.GetExtension(path) == OszExtension && ZipFile.IsZipFile(stream, false);
+                    return Path.GetExtension(path) == OSZ_EXTENSION && ZipFile.IsZipFile(stream, false);
             });
             OsuLegacyDecoder.Register();
         }

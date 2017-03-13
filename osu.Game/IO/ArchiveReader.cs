@@ -7,7 +7,7 @@ using System.IO;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 
-namespace osu.Game.Beatmaps.IO
+namespace osu.Game.IO
 {
     public abstract class ArchiveReader : IDisposable, IResourceStore<byte[]>
     {
