@@ -52,7 +52,6 @@
     <Compile Include="Objects\Drawable\DrawableNote.cs" />
     <Compile Include="Objects\HoldNote.cs" />
     <Compile Include="Objects\ManiaBaseHit.cs" />
-    <Compile Include="Objects\ManiaConverter.cs" />
     <Compile Include="Objects\Note.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\ManiaHitRenderer.cs" />
