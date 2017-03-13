@@ -27,6 +27,7 @@ namespace osu.Desktop.VisualTests
             {
                 new Score
                 {
+                    Rank = ScoreRank.SSPlus,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -44,6 +45,7 @@ namespace osu.Desktop.VisualTests
                 },
                 new Score
                 {
+                    Rank = ScoreRank.SS,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -61,6 +63,7 @@ namespace osu.Desktop.VisualTests
                 },
                 new Score
                 {
+                    Rank = ScoreRank.SPlus,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -78,6 +81,7 @@ namespace osu.Desktop.VisualTests
                 },
                 new Score
                 {
+                    Rank = ScoreRank.S,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -95,6 +99,7 @@ namespace osu.Desktop.VisualTests
                 },
                 new Score
                 {
+                    Rank = ScoreRank.A,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -112,6 +117,7 @@ namespace osu.Desktop.VisualTests
                 },
                 new Score
                 {
+                    Rank = ScoreRank.B,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -129,6 +135,7 @@ namespace osu.Desktop.VisualTests
                 },
                 new Score
                 {
+                    Rank = ScoreRank.C,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -146,6 +153,7 @@ namespace osu.Desktop.VisualTests
                 },
                 new Score
                 {
+                    Rank = ScoreRank.D,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -163,6 +171,7 @@ namespace osu.Desktop.VisualTests
                 },
                 new Score
                 {
+                    Rank = ScoreRank.F,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -180,6 +189,7 @@ namespace osu.Desktop.VisualTests
                 },
                 new Score
                 {
+                    Rank = ScoreRank.F,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
