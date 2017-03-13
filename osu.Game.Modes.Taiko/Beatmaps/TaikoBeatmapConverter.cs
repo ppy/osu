@@ -9,7 +9,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 {
     internal class TaikoBeatmapConverter : IBeatmapConverter<TaikoBaseHit>
     {
-        public Beatmap<TaikoBaseHit> Convert(Beatmap original)
+        public Beatmap<TaikoBaseHit> ConvertBeatmap(Beatmap original)
         {
             return new Beatmap<TaikoBaseHit>(original)
             {

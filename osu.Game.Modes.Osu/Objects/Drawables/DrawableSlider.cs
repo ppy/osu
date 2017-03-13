@@ -60,7 +60,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Position = s.StackedPosition,
                     ComboIndex = s.ComboIndex,
                     Scale = s.Scale,
-                    Colour = s.Colour,
+                    ComboColour = s.ComboColour,
                     Sample = s.Sample,
                 }),
             };
@@ -128,7 +128,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             var j = (OsuJudgementInfo)Judgement;
             var sc = (OsuJudgementInfo)initialCircle.Judgement;
 
-            if (!userTriggered && Time.Current >= HitObject.EndTime)
+            if (!userTriggered && Time.Current >= slider.EndTime)
             {
                 var ticksCount = ticks.Children.Count() + 1;
                 var ticksHit = ticks.Children.Count(t => t.Judgement.Result == HitResult.Hit);
@@ -165,7 +165,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             ball.FadeIn();
 
-            Delay(HitObject.Duration, true);
+            Delay(slider.Duration, true);
 
             body.FadeOut(160);
             ball.FadeOut(160);

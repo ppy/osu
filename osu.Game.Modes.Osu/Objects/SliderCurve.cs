@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using OpenTK;
 using System.Linq;
 using osu.Framework.MathUtils;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Osu.Objects
 {
@@ -14,7 +15,7 @@ namespace osu.Game.Modes.Osu.Objects
 
         public List<Vector2> ControlPoints;
 
-        public CurveTypes CurveType = CurveTypes.PerfectCurve;
+        public CurveType CurveType = CurveType.PerfectCurve;
 
         public Vector2 Offset;
 
@@ -25,9 +26,9 @@ namespace osu.Game.Modes.Osu.Objects
         {
             switch (CurveType)
             {
-                case CurveTypes.Linear:
+                case CurveType.Linear:
                     return subControlPoints;
-                case CurveTypes.PerfectCurve:
+                case CurveType.PerfectCurve:
                     //we can only use CircularArc iff we have exactly three control points and no dissection.
                     if (ControlPoints.Count != 3 || subControlPoints.Count != 3)
                         break;

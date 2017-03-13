@@ -110,10 +110,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                 {
                     progress -= border_portion;
 
-                    bytes[i * 4] = (byte)(slider.Colour.R * 255);
-                    bytes[i * 4 + 1] = (byte)(slider.Colour.G * 255);
-                    bytes[i * 4 + 2] = (byte)(slider.Colour.B * 255);
-                    bytes[i * 4 + 3] = (byte)((opacity_at_edge - (opacity_at_edge - opacity_at_centre) * progress / gradient_portion) * (slider.Colour.A * 255));
+                    bytes[i * 4] = (byte)(slider.ComboColour.R * 255);
+                    bytes[i * 4 + 1] = (byte)(slider.ComboColour.G * 255);
+                    bytes[i * 4 + 2] = (byte)(slider.ComboColour.B * 255);
+                    bytes[i * 4 + 3] = (byte)((opacity_at_edge - (opacity_at_edge - opacity_at_centre) * progress / gradient_portion) * (slider.ComboColour.A * 255));
                 }
             }
 

@@ -1,15 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Game.Modes.Objects;
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Osu.Objects.Drawables;
+using osu.Game.Modes.Objects.Types;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject
+    public abstract class OsuHitObject : HitObject, IHasCombo
     {
         public const double OBJECT_RADIUS = 64;
 
@@ -35,6 +36,12 @@ namespace osu.Game.Modes.Osu.Objects
         public float Scale { get; set; } = 1;
 
         public abstract HitObjectType Type { get; }
+
+        public virtual bool NewCombo { get; set; }
+
+        public Color4 ComboColour { get; set; }
+
+        public int ComboIndex { get; set; }
 
         public double HitWindowFor(OsuScoreResult result)
         {
@@ -68,17 +75,5 @@ namespace osu.Game.Modes.Osu.Objects
 
             Scale = (1.0f - 0.7f * (beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5) / 5) / 2;
         }
-    }
-
-    [Flags]
-    public enum HitObjectType
-    {
-        Circle = 1 << 0,
-        Slider = 1 << 1,
-        NewCombo = 1 << 2,
-        Spinner = 1 << 3,
-        ColourHax = 122,
-        Hold = 1 << 7,
-        SliderTick = 1 << 8,
     }
 }
