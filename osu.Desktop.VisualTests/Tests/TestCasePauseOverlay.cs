@@ -2,15 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Logging;
-using osu.Game.Overlays.Pause;
 using osu.Framework.Screens.Testing;
+using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCasePauseOverlay : TestCase
+    internal class TestCasePauseOverlay : TestCase
     {
-        public override string Name => @"PauseOverlay";
-
         public override string Description => @"Tests the pause overlay";
 
         private PauseOverlay pauseOverlay;

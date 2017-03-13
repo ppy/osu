@@ -20,10 +20,10 @@ namespace osu.Game.Online.API
         private OAuth authentication;
 
         public string Endpoint = @"https://new.ppy.sh";
-        const string client_id = @"5";
-        const string client_secret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
+        private const string client_id = @"5";
+        private const string client_secret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
 
-        ConcurrentQueue<APIRequest> queue = new ConcurrentQueue<APIRequest>();
+        private ConcurrentQueue<APIRequest> queue = new ConcurrentQueue<APIRequest>();
 
         public Scheduler Scheduler = new Scheduler();
 
@@ -38,22 +38,15 @@ namespace osu.Game.Online.API
         public string Token
         {
             get { return authentication.Token?.ToString(); }
-
-            set
-            {
-
-                if (string.IsNullOrEmpty(value))
-                    authentication.Token = null;
-                else
-                    authentication.Token = OAuthToken.Parse(value);
-            }
+            set { authentication.Token = string.IsNullOrEmpty(value) ? null : OAuthToken.Parse(value); }
         }
 
-        protected bool HasLogin => Token != null || (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password));
+        protected bool HasLogin => Token != null || !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password);
 
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (should dispose of this or at very least keep a reference).
         private Thread thread;
 
-        Logger log;
+        private Logger log;
 
         public APIAccess()
         {
@@ -88,22 +81,22 @@ namespace osu.Game.Online.API
         /// <summary>
         /// Number of consecutive requests which failed due to network issues.
         /// </summary>
-        int failureCount = 0;
+        private int failureCount;
 
         private void run()
         {
-            while (true)
+            while (thread.IsAlive)
             {
                 switch (State)
                 {
                     case APIState.Failing:
                         //todo: replace this with a ping request.
-                        log.Add($@"In a failing state, waiting a bit before we try again...");
+                        log.Add(@"In a failing state, waiting a bit before we try again...");
                         Thread.Sleep(5000);
                         if (queue.Count == 0)
                         {
-                            log.Add($@"Queueing a ping request");
-                            Queue(new ListChannelsRequest() { Timeout = 5000 });
+                            log.Add(@"Queueing a ping request");
+                            Queue(new ListChannelsRequest { Timeout = 5000 });
                         }
                         break;
                     case APIState.Offline:
@@ -131,7 +124,7 @@ namespace osu.Game.Online.API
 
 
                         var userReq = new GetUserRequest();
-                        userReq.Success += (u) => {
+                        userReq.Success += u => {
                             LocalUser.Value = u;
                             //we're connected!
                             State = APIState.Online;
@@ -291,7 +284,7 @@ namespace osu.Game.Online.API
             if (failOldRequests)
             {
                 APIRequest req;
-                while (queue.TryDequeue(out req))
+                while (oldQueue.TryDequeue(out req))
                     req.Fail(new Exception(@"Disconnected from server"));
             }
         }

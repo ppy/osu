@@ -11,16 +11,17 @@ namespace osu.Game.Overlays.Options
 {
     public abstract class OptionsSubsection : FillFlowContainer
     {
-        private Container<Drawable> content;
         protected override Container<Drawable> Content => content;
+
+        private Container<Drawable> content;
 
         protected abstract string Header { get; }
 
-        public OptionsSubsection()
+        protected OptionsSubsection()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Down;
+            Direction = FillDirection.Vertical;
             AddInternal(new Drawable[]
             {
                 new OsuSpriteText
@@ -31,7 +32,7 @@ namespace osu.Game.Overlays.Options
                 },
                 content = new FillFlowContainer
                 {
-                    Direction = FillDirection.Down,
+                    Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 5),
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,

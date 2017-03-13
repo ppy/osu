@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -55,12 +54,12 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Width = 0.4f, // TODO: InnerWidth property or something
-                    Direction = FillDirection.Down,
+                    Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
                         searchTextBox = new SearchTextBox {
                             RelativeSizeAxes = Axes.X,
-                            OnChange = (TextBox sender, bool newText) =>
+                            OnChange = (sender, newText) =>
                             {
                                 if (newText)
                                     FilterChanged?.Invoke();
@@ -188,7 +187,7 @@ namespace osu.Game.Screens.Select
                     new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Right,
+                        Direction = FillDirection.Horizontal,
                         Spacing = new Vector2(10, 0),
                         Children = new Drawable[]
                         {
@@ -210,17 +209,16 @@ namespace osu.Game.Screens.Select
                             groupsEllipsis = new TextAwesome
                             {
                                 Icon = FontAwesome.fa_ellipsis_h,
+                                Origin = Anchor.TopLeft,
                                 TextSize = 14,
                                 Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                                Origin = Anchor.BottomLeft,
-                                Anchor = Anchor.BottomLeft,
                             }
                         }
                     },
                     new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Right,
+                        Direction = FillDirection.Horizontal,
                         Spacing = new Vector2(10, 0),
                         Origin = Anchor.TopRight,
                         Anchor = Anchor.TopRight,
@@ -241,10 +239,9 @@ namespace osu.Game.Screens.Select
                             sortEllipsis = new TextAwesome
                             {
                                 Icon = FontAwesome.fa_ellipsis_h,
+                                Origin = Anchor.TopLeft,
                                 TextSize = 14,
                                 Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                                Origin = Anchor.BottomLeft,
-                                Anchor = Anchor.BottomLeft,
                             }
                         }
                     },

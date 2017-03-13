@@ -9,9 +9,9 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Audio.Sample;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -100,7 +100,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Delay(click_duration);
             Schedule(delegate {
-                colourContainer.ResizeTo(new Vector2(0.8f, 1f), 0, EasingTypes.None);
+                colourContainer.ResizeTo(new Vector2(0.8f, 1f));
                 spriteText.Spacing = Vector2.Zero;
                 glowContainer.FadeOut();
             });

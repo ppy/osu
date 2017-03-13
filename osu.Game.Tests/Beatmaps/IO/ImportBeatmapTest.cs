@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -22,7 +23,7 @@ namespace osu.Game.Tests.Beatmaps.IO
     [TestFixture]
     public class ImportBeatmapTest
     {
-        const string osz_path = @"../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
+        private const string osz_path = @"../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
 
         [OneTimeSetUp]
         public void SetUp()
@@ -40,8 +41,16 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (HeadlessGameHost host = new HeadlessGameHost())
             {
                 var osu = loadOsu(host);
-                osu.Dependencies.Get<BeatmapDatabase>().Import(osz_path);
+
+                var temp = prepareTempCopy(osz_path);
+
+                Assert.IsTrue(File.Exists(temp));
+
+                osu.Dependencies.Get<BeatmapDatabase>().Import(temp);
+
                 ensureLoaded(osu);
+
+                Assert.IsFalse(File.Exists(temp));
             }
         }
 
@@ -56,12 +65,49 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 var osu = loadOsu(host);
 
-                var importer = new BeatmapImporter(client);
-                if (!importer.ImportAsync(osz_path).Wait(1000))
+                var temp = prepareTempCopy(osz_path);
+
+                Assert.IsTrue(File.Exists(temp));
+
+                var importer = new BeatmapIPCChannel(client);
+                if (!importer.ImportAsync(temp).Wait(1000))
                     Assert.Fail(@"IPC took too long to send");
 
                 ensureLoaded(osu);
+
+                Assert.IsFalse(File.Exists(temp));
             }
+        }
+
+        [Test]
+        public void TestImportWhenFileOpen()
+        {
+            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new HeadlessGameHost())
+            {
+                var osu = loadOsu(host);
+
+                var temp = prepareTempCopy(osz_path);
+
+                Assert.IsTrue(File.Exists(temp));
+
+                using (File.OpenRead(temp))
+                    osu.Dependencies.Get<BeatmapDatabase>().Import(temp);
+
+                ensureLoaded(osu);
+
+                Assert.IsTrue(File.Exists(temp));
+                
+                File.Delete(temp);
+
+                Assert.IsFalse(File.Exists(temp));
+            }
+        }
+
+        private string prepareTempCopy(string path)
+        {
+            var temp = Path.GetTempFileName();
+            return new FileInfo(path).CopyTo(temp, true).FullName;
         }
 
         private OsuGameBase loadOsu(GameHost host)
@@ -84,13 +130,13 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Action waitAction = () =>
             {
-                while ((resultSets = osu.Dependencies.Get<BeatmapDatabase>()
-                    .Query<BeatmapSetInfo>().Where(s => s.OnlineBeatmapSetID == 241526)).Count() == 0)
+                while (!(resultSets = osu.Dependencies.Get<BeatmapDatabase>()
+                    .Query<BeatmapSetInfo>().Where(s => s.OnlineBeatmapSetID == 241526)).Any())
                     Thread.Sleep(50);
             };
 
             Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout),
-                $@"BeatmapSet did not import to the database in allocated time.");
+                @"BeatmapSet did not import to the database in allocated time.");
 
             //ensure we were stored to beatmap database backing...
 
@@ -122,7 +168,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.Mode == PlayMode.Osu))?.Beatmap;
 
-            Assert.IsTrue(beatmap.HitObjects.Count > 0);
+            Assert.IsTrue(beatmap?.HitObjects.Count > 0);
         }
     }
 }

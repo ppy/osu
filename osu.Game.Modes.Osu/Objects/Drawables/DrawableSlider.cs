@@ -21,13 +21,14 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         private Container<DrawableSliderTick> ticks;
 
-        SliderBody body;
-        SliderBall ball;
+        private SliderBody body;
+        private SliderBall ball;
 
-        SliderBouncer bouncer1, bouncer2;
+        private SliderBouncer bouncer2;
 
         public DrawableSlider(Slider s) : base(s)
         {
+            SliderBouncer bouncer1;
             slider = s;
 
             Children = new Drawable[]
@@ -94,7 +95,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         // pass all input through.
         public override bool Contains(Vector2 screenSpacePos) => true;
 
-        int currentRepeat;
+        private int currentRepeat;
 
         protected override void Update()
         {
@@ -102,8 +103,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             double progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
-            int repeat = (int)(progress * slider.RepeatCount);
-            progress = (progress * slider.RepeatCount) % 1;
+            int repeat = slider.RepeatAt(progress);
+            progress = slider.CurveProgressAt(progress);
 
             if (repeat > currentRepeat)
             {
@@ -111,9 +112,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     PlaySample();
                 currentRepeat = repeat;
             }
-
-            if (repeat % 2 == 1)
-                progress = 1 - progress;
 
             bouncer2.Position = slider.Curve.PositionAt(body.SnakedEnd ?? 0);
 
@@ -127,8 +125,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void CheckJudgement(bool userTriggered)
         {
-            var j = Judgement as OsuJudgementInfo;
-            var sc = initialCircle.Judgement as OsuJudgementInfo;
+            var j = (OsuJudgementInfo)Judgement;
+            var sc = (OsuJudgementInfo)initialCircle.Judgement;
 
             if (!userTriggered && Time.Current >= HitObject.EndTime)
             {

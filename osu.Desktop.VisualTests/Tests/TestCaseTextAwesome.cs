@@ -12,10 +12,8 @@ using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseTextAwesome : TestCase
+    internal class TestCaseTextAwesome : TestCase
     {
-        public override string Name => @"TextAwesome";
-
         public override string Description => @"Tests display of icons";
 
         public override void Reset()
@@ -24,7 +22,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             FillFlowContainer flow;
 
-            Add(flow = new FillFlowContainer()
+            Add(flow = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(0.5f),

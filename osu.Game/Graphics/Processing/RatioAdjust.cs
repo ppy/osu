@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.Processing
 {
-    class RatioAdjust : Container
+    internal class RatioAdjust : Container
     {
         public override bool Contains(Vector2 screenSpacePos) => true;
 

@@ -2,10 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Osu.Beatmaps;
 using osu.Game.Modes.Osu.Objects;
 using System;
 using System.Collections.Generic;
-using osu.Game.Modes.Objects;
 
 namespace osu.Game.Modes.Osu
 {
@@ -13,8 +13,6 @@ namespace osu.Game.Modes.Osu
     {
         private const double star_scaling_factor = 0.0675;
         private const double extreme_scaling_factor = 0.5;
-
-        protected override PlayMode PlayMode => PlayMode.Osu;
 
         /// <summary>
         /// HitObjects are stored as a member variable.
@@ -25,8 +23,6 @@ namespace osu.Game.Modes.Osu
         {
         }
 
-        protected override HitObjectConverter<OsuHitObject> Converter => new OsuHitObjectConverter();
-
         protected override void PreprocessHitObjects()
         {
             foreach (var h in Objects)
@@ -34,7 +30,7 @@ namespace osu.Game.Modes.Osu
                     ((Slider)h).Curve.Calculate();
         }
 
-        protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
+        protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
         {
             // Fill our custom DifficultyHitObject class, that carries additional information
             DifficultyHitObjects.Clear();
@@ -100,22 +96,23 @@ namespace osu.Game.Modes.Osu
         protected bool CalculateStrainValues()
         {
             // Traverse hitObjects in pairs to calculate the strain value of NextHitObject from the strain value of CurrentHitObject and environment.
-            List<OsuHitObjectDifficulty>.Enumerator hitObjectsEnumerator = DifficultyHitObjects.GetEnumerator();
-
-            if (!hitObjectsEnumerator.MoveNext()) return false;
-
-            OsuHitObjectDifficulty currentHitObject = hitObjectsEnumerator.Current;
-            OsuHitObjectDifficulty nextHitObject;
-
-            // First hitObject starts at strain 1. 1 is the default for strain values, so we don't need to set it here. See DifficultyHitObject.
-            while (hitObjectsEnumerator.MoveNext())
+            using (List<OsuHitObjectDifficulty>.Enumerator hitObjectsEnumerator = DifficultyHitObjects.GetEnumerator())
             {
-                nextHitObject = hitObjectsEnumerator.Current;
-                nextHitObject.CalculateStrains(currentHitObject, TimeRate);
-                currentHitObject = nextHitObject;
-            }
 
-            return true;
+                if (!hitObjectsEnumerator.MoveNext()) return false;
+
+                OsuHitObjectDifficulty current = hitObjectsEnumerator.Current;
+
+                // First hitObject starts at strain 1. 1 is the default for strain values, so we don't need to set it here. See DifficultyHitObject.
+                while (hitObjectsEnumerator.MoveNext())
+                {
+                    var next = hitObjectsEnumerator.Current;
+                    next?.CalculateStrains(current, TimeRate);
+                    current = next;
+                }
+
+                return true;
+            }
         }
 
         /// <summary>
@@ -183,8 +180,10 @@ namespace osu.Game.Modes.Osu
             return difficulty;
         }
 
+        protected override IBeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
+
         // Those values are used as array indices. Be careful when changing them!
-        public enum DifficultyType : int
+        public enum DifficultyType
         {
             Speed = 0,
             Aim,

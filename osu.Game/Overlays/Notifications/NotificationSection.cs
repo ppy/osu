@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Notifications
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Down;
+            Direction = FillDirection.Vertical;
 
             Padding = new MarginPadding
             {
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Notifications
             countText.Text = notifications.Children.Count(c => c.Alpha > 0.99f).ToString();
         }
 
-        class ClearAllButton : ClickableContainer
+        private class ClearAllButton : ClickableContainer
         {
             private OsuSpriteText text;
 

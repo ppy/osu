@@ -4,11 +4,11 @@
 using System;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
 
@@ -95,16 +95,16 @@ namespace osu.Game.Screens.Select
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Position = new Vector2(BackButton.SIZE_EXTENDED.X + padding, 0),
+                    Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, 0),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Direction = FillDirection.Right,
+                    Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(padding, 0),
                     Children = new Drawable[]
                     {
                         buttons = new FillFlowContainer
                         {
-                            Direction = FillDirection.Right,
+                            Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(0.2f, 0),
                             AutoSizeAxes = Axes.Both,
                         }

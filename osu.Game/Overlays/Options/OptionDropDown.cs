@@ -39,19 +39,19 @@ namespace osu.Game.Overlays.Options
                 bindable.ValueChanged += bindable_ValueChanged;
                 bindable_ValueChanged(null, null);
 
-                if (bindable?.Disabled ?? true)
+                if (bindable.Disabled)
                     Alpha = 0.3f;
             }
         }
 
         private Bindable<T> bindable;
 
-        void bindable_ValueChanged(object sender, EventArgs e)
+        private void bindable_ValueChanged(object sender, EventArgs e)
         {
             dropdown.SelectedValue = bindable.Value;
         }
 
-        void dropdown_ValueChanged(object sender, EventArgs e)
+        private void dropdown_ValueChanged(object sender, EventArgs e)
         {
             bindable.Value = dropdown.SelectedValue;
         }
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Options
         {
             Items = new KeyValuePair<string, T>[0];
 
-            Direction = FillDirection.Down;
+            Direction = FillDirection.Vertical;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]

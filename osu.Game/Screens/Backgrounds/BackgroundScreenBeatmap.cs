@@ -30,11 +30,7 @@ namespace osu.Game.Screens.Backgrounds
 
                 Schedule(() =>
                 {
-                    Background newBackground;
-                    if (beatmap == null)
-                        newBackground = new Background(@"Backgrounds/bg1");
-                    else
-                        newBackground = new BeatmapBackground(beatmap);
+                    var newBackground = beatmap == null ? new Background(@"Backgrounds/bg1") : new BeatmapBackground(beatmap);
 
                     newBackground.LoadAsync(Game, delegate
                     {
@@ -68,10 +64,13 @@ namespace osu.Game.Screens.Backgrounds
 
         public override bool Equals(BackgroundScreen other)
         {
-            return base.Equals(other) && beatmap == ((BackgroundScreenBeatmap)other).Beatmap;
+            var otherBeatmapBackground = other as BackgroundScreenBeatmap;
+            if (otherBeatmapBackground == null) return false;
+
+            return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
-        class BeatmapBackground : Background
+        private class BeatmapBackground : Background
         {
             private WorkingBeatmap beatmap;
 
