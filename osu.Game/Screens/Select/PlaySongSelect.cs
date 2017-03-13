@@ -326,8 +326,7 @@ namespace osu.Game.Screens.Select
                 backgroundModeBeatmap.FadeTo(1, 250);
             }
 
-            if (beatmap != null)
-                beatmapInfoWedge.UpdateBeatmap(beatmap);
+            beatmapInfoWedge.UpdateBeatmap(beatmap);
         }
 
         /// <summary>
@@ -337,11 +336,11 @@ namespace osu.Game.Screens.Select
         {
             base.OnBeatmapChanged(beatmap);
 
-            beatmap.Mods.BindTo(modSelect.SelectedMods);
+            beatmap?.Mods.BindTo(modSelect.SelectedMods);
 
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
-            carousel.SelectBeatmap(beatmap.BeatmapInfo);
+            carousel.SelectBeatmap(beatmap?.BeatmapInfo);
         }
 
         /// <summary>

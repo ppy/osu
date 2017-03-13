@@ -210,7 +210,7 @@ namespace osu.Game.Overlays
                     }
                 }
             };
-        
+
             this.beatmaps = beatmaps;
             trackManager = osuGame.Audio.Track;
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
@@ -247,6 +247,8 @@ namespace osu.Game.Overlays
 
                 if (current.Track.HasCompleted && !current.Track.Looping) next();
             }
+            else
+                playButton.Icon = FontAwesome.fa_play_circle_o;
         }
 
         private void preferUnicode_changed(object sender, EventArgs e)
@@ -337,12 +339,16 @@ namespace osu.Game.Overlays
                 Task.Run(() =>
                 {
                     if (beatmap?.Beatmap == null)
-                        //todo: we may need to display some default text here (currently in the constructor).
-                        return;
-
-                    BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
-                    title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
-                    artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
+                    {
+                        title.Text = @"Nothing to play";
+                        artist.Text = @"Nothing to play";
+                    }
+                    else
+                    {
+                        BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
+                        title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
+                        artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
+                    }
                 });
 
                 MusicControllerBackground newBackground;
