@@ -1,28 +1,24 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Modes.Objects;
-using OpenTK;
-using osu.Framework.Graphics.Primitives;
-using osu.Game.Screens.Play;
-using osu.Framework.Allocation;
 using osu.Game.Configuration;
-using osu.Framework.Configuration;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Play;
+using System;
 
 namespace osu.Game.Modes.UI
 {
-    public abstract class ScoreOverlay : Container
+    public abstract class HudOverlay : Container
     {
-        public KeyCounterCollection KeyCounter;
-        public ComboCounter ComboCounter;
-        public ScoreCounter ScoreCounter;
-        public PercentageCounter AccuracyCounter;
-        public HealthDisplay HealthDisplay;
-        public Score Score { get; set; }
+        public readonly KeyCounterCollection KeyCounter;
+        public readonly ComboCounter ComboCounter;
+        public readonly ScoreCounter ScoreCounter;
+        public readonly PercentageCounter AccuracyCounter;
+        public readonly HealthDisplay HealthDisplay;
 
         private Bindable<bool> showKeyCounter;
 
@@ -30,31 +26,14 @@ namespace osu.Game.Modes.UI
         protected abstract ComboCounter CreateComboCounter();
         protected abstract PercentageCounter CreateAccuracyCounter();
         protected abstract ScoreCounter CreateScoreCounter();
-        protected virtual HealthDisplay CreateHealthDisplay() => new HealthDisplay
-        {
-            Size = new Vector2(1, 5),
-            RelativeSizeAxes = Axes.X,
-            Margin = new MarginPadding { Top = 20 }
-        };
+        protected abstract HealthDisplay CreateHealthDisplay();
 
-        public virtual void OnHit(HitObject h)
-        {
-            ComboCounter?.Increment();
-            ScoreCounter?.Increment(300);
-            AccuracyCounter?.Set(Math.Min(1, AccuracyCounter.Count + 0.01f));
-        }
-
-        public virtual void OnMiss(HitObject h)
-        {
-            ComboCounter?.Roll();
-            AccuracyCounter?.Set(AccuracyCounter.Count - 0.01f);
-        }
-
-        protected ScoreOverlay()
+        protected HudOverlay()
         {
             RelativeSizeAxes = Axes.Both;
 
-            Children = new Drawable[] {
+            Children = new Drawable[]
+            {
                 KeyCounter = CreateKeyCounter(),
                 ComboCounter = CreateComboCounter(),
                 ScoreCounter = CreateScoreCounter(),
@@ -83,9 +62,9 @@ namespace osu.Game.Modes.UI
         {
             //bind processor bindables to combocounter, score display etc.
             //TODO: these should be bindable binds, not events!
-            processor.TotalScore.ValueChanged += delegate { ScoreCounter?.Set((ulong)processor.TotalScore.Value); };
-            processor.Accuracy.ValueChanged += delegate { AccuracyCounter?.Set((float)processor.Accuracy.Value); };
-            processor.Combo.ValueChanged += delegate { ComboCounter?.Set((ulong)processor.Combo.Value); };
+            ScoreCounter?.Current.BindTo(processor.TotalScore);
+            AccuracyCounter?.Current.BindTo(processor.Accuracy);
+            ComboCounter?.Current.BindTo(processor.Combo);
             HealthDisplay?.Current.BindTo(processor.Health);
         }
 

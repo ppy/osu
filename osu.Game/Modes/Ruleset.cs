@@ -1,13 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Game.Modes.Objects;
-using osu.Game.Modes.UI;
-using System;
-using System.Collections.Concurrent;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Modes.Objects;
+using osu.Game.Modes.UI;
+using osu.Game.Screens.Play;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace osu.Game.Modes
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Modes
     {
         private static ConcurrentDictionary<PlayMode, Type> availableRulesets = new ConcurrentDictionary<PlayMode, Type>();
 
-        public abstract ScoreOverlay CreateScoreOverlay();
+        public static IEnumerable<PlayMode> PlayModes => availableRulesets.Keys;
 
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
@@ -41,6 +42,10 @@ namespace osu.Game.Modes
         protected abstract PlayMode PlayMode { get; }
 
         public virtual FontAwesome Icon => FontAwesome.fa_question_circle;
+
+        public abstract string Description { get; }
+
+        public abstract IEnumerable<KeyCounter> CreateGameplayKeys();
 
         public virtual Score CreateAutoplayScore(Beatmap beatmap) => null;
 
