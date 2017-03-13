@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Mania.Beatmaps;
 using osu.Game.Modes.Mania.Objects;
-using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.UI;
 
@@ -19,7 +19,7 @@ namespace osu.Game.Modes.Mania.UI
             this.columns = columns;
         }
 
-        protected override HitObjectConverter<ManiaBaseHit> Converter => new ManiaConverter(columns);
+        protected override IBeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
 
         protected override Playfield<ManiaBaseHit> CreatePlayfield() => new ManiaPlayfield(columns);
 
