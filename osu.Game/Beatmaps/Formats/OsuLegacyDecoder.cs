@@ -265,7 +265,7 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     case Section.General:
                         handleGeneral(beatmap, key, val);
-                        parser = Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).CreateHitObjectParser();
+                        parser = new LegacyHitObjectParser();
                         break;
                     case Section.Editor:
                         handleEditor(beatmap, key, val);

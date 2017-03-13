@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
 using OpenTK;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Catch.Objects.Drawable
 {
@@ -21,7 +22,7 @@ namespace osu.Game.Modes.Catch.Objects.Drawable
             Origin = Anchor.Centre;
             Scale = new Vector2(0.1f);
             RelativePositionAxes = Axes.Y;
-            Position = new Vector2(h.Position, -0.1f);
+            Position = new Vector2(h.Position.X, -0.1f);
         }
 
         [BackgroundDependencyLoader]
@@ -29,8 +30,11 @@ namespace osu.Game.Modes.Catch.Objects.Drawable
         {
             Texture = textures.Get(@"Menu/logo");
 
-            Transforms.Add(new TransformPosition { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = new Vector2(h.Position, -0.1f), EndValue = new Vector2(h.Position, 0.9f) });
-            Transforms.Add(new TransformAlpha { StartTime = h.StartTime + h.Duration + 200, EndTime = h.StartTime + h.Duration + 400, StartValue = 1, EndValue = 0 });
+            double endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
+            double duration = endTime - h.StartTime;
+
+            Transforms.Add(new TransformPosition { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = new Vector2(h.Position.X, -0.1f), EndValue = new Vector2(h.Position.X, 0.9f) });
+            Transforms.Add(new TransformAlpha { StartTime = h.StartTime + duration + 200, EndTime = h.StartTime + duration + 400, StartValue = 1, EndValue = 0 });
             Expire(true);
         }
     }

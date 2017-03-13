@@ -5,14 +5,16 @@ using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Modes.Objects.Types;
 using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Modes.Osu.Objects
 {
-    public class Slider : OsuHitObject
+    public class Slider : OsuHitObject, IHasEndTime
     {
-        public override double EndTime => StartTime + RepeatCount * Curve.Length / Velocity;
+        public double EndTime => StartTime + RepeatCount * Curve.Length / Velocity;
+        public double Duration => EndTime - StartTime;
 
         public override Vector2 EndPosition => PositionAt(1);
 
@@ -64,7 +66,7 @@ namespace osu.Game.Modes.Osu.Objects
             set { Curve.Length = value; }
         }
 
-        public CurveTypes CurveType
+        public CurveType CurveType
         {
             get { return Curve.CurveType; }
             set { Curve.CurveType = value; }
@@ -124,7 +126,7 @@ namespace osu.Game.Modes.Osu.Objects
                             Position = Curve.PositionAt(distanceProgress),
                             StackHeight = StackHeight,
                             Scale = Scale,
-                            Colour = Colour,
+                            ComboColour = ComboColour,
                             Sample = new HitSampleInfo
                             {
                                 Type = SampleType.None,
@@ -137,13 +139,5 @@ namespace osu.Game.Modes.Osu.Objects
         }
 
         public override HitObjectType Type => HitObjectType.Slider;
-    }
-
-    public enum CurveTypes
-    {
-        Catmull,
-        Bezier,
-        Linear,
-        PerfectCurve
     }
 }

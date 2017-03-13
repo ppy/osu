@@ -1,16 +1,13 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
-
+﻿using OpenTK;
+using osu.Game.Beatmaps.Samples;
+using osu.Game.Modes.Objects.Types;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using osu.Game.Beatmaps.Samples;
-using osu.Game.Modes.Objects;
-using OpenTK;
 
-namespace osu.Game.Modes.Osu.Objects
+namespace osu.Game.Modes.Objects
 {
-    public class OsuHitObjectParser : HitObjectParser
+    internal class LegacyHitObjectParser : HitObjectParser
     {
         public override HitObject Parse(string text)
         {
@@ -19,17 +16,19 @@ namespace osu.Game.Modes.Osu.Objects
             bool combo = type.HasFlag(HitObjectType.NewCombo);
             type &= (HitObjectType)0xF;
             type &= ~HitObjectType.NewCombo;
-            OsuHitObject result;
+
+            HitObject result;
             switch (type)
             {
                 case HitObjectType.Circle:
-                    result = new HitCircle
+                    result = new Hit
                     {
-                        Position = new Vector2(int.Parse(split[0]), int.Parse(split[1]))
+                        Position = new Vector2(int.Parse(split[0]), int.Parse(split[1])),
+                        NewCombo = combo
                     };
                     break;
                 case HitObjectType.Slider:
-                    CurveTypes curveType = CurveTypes.Catmull;
+                    CurveType curveType = CurveType.Catmull;
                     double length = 0;
                     List<Vector2> points = new List<Vector2> { new Vector2(int.Parse(split[0]), int.Parse(split[1])) };
 
@@ -41,16 +40,16 @@ namespace osu.Game.Modes.Osu.Objects
                             switch (t)
                             {
                                 case @"C":
-                                    curveType = CurveTypes.Catmull;
+                                    curveType = CurveType.Catmull;
                                     break;
                                 case @"B":
-                                    curveType = CurveTypes.Bezier;
+                                    curveType = CurveType.Bezier;
                                     break;
                                 case @"L":
-                                    curveType = CurveTypes.Linear;
+                                    curveType = CurveType.Linear;
                                     break;
                                 case @"P":
-                                    curveType = CurveTypes.PerfectCurve;
+                                    curveType = CurveType.PerfectCurve;
                                     break;
                             }
                             continue;
@@ -75,17 +74,17 @@ namespace osu.Game.Modes.Osu.Objects
                     result = new Slider
                     {
                         ControlPoints = points,
-                        Length = length,
+                        Distance = length,
                         CurveType = curveType,
                         RepeatCount = repeatCount,
-                        Position = new Vector2(int.Parse(split[0]), int.Parse(split[1]))
+                        Position = new Vector2(int.Parse(split[0]), int.Parse(split[1])),
+                        NewCombo = combo
                     };
                     break;
                 case HitObjectType.Spinner:
                     result = new Spinner
                     {
-                        Length = Convert.ToDouble(split[5], CultureInfo.InvariantCulture) - Convert.ToDouble(split[2], CultureInfo.InvariantCulture),
-                        Position = new Vector2(512, 384) / 2,
+                        EndTime = Convert.ToDouble(split[5], CultureInfo.InvariantCulture)
                     };
                     break;
                 default:
@@ -97,8 +96,9 @@ namespace osu.Game.Modes.Osu.Objects
                 Type = (SampleType)int.Parse(split[4]),
                 Set = SampleSet.Soft,
             };
-            result.NewCombo = combo;
+
             // TODO: "addition" field
+
             return result;
         }
     }

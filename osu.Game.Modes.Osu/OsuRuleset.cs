@@ -4,7 +4,6 @@
 using OpenTK.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
@@ -93,8 +92,6 @@ namespace osu.Game.Modes.Osu
         }
 
         public override FontAwesome Icon => FontAwesome.fa_osu_osu_o;
-
-        public override HitObjectParser CreateHitObjectParser() => new OsuHitObjectParser();
 
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => new OsuScoreProcessor(hitObjectCount);
 

@@ -8,29 +8,90 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using System.Collections.Generic;
+using osu.Game.Modes.Objects.Types;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Beatmaps
 {
     internal class OsuBeatmapConverter : IBeatmapConverter<OsuHitObject>
     {
-        public Beatmap<OsuHitObject> Convert(Beatmap original)
+        public Beatmap<OsuHitObject> ConvertBeatmap(Beatmap original)
         {
             return new Beatmap<OsuHitObject>(original)
             {
-                HitObjects = convertHitObject(original.HitObjects, original.BeatmapInfo?.StackLeniency ?? 0.7f)
+                HitObjects = convertHitObjects(original.HitObjects, original.BeatmapInfo?.StackLeniency ?? 0.7f)
             };
         }
 
-        private List<OsuHitObject> convertHitObject(List<HitObject> hitObjects, float stackLeniency)
+        private OsuHitObject convertHitObject(HitObject original)
+        {
+            IHasCurve ihc = original as IHasCurve;
+            IHasDistance ihd = original as IHasDistance;
+            IHasEndTime ihet = original as IHasEndTime;
+            IHasPosition ihp = original as IHasPosition;
+            IHasRepeats ihr = original as IHasRepeats;
+            IHasCombo ihco = original as IHasCombo;
+
+            if (ihc != null)
+            {
+                return new Slider
+                {
+                    StartTime = original.StartTime,
+                    Sample = original.Sample,
+
+                    CurveType = ihc.CurveType,
+                    ControlPoints = ihc.ControlPoints,
+
+                    Position = ihp?.Position ?? Vector2.Zero,
+                    ComboColour = ihco?.ComboColour ?? Color4.White,
+                    ComboIndex = ihco?.ComboIndex ?? 0,
+                    NewCombo = ihco?.NewCombo ?? false,
+                    Length = ihd?.Distance ?? 0,
+                    RepeatCount = ihr?.RepeatCount ?? 0
+                };
+            }
+
+            if (ihet != null)
+            {
+                return new Spinner
+                {
+                    StartTime = original.StartTime,
+                    Sample = original.Sample,
+                    Position = new Vector2(512, 384) / 2,
+
+                    EndTime = ihet.EndTime,
+
+                    ComboColour = ihco?.ComboColour ?? Color4.White,
+                    ComboIndex = ihco?.ComboIndex ?? 0,
+                    NewCombo = ihco?.NewCombo ?? false,
+                };
+            }
+
+            return new HitCircle
+            {
+                StartTime = original.StartTime,
+                Sample = original.Sample,
+
+                Position = ihp?.Position ?? Vector2.Zero,
+                ComboColour = ihco?.ComboColour ?? Color4.White,
+                ComboIndex = ihco?.ComboIndex ?? 0,
+                NewCombo = ihco?.NewCombo ?? false
+            };
+        }
+
+        private List<OsuHitObject> convertHitObjects(List<HitObject> hitObjects, float stackLeniency)
         {
             List<OsuHitObject> converted = new List<OsuHitObject>();
 
             int combo = 0;
             foreach (HitObject h in hitObjects)
             {
-                if (h.NewCombo) combo = 0;
+                OsuHitObject c = convertHitObject(h);
 
-                h.ComboIndex = combo++;
+                if (c.NewCombo)
+                    combo = 0;
+
+                c.ComboIndex = combo++;
                 converted.Add(h as OsuHitObject);
             }
 
@@ -62,9 +123,12 @@ namespace osu.Game.Modes.Osu.Beatmaps
                     if (stackBaseObject is Spinner) break;
 
                     OsuHitObject objectN = hitObjects[n];
-                    if (objectN is Spinner) continue;
+                    if (objectN is Spinner)
+                        continue;
 
-                    if (objectN.StartTime - stackBaseObject.EndTime > stackThreshold)
+                    double endTime = (stackBaseObject as IHasEndTime)?.EndTime ?? stackBaseObject.StartTime;
+
+                    if (objectN.StartTime - endTime > stackThreshold)
                         //We are no longer within stacking range of the next object.
                         break;
 
@@ -116,7 +180,9 @@ namespace osu.Game.Modes.Osu.Beatmaps
                         OsuHitObject objectN = hitObjects[n];
                         if (objectN is Spinner) continue;
 
-                        if (objectI.StartTime - objectN.EndTime > stackThreshold)
+                        double endTime = (objectN as IHasEndTime)?.EndTime ?? objectN.StartTime;
+
+                        if (objectI.StartTime - endTime > stackThreshold)
                             //We are no longer within stacking range of the previous object.
                             break;
 

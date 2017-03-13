@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
 using OpenTK;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -29,8 +30,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         {
             Texture = textures.Get(@"Menu/logo");
 
+            double endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
+            double duration = endTime - h.StartTime;
+
             Transforms.Add(new TransformPositionX { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = 1.1f, EndValue = 0.1f });
-            Transforms.Add(new TransformAlpha { StartTime = h.StartTime + h.Duration + 200, EndTime = h.StartTime + h.Duration + 400, StartValue = 1, EndValue = 0 });
+            Transforms.Add(new TransformAlpha { StartTime = h.StartTime + duration + 200, EndTime = h.StartTime + duration + 400, StartValue = 1, EndValue = 0 });
             Expire(true);
         }
     }

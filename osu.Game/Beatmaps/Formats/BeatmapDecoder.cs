@@ -8,6 +8,7 @@ using osu.Game.Modes.Objects;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -81,8 +82,13 @@ namespace osu.Game.Beatmaps.Formats
 
             foreach (HitObject h in b.HitObjects)
             {
-                if (h.NewCombo || i == -1) i = (i + 1) % colours.Count;
-                h.Colour = colours[i];
+                IHasCombo ihc = h as IHasCombo;
+
+                if (ihc == null)
+                    continue;
+
+                if (ihc.NewCombo || i == -1) i = (i + 1) % colours.Count;
+                ihc.ComboColour = colours[i];
             }
         }
     }

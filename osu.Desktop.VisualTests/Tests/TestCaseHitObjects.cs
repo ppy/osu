@@ -75,7 +75,7 @@ namespace osu.Desktop.VisualTests.Tests
                     add(new DrawableSpinner(new Spinner
                     {
                         StartTime = framedClock.CurrentTime + 600,
-                        Length = 1000,
+                        EndTime = framedClock.CurrentTime + 1600,
                         Position = new Vector2(0, 0),
                     }));
                     break;
