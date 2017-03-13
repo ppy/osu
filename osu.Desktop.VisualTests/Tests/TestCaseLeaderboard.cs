@@ -13,6 +13,7 @@ using osu.Framework.Allocation;
 using osu.Framework.MathUtils;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Modes;
+using osu.Game.Users;
 
 namespace osu.Desktop.VisualTests
 {
@@ -38,7 +39,12 @@ namespace osu.Desktop.VisualTests
                     {
                         Id = 2,
                         Username = @"peppy",
-                        FlagName = @"AU",
+                        Region = new Region
+                        {
+                            FullName = @"Australia",
+                            Acronym = @"AUS",
+                            FlagName = @"AU",
+                        },
                     },
                 });
             }

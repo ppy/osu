@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Tournament.Teams
 {
@@ -20,11 +21,11 @@ namespace osu.Game.Screens.Tournament.Teams
             this.storage = storage;
         }
 
-        public IEnumerable<Team> Teams
+        public IEnumerable<Region> Teams
         {
             get
             {
-                var teams = new List<Team>();
+                var teams = new List<Region>();
 
                 try
                 {
@@ -52,7 +53,7 @@ namespace osu.Game.Screens.Tournament.Teams
                             string acronym = split.Length >= 3 ? split[2].Trim() : teamName;
                             acronym = acronym.Substring(0, Math.Min(3, acronym.Length));
 
-                            teams.Add(new Team()
+                            teams.Add(new Region()
                             {
                                 FlagName = flagName,
                                 FullName = teamName,

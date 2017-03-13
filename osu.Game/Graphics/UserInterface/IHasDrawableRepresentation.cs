@@ -1,13 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Game.Users;
+using osu.Framework.Graphics;
 
-namespace osu.Game.Screens.Tournament.Teams
+namespace osu.Game.Graphics.UserInterface
 {
-    public interface ITeamList
+    public interface IHasDrawableRepresentation<T> where T : Drawable
     {
-        IEnumerable<Region> Teams { get; }
+        T CreateDrawable();
     }
 }
