@@ -326,15 +326,12 @@
     <Compile Include="Screens\Select\Options\BeatmapOptionsEditButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsRemoveFromUnplayedButton.cs" />
-<<<<<<< HEAD
     <Compile Include="Screens\Select\Leaderboards\Leaderboard.cs" />
     <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
     <Compile Include="Graphics\UserInterface\IHasDrawableRepresentation.cs" />
     <Compile Include="Users\Region.cs" />
     <Compile Include="Users\Badge.cs" />
-=======
     <Compile Include="IO\ArchiveReader.cs" />
->>>>>>> 6f20473e65960e059727dee5dc075fc356d07c1b
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
