@@ -3,13 +3,11 @@
 
 using osu.Framework;
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using OpenTK;
 using osu.Framework.Graphics.Transforms;
-using osu.Framework.Graphics.Primitives;
 using System;
 
 namespace osu.Game.Overlays
@@ -136,19 +134,23 @@ namespace osu.Game.Overlays
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Visible;
 
-            contentContainer.FadeIn(APPEAR_DURATION, EasingTypes.OutQuint);
+            FadeIn(100, EasingTypes.OutQuint);
             contentContainer.MoveToY(0, APPEAR_DURATION, EasingTypes.OutQuint);
+
+            FadeIn(100, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            contentContainer.FadeOut(DISAPPEAR_DURATION, EasingTypes.In);
+            FadeOut(DISAPPEAR_DURATION, EasingTypes.InQuint);
             contentContainer.MoveToY(DrawHeight * 2f, DISAPPEAR_DURATION, EasingTypes.In);
 
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Hidden;
+
+            FadeOut(DISAPPEAR_DURATION, EasingTypes.InQuint);
         }
 
         protected override void UpdateAfterChildren()

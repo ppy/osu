@@ -2,12 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
+using osu.Game.Modes;
 
 namespace osu.Game.Beatmaps
 {
@@ -17,9 +20,19 @@ namespace osu.Game.Beatmaps
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
+        /// <summary>
+        /// A play mode that is preferred for this beatmap. PlayMode will become this mode where conversion is feasible,
+        /// or otherwise to the beatmap's default.
+        /// </summary>
+        public PlayMode? PreferredPlayMode;
+
+        public PlayMode PlayMode => beatmap?.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode ?? PlayMode.Osu;
+
+        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
+
         public readonly bool WithStoryboard;
 
-        protected abstract ArchiveReader GetReader();
+        protected abstract BeatmapArchiveReader GetReader();
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, bool withStoryboard = false)
         {
@@ -87,7 +100,7 @@ namespace osu.Game.Beatmaps
             set { lock (beatmapLock) beatmap = value; }
         }
 
-        private ArchiveReader trackReader;
+        private BeatmapArchiveReader trackReader;
         private Track track;
         private object trackLock = new object();
         public Track Track

@@ -51,6 +51,7 @@ namespace osu.Game.Overlays.Notifications
                 iconDrawable = new TextAwesome
                 {
                     Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Icon = icon,
                 }
             });
@@ -80,10 +81,8 @@ namespace osu.Game.Overlays.Notifications
 
             set
             {
-                if (base.Read = value)
-                    Light.FadeOut(100);
-                else
-                    Light.FadeIn(100);
+                base.Read = value;
+                Light.FadeTo(value ? 1 : 0, 100);
             }
         }
     }

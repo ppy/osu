@@ -10,11 +10,8 @@ namespace osu.Game.Overlays.Notifications
 {
     public class ProgressCompletionNotification : SimpleNotification
     {
-        private ProgressNotification progressNotification;
-
-        public ProgressCompletionNotification(ProgressNotification progressNotification)
+        public ProgressCompletionNotification()
         {
-            this.progressNotification = progressNotification;
             Icon = FontAwesome.fa_check;
         }
 

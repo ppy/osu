@@ -2,29 +2,24 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Mania.Beatmaps;
 using osu.Game.Modes.Mania.Objects;
-using osu.Game.Modes.Objects;
-using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Modes.Mania
 {
     public class ManiaDifficultyCalculator : DifficultyCalculator<ManiaBaseHit>
     {
-        protected override PlayMode PlayMode => PlayMode.Mania;
-
-        private int columns;
-
-        public ManiaDifficultyCalculator(Beatmap beatmap, int columns = 5) : base(beatmap)
+        public ManiaDifficultyCalculator(Beatmap beatmap)
+            : base(beatmap)
         {
-            this.columns = columns;
         }
 
-        protected override HitObjectConverter<ManiaBaseHit> Converter => new ManiaConverter(columns);
-
-        protected override double CalculateInternal(Dictionary<String, String> categoryDifficulty)
+        protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
         {
             return 0;
         }
+
+        protected override IBeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
     }
 }

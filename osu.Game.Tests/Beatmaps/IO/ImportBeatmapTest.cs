@@ -17,13 +17,14 @@ using osu.Game.Modes.Catch;
 using osu.Game.Modes.Mania;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Taiko;
+using osu.Game.Beatmaps.IO;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
     [TestFixture]
     public class ImportBeatmapTest
     {
-        const string osz_path = @"../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
+        private const string osz_path = @"../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
 
         [OneTimeSetUp]
         public void SetUp()
@@ -69,7 +70,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 Assert.IsTrue(File.Exists(temp));
 
-                var importer = new BeatmapImporter(client);
+                var importer = new BeatmapIPCChannel(client);
                 if (!importer.ImportAsync(temp).Wait(1000))
                     Assert.Fail(@"IPC took too long to send");
 
@@ -91,7 +92,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 Assert.IsTrue(File.Exists(temp));
 
-                using (FileStream stream = File.OpenRead(temp))
+                using (File.OpenRead(temp))
                     osu.Dependencies.Get<BeatmapDatabase>().Import(temp);
 
                 ensureLoaded(osu);
@@ -106,8 +107,8 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private string prepareTempCopy(string path)
         {
-            var temp = Path.GetTempFileName();
-            return new FileInfo(osz_path).CopyTo(temp, true).FullName;
+            var temp = Path.GetTempPath() + Guid.NewGuid() + BeatmapArchiveReader.OSZ_EXTENSION;
+            return new FileInfo(path).CopyTo(temp, true).FullName;
         }
 
         private OsuGameBase loadOsu(GameHost host)
@@ -130,13 +131,13 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Action waitAction = () =>
             {
-                while ((resultSets = osu.Dependencies.Get<BeatmapDatabase>()
-                    .Query<BeatmapSetInfo>().Where(s => s.OnlineBeatmapSetID == 241526)).Count() == 0)
+                while (!(resultSets = osu.Dependencies.Get<BeatmapDatabase>()
+                    .Query<BeatmapSetInfo>().Where(s => s.OnlineBeatmapSetID == 241526)).Any())
                     Thread.Sleep(50);
             };
 
             Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout),
-                $@"BeatmapSet did not import to the database in allocated time.");
+                @"BeatmapSet did not import to the database in allocated time.");
 
             //ensure we were stored to beatmap database backing...
 
@@ -168,7 +169,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.Mode == PlayMode.Osu))?.Beatmap;
 
-            Assert.IsTrue(beatmap.HitObjects.Count > 0);
+            Assert.IsTrue(beatmap?.HitObjects.Count > 0);
         }
     }
 }

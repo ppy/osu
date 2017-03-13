@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
@@ -25,31 +25,27 @@ namespace osu.Game.Modes.UI
                 reapplySize();
             }
         }
-
-        private Color4 backgroundColour;
-        new public Color4 Colour
+        
+        public new Color4 Colour
         {
             get
             {
-                return backgroundColour;
+                return background.Colour;
             }
             set
             {
-                backgroundColour = value;
                 background.Colour = value;
             }
         }
-
-        private FontAwesome icon;
+        
         public FontAwesome Icon
         {
             get
             {
-                return icon;
+                return modIcon.Icon;
             }
             set
             {
-                icon = value;
                 modIcon.Icon = value;
             }
         }

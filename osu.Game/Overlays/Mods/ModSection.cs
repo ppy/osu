@@ -2,8 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -16,53 +14,29 @@ using osu.Game.Modes;
 
 namespace osu.Game.Overlays.Mods
 {
-    class AlwaysPresentFlowContainer : FillFlowContainer
-    {
-        public override bool IsPresent => true;
-    }
-
-    public class ModSection : Container
+    public abstract class ModSection : Container
     {
         private OsuSpriteText headerLabel;
 
-        private AlwaysPresentFlowContainer buttonsContainer;
-        public FillFlowContainer ButtonsContainer => buttonsContainer;
+        public FillFlowContainer<ModButton> ButtonsContainer { get; }
 
         public Action<Mod> Action;
-        protected virtual Key[] ToggleKeys => new Key[] { };
+        protected abstract Key[] ToggleKeys { get; }
+        public abstract ModType ModType { get; }
 
-        public Mod[] SelectedMods
-        {
-            get
-            {
-                List<Mod> selectedMods = new List<Mod>();
-
-                foreach (ModButton button in Buttons)
-                {
-                    Mod selectedMod = button.SelectedMod;
-                    if (selectedMod != null)
-                        selectedMods.Add(selectedMod);
-                }
-
-                return selectedMods.ToArray();
-            }
-        }
-
-        private string header;
         public string Header
         {
             get
             {
-                return header;
+                return headerLabel.Text;
             }
             set
             {
-                header = value;
                 headerLabel.Text = value;
             }
         }
 
-        private ModButton[] buttons = {};
+        private ModButton[] buttons = { };
         public ModButton[] Buttons
         {
             get
@@ -76,30 +50,30 @@ namespace osu.Game.Overlays.Mods
 
                 foreach (ModButton button in value)
                 {
-                    button.Colour = Colour;
+                    button.ButtonColour = ButtonColour;
                     button.SelectedColour = selectedColour;
-                    button.Action = buttonPressed;
+                    button.Action = Action;
                 }
 
-                buttonsContainer.Add(value);
+                ButtonsContainer.Children = value;
             }
         }
 
-        private Color4 colour = Color4.White;
-        new public Color4 Colour
+        private Color4 buttonsBolour = Color4.White;
+        public Color4 ButtonColour
         {
             get
             {
-                return colour;
+                return buttonsBolour;
             }
             set
             {
-                if (value == colour) return;
-                colour = value;
+                if (value == buttonsBolour) return;
+                buttonsBolour = value;
 
                 foreach (ModButton button in buttons)
                 {
-                    button.Colour = value;
+                    button.ButtonColour = value;
                 }
             }
         }
@@ -140,12 +114,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private void buttonPressed(Mod mod)
-        {
-            Action?.Invoke(mod);
-        }
-
-        public ModSection()
+        protected ModSection()
         {
             AutoSizeAxes = Axes.Y;
 
@@ -156,10 +125,9 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.TopLeft,
                     Anchor = Anchor.TopLeft,
                     Position = new Vector2(0f, 0f),
-                    Font = @"Exo2.0-Bold",
-                    Text = Header,
+                    Font = @"Exo2.0-Bold"
                 },
-                buttonsContainer = new AlwaysPresentFlowContainer
+                ButtonsContainer = new FillFlowContainer<ModButton>
                 {
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.BottomLeft,
@@ -169,6 +137,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Top = 6,
                     },
+                    AlwaysPresent = true
                 },
             };
         }

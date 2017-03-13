@@ -9,9 +9,7 @@ using osu.Game.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Lists;
 using osu.Game.Beatmaps.Drawables;
-using osu.Framework.Timing;
 using osu.Framework.Input;
 using OpenTK.Input;
 using System.Collections;
@@ -20,7 +18,7 @@ using System.Diagnostics;
 
 namespace osu.Game.Screens.Select
 {
-    class CarouselContainer : ScrollContainer, IEnumerable<BeatmapGroup>
+    internal class CarouselContainer : ScrollContainer, IEnumerable<BeatmapGroup>
     {
         private Container<Panel> scrollableContent;
         private List<BeatmapGroup> groups = new List<BeatmapGroup>();
@@ -164,13 +162,13 @@ namespace osu.Game.Screens.Select
             switch (mode)
             {
                 case FilterControl.SortMode.Artist:
-                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist));
+                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist, StringComparison.InvariantCultureIgnoreCase));
                     break;
                 case FilterControl.SortMode.Title:
-                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title));
+                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title, StringComparison.InvariantCultureIgnoreCase));
                     break;
                 case FilterControl.SortMode.Author:
-                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author));
+                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author, StringComparison.InvariantCultureIgnoreCase));
                     break;
                 case FilterControl.SortMode.Difficulty:
                     sortedGroups.Sort((x, y) =>
@@ -356,7 +354,7 @@ namespace osu.Game.Screens.Select
 
         public void SelectRandom()
         {
-            List<BeatmapGroup> visibleGroups = this.groups.Where((BeatmapGroup selectGroup) => selectGroup.State != BeatmapGroupState.Hidden).ToList();
+            List<BeatmapGroup> visibleGroups = groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden).ToList();
             if (visibleGroups.Count < 1)
                 return;
             BeatmapGroup group = visibleGroups[RNG.Next(visibleGroups.Count)];

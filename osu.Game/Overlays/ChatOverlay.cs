@@ -27,7 +27,7 @@ namespace osu.Game.Overlays
 {
     public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent
     {
-        const float textbox_height = 40;
+        private const float textbox_height = 40;
 
         private ScheduledDelegate messageRequest;
 
