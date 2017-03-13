@@ -186,7 +186,7 @@ namespace osu.Game.Database
                 {
                     hash = input.GetMd5Hash();
                     input.Seek(0, SeekOrigin.Begin);
-                    path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash + BeatmapArchiveReader.OszExtension);
+                    path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash + BeatmapArchiveReader.OSZ_EXTENSION);
                     if (!storage.Exists(path))
                         using (var output = storage.GetStream(path, FileAccess.Write))
                             input.CopyTo(output);

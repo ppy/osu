@@ -5,12 +5,13 @@ using System;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.IO;
 
 namespace osu.Game.Beatmaps.IO
 {
     public abstract class BeatmapArchiveReader : ArchiveReader
     {
-        public const string OszExtension = @".osz";
+        public const string OSZ_EXTENSION = @".osz";
 
         public static BeatmapArchiveReader GetBeatmapArchiveReader(Storage storage, string path)
         {

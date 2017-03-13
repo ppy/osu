@@ -58,7 +58,7 @@ namespace osu.Desktop
             var dropData = (object[])e.Data.GetData(DataFormats.FileDrop);
             var filePaths = dropData.Select(f => f.ToString()).ToArray();
 
-            if (filePaths.All(f => Path.GetExtension(f) == BeatmapArchiveReader.OszExtension))
+            if (filePaths.All(f => Path.GetExtension(f) == BeatmapArchiveReader.OSZ_EXTENSION))
                 Task.Run(() => BeatmapDatabase.Import(filePaths));
             else if (filePaths.All(f => Path.GetExtension(f) == @".osr"))
                 Task.Run(() =>
@@ -68,7 +68,7 @@ namespace osu.Desktop
                 });
         }
 
-        private static readonly string[] allowed_extensions = { BeatmapArchiveReader.OszExtension, @".osr" };
+        private static readonly string[] allowed_extensions = { BeatmapArchiveReader.OSZ_EXTENSION, @".osr" };
 
         private void dragEnter(DragEventArgs e)
         {
