@@ -95,9 +95,9 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(next);
         }
 
-        class BeatmapMetadataDisplay : Container
+        private class BeatmapMetadataDisplay : Container
         {
-            class MetadataLine : Container
+            private class MetadataLine : Container
             {
                 public MetadataLine(string left, string right)
                 {
@@ -131,12 +131,12 @@ namespace osu.Game.Screens.Play
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    new FillFlowContainer()
+                    new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
-                        Direction = FillDirection.Down,
+                        Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
                             new OsuSpriteText
@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Play
                                 {
                                     new Sprite
                                     {
-                                        Texture = beatmap.Background,
+                                        Texture = beatmap?.Background,
                                         Origin = Anchor.Centre,
                                         Anchor = Anchor.Centre,
                                         FillMode = FillMode.Fill,
@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Play
                             },
                             new OsuSpriteText
                             {
-                                Text = beatmap.BeatmapInfo?.Version,
+                                Text = beatmap?.BeatmapInfo?.Version,
                                 TextSize = 26,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,

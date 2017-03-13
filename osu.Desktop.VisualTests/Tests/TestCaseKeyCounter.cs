@@ -15,10 +15,8 @@ using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseKeyCounter : TestCase
+    internal class TestCaseKeyCounter : TestCase
     {
-        public override string Name => @"KeyCounter";
-
         public override string Description => @"Tests key counter";
 
         public override void Reset()
@@ -32,10 +30,10 @@ namespace osu.Desktop.VisualTests.Tests
                 IsCounting = true,
                 Children = new KeyCounter[]
                 {
-                    new KeyCounterKeyboard(@"Z", Key.Z),
-                    new KeyCounterKeyboard(@"X", Key.X),
-                    new KeyCounterMouse(@"M1", MouseButton.Left),
-                    new KeyCounterMouse(@"M2", MouseButton.Right),
+                    new KeyCounterKeyboard(Key.Z),
+                    new KeyCounterKeyboard(Key.X),
+                    new KeyCounterMouse(MouseButton.Left),
+                    new KeyCounterMouse(MouseButton.Right),
                 },
             };
             BindableInt bindable = new BindableInt { MinValue = 0, MaxValue = 200, Default = 50 };
@@ -43,7 +41,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton("Add Random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
-                kc.Add(new KeyCounterKeyboard(key.ToString(), key));
+                kc.Add(new KeyCounterKeyboard(key));
             });
             ButtonsContainer.Add(new SpriteText { Text = "FadeTime" });
             ButtonsContainer.Add(new TestSliderBar<int>

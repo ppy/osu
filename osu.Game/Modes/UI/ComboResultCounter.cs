@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics.UserInterface;
+using System;
 
 namespace osu.Game.Modes.UI
 {
@@ -31,7 +31,7 @@ namespace osu.Game.Modes.UI
 
         public override void Increment(ulong amount)
         {
-            Count = Count + amount;
+            Current.Value = Current + amount;
         }
 
         protected class TransformComboResult : Transform<ulong>
@@ -51,7 +51,7 @@ namespace osu.Game.Modes.UI
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as ComboResultCounter).DisplayedCount = CurrentValue;
+                ((ComboResultCounter)d).DisplayedCount = CurrentValue;
             }
         }
     }

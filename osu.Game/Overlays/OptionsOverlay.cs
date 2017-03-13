@@ -77,7 +77,7 @@ namespace osu.Game.Overlays
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Direction = FillDirection.Down,
+                            Direction = FillDirection.Vertical,
 
                             Children = new Drawable[]
                             {
@@ -98,9 +98,10 @@ namespace osu.Game.Overlays
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                    Direction = FillDirection.Down,
+                                    Direction = FillDirection.Vertical,
                                     Children = sections,
-                                }
+                                },
+                                new OptionsFooter()
                             }
                         }
                     }
@@ -146,11 +147,8 @@ namespace osu.Game.Overlays
 
                 var previous = sidebarButtons.SingleOrDefault(sb => sb.Selected);
                 var next = sidebarButtons.SingleOrDefault(sb => sb.Section == bestCandidate);
-                if (next != null)
-                {
-                    previous.Selected = false;
-                    next.Selected = true;
-                }
+                if (previous != null) previous.Selected = false;
+                if (next != null) next.Selected = true;
             }
         }
 

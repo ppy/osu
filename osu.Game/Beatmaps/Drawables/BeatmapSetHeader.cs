@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class BeatmapSetHeader : Panel
+    internal class BeatmapSetHeader : Panel
     {
         public Action<BeatmapSetHeader> GainedSelection;
         private SpriteText title, artist;
@@ -38,7 +38,7 @@ namespace osu.Game.Beatmaps.Drawables
                 },
                 new FillFlowContainer
                 {
-                    Direction = FillDirection.Down,
+                    Direction = FillDirection.Vertical,
                     Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
@@ -52,7 +52,6 @@ namespace osu.Game.Beatmaps.Drawables
                         },
                         artist = new OsuSpriteText
                         {
-                            Margin = new MarginPadding { Top = -1 },
                             Font = @"Exo2.0-SemiBoldItalic",
                             Text = beatmap.BeatmapSetInfo.Metadata.Artist,
                             TextSize = 17,
@@ -97,7 +96,7 @@ namespace osu.Game.Beatmaps.Drawables
             base.Dispose(isDisposing);
         }
 
-        class PanelBackground : BufferedContainer
+        private class PanelBackground : BufferedContainer
         {
             private readonly WorkingBeatmap working;
 
@@ -112,7 +111,7 @@ namespace osu.Game.Beatmaps.Drawables
                     new FillFlowContainer
                     {
                         Depth = -1,
-                        Direction = FillDirection.Right,
+                        Direction = FillDirection.Horizontal,
                         RelativeSizeAxes = Axes.Both,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),
@@ -161,7 +160,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fill,
-                }.LoadAsync(game, (bg) =>
+                }.LoadAsync(game, bg =>
                 {
                     Add(bg);
                     ForceRedraw();
