@@ -16,7 +16,6 @@ using osu.Game.Database;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps.Drawables;
 using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -56,8 +55,15 @@ namespace osu.Game.Screens.Select
         public void UpdateBeatmap(WorkingBeatmap beatmap)
         {
             if (beatmap?.BeatmapInfo == null)
+            {
+                FadeOut(250);
+                beatmapInfoContainer?.FadeOut(250);
+                beatmapInfoContainer?.Expire();
+                beatmapInfoContainer = null;
                 return;
+            }
 
+            FadeIn(250);
             var lastContainer = beatmapInfoContainer;
 
             float newDepth = lastContainer?.Depth + 1 ?? 0;
@@ -84,7 +90,7 @@ namespace osu.Game.Screens.Select
                 }));
 
                 //get statistics fromt he current ruleset.
-                Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).GetBeatmapStatistics(beatmap).ForEach(s => labels.Add(new InfoLabel(s)));
+                labels.AddRange(Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
             }
 
             (beatmapInfoContainer = new BufferedContainer
@@ -191,7 +197,7 @@ namespace osu.Game.Screens.Select
 
         private string getBPMRange(Beatmap beatmap)
         {
-            double bpmMax = beatmap.BPMMaximum; 
+            double bpmMax = beatmap.BPMMaximum;
             double bpmMin = beatmap.BPMMinimum;
 
             if (Precision.AlmostEquals(bpmMin, bpmMax)) return Math.Round(bpmMin) + "bpm";
