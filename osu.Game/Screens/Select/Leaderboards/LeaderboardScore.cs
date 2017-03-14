@@ -235,7 +235,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     Size = new Vector2(score_rank_size),
                                     Position = new Vector2(0f, -10f),
                                 },
-                                scoreLabel = new GlowingSpriteText(string.Format("{0:n0}", Score.TotalScore), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa"))
+                                scoreLabel = new GlowingSpriteText(Score.TotalScore.ToString("N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa"))
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,

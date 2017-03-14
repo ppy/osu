@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public interface IHasDrawableRepresentation<T> where T : Drawable
+    public interface IHasDrawableRepresentation<out T> where T : Drawable
     {
         T CreateDrawable();
     }
