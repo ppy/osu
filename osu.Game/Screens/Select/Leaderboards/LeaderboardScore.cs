@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private const float corner_radius = 5;
         private const float edge_margin = 10;
         private const float background_alpha = 0.25f;
-        private const float score_rank_size = 30f;
+        private const float score_rank_size = 40f;
 
         private readonly EdgeEffect imageShadow = new EdgeEffect
         {
@@ -241,7 +241,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Size = new Vector2(score_rank_size),
-                                    Position = new Vector2(0f, -5f),
+                                    Position = new Vector2(0f, -10f),
                                 },
                                 scoreLabel = new GlowingSpriteText(string.Format("{0:n0}", Score.TotalScore), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa"))
                                 {
