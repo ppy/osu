@@ -29,14 +29,11 @@ namespace osu.Game.Screens.Select
                 Margin = new MarginPadding { Bottom = 50 }
             });
 
-            Footer.AddButton(@"mods", colours.Yellow, modSelect.ToggleVisibility, Key.F1);
-            Footer.AddButton(@"random", colours.Green, SelectRandom, Key.F2);
-            Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
+            Footer.AddButton(@"mods", colours.Yellow, modSelect.ToggleVisibility, Key.F1, float.MaxValue);
 
             BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
             BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.fa_eraser, colours.Purple, null, Key.Number2);
             BeatmapOptions.AddButton(@"Edit", @"Beatmap", FontAwesome.fa_pencil, colours.Yellow, null, Key.Number3);
-            BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, PromptDelete, Key.Number4);
         }
 
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
