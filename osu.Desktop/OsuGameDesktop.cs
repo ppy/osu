@@ -12,7 +12,6 @@ using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using osu.Game.Screens.Menu;
-using osu.Game.Beatmaps.IO;
 
 namespace osu.Desktop
 {
@@ -31,9 +30,9 @@ namespace osu.Desktop
             base.LoadComplete();
 
             versionManager.LoadAsync(this);
-            ModeChanged += m =>
+            ScreenChanged += s =>
             {
-                if (!versionManager.IsAlive && m is Intro)
+                if (!versionManager.IsAlive && s is Intro)
                     Add(versionManager);
             };
         }
@@ -58,7 +57,7 @@ namespace osu.Desktop
             var dropData = (object[])e.Data.GetData(DataFormats.FileDrop);
             var filePaths = dropData.Select(f => f.ToString()).ToArray();
 
-            if (filePaths.All(f => Path.GetExtension(f) == BeatmapArchiveReader.OSZ_EXTENSION))
+            if (filePaths.All(f => Path.GetExtension(f) == @".osz"))
                 Task.Run(() => BeatmapDatabase.Import(filePaths));
             else if (filePaths.All(f => Path.GetExtension(f) == @".osr"))
                 Task.Run(() =>
@@ -68,7 +67,7 @@ namespace osu.Desktop
                 });
         }
 
-        private static readonly string[] allowed_extensions = { BeatmapArchiveReader.OSZ_EXTENSION, @".osr" };
+        private static readonly string[] allowed_extensions = { @".osz", @".osr" };
 
         private void dragEnter(DragEventArgs e)
         {
