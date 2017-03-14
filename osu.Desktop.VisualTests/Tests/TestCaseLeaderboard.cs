@@ -10,8 +10,10 @@ using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Modes;
+using osu.Game.Modes.Mods;
 using osu.Game.Users;
 using osu.Game.Modes.Osu;
+using osu.Game.Modes.Osu.Mods;
 
 namespace osu.Desktop.VisualTests
 {

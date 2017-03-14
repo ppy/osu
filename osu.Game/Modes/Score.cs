@@ -4,6 +4,7 @@
 using osu.Game.Users;
 using osu.Game.Database;
 using System.ComponentModel;
+using osu.Game.Modes.Mods;
 
 namespace osu.Game.Modes
 {
