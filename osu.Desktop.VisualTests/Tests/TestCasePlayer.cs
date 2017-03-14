@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Screens.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Formats;
 using OpenTK;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps.IO;

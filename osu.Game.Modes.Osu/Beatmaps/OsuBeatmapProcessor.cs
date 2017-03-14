@@ -14,9 +14,6 @@ namespace osu.Game.Modes.Osu.Beatmaps
 
         public void PostProcess(Beatmap<OsuHitObject> beatmap)
         {
-            if ((beatmap.ComboColors?.Count ?? 0) == 0)
-                return;
-
             int comboIndex = 0;
             int colourIndex = 0;
 

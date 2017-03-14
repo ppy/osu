@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps
     {
         public BeatmapInfo BeatmapInfo;
         public List<ControlPoint> ControlPoints;
-        public List<Color4> ComboColors = new List<Color4>
+        public readonly List<Color4> ComboColors = new List<Color4>
         {
             new Color4(17, 136, 170, 255),
             new Color4(102, 136, 0, 255),
