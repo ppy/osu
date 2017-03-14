@@ -114,7 +114,6 @@
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Modes\Objects\Drawables\DrawableHitObject.cs" />
     <Compile Include="Modes\Objects\HitObject.cs" />
-    <Compile Include="Modes\Objects\HitObjectConverter.cs" />
     <Compile Include="Beatmaps\Samples\HitSampleInfo.cs" />
     <Compile Include="Beatmaps\Samples\SampleBank.cs" />
     <Compile Include="Beatmaps\Samples\SampleInfo.cs" />
@@ -342,7 +341,6 @@
     <None Include="..\osu.licenseheader">
       <Link>osu.licenseheader</Link>
     </None>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
