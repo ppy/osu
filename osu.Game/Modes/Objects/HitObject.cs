@@ -23,11 +23,5 @@ namespace osu.Game.Modes.Objects
         /// The sample to be played when this HitObject is hit.
         /// </summary>
         public HitSampleInfo Sample { get; set; }
-
-        /// <summary>
-        /// Sets default parameters from a beatmap.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to set from.</param>
-        public virtual void SetDefaultsFromBeatmap(Beatmap beatmap) { }
     }
 }

@@ -16,7 +16,8 @@ namespace osu.Game.Beatmaps
         /// Sets default values for a HitObject.
         /// </summary>
         /// <param name="hitObject">The HitObject to set default values for.</param>
-        void SetDefaults(T hitObject);
+        /// <param name="beatmap">The Beatmap to extract the default values from.</param>
+        void SetDefaults(T hitObject, Beatmap<T> beatmap);
 
         /// <summary>
         /// Post-processes a Beatmap to add mode-specific components that aren't added during conversion.

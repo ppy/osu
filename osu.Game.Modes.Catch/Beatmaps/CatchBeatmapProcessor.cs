@@ -8,11 +8,11 @@ namespace osu.Game.Modes.Catch.Beatmaps
 {
     internal class CatchBeatmapProcessor : IBeatmapProcessor<CatchBaseHit>
     {
-        public void PostProcess(Beatmap<CatchBaseHit> beatmap)
+        public void SetDefaults(CatchBaseHit hitObject, Beatmap<CatchBaseHit> beatmap)
         {
         }
 
-        public void SetDefaults(CatchBaseHit hitObject)
+        public void PostProcess(Beatmap<CatchBaseHit> beatmap)
         {
         }
     }

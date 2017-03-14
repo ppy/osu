@@ -75,7 +75,7 @@ namespace osu.Game.Modes.Osu.Objects
         public double Velocity;
         public double TickDistance;
 
-        public override void SetDefaultsFromBeatmap(Beatmap beatmap)
+        public override void SetDefaultsFromBeatmap(Beatmap<OsuHitObject> beatmap)
         {
             base.SetDefaultsFromBeatmap(beatmap);
 
