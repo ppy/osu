@@ -91,7 +91,7 @@
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
     <Compile Include="Modes\LegacyReplay.cs" />
-    <Compile Include="Modes\Mods\IApplyableMod.cs" />
+    <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
     <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
