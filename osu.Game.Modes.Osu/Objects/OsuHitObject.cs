@@ -10,7 +10,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject, IHasCombo
+    public abstract class OsuHitObject : HitObject, IHasCombo, IHasPosition
     {
         public const double OBJECT_RADIUS = 64;
 
@@ -37,10 +37,8 @@ namespace osu.Game.Modes.Osu.Objects
 
         public abstract HitObjectType Type { get; }
 
-        public virtual bool NewCombo { get; set; }
-
         public Color4 ComboColour { get; set; }
-
+        public virtual bool NewCombo { get; set; }
         public int ComboIndex { get; set; }
 
         public double HitWindowFor(OsuScoreResult result)

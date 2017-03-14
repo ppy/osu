@@ -54,7 +54,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
 
                     NewCombo = comboData?.NewCombo ?? false,
 
-                    Length = distanceData?.Distance ?? 0,
+                    Distance = distanceData?.Distance ?? 0,
 
                     RepeatCount = repeatsData?.RepeatCount ?? 0
                 };
