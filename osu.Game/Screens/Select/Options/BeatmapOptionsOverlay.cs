@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select.Options
@@ -90,7 +91,7 @@ namespace osu.Game.Screens.Select.Options
         /// <para>Lower depth to be put on the left, and higher to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Footer"/>!</para>
         /// </param>
-        public void AddButton(string firstLine, string secongLine, FontAwesome icon, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
+        public void AddButton(string firstLine, string secongLine, FontAwesome icon, Color4 colour, Action action, float depth = 0)
         {
             buttonsContainer.Add(new BeatmapOptionsButton
             {
@@ -104,8 +105,24 @@ namespace osu.Game.Screens.Select.Options
                     Hide();
                     action?.Invoke();
                 },
-                HotKey = hotkey
             });
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat) return false;
+            int index = (int)args.Key - (int)Key.Number1;
+            if (index >= 0 && index <= 9)
+            {
+                // Children of ButtonFlow is reversed. The same reason of depth in AddButton.
+                var button = buttonsContainer.Children.Reverse().ElementAtOrDefault(index);
+                if (button != null)
+                {
+                    button.TriggerClick();
+                    return true;
+                }
+            }
+            return base.OnKeyDown(state, args);
         }
 
         private class ButtonFlow : FillFlowContainer<BeatmapOptionsButton>

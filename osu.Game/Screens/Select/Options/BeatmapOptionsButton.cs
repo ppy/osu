@@ -3,7 +3,6 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -49,8 +48,6 @@ namespace osu.Game.Screens.Select.Options
             set { secondLine.Text = value; }
         }
 
-        public Key? HotKey;
-
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             flash.FadeTo(0.1f, 1000, EasingTypes.OutQuint);
@@ -70,17 +67,6 @@ namespace osu.Game.Screens.Select.Options
             flash.FadeOut(800, EasingTypes.OutExpo);
 
             return base.OnClick(state);
-        }
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (!args.Repeat && args.Key == HotKey)
-            {
-                OnClick(state);
-                return true;
-            }
-
-            return false;
         }
 
         public override bool Contains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
