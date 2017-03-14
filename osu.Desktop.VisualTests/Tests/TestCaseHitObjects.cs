@@ -65,7 +65,7 @@ namespace osu.Desktop.VisualTests.Tests
                             new Vector2(-200, 0),
                             new Vector2(400, 0),
                         },
-                        Length = 400,
+                        Distance = 400,
                         Position = new Vector2(-200, 0),
                         Velocity = 1,
                         TickDistance = 100,

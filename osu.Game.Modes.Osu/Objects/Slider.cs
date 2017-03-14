@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Modes.Osu.Objects
 {
-    public class Slider : OsuHitObject, IHasEndTime
+    public class Slider : OsuHitObject, IHasEndTime, IHasCurve, IHasDistance, IHasRepeats
     {
         public double EndTime => StartTime + RepeatCount * Curve.Length / Velocity;
         public double Duration => EndTime - StartTime;
@@ -60,7 +60,7 @@ namespace osu.Game.Modes.Osu.Objects
             set { Curve.ControlPoints = value; }
         }
 
-        public double Length
+        public double Distance
         {
             get { return Curve.Length; }
             set { Curve.Length = value; }
@@ -90,7 +90,7 @@ namespace osu.Game.Modes.Osu.Objects
             TickDistance = baseVelocity / baseDifficulty.SliderTickRate;
         }
 
-        public int RepeatCount = 1;
+        public int RepeatCount { get; set; } = 1;
 
         internal readonly SliderCurve Curve = new SliderCurve();
 
