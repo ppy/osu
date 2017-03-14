@@ -23,6 +23,14 @@ namespace osu.Game.Modes.UI
 
         internal readonly PlayerInputManager InputManager = new PlayerInputManager();
 
+        protected readonly KeyConversionInputManager KeyConversionInputManager;
+
+        protected HitRenderer()
+        {
+            KeyConversionInputManager = CreateKeyConversionInputManager();
+            KeyConversionInputManager.RelativeSizeAxes = Axes.Both;
+        }
+
         /// <summary>
         /// Whether all the HitObjects have been judged.
         /// </summary>
@@ -35,14 +43,14 @@ namespace osu.Game.Modes.UI
             if (AllObjectsJudged)
                 OnAllJudged?.Invoke();
         }
+
+        protected virtual KeyConversionInputManager CreateKeyConversionInputManager() => new KeyConversionInputManager();
     }
 
     public abstract class HitRenderer<TObject> : HitRenderer
         where TObject : HitObject
     {
         public Beatmap<TObject> Beatmap;
-
-        public IEnumerable<DrawableHitObject> DrawableObjects => Playfield.HitObjects.Children;
 
         protected override Container<Drawable> Content => content;
         protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
@@ -64,13 +72,12 @@ namespace osu.Game.Modes.UI
 
             RelativeSizeAxes = Axes.Both;
 
+            KeyConversionInputManager.Add(Playfield = CreatePlayfield());
+
             InputManager.Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new[]
-                {
-                    Playfield = CreatePlayfield(),
-                }
+                Children = new[] { KeyConversionInputManager }
             });
 
             AddInternal(InputManager);
