@@ -177,7 +177,7 @@ namespace osu.Game.Database
 
             BeatmapMetadata metadata;
 
-            using (var reader = BeatmapArchiveReader.GetBeatmapArchiveReader(storage, path))
+            using (var reader = ArchiveReader.GetReader(storage, path))
                 metadata = reader.ReadMetadata();
 
             if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
@@ -186,7 +186,7 @@ namespace osu.Game.Database
                 {
                     hash = input.GetMd5Hash();
                     input.Seek(0, SeekOrigin.Begin);
-                    path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash + BeatmapArchiveReader.OSZ_EXTENSION);
+                    path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
                     if (!storage.Exists(path))
                         using (var output = storage.GetStream(path, FileAccess.Write))
                             input.CopyTo(output);
@@ -216,7 +216,7 @@ namespace osu.Game.Database
                 Metadata = metadata
             };
 
-            using (var archive = BeatmapArchiveReader.GetBeatmapArchiveReader(storage, path))
+            using (var archive = ArchiveReader.GetReader(storage, path))
             {
                 string[] mapNames = archive.BeatmapFilenames;
                 foreach (var name in mapNames)
@@ -268,12 +268,12 @@ namespace osu.Game.Database
             BeatmapSetRemoved?.Invoke(beatmapSet);
         }
 
-        public BeatmapArchiveReader GetReader(BeatmapSetInfo beatmapSet)
+        public ArchiveReader GetReader(BeatmapSetInfo beatmapSet)
         {
             if (string.IsNullOrEmpty(beatmapSet.Path))
                 return null;
 
-            return BeatmapArchiveReader.GetBeatmapArchiveReader(storage, beatmapSet.Path);
+            return ArchiveReader.GetReader(storage, beatmapSet.Path);
         }
 
         public BeatmapSetInfo GetBeatmapSet(int id)
@@ -354,7 +354,7 @@ namespace osu.Game.Database
                 this.database = database;
             }
 
-            protected override BeatmapArchiveReader GetReader() => database?.GetReader(BeatmapSetInfo);
+            protected override ArchiveReader GetReader() => database?.GetReader(BeatmapSetInfo);
         }
     }
 }

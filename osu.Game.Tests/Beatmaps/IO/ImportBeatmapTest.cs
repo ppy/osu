@@ -17,7 +17,6 @@ using osu.Game.Modes.Catch;
 using osu.Game.Modes.Mania;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Taiko;
-using osu.Game.Beatmaps.IO;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -107,7 +106,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private string prepareTempCopy(string path)
         {
-            var temp = Path.GetTempPath() + Guid.NewGuid() + BeatmapArchiveReader.OSZ_EXTENSION;
+            var temp = Path.GetTempFileName();
             return new FileInfo(path).CopyTo(temp, true).FullName;
         }
 
