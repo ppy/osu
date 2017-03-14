@@ -3,7 +3,9 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Modes.Mania.Mods;
 using osu.Game.Modes.Mania.UI;
+using osu.Game.Modes.Mods;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;
@@ -13,7 +15,7 @@ namespace osu.Game.Modes.Mania
 {
     public class ManiaRuleset : Ruleset
     {
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new ManiaHitRenderer(beatmap);
+        public override HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap) => new ManiaHitRenderer(beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {

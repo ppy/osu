@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
@@ -69,8 +68,6 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            Beatmap.Mods.Value.ForEach(m => m.PlayerLoading(this));
-
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
 
@@ -128,13 +125,10 @@ namespace osu.Game.Screens.Play
                 OnQuit = Exit
             };
 
-            hitRenderer = ruleset.CreateHitRendererWith(beatmap);
+            hitRenderer = ruleset.CreateHitRendererWith(Beatmap);
 
             if (ReplayInputHandler != null)
-            {
-                ReplayInputHandler.ToScreenSpace = hitRenderer.MapPlayfieldToScreenSpace;
                 hitRenderer.InputManager.ReplayInputHandler = ReplayInputHandler;
-            }
 
             hudOverlay.BindHitRenderer(hitRenderer);
 
@@ -305,7 +299,8 @@ namespace osu.Game.Screens.Play
         {
             if (pauseOverlay == null) return false;
 
-            if (ReplayInputHandler != null) return false;
+            if (hitRenderer.InputManager.ReplayInputHandler != null)
+                return false;
 
             if (pauseOverlay.State != Visibility.Visible && !canPause) return true;
 
