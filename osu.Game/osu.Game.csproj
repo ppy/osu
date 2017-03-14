@@ -333,6 +333,9 @@
     <Compile Include="Graphics\UserInterface\IHasDrawableRepresentation.cs" />
     <Compile Include="Users\Region.cs" />
     <Compile Include="Users\Badge.cs" />
+    <Compile Include="Modes\ScoreRank.cs" />
+    <Compile Include="Users\Avatar.cs" />
+    <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

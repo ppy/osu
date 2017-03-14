@@ -3,7 +3,6 @@
 
 using osu.Game.Users;
 using osu.Game.Database;
-using System.ComponentModel;
 using osu.Game.Modes.Mods;
 
 namespace osu.Game.Modes
@@ -21,35 +20,5 @@ namespace osu.Game.Modes
         public User User { get; set; }
         public Replay Replay;
         public BeatmapInfo Beatmap;
-    }
-
-    public enum ScoreRank
-    {
-        [Description(@"F")]
-        F,
-
-        [Description(@"F")]
-        D,
-
-        [Description(@"C")]
-        C,
-
-        [Description(@"B")]
-        B,
-
-        [Description(@"A")]
-        A,
-
-        [Description(@"S")]
-        S,
-
-        [Description(@"SPlus")]
-        SPlus,
-
-        [Description(@"SS")]
-        SS,
-
-        [Description(@"SSPlus")]
-        SSPlus,
     }
 }
