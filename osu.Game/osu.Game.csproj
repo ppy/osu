@@ -184,7 +184,7 @@
     <Compile Include="Modes\Ruleset.cs" />
     <Compile Include="Screens\Ranking\Results.cs" />
     <Compile Include="Screens\Direct\OnlineListing.cs" />
-    <Compile Include="Screens\Select\PlaySongSelect.cs" />
+    <Compile Include="Screens\Select\SongSelect.cs" />
     <Compile Include="Modes\UI\HitRenderer.cs" />
     <Compile Include="Modes\UI\Playfield.cs" />
     <Compile Include="Screens\Select\EditSongSelect.cs" />
