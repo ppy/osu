@@ -44,7 +44,25 @@ namespace osu.Game.Beatmaps.Formats
 
         public virtual Beatmap Process(Beatmap beatmap)
         {
-            ApplyColours(beatmap);
+            int comboIndex = 0;
+            int colourIndex = 0;
+
+            foreach (var obj in beatmap.HitObjects)
+            {
+                HitObjectWithCombo comboObject = obj as HitObjectWithCombo;
+
+                if (comboObject == null || comboObject.NewCombo)
+                {
+                    comboIndex = 0;
+                    colourIndex = (colourIndex + 1) % beatmap.ComboColors.Count;
+                }
+
+                if (comboObject != null)
+                {
+                    comboObject.ComboIndex = comboIndex++;
+                    comboObject.ComboColour = beatmap.ComboColors[colourIndex];
+                }
+            }
 
             return beatmap;
         }
@@ -55,7 +73,12 @@ namespace osu.Game.Beatmaps.Formats
             {
                 HitObjects = new List<HitObject>(),
                 ControlPoints = new List<ControlPoint>(),
-                ComboColors = new List<Color4>(),
+                ComboColors = new List<Color4> {
+                    new Color4(17, 136, 170, 255),
+                    new Color4(102, 136, 0, 255),
+                    new Color4(204, 102, 0, 255),
+                    new Color4(121, 9, 13, 255),
+                },
                 BeatmapInfo = new BeatmapInfo
                 {
                     Metadata = new BeatmapMetadata(),
@@ -66,30 +89,5 @@ namespace osu.Game.Beatmaps.Formats
             return beatmap;
         }
         protected abstract void ParseFile(TextReader stream, Beatmap beatmap);
-
-        public virtual void ApplyColours(Beatmap b)
-        {
-            List<Color4> colours = b.ComboColors ?? new List<Color4> {
-                new Color4(17, 136, 170, 255),
-                new Color4(102, 136, 0, 255),
-                new Color4(204, 102, 0, 255),
-                new Color4(121, 9, 13, 255),
-            };
-
-            if (colours.Count == 0) return;
-
-            int i = -1;
-
-            foreach (HitObject h in b.HitObjects)
-            {
-                IHasCombo ihc = h as IHasCombo;
-
-                if (ihc == null)
-                    continue;
-
-                if (ihc.NewCombo || i == -1) i = (i + 1) % colours.Count;
-                ihc.ComboColour = colours[i];
-            }
-        }
     }
 }

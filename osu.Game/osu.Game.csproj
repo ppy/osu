@@ -94,6 +94,7 @@
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
     <Compile Include="Modes\Objects\Hit.cs" />
+    <Compile Include="Modes\Objects\HitObjectWithCombo.cs" />
     <Compile Include="Modes\Objects\IHitObjectConverter.cs" />
     <Compile Include="Modes\Objects\LegacyHitObjectParser.cs" />
     <Compile Include="Modes\Objects\Slider.cs" />

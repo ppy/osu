@@ -9,6 +9,7 @@ using osu.Game.Modes.Osu.Objects.Drawables;
 using System.Collections.Generic;
 using osu.Game.Modes.Objects.Types;
 using OpenTK.Graphics;
+using System.Linq;
 
 namespace osu.Game.Modes.Osu.Beatmaps
 {
@@ -16,10 +17,23 @@ namespace osu.Game.Modes.Osu.Beatmaps
     {
         public Beatmap<OsuHitObject> Convert(Beatmap original)
         {
+            List<OsuHitObject> converted = convertHitObjects(original.HitObjects, original.BeatmapInfo?.StackLeniency ?? 0.7f);
+
+            converted.ForEach(c => c.SetDefaultsFromBeatmap(original));
+
             return new Beatmap<OsuHitObject>(original)
             {
-                HitObjects = convertHitObjects(original.HitObjects, original.BeatmapInfo?.StackLeniency ?? 0.7f)
+                HitObjects = converted
             };
+        }
+
+        private List<OsuHitObject> convertHitObjects(List<HitObject> hitObjects, float stackLeniency)
+        {
+            List<OsuHitObject> converted = hitObjects.Select(h => convertHitObject(h)).ToList();
+
+            updateStacking(converted, stackLeniency);
+
+            return converted;
         }
 
         private OsuHitObject convertHitObject(HitObject original)
@@ -80,28 +94,6 @@ namespace osu.Game.Modes.Osu.Beatmaps
                 ComboIndex = comboData?.ComboIndex ?? 0,
                 NewCombo = comboData?.NewCombo ?? false
             };
-        }
-
-        private List<OsuHitObject> convertHitObjects(List<HitObject> hitObjects, float stackLeniency)
-        {
-            List<OsuHitObject> converted = new List<OsuHitObject>();
-
-            int combo = 0;
-            foreach (HitObject h in hitObjects)
-            {
-                OsuHitObject c = convertHitObject(h);
-
-                if (c.NewCombo)
-                    combo = 0;
-
-                c.ComboIndex = combo++;
-
-                converted.Add(c);
-            }
-
-            updateStacking(converted, stackLeniency);
-
-            return converted;
         }
 
         private void updateStacking(List<OsuHitObject> hitObjects, float stackLeniency, int startIndex = 0, int endIndex = -1)
