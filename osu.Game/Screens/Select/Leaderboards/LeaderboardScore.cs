@@ -16,6 +16,7 @@ using osu.Framework.Allocation;
 using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions;
+using osu.Game.Modes.Mods;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
