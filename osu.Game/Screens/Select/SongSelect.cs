@@ -34,7 +34,7 @@ using osu.Game.Screens.Select.Options;
 
 namespace osu.Game.Screens.Select
 {
-    public class PlaySongSelect : OsuScreen
+    public class SongSelect : OsuScreen
     {
         private Bindable<PlayMode> playMode = new Bindable<PlayMode>();
         private BeatmapDatabase database;
