@@ -340,6 +340,7 @@ namespace osu.Desktop.Deploy
                 WorkingDirectory = solutionPath,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 UseShellExecute = false,
                 WindowStyle = ProcessWindowStyle.Hidden
             };
@@ -348,6 +349,7 @@ namespace osu.Desktop.Deploy
             if (p == null) return false;
 
             string output = p.StandardOutput.ReadToEnd();
+            output += p.StandardError.ReadToEnd();
 
             if (p.ExitCode == 0) return true;
 
