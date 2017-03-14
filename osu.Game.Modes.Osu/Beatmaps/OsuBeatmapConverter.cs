@@ -15,7 +15,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
 {
     internal class OsuBeatmapConverter : IBeatmapConverter<OsuHitObject>
     {
-        public Beatmap<OsuHitObject> ConvertBeatmap(Beatmap original)
+        public Beatmap<OsuHitObject> Convert(Beatmap original)
         {
             return new Beatmap<OsuHitObject>(original)
             {

@@ -16,6 +16,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="original">The original Beatmap.</param>
         /// <returns>The converted Beatmap.</returns>
-        Beatmap<T> ConvertBeatmap(Beatmap original);
+        Beatmap<T> Convert(Beatmap original);
     }
 }

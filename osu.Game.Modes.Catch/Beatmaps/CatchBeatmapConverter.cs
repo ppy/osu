@@ -10,7 +10,7 @@ namespace osu.Game.Modes.Catch.Beatmaps
 {
     internal class CatchBeatmapConverter : IBeatmapConverter<CatchBaseHit>
     {
-        public Beatmap<CatchBaseHit> ConvertBeatmap(Beatmap original)
+        public Beatmap<CatchBaseHit> Convert(Beatmap original)
         {
             return new Beatmap<CatchBaseHit>(original)
             {

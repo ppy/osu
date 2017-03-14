@@ -57,7 +57,7 @@ namespace osu.Game.Modes.UI
 
         protected HitRenderer(Beatmap beatmap)
         {
-            Beatmap = CreateBeatmapConverter().ConvertBeatmap(beatmap);
+            Beatmap = CreateBeatmapConverter().Convert(beatmap);
 
             RelativeSizeAxes = Axes.Both;
 
