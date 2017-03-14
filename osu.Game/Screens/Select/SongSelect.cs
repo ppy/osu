@@ -27,9 +27,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Modes;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
 
 namespace osu.Game.Screens.Select
@@ -47,8 +45,6 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
         private BeatmapInfoWedge beatmapInfoWedge;
 
-        private ModSelectOverlay modSelect;
-
         private static readonly Vector2 background_blur = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
 
@@ -57,8 +53,8 @@ namespace osu.Game.Screens.Select
 
         private List<BeatmapGroup> beatmapGroups;
 
-        private BeatmapOptionsOverlay beatmapOptions;
-        private Footer footer;
+        protected BeatmapOptionsOverlay BeatmapOptions { get; private set; }
+        protected Footer Footer { get; private set; }
 
         private FilterControl filter;
         public FilterControl Filter
@@ -130,7 +126,7 @@ namespace osu.Game.Screens.Select
                     },
                     X = -50,
                 },
-                beatmapOptions = new BeatmapOptionsOverlay
+                BeatmapOptions = new BeatmapOptionsOverlay
                 {
                     OnRemoveFromUnplayed = null,
                     OnClearLocalScores = null,
@@ -141,17 +137,7 @@ namespace osu.Game.Screens.Select
                         Bottom = 50,
                     },
                 },
-                modSelect = new ModSelectOverlay
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
-                    Margin = new MarginPadding
-                    {
-                        Bottom = 50,
-                    },
-                },
-                footer = new Footer
+                Footer = new Footer
                 {
                     OnBack = Exit,
                     OnStart = () =>
@@ -163,10 +149,6 @@ namespace osu.Game.Screens.Select
                     }
                 },
             };
-
-            footer.AddButton(@"mods", colours.Yellow, modSelect.ToggleVisibility, Key.F1);
-            footer.AddButton(@"random", colours.Green, carousel.SelectRandom, Key.F2);
-            footer.AddButton(@"options", colours.Blue, beatmapOptions.ToggleVisibility, Key.F3);
 
             if (osu != null)
                 playMode.BindTo(osu.PlayMode);
@@ -189,6 +171,7 @@ namespace osu.Game.Screens.Select
             Task.Factory.StartNew(() => addBeatmapSets(game, initialAddSetsTask.Token), initialAddSetsTask.Token);
         }
 
+        public void SelectRandom() => carousel.SelectRandom();
         protected abstract void OnSelected(WorkingBeatmap beatmap);
 
         private ScheduledDelegate filterTask;
@@ -329,8 +312,6 @@ namespace osu.Game.Screens.Select
         {
             base.OnBeatmapChanged(beatmap);
 
-            beatmap?.Mods.BindTo(modSelect.SelectedMods);
-
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
             carousel.SelectBeatmap(beatmap?.BeatmapInfo);
@@ -382,7 +363,7 @@ namespace osu.Game.Screens.Select
             var group = new BeatmapGroup(beatmapSet, database)
             {
                 SelectionChanged = selectionChanged,
-                StartRequested = b => footer.StartButton.TriggerClick()
+                StartRequested = b => Footer.StartButton.TriggerClick()
             };
 
             //for the time being, let's completely load the difficulty panels in the background.
