@@ -128,10 +128,6 @@ namespace osu.Game.Screens.Select
                 },
                 BeatmapOptions = new BeatmapOptionsOverlay
                 {
-                    OnRemoveFromUnplayed = null,
-                    OnClearLocalScores = null,
-                    OnEdit = null,
-                    OnDelete = promptDelete,
                     Margin = new MarginPadding
                     {
                         Bottom = 50,
@@ -408,7 +404,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void promptDelete()
+        protected void PromptDelete()
         {
             if (Beatmap != null)
                 dialogOverlay?.Push(new BeatmapDeleteDialog(Beatmap));
@@ -418,7 +414,7 @@ namespace osu.Game.Screens.Select
         {
             if (!args.Repeat && args.Key == Key.Delete && state.Keyboard.ShiftPressed)
             {
-                promptDelete();
+                PromptDelete();
                 return true;
             }
 
