@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Select
             base.OnResuming(last);
         }
 
-        protected override void OnSelected(WorkingBeatmap beatmap)
+        protected override void OnSelected()
         {
             if (player != null) return;
 

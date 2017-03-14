@@ -180,11 +180,11 @@ namespace osu.Game.Screens.Select
             if (Beatmap == null) return;
 
             Beatmap.PreferredPlayMode = playMode.Value;
-            OnSelected(Beatmap);
+            OnSelected();
         }
 
         public void SelectRandom() => carousel.SelectRandom();
-        protected abstract void OnSelected(WorkingBeatmap beatmap);
+        protected abstract void OnSelected();
 
         private ScheduledDelegate filterTask;
 
