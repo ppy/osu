@@ -144,6 +144,14 @@ namespace osu.Game.Modes
         public override bool Ranked => true;
     }
 
+    public abstract class ModDoubleTrouble : Mod
+    {
+        public override string Name => "DoubleTrouble";
+        public override FontAwesome Icon => FontAwesome.fa_osu_mod_perfect; //FontAwesome.fa_osu_mod_doubleTrouble;
+        public override string Description => @"Twice as many Bosses";
+        public override bool Ranked => true;
+    }
+
     public class ModAutoplay : Mod
     {
         public override string Name => "Autoplay";

@@ -214,6 +214,10 @@
       <Project>{f167e17a-7de6-4af5-b920-a5112296c695}</Project>
       <Name>osu.Game.Modes.Taiko</Name>
     </ProjectReference>
+    <ProjectReference Include="..\osu.Game.Modes.Vitaru\osu.Game.Modes.Vitaru.csproj">
+      <Project>{9a615027-b2ab-435e-b865-0c7209933457}</Project>
+      <Name>osu.Game.Modes.Vitaru</Name>
+    </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
       <Project>{0d3fbf8a-7464-4cf7-8c90-3e7886df2d4d}</Project>
       <Name>osu.Game</Name>
