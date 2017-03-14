@@ -181,6 +181,7 @@
     <Compile Include="Screens\Multiplayer\Match.cs" />
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
     <Compile Include="Screens\Play\FailDialog.cs" />
+    <Compile Include="Screens\Play\KeyConversionInputManager.cs" />
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
