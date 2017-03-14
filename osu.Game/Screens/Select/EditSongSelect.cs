@@ -1,19 +1,24 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using osu.Game.Screens.Backgrounds;
+using OpenTK.Input;
+using osu.Framework.Allocation;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Screens.Edit;
 
 namespace osu.Game.Screens.Select
 {
-    internal class EditSongSelect : ScreenWhiteBox
+    internal class EditSongSelect : SongSelect
     {
-        protected override IEnumerable<Type> PossibleChildren => new[] {
-                typeof(Editor)
-        };
+        protected override void OnSelected(WorkingBeatmap beatmap) => Push(new Editor(beatmap));
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            Footer.AddButton(@"random", colours.Green, SelectRandom, Key.F2);
+            Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
+            BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, PromptDelete, Key.Number4);
+        }
     }
 }
