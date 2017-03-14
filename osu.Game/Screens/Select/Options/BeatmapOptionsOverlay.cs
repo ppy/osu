@@ -86,16 +86,22 @@ namespace osu.Game.Screens.Select.Options
             };
         }
 
+        /// <param name="firstLine">Text in the first line.</param>
+        /// <param name="secondLine">Text in the second line.</param>
+        /// <param name="colour">Colour of the button.</param>
+        /// <param name="icon">Icon of the button.</param>
+        /// <param name="hotkey">Hotkey of the button.</param>
+        /// <param name="action">Action the button does.</param>
         /// <param name="depth">
         /// <para>Lower depth to be put on the left, and higher to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Footer"/>!</para>
         /// </param>
-        public void AddButton(string firstLine, string secongLine, FontAwesome icon, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
+        public void AddButton(string firstLine, string secondLine, FontAwesome icon, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
         {
             buttonsContainer.Add(new BeatmapOptionsButton
             {
                 FirstLineText = firstLine,
-                SecondLineText = secongLine,
+                SecondLineText = secondLine,
                 Icon = icon,
                 ButtonColour = colour,
                 Depth = depth,
