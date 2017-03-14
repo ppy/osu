@@ -8,6 +8,8 @@ using osu.Framework.MathUtils;
 using osu.Framework.Screens.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.IO;
+using osu.Game.Database;
 using osu.Game.Modes.Catch.UI;
 using osu.Game.Modes.Mania.UI;
 using osu.Game.Modes.Objects;
@@ -41,10 +43,19 @@ namespace osu.Desktop.VisualTests.Tests
                 time += RNG.Next(50, 500);
             }
 
-            Beatmap beatmap = new Beatmap
+            WorkingBeatmap beatmap = new TestWorkingBeatmap(new Beatmap
             {
-                HitObjects = objects
-            };
+                HitObjects = objects,
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Metadata = new BeatmapMetadata
+                    {
+                        Artist = @"Unknown",
+                        Title = @"Sample Beatmap",
+                        Author = @"peppy",
+                    }
+                }
+            });
 
             Add(new Drawable[]
             {
@@ -82,6 +93,17 @@ namespace osu.Desktop.VisualTests.Tests
                     }
                 }
             });
+        }
+
+        private class TestWorkingBeatmap : WorkingBeatmap
+        {
+            public TestWorkingBeatmap(Beatmap beatmap)
+                : base(beatmap.BeatmapInfo, beatmap.BeatmapInfo.BeatmapSet)
+            {
+                Beatmap = beatmap;
+            }
+
+            protected override ArchiveReader GetReader() => null;
         }
     }
 }

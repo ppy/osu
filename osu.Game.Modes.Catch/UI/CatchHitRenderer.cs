@@ -11,7 +11,7 @@ namespace osu.Game.Modes.Catch.UI
 {
     public class CatchHitRenderer : HitRenderer<CatchBaseHit>
     {
-        public CatchHitRenderer(Beatmap beatmap)
+        public CatchHitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
         {
         }
