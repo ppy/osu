@@ -2,18 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Framework.Screens.Testing;
 using osu.Game.Modes;
 using osu.Game.Modes.Mods;
-using osu.Game.Users;
-using osu.Game.Modes.Osu;
 using osu.Game.Modes.Osu.Mods;
+using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Users;
 
 namespace osu.Desktop.VisualTests
 {
