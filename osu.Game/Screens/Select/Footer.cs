@@ -4,11 +4,13 @@
 using System;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
 
@@ -34,7 +36,7 @@ namespace osu.Game.Screens.Select
 
         public OsuLogo StartButton;
 
-        public void AddButton(string text, Color4 colour, Action action)
+        public void AddButton(string text, Color4 colour, Action action, Key? hotkey = null)
         {
             var button = new FooterButton
             {
@@ -43,6 +45,7 @@ namespace osu.Game.Screens.Select
                 Width = play_song_select_button_width,
                 SelectedColour = colour,
                 DeselectedColour = colour.Opacity(0.5f),
+                Hotkey = hotkey,
             };
 
             button.Hovered = () => updateModeLight(button);
@@ -89,7 +92,7 @@ namespace osu.Game.Screens.Select
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Action = () => OnBack?.Invoke(),
+                    Action = () => OnBack?.Invoke()
                 },
                 new FillFlowContainer
                 {
@@ -113,6 +116,17 @@ namespace osu.Game.Screens.Select
             };
 
             updateModeLight();
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (!args.Repeat && args.Key == Key.Enter)
+            {
+                OnStart?.Invoke();
+                return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
     }
 }

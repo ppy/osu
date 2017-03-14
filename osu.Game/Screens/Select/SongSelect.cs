@@ -164,9 +164,9 @@ namespace osu.Game.Screens.Select
                 },
             };
 
-            footer.AddButton(@"mods", colours.Yellow, modSelect.ToggleVisibility);
-            footer.AddButton(@"random", colours.Green, carousel.SelectRandom);
-            footer.AddButton(@"options", colours.Blue, beatmapOptions.ToggleVisibility);
+            footer.AddButton(@"mods", colours.Yellow, modSelect.ToggleVisibility, Key.F1);
+            footer.AddButton(@"random", colours.Green, carousel.SelectRandom, Key.F2);
+            footer.AddButton(@"options", colours.Blue, beatmapOptions.ToggleVisibility, Key.F3);
 
             if (osu != null)
                 playMode.BindTo(osu.PlayMode);
@@ -435,29 +435,10 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Repeat) return false;
-
-            switch (args.Key)
+            if (!args.Repeat && args.Key == Key.Delete && state.Keyboard.ShiftPressed)
             {
-                case Key.F1:
-                    modSelect.ToggleVisibility();
-                    return true;
-                case Key.F2:
-                    carousel.SelectRandom();
-                    return true;
-                case Key.F3:
-                    beatmapOptions.ToggleVisibility();
-                    return true;
-                case Key.Enter:
-                    footer.StartButton.TriggerClick();
-                    return true;
-                case Key.Delete:
-                    if (state.Keyboard.ShiftPressed)
-                    {
-                        promptDelete();
-                        return true;
-                    }
-                    break;
+                promptDelete();
+                return true;
             }
 
             return base.OnKeyDown(state, args);
