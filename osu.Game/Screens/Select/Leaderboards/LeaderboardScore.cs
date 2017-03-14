@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                             for (int i = 0; i < drawables.Length; i++)
                             {
-                                drawables[i].FadeIn(100 + (i * 50));
+                                drawables[i].FadeIn(100 + i * 50);
                             }
                         });
                     });
@@ -221,7 +221,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Children = new Drawable[]
                                                     {
                                                         maxCombo = new ScoreComponentLabel(FontAwesome.fa_circle_o, Score.MaxCombo.ToString()),
-                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_circle_o, Score.Accuracy.ToString()),
+                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_circle_o, string.Format(Score.Accuracy % 1 == 0 ? "{0:0}" : "{0:0.00}", Score.Accuracy)),
                                                     },
                                                 },
                                             },
@@ -263,7 +263,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        class GlowingSpriteText : Container
+        private class GlowingSpriteText : Container
         {
             public GlowingSpriteText(string text, string font, int textSize, Color4 textColour, Color4 glowColour)
             {
@@ -308,7 +308,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        class ScoreModIcon : Container
+        private class ScoreModIcon : Container
         {
             public ScoreModIcon(FontAwesome icon, Color4 colour)
             {
@@ -337,7 +337,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        class ScoreComponentLabel : Container
+        private class ScoreComponentLabel : Container
         {
             public ScoreComponentLabel(FontAwesome icon, string value)
             {

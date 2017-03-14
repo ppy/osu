@@ -10,9 +10,9 @@ using osu.Game.Modes.Osu.Mods;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 
-namespace osu.Desktop.VisualTests
+namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseLeaderboard : TestCase
+    internal class TestCaseLeaderboard : TestCase
     {
         public override string Description => @"From song select";
 
@@ -115,7 +115,7 @@ namespace osu.Desktop.VisualTests
                 new Score
                 {
                     Rank = ScoreRank.B,
-                    Accuracy = 100,
+                    Accuracy = 98.26,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -133,7 +133,7 @@ namespace osu.Desktop.VisualTests
                 new Score
                 {
                     Rank = ScoreRank.C,
-                    Accuracy = 100,
+                    Accuracy = 96.54,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -151,7 +151,7 @@ namespace osu.Desktop.VisualTests
                 new Score
                 {
                     Rank = ScoreRank.F,
-                    Accuracy = 100,
+                    Accuracy = 60.25,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -169,7 +169,7 @@ namespace osu.Desktop.VisualTests
                 new Score
                 {
                     Rank = ScoreRank.F,
-                    Accuracy = 100,
+                    Accuracy = 51.40,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -187,7 +187,7 @@ namespace osu.Desktop.VisualTests
                 new Score
                 {
                     Rank = ScoreRank.F,
-                    Accuracy = 100,
+                    Accuracy = 42.22,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -218,7 +218,7 @@ namespace osu.Desktop.VisualTests
                 Size = new Vector2(550f, 450f),
             });
 
-            AddButton(@"New Scores", () => newScores());
+            AddButton(@"New Scores", newScores);
             newScores();
         }
     }
