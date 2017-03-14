@@ -4,9 +4,12 @@
 using osu.Game.Modes.Objects.Types;
 using OpenTK;
 
-namespace osu.Game.Modes.Objects
+namespace osu.Game.Modes.Objects.Legacy
 {
-    internal class Hit : HitObject, IHasPosition, IHasCombo
+    /// <summary>
+    /// Base Hit-type, used for parsing Beatmaps.
+    /// </summary>
+    public sealed class LegacyHit : HitObject, IHasPosition, IHasCombo
     {
         public Vector2 Position { get; set; }
 

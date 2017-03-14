@@ -3,9 +3,12 @@
 
 using osu.Game.Modes.Objects.Types;
 
-namespace osu.Game.Modes.Objects
+namespace osu.Game.Modes.Objects.Legacy
 {
-    internal class Spinner : HitObject, IHasEndTime
+    /// <summary>
+    /// Base Spinner-type, used for parsing Beatmaps.
+    /// </summary>
+    internal class LegacySpinner : HitObject, IHasEndTime
     {
         public double EndTime { get; set; }
 
