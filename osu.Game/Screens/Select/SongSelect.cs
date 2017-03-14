@@ -146,6 +146,11 @@ namespace osu.Game.Screens.Select
                 },
             };
 
+            Footer.AddButton(@"random", colours.Green, SelectRandom, Key.F2);
+            Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
+
+            BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
+
             if (osu != null)
                 playMode.BindTo(osu.PlayMode);
             playMode.ValueChanged += playMode_ValueChanged;
@@ -404,7 +409,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected void PromptDelete()
+        private void promptDelete()
         {
             if (Beatmap != null)
                 dialogOverlay?.Push(new BeatmapDeleteDialog(Beatmap));
@@ -414,7 +419,7 @@ namespace osu.Game.Screens.Select
         {
             if (!args.Repeat && args.Key == Key.Delete && state.Keyboard.ShiftPressed)
             {
-                PromptDelete();
+                promptDelete();
                 return true;
             }
 
