@@ -57,6 +57,7 @@ namespace osu.Game.Screens.Select
         public void RemoveGroup(BeatmapGroup group)
         {
             groups.Remove(group);
+            panels.Remove(group.Header);
             foreach (var p in group.BeatmapPanels)
                 panels.Remove(p);
 

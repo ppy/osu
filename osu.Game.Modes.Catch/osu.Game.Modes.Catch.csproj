@@ -50,7 +50,6 @@
     <Compile Include="Beatmaps\CatchBeatmapConverter.cs" />
     <Compile Include="CatchDifficultyCalculator.cs" />
     <Compile Include="Objects\CatchBaseHit.cs" />
-    <Compile Include="Objects\CatchConverter.cs" />
     <Compile Include="Objects\Drawable\DrawableFruit.cs" />
     <Compile Include="Objects\Droplet.cs" />
     <Compile Include="Objects\Fruit.cs" />
@@ -58,7 +57,7 @@
     <Compile Include="UI\CatchHitRenderer.cs" />
     <Compile Include="UI\CatchPlayfield.cs" />
     <Compile Include="CatchRuleset.cs" />
-    <Compile Include="CatchMod.cs" />
+    <Compile Include="Mods\CatchMod.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\osu.licenseheader">

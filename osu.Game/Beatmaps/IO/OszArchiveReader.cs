@@ -9,14 +9,14 @@ using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.IO
 {
-    public sealed class OszArchiveReader : BeatmapArchiveReader
+    public sealed class OszArchiveReader : ArchiveReader
     {
         public static void Register()
         {
             AddReader<OszArchiveReader>((storage, path) =>
             {
                 using (var stream = storage.GetStream(path))
-                    return Path.GetExtension(path) == OSZ_EXTENSION && ZipFile.IsZipFile(stream, false);
+                    return ZipFile.IsZipFile(stream, false);
             });
             OsuLegacyDecoder.Register();
         }

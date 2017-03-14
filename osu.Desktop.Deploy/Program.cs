@@ -198,7 +198,7 @@ namespace osu.Desktop.Deploy
             write($"- Creating release {version}...", ConsoleColor.Yellow);
             var req = new JsonWebRequest<GitHubRelease>($"{GitHubApiEndpoint}")
             {
-                Method = HttpMethod.POST
+                Method = HttpMethod.POST,
             };
             req.AddRaw(JsonConvert.SerializeObject(new GitHubRelease
             {
@@ -215,6 +215,7 @@ namespace osu.Desktop.Deploy
                 var upload = new WebRequest(assetUploadUrl, Path.GetFileName(a))
                 {
                     Method = HttpMethod.POST,
+                    Timeout = 240000,
                     ContentType = "application/octet-stream",
                 };
 
@@ -261,7 +262,7 @@ namespace osu.Desktop.Deploy
 
             if (!File.Exists(Path.Combine(ReleasesFolder, nupkgDistroFilename(lastRelease.Name))))
             {
-                write("Last verion's package not found locally.", ConsoleColor.Red);
+                write("Last version's package not found locally.", ConsoleColor.Red);
                 requireDownload = true;
             }
             else
@@ -282,6 +283,8 @@ namespace osu.Desktop.Deploy
 
             foreach (var a in assets)
             {
+                if (a.Name.EndsWith(".exe")) continue;
+
                 write($"- Downloading {a.Name}...", ConsoleColor.Yellow);
                 new FileWebRequest(Path.Combine(ReleasesFolder, a.Name), $"{GitHubApiEndpoint}/assets/{a.Id}").AuthenticatedBlockingPerform();
             }
@@ -337,6 +340,7 @@ namespace osu.Desktop.Deploy
                 WorkingDirectory = solutionPath,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 UseShellExecute = false,
                 WindowStyle = ProcessWindowStyle.Hidden
             };
@@ -345,6 +349,7 @@ namespace osu.Desktop.Deploy
             if (p == null) return false;
 
             string output = p.StandardOutput.ReadToEnd();
+            output += p.StandardError.ReadToEnd();
 
             if (p.ExitCode == 0) return true;
 

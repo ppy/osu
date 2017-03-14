@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -10,7 +9,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes;
+using osu.Game.Modes.Mods;
+using System;
 
 namespace osu.Game.Overlays.Mods
 {

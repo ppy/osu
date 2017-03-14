@@ -1,9 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Textures;
@@ -11,6 +8,10 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Modes;
+using osu.Game.Modes.Mods;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace osu.Game.Beatmaps
 {
@@ -32,7 +33,7 @@ namespace osu.Game.Beatmaps
 
         public readonly bool WithStoryboard;
 
-        protected abstract BeatmapArchiveReader GetReader();
+        protected abstract ArchiveReader GetReader();
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, bool withStoryboard = false)
         {
@@ -100,7 +101,7 @@ namespace osu.Game.Beatmaps
             set { lock (beatmapLock) beatmap = value; }
         }
 
-        private BeatmapArchiveReader trackReader;
+        private ArchiveReader trackReader;
         private Track track;
         private object trackLock = new object();
         public Track Track
