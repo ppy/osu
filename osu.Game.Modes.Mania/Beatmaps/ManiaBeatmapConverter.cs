@@ -10,7 +10,7 @@ namespace osu.Game.Modes.Mania.Beatmaps
 {
     internal class ManiaBeatmapConverter : IBeatmapConverter<ManiaBaseHit>
     {
-        public Beatmap<ManiaBaseHit> ConvertBeatmap(Beatmap original)
+        public Beatmap<ManiaBaseHit> Convert(Beatmap original)
         {
             return new Beatmap<ManiaBaseHit>(original)
             {
