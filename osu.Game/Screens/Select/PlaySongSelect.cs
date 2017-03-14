@@ -9,6 +9,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Mods;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Select
@@ -36,7 +37,11 @@ namespace osu.Game.Screens.Select
 
             BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
             BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.fa_eraser, colours.Purple, null, Key.Number2);
-            BeatmapOptions.AddButton(@"Edit", @"Beatmap", FontAwesome.fa_pencil, colours.Yellow, null, Key.Number3);
+            BeatmapOptions.AddButton(@"Edit", @"Beatmap", FontAwesome.fa_pencil, colours.Yellow, () =>
+            {
+                ValidForResume = false;
+                Push(new Editor());
+            }, Key.Number3);
         }
 
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
