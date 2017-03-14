@@ -10,9 +10,23 @@ namespace osu.Game.Screens.Play
     public class KeyCounterMouse : KeyCounter
     {
         public MouseButton Button { get; }
-        public KeyCounterMouse(MouseButton button) : base(button.ToString())
+
+        public KeyCounterMouse(MouseButton button) : base(getStringRepresentation(button))
         {
             Button = button;
+        }
+
+        private static string getStringRepresentation(MouseButton button)
+        {
+            switch (button)
+            {
+                default:
+                    return button.ToString();
+                case MouseButton.Left:
+                    return @"M1";
+                case MouseButton.Right:
+                    return @"M2";
+            }
         }
 
         public override bool Contains(Vector2 screenSpacePos) => true;
