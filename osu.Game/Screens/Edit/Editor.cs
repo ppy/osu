@@ -10,10 +10,10 @@ namespace osu.Game.Screens.Edit
 {
     internal class Editor : ScreenWhiteBox
     {
-        //private WorkingBeatmap beatmap;
+        private WorkingBeatmap beatmap;
         public Editor(WorkingBeatmap workingBeatmap)
         {
-            //beatmap = workingBeatmap;
+            beatmap = workingBeatmap;
         }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
@@ -22,11 +22,13 @@ namespace osu.Game.Screens.Edit
         {
             base.OnEntering(last);
             Background.Schedule(() => Background.FadeColour(Color4.DarkGray, 500));
+            beatmap.Track?.Stop();
         }
 
         protected override bool OnExiting(Screen next)
         {
             Background.Schedule(() => Background.FadeColour(Color4.White, 500));
+            beatmap.Track?.Start();
             return base.OnExiting(next);
         }
     }
