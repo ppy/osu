@@ -24,33 +24,36 @@ namespace osu.Game.Modes.Osu.Beatmaps
 
         private OsuHitObject convertHitObject(HitObject original)
         {
-            IHasCurve ihc = original as IHasCurve;
-            IHasDistance ihd = original as IHasDistance;
-            IHasEndTime ihet = original as IHasEndTime;
-            IHasPosition ihp = original as IHasPosition;
-            IHasRepeats ihr = original as IHasRepeats;
-            IHasCombo ihco = original as IHasCombo;
+            IHasCurve curveData = original as IHasCurve;
+            IHasDistance distanceData = original as IHasDistance;
+            IHasEndTime endTimeData = original as IHasEndTime;
+            IHasPosition positionData = original as IHasPosition;
+            IHasRepeats repeatsData = original as IHasRepeats;
+            IHasCombo comboData = original as IHasCombo;
 
-            if (ihc != null)
+            if (curveData != null)
             {
                 return new Slider
                 {
                     StartTime = original.StartTime,
                     Sample = original.Sample,
 
-                    CurveType = ihc.CurveType,
-                    ControlPoints = ihc.ControlPoints,
+                    CurveType = curveData.CurveType,
+                    ControlPoints = curveData.ControlPoints,
 
-                    Position = ihp?.Position ?? Vector2.Zero,
-                    ComboColour = ihco?.ComboColour ?? Color4.White,
-                    ComboIndex = ihco?.ComboIndex ?? 0,
-                    NewCombo = ihco?.NewCombo ?? false,
-                    Length = ihd?.Distance ?? 0,
-                    RepeatCount = ihr?.RepeatCount ?? 0
+                    Position = positionData?.Position ?? Vector2.Zero,
+
+                    ComboColour = comboData?.ComboColour ?? Color4.White,
+                    ComboIndex = comboData?.ComboIndex ?? 0,
+                    NewCombo = comboData?.NewCombo ?? false,
+
+                    Length = distanceData?.Distance ?? 0,
+
+                    RepeatCount = repeatsData?.RepeatCount ?? 0
                 };
             }
 
-            if (ihet != null)
+            if (endTimeData != null)
             {
                 return new Spinner
                 {
@@ -58,11 +61,11 @@ namespace osu.Game.Modes.Osu.Beatmaps
                     Sample = original.Sample,
                     Position = new Vector2(512, 384) / 2,
 
-                    EndTime = ihet.EndTime,
+                    EndTime = endTimeData.EndTime,
 
-                    ComboColour = ihco?.ComboColour ?? Color4.White,
-                    ComboIndex = ihco?.ComboIndex ?? 0,
-                    NewCombo = ihco?.NewCombo ?? false,
+                    ComboColour = comboData?.ComboColour ?? Color4.White,
+                    ComboIndex = comboData?.ComboIndex ?? 0,
+                    NewCombo = comboData?.NewCombo ?? false,
                 };
             }
 
@@ -71,10 +74,11 @@ namespace osu.Game.Modes.Osu.Beatmaps
                 StartTime = original.StartTime,
                 Sample = original.Sample,
 
-                Position = ihp?.Position ?? Vector2.Zero,
-                ComboColour = ihco?.ComboColour ?? Color4.White,
-                ComboIndex = ihco?.ComboIndex ?? 0,
-                NewCombo = ihco?.NewCombo ?? false
+                Position = positionData?.Position ?? Vector2.Zero,
+
+                ComboColour = comboData?.ComboColour ?? Color4.White,
+                ComboIndex = comboData?.ComboIndex ?? 0,
+                NewCombo = comboData?.NewCombo ?? false
             };
         }
 
@@ -91,7 +95,8 @@ namespace osu.Game.Modes.Osu.Beatmaps
                     combo = 0;
 
                 c.ComboIndex = combo++;
-                converted.Add(h as OsuHitObject);
+
+                converted.Add(c);
             }
 
             updateStacking(converted, stackLeniency);
