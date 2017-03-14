@@ -108,7 +108,7 @@
     <Compile Include="Modes\Objects\Types\IHasCurve.cs" />
     <Compile Include="Modes\Objects\Types\IHasRepeats.cs" />
     <Compile Include="Modes\Objects\Types\IHasPosition.cs" />
-    <Compile Include="Modes\Objects\Types\LegacyHitObjectLive.cs" />
+    <Compile Include="Modes\Objects\Types\LegacyHitObjectType.cs" />
     <Compile Include="Modes\Replay.cs" />
     <Compile Include="Modes\Score.cs" />
     <Compile Include="Modes\ScoreProcesssor.cs" />
