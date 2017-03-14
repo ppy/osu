@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private string prepareTempCopy(string path)
         {
-            var temp = Path.GetTempPath() + Guid.NewGuid() + BeatmapArchiveReader.OSZ_EXTENSION;
+            var temp = Path.GetTempPath() + Guid.NewGuid();
             return new FileInfo(path).CopyTo(temp, true).FullName;
         }
 

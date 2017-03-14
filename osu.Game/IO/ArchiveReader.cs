@@ -11,7 +11,7 @@ namespace osu.Game.IO
 {
     public abstract class ArchiveReader : IDisposable, IResourceStore<byte[]>
     {
-        protected class Reader
+        public class Reader
         {
             public Func<Storage, string, bool> Test { get; set; }
             public Type Type { get; set; }
@@ -19,11 +19,11 @@ namespace osu.Game.IO
 
         protected static List<Reader> Readers { get; } = new List<Reader>();
 
-        public static ArchiveReader GetReader(Storage storage, string path)
+        public static ArchiveReader GetReader(Storage storage, string path, Func<Reader, bool> additionalTest = null)
         {
             foreach (var reader in Readers)
             {
-                if (reader.Test(storage, path))
+                if (reader.Test(storage, path) && (additionalTest?.Invoke(reader) ?? true))
                     return (ArchiveReader)Activator.CreateInstance(reader.Type, storage.GetStream(path));
             }
             throw new IOException(@"Unknown file format");

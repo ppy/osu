@@ -11,19 +11,12 @@ namespace osu.Game.Beatmaps.IO
 {
     public abstract class BeatmapArchiveReader : ArchiveReader
     {
-        public const string OSZ_EXTENSION = @".osz";
-
         public static BeatmapArchiveReader GetBeatmapArchiveReader(Storage storage, string path)
         {
-            try
-            {
-                return (BeatmapArchiveReader)GetReader(storage, path);
-            }
-            catch (InvalidCastException e)
-            {
-                Logger.Error(e, "A tricky  " + $@"{nameof(ArchiveReader)}" + " instance passed the test to be a " + $@"{nameof(BeatmapArchiveReader)}" + ", but it's really not");
-                throw;
-            }
+            Func<ArchiveReader.Reader, bool> testBeatmapArchiveReader = (ArchiveReader.Reader r) => {
+                return typeof(BeatmapArchiveReader).IsAssignableFrom(r.Type);
+            };
+            return (BeatmapArchiveReader)GetReader(storage, path, testBeatmapArchiveReader);
         }
 
         /// <summary>
