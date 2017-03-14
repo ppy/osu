@@ -262,7 +262,7 @@ namespace osu.Desktop.Deploy
 
             if (!File.Exists(Path.Combine(ReleasesFolder, nupkgDistroFilename(lastRelease.Name))))
             {
-                write("Last verion's package not found locally.", ConsoleColor.Red);
+                write("Last version's package not found locally.", ConsoleColor.Red);
                 requireDownload = true;
             }
             else
