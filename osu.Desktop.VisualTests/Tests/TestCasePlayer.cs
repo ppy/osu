@@ -110,7 +110,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Beatmap = beatmap;
             }
 
-            protected override BeatmapArchiveReader GetReader() => null;
+            protected override ArchiveReader GetReader() => null;
         }
     }
 }

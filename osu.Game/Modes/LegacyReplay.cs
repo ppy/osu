@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Input.Handlers;
@@ -95,24 +96,17 @@ namespace osu.Game.Modes
 
             public override List<InputState> GetPendingStates()
             {
+                var buttons = new HashSet<MouseButton>();
+                if (CurrentFrame?.MouseLeft ?? false)
+                    buttons.Add(MouseButton.Left);
+                if (CurrentFrame?.MouseRight ?? false)
+                    buttons.Add(MouseButton.Right);
+
                 return new List<InputState>
                 {
                     new InputState
                     {
-                        Mouse = new ReplayMouseState(
-                            ToScreenSpace(position ?? Vector2.Zero),
-                            new List<MouseState.ButtonState>
-                            {
-                                new MouseState.ButtonState(MouseButton.Left)
-                                {
-                                    State = CurrentFrame?.MouseLeft ?? false
-                                },
-                                new MouseState.ButtonState(MouseButton.Right)
-                                {
-                                    State = CurrentFrame?.MouseRight ?? false
-                                },
-                            }
-                        ),
+                        Mouse = new ReplayMouseState(ToScreenSpace(position ?? Vector2.Zero), buttons),
                         Keyboard = new ReplayKeyboardState(new List<Key>())
                     }
                 };
@@ -171,10 +165,10 @@ namespace osu.Game.Modes
 
             private class ReplayMouseState : MouseState
             {
-                public ReplayMouseState(Vector2 position, List<ButtonState> list)
+                public ReplayMouseState(Vector2 position, IEnumerable<MouseButton> list)
                 {
                     Position = position;
-                    ButtonStates = list;
+                    list.ForEach(b => PressedButtons.Add(b));
                 }
             }
 

@@ -91,6 +91,8 @@
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
     <Compile Include="Modes\LegacyReplay.cs" />
+    <Compile Include="Modes\Mods\IApplicableMod.cs" />
+    <Compile Include="Modes\Mods\ModType.cs" />
     <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Modes\Objects\NullHitObjectParser.cs" />
@@ -114,7 +116,6 @@
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Modes\Objects\Drawables\DrawableHitObject.cs" />
     <Compile Include="Modes\Objects\HitObject.cs" />
-    <Compile Include="Modes\Objects\HitObjectConverter.cs" />
     <Compile Include="Beatmaps\Samples\HitSampleInfo.cs" />
     <Compile Include="Beatmaps\Samples\SampleBank.cs" />
     <Compile Include="Beatmaps\Samples\SampleInfo.cs" />
@@ -168,6 +169,7 @@
     <Compile Include="Screens\Multiplayer\Match.cs" />
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
     <Compile Include="Screens\Play\FailDialog.cs" />
+    <Compile Include="Screens\Play\KeyConversionInputManager.cs" />
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
@@ -238,7 +240,7 @@
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
-    <Compile Include="Beatmaps\IO\BeatmapArchiveReader.cs" />
+    <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
@@ -305,7 +307,7 @@
     <Compile Include="Screens\Play\Pause\RetryButton.cs" />
     <Compile Include="Screens\Play\Pause\QuitButton.cs" />
     <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
-    <Compile Include="Modes\Mod.cs" />
+    <Compile Include="Modes\Mods\Mod.cs" />
     <Compile Include="Overlays\Mods\ModButton.cs" />
     <Compile Include="Modes\UI\ModIcon.cs" />
     <Compile Include="Overlays\Mods\ModSection.cs" />
@@ -326,12 +328,10 @@
     <Compile Include="Screens\Select\Options\BeatmapOptionsEditButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsRemoveFromUnplayedButton.cs" />
-    <Compile Include="Screens\Select\Leaderboards\Leaderboard.cs" />
     <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
     <Compile Include="Graphics\UserInterface\IHasDrawableRepresentation.cs" />
     <Compile Include="Users\Region.cs" />
     <Compile Include="Users\Badge.cs" />
-    <Compile Include="IO\ArchiveReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -347,7 +347,6 @@
     <None Include="..\osu.licenseheader">
       <Link>osu.licenseheader</Link>
     </None>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
