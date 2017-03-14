@@ -149,7 +149,7 @@ namespace osu.Game.Modes.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail) };
     }
 
-    public abstract class ModAutoplay<T> : ModAutoplay, IApplyableMod<T>
+    public abstract class ModAutoplay<T> : ModAutoplay, IApplicableMod<T>
         where T : HitObject
     {
         protected abstract Score CreateReplayScore(Beatmap<T> beatmap);

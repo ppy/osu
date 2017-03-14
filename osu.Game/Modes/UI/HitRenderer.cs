@@ -104,7 +104,7 @@ namespace osu.Game.Modes.UI
 
             foreach (var mod in mods)
             {
-                var applyable = mod as IApplyableMod<TObject>;
+                var applyable = mod as IApplicableMod<TObject>;
 
                 applyable?.Apply(this);
             }

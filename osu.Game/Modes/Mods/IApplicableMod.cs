@@ -11,7 +11,7 @@ namespace osu.Game.Modes.Mods
     /// An interface for mods that are applied to a HitRenderer.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject the HitRenderer contains.</typeparam>
-    public interface IApplyableMod<TObject>
+    public interface IApplicableMod<TObject>
         where TObject : HitObject
     {
         /// <summary>
