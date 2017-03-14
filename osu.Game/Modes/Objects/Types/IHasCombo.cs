@@ -13,7 +13,7 @@ namespace osu.Game.Modes.Objects.Types
         /// <summary>
         /// The colour of this HitObject in the combo.
         /// </summary>
-        Color4 ComboColour { get; set; }
+        Color4 ComboColour { get; }
 
         /// <summary>
         /// Whether the HitObject starts a new combo.
