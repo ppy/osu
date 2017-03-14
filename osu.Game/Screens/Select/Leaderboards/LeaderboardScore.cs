@@ -13,10 +13,10 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Allocation;
-using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions;
 using osu.Game.Modes.Mods;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private Box background;
         private Container content, avatarContainer;
-        private Sprite scoreRank;
+        private DrawableRank scoreRank;
         private OsuSpriteText nameLabel;
         private GlowingSpriteText scoreLabel;
         private ScoreComponentLabel maxCombo, accuracy;
@@ -57,12 +57,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             background.FadeTo(background_alpha, 200, EasingTypes.OutQuint);
             base.OnHoverLost(state);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            scoreRank.Texture = textures.Get($@"Badges/ScoreRanks/{Score.Rank.GetDescription()}");
         }
 
         protected override void LoadComplete()
@@ -182,7 +176,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     EdgeEffect = imageShadow,
                                     Children = new Drawable[]
                                     {
-                                        new Overlays.Toolbar.ToolbarUserButton.Avatar
+                                        new Avatar
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             UserId = Score.User.Id,
@@ -237,7 +231,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                         },
                                     },
                                 },
-                                scoreRank = new Sprite
+                                scoreRank = new DrawableRank(Score.Rank)
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
