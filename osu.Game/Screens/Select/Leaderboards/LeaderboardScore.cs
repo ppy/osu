@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             Schedule(() =>
             {
                 FadeIn(200);
-                content.MoveToY(0, 400, EasingTypes.OutQuint);
+                content.MoveToY(0, 800, EasingTypes.OutQuint);
 
                 Delay(100);
                 Schedule(() =>
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                             for (int i = 0; i < drawables.Length; i++)
                             {
-                                drawables[i].FadeIn(200 + (i * 50));
+                                drawables[i].FadeIn(100 + (i * 50));
                             }
                         });
                     });
