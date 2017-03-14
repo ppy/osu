@@ -103,7 +103,7 @@ namespace osu.Game.Modes.UI
                 return;
 
             foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
-                mod?.Apply(this);
+                mod.Apply(this);
         }
 
         private void onJudgement(DrawableHitObject<TObject> o, JudgementInfo j) => TriggerOnJudgement(j);
