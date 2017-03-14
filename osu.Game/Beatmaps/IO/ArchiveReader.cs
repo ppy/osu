@@ -6,22 +6,23 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Game.Database;
 
-namespace osu.Game.IO
+namespace osu.Game.Beatmaps.IO
 {
     public abstract class ArchiveReader : IDisposable, IResourceStore<byte[]>
     {
-        protected class Reader
+        private class Reader
         {
             public Func<Storage, string, bool> Test { get; set; }
             public Type Type { get; set; }
         }
 
-        protected static List<Reader> Readers { get; } = new List<Reader>();
+        private static List<Reader> readers { get; } = new List<Reader>();
 
         public static ArchiveReader GetReader(Storage storage, string path)
         {
-            foreach (var reader in Readers)
+            foreach (var reader in readers)
             {
                 if (reader.Test(storage, path))
                     return (ArchiveReader)Activator.CreateInstance(reader.Type, storage.GetStream(path));
@@ -31,8 +32,23 @@ namespace osu.Game.IO
 
         protected static void AddReader<T>(Func<Storage, string, bool> test) where T : ArchiveReader
         {
-            Readers.Add(new Reader { Test = test, Type = typeof(T) });
+            readers.Add(new Reader { Test = test, Type = typeof(T) });
         }
+
+        /// <summary>
+        /// Reads the beatmap metadata from this archive.
+        /// </summary>
+        public abstract BeatmapMetadata ReadMetadata();
+
+        /// <summary>
+        /// Gets a list of beatmap file names.
+        /// </summary>
+        public string[] BeatmapFilenames { get; protected set; }
+
+        /// <summary>
+        /// The storyboard filename. Null if no storyboard is present.
+        /// </summary>
+        public string StoryboardFilename { get; protected set; }
 
         /// <summary>
         /// Opens a stream for reading a specific file from this archive.
