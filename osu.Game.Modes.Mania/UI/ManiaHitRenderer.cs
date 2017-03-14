@@ -13,7 +13,7 @@ namespace osu.Game.Modes.Mania.UI
     {
         private readonly int columns;
 
-        public ManiaHitRenderer(Beatmap beatmap, int columns = 5)
+        public ManiaHitRenderer(WorkingBeatmap beatmap, int columns = 5)
             : base(beatmap)
         {
             this.columns = columns;

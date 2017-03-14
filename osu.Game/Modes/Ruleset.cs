@@ -3,6 +3,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Modes.Mods;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;
 using System;
@@ -30,7 +31,7 @@ namespace osu.Game.Modes
 
         public abstract ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0);
 
-        public abstract HitRenderer CreateHitRendererWith(Beatmap beatmap);
+        public abstract HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap);
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap);
 
@@ -43,8 +44,6 @@ namespace osu.Game.Modes
         public abstract string Description { get; }
 
         public abstract IEnumerable<KeyCounter> CreateGameplayKeys();
-
-        public virtual Score CreateAutoplayScore(Beatmap beatmap) => null;
 
         public static Ruleset GetRuleset(PlayMode mode)
         {

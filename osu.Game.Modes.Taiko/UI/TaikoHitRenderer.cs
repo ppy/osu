@@ -11,7 +11,7 @@ namespace osu.Game.Modes.Taiko.UI
 {
     public class TaikoHitRenderer : HitRenderer<TaikoBaseHit>
     {
-        public TaikoHitRenderer(Beatmap beatmap)
+        public TaikoHitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
         {
         }

@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Mods;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Play;
@@ -21,11 +21,6 @@ namespace osu.Game.Modes.UI
         public event Action OnAllJudged;
 
         internal readonly PlayerInputManager InputManager = new PlayerInputManager();
-
-        /// <summary>
-        /// A function to convert coordinates from gamefield to screen space.
-        /// </summary>
-        public abstract Func<Vector2, Vector2> MapPlayfieldToScreenSpace { get; }
 
         /// <summary>
         /// Whether all the HitObjects have been judged.
@@ -44,20 +39,22 @@ namespace osu.Game.Modes.UI
     public abstract class HitRenderer<TObject> : HitRenderer
         where TObject : HitObject
     {
-        public override Func<Vector2, Vector2> MapPlayfieldToScreenSpace => Playfield.ScaledContent.ToScreenSpace;
+        public Beatmap<TObject> Beatmap;
+
         public IEnumerable<DrawableHitObject> DrawableObjects => Playfield.HitObjects.Children;
 
         protected override Container<Drawable> Content => content;
         protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
 
         protected Playfield<TObject> Playfield;
-        protected Beatmap<TObject> Beatmap;
 
         private Container content;
 
-        protected HitRenderer(Beatmap beatmap)
+        protected HitRenderer(WorkingBeatmap beatmap)
         {
-            Beatmap = CreateBeatmapConverter().Convert(beatmap);
+            Beatmap = CreateBeatmapConverter().Convert(beatmap.Beatmap);
+
+            applyMods(beatmap.Mods.Value);
 
             RelativeSizeAxes = Axes.Both;
 
@@ -78,6 +75,9 @@ namespace osu.Game.Modes.UI
         private void load()
         {
             loadObjects();
+
+            if (InputManager?.ReplayInputHandler != null)
+                InputManager.ReplayInputHandler.ToScreenSpace = Playfield.ScaledContent.ToScreenSpace;
         }
 
         private void loadObjects()
@@ -95,6 +95,15 @@ namespace osu.Game.Modes.UI
             }
 
             Playfield.PostProcess();
+        }
+
+        private void applyMods(IEnumerable<Mod> mods)
+        {
+            if (mods == null)
+                return;
+
+            foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
+                mod.Apply(this);
         }
 
         private void onJudgement(DrawableHitObject<TObject> o, JudgementInfo j) => TriggerOnJudgement(j);

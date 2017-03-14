@@ -30,9 +30,9 @@ namespace osu.Desktop
             base.LoadComplete();
 
             versionManager.LoadAsync(this);
-            ModeChanged += m =>
+            ScreenChanged += s =>
             {
-                if (!versionManager.IsAlive && m is Intro)
+                if (!versionManager.IsAlive && s is Intro)
                     Add(versionManager);
             };
         }

@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-namespace osu.Game.Modes.Taiko
+using osu.Game.Modes.Mods;
+
+namespace osu.Game.Modes.Taiko.Mods
 {
     public class TaikoModNoFail : ModNoFail
     {
