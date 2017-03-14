@@ -74,6 +74,7 @@
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\IBeatmapCoverter.cs" />
+    <Compile Include="Beatmaps\IBeatmapProcessor.cs" />
     <Compile Include="Database\ScoreDatabase.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
@@ -94,7 +95,6 @@
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
     <Compile Include="Modes\Objects\Hit.cs" />
-    <Compile Include="Modes\Objects\HitObjectWithCombo.cs" />
     <Compile Include="Modes\Objects\LegacyHitObjectParser.cs" />
     <Compile Include="Modes\Objects\Slider.cs" />
     <Compile Include="Modes\Objects\Spinner.cs" />

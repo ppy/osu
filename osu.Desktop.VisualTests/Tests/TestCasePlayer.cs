@@ -77,8 +77,6 @@ namespace osu.Desktop.VisualTests.Tests
                     }
                 };
 
-                decoder.Process(b);
-
                 beatmap = new TestWorkingBeatmap(b);
             }
 

@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\OsuBeatmapConverter.cs" />
+    <Compile Include="Beatmaps\OsuBeatmapProcessor.cs" />
     <Compile Include="Objects\BezierApproximator.cs" />
     <Compile Include="Objects\CircularArcApproximator.cs" />
     <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />

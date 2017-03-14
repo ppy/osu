@@ -19,6 +19,8 @@ namespace osu.Game.Modes.Osu.UI
 
         protected override IBeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
 
+        protected override IBeatmapProcessor<OsuHitObject> CreateBeatmapProcessor() => new OsuBeatmapProcessor();
+
         protected override Playfield<OsuHitObject> CreatePlayfield() => new OsuPlayfield();
 
         protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)

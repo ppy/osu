@@ -52,7 +52,10 @@ namespace osu.Game.Modes.UI
 
         protected HitRenderer(WorkingBeatmap beatmap)
         {
+            // Convert + process the beatmap
             Beatmap = CreateBeatmapConverter().Convert(beatmap.Beatmap);
+            Beatmap.HitObjects.ForEach(CreateBeatmapProcessor().SetDefaults);
+            CreateBeatmapProcessor().PostProcess(Beatmap);
 
             applyMods(beatmap.Mods.Value);
 
@@ -69,7 +72,6 @@ namespace osu.Game.Modes.UI
 
             AddInternal(InputManager);
         }
-
 
         [BackgroundDependencyLoader]
         private void load()
@@ -110,6 +112,8 @@ namespace osu.Game.Modes.UI
 
         protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
         protected abstract Playfield<TObject> CreatePlayfield();
+
         protected abstract IBeatmapConverter<TObject> CreateBeatmapConverter();
+        protected abstract IBeatmapProcessor<TObject> CreateBeatmapProcessor();
     }
 }

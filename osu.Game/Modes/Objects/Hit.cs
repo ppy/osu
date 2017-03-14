@@ -6,8 +6,10 @@ using OpenTK;
 
 namespace osu.Game.Modes.Objects
 {
-    internal class Hit : HitObjectWithCombo, IHasPosition
+    internal class Hit : HitObject, IHasPosition, IHasCombo
     {
         public Vector2 Position { get; set; }
+
+        public bool NewCombo { get; set; }
     }
 }

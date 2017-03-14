@@ -19,7 +19,13 @@ namespace osu.Game.Beatmaps
     {
         public BeatmapInfo BeatmapInfo;
         public List<ControlPoint> ControlPoints;
-        public List<Color4> ComboColors;
+        public List<Color4> ComboColors = new List<Color4>
+        {
+            new Color4(17, 136, 170, 255),
+            new Color4(102, 136, 0, 255),
+            new Color4(204, 102, 0, 255),
+            new Color4(121, 9, 13, 255)
+        };
 
         public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
 
@@ -34,9 +40,9 @@ namespace osu.Game.Beatmaps
         /// <param name="original">The original beatmap to use the parameters of.</param>
         public Beatmap(Beatmap original = null)
         {
-            BeatmapInfo = original?.BeatmapInfo;
-            ControlPoints = original?.ControlPoints;
-            ComboColors = original?.ComboColors;
+            BeatmapInfo = original?.BeatmapInfo ?? BeatmapInfo;
+            ControlPoints = original?.ControlPoints ?? ControlPoints;
+            ComboColors = original?.ComboColors ?? ComboColors;
         }
 
         public double BPMMaximum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderBy(c => c.BeatLength).FirstOrDefault() ?? ControlPoint.Default).BeatLength;

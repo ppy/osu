@@ -8,7 +8,6 @@ using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using System.Collections.Generic;
 using osu.Game.Modes.Objects.Types;
-using OpenTK.Graphics;
 using System.Linq;
 
 namespace osu.Game.Modes.Osu.Beatmaps
@@ -17,13 +16,9 @@ namespace osu.Game.Modes.Osu.Beatmaps
     {
         public Beatmap<OsuHitObject> Convert(Beatmap original)
         {
-            List<OsuHitObject> converted = convertHitObjects(original.HitObjects, original.BeatmapInfo?.StackLeniency ?? 0.7f);
-
-            converted.ForEach(c => c.SetDefaultsFromBeatmap(original));
-
             return new Beatmap<OsuHitObject>(original)
             {
-                HitObjects = converted
+                HitObjects = convertHitObjects(original.HitObjects, original.BeatmapInfo?.StackLeniency ?? 0.7f)
             };
         }
 
@@ -57,8 +52,6 @@ namespace osu.Game.Modes.Osu.Beatmaps
 
                     Position = positionData?.Position ?? Vector2.Zero,
 
-                    ComboColour = comboData?.ComboColour ?? Color4.White,
-                    ComboIndex = comboData?.ComboIndex ?? 0,
                     NewCombo = comboData?.NewCombo ?? false,
 
                     Length = distanceData?.Distance ?? 0,
@@ -76,10 +69,6 @@ namespace osu.Game.Modes.Osu.Beatmaps
                     Position = new Vector2(512, 384) / 2,
 
                     EndTime = endTimeData.EndTime,
-
-                    ComboColour = comboData?.ComboColour ?? Color4.White,
-                    ComboIndex = comboData?.ComboIndex ?? 0,
-                    NewCombo = comboData?.NewCombo ?? false,
                 };
             }
 
@@ -90,8 +79,6 @@ namespace osu.Game.Modes.Osu.Beatmaps
 
                 Position = positionData?.Position ?? Vector2.Zero,
 
-                ComboColour = comboData?.ComboColour ?? Color4.White,
-                ComboIndex = comboData?.ComboIndex ?? 0,
                 NewCombo = comboData?.NewCombo ?? false
             };
         }
