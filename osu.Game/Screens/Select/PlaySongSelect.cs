@@ -2,33 +2,34 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using OpenTK;
+using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
-using osu.Framework.Screens;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Game.Beatmaps;
-using osu.Game.Database;
-using osu.Game.Modes;
-using osu.Game.Screens.Backgrounds;
-using OpenTK;
-using osu.Game.Screens.Play;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Transforms;
-using osu.Game.Beatmaps.Drawables;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Framework.Input;
-using OpenTK.Input;
-using System.Collections.Generic;
+using osu.Framework.Screens;
 using osu.Framework.Threading;
-using osu.Game.Overlays.Mods;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
+using osu.Game.Database;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Modes;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
+using osu.Game.Screens.Backgrounds;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
 
 namespace osu.Game.Screens.Select
@@ -129,6 +130,7 @@ namespace osu.Game.Screens.Select
                         Top = 20,
                         Right = 20,
                     },
+                    X = -50,
                 },
                 beatmapOptions = new BeatmapOptionsOverlay
                 {
@@ -259,8 +261,7 @@ namespace osu.Game.Screens.Select
 
             Content.FadeInFromZero(250);
 
-            beatmapInfoWedge.MoveToX(-50);
-            beatmapInfoWedge.MoveToX(0, 800, EasingTypes.OutQuint);
+            beatmapInfoWedge.State = Visibility.Visible;
 
             filter.Activate();
         }
@@ -292,8 +293,7 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnExiting(Screen next)
         {
-            beatmapInfoWedge.MoveToX(-100, 800, EasingTypes.InQuint);
-            beatmapInfoWedge.RotateTo(10, 800, EasingTypes.InQuint);
+            beatmapInfoWedge.State = Visibility.Hidden;
 
             Content.FadeOut(100);
 
