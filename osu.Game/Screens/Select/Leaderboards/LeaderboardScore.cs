@@ -220,8 +220,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Margin = new MarginPadding { Left = 10, },
                                                     Children = new Drawable[]
                                                     {
-                                                        maxCombo = new ScoreComponentLabel(FontAwesome.fa_circle_o, Score.MaxCombo.ToString()),
-                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_circle_o, string.Format(Score.Accuracy % 1 == 0 ? "{0:0}" : "{0:0.00}", Score.Accuracy)),
+                                                        maxCombo = new ScoreComponentLabel(FontAwesome.fa_link, Score.MaxCombo.ToString()),
+                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_crosshairs, string.Format(Score.Accuracy % 1 == 0 ? "{0:0}" : "{0:0.00}", Score.Accuracy)),
                                                     },
                                                 },
                                             },
