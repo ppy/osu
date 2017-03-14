@@ -7,6 +7,7 @@ using osu.Game.Modes.Osu.Beatmaps;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Game.Modes.UI;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.Osu.UI
 {
@@ -20,6 +21,8 @@ namespace osu.Game.Modes.Osu.UI
         protected override IBeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
 
         protected override Playfield<OsuHitObject> CreatePlayfield() => new OsuPlayfield();
+
+        protected override KeyConversionInputManager CreateKeyConversionInputManager() => new OsuKeyConversionInputManager();
 
         protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {
