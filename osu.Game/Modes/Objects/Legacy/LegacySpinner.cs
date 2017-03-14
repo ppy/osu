@@ -6,7 +6,7 @@ using osu.Game.Modes.Objects.Types;
 namespace osu.Game.Modes.Objects.Legacy
 {
     /// <summary>
-    /// Base Spinner-type, used for parsing Beatmaps.
+    /// Legacy Spinner-type, used for parsing Beatmaps.
     /// </summary>
     internal class LegacySpinner : HitObject, IHasEndTime
     {
