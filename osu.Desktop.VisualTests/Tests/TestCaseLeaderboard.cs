@@ -155,7 +155,7 @@ namespace osu.Desktop.VisualTests
                 },
                 new Score
                 {
-                    Rank = ScoreRank.D,
+                    Rank = ScoreRank.F,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
