@@ -102,12 +102,8 @@ namespace osu.Game.Modes.UI
             if (mods == null)
                 return;
 
-            foreach (var mod in mods)
-            {
-                var applyable = mod as IApplicableMod<TObject>;
-
-                applyable?.Apply(this);
-            }
+            foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
+                mod?.Apply(this);
         }
 
         private void onJudgement(DrawableHitObject<TObject> o, JudgementInfo j) => TriggerOnJudgement(j);
