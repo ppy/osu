@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Extensions;
 using osu.Game.Modes;
+using System;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -24,7 +25,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 if (value == rank) return;
                 rank = value;
-                sprite.Texture = textures.Get($@"Badges/ScoreRanks/{rank.GetDescription()}");
+                sprite.Texture = textures.Get($@"Badges/ScoreRanks/{Enum.GetName(typeof(ScoreRank), rank)}");
             }
         }
 
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private void load(TextureStore ts)
         {
             textures = ts;
-            sprite.Texture = textures.Get($@"Badges/ScoreRanks/{rank.GetDescription()}");
+            sprite.Texture = textures.Get($@"Badges/ScoreRanks/{Enum.GetName(typeof(ScoreRank), rank)}");
         }
 
         public DrawableRank(ScoreRank rank)

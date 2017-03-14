@@ -7,31 +7,13 @@ namespace osu.Game.Modes
 {
     public enum ScoreRank
     {
-        [Description(@"F")]
         F,
-
-        [Description(@"F")]
-        D,
-
-        [Description(@"C")]
         C,
-
-        [Description(@"B")]
         B,
-
-        [Description(@"A")]
         A,
-
-        [Description(@"S")]
         S,
-
-        [Description(@"SPlus")]
         SPlus,
-
-        [Description(@"SS")]
         SS,
-
-        [Description(@"SSPlus")]
         SSPlus,
     }
 }
