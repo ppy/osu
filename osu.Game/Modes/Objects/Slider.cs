@@ -7,7 +7,7 @@ using OpenTK;
 
 namespace osu.Game.Modes.Objects
 {
-    internal class Slider : HitObjectWithCombo, IHasCurve, IHasPosition, IHasDistance, IHasRepeats
+    internal class Slider : HitObject, IHasCurve, IHasPosition, IHasDistance, IHasRepeats, IHasCombo
     {
         public List<Vector2> ControlPoints { get; set; }
         public CurveType CurveType { get; set; }
@@ -17,5 +17,7 @@ namespace osu.Game.Modes.Objects
         public double Distance { get; set; }
 
         public int RepeatCount { get; set; }
+
+        public bool NewCombo { get; set; }
     }
 }

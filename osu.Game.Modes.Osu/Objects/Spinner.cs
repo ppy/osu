@@ -13,6 +13,5 @@ namespace osu.Game.Modes.Osu.Objects
         public override HitObjectType Type => HitObjectType.Spinner;
 
         public override bool NewCombo => true;
-
     }
 }

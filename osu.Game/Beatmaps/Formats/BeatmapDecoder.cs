@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Game.Modes.Objects;
-using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 
@@ -31,39 +30,12 @@ namespace osu.Game.Beatmaps.Formats
 
         public virtual Beatmap Decode(TextReader stream)
         {
-            Beatmap b = ParseFile(stream);
-            Process(b);
-            return b;
+            return ParseFile(stream);
         }
 
         public virtual void Decode(TextReader stream, Beatmap beatmap)
         {
             ParseFile(stream, beatmap);
-        }
-
-        public virtual Beatmap Process(Beatmap beatmap)
-        {
-            int comboIndex = 0;
-            int colourIndex = 0;
-
-            foreach (var obj in beatmap.HitObjects)
-            {
-                HitObjectWithCombo comboObject = obj as HitObjectWithCombo;
-
-                if (comboObject == null || comboObject.NewCombo)
-                {
-                    comboIndex = 0;
-                    colourIndex = (colourIndex + 1) % beatmap.ComboColors.Count;
-                }
-
-                if (comboObject != null)
-                {
-                    comboObject.ComboIndex = comboIndex++;
-                    comboObject.ComboColour = beatmap.ComboColors[colourIndex];
-                }
-            }
-
-            return beatmap;
         }
 
         protected virtual Beatmap ParseFile(TextReader stream)
@@ -72,12 +44,6 @@ namespace osu.Game.Beatmaps.Formats
             {
                 HitObjects = new List<HitObject>(),
                 ControlPoints = new List<ControlPoint>(),
-                ComboColors = new List<Color4> {
-                    new Color4(17, 136, 170, 255),
-                    new Color4(102, 136, 0, 255),
-                    new Color4(204, 102, 0, 255),
-                    new Color4(121, 9, 13, 255),
-                },
                 BeatmapInfo = new BeatmapInfo
                 {
                     Metadata = new BeatmapMetadata(),
