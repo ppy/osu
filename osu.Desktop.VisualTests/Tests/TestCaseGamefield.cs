@@ -17,7 +17,6 @@ using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.Taiko.UI;
 using System.Collections.Generic;
-using osu.Game.IO;
 
 namespace osu.Desktop.VisualTests.Tests
 {

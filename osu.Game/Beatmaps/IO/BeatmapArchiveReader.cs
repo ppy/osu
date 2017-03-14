@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.IO;
@@ -13,10 +11,7 @@ namespace osu.Game.Beatmaps.IO
     {
         public static BeatmapArchiveReader GetBeatmapArchiveReader(Storage storage, string path)
         {
-            Func<ArchiveReader.Reader, bool> testBeatmapArchiveReader = (ArchiveReader.Reader r) => {
-                return typeof(BeatmapArchiveReader).IsAssignableFrom(r.Type);
-            };
-            return (BeatmapArchiveReader)GetReader(storage, path, testBeatmapArchiveReader);
+            return (BeatmapArchiveReader)GetReader(storage, path, r => typeof(BeatmapArchiveReader).IsAssignableFrom(r.Type));
         }
 
         /// <summary>

@@ -17,7 +17,6 @@ using osu.Game.Modes.Catch;
 using osu.Game.Modes.Mania;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Taiko;
-using osu.Game.Beatmaps.IO;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {

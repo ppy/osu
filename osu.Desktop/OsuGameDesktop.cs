@@ -12,7 +12,6 @@ using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using osu.Game.Screens.Menu;
-using osu.Game.Beatmaps.IO;
 
 namespace osu.Desktop
 {
