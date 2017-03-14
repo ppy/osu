@@ -4,6 +4,8 @@
 using OpenTK.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Modes.Mods;
+using osu.Game.Modes.Osu.Mods;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.UI;
@@ -15,7 +17,7 @@ namespace osu.Game.Modes.Osu
 {
     public class OsuRuleset : Ruleset
     {
-        public override HitRenderer CreateHitRendererWith(Beatmap beatmap) => new OsuHitRenderer(beatmap);
+        public override HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap) => new OsuHitRenderer(beatmap);
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
         {
@@ -96,13 +98,6 @@ namespace osu.Game.Modes.Osu
         public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => new OsuScoreProcessor(hitObjectCount);
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
-
-        public override Score CreateAutoplayScore(Beatmap beatmap)
-        {
-            var score = CreateScoreProcessor().GetScore();
-            score.Replay = new OsuAutoReplay(beatmap);
-            return score;
-        }
 
         protected override PlayMode PlayMode => PlayMode.Osu;
 

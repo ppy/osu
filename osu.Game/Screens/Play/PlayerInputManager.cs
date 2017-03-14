@@ -70,14 +70,14 @@ namespace osu.Game.Screens.Play
             {
                 if (mouseDisabled.Value)
                 {
-                    mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = false;
-                    mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = false;
+                    mouse.PressedButtons.Remove(MouseButton.Left);
+                    mouse.PressedButtons.Remove(MouseButton.Right);
                 }
 
                 if (leftViaKeyboard)
-                    mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = true;
+                    mouse.PressedButtons.Add(MouseButton.Left);
                 if (rightViaKeyboard)
-                    mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = true;
+                    mouse.PressedButtons.Add(MouseButton.Right);
             }
         }
 

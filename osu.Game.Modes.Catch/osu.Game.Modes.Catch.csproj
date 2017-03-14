@@ -57,7 +57,7 @@
     <Compile Include="UI\CatchHitRenderer.cs" />
     <Compile Include="UI\CatchPlayfield.cs" />
     <Compile Include="CatchRuleset.cs" />
-    <Compile Include="CatchMod.cs" />
+    <Compile Include="Mods\CatchMod.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\osu.licenseheader">
