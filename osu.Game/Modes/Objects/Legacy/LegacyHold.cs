@@ -9,7 +9,7 @@ namespace osu.Game.Modes.Objects.Legacy
     /// <summary>
     /// Legacy Hold-type, used for parsing "specials" in beatmaps.
     /// </summary>
-    public sealed class LegacyHold : HitObject, IHasPosition, IHasCombo
+    public sealed class LegacyHold : HitObject, IHasPosition, IHasCombo, IHasSpecial
     {
         public Vector2 Position { get; set; }
 
