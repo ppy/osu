@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Select
             Footer.AddButton(@"random", colours.Green, SelectRandom, Key.F2);
             Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
 
-            BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, float.MaxValue);
+            BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
 
             if (osu != null)
                 playMode.BindTo(osu.PlayMode);
