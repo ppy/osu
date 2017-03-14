@@ -8,11 +8,11 @@ namespace osu.Game.Modes.Mania.Beatmaps
 {
     internal class ManiaBeatmapProcessor : IBeatmapProcessor<ManiaBaseHit>
     {
-        public void PostProcess(Beatmap<ManiaBaseHit> beatmap)
+        public void SetDefaults(ManiaBaseHit hitObject, Beatmap<ManiaBaseHit> beatmap)
         {
         }
 
-        public void SetDefaults(ManiaBaseHit hitObject)
+        public void PostProcess(Beatmap<ManiaBaseHit> beatmap)
         {
         }
     }

@@ -65,7 +65,7 @@ namespace osu.Game.Modes.UI
 
             // Convert + process the beatmap
             Beatmap = CreateBeatmapConverter().Convert(beatmap.Beatmap);
-            Beatmap.HitObjects.ForEach(CreateBeatmapProcessor().SetDefaults);
+            Beatmap.HitObjects.ForEach(h => CreateBeatmapProcessor().SetDefaults(h, Beatmap));
             CreateBeatmapProcessor().PostProcess(Beatmap);
 
             applyMods(beatmap.Mods.Value);

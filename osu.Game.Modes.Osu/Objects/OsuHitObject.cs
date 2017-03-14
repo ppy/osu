@@ -67,10 +67,8 @@ namespace osu.Game.Modes.Osu.Objects
             return OsuScoreResult.Miss;
         }
 
-        public override void SetDefaultsFromBeatmap(Beatmap beatmap)
+        public virtual void SetDefaultsFromBeatmap(Beatmap<OsuHitObject> beatmap)
         {
-            base.SetDefaultsFromBeatmap(beatmap);
-
             Scale = (1.0f - 0.7f * (beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5) / 5) / 2;
         }
     }
