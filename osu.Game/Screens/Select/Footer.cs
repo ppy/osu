@@ -126,16 +126,5 @@ namespace osu.Game.Screens.Select
 
             updateModeLight();
         }
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (!args.Repeat && args.Key == Key.Enter)
-            {
-                OnStart?.Invoke();
-                return true;
-            }
-
-            return base.OnKeyDown(state, args);
-        }
     }
 }

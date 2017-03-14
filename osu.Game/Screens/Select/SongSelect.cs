@@ -53,7 +53,13 @@ namespace osu.Game.Screens.Select
 
         private List<BeatmapGroup> beatmapGroups;
 
+        /// <summary>
+        /// Can be null if hasFooter:false in constructor
+        /// </summary>
         protected BeatmapOptionsOverlay BeatmapOptions { get; private set; }
+        /// <summary>
+        /// Can be null if hasFooter:false in constructor
+        /// </summary>
         protected Footer Footer { get; private set; }
 
         private FilterControl filter;
@@ -73,83 +79,80 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase beatmaps, AudioManager audio, DialogOverlay dialog, Framework.Game game,
-            OsuGame osu, OsuColour colours)
+        protected SongSelect(bool hasFooter)
         {
             const float carousel_width = 640;
             const float filter_height = 100;
 
             beatmapGroups = new List<BeatmapGroup>();
-            Children = new Drawable[]
+            Add(new ParallaxContainer
             {
-                new ParallaxContainer
+                Padding = new MarginPadding { Top = filter_height },
+                ParallaxAmount = 0.005f,
+                RelativeSizeAxes = Axes.Both,
+                Children = new[]
                 {
-                    Padding = new MarginPadding { Top = filter_height },
-                    ParallaxAmount = 0.005f,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
+                    new WedgeBackground
                     {
-                        new WedgeBackground
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding
-                            {
-                                Right = carousel_width * 0.76f
-                            },
-                        },
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Right = carousel_width * 0.76f },
                     }
-                },
-                carousel = new CarouselContainer
+                }
+            });
+            Add(carousel = new CarouselContainer
+            {
+                RelativeSizeAxes = Axes.Y,
+                Size = new Vector2(carousel_width, 1),
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+            });
+            Add(filter = new FilterControl
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = filter_height,
+                FilterChanged = () => filterChanged(),
+                Exit = Exit,
+            });
+            Add(beatmapInfoWedge = new BeatmapInfoWedge
+            {
+                Alpha = 0,
+                Size = wedged_container_size,
+                RelativeSizeAxes = Axes.X,
+                Margin = new MarginPadding
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(carousel_width, 1),
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
+                    Top = 20,
+                    Right = 20,
                 },
-                filter = new FilterControl
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = filter_height,
-                    FilterChanged = () => filterChanged(),
-                    Exit = Exit,
-                },
-                beatmapInfoWedge = new BeatmapInfoWedge
-                {
-                    Alpha = 0,
-                    Size = wedged_container_size,
-                    RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding
-                    {
-                        Top = 20,
-                        Right = 20,
-                    },
-                    X = -50,
-                },
-                BeatmapOptions = new BeatmapOptionsOverlay
+                X = -50,
+            });
+            if (hasFooter)
+            {
+                Add(BeatmapOptions = new BeatmapOptionsOverlay
                 {
                     Margin = new MarginPadding
                     {
                         Bottom = 50,
                     },
-                },
-                Footer = new Footer
+                });
+                Add(Footer = new Footer
                 {
                     OnBack = Exit,
-                    OnStart = () =>
-                    {
-                        if (Beatmap == null) return;
+                    OnStart = raiseSelect,
+                });
+            }
+        }
 
-                        Beatmap.PreferredPlayMode = playMode.Value;
-                        OnSelected(Beatmap);
-                    }
-                },
-            };
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(BeatmapDatabase beatmaps, AudioManager audio, DialogOverlay dialog, Framework.Game game,
+            OsuGame osu, OsuColour colours)
+        {
+            if (Footer != null)
+            {
+                Footer.AddButton(@"random", colours.Green, SelectRandom, Key.F2);
+                Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
 
-            Footer.AddButton(@"random", colours.Green, SelectRandom, Key.F2);
-            Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
-
-            BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
+                BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
+            }
 
             if (osu != null)
                 playMode.BindTo(osu.PlayMode);
@@ -170,6 +173,14 @@ namespace osu.Game.Screens.Select
             initialAddSetsTask = new CancellationTokenSource();
 
             Task.Factory.StartNew(() => addBeatmapSets(game, initialAddSetsTask.Token), initialAddSetsTask.Token);
+        }
+
+        private void raiseSelect()
+        {
+            if (Beatmap == null) return;
+
+            Beatmap.PreferredPlayMode = playMode.Value;
+            OnSelected(Beatmap);
         }
 
         public void SelectRandom() => carousel.SelectRandom();
@@ -364,7 +375,7 @@ namespace osu.Game.Screens.Select
             var group = new BeatmapGroup(beatmapSet, database)
             {
                 SelectionChanged = selectionChanged,
-                StartRequested = b => Footer.StartButton.TriggerClick()
+                StartRequested = b => raiseSelect()
             };
 
             //for the time being, let's completely load the difficulty panels in the background.
@@ -417,10 +428,20 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (!args.Repeat && args.Key == Key.Delete && state.Keyboard.ShiftPressed)
+            if (args.Repeat) return false;
+
+            switch (args.Key)
             {
-                promptDelete();
-                return true;
+                case Key.Enter:
+                    raiseSelect();
+                    return true;
+                case Key.Delete:
+                    if (state.Keyboard.ShiftPressed)
+                    {
+                        promptDelete();
+                        return true;
+                    }
+                    break;
             }
 
             return base.OnKeyDown(state, args);

@@ -18,8 +18,7 @@ namespace osu.Game.Screens.Select
         private OsuScreen player;
         private ModSelectOverlay modSelect;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        public PlaySongSelect() : base(true)
         {
             Add(modSelect = new ModSelectOverlay
             {
@@ -28,7 +27,11 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.BottomCentre,
                 Margin = new MarginPadding { Bottom = 50 }
             });
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
             Footer.AddButton(@"mods", colours.Yellow, modSelect.ToggleVisibility, Key.F1, float.MaxValue);
 
             BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
