@@ -12,7 +12,7 @@ namespace osu.Game.Modes.Osu.UI
 {
     public class OsuHitRenderer : HitRenderer<OsuHitObject>
     {
-        public OsuHitRenderer(Beatmap beatmap)
+        public OsuHitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
         {
         }

@@ -1,11 +1,13 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Screens.Play;
+using osu.Game.Modes.Objects;
+using osu.Game.Modes.UI;
+using System;
 
-namespace osu.Game.Modes
+namespace osu.Game.Modes.Mods
 {
     /// <summary>
     /// The base class for gameplay modifiers.
@@ -41,12 +43,6 @@ namespace osu.Game.Modes
         /// The mods this mod cannot be enabled with.
         /// </summary>
         public virtual Type[] IncompatibleMods => new Type[] { };
-
-        /// <summary>
-        /// Direct access to the Player before load has run.
-        /// </summary>
-        /// <param name="player"></param>
-        public virtual void PlayerLoading(Player player) { }
     }
 
     public class MultiMod : Mod
@@ -151,11 +147,16 @@ namespace osu.Game.Modes
         public override string Description => "Watch a perfect automated play through the song";
         public override double ScoreMultiplier => 0;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail) };
+    }
 
-        public override void PlayerLoading(Player player)
+    public abstract class ModAutoplay<T> : ModAutoplay, IApplicableMod<T>
+        where T : HitObject
+    {
+        protected abstract Score CreateReplayScore(Beatmap<T> beatmap);
+
+        public void Apply(HitRenderer<T> hitRenderer)
         {
-            base.PlayerLoading(player);
-            player.ReplayInputHandler = Ruleset.GetRuleset(player.Beatmap.PlayMode).CreateAutoplayScore(player.Beatmap.Beatmap)?.Replay?.GetInputHandler();
+            hitRenderer.InputManager.ReplayInputHandler = CreateReplayScore(hitRenderer.Beatmap)?.Replay?.GetInputHandler();
         }
     }
 
@@ -169,12 +170,5 @@ namespace osu.Game.Modes
     {
         public override string Name => "Cinema";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_cinema;
-    }
-
-    public enum ModType
-    {
-        DifficultyReduction,
-        DifficultyIncrease,
-        Special,
     }
 }
