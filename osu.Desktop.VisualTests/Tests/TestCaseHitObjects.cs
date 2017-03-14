@@ -1,19 +1,19 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Framework.Screens.Testing;
-using osu.Framework.Graphics;
-using osu.Framework.Timing;
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Configuration;
-using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Modes.Osu.Objects;
-using osu.Game.Modes.Osu.Objects.Drawables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using OpenTK.Graphics;
+using osu.Framework.Screens.Testing;
+using osu.Framework.Timing;
+using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Osu.Objects;
+using osu.Game.Modes.Osu.Objects.Drawables;
+using System.Collections.Generic;
 
 namespace osu.Desktop.VisualTests.Tests
 {

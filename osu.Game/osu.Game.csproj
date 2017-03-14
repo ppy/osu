@@ -96,6 +96,7 @@
     <Compile Include="Modes\Mods\ModType.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacyHit.cs" />
     <Compile Include="Modes\Objects\LegacyHitObjectParser.cs" />
+    <Compile Include="Modes\Objects\Legacy\LegacyHold.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacySlider.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacySpinner.cs" />
     <Compile Include="Modes\Objects\Types\CurveType.cs" />
