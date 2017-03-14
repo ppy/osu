@@ -61,8 +61,6 @@ namespace osu.Desktop.VisualTests.Tests
                     time += 500;
                 }
 
-                var decoder = new ConstructableBeatmapDecoder();
-
                 Beatmap b = new Beatmap
                 {
                     HitObjects = objects,
