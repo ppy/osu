@@ -94,10 +94,10 @@
     <Compile Include="Modes\LegacyReplay.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
-    <Compile Include="Modes\Objects\Hit.cs" />
+    <Compile Include="Modes\Objects\Legacy\LegacyHit.cs" />
     <Compile Include="Modes\Objects\LegacyHitObjectParser.cs" />
-    <Compile Include="Modes\Objects\Slider.cs" />
-    <Compile Include="Modes\Objects\Spinner.cs" />
+    <Compile Include="Modes\Objects\Legacy\LegacySlider.cs" />
+    <Compile Include="Modes\Objects\Legacy\LegacySpinner.cs" />
     <Compile Include="Modes\Objects\Types\CurveType.cs" />
     <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />

@@ -7,6 +7,7 @@ using osu.Game.Modes.Objects.Types;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using osu.Game.Modes.Objects.Legacy;
 
 namespace osu.Game.Modes.Objects
 {
@@ -24,7 +25,7 @@ namespace osu.Game.Modes.Objects
             switch (type)
             {
                 case HitObjectType.Circle:
-                    result = new Hit
+                    result = new LegacyHit
                     {
                         Position = new Vector2(int.Parse(split[0]), int.Parse(split[1])),
                         NewCombo = combo
@@ -74,7 +75,7 @@ namespace osu.Game.Modes.Objects
                     if (split.Length > 7)
                         length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
 
-                    result = new Slider
+                    result = new LegacySlider
                     {
                         ControlPoints = points,
                         Distance = length,
@@ -85,7 +86,7 @@ namespace osu.Game.Modes.Objects
                     };
                     break;
                 case HitObjectType.Spinner:
-                    result = new Spinner
+                    result = new LegacySpinner
                     {
                         EndTime = Convert.ToDouble(split[5], CultureInfo.InvariantCulture)
                     };
