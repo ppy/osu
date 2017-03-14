@@ -73,6 +73,7 @@
     <Compile Include="Objects\SliderTick.cs" />
     <Compile Include="OsuAutoReplay.cs" />
     <Compile Include="OsuDifficultyCalculator.cs" />
+    <Compile Include="OsuKeyConversionInputManager.cs" />
     <Compile Include="OsuScore.cs" />
     <Compile Include="OsuScoreProcessor.cs" />
     <Compile Include="UI\OsuHitRenderer.cs" />
