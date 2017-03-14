@@ -16,91 +16,94 @@ namespace osu.Game.Modes.Objects
         public override HitObject Parse(string text)
         {
             string[] split = text.Split(',');
-            var type = (HitObjectType)int.Parse(split[3]);
+            var type = (HitObjectType)int.Parse(split[3]) & ~HitObjectType.ColourHax;
             bool combo = type.HasFlag(HitObjectType.NewCombo);
             type &= ~HitObjectType.NewCombo;
 
             HitObject result;
-            switch (type)
+
+            if ((type & HitObjectType.Circle) > 0)
             {
-                case HitObjectType.Circle:
-                    result = new LegacyHit
-                    {
-                        Position = new Vector2(int.Parse(split[0]), int.Parse(split[1])),
-                        NewCombo = combo
-                    };
-                    break;
-                case HitObjectType.Slider:
-                    CurveType curveType = CurveType.Catmull;
-                    double length = 0;
-                    List<Vector2> points = new List<Vector2> { new Vector2(int.Parse(split[0]), int.Parse(split[1])) };
+                result = new LegacyHit
+                {
+                    Position = new Vector2(int.Parse(split[0]), int.Parse(split[1])),
+                    NewCombo = combo
+                };
+            }
+            else if ((type & HitObjectType.Slider) > 0)
+            {
+                CurveType curveType = CurveType.Catmull;
+                double length = 0;
+                List<Vector2> points = new List<Vector2> { new Vector2(int.Parse(split[0]), int.Parse(split[1])) };
 
-                    string[] pointsplit = split[5].Split('|');
-                    foreach (string t in pointsplit)
+                string[] pointsplit = split[5].Split('|');
+                foreach (string t in pointsplit)
+                {
+                    if (t.Length == 1)
                     {
-                        if (t.Length == 1)
+                        switch (t)
                         {
-                            switch (t)
-                            {
-                                case @"C":
-                                    curveType = CurveType.Catmull;
-                                    break;
-                                case @"B":
-                                    curveType = CurveType.Bezier;
-                                    break;
-                                case @"L":
-                                    curveType = CurveType.Linear;
-                                    break;
-                                case @"P":
-                                    curveType = CurveType.PerfectCurve;
-                                    break;
-                            }
-                            continue;
+                            case @"C":
+                                curveType = CurveType.Catmull;
+                                break;
+                            case @"B":
+                                curveType = CurveType.Bezier;
+                                break;
+                            case @"L":
+                                curveType = CurveType.Linear;
+                                break;
+                            case @"P":
+                                curveType = CurveType.PerfectCurve;
+                                break;
                         }
-
-                        string[] temp = t.Split(':');
-                        Vector2 v = new Vector2(
-                            (int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture),
-                            (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)
-                        );
-                        points.Add(v);
+                        continue;
                     }
 
-                    int repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
+                    string[] temp = t.Split(':');
+                    Vector2 v = new Vector2(
+                        (int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture),
+                        (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)
+                    );
+                    points.Add(v);
+                }
 
-                    if (repeatCount > 9000)
-                        throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
+                int repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
 
-                    if (split.Length > 7)
-                        length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
+                if (repeatCount > 9000)
+                    throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
 
-                    result = new LegacySlider
-                    {
-                        ControlPoints = points,
-                        Distance = length,
-                        CurveType = curveType,
-                        RepeatCount = repeatCount,
-                        Position = new Vector2(int.Parse(split[0]), int.Parse(split[1])),
-                        NewCombo = combo
-                    };
-                    break;
-                case HitObjectType.Spinner:
-                    result = new LegacySpinner
-                    {
-                        EndTime = Convert.ToDouble(split[5], CultureInfo.InvariantCulture)
-                    };
-                    break;
-                case HitObjectType.Hold:
-                    // Note: Hold is generated by BMS converts
-                    result = new LegacyHold
-                    {
-                        Position = new Vector2(int.Parse(split[0]), int.Parse(split[1])),
-                        NewCombo = combo
-                    };
-                    break;
-                default:
-                    throw new InvalidOperationException($@"Unknown hit object type {type}");
+                if (split.Length > 7)
+                    length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
+
+                result = new LegacySlider
+                {
+                    ControlPoints = points,
+                    Distance = length,
+                    CurveType = curveType,
+                    RepeatCount = repeatCount,
+                    Position = new Vector2(int.Parse(split[0]), int.Parse(split[1])),
+                    NewCombo = combo
+                };
             }
+            else if ((type & HitObjectType.Spinner) > 0)
+            {
+                result = new LegacySpinner
+                {
+                    EndTime = Convert.ToDouble(split[5], CultureInfo.InvariantCulture)
+                };
+            }
+            else if ((type & HitObjectType.Hold) > 0)
+            {
+                // Note: Hold is generated by BMS converts
+                result = new LegacyHold
+                {
+                    Position = new Vector2(int.Parse(split[0]), int.Parse(split[1])),
+                    NewCombo = combo
+                };
+            }
+            else
+                throw new InvalidOperationException($@"Unknown hit object type {type}");
+
             result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
             result.Sample = new HitSampleInfo
             {
