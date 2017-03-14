@@ -29,7 +29,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
 
         private List<OsuHitObject> convertHitObjects(List<HitObject> hitObjects, float stackLeniency)
         {
-            List<OsuHitObject> converted = hitObjects.Select(h => convertHitObject(h)).ToList();
+            List<OsuHitObject> converted = hitObjects.Select(convertHitObject).ToList();
 
             updateStacking(converted, stackLeniency);
 

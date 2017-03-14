@@ -3,7 +3,6 @@
 
 using osu.Game.Modes.Objects.Types;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Objects
 {
