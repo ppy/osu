@@ -324,11 +324,7 @@
     <Compile Include="Overlays\Mods\AssistedSection.cs" />
     <Compile Include="Overlays\WaveOverlayContainer.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
-    <Compile Include="Screens\Select\Options\BeatmapOptionsClearLocalScoresButton.cs" />
-    <Compile Include="Screens\Select\Options\BeatmapOptionsDeleteButton.cs" />
-    <Compile Include="Screens\Select\Options\BeatmapOptionsEditButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
-    <Compile Include="Screens\Select\Options\BeatmapOptionsRemoveFromUnplayedButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
