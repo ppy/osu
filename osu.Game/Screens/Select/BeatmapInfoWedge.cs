@@ -77,8 +77,8 @@ namespace osu.Game.Screens.Select
 
             if (beatmap.Beatmap != null)
             {
-                HitObject lastObject = beatmap.Beatmap.HitObjects.Last();
-                double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime;
+                HitObject lastObject = beatmap.Beatmap.HitObjects.LastOrDefault();
+                double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
 
                 labels.Add(new InfoLabel(new BeatmapStatistic
                 {
