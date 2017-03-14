@@ -34,7 +34,7 @@ using osu.Game.Screens.Select.Options;
 
 namespace osu.Game.Screens.Select
 {
-    public class SongSelect : OsuScreen
+    public abstract class SongSelect : OsuScreen
     {
         private Bindable<PlayMode> playMode = new Bindable<PlayMode>();
         private BeatmapDatabase database;
@@ -59,8 +59,6 @@ namespace osu.Game.Screens.Select
 
         private BeatmapOptionsOverlay beatmapOptions;
         private Footer footer;
-
-        private OsuScreen player;
 
         private FilterControl filter;
         public FilterControl Filter
@@ -158,15 +156,10 @@ namespace osu.Game.Screens.Select
                     OnBack = Exit,
                     OnStart = () =>
                     {
-                        if (player != null || Beatmap == null)
-                            return;
+                        if (Beatmap == null) return;
 
                         Beatmap.PreferredPlayMode = playMode.Value;
-
-                        (player = new PlayerLoader(new Player
-                        {
-                            Beatmap = Beatmap, //eagerly set this so it's present before push.
-                        })).LoadAsync(Game, l => Push(player));
+                        OnSelected(Beatmap);
                     }
                 },
             };
@@ -195,6 +188,8 @@ namespace osu.Game.Screens.Select
 
             Task.Factory.StartNew(() => addBeatmapSets(game, initialAddSetsTask.Token), initialAddSetsTask.Token);
         }
+
+        protected abstract void OnSelected(WorkingBeatmap beatmap);
 
         private ScheduledDelegate filterTask;
 
@@ -268,8 +263,6 @@ namespace osu.Game.Screens.Select
 
         protected override void OnResuming(Screen last)
         {
-            player = null;
-
             changeBackground(Beatmap);
             ensurePlayingSelected();
             base.OnResuming(last);
