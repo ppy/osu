@@ -8,6 +8,7 @@ namespace osu.Game.Screens.Select
 {
     internal class EditSongSelect : SongSelect
     {
+        public EditSongSelect() : base(false) { }
         protected override void OnSelected(WorkingBeatmap beatmap) => Push(new Editor(beatmap));
     }
 }
