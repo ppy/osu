@@ -198,7 +198,7 @@ namespace osu.Desktop.Deploy
             write($"- Creating release {version}...", ConsoleColor.Yellow);
             var req = new JsonWebRequest<GitHubRelease>($"{GitHubApiEndpoint}")
             {
-                Method = HttpMethod.POST
+                Method = HttpMethod.POST,
             };
             req.AddRaw(JsonConvert.SerializeObject(new GitHubRelease
             {
@@ -215,6 +215,7 @@ namespace osu.Desktop.Deploy
                 var upload = new WebRequest(assetUploadUrl, Path.GetFileName(a))
                 {
                     Method = HttpMethod.POST,
+                    Timeout = 240000,
                     ContentType = "application/octet-stream",
                 };
 
