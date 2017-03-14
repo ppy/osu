@@ -10,10 +10,10 @@ namespace osu.Game.Screens.Edit
 {
     internal class Editor : ScreenWhiteBox
     {
-        private WorkingBeatmap beatmap;
-        public Editor(WorkingBeatmap wokringBeatmap)
+        //private WorkingBeatmap beatmap;
+        public Editor(WorkingBeatmap workingBeatmap)
         {
-            beatmap = wokringBeatmap;
+            //beatmap = workingBeatmap;
         }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");

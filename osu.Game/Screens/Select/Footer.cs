@@ -36,6 +36,10 @@ namespace osu.Game.Screens.Select
 
         public OsuLogo StartButton;
 
+        /// <param name="text">Text on the button.</param>
+        /// <param name="colour">Colour of the button.</param>
+        /// <param name="hotkey">Hotkey of the button.</param>
+        /// <param name="action">Action the button does.</param>
         /// <param name="depth">
         /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
