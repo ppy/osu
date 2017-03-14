@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Edit
 {
     internal class Editor : ScreenWhiteBox
     {
-        protected override IEnumerable<Type> PossibleChildren => new Type[] { typeof(EditSongSelect) };
+        protected override IEnumerable<Type> PossibleChildren => new[] { typeof(EditSongSelect) };
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
