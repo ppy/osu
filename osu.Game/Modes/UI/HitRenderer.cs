@@ -44,6 +44,8 @@ namespace osu.Game.Modes.UI
     public abstract class HitRenderer<TObject> : HitRenderer
         where TObject : HitObject
     {
+        internal readonly KeyConversionInputManager KeyConversionInputManager;
+
         public override Func<Vector2, Vector2> MapPlayfieldToScreenSpace => Playfield.ScaledContent.ToScreenSpace;
         public IEnumerable<DrawableHitObject> DrawableObjects => Playfield.HitObjects.Children;
 
@@ -61,12 +63,16 @@ namespace osu.Game.Modes.UI
 
             RelativeSizeAxes = Axes.Both;
 
+            KeyConversionInputManager = CreateKeyConversionInputManager();
+            KeyConversionInputManager.RelativeSizeAxes = Axes.Both;
+            KeyConversionInputManager.Add(Playfield = CreatePlayfield());
+
             InputManager.Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    Playfield = CreatePlayfield(),
+                    KeyConversionInputManager
                 }
             });
 
@@ -102,5 +108,6 @@ namespace osu.Game.Modes.UI
         protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
         protected abstract Playfield<TObject> CreatePlayfield();
         protected abstract IBeatmapConverter<TObject> CreateBeatmapConverter();
+        protected virtual KeyConversionInputManager CreateKeyConversionInputManager() => new KeyConversionInputManager();
     }
 }
