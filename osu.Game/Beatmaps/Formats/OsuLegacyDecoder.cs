@@ -10,7 +10,6 @@ using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
-using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Beatmaps.Formats
 {
