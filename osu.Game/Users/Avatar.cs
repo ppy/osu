@@ -21,22 +21,11 @@ namespace osu.Game.Users
         private OsuGame game;
         private Texture guestTexture;
 
-        public Avatar()
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuGameBase game, TextureStore textures)
         {
-            Size = new Vector2(32);
-            Anchor = Anchor.CentreLeft;
-            Origin = Anchor.CentreLeft;
-
-            CornerRadius = Size.X / 8;
-
-            EdgeEffect = new EdgeEffect
-            {
-                Type = EdgeEffectType.Shadow,
-                Radius = 4,
-                Colour = Color4.Black.Opacity(0.1f),
-            };
-
-            Masking = true;
+            this.game = game;
+            guestTexture = textures.Get(@"Online/avatar-guest");
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
