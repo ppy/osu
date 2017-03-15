@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Game.Modes.Objects;
-using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 
@@ -31,21 +30,12 @@ namespace osu.Game.Beatmaps.Formats
 
         public virtual Beatmap Decode(TextReader stream)
         {
-            Beatmap b = ParseFile(stream);
-            Process(b);
-            return b;
+            return ParseFile(stream);
         }
 
         public virtual void Decode(TextReader stream, Beatmap beatmap)
         {
             ParseFile(stream, beatmap);
-        }
-
-        public virtual Beatmap Process(Beatmap beatmap)
-        {
-            ApplyColours(beatmap);
-
-            return beatmap;
         }
 
         protected virtual Beatmap ParseFile(TextReader stream)
@@ -54,7 +44,6 @@ namespace osu.Game.Beatmaps.Formats
             {
                 HitObjects = new List<HitObject>(),
                 ControlPoints = new List<ControlPoint>(),
-                ComboColors = new List<Color4>(),
                 BeatmapInfo = new BeatmapInfo
                 {
                     Metadata = new BeatmapMetadata(),
@@ -65,25 +54,5 @@ namespace osu.Game.Beatmaps.Formats
             return beatmap;
         }
         protected abstract void ParseFile(TextReader stream, Beatmap beatmap);
-
-        public virtual void ApplyColours(Beatmap b)
-        {
-            List<Color4> colours = b.ComboColors ?? new List<Color4> {
-                new Color4(17, 136, 170, 255),
-                new Color4(102, 136, 0, 255),
-                new Color4(204, 102, 0, 255),
-                new Color4(121, 9, 13, 255),
-            };
-
-            if (colours.Count == 0) return;
-
-            int i = -1;
-
-            foreach (HitObject h in b.HitObjects)
-            {
-                if (h.NewCombo || i == -1) i = (i + 1) % colours.Count;
-                h.Colour = colours[i];
-            }
-        }
     }
 }
