@@ -3,10 +3,10 @@
 
 using System;
 
-namespace osu.Game.Modes.Objects.Types
+namespace osu.Game.Modes.Objects.Legacy
 {
     [Flags]
-    public enum HitObjectType
+    public enum LegacyHitObjectType
     {
         Circle = 1 << 0,
         Slider = 1 << 1,
