@@ -26,14 +26,6 @@ namespace osu.Game.Modes.Mania.UI
         protected override Playfield<ManiaBaseHit, ManiaJudgementInfo> CreatePlayfield() => new ManiaPlayfield(columns);
 
 
-        protected override DrawableHitObject<ManiaBaseHit, ManiaJudgementInfo> GetVisualRepresentation(ManiaBaseHit h)
-        {
-            return null;
-            //return new DrawableNote(h)
-            //{
-            //    Position = new Vector2((float)(h.Column + 0.5) / columns, -0.1f),
-            //    RelativePositionAxes = Axes.Both
-            //};
-        }
+        protected override DrawableHitObject<ManiaBaseHit, ManiaJudgementInfo> GetVisualRepresentation(ManiaBaseHit h) => null;
     }
 }
