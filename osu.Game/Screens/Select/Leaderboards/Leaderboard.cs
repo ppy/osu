@@ -43,11 +43,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                     };
                     scrollFlow.Add(ls);
 
-                    ls.Delay(i * 50);
-                    ls.Schedule(() =>
-                    {
-                        ls.Show();
-                    });
+                    ls.Delay(i * 50, true);
+                    ls.Show();
                 }
 
                 scrollContainer.ScrollTo(0f, false);
