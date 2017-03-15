@@ -1,11 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Transforms;
@@ -13,8 +11,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.UserInterface.Tab;
 using osu.Game.Graphics;
 using osu.Game.Screens.Select.Filter;
-using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Select.Tab
 {
