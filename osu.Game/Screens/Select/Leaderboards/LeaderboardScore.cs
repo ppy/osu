@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private Container flagBadgeContainer;
         private FillFlowContainer<ScoreModIcon> modsContainer;
 
-        private readonly int index;
+        public readonly int Index;
         public readonly Score Score;
 
         private Visibility state;
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         public LeaderboardScore(Score score, int i)
         {
             Score = score;
-            index = i;
+            Index = i;
 
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Origin = Anchor.CentreLeft,
                             Font = @"Exo2.0-MediumItalic",
                             TextSize = 22,
-                            Text = index.ToString(),
+                            Text = Index.ToString(),
                         },
                     },
                 },
