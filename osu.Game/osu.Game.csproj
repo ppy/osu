@@ -94,6 +94,8 @@
     <Compile Include="Modes\LegacyReplay.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
+    <Compile Include="Modes\Objects\Drawables\ArmedState.cs" />
+    <Compile Include="Modes\Objects\Drawables\HitResult.cs" />
     <Compile Include="Modes\Objects\BezierApproximator.cs" />
     <Compile Include="Modes\Objects\CircularArcApproximator.cs" />
     <Compile Include="Modes\Objects\CurvedHitObject.cs" />
@@ -105,6 +107,7 @@
     <Compile Include="Modes\Objects\SliderCurve.cs" />
     <Compile Include="Modes\Objects\Types\CurveType.cs" />
     <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
+    <Compile Include="Modes\Judgements\JudgementInfo.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Modes\Objects\Types\IHasCombo.cs" />
     <Compile Include="Modes\Objects\Types\IHasEndTime.cs" />

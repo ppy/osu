@@ -75,8 +75,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             if (Time.Current < HitObject.StartTime) return;
 
-            var j = (OsuJudgementInfo)Judgement;
-
             disc.ScaleTo(Interpolation.ValueAt(Math.Sqrt(Progress), scaleToCircle, Vector2.One, 0, 1), 100);
 
             if (Progress >= 1)
@@ -86,24 +84,24 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             {
                 if (Progress >= 1)
                 {
-                    j.Score = OsuScoreResult.Hit300;
-                    j.Result = HitResult.Hit;
+                    Judgement.Score = OsuScoreResult.Hit300;
+                    Judgement.Result = HitResult.Hit;
                 }
                 else if (Progress > .9)
                 {
-                    j.Score = OsuScoreResult.Hit100;
-                    j.Result = HitResult.Hit;
+                    Judgement.Score = OsuScoreResult.Hit100;
+                    Judgement.Result = HitResult.Hit;
                 }
                 else if (Progress > .75)
                 {
-                    j.Score = OsuScoreResult.Hit50;
-                    j.Result = HitResult.Hit;
+                    Judgement.Score = OsuScoreResult.Hit50;
+                    Judgement.Result = HitResult.Hit;
                 }
                 else
                 {
-                    j.Score = OsuScoreResult.Miss;
+                    Judgement.Score = OsuScoreResult.Miss;
                     if (Time.Current >= spinner.EndTime)
-                        j.Result = HitResult.Miss;
+                        Judgement.Result = HitResult.Miss;
                 }
             }
         }

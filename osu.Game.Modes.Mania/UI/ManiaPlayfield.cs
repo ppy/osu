@@ -7,10 +7,11 @@ using osu.Game.Modes.Mania.Objects;
 using osu.Game.Modes.UI;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Modes.Mania.Judgements;
 
 namespace osu.Game.Modes.Mania.UI
 {
-    public class ManiaPlayfield : Playfield<ManiaBaseHit>
+    public class ManiaPlayfield : Playfield<ManiaBaseHit, ManiaJudgementInfo>
     {
         public ManiaPlayfield(int columns)
         {

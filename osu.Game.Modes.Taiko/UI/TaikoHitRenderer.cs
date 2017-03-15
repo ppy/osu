@@ -4,12 +4,13 @@
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Beatmaps;
+using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Taiko.UI
 {
-    public class TaikoHitRenderer : HitRenderer<TaikoBaseHit>
+    public class TaikoHitRenderer : HitRenderer<TaikoBaseHit, TaikoJudgementInfo>
     {
         public TaikoHitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
@@ -19,9 +20,9 @@ namespace osu.Game.Modes.Taiko.UI
         protected override IBeatmapConverter<TaikoBaseHit> CreateBeatmapConverter() => new TaikoBeatmapConverter();
 
         protected override IBeatmapProcessor<TaikoBaseHit> CreateBeatmapProcessor() => new TaikoBeatmapProcessor();
+        protected override Playfield<TaikoBaseHit, TaikoJudgementInfo> CreatePlayfield() => new TaikoPlayfield();
 
-        protected override Playfield<TaikoBaseHit> CreatePlayfield() => new TaikoPlayfield();
 
-        protected override DrawableHitObject<TaikoBaseHit> GetVisualRepresentation(TaikoBaseHit h) => null;// new DrawableTaikoHit(h);
+        protected override DrawableHitObject<TaikoBaseHit, TaikoJudgementInfo> GetVisualRepresentation(TaikoBaseHit h) => null;
     }
 }
