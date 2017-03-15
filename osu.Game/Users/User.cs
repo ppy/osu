@@ -10,6 +10,6 @@ namespace osu.Game.Users
         public int Id;
         public string Username;
         public Region Region;
-        public IEnumerable<Badge> Badges;
+        public Team Team;
     }
 }

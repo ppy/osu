@@ -7,16 +7,16 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Users
 {
-    public class Badge : IHasDrawableRepresentation<Sprite>
+    public class Team : IHasDrawableRepresentation<Sprite>
     {
         public string Name;
-        public Texture Texture; // TODO: Replace this with something better
+        public Texture Flag; // TODO: Replace this with something better
 
         public Sprite CreateDrawable()
         {
             return new Sprite
             {
-                Texture = Texture,
+                Texture = Flag,
             };
         }
     }
