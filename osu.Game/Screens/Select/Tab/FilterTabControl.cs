@@ -11,11 +11,7 @@ namespace osu.Game.Screens.Select.Tab
 
         protected override TabItem<T> CreateTabItem(T value) => new FilterTabItem<T> { Value = value };
 
-        public FilterTabControl(float offset, params T[] pinned) : base(offset, pinned)
-        {
-        }
-
-        public FilterTabControl(params T[] pinned) : base(pinned)
+        public FilterTabControl(float offset = 0) : base(offset)
         {
         }
     }
