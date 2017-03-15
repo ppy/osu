@@ -58,12 +58,13 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             base.Update();
 
+            var fadeStart = scrollContainer.DrawHeight - 10;
+            fadeStart += scrollContainer.IsScrolledToEnd() ? 70 : 0;
+
             foreach (var s in scrollFlow.Children)
             {
                 var topY = scrollContainer.ScrollContent.DrawPosition.Y + s.DrawPosition.Y;
                 var bottomY = topY + 70;
-                var fadeStart = scrollContainer.DrawHeight - 10;
-                fadeStart += scrollContainer.IsScrolledToEnd() ? 70 : 0;
 
                 s.ColourInfo = ColourInfo.GradientVertical(Color4.White.Opacity(System.Math.Min((fadeStart - topY) / 70, 1)),
                                                            Color4.White.Opacity(System.Math.Min((fadeStart - bottomY) / 70, 1)));
