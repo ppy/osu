@@ -6,7 +6,7 @@ namespace osu.Game.Modes.Objects.Types
     /// <summary>
     /// A HitObject that has a distance.
     /// </summary>
-    public interface IHasDistance
+    public interface IHasDistance : IHasEndTime
     {
         /// <summary>
         /// The distance of the HitObject.

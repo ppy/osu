@@ -6,7 +6,7 @@ namespace osu.Game.Modes.Objects.Types
     /// <summary>
     /// A HitObject that spans some length.
     /// </summary>
-    public interface IHasRepeats
+    public interface IHasRepeats : IHasEndTime
     {
         /// <summary>
         /// The amount of times the HitObject repeats.
