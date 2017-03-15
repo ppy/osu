@@ -3,12 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps.Samples;
+using osu.Game.Modes.Judgements;
 using OpenTK;
 using Container = osu.Framework.Graphics.Containers.Container;
 
@@ -16,10 +16,6 @@ namespace osu.Game.Modes.Objects.Drawables
 {
     public abstract class DrawableHitObject : Container, IStateful<ArmedState>
     {
-        public override bool HandleInput => Interactive;
-
-        public bool Interactive = true;
-
         public JudgementInfo Judgement;
 
         protected abstract JudgementInfo CreateJudgementInfo();
@@ -152,30 +148,8 @@ namespace osu.Game.Modes.Objects.Drawables
         }
     }
 
-    public enum ArmedState
-    {
-        Idle,
-        Hit,
-        Miss
-    }
-
     public class PositionalJudgementInfo : JudgementInfo
     {
         public Vector2 PositionOffset;
-    }
-
-    public class JudgementInfo
-    {
-        public ulong? ComboAtHit;
-        public HitResult? Result;
-        public double TimeOffset;
-    }
-
-    public enum HitResult
-    {
-        [Description(@"Miss")]
-        Miss,
-        [Description(@"Hit")]
-        Hit,
     }
 }

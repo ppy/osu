@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps.Samples;
+using osu.Game.Modes.Judgements;
 using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;

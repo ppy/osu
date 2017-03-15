@@ -93,7 +93,10 @@
     <Compile Include="Modes\LegacyReplay.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
+    <Compile Include="Modes\Objects\Drawables\ArmedState.cs" />
+    <Compile Include="Modes\Objects\Drawables\HitResult.cs" />
     <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
+    <Compile Include="Modes\Judgements\JudgementInfo.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Modes\Objects\NullHitObjectParser.cs" />
     <Compile Include="Modes\Replay.cs" />
