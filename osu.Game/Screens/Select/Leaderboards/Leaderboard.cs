@@ -3,7 +3,10 @@
 
 using System.Collections.Generic;
 using OpenTK;
+using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Modes;
@@ -48,6 +51,22 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
 
                 scrollContainer.ScrollTo(0f, false);
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            foreach (var s in scrollFlow.Children)
+            {
+                var topY = scrollContainer.ScrollContent.DrawPosition.Y + s.DrawPosition.Y;
+                var bottomY = topY + 70;
+                var fadeStart = scrollContainer.DrawHeight - 10;
+                fadeStart += scrollContainer.IsScrolledToEnd() ? 70 : 0;
+
+                s.ColourInfo = ColourInfo.GradientVertical(Color4.White.Opacity(System.Math.Min((fadeStart - topY) / 70, 1)),
+                                                           Color4.White.Opacity(System.Math.Min((fadeStart - bottomY) / 70, 1)));
             }
         }
 
