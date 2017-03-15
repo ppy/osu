@@ -39,13 +39,13 @@ namespace osu.Game.Screens.Select.Tab
 
             if (typeof(T) == typeof(SortMode))
             {
-                BackgroundColourHover = new Color4(163, 196, 36, 255);
-                BackgroundColourSelected = new Color4(163, 196, 36, 255);
+                BackgroundColourHover = colours.GreenLight;
+                BackgroundColourSelected = colours.GreenLight;
             }
             else
             {
-                BackgroundColourHover = new Color4(124, 200, 253, 255);
-                BackgroundColourSelected = new Color4(124, 200, 253, 255);
+                BackgroundColourHover = colours.Blue;
+                BackgroundColourSelected = colours.Blue;
             }
         }
     }

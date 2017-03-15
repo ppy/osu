@@ -12,12 +12,10 @@ namespace osu.Game.Screens.Select.Tab
     {
         protected override string Label { get; set; }
 
-        private TextAwesome ellipses;
-
         public FilterTabDropDownHeader() {
             Foreground.Children = new Drawable[]
             {
-                ellipses = new TextAwesome
+                new TextAwesome
                 {
                     Icon = FontAwesome.fa_ellipsis_h,
                     TextSize = 14,

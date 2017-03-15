@@ -44,19 +44,12 @@ namespace osu.Game.Screens.Select.Tab
 
         protected override void UpdateContentHeight()
         {
-            if (State == DropDownMenuState.Opened)
-                ContentContainer.ResizeTo(new Vector2(1, ContentHeight), 300, EasingTypes.OutQuint);
-            else
-                ContentContainer.ResizeTo(new Vector2(1, 0), 300, EasingTypes.OutQuint);
+            ContentContainer.ResizeTo(new Vector2(1, State == DropDownMenuState.Opened ? ContentHeight : 0), 300, EasingTypes.OutQuint);
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            if (typeof(T) == typeof(SortMode))
-                Header.Colour = colours.GreenLight;
-            else
-                Header.Colour = colours.Blue;
+        private void load(OsuColour colours) {
+            Header.Colour = typeof(T) == typeof(SortMode) ? colours.GreenLight : colours.Blue;
         }
     }
 }
