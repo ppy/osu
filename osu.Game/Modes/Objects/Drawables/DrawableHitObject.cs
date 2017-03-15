@@ -63,14 +63,14 @@ namespace osu.Game.Modes.Objects.Drawables
         }
     }
 
-    public abstract class DrawableHitObject<HitObjectType> : DrawableHitObject
-        where HitObjectType : HitObject
+    public abstract class DrawableHitObject<TObject> : DrawableHitObject
+        where TObject : HitObject
     {
-        public event Action<DrawableHitObject<HitObjectType>, JudgementInfo> OnJudgement;
+        public event Action<DrawableHitObject<TObject>, JudgementInfo> OnJudgement;
 
-        public HitObjectType HitObject;
+        public TObject HitObject;
 
-        protected DrawableHitObject(HitObjectType hitObject)
+        protected DrawableHitObject(TObject hitObject)
         {
             HitObject = hitObject;
         }
@@ -134,14 +134,14 @@ namespace osu.Game.Modes.Objects.Drawables
             Sample = audio.Sample.Get($@"Gameplay/{sampleSet.ToString().ToLower()}-hit{type.ToString().ToLower()}");
         }
 
-        private List<DrawableHitObject<HitObjectType>> nestedHitObjects;
+        private List<DrawableHitObject<TObject>> nestedHitObjects;
 
-        protected IEnumerable<DrawableHitObject<HitObjectType>> NestedHitObjects => nestedHitObjects;
+        protected IEnumerable<DrawableHitObject<TObject>> NestedHitObjects => nestedHitObjects;
 
-        protected void AddNested(DrawableHitObject<HitObjectType> h)
+        protected void AddNested(DrawableHitObject<TObject> h)
         {
             if (nestedHitObjects == null)
-                nestedHitObjects = new List<DrawableHitObject<HitObjectType>>();
+                nestedHitObjects = new List<DrawableHitObject<TObject>>();
 
             h.OnJudgement += (d, j) => { OnJudgement?.Invoke(d, j); } ;
             nestedHitObjects.Add(h);
