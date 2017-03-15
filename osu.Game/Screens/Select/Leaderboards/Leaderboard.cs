@@ -14,22 +14,26 @@ namespace osu.Game.Screens.Select.Leaderboards
         private ScrollContainer scrollContainer;
         private FillFlowContainer<LeaderboardScore> scrollFlow;
 
-        private Score[] scores;
-        public Score[] Scores
+        private IEnumerable<Score> scores;
+        public IEnumerable<Score> Scores
         {
             get { return scores; }
             set
             {
-                if (value == scores) return;
                 scores = value;
 
-                var scoreDisplays = new List<LeaderboardScore>();
-                for (int i = 0; i < value.Length; i++)
+                scrollFlow.Clear();
+
+                if (scores == null)
+                    return;
+
+                int i = 0;
+                foreach(var s in scores)
                 {
-                    scoreDisplays.Add(new LeaderboardScore(value[i], i + 1));
+                    scrollFlow.Add(new LeaderboardScore(s, i + 1));
+                    i++;
                 }
 
-                scrollFlow.Children = scoreDisplays;
                 scrollContainer.ScrollTo(0f, false);
             }
         }
