@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             RelativeSizeAxes = Axes.X;
             Height = height;
 
-            var flag = Score.User.Region.CreateDrawable();
+            var flag = Score.User?.Region.CreateDrawable() ?? new DrawableFlag();
             flag.Width = 30;
             flag.RelativeSizeAxes = Axes.Y;
 
@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     {
                                         nameLabel = new OsuSpriteText
                                         {
-                                            Text = Score.User?.Username,
+                                            Text = Score.User?.Username ?? Score.Username,
                                             Font = @"Exo2.0-BoldItalic",
                                             TextSize = 23,
                                         },
@@ -248,10 +248,13 @@ namespace osu.Game.Screens.Select.Leaderboards
                 },
             };
 
-            foreach (Mod mod in Score.Mods)
+            if (Score.Mods != null)
             {
-                // TODO: Get actual mod colours
-                modsContainer.Add(new ScoreModIcon(mod.Icon, OsuColour.FromHex(@"ffcc22")));
+                foreach (Mod mod in Score.Mods)
+                {
+                    // TODO: Get actual mod colours
+                    modsContainer.Add(new ScoreModIcon(mod.Icon, OsuColour.FromHex(@"ffcc22")));
+                }
             }
         }
 
