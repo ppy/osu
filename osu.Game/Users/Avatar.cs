@@ -2,14 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Diagnostics;
-using OpenTK;
-using OpenTK.Graphics;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Logging;
 
 namespace osu.Game.Users
 {
@@ -17,8 +16,8 @@ namespace osu.Game.Users
     {
         public Drawable Sprite;
 
-        private int userId;
-        private OsuGame game;
+        private long userId;
+        private OsuGameBase game;
         private Texture guestTexture;
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -28,15 +27,7 @@ namespace osu.Game.Users
             guestTexture = textures.Get(@"Online/avatar-guest");
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGame game, TextureStore textures)
-        {
-            this.game = game;
-
-            guestTexture = textures.Get(@"Online/avatar-guest");
-        }
-
-        public int UserId
+        public long UserId
         {
             get { return userId; }
             set
@@ -45,27 +36,43 @@ namespace osu.Game.Users
                     return;
 
                 userId = value;
-
-                var newSprite = userId > 1 ? new OnlineSprite($@"https://a.ppy.sh/{userId}") : new Sprite { Texture = guestTexture };
-
-                newSprite.FillMode = FillMode.Fit;
-
-                if (game != null)
-                {
-                    newSprite.LoadAsync(game, s =>
-                    {
-                        Sprite?.FadeOut();
-                        Sprite?.Expire();
-                        Sprite = s;
-
-                        Add(s);
-
-                            //todo: fix this... clock dependencies are a pain
-                            if (s.Clock != null)
-                            s.FadeInFromZero(200);
-                    });
-                }
+                invalidateSprite();
             }
+        }
+
+        private Task loadTask;
+
+        private void invalidateSprite()
+        {
+            Sprite?.FadeOut(100);
+            Sprite?.Expire();
+            Sprite = null;
+        }
+
+        private void updateSprite()
+        {
+            if (loadTask != null || Sprite != null) return;
+
+            var newSprite = userId > 1 ? new OnlineSprite($@"https://a.ppy.sh/{userId}") : new Sprite { Texture = guestTexture };
+
+            newSprite.FillMode = FillMode.Fill;
+
+            loadTask = newSprite.LoadAsync(game, s =>
+            {
+                Sprite = s;
+                Add(Sprite);
+
+                Sprite.FadeInFromZero(200);
+                loadTask = null;
+            });
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            //todo: should only be run when we are visible to the user.
+            updateSprite();
         }
 
         public class OnlineSprite : Sprite
