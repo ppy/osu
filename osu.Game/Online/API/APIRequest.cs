@@ -60,14 +60,17 @@ namespace osu.Game.Online.API
 
         private bool cancelled;
 
+        private Action pendingFailure;
+
         public void Perform(APIAccess api)
         {
-            if (cancelled) return;
+            this.api = api;
+
+            if (checkAndProcessFailure())
+                return;
 
             if (startTime == null)
                 startTime = DateTime.Now.TotalMilliseconds();
-
-            this.api = api;
 
             if (remainingTime <= 0)
                 throw new TimeoutException(@"API request timeout hit");
@@ -76,10 +79,16 @@ namespace osu.Game.Online.API
             WebRequest.RetryCount = 0;
             WebRequest.Headers[@"Authorization"] = $@"Bearer {api.AccessToken}";
 
-            WebRequest.BlockingPerform();
+            if (checkAndProcessFailure())
+                return;
 
-            if (WebRequest.Completed)
-                api.Scheduler.Add(delegate { Success?.Invoke(); });
+            if (!WebRequest.Aborted) //could have been aborted by a Cancel() call
+                WebRequest.BlockingPerform();
+
+            if (checkAndProcessFailure())
+                return;
+
+            api.Scheduler.Add(delegate { Success?.Invoke(); });
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
@@ -89,10 +98,22 @@ namespace osu.Game.Online.API
             cancelled = true;
 
             WebRequest?.Abort();
-            api.Scheduler.Add(delegate
-            {
-                Failure?.Invoke(e);
-            });
+
+            pendingFailure = () => Failure?.Invoke(e);
+            checkAndProcessFailure();
+        }
+
+        /// <summary>
+        /// Checked for cancellation or error. Also queues up the Failed event if we can.
+        /// </summary>
+        /// <returns>Whether we are in a failed or cancelled state.</returns>
+        private bool checkAndProcessFailure()
+        {
+            if (api == null || pendingFailure == null) return cancelled;
+
+            api.Scheduler.Add(pendingFailure);
+            pendingFailure = null;
+            return true;
         }
     }
 
