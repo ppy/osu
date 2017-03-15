@@ -34,19 +34,6 @@ namespace osu.Game.Screens.Select.Tab
             ContentBackground.Colour = Color4.Black.Opacity(0.9f);
             ScrollContainer.ScrollDraggerVisible = false;
             DropDownItemsContainer.Padding = new MarginPadding { Left = 5, Bottom = 7, Right = 5, Top = 7 };
-
-            if (!typeof(T).IsEnum)
-                throw new InvalidOperationException("TabControl only supports enums as the generic type argument");
-
-            List<KeyValuePair<string, T>> items = new List<KeyValuePair<string, T>>();
-            foreach (var val in (T[])Enum.GetValues(typeof(T)))
-            {
-                if (!val.Equals(default(T)))
-                    items.Add(new KeyValuePair<string, T>((val as Enum)?.GetDescription(), val));
-            }
-
-            Items = items;
-            // TODO: ValueChanged Handling
         }
 
         protected override void AnimateOpen()

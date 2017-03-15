@@ -7,7 +7,6 @@ namespace osu.Game.Screens.Select.Filter
 {
     public enum GroupMode
     {
-        None = 0,
         [Description("All")]
         All,
         [Description("Artist")]
