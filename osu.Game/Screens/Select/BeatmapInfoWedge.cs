@@ -21,6 +21,8 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
+using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Screens.Select
 {
@@ -90,11 +92,14 @@ namespace osu.Game.Screens.Select
 
             if (beatmap.Beatmap != null)
             {
+                HitObject lastObject = beatmap.Beatmap.HitObjects.LastOrDefault();
+                double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
+
                 labels.Add(new InfoLabel(new BeatmapStatistic
                 {
                     Name = "Length",
                     Icon = FontAwesome.fa_clock_o,
-                    Content = beatmap.Beatmap.HitObjects.Count == 0 ? "-" : TimeSpan.FromMilliseconds(beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
+                    Content = beatmap.Beatmap.HitObjects.Count == 0 ? "-" : TimeSpan.FromMilliseconds(endTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
                 }));
 
                 labels.Add(new InfoLabel(new BeatmapStatistic

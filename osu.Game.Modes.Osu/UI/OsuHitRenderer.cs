@@ -21,7 +21,9 @@ namespace osu.Game.Modes.Osu.UI
 
         protected override IBeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
 
+        protected override IBeatmapProcessor<OsuHitObject> CreateBeatmapProcessor() => new OsuBeatmapProcessor();
         protected override Playfield<OsuHitObject, OsuJudgementInfo> CreatePlayfield() => new OsuPlayfield();
+
 
         protected override KeyConversionInputManager CreateKeyConversionInputManager() => new OsuKeyConversionInputManager();
 

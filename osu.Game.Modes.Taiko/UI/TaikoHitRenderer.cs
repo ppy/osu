@@ -19,7 +19,9 @@ namespace osu.Game.Modes.Taiko.UI
 
         protected override IBeatmapConverter<TaikoBaseHit> CreateBeatmapConverter() => new TaikoBeatmapConverter();
 
+        protected override IBeatmapProcessor<TaikoBaseHit> CreateBeatmapProcessor() => new TaikoBeatmapProcessor();
         protected override Playfield<TaikoBaseHit, TaikoJudgementInfo> CreatePlayfield() => new TaikoPlayfield();
+
 
         protected override DrawableHitObject<TaikoBaseHit, TaikoJudgementInfo> GetVisualRepresentation(TaikoBaseHit h) => null;// new DrawableTaikoHit(h);
     }
