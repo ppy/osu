@@ -70,7 +70,6 @@
     <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
     <Compile Include="Objects\HitObjectType.cs" />
     <Compile Include="Objects\OsuHitObjectDifficulty.cs" />
-    <Compile Include="Objects\SliderCurve.cs" />
     <Compile Include="Objects\SliderTick.cs" />
     <Compile Include="OsuAutoReplay.cs" />
     <Compile Include="OsuDifficultyCalculator.cs" />

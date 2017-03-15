@@ -2,16 +2,16 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using OpenTK;
 using System.Linq;
 using osu.Framework.MathUtils;
 using osu.Game.Modes.Objects.Types;
+using OpenTK;
 
-namespace osu.Game.Modes.Osu.Objects
+namespace osu.Game.Modes.Objects
 {
     public class SliderCurve
     {
-        public double Length;
+        public double Distance;
 
         public List<Vector2> ControlPoints;
 
@@ -83,12 +83,12 @@ namespace osu.Game.Modes.Osu.Objects
 
                 // Shorten slider curves that are too long compared to what's
                 // in the .osu file.
-                if (Length - l < d)
+                if (Distance - l < d)
                 {
-                    calculatedPath[i + 1] = calculatedPath[i] + diff * (float)((Length - l) / d);
+                    calculatedPath[i + 1] = calculatedPath[i] + diff * (float)((Distance - l) / d);
                     calculatedPath.RemoveRange(i + 2, calculatedPath.Count - 2 - i);
 
-                    l = Length;
+                    l = Distance;
                     cumulativeLength.Add(l);
                     break;
                 }
@@ -130,7 +130,7 @@ namespace osu.Game.Modes.Osu.Objects
 
         private double progressToDistance(double progress)
         {
-            return MathHelper.Clamp(progress, 0, 1) * Length;
+            return MathHelper.Clamp(progress, 0, 1) * Distance;
         }
 
         private Vector2 interpolateVertices(int i, double d)
