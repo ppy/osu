@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Judgements;
 using osu.Game.Modes.Mods;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
@@ -13,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Game.Modes.Judgements;
 
 namespace osu.Game.Modes.UI
 {
@@ -117,6 +117,13 @@ namespace osu.Game.Modes.UI
         /// </summary>
         /// <returns>The Beatmap converter.</returns>
         protected abstract IBeatmapConverter<TObject> CreateBeatmapConverter();
+
+        /// <summary>
+        /// Creates a processor to perform post-processing operations
+        /// on HitObjects in converted Beatmaps.
+        /// </summary>
+        /// <returns>The Beatmap processor.</returns>
+        protected abstract IBeatmapProcessor<TObject> CreateBeatmapProcessor();
     }
 
     /// <summary>
