@@ -4,6 +4,7 @@
 using System;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -34,15 +35,25 @@ namespace osu.Game.Screens.Select
 
         public OsuLogo StartButton;
 
-        public void AddButton(string text, Color4 colour, Action action)
+        /// <param name="text">Text on the button.</param>
+        /// <param name="colour">Colour of the button.</param>
+        /// <param name="hotkey">Hotkey of the button.</param>
+        /// <param name="action">Action the button does.</param>
+        /// <param name="depth">
+        /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
+        /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
+        /// </param>
+        public void AddButton(string text, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
         {
             var button = new FooterButton
             {
                 Text = text,
                 Height = play_song_select_button_height,
                 Width = play_song_select_button_width,
+                Depth = depth,
                 SelectedColour = colour,
                 DeselectedColour = colour.Opacity(0.5f),
+                Hotkey = hotkey,
             };
 
             button.Hovered = () => updateModeLight(button);
@@ -89,7 +100,7 @@ namespace osu.Game.Screens.Select
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Action = () => OnBack?.Invoke(),
+                    Action = () => OnBack?.Invoke()
                 },
                 new FillFlowContainer
                 {

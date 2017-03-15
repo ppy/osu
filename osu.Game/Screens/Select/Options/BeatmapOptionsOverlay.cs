@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select.Options
 {
@@ -23,11 +25,6 @@ namespace osu.Game.Screens.Select.Options
 
         private Box holder;
         private FillFlowContainer<BeatmapOptionsButton> buttonsContainer;
-
-        public Action OnRemoveFromUnplayed;
-        public Action OnClearLocalScores;
-        public Action OnEdit;
-        public Action OnDelete;
 
         protected override void PopIn()
         {
@@ -85,43 +82,36 @@ namespace osu.Game.Screens.Select.Options
                     AutoSizeAxes = Axes.X,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                    Children = new BeatmapOptionsButton[]
-                    {
-                        new BeatmapOptionsRemoveFromUnplayedButton
-                        {
-                            Action = () =>
-                            {
-                                Hide();
-                                OnRemoveFromUnplayed?.Invoke();
-                            },
-                        },
-                        new BeatmapOptionsClearLocalScoresButton
-                        {
-                            Action = () =>
-                            {
-                                Hide();
-                                OnClearLocalScores?.Invoke();
-                            },
-                        },
-                        new BeatmapOptionsEditButton
-                        {
-                            Action = () =>
-                            {
-                                Hide();
-                                OnEdit?.Invoke();
-                            },
-                        },
-                        new BeatmapOptionsDeleteButton
-                        {
-                            Action = () =>
-                            {
-                                Hide();
-                                OnDelete?.Invoke();
-                            },
-                        },
-                    },
                 },
             };
+        }
+
+        /// <param name="firstLine">Text in the first line.</param>
+        /// <param name="secondLine">Text in the second line.</param>
+        /// <param name="colour">Colour of the button.</param>
+        /// <param name="icon">Icon of the button.</param>
+        /// <param name="hotkey">Hotkey of the button.</param>
+        /// <param name="action">Action the button does.</param>
+        /// <param name="depth">
+        /// <para>Lower depth to be put on the left, and higher to be put on the right.</para>
+        /// <para>Notice this is different to <see cref="Footer"/>!</para>
+        /// </param>
+        public void AddButton(string firstLine, string secondLine, FontAwesome icon, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
+        {
+            buttonsContainer.Add(new BeatmapOptionsButton
+            {
+                FirstLineText = firstLine,
+                SecondLineText = secondLine,
+                Icon = icon,
+                ButtonColour = colour,
+                Depth = depth,
+                Action = () =>
+                {
+                    Hide();
+                    action?.Invoke();
+                },
+                HotKey = hotkey
+            });
         }
 
         private class ButtonFlow : FillFlowContainer<BeatmapOptionsButton>
