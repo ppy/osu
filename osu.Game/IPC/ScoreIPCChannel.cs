@@ -8,7 +8,7 @@ using osu.Game.Database;
 
 namespace osu.Game.IPC
 {
-    public class ScoreIPCChannel : IpcChannel<ScoreImportMessage>
+    public class ScoreIPCChannel : IpcChannel<ScoreImportMessage>, IImporter
     {
         private ScoreDatabase scores;
 

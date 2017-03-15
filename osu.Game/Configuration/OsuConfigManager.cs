@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
 using osu.Game.Modes;
+using osu.Game.Skins;
 
 namespace osu.Game.Configuration
 {
@@ -35,6 +36,8 @@ namespace osu.Game.Configuration
             Set(OsuConfig.MenuParallax, true);
 
             Set(OsuConfig.KeyOverlay, false);
+
+            Set(OsuConfig.Skin, SkinManager.DefaultSkin);
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
@@ -131,7 +134,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.ShowReplayComments, true).Disabled = true;
             Set(OsuConfig.ShowSpectators, true).Disabled = true;
             Set(OsuConfig.ShowStoryboard, true).Disabled = true;
-            //Set(OsuConfig.Skin, SkinManager.DEFAULT_SKIN).Disabled = true;
             Set(OsuConfig.SkinSamples, true).Disabled = true;
             Set(OsuConfig.SkipTablet, false).Disabled = true;
             Set(OsuConfig.Tablet, false).Disabled = true;

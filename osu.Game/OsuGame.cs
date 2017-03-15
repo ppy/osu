@@ -28,6 +28,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
+using System.IO;
 
 namespace osu.Game
 {
@@ -83,7 +84,12 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                Task.Run(() => BeatmapDatabase.Import(paths));
+
+                var beatmapPaths = paths.Where(a => Path.GetExtension(a) == ".osz");
+                Task.Run(() => BeatmapDatabase.Import(beatmapPaths));
+
+                var skinPaths = paths.Where(a => Path.GetExtension(a) == ".osk");
+                Task.Run(() => SkinDatabase.Import(skinPaths));
             }
 
             Dependencies.Cache(this);
