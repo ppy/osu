@@ -24,7 +24,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 new Score
                 {
-                    Rank = ScoreRank.SSPlus,
+                    Rank = ScoreRank.XH,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -42,7 +42,7 @@ namespace osu.Desktop.VisualTests.Tests
                 },
                 new Score
                 {
-                    Rank = ScoreRank.SS,
+                    Rank = ScoreRank.X,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -60,7 +60,7 @@ namespace osu.Desktop.VisualTests.Tests
                 },
                 new Score
                 {
-                    Rank = ScoreRank.SPlus,
+                    Rank = ScoreRank.SH,
                     Accuracy = 100,
                     MaxCombo = 244,
                     TotalScore = 1707827,
