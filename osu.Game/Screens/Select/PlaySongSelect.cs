@@ -8,9 +8,11 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
 {
@@ -18,6 +20,7 @@ namespace osu.Game.Screens.Select
     {
         private OsuScreen player;
         private ModSelectOverlay modSelect;
+        private Leaderboard leaderboard;
 
         public PlaySongSelect()
         {
@@ -27,6 +30,11 @@ namespace osu.Game.Screens.Select
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.BottomCentre,
                 Margin = new MarginPadding { Bottom = 50 }
+            });
+
+            LeftContent.Add(leaderboard = new Leaderboard
+            {
+                RelativeSizeAxes = Axes.Both,
             });
         }
 
@@ -47,6 +55,18 @@ namespace osu.Game.Screens.Select
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
+
+            leaderboard.Scores = null;
+            if (beatmap != null)
+            {
+                var getScores = new GetScoresRequest(beatmap.BeatmapInfo);
+                getScores.Success += res =>
+                {
+                    leaderboard.Scores = res.Scores;
+                };
+                Game.API.Queue(getScores);
+            }
+
             base.OnBeatmapChanged(beatmap);
         }
 
