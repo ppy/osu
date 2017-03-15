@@ -47,7 +47,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = sliderTick.Colour,
+                    Colour = sliderTick.ComboColour,
                     Alpha = 0.3f,
                 }
             };

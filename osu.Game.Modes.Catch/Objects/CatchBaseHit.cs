@@ -7,6 +7,6 @@ namespace osu.Game.Modes.Catch.Objects
 {
     public abstract class CatchBaseHit : HitObject
     {
-        public float Position;
+        public float Position { get; set; }
     }
 }

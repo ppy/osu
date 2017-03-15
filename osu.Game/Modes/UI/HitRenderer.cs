@@ -11,6 +11,7 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Screens.Play;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace osu.Game.Modes.UI
@@ -60,7 +61,12 @@ namespace osu.Game.Modes.UI
 
         protected HitRenderer(WorkingBeatmap beatmap)
         {
+            Debug.Assert(beatmap != null, "HitRenderer initialized with a null beatmap.");
+
+            // Convert + process the beatmap
             Beatmap = CreateBeatmapConverter().Convert(beatmap.Beatmap);
+            Beatmap.HitObjects.ForEach(h => CreateBeatmapProcessor().SetDefaults(h, Beatmap));
+            CreateBeatmapProcessor().PostProcess(Beatmap);
 
             applyMods(beatmap.Mods.Value);
 
@@ -116,6 +122,8 @@ namespace osu.Game.Modes.UI
 
         protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
         protected abstract Playfield<TObject> CreatePlayfield();
+
         protected abstract IBeatmapConverter<TObject> CreateBeatmapConverter();
+        protected abstract IBeatmapProcessor<TObject> CreateBeatmapProcessor();
     }
 }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using OpenTK;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
 {
@@ -63,7 +64,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
                 {
                     Vector2 startPosition = prevHitObject.EndPosition;
                     Vector2 endPosition = currHitObject.Position;
-                    double startTime = prevHitObject.EndTime;
+                    double startTime = (prevHitObject as IHasEndTime)?.EndTime ?? prevHitObject.StartTime;
                     double endTime = currHitObject.StartTime;
 
                     Vector2 distanceVector = endPosition - startPosition;
