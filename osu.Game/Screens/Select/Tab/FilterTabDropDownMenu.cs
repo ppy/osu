@@ -25,8 +25,7 @@ namespace osu.Game.Screens.Select.Tab
 
         protected override DropDownHeader CreateHeader() => new FilterTabDropDownHeader();
 
-        protected override IEnumerable<DropDownMenuItem<T>> GetDropDownItems(IEnumerable<KeyValuePair<string, T>> values)
-            => values.Select(v => new FilterTabDropDownMenuItem<T>(v.Key, v.Value));
+        protected override DropDownMenuItem<T> CreateDropDownItem(string key, T value) => new FilterTabDropDownMenuItem<T>(key, value);
 
         public FilterTabDropDownMenu()
         {

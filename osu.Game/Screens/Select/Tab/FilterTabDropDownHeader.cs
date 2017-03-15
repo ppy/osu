@@ -3,23 +3,18 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Graphics.UserInterface.Tab;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select.Tab
 {
-    public class FilterTabDropDownHeader : DropDownHeader
+    public class FilterTabDropDownHeader : TabDropDownHeader
     {
         protected override string Label { get; set; }
 
         private TextAwesome ellipses;
 
         public FilterTabDropDownHeader() {
-            Background.Hide(); // don't need a background
-            RelativeSizeAxes = Axes.None;
-            AutoSizeAxes = Axes.Both;
-            Foreground.RelativeSizeAxes = Axes.None;
-            Foreground.AutoSizeAxes = Axes.Both;
             Foreground.Children = new Drawable[]
             {
                 ellipses = new TextAwesome

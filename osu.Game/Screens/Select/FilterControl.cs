@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.TopLeft,
                         Position = new Vector2(0, 23)
                     },
-                    groupTabs = new FilterTabControl<GroupMode>(GroupMode.All, GroupMode.RecentlyPlayed)
+                    groupTabs = new FilterTabControl<GroupMode>
                     {
                         Width = 230,
                         AutoSort = true
@@ -141,6 +141,8 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 };
+                groupTabs.PinTab(GroupMode.All);
+                groupTabs.PinTab(GroupMode.RecentlyPlayed);
             }
 
             [BackgroundDependencyLoader]
