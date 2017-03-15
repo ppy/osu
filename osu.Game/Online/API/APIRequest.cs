@@ -58,8 +58,12 @@ namespace osu.Game.Online.API
         public event APISuccessHandler Success;
         public event APIFailureHandler Failure;
 
+        private bool cancelled;
+
         public void Perform(APIAccess api)
         {
+            if (cancelled) return;
+
             if (startTime == null)
                 startTime = DateTime.Now.TotalMilliseconds();
 
@@ -74,11 +78,16 @@ namespace osu.Game.Online.API
 
             WebRequest.BlockingPerform();
 
-            api.Scheduler.Add(delegate { Success?.Invoke(); });
+            if (WebRequest.Completed)
+                api.Scheduler.Add(delegate { Success?.Invoke(); });
         }
+
+        public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
 
         public void Fail(Exception e)
         {
+            cancelled = true;
+
             WebRequest?.Abort();
             api.Scheduler.Add(delegate
             {
