@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Select
         private OsuScreen player;
         private ModSelectOverlay modSelect;
 
-        public PlaySongSelect() : base(true)
+        public PlaySongSelect()
         {
             Add(modSelect = new ModSelectOverlay
             {

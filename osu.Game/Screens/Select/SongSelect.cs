@@ -53,14 +53,17 @@ namespace osu.Game.Screens.Select
 
         private List<BeatmapGroup> beatmapGroups;
 
+        protected virtual bool ShowFooter => true;
+
         /// <summary>
-        /// Can be null if hasFooter:false in constructor
+        /// Can be null if <see cref="ShowFooter"/> == false
         /// </summary>
-        protected BeatmapOptionsOverlay BeatmapOptions { get; private set; }
+        protected readonly BeatmapOptionsOverlay BeatmapOptions;
+
         /// <summary>
-        /// Can be null if hasFooter:false in constructor
+        /// Can be null if <see cref="ShowFooter"/> == false
         /// </summary>
-        protected Footer Footer { get; private set; }
+        protected readonly Footer Footer;
 
         private FilterControl filter;
         public FilterControl Filter
@@ -79,7 +82,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected SongSelect(bool hasFooter)
+        protected SongSelect()
         {
             const float carousel_width = 640;
             const float filter_height = 100;
@@ -125,7 +128,8 @@ namespace osu.Game.Screens.Select
                 },
                 X = -50,
             });
-            if (hasFooter)
+
+            if (ShowFooter)
             {
                 Add(BeatmapOptions = new BeatmapOptionsOverlay
                 {
