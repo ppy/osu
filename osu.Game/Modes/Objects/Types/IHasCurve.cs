@@ -9,7 +9,7 @@ namespace osu.Game.Modes.Objects.Types
     /// <summary>
     /// A HitObject that has a curve.
     /// </summary>
-    public interface IHasCurve
+    public interface IHasCurve : IHasDistance
     {
         /// <summary>
         /// The control points that shape the curve.
