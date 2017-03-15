@@ -8,11 +8,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Modes.Osu.Judgements;
 using osu.Framework.Screens.Testing;
 using osu.Framework.Timing;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Osu.Judgements;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using System.Collections.Generic;
@@ -128,7 +128,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private int depth;
 
-        private void add(DrawableHitObject<OsuJudgementInfo> h)
+        private void add(DrawableOsuHitObject h)
         {
             h.Anchor = Anchor.Centre;
             h.Depth = depth++;
