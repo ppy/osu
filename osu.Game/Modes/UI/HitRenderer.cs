@@ -18,7 +18,10 @@ using System.Linq;
 namespace osu.Game.Modes.UI
 {
     /// <summary>
-    /// Base HitRenderer. Doesn't hold objects, should not be derived.
+    /// Base HitRenderer. Doesn't hold objects.
+    /// <para>
+    /// Should not be derived - derive <see cref="HitRenderer{TObject, TJudgement}"/> instead.
+    /// </para>
     /// </summary>
     public abstract class HitRenderer : Container
     {
@@ -75,6 +78,9 @@ namespace osu.Game.Modes.UI
     /// <summary>
     /// HitRenderer that applies conversion to Beatmaps. Does not contain a Playfield
     /// and does not load drawable hit objects.
+    /// <para>
+    /// Should not be derived - derive <see cref="HitRenderer{TObject, TJudgement}"/> instead.
+    /// </para>
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this HitRenderer.</typeparam>
     public abstract class HitRenderer<TObject> : HitRenderer
