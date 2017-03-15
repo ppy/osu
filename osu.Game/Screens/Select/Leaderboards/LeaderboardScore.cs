@@ -60,13 +60,12 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             base.LoadComplete();
 
-            // TODO: This fade to 0.01 is hacky, find a better way
-            FadeTo(0.01f);
-
             foreach (Drawable d in new Drawable[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, maxCombo, accuracy, modsContainer, })
             {
                 d.FadeOut();
             }
+
+            Alpha = 0;
 
             content.MoveToY(75);
             avatar.MoveToX(75);

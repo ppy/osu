@@ -31,8 +31,10 @@ namespace osu.Game.Screens.Select.Leaderboards
                 int i = 0;
                 foreach(var s in scores)
                 {
-                    scrollFlow.Add(new LeaderboardScore(s, i + 1));
-                    i++;
+                    scrollFlow.Add(new LeaderboardScore(s, 1 + i++)
+                    {
+                        AlwaysPresent = true
+                    });
                 }
 
                 scrollContainer.ScrollTo(0f, false);
