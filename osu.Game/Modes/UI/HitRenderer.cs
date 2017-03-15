@@ -16,14 +16,35 @@ using osu.Game.Modes.Judgements;
 
 namespace osu.Game.Modes.UI
 {
+    /// <summary>
+    /// Base HitRenderer. Doesn't hold objects, should not be derived.
+    /// </summary>
     public abstract class HitRenderer : Container
     {
+        /// <summary>
+        /// The event that's fired when a hit object is judged.
+        /// </summary>
         public event Action<JudgementInfo> OnJudgement;
+
+        /// <summary>
+        /// The event that's fired when all hit objects have been judged.
+        /// </summary>
         public event Action OnAllJudged;
 
+        /// <summary>
+        /// The input manager for this HitRenderer.
+        /// </summary>
         internal readonly PlayerInputManager InputManager = new PlayerInputManager();
 
+        /// <summary>
+        /// The key conversion input manager for this HitRenderer.
+        /// </summary>
         protected readonly KeyConversionInputManager KeyConversionInputManager;
+
+        /// <summary>
+        /// Whether all the HitObjects have been judged.
+        /// </summary>
+        protected abstract bool AllObjectsJudged { get; }
 
         protected HitRenderer()
         {
@@ -32,10 +53,9 @@ namespace osu.Game.Modes.UI
         }
 
         /// <summary>
-        /// Whether all the HitObjects have been judged.
+        /// Triggers a judgement for further processing.
         /// </summary>
-        protected abstract bool AllObjectsJudged { get; }
-
+        /// <param name="j">The judgement to trigger.</param>
         protected void TriggerOnJudgement(JudgementInfo j)
         {
             OnJudgement?.Invoke(j);
@@ -44,12 +64,24 @@ namespace osu.Game.Modes.UI
                 OnAllJudged?.Invoke();
         }
 
+        /// <summary>
+        /// Creates a key conversion input manager.
+        /// </summary>
+        /// <returns>The input manager.</returns>
         protected virtual KeyConversionInputManager CreateKeyConversionInputManager() => new KeyConversionInputManager();
     }
 
+    /// <summary>
+    /// HitRenderer that applies conversion to Beatmaps. Does not contain a Playfield
+    /// and does not load drawable hit objects.
+    /// </summary>
+    /// <typeparam name="TObject">The type of HitObject contained by this HitRenderer.</typeparam>
     public abstract class HitRenderer<TObject> : HitRenderer
         where TObject : HitObject
     {
+        /// <summary>
+        /// The Beatmap 
+        /// </summary>
         public Beatmap<TObject> Beatmap;
 
         protected HitRenderer(WorkingBeatmap beatmap)
@@ -61,6 +93,10 @@ namespace osu.Game.Modes.UI
             RelativeSizeAxes = Axes.Both;
         }
 
+        /// <summary>
+        /// Applies the active mods to this HitRenderer.
+        /// </summary>
+        /// <param name="mods"></param>
         private void applyMods(IEnumerable<Mod> mods)
         {
             if (mods == null)
@@ -70,9 +106,18 @@ namespace osu.Game.Modes.UI
                 mod.Apply(this);
         }
 
+        /// <summary>
+        /// Creates a converter to convert Beatmap to a specific mode.
+        /// </summary>
+        /// <returns>The Beatmap converter.</returns>
         protected abstract IBeatmapConverter<TObject> CreateBeatmapConverter();
     }
 
+    /// <summary>
+    /// A derivable HitRenderer that manages the Playfield and HitObjects.
+    /// </summary>
+    /// <typeparam name="TObject">The type of HitObject contained by this HitRenderer.</typeparam>
+    /// <typeparam name="TJudgement">The type of Judgement of DrawableHitObjects contained by this HitRenderer.</typeparam>
     public abstract class HitRenderer<TObject, TJudgement> : HitRenderer<TObject>
         where TObject : HitObject
         where TJudgement : JudgementInfo
@@ -80,6 +125,9 @@ namespace osu.Game.Modes.UI
         protected override Container<Drawable> Content => content;
         protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
 
+        /// <summary>
+        /// The playfield.
+        /// </summary>
         protected Playfield<TObject, TJudgement> Playfield;
 
         private Container content;
@@ -124,13 +172,27 @@ namespace osu.Game.Modes.UI
             Playfield.PostProcess();
         }
 
-        private void onJudgement(DrawableHitObject<TObject, TJudgement> j)
+        /// <summary>
+        /// Triggered when an object's Judgement is updated.
+        /// </summary>
+        /// <param name="judgedObject">The object that Judgement has been updated for.</param>
+        private void onJudgement(DrawableHitObject<TObject, TJudgement> judgedObject)
         {
-            TriggerOnJudgement(j.Judgement);
-            Playfield.OnJudgement(j);
+            TriggerOnJudgement(judgedObject.Judgement);
+            Playfield.OnJudgement(judgedObject);
         }
 
+        /// <summary>
+        /// Creates a DrawableHitObject from a HitObject.
+        /// </summary>
+        /// <param name="h">The HitObject to make drawable.</param>
+        /// <returns>The DrawableHitObject.</returns>
         protected abstract DrawableHitObject<TObject, TJudgement> GetVisualRepresentation(TObject h);
+
+        /// <summary>
+        /// Creates a Playfield.
+        /// </summary>
+        /// <returns>The Playfield.</returns>
         protected abstract Playfield<TObject, TJudgement> CreatePlayfield();
     }
 }

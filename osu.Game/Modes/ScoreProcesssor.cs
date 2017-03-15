@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
-using osu.Game.Modes.Objects.Drawables;
 using System;
 using System.Collections.Generic;
 using osu.Game.Modes.Judgements;
