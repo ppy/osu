@@ -212,14 +212,23 @@ namespace osu.Game.Beatmaps.Formats
                 beatmap.ControlPoints.Add(cp);
         }
 
-        private void handleColours(Beatmap beatmap, string key, string val)
+        private void handleColours(Beatmap beatmap, string key, string val, ref bool hasCustomColours)
         {
             string[] split = val.Split(',');
+
             if (split.Length != 3)
                 throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {val}");
+
             byte r, g, b;
             if (!byte.TryParse(split[0], out r) || !byte.TryParse(split[1], out g) || !byte.TryParse(split[2], out b))
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
+
+            if (!hasCustomColours)
+            {
+                beatmap.ComboColors.Clear();
+                hasCustomColours = true;
+            }
+
             // Note: the combo index specified in the beatmap is discarded
             if (key.StartsWith(@"Combo"))
             {
@@ -236,6 +245,8 @@ namespace osu.Game.Beatmaps.Formats
         protected override void ParseFile(TextReader stream, Beatmap beatmap)
         {
             HitObjectParser parser = null;
+
+            bool hasCustomColours = false;
 
             var section = Section.None;
             while (true)
@@ -265,7 +276,7 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     case Section.General:
                         handleGeneral(beatmap, key, val);
-                        parser = Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).CreateHitObjectParser();
+                        parser = new LegacyHitObjectParser();
                         break;
                     case Section.Editor:
                         handleEditor(beatmap, key, val);
@@ -283,16 +294,14 @@ namespace osu.Game.Beatmaps.Formats
                         handleTimingPoints(beatmap, val);
                         break;
                     case Section.Colours:
-                        handleColours(beatmap, key, val);
+                        handleColours(beatmap, key, val, ref hasCustomColours);
                         break;
                     case Section.HitObjects:
                         var obj = parser?.Parse(val);
 
                         if (obj != null)
-                        {
-                            obj.SetDefaultsFromBeatmap(beatmap);
                             beatmap.HitObjects.Add(obj);
-                        }
+
                         break;
                 }
             }

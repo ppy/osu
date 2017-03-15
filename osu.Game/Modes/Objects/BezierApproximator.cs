@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using OpenTK;
 
-namespace osu.Game.Modes.Osu.Objects
+namespace osu.Game.Modes.Objects
 {
     public class BezierApproximator
     {
