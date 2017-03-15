@@ -12,13 +12,13 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Colour;
 using osu.Game.Modes.Mods;
 using osu.Game.Users;
+using osu.Framework;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public class LeaderboardScore : Container
+    public class LeaderboardScore : Container, IStateful<Visibility>
     {
         private const float height = 70;
         private const float corner_radius = 5;
@@ -45,6 +45,70 @@ namespace osu.Game.Screens.Select.Leaderboards
         private readonly int index;
         public readonly Score Score;
 
+        private Visibility state;
+        public Visibility State
+        {
+            get { return state; }
+            set
+            {
+                state = value;
+
+                switch (state)
+                {
+                    case Visibility.Hidden:
+                        foreach (Drawable d in new Drawable[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, maxCombo, accuracy, modsContainer, })
+                        {
+                            d.FadeOut();
+                        }
+
+                        Alpha = 0;
+
+                        content.MoveToY(75);
+                        avatar.MoveToX(75);
+                        nameLabel.MoveToX(150);
+                        break;
+
+                    case Visibility.Visible:
+                        FadeIn(200);
+                        content.MoveToY(0, 800, EasingTypes.OutQuint);
+
+                        Delay(100);
+                        Schedule(() =>
+                        {
+                            avatar.FadeIn(300, EasingTypes.OutQuint);
+                            nameLabel.FadeIn(350, EasingTypes.OutQuint);
+
+                            avatar.MoveToX(0, 300, EasingTypes.OutQuint);
+                            nameLabel.MoveToX(0, 350, EasingTypes.OutQuint);
+
+                            Delay(250);
+                            Schedule(() =>
+                            {
+                                scoreLabel.FadeIn(200);
+                                scoreRank.FadeIn(200);
+
+                                Delay(50);
+                                Schedule(() =>
+                                {
+                                    var drawables = new Drawable[] { flagBadgeContainer, maxCombo, accuracy, modsContainer, };
+
+                                    for (int i = 0; i < drawables.Length; i++)
+                                    {
+                                        drawables[i].FadeIn(100 + i * 50);
+                                    }
+                                });
+                            });
+                        });
+
+                        break;
+                }
+            }
+        }
+
+        public override void Hide() => State = Visibility.Hidden;
+        public override void Show() => State = Visibility.Visible;
+        public void ToggleVisibility() => State = State == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
+
         protected override bool OnHover(Framework.Input.InputState state)
         {
             background.FadeTo(0.5f, 300, EasingTypes.OutQuint);
@@ -55,57 +119,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             background.FadeTo(background_alpha, 200, EasingTypes.OutQuint);
             base.OnHoverLost(state);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            foreach (Drawable d in new Drawable[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, maxCombo, accuracy, modsContainer, })
-            {
-                d.FadeOut();
-            }
-
-            Alpha = 0;
-
-            content.MoveToY(75);
-            avatar.MoveToX(75);
-            nameLabel.MoveToX(150);
-
-            Delay(index * 50);
-            Schedule(() =>
-            {
-                FadeIn(200);
-                content.MoveToY(0, 800, EasingTypes.OutQuint);
-
-                Delay(100);
-                Schedule(() =>
-                {
-                    avatar.FadeIn(300, EasingTypes.OutQuint);
-                    nameLabel.FadeIn(350, EasingTypes.OutQuint);
-
-                    avatar.MoveToX(0, 300, EasingTypes.OutQuint);
-                    nameLabel.MoveToX(0, 350, EasingTypes.OutQuint);
-
-                    Delay(250);
-                    Schedule(() =>
-                    {
-                        scoreLabel.FadeIn(200);
-                        scoreRank.FadeIn(200);
-
-                        Delay(50);
-                        Schedule(() =>
-                        {
-                            var drawables = new Drawable[] { flagBadgeContainer, maxCombo, accuracy, modsContainer, };
-
-                            for (int i = 0; i < drawables.Length; i++)
-                            {
-                                drawables[i].FadeIn(100 + i * 50);
-                            }
-                        });
-                    });
-                });
-            });
         }
 
         public LeaderboardScore(Score score, int i)
