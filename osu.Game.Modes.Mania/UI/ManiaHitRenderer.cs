@@ -3,13 +3,14 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Mania.Beatmaps;
+using osu.Game.Modes.Mania.Judgements;
 using osu.Game.Modes.Mania.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Mania.UI
 {
-    public class ManiaHitRenderer : HitRenderer<ManiaBaseHit>
+    public class ManiaHitRenderer : HitRenderer<ManiaBaseHit, ManiaJudgementInfo>
     {
         private readonly int columns;
 
@@ -21,9 +22,9 @@ namespace osu.Game.Modes.Mania.UI
 
         protected override IBeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
 
-        protected override Playfield<ManiaBaseHit> CreatePlayfield() => new ManiaPlayfield(columns);
+        protected override Playfield<ManiaBaseHit, ManiaJudgementInfo> CreatePlayfield() => new ManiaPlayfield(columns);
 
-        protected override DrawableHitObject<ManiaBaseHit> GetVisualRepresentation(ManiaBaseHit h)
+        protected override DrawableHitObject<ManiaBaseHit, ManiaJudgementInfo> GetVisualRepresentation(ManiaBaseHit h)
         {
             return null;
             //return new DrawableNote(h)

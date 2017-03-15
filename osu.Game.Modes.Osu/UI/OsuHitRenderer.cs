@@ -11,7 +11,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.Osu.UI
 {
-    public class OsuHitRenderer : HitRenderer<OsuHitObject>
+    public class OsuHitRenderer : HitRenderer<OsuHitObject, OsuJudgementInfo>
     {
         public OsuHitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
@@ -20,11 +20,11 @@ namespace osu.Game.Modes.Osu.UI
 
         protected override IBeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
 
-        protected override Playfield<OsuHitObject> CreatePlayfield() => new OsuPlayfield();
+        protected override Playfield<OsuHitObject, OsuJudgementInfo> CreatePlayfield() => new OsuPlayfield();
 
         protected override KeyConversionInputManager CreateKeyConversionInputManager() => new OsuKeyConversionInputManager();
 
-        protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
+        protected override DrawableHitObject<OsuHitObject, OsuJudgementInfo> GetVisualRepresentation(OsuHitObject h)
         {
             var circle = h as HitCircle;
             if (circle != null)

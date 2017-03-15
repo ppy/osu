@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Beatmaps\CatchBeatmapConverter.cs" />
     <Compile Include="CatchDifficultyCalculator.cs" />
+    <Compile Include="Judgements\CatchJudgementInfo.cs" />
     <Compile Include="Objects\CatchBaseHit.cs" />
     <Compile Include="Objects\Drawable\DrawableFruit.cs" />
     <Compile Include="Objects\Droplet.cs" />

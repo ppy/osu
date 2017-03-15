@@ -52,13 +52,6 @@ namespace osu.Game.Modes.UI
     {
         public Beatmap<TObject> Beatmap;
 
-        protected override Container<Drawable> Content => content;
-        protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
-
-        protected Playfield<TObject> Playfield;
-
-        private Container content;
-
         protected HitRenderer(WorkingBeatmap beatmap)
         {
             Beatmap = CreateBeatmapConverter().Convert(beatmap.Beatmap);
@@ -66,7 +59,34 @@ namespace osu.Game.Modes.UI
             applyMods(beatmap.Mods.Value);
 
             RelativeSizeAxes = Axes.Both;
+        }
 
+        private void applyMods(IEnumerable<Mod> mods)
+        {
+            if (mods == null)
+                return;
+
+            foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
+                mod.Apply(this);
+        }
+
+        protected abstract IBeatmapConverter<TObject> CreateBeatmapConverter();
+    }
+
+    public abstract class HitRenderer<TObject, TJudgement> : HitRenderer<TObject>
+        where TObject : HitObject
+        where TJudgement : JudgementInfo
+    {
+        protected override Container<Drawable> Content => content;
+        protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
+
+        protected Playfield<TObject, TJudgement> Playfield;
+
+        private Container content;
+
+        protected HitRenderer(WorkingBeatmap beatmap)
+            : base(beatmap)
+        {
             KeyConversionInputManager.Add(Playfield = CreatePlayfield());
 
             InputManager.Add(content = new Container
@@ -91,7 +111,7 @@ namespace osu.Game.Modes.UI
         {
             foreach (TObject h in Beatmap.HitObjects)
             {
-                DrawableHitObject<TObject> drawableObject = GetVisualRepresentation(h);
+                var drawableObject = GetVisualRepresentation(h);
 
                 if (drawableObject == null)
                     continue;
@@ -104,19 +124,13 @@ namespace osu.Game.Modes.UI
             Playfield.PostProcess();
         }
 
-        private void applyMods(IEnumerable<Mod> mods)
+        private void onJudgement(DrawableHitObject<TObject, TJudgement> j)
         {
-            if (mods == null)
-                return;
-
-            foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
-                mod.Apply(this);
+            TriggerOnJudgement(j.Judgement);
+            Playfield.OnJudgement(j);
         }
 
-        private void onJudgement(DrawableHitObject<TObject> o, JudgementInfo j) => TriggerOnJudgement(j);
-
-        protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
-        protected abstract Playfield<TObject> CreatePlayfield();
-        protected abstract IBeatmapConverter<TObject> CreateBeatmapConverter();
+        protected abstract DrawableHitObject<TObject, TJudgement> GetVisualRepresentation(TObject h);
+        protected abstract Playfield<TObject, TJudgement> CreatePlayfield();
     }
 }

@@ -6,15 +6,17 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
+using osu.Game.Modes.Judgements;
 
 namespace osu.Game.Modes.UI
 {
-    public abstract class Playfield<T> : Container
-        where T : HitObject
+    public abstract class Playfield<TObject, TJudgement> : Container
+        where TObject : HitObject
+        where TJudgement : JudgementInfo
     {
-        public HitObjectContainer<DrawableHitObject<T>> HitObjects;
+        public HitObjectContainer<DrawableHitObject<TObject, TJudgement>> HitObjects;
 
-        public virtual void Add(DrawableHitObject<T> h) => HitObjects.Add(h);
+        public virtual void Add(DrawableHitObject<TObject, TJudgement> h) => HitObjects.Add(h);
 
         internal Container<Drawable> ScaledContent;
 
@@ -43,7 +45,7 @@ namespace osu.Game.Modes.UI
                 }
             });
 
-            Add(HitObjects = new HitObjectContainer<DrawableHitObject<T>>
+            Add(HitObjects = new HitObjectContainer<DrawableHitObject<TObject, TJudgement>>
             {
                 RelativeSizeAxes = Axes.Both,
             });
@@ -70,5 +72,7 @@ namespace osu.Game.Modes.UI
         {
             public override bool Contains(Vector2 screenSpacePos) => true;
         }
+
+        public virtual void OnJudgement(DrawableHitObject<TObject, TJudgement> judgedObject) { }
     }
 }
