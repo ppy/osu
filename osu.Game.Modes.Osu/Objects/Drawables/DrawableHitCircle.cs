@@ -44,7 +44,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     {
                         if (Judgement.Result.HasValue) return false;
 
-                        ((PositionalJudgementInfo)Judgement).PositionOffset = Vector2.Zero; //todo: set to correct value
+                        Judgement.PositionOffset = Vector2.Zero; //todo: set to correct value
                         UpdateJudgement(true);
                         return true;
                     },
@@ -80,12 +80,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             double hitOffset = Math.Abs(Judgement.TimeOffset);
 
-            OsuJudgementInfo osuJudgement = (OsuJudgementInfo)Judgement;
-
             if (hitOffset < HitObject.HitWindowFor(OsuScoreResult.Hit50))
             {
                 Judgement.Result = HitResult.Hit;
-                osuJudgement.Score = HitObject.ScoreResultForOffset(hitOffset);
+                Judgement.Score = HitObject.ScoreResultForOffset(hitOffset);
             }
             else
                 Judgement.Result = HitResult.Miss;

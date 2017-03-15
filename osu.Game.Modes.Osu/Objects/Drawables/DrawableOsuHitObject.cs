@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.ComponentModel;
-using osu.Game.Modes.Judgements;
 using osu.Game.Modes.Objects.Drawables;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables

@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps.Samples;
-using osu.Game.Modes.Judgements;
 using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
@@ -72,12 +71,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void CheckJudgement(bool userTriggered)
         {
-            var j = (OsuJudgementInfo)Judgement;
-
             if (Judgement.TimeOffset >= 0)
             {
-                j.Result = Tracking ? HitResult.Hit : HitResult.Miss;
-                j.Score = Tracking ? OsuScoreResult.SliderTick : OsuScoreResult.Miss;
+                Judgement.Result = Tracking ? HitResult.Hit : HitResult.Miss;
+                Judgement.Score = Tracking ? OsuScoreResult.SliderTick : OsuScoreResult.Miss;
             }
         }
         

@@ -14,16 +14,15 @@ namespace osu.Game.Modes.UI
         where TObject : HitObject
         where TJudgement : JudgementInfo
     {
+        /// <summary>
+        /// The HitObjects contained in this Playfield.
+        /// </summary>
         public HitObjectContainer<DrawableHitObject<TObject, TJudgement>> HitObjects;
-
-        public virtual void Add(DrawableHitObject<TObject, TJudgement> h) => HitObjects.Add(h);
+        public override bool Contains(Vector2 screenSpacePos) => true;
 
         internal Container<Drawable> ScaledContent;
 
-        public override bool Contains(Vector2 screenSpacePos) => true;
-
         protected override Container<Drawable> Content => content;
-
         private Container<Drawable> content;
 
         /// <summary>
@@ -51,9 +50,22 @@ namespace osu.Game.Modes.UI
             });
         }
 
-        public virtual void PostProcess()
-        {
-        }
+        /// <summary>
+        /// Performs post-processing tasks (if any) after all DrawableHitObjects are loaded into this Playfield.
+        /// </summary>
+        public virtual void PostProcess() { }
+
+        /// <summary>
+        /// Adds a DrawableHitObject to this Playfield.
+        /// </summary>
+        /// <param name="h">The DrawableHitObject to add.</param>
+        public virtual void Add(DrawableHitObject<TObject, TJudgement> h) => HitObjects.Add(h);
+
+        /// <summary>
+        /// Triggered when an object's Judgement is updated.
+        /// </summary>
+        /// <param name="judgedObject">The object that Judgement has been updated for.</param>
+        public virtual void OnJudgement(DrawableHitObject<TObject, TJudgement> judgedObject) { }
 
         private class ScaledContainer : Container
         {
@@ -72,7 +84,5 @@ namespace osu.Game.Modes.UI
         {
             public override bool Contains(Vector2 screenSpacePos) => true;
         }
-
-        public virtual void OnJudgement(DrawableHitObject<TObject, TJudgement> judgedObject) { }
     }
 }
