@@ -3,10 +3,7 @@
 
 using System.Collections.Generic;
 using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Modes;
@@ -39,9 +36,17 @@ namespace osu.Game.Screens.Select.Leaderboards
                 i = 0;
                 foreach(var s in scores)
                 {
-                    scrollFlow.Add(new LeaderboardScore(s, 1 + i++)
+                    var ls = new LeaderboardScore(s, 1 + i++)
                     {
-                        AlwaysPresent = true
+                        AlwaysPresent = true,
+                        State = Visibility.Hidden,
+                    };
+                    scrollFlow.Add(ls);
+
+                    ls.Delay(i * 50);
+                    ls.Schedule(() =>
+                    {
+                        ls.Show();
                     });
                 }
 
