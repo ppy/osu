@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         };
 
         private Box background;
-        private Container content, avatarContainer;
+        private Container content, avatar;
         private DrawableRank scoreRank;
         private OsuSpriteText nameLabel;
         private GlowingSpriteText scoreLabel;
@@ -63,13 +63,13 @@ namespace osu.Game.Screens.Select.Leaderboards
             // TODO: This fade to 0.01 is hacky, find a better way
             FadeTo(0.01f);
 
-            foreach (Drawable d in new Drawable[] { avatarContainer, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, maxCombo, accuracy, modsContainer, })
+            foreach (Drawable d in new Drawable[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, maxCombo, accuracy, modsContainer, })
             {
                 d.FadeOut();
             }
 
             content.MoveToY(75);
-            avatarContainer.MoveToX(75);
+            avatar.MoveToX(75);
             nameLabel.MoveToX(150);
 
             Delay(index * 50);
@@ -81,10 +81,10 @@ namespace osu.Game.Screens.Select.Leaderboards
                 Delay(100);
                 Schedule(() =>
                 {
-                    avatarContainer.FadeIn(300, EasingTypes.OutQuint);
+                    avatar.FadeIn(300, EasingTypes.OutQuint);
                     nameLabel.FadeIn(350, EasingTypes.OutQuint);
 
-                    avatarContainer.MoveToX(0, 300, EasingTypes.OutQuint);
+                    avatar.MoveToX(0, 300, EasingTypes.OutQuint);
                     nameLabel.MoveToX(0, 350, EasingTypes.OutQuint);
 
                     Delay(250);
@@ -165,21 +165,13 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Padding = new MarginPadding(edge_margin),
                             Children = new Drawable[]
                             {
-                                avatarContainer = new Container
+                                avatar = new Avatar
                                 {
                                     Size = new Vector2(height - edge_margin * 2, height - edge_margin * 2),
                                     CornerRadius = corner_radius,
                                     Masking = true,
                                     EdgeEffect = imageShadow,
-                                    Children = new Drawable[]
-                                    {
-                                        new Avatar
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            UserId = Score.User.Id,
-                                            Masking = false,
-                                        },
-                                    },
+                                    UserId = Score.User?.Id ?? Score.UserID,
                                 },
                                 new Container
                                 {
