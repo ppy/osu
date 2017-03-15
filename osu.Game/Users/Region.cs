@@ -57,7 +57,7 @@ namespace osu.Game.Users
             sprite.Texture = textures.Get($@"Flags/{flagName}");
         }
 
-        public DrawableFlag(string name)
+        public DrawableFlag(string name = @"__")
         {
             flagName = name;
 
