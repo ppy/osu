@@ -46,7 +46,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Alpha = 0,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    DiscColour = s.Colour
+                    DiscColour = s.ComboColour
                 },
                 circleContainer = new Container
                 {
@@ -80,7 +80,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             if (Progress >= 1)
                 disc.Complete = true;
 
-            if (!userTriggered && Time.Current >= HitObject.EndTime)
+            if (!userTriggered && Time.Current >= spinner.EndTime)
             {
                 if (Progress >= 1)
                 {
@@ -100,7 +100,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 else
                 {
                     Judgement.Score = OsuScoreResult.Miss;
-                    if (Time.Current >= HitObject.EndTime)
+                    if (Time.Current >= spinner.EndTime)
                         Judgement.Result = HitResult.Miss;
                 }
             }
@@ -138,7 +138,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             base.UpdateState(state);
 
-            Delay(HitObject.Duration, true);
+            Delay(spinner.Duration, true);
 
             FadeOut(160);
 

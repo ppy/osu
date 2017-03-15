@@ -10,6 +10,7 @@ using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Judgements;
 using Container = osu.Framework.Graphics.Containers.Container;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Objects.Drawables
 {
@@ -89,7 +90,9 @@ namespace osu.Game.Modes.Objects.Drawables
             if (Judgement.Result != null)
                 return false;
 
-            Judgement.TimeOffset = Time.Current - HitObject.EndTime;
+            double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+
+            Judgement.TimeOffset = Time.Current - endTime;
 
             CheckJudgement(userTriggered);
 

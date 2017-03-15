@@ -60,7 +60,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Position = s.StackedPosition,
                     ComboIndex = s.ComboIndex,
                     Scale = s.Scale,
-                    Colour = s.Colour,
+                    ComboColour = s.ComboColour,
                     Sample = s.Sample,
                 }),
             };
@@ -72,7 +72,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             AddNested(initialCircle);
 
-            var repeatDuration = s.Curve.Length / s.Velocity;
+            var repeatDuration = s.Curve.Distance / s.Velocity;
             foreach (var tick in s.Ticks)
             {
                 var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
@@ -104,7 +104,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             double progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             int repeat = slider.RepeatAt(progress);
-            progress = slider.CurveProgressAt(progress);
+            progress = slider.ProgressAt(progress);
 
             if (repeat > currentRepeat)
             {
@@ -125,7 +125,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void CheckJudgement(bool userTriggered)
         {
-            if (!userTriggered && Time.Current >= HitObject.EndTime)
+            if (!userTriggered && Time.Current >= slider.EndTime)
             {
                 var ticksCount = ticks.Children.Count() + 1;
                 var ticksHit = ticks.Children.Count(t => t.Judgement.Result == HitResult.Hit);
@@ -162,7 +162,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             ball.FadeIn();
 
-            Delay(HitObject.Duration, true);
+            Delay(slider.Duration, true);
 
             body.FadeOut(160);
             ball.FadeOut(160);
