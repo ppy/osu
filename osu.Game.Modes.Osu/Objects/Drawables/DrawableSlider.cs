@@ -72,7 +72,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             AddNested(initialCircle);
 
-            var repeatDuration = s.Curve.Length / s.Velocity;
+            var repeatDuration = s.Curve.Distance / s.Velocity;
             foreach (var tick in s.Ticks)
             {
                 var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
@@ -104,7 +104,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             double progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             int repeat = slider.RepeatAt(progress);
-            progress = slider.CurveProgressAt(progress);
+            progress = slider.ProgressAt(progress);
 
             if (repeat > currentRepeat)
             {

@@ -94,11 +94,15 @@
     <Compile Include="Modes\LegacyReplay.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
+    <Compile Include="Modes\Objects\BezierApproximator.cs" />
+    <Compile Include="Modes\Objects\CircularArcApproximator.cs" />
+    <Compile Include="Modes\Objects\CurvedHitObject.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacyHit.cs" />
     <Compile Include="Modes\Objects\LegacyHitObjectParser.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacyHold.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacySlider.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacySpinner.cs" />
+    <Compile Include="Modes\Objects\SliderCurve.cs" />
     <Compile Include="Modes\Objects\Types\CurveType.cs" />
     <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />

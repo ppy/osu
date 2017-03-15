@@ -34,10 +34,8 @@ namespace osu.Game.Modes.Osu.Beatmaps
         private OsuHitObject convertHitObject(HitObject original)
         {
             IHasCurve curveData = original as IHasCurve;
-            IHasDistance distanceData = original as IHasDistance;
             IHasEndTime endTimeData = original as IHasEndTime;
             IHasPosition positionData = original as IHasPosition;
-            IHasRepeats repeatsData = original as IHasRepeats;
             IHasCombo comboData = original as IHasCombo;
 
             if (curveData != null)
@@ -47,16 +45,11 @@ namespace osu.Game.Modes.Osu.Beatmaps
                     StartTime = original.StartTime,
                     Sample = original.Sample,
 
-                    CurveType = curveData.CurveType,
-                    ControlPoints = curveData.ControlPoints,
+                    CurveObject = curveData,
 
                     Position = positionData?.Position ?? Vector2.Zero,
 
-                    NewCombo = comboData?.NewCombo ?? false,
-
-                    Distance = distanceData?.Distance ?? 0,
-
-                    RepeatCount = repeatsData?.RepeatCount ?? 0
+                    NewCombo = comboData?.NewCombo ?? false
                 };
             }
 
@@ -68,7 +61,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
                     Sample = original.Sample,
                     Position = new Vector2(512, 384) / 2,
 
-                    EndTime = endTimeData.EndTime,
+                    EndTime = endTimeData.EndTime
                 };
             }
 

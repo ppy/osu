@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens.Testing;
 using osu.Framework.Timing;
+using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
@@ -60,12 +61,15 @@ namespace osu.Desktop.VisualTests.Tests
                     add(new DrawableSlider(new Slider
                     {
                         StartTime = framedClock.CurrentTime + 600,
-                        ControlPoints = new List<Vector2>
+                        CurveObject = new CurvedHitObject
                         {
-                            new Vector2(-200, 0),
-                            new Vector2(400, 0),
+                            ControlPoints = new List<Vector2>
+                            {
+                                new Vector2(-200, 0),
+                                new Vector2(400, 0),
+                            },
+                            Distance = 400
                         },
-                        Distance = 400,
                         Position = new Vector2(-200, 0),
                         Velocity = 1,
                         TickDistance = 100,
