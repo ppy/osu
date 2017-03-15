@@ -3,7 +3,7 @@
 
 using osu.Game.Modes.Judgements;
 using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Modes.Osu.Objects.Drawables;
+using osu.Game.Modes.Osu.Judgements;
 
 namespace osu.Game.Modes.Osu
 {

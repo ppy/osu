@@ -9,7 +9,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Judgements;
-using OpenTK;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Modes.Objects.Drawables
@@ -152,10 +151,5 @@ namespace osu.Game.Modes.Objects.Drawables
             h.OnJudgement += d => OnJudgement?.Invoke(d);
             nestedHitObjects.Add(h);
         }
-    }
-
-    public class PositionalJudgementInfo : JudgementInfo
-    {
-        public Vector2 PositionOffset;
     }
 }
