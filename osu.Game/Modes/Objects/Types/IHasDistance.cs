@@ -4,12 +4,12 @@
 namespace osu.Game.Modes.Objects.Types
 {
     /// <summary>
-    /// A HitObject that has a distance.
+    /// A HitObject that has a positional length.
     /// </summary>
     public interface IHasDistance : IHasEndTime
     {
         /// <summary>
-        /// The distance of the HitObject.
+        /// The positional length of the HitObject.
         /// </summary>
         double Distance { get; }
     }
