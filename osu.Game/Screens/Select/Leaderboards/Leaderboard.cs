@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Modes;
 
 namespace osu.Game.Screens.Select.Leaderboards
@@ -53,6 +54,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Spacing = new Vector2(0f, 5f),
+                            Padding = new MarginPadding(5),
                         },
                     },
                 },
