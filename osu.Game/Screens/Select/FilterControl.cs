@@ -49,8 +49,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private TabControl<GroupMode> groupTabs;
-        private TabControl<SortMode> sortTabs;
         private OsuSpriteText spriteText;
 
         public Action Exit;
@@ -59,6 +57,9 @@ namespace osu.Game.Screens.Select
 
         public FilterControl(float height)
         {
+            TabControl<SortMode> sortTabs;
+            TabControl<GroupMode> groupTabs;
+
             Children = new Drawable[]
             {
                 new Box
