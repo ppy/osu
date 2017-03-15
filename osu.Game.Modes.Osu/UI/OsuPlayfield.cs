@@ -11,6 +11,7 @@ using osu.Game.Modes.Osu.Objects.Drawables.Connections;
 using osu.Game.Modes.UI;
 using System.Linq;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Modes.Osu.Judgements;
 using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.UI
