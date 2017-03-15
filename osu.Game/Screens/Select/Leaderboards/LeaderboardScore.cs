@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Children = new Drawable[]
                                                     {
                                                         maxCombo = new ScoreComponentLabel(FontAwesome.fa_link, Score.MaxCombo.ToString()),
-                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_crosshairs, string.Format(Score.Accuracy % 1 == 0 ? "{0:0}" : "{0:0.00}", Score.Accuracy)),
+                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_crosshairs, string.Format(Score.Accuracy % 1 == 0 ? @"{0:0}" : @"{0:0.00}", Score.Accuracy)),
                                                     },
                                                 },
                                             },
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     Size = new Vector2(score_rank_size),
                                     Position = new Vector2(0f, -10f),
                                 },
-                                scoreLabel = new GlowingSpriteText(Score.TotalScore.ToString("N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa"))
+                                scoreLabel = new GlowingSpriteText(Score.TotalScore.ToString(@"N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa"))
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
