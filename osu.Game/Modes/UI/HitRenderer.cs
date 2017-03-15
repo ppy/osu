@@ -12,6 +12,7 @@ using osu.Game.Screens.Play;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Modes.Judgements;
 
 namespace osu.Game.Modes.UI
 {

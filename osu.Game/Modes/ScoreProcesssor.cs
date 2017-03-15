@@ -5,6 +5,7 @@ using osu.Framework.Configuration;
 using osu.Game.Modes.Objects.Drawables;
 using System;
 using System.Collections.Generic;
+using osu.Game.Modes.Judgements;
 
 namespace osu.Game.Modes
 {
