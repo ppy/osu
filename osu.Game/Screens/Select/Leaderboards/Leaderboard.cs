@@ -23,12 +23,17 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 scores = value;
 
+                int i = 0;
+                if (scores == null)
+                {
+                    foreach (var c in scrollFlow.Children)
+                        c.FadeOut(150 + i++ * 10);
+                    return;
+                }
+
                 scrollFlow.Clear();
 
-                if (scores == null)
-                    return;
-
-                int i = 0;
+                i = 0;
                 foreach(var s in scores)
                 {
                     scrollFlow.Add(new LeaderboardScore(s, 1 + i++)
