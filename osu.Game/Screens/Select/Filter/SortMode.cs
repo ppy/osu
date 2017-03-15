@@ -7,7 +7,6 @@ namespace osu.Game.Screens.Select.Filter
 {
     public enum SortMode
     {
-        None = 0,
         [Description("Artist")]
         Artist,
         [Description("Author")]

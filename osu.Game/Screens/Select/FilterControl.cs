@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Allocation;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -35,6 +35,23 @@ namespace osu.Game.Screens.Select
                 }
             } 
         }
+
+        private GroupMode group = GroupMode.All;
+        public GroupMode Group {
+            get { return group; }
+            set
+            {
+                if (group != value)
+                {
+                    group = value;
+                    FilterChanged?.Invoke();
+                }
+            }
+        }
+
+        private TabControl<GroupMode> groupTabs;
+        private TabControl<SortMode> sortTabs;
+        private OsuSpriteText spriteText;
 
         public Action Exit;
 
@@ -72,10 +89,61 @@ namespace osu.Game.Screens.Select
                             },
                             Exit = () => Exit?.Invoke(),
                         },
-                        new GroupSortTabs()
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 1,
+                                    Colour = OsuColour.Gray(80),
+                                    Origin = Anchor.TopLeft,
+                                    Anchor = Anchor.TopLeft,
+                                    Position = new Vector2(0, 23)
+                                },
+                                groupTabs = new FilterTabControl<GroupMode>
+                                {
+                                    Width = 230,
+                                    AutoSort = true
+                                },
+                                new Container
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Children = new Drawable[]
+                                    {
+                                        spriteText = new OsuSpriteText
+                                        {
+                                            Font = @"Exo2.0-Bold",
+                                            Text = "Sort results by",
+                                            TextSize = 14,
+                                            Margin = new MarginPadding
+                                            {
+                                                Top = 5,
+                                                Bottom = 5
+                                            },
+                                        },
+                                        sortTabs = new FilterTabControl<SortMode>(87)
+                                        {
+                                            Width = 191,
+                                            AutoSort = true
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             };
+
+            groupTabs.PinTab(GroupMode.All);
+            groupTabs.PinTab(GroupMode.RecentlyPlayed);
+            groupTabs.ValueChanged += (sender, value) => Group = value;
+            sortTabs.ValueChanged += (sender, value) => Sort = value;
         }
 
         public void Deactivate()
@@ -89,66 +157,10 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = true;
         }
 
-        private class GroupSortTabs : Container
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            private TabControl<GroupMode> groupTabs;
-            private TabControl<SortMode> sortTabs;
-            private OsuSpriteText spriteText;
-
-            public GroupSortTabs()
-            {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 1,
-                        Colour = OsuColour.Gray(80),
-                        Origin = Anchor.TopLeft,
-                        Anchor = Anchor.TopLeft,
-                        Position = new Vector2(0, 23)
-                    },
-                    groupTabs = new FilterTabControl<GroupMode>
-                    {
-                        Width = 230,
-                        AutoSort = true
-                    },
-                    new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Children = new Drawable[]
-                        {
-                            spriteText = new OsuSpriteText
-                            {
-                                Font = @"Exo2.0-Bold",
-                                Text = "Sort results by",
-                                TextSize = 14,
-                                Margin = new MarginPadding
-                                {
-                                    Top = 5,
-                                    Bottom = 5
-                                },
-                            },
-                            sortTabs = new FilterTabControl<SortMode>(87)
-                            {
-                                Width = 191,
-                                AutoSort = true
-                            }
-                        }
-                    }
-                };
-                groupTabs.PinTab(GroupMode.All);
-                groupTabs.PinTab(GroupMode.RecentlyPlayed);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours) {
-                spriteText.Colour = colours.GreenLight;
-            }
+            spriteText.Colour = colours.GreenLight;
         }
     }
 }
