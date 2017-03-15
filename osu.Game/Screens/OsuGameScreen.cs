@@ -69,6 +69,8 @@ namespace osu.Game.Screens
 
             BackgroundScreen bg = CreateBackground();
 
+            OnBeatmapChanged(Beatmap);
+
             if (lastOsu?.Background != null)
             {
                 if (bg == null || lastOsu.Background.Equals(bg))
