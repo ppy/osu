@@ -123,7 +123,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private int depth;
 
-        private void add(DrawableHitObject h)
+        private void add(DrawableHitObject<OsuJudgementInfo> h)
         {
             h.Anchor = Anchor.Centre;
             h.Depth = depth++;
