@@ -186,6 +186,7 @@
     <Compile Include="Screens\Ranking\Results.cs" />
     <Compile Include="Screens\Direct\OnlineListing.cs" />
     <Compile Include="Screens\Select\PlaySongSelect.cs" />
+    <Compile Include="Screens\Select\SongSelect.cs" />
     <Compile Include="Modes\UI\HitRenderer.cs" />
     <Compile Include="Modes\UI\Playfield.cs" />
     <Compile Include="Screens\Select\EditSongSelect.cs" />
@@ -324,11 +325,7 @@
     <Compile Include="Overlays\Mods\AssistedSection.cs" />
     <Compile Include="Overlays\WaveOverlayContainer.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
-    <Compile Include="Screens\Select\Options\BeatmapOptionsClearLocalScoresButton.cs" />
-    <Compile Include="Screens\Select\Options\BeatmapOptionsDeleteButton.cs" />
-    <Compile Include="Screens\Select\Options\BeatmapOptionsEditButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
-    <Compile Include="Screens\Select\Options\BeatmapOptionsRemoveFromUnplayedButton.cs" />
     <Compile Include="IO\ArchiveReader.cs" />
   </ItemGroup>
   <ItemGroup>
