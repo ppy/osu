@@ -52,19 +52,23 @@ namespace osu.Game.Screens.Select
             }, Key.Number3);
         }
 
+        private GetScoresRequest getScoresRequest;
+
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
 
             leaderboard.Scores = null;
+            getScoresRequest?.Cancel();
+
             if (beatmap != null)
             {
-                var getScores = new GetScoresRequest(beatmap.BeatmapInfo);
-                getScores.Success += res =>
+                getScoresRequest = new GetScoresRequest(beatmap.BeatmapInfo);
+                getScoresRequest.Success += res =>
                 {
                     leaderboard.Scores = res.Scores;
                 };
-                Game.API.Queue(getScores);
+                Game.API.Queue(getScoresRequest);
             }
 
             base.OnBeatmapChanged(beatmap);
