@@ -66,12 +66,30 @@ namespace osu.Game.Users
             });
         }
 
+        private double timeVisible;
+
+        private bool shouldUpdate => Sprite != null || timeVisible > 500;
+
         protected override void Update()
         {
             base.Update();
 
-            //todo: should only be run when we are visible to the user.
-            updateSprite();
+            if (!shouldUpdate)
+            {
+                //Special optimisation to not start loading until we are within bounds of our closest ScrollContainer parent.
+                ScrollContainer scroll = null;
+                IContainer cursor = this;
+                while (scroll == null && (cursor = cursor.Parent) != null)
+                    scroll = cursor as ScrollContainer;
+
+                if (scroll?.ScreenSpaceDrawQuad.Intersects(ScreenSpaceDrawQuad) ?? true)
+                    timeVisible += Time.Elapsed;
+                else
+                    timeVisible = 0;
+            }
+
+            if (shouldUpdate)
+                updateSprite();
         }
 
         public class OnlineSprite : Sprite
