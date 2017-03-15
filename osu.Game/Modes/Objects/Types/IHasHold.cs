@@ -6,7 +6,7 @@ namespace osu.Game.Modes.Objects.Types
     /// <summary>
     /// A special type of HitObject, mostly used for legacy conversion of "holds".
     /// </summary>
-    public interface IHasSpecial
+    public interface IHasHold
     {
     }
 }
