@@ -3,9 +3,10 @@
 
 namespace osu.Game.Screens.Select
 {
-    internal class EditSongSelect : SongSelect
+    public class EditSongSelect : SongSelect
     {
-        public EditSongSelect() : base(false) { }
+        protected override bool ShowFooter => false;
+
         protected override void OnSelected() => Exit();
     }
 }

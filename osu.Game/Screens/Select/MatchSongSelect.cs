@@ -3,9 +3,8 @@
 
 namespace osu.Game.Screens.Select
 {
-    internal class MatchSongSelect : SongSelect
+    public class MatchSongSelect : SongSelect
     {
-        public MatchSongSelect() : base(true) { }
         protected override void OnSelected() => Exit();
     }
 }
