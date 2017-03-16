@@ -60,7 +60,7 @@ namespace osu.Game.Modes
         };
 
         /// <summary>
-        /// Resets this ScoreProcessor to a stale state.
+        /// Resets this ScoreProcessor to a default state.
         /// </summary>
         protected virtual void Reset()
         {
