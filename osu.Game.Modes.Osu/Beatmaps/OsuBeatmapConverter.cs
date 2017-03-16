@@ -1,13 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using System.Collections.Generic;
+using osu.Game.Modes.Objects.Types;
+using System.Linq;
 
 namespace osu.Game.Modes.Osu.Beatmaps
 {
@@ -17,26 +18,62 @@ namespace osu.Game.Modes.Osu.Beatmaps
         {
             return new Beatmap<OsuHitObject>(original)
             {
-                HitObjects = convertHitObject(original.HitObjects, original.BeatmapInfo?.StackLeniency ?? 0.7f)
+                HitObjects = convertHitObjects(original.HitObjects, original.BeatmapInfo?.StackLeniency ?? 0.7f)
             };
         }
 
-        private List<OsuHitObject> convertHitObject(List<HitObject> hitObjects, float stackLeniency)
+        private List<OsuHitObject> convertHitObjects(List<HitObject> hitObjects, float stackLeniency)
         {
-            List<OsuHitObject> converted = new List<OsuHitObject>();
-
-            int combo = 0;
-            foreach (HitObject h in hitObjects)
-            {
-                if (h.NewCombo) combo = 0;
-
-                h.ComboIndex = combo++;
-                converted.Add(h as OsuHitObject);
-            }
+            List<OsuHitObject> converted = hitObjects.Select(convertHitObject).ToList();
 
             updateStacking(converted, stackLeniency);
 
             return converted;
+        }
+
+        private OsuHitObject convertHitObject(HitObject original)
+        {
+            IHasCurve curveData = original as IHasCurve;
+            IHasEndTime endTimeData = original as IHasEndTime;
+            IHasPosition positionData = original as IHasPosition;
+            IHasCombo comboData = original as IHasCombo;
+
+            if (curveData != null)
+            {
+                return new Slider
+                {
+                    StartTime = original.StartTime,
+                    Sample = original.Sample,
+
+                    CurveObject = curveData,
+
+                    Position = positionData?.Position ?? Vector2.Zero,
+
+                    NewCombo = comboData?.NewCombo ?? false
+                };
+            }
+
+            if (endTimeData != null)
+            {
+                return new Spinner
+                {
+                    StartTime = original.StartTime,
+                    Sample = original.Sample,
+                    Position = new Vector2(512, 384) / 2,
+
+                    EndTime = endTimeData.EndTime
+                };
+            }
+
+            return new HitCircle
+            {
+                StartTime = original.StartTime,
+                Sample = original.Sample,
+
+                Position = positionData?.Position ?? Vector2.Zero,
+
+                NewCombo = comboData?.NewCombo ?? false
+            };
         }
 
         private void updateStacking(List<OsuHitObject> hitObjects, float stackLeniency, int startIndex = 0, int endIndex = -1)
@@ -62,9 +99,12 @@ namespace osu.Game.Modes.Osu.Beatmaps
                     if (stackBaseObject is Spinner) break;
 
                     OsuHitObject objectN = hitObjects[n];
-                    if (objectN is Spinner) continue;
+                    if (objectN is Spinner)
+                        continue;
 
-                    if (objectN.StartTime - stackBaseObject.EndTime > stackThreshold)
+                    double endTime = (stackBaseObject as IHasEndTime)?.EndTime ?? stackBaseObject.StartTime;
+
+                    if (objectN.StartTime - endTime > stackThreshold)
                         //We are no longer within stacking range of the next object.
                         break;
 
@@ -116,7 +156,9 @@ namespace osu.Game.Modes.Osu.Beatmaps
                         OsuHitObject objectN = hitObjects[n];
                         if (objectN is Spinner) continue;
 
-                        if (objectI.StartTime - objectN.EndTime > stackThreshold)
+                        double endTime = (objectN as IHasEndTime)?.EndTime ?? objectN.StartTime;
+
+                        if (objectI.StartTime - endTime > stackThreshold)
                             //We are no longer within stacking range of the previous object.
                             break;
 

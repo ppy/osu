@@ -51,7 +51,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     {
                         new Box
                         {
-                            Colour = slider.Colour,
+                            Colour = slider.ComboColour,
                             Alpha = 0.4f,
                             Width = width,
                             Height = width,

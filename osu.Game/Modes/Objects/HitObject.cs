@@ -1,30 +1,26 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Samples;
-using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Objects
 {
     /// <summary>
-    /// A hitobject describes a point in a beatmap 
+    /// A HitObject describes an object in a Beatmap.
+    /// <para>
+    /// HitObjects may contain more properties for which you should be checking through the IHas* types.
+    /// </para>
     /// </summary>
-    public abstract class HitObject
+    public class HitObject
     {
-        public double StartTime;
-        public virtual double EndTime => StartTime;
+        /// <summary>
+        /// The time at which the HitObject starts.
+        /// </summary>
+        public double StartTime { get; set; }
 
-        public bool NewCombo { get; set; }
-
-        public Color4 Colour = new Color4(17, 136, 170, 255);
-
-        public double Duration => EndTime - StartTime;
-
-        public HitSampleInfo Sample;
-
-        public int ComboIndex;
-
-        public virtual void SetDefaultsFromBeatmap(Beatmap beatmap) { }
+        /// <summary>
+        /// The sample to be played when this HitObject is hit.
+        /// </summary>
+        public HitSampleInfo Sample { get; set; }
     }
 }
