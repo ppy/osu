@@ -3,7 +3,6 @@
 
 using osu.Game.Modes.Objects;
 using OpenTK;
-using osu.Game.Beatmaps;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Game.Modes.Objects.Types;
 using OpenTK.Graphics;
@@ -67,9 +66,11 @@ namespace osu.Game.Modes.Osu.Objects
             return OsuScoreResult.Miss;
         }
 
-        public virtual void SetDefaultsFromBeatmap(Beatmap<OsuHitObject> beatmap)
+        public override void ApplyDefaults(HitObjectDefaults defaults)
         {
-            Scale = (1.0f - 0.7f * (beatmap.BeatmapInfo.Difficulty.CircleSize - 5) / 5) / 2;
+            base.ApplyDefaults(defaults);
+
+            Scale = (1.0f - 0.7f * (defaults.Difficulty.CircleSize - 5) / 5) / 2;
         }
     }
 }

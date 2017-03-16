@@ -100,6 +100,7 @@
     <Compile Include="Modes\Objects\BezierApproximator.cs" />
     <Compile Include="Modes\Objects\CircularArcApproximator.cs" />
     <Compile Include="Modes\Objects\CurvedHitObject.cs" />
+    <Compile Include="Modes\Objects\HitObjectDefaults.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacyHit.cs" />
     <Compile Include="Modes\Objects\LegacyHitObjectParser.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacyHold.cs" />

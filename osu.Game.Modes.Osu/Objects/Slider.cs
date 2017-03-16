@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes.Objects.Types;
@@ -47,19 +46,17 @@ namespace osu.Game.Modes.Osu.Objects
         public double Velocity;
         public double TickDistance;
 
-        public override void SetDefaultsFromBeatmap(Beatmap<OsuHitObject> beatmap)
+        public override void ApplyDefaults(HitObjectDefaults defaults)
         {
-            base.SetDefaultsFromBeatmap(beatmap);
-
-            var baseDifficulty = beatmap.BeatmapInfo.Difficulty;
+            base.ApplyDefaults(defaults);
 
             ControlPoint overridePoint;
-            ControlPoint timingPoint = beatmap.TimingInfo.TimingPointAt(StartTime, out overridePoint);
+            ControlPoint timingPoint = defaults.Timing.TimingPointAt(StartTime, out overridePoint);
             var velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
-            var baseVelocity = 100 * baseDifficulty.SliderMultiplier / velocityAdjustment;
+            var baseVelocity = 100 * defaults.Difficulty.SliderMultiplier / velocityAdjustment;
 
             Velocity = baseVelocity / timingPoint.BeatLength;
-            TickDistance = baseVelocity / baseDifficulty.SliderTickRate;
+            TickDistance = baseVelocity / defaults.Difficulty.SliderTickRate;
         }
 
         public IEnumerable<SliderTick> Ticks
