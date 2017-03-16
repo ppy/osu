@@ -22,6 +22,7 @@ namespace osu.Desktop.VisualTests.Tests
             OsuTabControl<GroupMode> filter;
             Add(filter = new OsuTabControl<GroupMode>
             {
+                Margin = new MarginPadding(4),
                 Size = new Vector2(229, 24),
                 AutoSort = true
             });
