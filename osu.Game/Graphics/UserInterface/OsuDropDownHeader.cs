@@ -21,6 +21,17 @@ namespace osu.Game.Graphics.UserInterface
             set { label.Text = value; }
         }
 
+        private Color4? accentColour;
+        public virtual Color4 AccentColour
+        {
+            get { return accentColour.GetValueOrDefault(); }
+            set
+            {
+                accentColour = value;
+                BackgroundColourHover = value;
+            }
+        }
+
         public OsuDropDownHeader()
         {
             Foreground.Padding = new MarginPadding(4);
@@ -30,7 +41,7 @@ namespace osu.Game.Graphics.UserInterface
             CornerRadius = 4;
             Height = 40;
 
-            Children = new[]
+            Foreground.Children = new Drawable[]
             {
                 label = new OsuSpriteText
                 {
@@ -51,7 +62,7 @@ namespace osu.Game.Graphics.UserInterface
         private void load(OsuColour colours)
         {
             BackgroundColour = Color4.Black.Opacity(0.5f);
-            BackgroundColourHover = colours.PinkDarker;
+            BackgroundColourHover = accentColour ?? colours.PinkDarker;
         }
     }
 }
