@@ -70,7 +70,6 @@ namespace osu.Game.Screens.Play
 
         private FillFlowContainer retryCounterContainer;
 
-        public override bool Contains(Vector2 screenSpacePos) => true;
         public override bool HandleInput => State == Visibility.Visible;
 
         protected override void PopIn() => FadeIn(transition_duration, EasingTypes.In);
@@ -217,6 +216,7 @@ namespace osu.Game.Screens.Play
 
         public PauseOverlay()
         {
+            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
         }
     }

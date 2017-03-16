@@ -28,6 +28,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         public DrawableSlider(Slider s) : base(s)
         {
+            // Since the DrawableSlider itself is just a container without a size we need to
+            // pass all input through.
+            AlwaysReceiveInput = true;
+
             SliderBouncer bouncer1;
             slider = s;
 
@@ -90,10 +94,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 AddNested(drawableTick);
             }
         }
-
-        // Since the DrawableSlider itself is just a container without a size we need to
-        // pass all input through.
-        public override bool Contains(Vector2 screenSpacePos) => true;
 
         private int currentRepeat;
 

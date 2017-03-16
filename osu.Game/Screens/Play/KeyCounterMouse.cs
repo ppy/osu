@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Input;
-using OpenTK;
 using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
@@ -13,6 +12,7 @@ namespace osu.Game.Screens.Play
 
         public KeyCounterMouse(MouseButton button) : base(getStringRepresentation(button))
         {
+            AlwaysReceiveInput = true;
             Button = button;
         }
 
@@ -28,8 +28,6 @@ namespace osu.Game.Screens.Play
                     return @"M2";
             }
         }
-
-        public override bool Contains(Vector2 screenSpacePos) => true;
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {

@@ -18,7 +18,6 @@ namespace osu.Game.Graphics.Cursor
 {
     internal class CursorTrail : Drawable
     {
-        public override bool Contains(Vector2 screenSpacePos) => true;
         public override bool HandleInput => true;
 
         private int currentIndex;
@@ -59,6 +58,7 @@ namespace osu.Game.Graphics.Cursor
 
         public CursorTrail()
         {
+            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
 
             for (int i = 0; i < max_sprites; i++)
