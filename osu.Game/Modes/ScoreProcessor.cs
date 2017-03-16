@@ -60,7 +60,11 @@ namespace osu.Game.Modes
             Reset();
         }
 
-        public virtual Score GetScore() => new Score
+        /// <summary>
+        /// Creates a Score applicable to the game mode in which this ScoreProcessor resides.
+        /// </summary>
+        /// <returns>The Score.</returns>
+        public virtual Score CreateScore() => new Score
         {
             TotalScore = TotalScore,
             Combo = Combo,

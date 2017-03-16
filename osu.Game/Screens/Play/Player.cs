@@ -249,7 +249,7 @@ namespace osu.Game.Screens.Play
                 ValidForResume = false;
                 Push(new Results
                 {
-                    Score = scoreProcessor.GetScore()
+                    Score = scoreProcessor.CreateScore()
                 });
             });
         }
