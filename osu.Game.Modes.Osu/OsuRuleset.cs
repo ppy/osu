@@ -108,5 +108,7 @@ namespace osu.Game.Modes.Osu
             new KeyCounterMouse(MouseButton.Left),
             new KeyCounterMouse(MouseButton.Right)
         };
+
+        public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
     }
 }

@@ -68,11 +68,17 @@ namespace osu.Game.Modes
         /// </summary>
         protected bool HasFailed { get; private set; }
 
-        protected ScoreProcessor(HitRenderer<TObject, TJudgement> hitRenderer)
+        protected ScoreProcessor()
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
-            Judgements = new List<TJudgement>(hitRenderer.Beatmap.HitObjects.Count);
 
+            Reset();
+        }
+
+        protected ScoreProcessor(HitRenderer<TObject, TJudgement> hitRenderer)
+            : this()
+        {
+            Judgements = new List<TJudgement>(hitRenderer.Beatmap.HitObjects.Count);
             hitRenderer.OnJudgement += addJudgement;
         }
 
@@ -89,6 +95,11 @@ namespace osu.Game.Modes
                 TriggerFailed();
             }
         }
+
+        /// <summary>
+        /// Resets this ScoreProcessor to a stale state.
+        /// </summary>
+        protected virtual void Reset() { }
 
         /// <summary>
         /// Update any values that potentially need post-processing on a judgement change.

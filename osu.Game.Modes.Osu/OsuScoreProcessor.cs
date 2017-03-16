@@ -10,9 +10,19 @@ namespace osu.Game.Modes.Osu
 {
     internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject, OsuJudgementInfo>
     {
+        public OsuScoreProcessor()
+        {
+        }
+
         public OsuScoreProcessor(HitRenderer<OsuHitObject, OsuJudgementInfo> hitRenderer)
             : base(hitRenderer)
         {
+        }
+
+        protected override void Reset()
+        {
+            base.Reset();
+
             Health.Value = 1;
             Accuracy.Value = 1;
         }

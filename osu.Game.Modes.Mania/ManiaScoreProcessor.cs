@@ -9,6 +9,10 @@ namespace osu.Game.Modes.Mania
 {
     internal class ManiaScoreProcessor : ScoreProcessor<ManiaBaseHit, ManiaJudgementInfo>
     {
+        public ManiaScoreProcessor()
+        {
+        }
+
         public ManiaScoreProcessor(HitRenderer<ManiaBaseHit, ManiaJudgementInfo> hitRenderer)
             : base(hitRenderer)
         {

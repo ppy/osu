@@ -9,6 +9,10 @@ namespace osu.Game.Modes.Taiko
 {
     internal class TaikoScoreProcessor : ScoreProcessor<TaikoBaseHit, TaikoJudgementInfo>
     {
+        public TaikoScoreProcessor()
+        {
+        }
+
         public TaikoScoreProcessor(HitRenderer<TaikoBaseHit, TaikoJudgementInfo> hitRenderer)
             : base(hitRenderer)
         {
