@@ -25,6 +25,9 @@ namespace osu.Game.Modes.UI
     /// </summary>
     public abstract class HitRenderer : Container
     {
+        /// <summary>
+        /// Invoked when all the judgeable HitObjects have been judged.
+        /// </summary>
         public event Action OnAllJudged;
 
         /// <summary>
