@@ -6,6 +6,8 @@ using OpenTK;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Game.Modes.Objects.Types;
 using OpenTK.Graphics;
+using osu.Game.Beatmaps.Timing;
+using osu.Game.Database;
 
 namespace osu.Game.Modes.Osu.Objects
 {
@@ -66,11 +68,11 @@ namespace osu.Game.Modes.Osu.Objects
             return OsuScoreResult.Miss;
         }
 
-        public override void ApplyDefaults(HitObjectDefaults defaults)
+        public override void ApplyDefaults(TimingInfo timing, BaseDifficulty difficulty)
         {
-            base.ApplyDefaults(defaults);
+            base.ApplyDefaults(timing, difficulty);
 
-            Scale = (1.0f - 0.7f * (defaults.Difficulty.CircleSize - 5) / 5) / 2;
+            Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }
     }
 }
