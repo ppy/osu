@@ -33,10 +33,10 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(275, 5)
             });
 
-            filter.PinTab(GroupMode.All);
-            filter.PinTab(GroupMode.RecentlyPlayed);
+            filter.PinItem(GroupMode.All);
+            filter.PinItem(GroupMode.RecentlyPlayed);
 
-            filter.ValueChanged += (sender, mode) =>
+            filter.ItemChanged += (sender, mode) =>
             {
                 text.Text = "Currently Selected: " + mode.ToString();
             };
