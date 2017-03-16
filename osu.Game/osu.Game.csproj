@@ -119,7 +119,7 @@
     <Compile Include="Modes\Objects\Legacy\LegacyHitObjectType.cs" />
     <Compile Include="Modes\Replay.cs" />
     <Compile Include="Modes\Score.cs" />
-    <Compile Include="Modes\ScoreProcesssor.cs" />
+    <Compile Include="Modes\ScoreProcessor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />
     <Compile Include="Modes\UI\HudOverlay.cs" />
     <Compile Include="Modes\UI\StandardHealthDisplay.cs" />
