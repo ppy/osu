@@ -9,7 +9,6 @@ using osu.Game.Modes.Judgements;
 using osu.Game.Modes.Mods;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Modes.Objects.Types;
 using osu.Game.Screens.Play;
 using System;
 using System.Collections.Generic;
@@ -96,14 +95,8 @@ namespace osu.Game.Modes.UI
             Beatmap = converter.Convert(beatmap.Beatmap);
 
             // Apply defaults
-            HitObjectDefaults defaults = new HitObjectDefaults
-            {
-                Timing = Beatmap.TimingInfo,
-                Difficulty = Beatmap.BeatmapInfo.BaseDifficulty
-            };
-
             foreach (var h in Beatmap.HitObjects)
-                h.ApplyDefaults(defaults);
+                h.ApplyDefaults(Beatmap.TimingInfo, Beatmap.BeatmapInfo.BaseDifficulty);
 
             // Post-process the beatmap
             processor.PostProcess(Beatmap);

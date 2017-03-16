@@ -8,6 +8,7 @@ using osu.Game.Modes.Objects.Types;
 using System;
 using System.Collections.Generic;
 using osu.Game.Modes.Objects;
+using osu.Game.Database;
 
 namespace osu.Game.Modes.Osu.Objects
 {
@@ -46,17 +47,17 @@ namespace osu.Game.Modes.Osu.Objects
         public double Velocity;
         public double TickDistance;
 
-        public override void ApplyDefaults(HitObjectDefaults defaults)
+        public override void ApplyDefaults(TimingInfo timing, BaseDifficulty difficulty)
         {
-            base.ApplyDefaults(defaults);
+            base.ApplyDefaults(timing, difficulty);
 
             ControlPoint overridePoint;
-            ControlPoint timingPoint = defaults.Timing.TimingPointAt(StartTime, out overridePoint);
+            ControlPoint timingPoint = timing.TimingPointAt(StartTime, out overridePoint);
             var velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
-            var baseVelocity = 100 * defaults.Difficulty.SliderMultiplier / velocityAdjustment;
+            var baseVelocity = 100 * difficulty.SliderMultiplier / velocityAdjustment;
 
             Velocity = baseVelocity / timingPoint.BeatLength;
-            TickDistance = baseVelocity / defaults.Difficulty.SliderTickRate;
+            TickDistance = baseVelocity / difficulty.SliderTickRate;
         }
 
         public IEnumerable<SliderTick> Ticks
