@@ -14,7 +14,7 @@ namespace osu.Game.Modes
     public abstract class ScoreProcessor
     {
         /// <summary>
-        /// Invoked when the score is in a failed state.
+        /// Invoked when the ScoreProcessor is in a failed state.
         /// </summary>
         public event Action Failed;
 
