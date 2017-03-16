@@ -76,8 +76,8 @@ namespace osu.Game.Screens.Select
                 {
                     Padding = new MarginPadding(20),
                     BypassContainsCheck = true,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 500,
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.5f,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Children = new Drawable[]
