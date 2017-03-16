@@ -6,10 +6,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 using OpenTK.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -30,23 +28,27 @@ namespace osu.Game.Graphics.UserInterface
             });
         }
 
+        private Color4? accentColour;
+        public Color4 AccentColour
+        {
+            get { return accentColour.Value; }
+            set
+            {
+                accentColour = value;
+                BackgroundColourHover = BackgroundColourSelected = value;
+                FormatBackground();
+                FormatForeground();
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             BackgroundColour = Color4.Black.Opacity(0f);
             ForegroundColourHover = Color4.Black;
             ForegroundColourSelected = Color4.Black;
-
-            if (typeof(T) == typeof(SortMode))
-            {
-                BackgroundColourHover = colours.GreenLight;
-                BackgroundColourSelected = colours.GreenLight;
-            }
-            else
-            {
-                BackgroundColourHover = colours.Blue;
-                BackgroundColourSelected = colours.Blue;
-            }
+            if (accentColour == null)
+                AccentColour = colours.Blue;
         }
     }
 }

@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface.Tab;
 
 namespace osu.Game.Graphics.UserInterface
@@ -19,6 +21,26 @@ namespace osu.Game.Graphics.UserInterface
 
             foreach (var val in (T[])Enum.GetValues(typeof(T)))
                 AddTab(val);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            if (accentColour == null)
+                AccentColour = colours.Blue;
+        }
+
+        private Color4? accentColour;
+        public Color4 AccentColour
+        {
+            get { return accentColour.GetValueOrDefault(); }
+            set
+            {
+                accentColour = value;
+                (DropDown as OsuTabDropDownMenu<T>).AccentColour = value;
+                foreach (OsuTabItem<T> item in TabContainer.Children)
+                    item.AccentColour = value;
+            }
         }
     }
 }

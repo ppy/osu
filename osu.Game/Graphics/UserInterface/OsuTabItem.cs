@@ -10,9 +10,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface.Tab;
 using osu.Framework.Input;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -20,7 +18,18 @@ namespace osu.Game.Graphics.UserInterface
     {
         private SpriteText text;
         private Box box;
-        private Color4 fadeColour;
+        
+        private Color4? accentColour;
+        public Color4 AccentColour
+        {
+            get { return accentColour.GetValueOrDefault(); }
+            set
+            {
+                accentColour = value;
+                if (!Active)
+                    text.Colour = value;
+            }
+        }
 
         public new T Value
         {
@@ -54,16 +63,18 @@ namespace osu.Game.Graphics.UserInterface
         private void fadeInactive()
         {
             box.FadeOut(300);
-            text.FadeColour(fadeColour, 300);
+            text.FadeColour(AccentColour, 300);
         }
 
-        protected override bool OnHover(InputState state) {
+        protected override bool OnHover(InputState state)
+        {
             if (!Active)
                 fadeActive();
             return true;
         }
 
-        protected override void OnHoverLost(InputState state) {
+        protected override void OnHoverLost(InputState state)
+        {
             if (!Active)
                 fadeInactive();
         }
@@ -94,18 +105,8 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (typeof(T) == typeof(SortMode))
-            {
-                fadeColour = colours.GreenLight;
-                if (!Active)
-                    text.Colour = colours.GreenLight;
-            }
-            else
-            {
-                fadeColour = colours.Blue;
-                if (!Active)
-                    text.Colour = colours.Blue;
-            }
+            if (accentColour == null)
+                AccentColour = colours.Blue;
         }
     }
 }

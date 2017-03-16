@@ -23,6 +23,8 @@ namespace osu.Game.Screens.Select
         public Action FilterChanged;
 
         public string Search => searchTextBox.Text;
+
+        private OsuTabControl<SortMode> sortTabs;
         
         private SortMode sort = SortMode.Title;
         public SortMode Sort
@@ -60,7 +62,6 @@ namespace osu.Game.Screens.Select
 
         public FilterControl(float height)
         {
-            TabControl<SortMode> sortTabs;
             TabControl<GroupMode> groupTabs;
 
             Children = new Drawable[]
@@ -134,7 +135,7 @@ namespace osu.Game.Screens.Select
                                         sortTabs = new OsuTabControl<SortMode>(87)
                                         {
                                             Width = 191,
-                                            AutoSort = true
+                                            AutoSort = true,
                                         }
                                     }
                                 }
@@ -164,7 +165,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            spriteText.Colour = colours.GreenLight;
+            sortTabs.AccentColour = spriteText.Colour = colours.GreenLight;
         }
     }
 }

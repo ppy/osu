@@ -9,8 +9,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.UserInterface.Tab;
-using osu.Game.Graphics;
-using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -19,9 +17,26 @@ namespace osu.Game.Graphics.UserInterface
         public override float HeaderWidth => 14;
         public override float HeaderHeight => 24;
 
-        protected override DropDownHeader CreateHeader() => new OsuTabDropDownHeader();
+        private Color4? accentColour;
+        public Color4 AccentColour
+        {
+            get { return accentColour.GetValueOrDefault(); }
+            set
+            {
+                accentColour = value;
+                Header.Colour = value;
+                foreach (OsuTabDropDownMenuItem<T> item in ItemList)
+                    item.AccentColour = value;
+            }
+        }
 
-        protected override DropDownMenuItem<T> CreateDropDownItem(string key, T value) => new OsuTabDropDownMenuItem<T>(key, value);
+        protected override DropDownHeader CreateHeader() => new OsuTabDropDownHeader
+        {
+            Colour = AccentColour
+        };
+
+        protected override DropDownMenuItem<T> CreateDropDownItem(string key, T value) =>
+            new OsuTabDropDownMenuItem<T>(key, value) { AccentColour = AccentColour };
 
         public OsuTabDropDownMenu()
         {
@@ -50,7 +65,8 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Header.Colour = typeof(T) == typeof(SortMode) ? colours.GreenLight : colours.Blue;
+            if (accentColour == null)
+                AccentColour = colours.Blue;
         }
     }
 }
