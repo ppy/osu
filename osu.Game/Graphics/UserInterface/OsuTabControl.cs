@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface.Tab;
@@ -37,8 +38,10 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                (DropDown as OsuTabDropDownMenu<T>).AccentColour = value;
-                foreach (OsuTabItem<T> item in TabContainer.Children)
+                var dropDown = DropDown as OsuTabDropDownMenu<T>;
+                if (dropDown != null)
+                    dropDown.AccentColour = value;
+                foreach (var item in TabContainer.Children.OfType<OsuTabItem<T>>())
                     item.AccentColour = value;
             }
         }
