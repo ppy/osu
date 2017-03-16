@@ -68,7 +68,7 @@ namespace osu.Game.Modes.Osu.Objects
             return OsuScoreResult.Miss;
         }
 
-        public override void ApplyDefaults(TimingInfo timing, BaseDifficulty difficulty)
+        public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaults(timing, difficulty);
 

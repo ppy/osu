@@ -96,7 +96,7 @@ namespace osu.Game.Modes.UI
 
             // Apply defaults
             foreach (var h in Beatmap.HitObjects)
-                h.ApplyDefaults(Beatmap.TimingInfo, Beatmap.BeatmapInfo.BaseDifficulty);
+                h.ApplyDefaults(Beatmap.TimingInfo, Beatmap.BeatmapInfo.Difficulty);
 
             // Post-process the beatmap
             processor.PostProcess(Beatmap);
