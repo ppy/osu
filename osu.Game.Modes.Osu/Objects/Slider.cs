@@ -47,7 +47,7 @@ namespace osu.Game.Modes.Osu.Objects
         public double Velocity;
         public double TickDistance;
 
-        public override void ApplyDefaults(TimingInfo timing, BaseDifficulty difficulty)
+        public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaults(timing, difficulty);
 

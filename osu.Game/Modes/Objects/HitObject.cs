@@ -30,6 +30,6 @@ namespace osu.Game.Modes.Objects
         /// </summary>
         /// <param name="difficulty">The difficulty settings to use.</param>
         /// <param name="timing">The timing settings to use.</param>
-        public virtual void ApplyDefaults(TimingInfo timing, BaseDifficulty difficulty) { }
+        public virtual void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty) { }
     }
 }
