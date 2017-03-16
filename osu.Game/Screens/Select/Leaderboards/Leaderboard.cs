@@ -37,37 +37,20 @@ namespace osu.Game.Screens.Select.Leaderboards
                 scrollFlow.Clear();
 
                 i = 0;
-                foreach(var s in scores)
+                foreach (var s in scores)
                 {
-                    var ls = new LeaderboardScore(s, 1 + i++)
+                    var ls = new LeaderboardScore(s, 1 + i)
                     {
                         AlwaysPresent = true,
                         State = Visibility.Hidden,
                     };
                     scrollFlow.Add(ls);
 
-                    ls.Delay((i - 1) * 50, true);
+                    ls.Delay(i++ * 50, true);
                     ls.Show();
                 }
 
                 scrollContainer.ScrollTo(0f, false);
-            }
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            var fadeStart = scrollContainer.DrawHeight - 10;
-            fadeStart += scrollContainer.IsScrolledToEnd() ? 70 : 0;
-
-            foreach (var s in scrollFlow.Children)
-            {
-                var topY = scrollContainer.ScrollContent.DrawPosition.Y + s.DrawPosition.Y;
-                var bottomY = topY + 70;
-
-                s.ColourInfo = ColourInfo.GradientVertical(Color4.White.Opacity(System.Math.Min((fadeStart - topY) / 70, 1)),
-                                                           Color4.White.Opacity(System.Math.Min((fadeStart - bottomY) / 70, 1)));
             }
         }
 
@@ -91,6 +74,23 @@ namespace osu.Game.Screens.Select.Leaderboards
                     },
                 },
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            var fadeStart = scrollContainer.DrawHeight - 10;
+            fadeStart += scrollContainer.IsScrolledToEnd() ? 70 : 0;
+
+            foreach (var s in scrollFlow.Children)
+            {
+                var topY = scrollContainer.ScrollContent.DrawPosition.Y + s.DrawPosition.Y;
+                var bottomY = topY + 70;
+
+                s.ColourInfo = ColourInfo.GradientVertical(Color4.White.Opacity(System.Math.Min((fadeStart - topY) / 70, 1)),
+                                                           Color4.White.Opacity(System.Math.Min((fadeStart - bottomY) / 70, 1)));
+            }
         }
     }
 }
