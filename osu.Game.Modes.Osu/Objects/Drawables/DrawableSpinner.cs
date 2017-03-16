@@ -24,6 +24,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         public DrawableSpinner(Spinner s) : base(s)
         {
+            AlwaysReceiveInput = true;
+
             Origin = Anchor.Centre;
             Position = s.Position;
 
@@ -68,8 +70,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             background.Scale = scaleToCircle;
             disc.Scale = scaleToCircle;
         }
-
-        public override bool Contains(Vector2 screenSpacePos) => true;
 
         protected override void CheckJudgement(bool userTriggered)
         {
