@@ -120,7 +120,7 @@
     <Compile Include="Modes\Objects\Legacy\LegacyHitObjectType.cs" />
     <Compile Include="Modes\Replay.cs" />
     <Compile Include="Modes\Score.cs" />
-    <Compile Include="Modes\ScoreProcesssor.cs" />
+    <Compile Include="Modes\ScoreProcessor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />
     <Compile Include="Modes\UI\HudOverlay.cs" />
     <Compile Include="Modes\UI\StandardHealthDisplay.cs" />
@@ -197,6 +197,8 @@
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Modes\UI\StandardComboCounter.cs" />
     <Compile Include="Screens\Select\CarouselContainer.cs" />
+    <Compile Include="Screens\Select\Filter\GroupMode.cs" />
+    <Compile Include="Screens\Select\Filter\SortMode.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameScreen.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
@@ -348,6 +350,8 @@
     <Compile Include="Overlays\WaveOverlayContainer.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

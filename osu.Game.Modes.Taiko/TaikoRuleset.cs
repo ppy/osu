@@ -88,8 +88,8 @@ namespace osu.Game.Modes.Taiko
             new KeyCounterKeyboard(Key.K)
         };
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
-
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new TaikoDifficultyCalculator(beatmap);
+
+        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor();
     }
 }

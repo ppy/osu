@@ -56,31 +56,16 @@ namespace osu.Game.Screens.Select
         protected virtual bool ShowFooter => true;
 
         /// <summary>
-        /// Can be null if <see cref="ShowFooter"/> == false
+        /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
         protected readonly BeatmapOptionsOverlay BeatmapOptions;
 
         /// <summary>
-        /// Can be null if <see cref="ShowFooter"/> == false
+        /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
         protected readonly Footer Footer;
 
-        private FilterControl filter;
-        public FilterControl Filter
-        {
-            get
-            {
-                return filter;
-            }
-            private set
-            {
-                if (filter != value)
-                {
-                    filter = value;
-                    filterChanged();
-                }
-            }
-        }
+        public readonly FilterControl FilterControl;
 
         protected SongSelect()
         {
@@ -109,7 +94,7 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
             });
-            Add(filter = new FilterControl
+            Add(FilterControl = new FilterControl
             {
                 RelativeSizeAxes = Axes.X,
                 Height = filter_height,
@@ -198,9 +183,9 @@ namespace osu.Game.Screens.Select
             filterTask = Scheduler.AddDelayed(() =>
             {
                 filterTask = null;
-                var search = filter.Search;
+                var search = FilterControl.Search;
                 BeatmapGroup newSelection = null;
-                carousel.Sort(filter.Sort);
+                carousel.Sort(FilterControl.Sort);
                 foreach (var beatmapGroup in carousel)
                 {
                     var set = beatmapGroup.BeatmapSet;
@@ -257,7 +242,7 @@ namespace osu.Game.Screens.Select
 
             beatmapInfoWedge.State = Visibility.Visible;
 
-            filter.Activate();
+            FilterControl.Activate();
         }
 
         protected override void OnResuming(Screen last)
@@ -270,7 +255,7 @@ namespace osu.Game.Screens.Select
 
             Content.ScaleTo(1, 250, EasingTypes.OutSine);
 
-            filter.Activate();
+            FilterControl.Activate();
         }
 
         protected override void OnSuspending(Screen next)
@@ -279,7 +264,7 @@ namespace osu.Game.Screens.Select
 
             Content.FadeOut(250);
 
-            filter.Deactivate();
+            FilterControl.Deactivate();
             base.OnSuspending(next);
         }
 
@@ -289,7 +274,7 @@ namespace osu.Game.Screens.Select
 
             Content.FadeOut(100);
 
-            filter.Deactivate();
+            FilterControl.Deactivate();
             return base.OnExiting(next);
         }
 

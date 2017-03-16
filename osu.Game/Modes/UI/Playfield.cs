@@ -18,7 +18,6 @@ namespace osu.Game.Modes.UI
         /// The HitObjects contained in this Playfield.
         /// </summary>
         public HitObjectContainer<DrawableHitObject<TObject, TJudgement>> HitObjects;
-        public override bool Contains(Vector2 screenSpacePos) => true;
 
         internal Container<Drawable> ScaledContent;
 
@@ -31,6 +30,8 @@ namespace osu.Game.Modes.UI
         /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width.</param>
         protected Playfield(float? customWidth = null)
         {
+            AlwaysReceiveInput = true;
+
             AddInternal(ScaledContent = new ScaledContainer
             {
                 CustomWidth = customWidth,
@@ -77,12 +78,18 @@ namespace osu.Game.Modes.UI
             //dividing by the customwidth will effectively scale our content to the required container size.
             protected override Vector2 DrawScale => CustomWidth.HasValue ? new Vector2(DrawSize.X / CustomWidth.Value) : base.DrawScale;
 
-            public override bool Contains(Vector2 screenSpacePos) => true;
+            public ScaledContainer()
+            {
+                AlwaysReceiveInput = true;
+            }
         }
 
         public class HitObjectContainer<U> : Container<U> where U : Drawable
         {
-            public override bool Contains(Vector2 screenSpacePos) => true;
+            public HitObjectContainer()
+            {
+                AlwaysReceiveInput = true;
+            }
         }
     }
 }
