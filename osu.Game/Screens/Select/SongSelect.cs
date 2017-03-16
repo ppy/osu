@@ -352,37 +352,66 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void addBeatmapSet(BeatmapSetInfo beatmapSet, Framework.Game game, bool select = false)
+        private BeatmapGroup prepareBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            beatmapSet = database.GetWithChildren<BeatmapSetInfo>(beatmapSet.ID);
-            beatmapSet.Beatmaps.ForEach(b =>
-            {
-                database.GetChildren(b);
-                if (b.Metadata == null) b.Metadata = beatmapSet.Metadata;
-            });
+            database.GetChildren(beatmapSet);
+            beatmapSet.Beatmaps.ForEach(b => { if (b.Metadata == null) b.Metadata = beatmapSet.Metadata; });
 
-            var group = new BeatmapGroup(beatmapSet, database)
+            return new BeatmapGroup(beatmapSet, database)
             {
                 SelectionChanged = selectionChanged,
                 StartRequested = b => raiseSelect()
             };
+        }
+
+        private void addBeatmapSet(BeatmapSetInfo beatmapSet, Framework.Game game, bool select = false)
+        {
+            var group = prepareBeatmapSet(beatmapSet);
 
             //for the time being, let's completely load the difficulty panels in the background.
             //this likely won't scale so well, but allows us to completely async the loading flow.
             Task.WhenAll(group.BeatmapPanels.Select(panel => panel.LoadAsync(game))).ContinueWith(task => Schedule(delegate
             {
-                beatmapGroups.Add(group);
-
-                group.State = BeatmapGroupState.Collapsed;
-                carousel.AddGroup(group);
-
-                filterChanged(false, false);
+                addGroup(group);
 
                 if (Beatmap == null || select)
-                    carousel.SelectBeatmap(beatmapSet.Beatmaps.First());
+                    selectBeatmap(beatmapSet);
                 else
-                    carousel.SelectBeatmap(Beatmap.BeatmapInfo);
+                    selectBeatmap();
             }));
+        }
+
+        private void addGroup(BeatmapGroup group)
+        {
+            beatmapGroups.Add(group);
+
+            group.State = BeatmapGroupState.Collapsed;
+            carousel.AddGroup(group);
+
+            filterChanged(false, false);
+        }
+
+        private void selectBeatmap(BeatmapSetInfo beatmapSet = null)
+        {
+            carousel.SelectBeatmap(beatmapSet != null ? beatmapSet.Beatmaps.First() : Beatmap.BeatmapInfo);
+        }
+
+        private void addBeatmapSets(Framework.Game game, CancellationToken token)
+        {
+            List<BeatmapGroup> groups = new List<BeatmapGroup>();
+
+            foreach (var beatmapSet in database.Query<BeatmapSetInfo>().Where(b => !b.DeletePending))
+            {
+                if (token.IsCancellationRequested) return;
+
+                groups.Add(prepareBeatmapSet(beatmapSet));
+            }
+
+            Schedule(() =>
+            {
+                groups.ForEach(addGroup);
+                selectBeatmap(Beatmap?.BeatmapSetInfo ?? groups.First().BeatmapSet);
+            });
         }
 
         private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -398,15 +427,6 @@ namespace osu.Game.Screens.Select
 
             if (beatmapGroups.Count == 0)
                 Beatmap = null;
-        }
-
-        private void addBeatmapSets(Framework.Game game, CancellationToken token)
-        {
-            foreach (var beatmapSet in database.Query<BeatmapSetInfo>().Where(b => !b.DeletePending))
-            {
-                if (token.IsCancellationRequested) return;
-                addBeatmapSet(beatmapSet, game);
-            }
         }
 
         private void promptDelete()
