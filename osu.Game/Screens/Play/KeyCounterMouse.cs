@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Input;
-using OpenTK;
 using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
