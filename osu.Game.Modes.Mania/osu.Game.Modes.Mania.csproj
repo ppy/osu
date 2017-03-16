@@ -51,6 +51,7 @@
     <Compile Include="Beatmaps\ManiaBeatmapProcessor.cs" />
     <Compile Include="Judgements\ManiaJudgementInfo.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
+    <Compile Include="ManiaScoreProcessor.cs" />
     <Compile Include="Objects\Drawable\DrawableNote.cs" />
     <Compile Include="Objects\HoldNote.cs" />
     <Compile Include="Objects\ManiaBaseHit.cs" />

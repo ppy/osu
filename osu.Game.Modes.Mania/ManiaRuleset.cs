@@ -102,8 +102,8 @@ namespace osu.Game.Modes.Mania
 
         public override IEnumerable<KeyCounter> CreateGameplayKeys() => new KeyCounter[] { /* Todo: Should be keymod specific */ };
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
-
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new ManiaDifficultyCalculator(beatmap);
+
+        public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
     }
 }
