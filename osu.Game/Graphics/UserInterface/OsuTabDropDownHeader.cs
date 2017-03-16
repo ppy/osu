@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface.Tab;
-using osu.Game.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
