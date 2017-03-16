@@ -73,7 +73,7 @@ namespace osu.Game.Modes
         /// <summary>
         /// All judgements held by this ScoreProcessor.
         /// </summary>
-        protected List<TJudgement> Judgements;
+        protected readonly List<TJudgement> Judgements = new List<TJudgement>();
 
         /// <summary>
         /// Whether the score is in a failable state.
@@ -95,7 +95,7 @@ namespace osu.Game.Modes
         protected ScoreProcessor(HitRenderer<TObject, TJudgement> hitRenderer)
             : this()
         {
-            Judgements = new List<TJudgement>(hitRenderer.Beatmap.HitObjects.Count);
+            Judgements.Capacity = hitRenderer.Beatmap.HitObjects.Count;
             hitRenderer.OnJudgement += addJudgement;
         }
 
