@@ -190,8 +190,9 @@ namespace osu.Game.Modes.UI
         /// <param name="judgedObject">The object that Judgement has been updated for.</param>
         private void onJudgement(DrawableHitObject<TObject, TJudgement> judgedObject)
         {
-            OnJudgement?.Invoke(judgedObject.Judgement);
             Playfield.OnJudgement(judgedObject);
+
+            OnJudgement?.Invoke(judgedObject.Judgement);
 
             CheckAllJudged();
         }
