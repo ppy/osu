@@ -25,6 +25,9 @@ namespace osu.Game.Modes.UI
     /// </summary>
     public abstract class HitRenderer : Container
     {
+        /// <summary>
+        /// Invoked when all the judgeable HitObjects have been judged.
+        /// </summary>
         public event Action OnAllJudged;
 
         /// <summary>
@@ -200,8 +203,9 @@ namespace osu.Game.Modes.UI
         /// <param name="judgedObject">The object that Judgement has been updated for.</param>
         private void onJudgement(DrawableHitObject<TObject, TJudgement> judgedObject)
         {
-            OnJudgement?.Invoke(judgedObject.Judgement);
             Playfield.OnJudgement(judgedObject);
+
+            OnJudgement?.Invoke(judgedObject.Judgement);
 
             CheckAllJudged();
         }
