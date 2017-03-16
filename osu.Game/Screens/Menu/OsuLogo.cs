@@ -50,10 +50,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override bool Contains(Vector2 screenSpacePos)
-        {
-            return logoContainer.Contains(screenSpacePos);
-        }
+        protected override bool InternalContains(Vector2 screenSpacePos) => logoContainer.Contains(screenSpacePos);
 
         public bool Ripple
         {

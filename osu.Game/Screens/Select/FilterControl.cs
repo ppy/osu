@@ -9,12 +9,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
-using osu.Framework.Graphics.UserInterface.Tab;
 using osu.Framework.Input;
 
 namespace osu.Game.Screens.Select
@@ -27,7 +26,7 @@ namespace osu.Game.Screens.Select
 
         private OsuTabControl<SortMode> sortTabs;
 
-        TabControl<GroupMode> groupTabs;
+        private TabControl<GroupMode> groupTabs;
 
         private SortMode sort = SortMode.Title;
         public SortMode Sort
@@ -61,7 +60,7 @@ namespace osu.Game.Screens.Select
 
         private SearchTextBox searchTextBox;
 
-        public override bool Contains(Vector2 screenSpacePos) => base.Contains(screenSpacePos) || groupTabs.Contains(screenSpacePos) || sortTabs.Contains(screenSpacePos);
+        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || groupTabs.Contains(screenSpacePos) || sortTabs.Contains(screenSpacePos);
 
         public FilterControl()
         {
@@ -76,9 +75,9 @@ namespace osu.Game.Screens.Select
                 new Container
                 {
                     Padding = new MarginPadding(20),
-                    BypassContainsCheck = true,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 500,
+                    AlwaysReceiveInput = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.5f,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Children = new Drawable[]
@@ -97,7 +96,6 @@ namespace osu.Game.Screens.Select
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 1,
-                            Y = 24,
                             Colour = OsuColour.Gray(80),
                             Origin = Anchor.BottomLeft,
                             Anchor = Anchor.BottomLeft,
@@ -109,12 +107,13 @@ namespace osu.Game.Screens.Select
                             Direction = FillDirection.Horizontal,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            BypassContainsCheck = true,
+                            AlwaysReceiveInput = true,
                             Children = new Drawable[]
                             {
                                 groupTabs = new OsuTabControl<GroupMode>
                                 {
                                     RelativeSizeAxes = Axes.X,
+                                    Height = 24,
                                     Width = 0.5f,
                                     AutoSort = true
                                 },
@@ -133,6 +132,7 @@ namespace osu.Game.Screens.Select
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Width = 0.5f,
+                                    Height = 24,
                                     AutoSort = true,
                                 }
                             }

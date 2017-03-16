@@ -88,7 +88,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's when clicking
 
-        public override bool Contains(Vector2 screenSpacePos) => backgroundContainer.Contains(screenSpacePos);
+        protected override bool InternalContains(Vector2 screenSpacePos) => backgroundContainer.Contains(screenSpacePos);
 
         protected override bool OnClick(Framework.Input.InputState state)
         {
