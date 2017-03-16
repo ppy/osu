@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Screens.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Formats;
 using OpenTK;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps.IO;
@@ -61,13 +60,12 @@ namespace osu.Desktop.VisualTests.Tests
                     time += 500;
                 }
 
-                var decoder = new ConstructableBeatmapDecoder();
-
                 Beatmap b = new Beatmap
                 {
                     HitObjects = objects,
                     BeatmapInfo = new BeatmapInfo
                     {
+                        BaseDifficulty = new BaseDifficulty(),
                         Metadata = new BeatmapMetadata
                         {
                             Artist = @"Unknown",
@@ -76,8 +74,6 @@ namespace osu.Desktop.VisualTests.Tests
                         }
                     }
                 };
-
-                decoder.Process(b);
 
                 beatmap = new TestWorkingBeatmap(b);
             }
