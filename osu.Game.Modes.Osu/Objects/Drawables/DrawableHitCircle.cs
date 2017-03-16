@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -35,16 +36,16 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             {
                 glow = new GlowPiece
                 {
-                    Colour = osuObject.Colour
+                    Colour = osuObject.ComboColour
                 },
                 circle = new CirclePiece
                 {
-                    Colour = osuObject.Colour,
+                    Colour = osuObject.ComboColour,
                     Hit = () =>
                     {
                         if (Judgement.Result.HasValue) return false;
 
-                        ((PositionalJudgementInfo)Judgement).PositionOffset = Vector2.Zero; //todo: set to correct value
+                        Judgement.PositionOffset = Vector2.Zero; //todo: set to correct value
                         UpdateJudgement(true);
                         return true;
                     },
@@ -57,11 +58,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 flash = new FlashPiece(),
                 explode = new ExplodePiece
                 {
-                    Colour = osuObject.Colour,
+                    Colour = osuObject.ComboColour,
                 },
                 ApproachCircle = new ApproachCircle
                 {
-                    Colour = osuObject.Colour,
+                    Colour = osuObject.ComboColour,
                 }
             };
 
@@ -80,12 +81,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             double hitOffset = Math.Abs(Judgement.TimeOffset);
 
-            OsuJudgementInfo osuJudgement = (OsuJudgementInfo)Judgement;
-
             if (hitOffset < HitObject.HitWindowFor(OsuScoreResult.Hit50))
             {
                 Judgement.Result = HitResult.Hit;
-                osuJudgement.Score = HitObject.ScoreResultForOffset(hitOffset);
+                Judgement.Score = HitObject.ScoreResultForOffset(hitOffset);
             }
             else
                 Judgement.Result = HitResult.Miss;
@@ -118,13 +117,16 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             ApproachCircle.FadeOut();
 
-            glow.Delay(osuObject.Duration);
+            double endTime = (osuObject as IHasEndTime)?.EndTime ?? osuObject.StartTime;
+            double duration = endTime - osuObject.StartTime;
+
+            glow.Delay(duration);
             glow.FadeOut(400);
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    Delay(osuObject.Duration + TIME_PREEMPT);
+                    Delay(duration + TIME_PREEMPT);
                     FadeOut(TIME_FADEOUT);
                     break;
                 case ArmedState.Miss:

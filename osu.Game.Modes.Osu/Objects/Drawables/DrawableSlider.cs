@@ -60,7 +60,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Position = s.StackedPosition,
                     ComboIndex = s.ComboIndex,
                     Scale = s.Scale,
-                    Colour = s.Colour,
+                    ComboColour = s.ComboColour,
                     Sample = s.Sample,
                 }),
             };
@@ -72,7 +72,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             AddNested(initialCircle);
 
-            var repeatDuration = s.Curve.Length / s.Velocity;
+            var repeatDuration = s.Curve.Distance / s.Velocity;
             foreach (var tick in s.Ticks)
             {
                 var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
@@ -104,7 +104,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             double progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             int repeat = slider.RepeatAt(progress);
-            progress = slider.CurveProgressAt(progress);
+            progress = slider.ProgressAt(progress);
 
             if (repeat > currentRepeat)
             {
@@ -125,27 +125,24 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void CheckJudgement(bool userTriggered)
         {
-            var j = (OsuJudgementInfo)Judgement;
-            var sc = (OsuJudgementInfo)initialCircle.Judgement;
-
-            if (!userTriggered && Time.Current >= HitObject.EndTime)
+            if (!userTriggered && Time.Current >= slider.EndTime)
             {
                 var ticksCount = ticks.Children.Count() + 1;
                 var ticksHit = ticks.Children.Count(t => t.Judgement.Result == HitResult.Hit);
-                if (sc.Result == HitResult.Hit)
+                if (initialCircle.Judgement.Result == HitResult.Hit)
                     ticksHit++;
 
                 var hitFraction = (double)ticksHit / ticksCount;
-                if (hitFraction == 1 && sc.Score == OsuScoreResult.Hit300)
-                    j.Score = OsuScoreResult.Hit300;
-                else if (hitFraction >= 0.5 && sc.Score >= OsuScoreResult.Hit100)
-                    j.Score = OsuScoreResult.Hit100;
+                if (hitFraction == 1 && initialCircle.Judgement.Score == OsuScoreResult.Hit300)
+                    Judgement.Score = OsuScoreResult.Hit300;
+                else if (hitFraction >= 0.5 && initialCircle.Judgement.Score >= OsuScoreResult.Hit100)
+                    Judgement.Score = OsuScoreResult.Hit100;
                 else if (hitFraction > 0)
-                    j.Score = OsuScoreResult.Hit50;
+                    Judgement.Score = OsuScoreResult.Hit50;
                 else
-                    j.Score = OsuScoreResult.Miss;
+                    Judgement.Score = OsuScoreResult.Miss;
 
-                j.Result = j.Score != OsuScoreResult.Miss ? HitResult.Hit : HitResult.Miss;
+                Judgement.Result = Judgement.Score != OsuScoreResult.Miss ? HitResult.Hit : HitResult.Miss;
             }
         }
 
@@ -165,7 +162,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             ball.FadeIn();
 
-            Delay(HitObject.Duration, true);
+            Delay(slider.Duration, true);
 
             body.FadeOut(160);
             ball.FadeOut(160);
