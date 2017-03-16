@@ -6,18 +6,17 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.UserInterface.Tab;
+using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabDropDownMenu<T> : TabDropDownMenu<T>
     {
-        public override float HeaderWidth => 14;
-        public override float HeaderHeight => 24;
-
         private Color4? accentColour;
         public Color4 AccentColour
         {
@@ -25,7 +24,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                Header.Colour = value;
+                ((OsuTabDropDownHeader)Header).AccentColour = value;
                 foreach (var item in ItemList.OfType<OsuTabDropDownMenuItem<T>>())
                     item.AccentColour = value;
             }
@@ -33,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override DropDownHeader CreateHeader() => new OsuTabDropDownHeader
         {
-            Colour = AccentColour
+            AccentColour = AccentColour
         };
 
         protected override DropDownMenuItem<T> CreateDropDownItem(string key, T value) =>
@@ -68,6 +67,64 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (accentColour == null)
                 AccentColour = colours.Blue;
+        }
+
+        public class OsuTabDropDownHeader : DropDownHeader
+        {
+            protected override string Label { get; set; }
+
+            private Color4? accentColour;
+            public Color4 AccentColour
+            {
+                get { return accentColour.GetValueOrDefault(); }
+                set
+                {
+                    accentColour = value;
+                    BackgroundColourHover = value;
+                    Foreground.Colour = value;
+                }
+            }
+
+            protected override bool OnHover(InputState state)
+            {
+                Foreground.Colour = BackgroundColour;
+                return base.OnHover(state);
+            }
+
+            protected override void OnHoverLost(InputState state)
+            {
+                Foreground.Colour = BackgroundColourHover;
+                base.OnHoverLost(state);
+            }
+
+            public OsuTabDropDownHeader()
+            {
+                RelativeSizeAxes = Axes.None;
+                AutoSizeAxes = Axes.X;
+
+                BackgroundColour = Color4.Black;
+
+                Background.Height = 0.5f;
+                Background.CornerRadius = 3;
+                Background.Masking = true;
+
+                Foreground.RelativeSizeAxes = Axes.None;
+                Foreground.AutoSizeAxes = Axes.X;
+                Foreground.RelativeSizeAxes = Axes.Y;
+                Foreground.Margin = new MarginPadding(5);
+                Foreground.Children = new Drawable[]
+                {
+                    new TextAwesome
+                    {
+                        Icon = FontAwesome.fa_ellipsis_h,
+                        TextSize = 14,
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                    }
+                };
+
+                Padding = new MarginPadding { Left = 5, Right = 5 };
+            }
         }
     }
 }

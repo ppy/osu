@@ -94,10 +94,10 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
             });
-            Add(FilterControl = new FilterControl(filter_height)
+            Add(FilterControl = new FilterControl
             {
                 RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
+                Height = filter_height,
                 FilterChanged = () => filterChanged(),
                 Exit = Exit,
             });
