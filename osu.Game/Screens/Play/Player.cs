@@ -239,18 +239,18 @@ namespace osu.Game.Screens.Play
 
         private void onCompletion()
         {
+            // Force a final check to see if the player has failed
+            // Some game modes (e.g. taiko) fail at the end of the map
+            if (scoreProcessor.CheckFailed())
+            {
+                // If failed, onFail will be invoked which will push a new screen.
+                // Let's not push the completion screen in this case
+                return;
+            }
+
             Delay(1000);
             Schedule(delegate
             {
-                // Force a final check to see if the player has failed
-                // Some game modes (e.g. taiko) fail at the end of the map
-                if (scoreProcessor.CheckFailed())
-                {
-                    // If failed, onFail will be called which will push a new screen.
-                    // Let's not push the completion screen in this case
-                    return;
-                }
-
                 ValidForResume = false;
                 Push(new Results
                 {
