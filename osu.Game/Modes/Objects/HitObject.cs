@@ -22,5 +22,11 @@ namespace osu.Game.Modes.Objects
         /// The sample to be played when this HitObject is hit.
         /// </summary>
         public HitSampleInfo Sample { get; set; }
+
+        /// <summary>
+        /// Applies default values to this HitObject.
+        /// </summary>
+        /// <param name="defaults">The default values to apply.</param>
+        public virtual void ApplyDefaults(HitObjectDefaults defaults) { }
     }
 }

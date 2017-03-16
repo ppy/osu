@@ -8,11 +8,6 @@ namespace osu.Game.Modes.Osu.Beatmaps
 {
     internal class OsuBeatmapProcessor : IBeatmapProcessor<OsuHitObject>
     {
-        public void SetDefaults(OsuHitObject hitObject, Beatmap<OsuHitObject> beatmap)
-        {
-            hitObject.SetDefaultsFromBeatmap(beatmap);
-        }
-
         public void PostProcess(Beatmap<OsuHitObject> beatmap)
         {
             if (beatmap.ComboColors.Count == 0)
