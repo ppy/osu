@@ -15,6 +15,7 @@ using OpenTK.Input;
 using System.Collections;
 using osu.Framework.MathUtils;
 using System.Diagnostics;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
 {
@@ -157,46 +158,26 @@ namespace osu.Game.Screens.Select
             ScrollTo(selectedY, animated);
         }
 
-        public void Sort(FilterControl.SortMode mode)
+        public void Sort(SortMode mode)
         {
             List<BeatmapGroup> sortedGroups = new List<BeatmapGroup>(groups);
             switch (mode)
             {
-                case FilterControl.SortMode.Artist:
+                case SortMode.Artist:
                     sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist, StringComparison.InvariantCultureIgnoreCase));
                     break;
-                case FilterControl.SortMode.Title:
+                case SortMode.Title:
                     sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title, StringComparison.InvariantCultureIgnoreCase));
                     break;
-                case FilterControl.SortMode.Author:
+                case SortMode.Author:
                     sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author, StringComparison.InvariantCultureIgnoreCase));
                     break;
-                case FilterControl.SortMode.Difficulty:
-                    sortedGroups.Sort((x, y) =>
-                    {
-                        float xAverage = 0, yAverage = 0;
-                        int counter = 0;
-                        foreach (BeatmapInfo set in x.BeatmapSet.Beatmaps)
-                        {
-                            xAverage += set.StarDifficulty;
-                            counter++;
-                        }
-                        xAverage /= counter;
-                        counter = 0;
-                        foreach (BeatmapInfo set in y.BeatmapSet.Beatmaps)
-                        {
-                            yAverage += set.StarDifficulty;
-                            counter++;
-                        }
-                        yAverage /= counter;
-                        if (xAverage > yAverage)
-                            return 1;
-                        else
-                            return -1;
-                    });
+                case SortMode.Difficulty:
+                    sortedGroups.Sort((x, y) => x.BeatmapSet.MaxStarDifficulty.CompareTo(y.BeatmapSet.MaxStarDifficulty));
                     break;
                 default:
-                    throw new NotImplementedException();
+                    Sort(SortMode.Artist); // Temporary
+                    break;
             }
 
             scrollableContent.Clear(false);
