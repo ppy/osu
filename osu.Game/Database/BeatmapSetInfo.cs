@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 
@@ -22,6 +23,8 @@ namespace osu.Game.Database
 
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<BeatmapInfo> Beatmaps { get; set; }
+
+        public float MaxStarDifficulty => Beatmaps.Max(b => b.StarDifficulty);
 
         public bool DeletePending { get; set; }
 
