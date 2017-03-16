@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Graphics.UserInterface.Tab;
+using osu.Framework.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -166,6 +167,11 @@ namespace osu.Game.Screens.Select
         private void load(OsuColour colours)
         {
             sortTabs.AccentColour = spriteText.Colour = colours.GreenLight;
+        }
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            return true;
         }
     }
 }

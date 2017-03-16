@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         protected readonly Footer Footer;
 
-        private FilterControl filterControl;
+        public readonly FilterControl FilterControl;
 
         protected SongSelect()
         {
@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
             });
-            Add(filterControl = new FilterControl(filter_height)
+            Add(FilterControl = new FilterControl(filter_height)
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -183,9 +183,9 @@ namespace osu.Game.Screens.Select
             filterTask = Scheduler.AddDelayed(() =>
             {
                 filterTask = null;
-                var search = filterControl.Search;
+                var search = FilterControl.Search;
                 BeatmapGroup newSelection = null;
-                carousel.Sort(filterControl.Sort);
+                carousel.Sort(FilterControl.Sort);
                 foreach (var beatmapGroup in carousel)
                 {
                     var set = beatmapGroup.BeatmapSet;
@@ -242,7 +242,7 @@ namespace osu.Game.Screens.Select
 
             beatmapInfoWedge.State = Visibility.Visible;
 
-            filterControl.Activate();
+            FilterControl.Activate();
         }
 
         protected override void OnResuming(Screen last)
@@ -255,7 +255,7 @@ namespace osu.Game.Screens.Select
 
             Content.ScaleTo(1, 250, EasingTypes.OutSine);
 
-            filterControl.Activate();
+            FilterControl.Activate();
         }
 
         protected override void OnSuspending(Screen next)
@@ -264,7 +264,7 @@ namespace osu.Game.Screens.Select
 
             Content.FadeOut(250);
 
-            filterControl.Deactivate();
+            FilterControl.Deactivate();
             base.OnSuspending(next);
         }
 
@@ -274,7 +274,7 @@ namespace osu.Game.Screens.Select
 
             Content.FadeOut(100);
 
-            filterControl.Deactivate();
+            FilterControl.Deactivate();
             return base.OnExiting(next);
         }
 

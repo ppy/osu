@@ -40,10 +40,10 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(songSelect = new PlaySongSelect());
 
-            AddButton(@"Sort by Artist", delegate { songSelect.Filter.Sort = SortMode.Artist; });
-            AddButton(@"Sort by Title", delegate { songSelect.Filter.Sort = SortMode.Title; });
-            AddButton(@"Sort by Author", delegate { songSelect.Filter.Sort = SortMode.Author; });
-            AddButton(@"Sort by Difficulty", delegate { songSelect.Filter.Sort = SortMode.Difficulty; });
+            AddButton(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
+            AddButton(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });
+            AddButton(@"Sort by Author", delegate { songSelect.FilterControl.Sort = SortMode.Author; });
+            AddButton(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
         }
 
         protected override void Dispose(bool isDisposing)
