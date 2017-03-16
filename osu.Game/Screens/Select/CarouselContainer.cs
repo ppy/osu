@@ -173,28 +173,7 @@ namespace osu.Game.Screens.Select
                     sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author, StringComparison.InvariantCultureIgnoreCase));
                     break;
                 case SortMode.Difficulty:
-                    sortedGroups.Sort((x, y) =>
-                    {
-                        float xAverage = 0, yAverage = 0;
-                        int counter = 0;
-                        foreach (BeatmapInfo set in x.BeatmapSet.Beatmaps)
-                        {
-                            xAverage += set.StarDifficulty;
-                            counter++;
-                        }
-                        xAverage /= counter;
-                        counter = 0;
-                        foreach (BeatmapInfo set in y.BeatmapSet.Beatmaps)
-                        {
-                            yAverage += set.StarDifficulty;
-                            counter++;
-                        }
-                        yAverage /= counter;
-                        if (xAverage > yAverage)
-                            return 1;
-                        else
-                            return -1;
-                    });
+                    sortedGroups.Sort((x, y) => x.BeatmapSet.MaxStarDifficulty.CompareTo(y.BeatmapSet.MaxStarDifficulty));
                     break;
                 default:
                     Sort(SortMode.Artist); // Temporary
