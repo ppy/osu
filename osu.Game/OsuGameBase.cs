@@ -137,7 +137,7 @@ namespace osu.Game
             {
                 Children = new[]
                 {
-                    Cursor = new OsuCursorContainer { Depth = float.MinValue }
+                    Cursor = new MenuCursor { Depth = float.MinValue }
                 }
             });
         }
