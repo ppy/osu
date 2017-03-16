@@ -5,6 +5,8 @@ using osu.Framework.Configuration;
 using System;
 using System.Collections.Generic;
 using osu.Game.Modes.Judgements;
+using osu.Game.Modes.UI;
+using osu.Game.Modes.Objects;
 
 namespace osu.Game.Modes
 {
@@ -28,36 +30,50 @@ namespace osu.Game.Modes
         public readonly BindableInt Combo = new BindableInt();
 
         /// <summary>
-        /// Are we allowed to fail?
+        /// Keeps track of the highest combo ever achieved in this play.
+        /// This is handled automatically by ScoreProcessor.
         /// </summary>
-        protected bool CanFail => true;
-
-        protected bool HasFailed { get; private set; }
+        public readonly BindableInt HighestCombo = new BindableInt();
 
         /// <summary>
         /// Called when we reach a failing health of zero.
         /// </summary>
         public event Action Failed;
 
-        /// <summary>
-        /// Keeps track of the highest combo ever achieved in this play.
-        /// This is handled automatically by ScoreProcessor.
-        /// </summary>
-        public readonly BindableInt HighestCombo = new BindableInt();
+        protected void TriggerFailed()
+        {
+            Failed?.Invoke();
+        }
+    }
 
-        public readonly List<JudgementInfo> Judgements;
+    public abstract class ScoreProcessor<TObject, TJudgement> : ScoreProcessor
+        where TObject : HitObject
+        where TJudgement : JudgementInfo
+    {
+        /// <summary>
+        /// All judgements held by this ScoreProcessor.
+        /// </summary>
+        protected List<TJudgement> Judgements;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ScoreProcessor"/> class.
+        /// Are we allowed to fail?
         /// </summary>
-        /// <param name="hitObjectCount">Number of HitObjects. It is used for specifying Judgements collection Capacity</param>
-        protected ScoreProcessor(int hitObjectCount = 0)
+        protected bool CanFail => true;
+
+        /// <summary>
+        /// Whether this ScoreProcessor has already triggered the failed event.
+        /// </summary>
+        protected bool HasFailed { get; private set; }
+
+        protected ScoreProcessor(HitRenderer<TObject, TJudgement> hitRenderer)
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
-            Judgements = new List<JudgementInfo>(hitObjectCount);
+            Judgements = new List<TJudgement>(hitRenderer.Beatmap.HitObjects.Count);
+
+            hitRenderer.OnJudgement += addJudgement;
         }
 
-        public void AddJudgement(JudgementInfo judgement)
+        private void addJudgement(TJudgement judgement)
         {
             Judgements.Add(judgement);
 
@@ -67,7 +83,7 @@ namespace osu.Game.Modes
             if (Health.Value == Health.MinValue && !HasFailed)
             {
                 HasFailed = true;
-                Failed?.Invoke();
+                TriggerFailed();
             }
         }
 
@@ -75,6 +91,6 @@ namespace osu.Game.Modes
         /// Update any values that potentially need post-processing on a judgement change.
         /// </summary>
         /// <param name="newJudgement">A new JudgementInfo that triggered this calculation. May be null.</param>
-        protected abstract void UpdateCalculations(JudgementInfo newJudgement);
+        protected abstract void UpdateCalculations(TJudgement newJudgement);
     }
 }

@@ -17,11 +17,13 @@ namespace osu.Game.Modes.Taiko.UI
         {
         }
 
+        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
+
         protected override IBeatmapConverter<TaikoBaseHit> CreateBeatmapConverter() => new TaikoBeatmapConverter();
 
         protected override IBeatmapProcessor<TaikoBaseHit> CreateBeatmapProcessor() => new TaikoBeatmapProcessor();
-        protected override Playfield<TaikoBaseHit, TaikoJudgementInfo> CreatePlayfield() => new TaikoPlayfield();
 
+        protected override Playfield<TaikoBaseHit, TaikoJudgementInfo> CreatePlayfield() => new TaikoPlayfield();
 
         protected override DrawableHitObject<TaikoBaseHit, TaikoJudgementInfo> GetVisualRepresentation(TaikoBaseHit h) => null;
     }

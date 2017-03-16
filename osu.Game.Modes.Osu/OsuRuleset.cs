@@ -95,8 +95,6 @@ namespace osu.Game.Modes.Osu
 
         public override FontAwesome Icon => FontAwesome.fa_osu_osu_o;
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => new OsuScoreProcessor(hitObjectCount);
-
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
 
         protected override PlayMode PlayMode => PlayMode.Osu;

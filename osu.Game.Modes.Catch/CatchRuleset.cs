@@ -87,8 +87,6 @@ namespace osu.Game.Modes.Catch
             new KeyCounterMouse(MouseButton.Right)
         };
 
-        public override ScoreProcessor CreateScoreProcessor(int hitObjectCount = 0) => null;
-
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new CatchDifficultyCalculator(beatmap);
     }
 }
