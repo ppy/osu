@@ -80,7 +80,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Mode = PlayMode.Osu,
                         Path = "normal.osu",
                         Version = "Normal",
-                        BaseDifficulty = new BaseDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 3.5f,
                         }
@@ -91,7 +91,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Mode = PlayMode.Osu,
                         Path = "hard.osu",
                         Version = "Hard",
-                        BaseDifficulty = new BaseDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 5,
                         }
@@ -102,7 +102,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Mode = PlayMode.Osu,
                         Path = "insane.osu",
                         Version = "Insane",
-                        BaseDifficulty = new BaseDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 7,
                         }

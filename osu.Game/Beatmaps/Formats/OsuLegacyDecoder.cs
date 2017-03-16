@@ -144,7 +144,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleDifficulty(Beatmap beatmap, string key, string val)
         {
-            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            var difficulty = beatmap.BeatmapInfo.Difficulty;
             switch (key)
             {
                 case @"HPDrainRate":

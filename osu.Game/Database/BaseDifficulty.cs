@@ -5,7 +5,7 @@ using SQLite.Net.Attributes;
 
 namespace osu.Game.Database
 {
-    public class BaseDifficulty
+    public class BeatmapDifficulty
     {
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }

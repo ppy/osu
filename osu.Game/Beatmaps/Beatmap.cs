@@ -51,29 +51,12 @@ namespace osu.Game.Beatmaps
         /// <returns>The slider velocity in positional length units.</returns>
         public double SliderVelocityAt(double time)
         {
-            double scoringDistance = 100 * BeatmapInfo.BaseDifficulty.SliderMultiplier;
+            double scoringDistance = 100 * BeatmapInfo.Difficulty.SliderMultiplier;
             double beatDistance = TimingInfo.BeatDistanceAt(time);
 
             if (beatDistance > 0)
                 return scoringDistance / beatDistance * 1000;
             return scoringDistance;
-        }
-
-        /// <summary>
-        /// Maps a difficulty value [0, 10] to a two-piece linear range of values.
-        /// </summary>
-        /// <param name="difficulty">The difficulty value to be mapped.</param>
-        /// <param name="min">Minimum of the resulting range which will be achieved by a difficulty value of 0.</param>
-        /// <param name="mid">Midpoint of the resulting range which will be achieved by a difficulty value of 5.</param>
-        /// <param name="max">Maximum of the resulting range which will be achieved by a difficulty value of 10.</param>
-        /// <returns>Value to which the difficulty value maps in the specified range.</returns>
-        public static double MapDifficultyRange(double difficulty, double min, double mid, double max)
-        {
-            if (difficulty > 5)
-                return mid + (max - mid) * (difficulty - 5) / 5;
-            if (difficulty < 5)
-                return mid - (mid - min) * (5 - difficulty) / 5;
-            return mid;
         }
     }
 
