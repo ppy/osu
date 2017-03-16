@@ -79,6 +79,7 @@
     <Compile Include="Database\ScoreDatabase.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
+    <Compile Include="Graphics\Cursor\GameplayCursor.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
     <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
@@ -221,7 +222,7 @@
     <Compile Include="Input\GlobalHotkeys.cs" />
     <Compile Include="Graphics\Backgrounds\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
-    <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
+    <Compile Include="Graphics\Cursor\MenuCursor.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\TextAwesome.cs" />
     <Compile Include="Screens\Play\KeyCounter.cs" />
