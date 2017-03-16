@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Game.Modes.Objects;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Formats
@@ -43,11 +42,10 @@ namespace osu.Game.Beatmaps.Formats
             var beatmap = new Beatmap
             {
                 HitObjects = new List<HitObject>(),
-                ControlPoints = new List<ControlPoint>(),
                 BeatmapInfo = new BeatmapInfo
                 {
                     Metadata = new BeatmapMetadata(),
-                    BaseDifficulty = new BaseDifficulty(),
+                    Difficulty = new BeatmapDifficulty(),
                 },
             };
             ParseFile(stream, beatmap);

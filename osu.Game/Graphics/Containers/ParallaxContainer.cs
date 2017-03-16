@@ -18,10 +18,10 @@ namespace osu.Game.Graphics.Containers
 
         private Bindable<bool> parallaxEnabled;
 
-        public override bool Contains(Vector2 screenSpacePos) => true;
-
         public ParallaxContainer()
         {
+            AlwaysReceiveInput = true;
+
             RelativeSizeAxes = Axes.Both;
             AddInternal(content = new Container
             {

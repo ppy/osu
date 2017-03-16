@@ -69,7 +69,7 @@ namespace osu.Game.Modes.Osu.Objects
 
         public virtual void SetDefaultsFromBeatmap(Beatmap<OsuHitObject> beatmap)
         {
-            Scale = (1.0f - 0.7f * (beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5) / 5) / 2;
+            Scale = (1.0f - 0.7f * (beatmap.BeatmapInfo.Difficulty.CircleSize - 5) / 5) / 2;
         }
     }
 }

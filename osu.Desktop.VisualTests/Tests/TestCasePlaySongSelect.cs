@@ -8,6 +8,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -39,10 +40,10 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(songSelect = new PlaySongSelect());
 
-            AddButton(@"Sort by Artist", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Artist; });
-            AddButton(@"Sort by Title", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Title; });
-            AddButton(@"Sort by Author", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Author; });
-            AddButton(@"Sort by Difficulty", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Difficulty; });
+            AddButton(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
+            AddButton(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });
+            AddButton(@"Sort by Author", delegate { songSelect.FilterControl.Sort = SortMode.Author; });
+            AddButton(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
         }
 
         protected override void Dispose(bool isDisposing)
@@ -79,7 +80,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Mode = PlayMode.Osu,
                         Path = "normal.osu",
                         Version = "Normal",
-                        BaseDifficulty = new BaseDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 3.5f,
                         }
@@ -90,7 +91,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Mode = PlayMode.Osu,
                         Path = "hard.osu",
                         Version = "Hard",
-                        BaseDifficulty = new BaseDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 5,
                         }
@@ -101,7 +102,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Mode = PlayMode.Osu,
                         Path = "insane.osu",
                         Version = "Insane",
-                        BaseDifficulty = new BaseDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 7,
                         }
