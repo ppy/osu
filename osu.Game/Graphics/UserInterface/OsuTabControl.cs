@@ -45,12 +45,5 @@ namespace osu.Game.Graphics.UserInterface
                     item.AccentColour = value;
             }
         }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            DropDown.HeaderHeight = DrawHeight;
-        }
     }
 }
