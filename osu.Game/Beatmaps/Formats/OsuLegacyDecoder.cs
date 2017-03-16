@@ -209,7 +209,7 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             if (cp != null)
-                beatmap.ControlPoints.Add(cp);
+                beatmap.TimingInfo.ControlPoints.Add(cp);
         }
 
         private void handleColours(Beatmap beatmap, string key, string val, ref bool hasCustomColours)
