@@ -9,12 +9,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface.Tab;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Screens.Select.Tab;
 using Container = osu.Framework.Graphics.Containers.Container;
+using osu.Framework.Graphics.UserInterface.Tab;
 
 namespace osu.Game.Screens.Select
 {
@@ -23,8 +23,10 @@ namespace osu.Game.Screens.Select
         public Action FilterChanged;
 
         public string Search => searchTextBox.Text;
+        
         private SortMode sort = SortMode.Title;
-        public SortMode Sort { 
+        public SortMode Sort
+        { 
             get { return sort; } 
             set
             {
@@ -37,7 +39,8 @@ namespace osu.Game.Screens.Select
         }
 
         private GroupMode group = GroupMode.All;
-        public GroupMode Group {
+        public GroupMode Group
+        {
             get { return group; }
             set
             {
@@ -105,7 +108,7 @@ namespace osu.Game.Screens.Select
                                     Anchor = Anchor.TopLeft,
                                     Position = new Vector2(0, 23)
                                 },
-                                groupTabs = new FilterTabControl<GroupMode>
+                                groupTabs = new OsuTabControl<GroupMode>
                                 {
                                     Width = 230,
                                     AutoSort = true
@@ -128,7 +131,7 @@ namespace osu.Game.Screens.Select
                                                 Bottom = 5
                                             },
                                         },
-                                        sortTabs = new FilterTabControl<SortMode>(87)
+                                        sortTabs = new OsuTabControl<SortMode>(87)
                                         {
                                             Width = 191,
                                             AutoSort = true

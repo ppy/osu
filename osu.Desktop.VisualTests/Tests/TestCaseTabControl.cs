@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Screens.Select.Tab;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -21,7 +21,7 @@ namespace osu.Desktop.VisualTests.Tests
             base.Reset();
 
             OsuSpriteText text;
-            FilterTabControl<GroupMode> filter;
+            OsuTabControl<GroupMode> filter;
 
             Add(new FillFlowContainer
             {
@@ -29,7 +29,7 @@ namespace osu.Desktop.VisualTests.Tests
                 AutoSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    filter = new FilterTabControl<GroupMode>
+                    filter = new OsuTabControl<GroupMode>
                     {
                         Width = 229,
                         AutoSort = true

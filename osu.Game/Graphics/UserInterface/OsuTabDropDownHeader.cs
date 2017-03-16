@@ -6,13 +6,14 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface.Tab;
 using osu.Game.Graphics;
 
-namespace osu.Game.Screens.Select.Tab
+namespace osu.Game.Graphics.UserInterface
 {
-    public class FilterTabDropDownHeader : TabDropDownHeader
+    public class OsuTabDropDownHeader : TabDropDownHeader
     {
         protected override string Label { get; set; }
 
-        public FilterTabDropDownHeader() {
+        public OsuTabDropDownHeader()
+        {
             Foreground.Children = new Drawable[]
             {
                 new TextAwesome

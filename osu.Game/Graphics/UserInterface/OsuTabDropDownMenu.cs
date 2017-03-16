@@ -12,18 +12,18 @@ using osu.Framework.Graphics.UserInterface.Tab;
 using osu.Game.Graphics;
 using osu.Game.Screens.Select.Filter;
 
-namespace osu.Game.Screens.Select.Tab
+namespace osu.Game.Graphics.UserInterface
 {
-    public class FilterTabDropDownMenu<T> : TabDropDownMenu<T>
+    public class OsuTabDropDownMenu<T> : TabDropDownMenu<T>
     {
         public override float HeaderWidth => 14;
         public override float HeaderHeight => 24;
 
-        protected override DropDownHeader CreateHeader() => new FilterTabDropDownHeader();
+        protected override DropDownHeader CreateHeader() => new OsuTabDropDownHeader();
 
-        protected override DropDownMenuItem<T> CreateDropDownItem(string key, T value) => new FilterTabDropDownMenuItem<T>(key, value);
+        protected override DropDownMenuItem<T> CreateDropDownItem(string key, T value) => new OsuTabDropDownMenuItem<T>(key, value);
 
-        public FilterTabDropDownMenu()
+        public OsuTabDropDownMenu()
         {
             MaxDropDownHeight = int.MaxValue;
             ContentContainer.CornerRadius = 4;
@@ -48,7 +48,8 @@ namespace osu.Game.Screens.Select.Tab
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours) {
+        private void load(OsuColour colours)
+        {
             Header.Colour = typeof(T) == typeof(SortMode) ? colours.GreenLight : colours.Blue;
         }
     }
