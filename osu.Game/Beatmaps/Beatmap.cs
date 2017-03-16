@@ -7,7 +7,6 @@ using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Beatmaps
 {
@@ -18,7 +17,7 @@ namespace osu.Game.Beatmaps
         where T : HitObject
     {
         public BeatmapInfo BeatmapInfo;
-        public List<ControlPoint> ControlPoints;
+        public TimingInfo TimingInfo = new TimingInfo();
         public readonly List<Color4> ComboColors = new List<Color4>
         {
             new Color4(17, 136, 170, 255),
@@ -41,49 +40,40 @@ namespace osu.Game.Beatmaps
         public Beatmap(Beatmap original = null)
         {
             BeatmapInfo = original?.BeatmapInfo ?? BeatmapInfo;
-            ControlPoints = original?.ControlPoints ?? ControlPoints;
+            TimingInfo = original?.TimingInfo ?? TimingInfo;
             ComboColors = original?.ComboColors ?? ComboColors;
         }
 
-        public double BPMMaximum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderBy(c => c.BeatLength).FirstOrDefault() ?? ControlPoint.Default).BeatLength;
-        public double BPMMinimum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? ControlPoint.Default).BeatLength;
-        public double BPMMode => BPMAt(ControlPoints.Where(c => c.BeatLength != 0).GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).First().First().Time);
-
-        public double BPMAt(double time)
+        /// <summary>
+        /// Finds the slider velocity at a time.
+        /// </summary>
+        /// <param name="time">The time to find the slider velocity at.</param>
+        /// <returns>The slider velocity in positional length units.</returns>
+        public double SliderVelocityAt(double time)
         {
-            return 60000 / BeatLengthAt(time);
+            double scoringDistance = 100 * BeatmapInfo.BaseDifficulty.SliderMultiplier;
+            double beatDistance = TimingInfo.BeatDistanceAt(time);
+
+            if (beatDistance > 0)
+                return scoringDistance / beatDistance * 1000;
+            return scoringDistance;
         }
 
-        public double BeatLengthAt(double time)
+        /// <summary>
+        /// Maps a difficulty value [0, 10] to a two-piece linear range of values.
+        /// </summary>
+        /// <param name="difficulty">The difficulty value to be mapped.</param>
+        /// <param name="min">Minimum of the resulting range which will be achieved by a difficulty value of 0.</param>
+        /// <param name="mid">Midpoint of the resulting range which will be achieved by a difficulty value of 5.</param>
+        /// <param name="max">Maximum of the resulting range which will be achieved by a difficulty value of 10.</param>
+        /// <returns>Value to which the difficulty value maps in the specified range.</returns>
+        public static double MapDifficultyRange(double difficulty, double min, double mid, double max)
         {
-            ControlPoint overridePoint;
-            ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
-            return timingPoint.BeatLength;
-        }
-
-        public ControlPoint TimingPointAt(double time, out ControlPoint overridePoint)
-        {
-            overridePoint = null;
-
-            ControlPoint timingPoint = null;
-            foreach (var controlPoint in ControlPoints)
-            {
-                // Some beatmaps have the first timingPoint (accidentally) start after the first HitObject(s).
-                // This null check makes it so that the first ControlPoint that makes a timing change is used as
-                // the timingPoint for those HitObject(s).
-                if (controlPoint.Time <= time || timingPoint == null)
-                {
-                    if (controlPoint.TimingChange)
-                    {
-                        timingPoint = controlPoint;
-                        overridePoint = null;
-                    }
-                    else overridePoint = controlPoint;
-                }
-                else break;
-            }
-
-            return timingPoint ?? ControlPoint.Default;
+            if (difficulty > 5)
+                return mid + (max - mid) * (difficulty - 5) / 5;
+            if (difficulty < 5)
+                return mid - (mid - min) * (5 - difficulty) / 5;
+            return mid;
         }
     }
 

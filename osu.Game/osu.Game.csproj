@@ -75,6 +75,7 @@
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\IBeatmapCoverter.cs" />
     <Compile Include="Beatmaps\IBeatmapProcessor.cs" />
+    <Compile Include="Beatmaps\Timing\TimingInfo.cs" />
     <Compile Include="Database\ScoreDatabase.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
