@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.Update();
 
-            DropDown.Header.Height = DrawHeight;
+            DropDown.HeaderHeight = DrawHeight;
         }
     }
 }
