@@ -25,14 +25,6 @@ namespace osu.Game.Modes.UI
     /// </summary>
     public abstract class HitRenderer : Container
     {
-        /// <summary>
-        /// The event that's fired when a hit object is judged.
-        /// </summary>
-        public event Action<JudgementInfo> OnJudgement;
-
-        /// <summary>
-        /// The event that's fired when all hit objects have been judged.
-        /// </summary>
         public event Action OnAllJudged;
 
         /// <summary>
@@ -57,16 +49,15 @@ namespace osu.Game.Modes.UI
         }
 
         /// <summary>
-        /// Triggers a judgement for further processing.
+        /// Checks whether all HitObjects have been judged, and invokes OnAllJudged.
         /// </summary>
-        /// <param name="j">The judgement to trigger.</param>
-        protected void TriggerOnJudgement(JudgementInfo j)
+        protected void CheckAllJudged()
         {
-            OnJudgement?.Invoke(j);
-
             if (AllObjectsJudged)
                 OnAllJudged?.Invoke();
         }
+
+        public abstract ScoreProcessor CreateScoreProcessor();
 
         /// <summary>
         /// Creates a key conversion input manager.
@@ -141,6 +132,8 @@ namespace osu.Game.Modes.UI
         where TObject : HitObject
         where TJudgement : JudgementInfo
     {
+        public event Action<TJudgement> OnJudgement;
+
         protected override Container<Drawable> Content => content;
         protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
 
@@ -197,8 +190,10 @@ namespace osu.Game.Modes.UI
         /// <param name="judgedObject">The object that Judgement has been updated for.</param>
         private void onJudgement(DrawableHitObject<TObject, TJudgement> judgedObject)
         {
-            TriggerOnJudgement(judgedObject.Judgement);
+            OnJudgement?.Invoke(judgedObject.Judgement);
             Playfield.OnJudgement(judgedObject);
+
+            CheckAllJudged();
         }
 
         /// <summary>

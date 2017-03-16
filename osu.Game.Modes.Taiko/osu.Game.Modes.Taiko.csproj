@@ -54,6 +54,7 @@
     <Compile Include="Objects\Drawable\DrawableTaikoHit.cs" />
     <Compile Include="Objects\TaikoBaseHit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TaikoScoreProcessor.cs" />
     <Compile Include="UI\TaikoHitRenderer.cs" />
     <Compile Include="UI\TaikoPlayfield.cs" />
     <Compile Include="TaikoRuleset.cs" />
