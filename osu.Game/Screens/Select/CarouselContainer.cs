@@ -197,7 +197,8 @@ namespace osu.Game.Screens.Select
                     });
                     break;
                 default:
-                    throw new NotImplementedException();
+                    Sort(SortMode.Artist); // Temporary
+                    break;
             }
 
             scrollableContent.Clear(false);
