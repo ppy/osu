@@ -64,7 +64,7 @@ namespace osu.Game.Database
                     foreach (var i in b.Beatmaps)
                     {
                         if (i.Metadata != null) connection.Delete(i.Metadata);
-                        if (i.BaseDifficulty != null) connection.Delete(i.BaseDifficulty);
+                        if (i.Difficulty != null) connection.Delete(i.Difficulty);
 
                         connection.Delete(i);
                     }
@@ -90,7 +90,7 @@ namespace osu.Game.Database
             try
             {
                 conn.CreateTable<BeatmapMetadata>();
-                conn.CreateTable<BaseDifficulty>();
+                conn.CreateTable<BeatmapDifficulty>();
                 conn.CreateTable<BeatmapSetInfo>();
                 conn.CreateTable<BeatmapInfo>();
             }
@@ -112,7 +112,7 @@ namespace osu.Game.Database
             }
 
             connection.DeleteAll<BeatmapMetadata>();
-            connection.DeleteAll<BaseDifficulty>();
+            connection.DeleteAll<BeatmapDifficulty>();
             connection.DeleteAll<BeatmapSetInfo>();
             connection.DeleteAll<BeatmapInfo>();
         }
@@ -329,7 +329,7 @@ namespace osu.Game.Database
             typeof(BeatmapSetInfo),
             typeof(BeatmapInfo),
             typeof(BeatmapMetadata),
-            typeof(BaseDifficulty),
+            typeof(BeatmapDifficulty),
         };
 
         public void Update<T>(T record, bool cascade = true) where T : class
