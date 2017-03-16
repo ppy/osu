@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select
 
         private OsuTabControl<SortMode> sortTabs;
 
-        TabControl<GroupMode> groupTabs;
+        private TabControl<GroupMode> groupTabs;
 
         private SortMode sort = SortMode.Title;
         public SortMode Sort
