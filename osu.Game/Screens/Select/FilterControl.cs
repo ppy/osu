@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Graphics.UserInterface.Tab;
@@ -97,7 +96,6 @@ namespace osu.Game.Screens.Select
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 1,
-                            Y = 24,
                             Colour = OsuColour.Gray(80),
                             Origin = Anchor.BottomLeft,
                             Anchor = Anchor.BottomLeft,
@@ -115,6 +113,7 @@ namespace osu.Game.Screens.Select
                                 groupTabs = new OsuTabControl<GroupMode>
                                 {
                                     RelativeSizeAxes = Axes.X,
+                                    Height = 24,
                                     Width = 0.5f,
                                     AutoSort = true
                                 },
@@ -133,6 +132,7 @@ namespace osu.Game.Screens.Select
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Width = 0.5f,
+                                    Height = 24,
                                     AutoSort = true,
                                 }
                             }
