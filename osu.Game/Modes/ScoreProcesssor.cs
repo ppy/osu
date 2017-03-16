@@ -40,6 +40,9 @@ namespace osu.Game.Modes
         /// </summary>
         public event Action Failed;
 
+        /// <summary>
+        /// Notifies subscribers that the score is in a failed state.
+        /// </summary>
         protected void TriggerFailed()
         {
             Failed?.Invoke();
