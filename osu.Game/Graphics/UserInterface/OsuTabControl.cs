@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -19,10 +20,10 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem<T> { Value = value };
 
+        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || DropDown.Contains(screenSpacePos);
+
         public OsuTabControl()
         {
-            AlwaysReceiveInput = true;
-
             if (!typeof(T).IsEnum)
                 throw new InvalidOperationException("OsuTabControl only supports enums as the generic type argument");
 
