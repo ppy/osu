@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.BindHitRenderer(hitRenderer);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
-            hitRenderer.OnAllJudged += onPass;
+            hitRenderer.OnAllJudged += onCompletion;
 
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
@@ -237,11 +237,20 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private void onPass()
+        private void onCompletion()
         {
             Delay(1000);
             Schedule(delegate
             {
+                // Force a final check to see if the player has failed
+                // Some game modes (e.g. taiko) fail at the end of the map
+                if (scoreProcessor.CheckFailed())
+                {
+                    // If failed, onFail will be called which will push a new screen.
+                    // Let's not push the completion screen in this case
+                    return;
+                }
+
                 ValidForResume = false;
                 Push(new Results
                 {
