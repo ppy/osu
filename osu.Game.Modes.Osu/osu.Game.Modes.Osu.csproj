@@ -44,11 +44,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\OsuBeatmapConverter.cs" />
-    <Compile Include="Objects\BezierApproximator.cs" />
-    <Compile Include="Objects\CircularArcApproximator.cs" />
+    <Compile Include="Beatmaps\OsuBeatmapProcessor.cs" />
     <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
     <Compile Include="Objects\Drawables\Connections\ConnectionRenderer.cs" />
     <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
+    <Compile Include="Judgements\OsuJudgementInfo.cs" />
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerBackground.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
@@ -67,9 +67,8 @@
     <Compile Include="Objects\Drawables\Pieces\TrianglesPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBall.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
+    <Compile Include="Objects\HitObjectType.cs" />
     <Compile Include="Objects\OsuHitObjectDifficulty.cs" />
-    <Compile Include="Objects\OsuHitObjectParser.cs" />
-    <Compile Include="Objects\SliderCurve.cs" />
     <Compile Include="Objects\SliderTick.cs" />
     <Compile Include="OsuAutoReplay.cs" />
     <Compile Include="OsuDifficultyCalculator.cs" />

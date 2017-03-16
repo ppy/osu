@@ -3,26 +3,27 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps.Samples;
-using OpenTK;
+using osu.Game.Modes.Judgements;
 using Container = osu.Framework.Graphics.Containers.Container;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Objects.Drawables
 {
-    public abstract class DrawableHitObject : Container, IStateful<ArmedState>
+    public abstract class DrawableHitObject<TJudgement> : Container, IStateful<ArmedState>
+        where TJudgement : JudgementInfo
     {
         public override bool HandleInput => Interactive;
 
         public bool Interactive = true;
 
-        public JudgementInfo Judgement;
+        public TJudgement Judgement;
 
-        protected abstract JudgementInfo CreateJudgementInfo();
+        protected abstract TJudgement CreateJudgementInfo();
 
         protected abstract void UpdateState(ArmedState state);
 
@@ -67,14 +68,15 @@ namespace osu.Game.Modes.Objects.Drawables
         }
     }
 
-    public abstract class DrawableHitObject<HitObjectType> : DrawableHitObject
-        where HitObjectType : HitObject
+    public abstract class DrawableHitObject<TObject, TJudgement> : DrawableHitObject<TJudgement>
+        where TObject : HitObject
+        where TJudgement : JudgementInfo
     {
-        public event Action<DrawableHitObject<HitObjectType>, JudgementInfo> OnJudgement;
+        public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
 
-        public HitObjectType HitObject;
+        public TObject HitObject;
 
-        protected DrawableHitObject(HitObjectType hitObject)
+        protected DrawableHitObject(TObject hitObject)
         {
             HitObject = hitObject;
         }
@@ -88,7 +90,9 @@ namespace osu.Game.Modes.Objects.Drawables
             if (Judgement.Result != null)
                 return false;
 
-            Judgement.TimeOffset = Time.Current - HitObject.EndTime;
+            double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+
+            Judgement.TimeOffset = Time.Current - endTime;
 
             CheckJudgement(userTriggered);
 
@@ -105,7 +109,7 @@ namespace osu.Game.Modes.Objects.Drawables
                     break;
             }
 
-            OnJudgement?.Invoke(this, Judgement);
+            OnJudgement?.Invoke(this);
 
             return true;
         }
@@ -138,44 +142,17 @@ namespace osu.Game.Modes.Objects.Drawables
             Sample = audio.Sample.Get($@"Gameplay/{sampleSet.ToString().ToLower()}-hit{type.ToString().ToLower()}");
         }
 
-        private List<DrawableHitObject<HitObjectType>> nestedHitObjects;
+        private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;
 
-        protected IEnumerable<DrawableHitObject<HitObjectType>> NestedHitObjects => nestedHitObjects;
+        protected IEnumerable<DrawableHitObject<TObject, TJudgement>> NestedHitObjects => nestedHitObjects;
 
-        protected void AddNested(DrawableHitObject<HitObjectType> h)
+        protected void AddNested(DrawableHitObject<TObject, TJudgement> h)
         {
             if (nestedHitObjects == null)
-                nestedHitObjects = new List<DrawableHitObject<HitObjectType>>();
+                nestedHitObjects = new List<DrawableHitObject<TObject, TJudgement>>();
 
-            h.OnJudgement += (d, j) => { OnJudgement?.Invoke(d, j); } ;
+            h.OnJudgement += d => OnJudgement?.Invoke(d);
             nestedHitObjects.Add(h);
         }
-    }
-
-    public enum ArmedState
-    {
-        Idle,
-        Hit,
-        Miss
-    }
-
-    public class PositionalJudgementInfo : JudgementInfo
-    {
-        public Vector2 PositionOffset;
-    }
-
-    public class JudgementInfo
-    {
-        public ulong? ComboAtHit;
-        public HitResult? Result;
-        public double TimeOffset;
-    }
-
-    public enum HitResult
-    {
-        [Description(@"Miss")]
-        Miss,
-        [Description(@"Hit")]
-        Hit,
     }
 }

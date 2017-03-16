@@ -1,19 +1,21 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Framework.Screens.Testing;
-using osu.Framework.Graphics;
-using osu.Framework.Timing;
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Configuration;
-using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Modes.Osu.Objects;
-using osu.Game.Modes.Osu.Objects.Drawables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using OpenTK.Graphics;
+using osu.Framework.Screens.Testing;
+using osu.Framework.Timing;
+using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Osu.Judgements;
+using osu.Game.Modes.Osu.Objects;
+using osu.Game.Modes.Osu.Objects.Drawables;
+using System.Collections.Generic;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -60,12 +62,15 @@ namespace osu.Desktop.VisualTests.Tests
                     add(new DrawableSlider(new Slider
                     {
                         StartTime = framedClock.CurrentTime + 600,
-                        ControlPoints = new List<Vector2>
+                        CurveObject = new CurvedHitObject
                         {
-                            new Vector2(-200, 0),
-                            new Vector2(400, 0),
+                            ControlPoints = new List<Vector2>
+                            {
+                                new Vector2(-200, 0),
+                                new Vector2(400, 0),
+                            },
+                            Distance = 400
                         },
-                        Length = 400,
                         Position = new Vector2(-200, 0),
                         Velocity = 1,
                         TickDistance = 100,
@@ -75,7 +80,7 @@ namespace osu.Desktop.VisualTests.Tests
                     add(new DrawableSpinner(new Spinner
                     {
                         StartTime = framedClock.CurrentTime + 600,
-                        Length = 1000,
+                        EndTime = framedClock.CurrentTime + 1600,
                         Position = new Vector2(0, 0),
                     }));
                     break;
@@ -123,7 +128,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private int depth;
 
-        private void add(DrawableHitObject h)
+        private void add(DrawableOsuHitObject h)
         {
             h.Anchor = Anchor.Centre;
             h.Depth = depth++;

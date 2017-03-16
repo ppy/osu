@@ -11,11 +11,12 @@ using osu.Game.Modes.Osu.Objects.Drawables.Connections;
 using osu.Game.Modes.UI;
 using System.Linq;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Modes.Osu.Judgements;
 using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.UI
 {
-    public class OsuPlayfield : Playfield<OsuHitObject>
+    public class OsuPlayfield : Playfield<OsuHitObject, OsuJudgementInfo>
     {
         private Container approachCircles;
         private Container judgementLayer;
@@ -65,16 +66,13 @@ namespace osu.Game.Modes.Osu.UI
             AddInternal(new OsuCursorContainer { Colour = Color4.LightYellow });
         }
 
-        public override void Add(DrawableHitObject<OsuHitObject> h)
+        public override void Add(DrawableHitObject<OsuHitObject, OsuJudgementInfo> h)
         {
             h.Depth = (float)h.HitObject.StartTime;
+
             IDrawableHitObjectWithProxiedApproach c = h as IDrawableHitObjectWithProxiedApproach;
             if (c != null)
-            {
                 approachCircles.Add(c.ProxiedLayer.CreateProxy());
-            }
-
-            h.OnJudgement += judgement;
 
             base.Add(h);
         }
@@ -86,9 +84,9 @@ namespace osu.Game.Modes.Osu.UI
                 .OrderBy(h => h.StartTime);
         }
 
-        private void judgement(DrawableHitObject<OsuHitObject> h, JudgementInfo j)
+        public override void OnJudgement(DrawableHitObject<OsuHitObject, OsuJudgementInfo> judgedObject)
         {
-            HitExplosion explosion = new HitExplosion((OsuJudgementInfo)j, h.HitObject);
+            HitExplosion explosion = new HitExplosion(judgedObject.Judgement, judgedObject.HitObject);
 
             judgementLayer.Add(explosion);
         }
