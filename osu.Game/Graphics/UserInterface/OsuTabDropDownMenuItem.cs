@@ -11,11 +11,11 @@ using OpenTK.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Select.Filter;
 
-namespace osu.Game.Screens.Select.Tab
+namespace osu.Game.Graphics.UserInterface
 {
-    public class FilterTabDropDownMenuItem<T> : DropDownMenuItem<T>
+    public class OsuTabDropDownMenuItem<T> : DropDownMenuItem<T>
     {
-        public FilterTabDropDownMenuItem(string text, T value) : base(text, value)
+        public OsuTabDropDownMenuItem(string text, T value) : base(text, value)
         {
             Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4 };
             Foreground.Margin = new MarginPadding { Left = 7 };

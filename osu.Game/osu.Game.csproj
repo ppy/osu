@@ -85,11 +85,6 @@
     <Compile Include="Graphics\UserInterface\OsuPasswordTextBox.cs" />
     <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
-    <Compile Include="Screens\Select\Tab\FilterTabControl.cs" />
-    <Compile Include="Screens\Select\Tab\FilterTabDropDownMenu.cs" />
-    <Compile Include="Screens\Select\Tab\FilterTabItem.cs" />
-    <Compile Include="Screens\Select\Tab\FilterTabDropDownHeader.cs" />
-    <Compile Include="Screens\Select\Tab\FilterTabDropDownMenuItem.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
     <Compile Include="Input\Handlers\ReplayInputHandler.cs" />
     <Compile Include="IO\Legacy\ILegacySerializable.cs" />
@@ -354,6 +349,11 @@
     <Compile Include="Overlays\WaveOverlayContainer.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabDropDownHeader.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabDropDownMenu.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabDropDownMenuItem.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

@@ -14,9 +14,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Select.Filter;
 
-namespace osu.Game.Screens.Select.Tab
+namespace osu.Game.Graphics.UserInterface
 {
-    public class FilterTabItem<T> : TabItem<T>
+    public class OsuTabItem<T> : TabItem<T>
     {
         private SpriteText text;
         private Box box;
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Select.Tab
                 fadeInactive();
         }
 
-        public FilterTabItem()
+        public OsuTabItem()
         {
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
