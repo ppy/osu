@@ -56,12 +56,12 @@ namespace osu.Game.Screens.Select
         protected virtual bool ShowFooter => true;
 
         /// <summary>
-        /// Can be null if <see cref="ShowFooter"/> == false
+        /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
         protected readonly BeatmapOptionsOverlay BeatmapOptions;
 
         /// <summary>
-        /// Can be null if <see cref="ShowFooter"/> == false
+        /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
         protected readonly Footer Footer;
 
