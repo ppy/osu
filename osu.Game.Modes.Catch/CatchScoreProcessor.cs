@@ -9,6 +9,10 @@ namespace osu.Game.Modes.Catch
 {
     internal class CatchScoreProcessor : ScoreProcessor<CatchBaseHit, CatchJudgementInfo>
     {
+        public CatchScoreProcessor()
+        {
+        }
+
         public CatchScoreProcessor(HitRenderer<CatchBaseHit, CatchJudgementInfo> hitRenderer)
             : base(hitRenderer)
         {
