@@ -55,6 +55,20 @@ namespace osu.Game.Graphics.Cursor
             return base.OnDragStart(state);
         }
 
+        protected override void PopIn()
+        {
+            ActiveCursor.FadeTo(1, 250, EasingTypes.OutQuint);
+            ActiveCursor.ScaleTo(1, 1000, EasingTypes.OutElastic);
+        }
+
+        protected override void PopOut()
+        {
+            ActiveCursor.FadeTo(0, 1400, EasingTypes.OutQuint);
+            ActiveCursor.ScaleTo(1.1f, 100, EasingTypes.Out);
+            ActiveCursor.Delay(100);
+            ActiveCursor.ScaleTo(0, 500, EasingTypes.In);
+        }
+
         public class Cursor : Container
         {
             private Container cursorContainer;

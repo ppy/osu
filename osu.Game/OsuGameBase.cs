@@ -38,7 +38,7 @@ namespace osu.Game
 
         private RatioAdjust ratioContainer;
 
-        protected CursorContainer Cursor;
+        protected MenuCursor Cursor;
 
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
