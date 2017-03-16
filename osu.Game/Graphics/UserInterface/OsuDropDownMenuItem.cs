@@ -18,6 +18,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             Foreground.Padding = new MarginPadding(2);
 
+            Masking = true;
+            CornerRadius = 6;
+
             Children = new[]
             {
                 new FillFlowContainer
@@ -27,12 +30,15 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new TextAwesome
+                        chevron = new TextAwesome
                         {
+                            AlwaysPresent = true,
                             Icon = FontAwesome.fa_chevron_right,
+                            UseFullGlyphHeight = false,
                             Colour = Color4.Black,
-                            TextSize = 12,
-                            Margin = new MarginPadding { Right = 3 },
+                            Alpha = 0.5f,
+                            TextSize = 8,
+                            Margin = new MarginPadding { Left = 3, Right = 3 },
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                         },
@@ -46,11 +52,33 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
+        private Color4? accentColour;
+
+        private TextAwesome chevron;
+
+        protected override void FormatForeground(bool hover = false)
+        {
+            base.FormatForeground(hover);
+            chevron.Alpha = hover ? 1 : 0;
+        }
+
+        public Color4 AccentColour
+        {
+            get { return accentColour.GetValueOrDefault(); }
+            set
+            {
+                accentColour = value;
+                BackgroundColourHover = BackgroundColourSelected = value;
+                FormatBackground();
+                FormatForeground();
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BackgroundColour = Color4.Black.Opacity(0.5f);
-            BackgroundColourHover = colours.PinkDarker;
+            BackgroundColour = Color4.Transparent;
+            BackgroundColourHover = accentColour ?? colours.PinkDarker;
             BackgroundColourSelected = Color4.Black.Opacity(0.5f);
         }
     }

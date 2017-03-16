@@ -108,10 +108,13 @@ namespace osu.Game.Screens.Play
             });
 
             ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
+            hitRenderer = ruleset.CreateHitRendererWith(Beatmap);
+
+            scoreProcessor = hitRenderer.CreateScoreProcessor();
 
             hudOverlay = new StandardHudOverlay();
             hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
-            hudOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
+            hudOverlay.BindProcessor(scoreProcessor);
 
             pauseOverlay = new PauseOverlay
             {
@@ -125,7 +128,6 @@ namespace osu.Game.Screens.Play
                 OnQuit = Exit
             };
 
-            hitRenderer = ruleset.CreateHitRendererWith(Beatmap);
 
             if (ReplayInputHandler != null)
                 hitRenderer.InputManager.ReplayInputHandler = ReplayInputHandler;
@@ -133,7 +135,6 @@ namespace osu.Game.Screens.Play
             hudOverlay.BindHitRenderer(hitRenderer);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
-            hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
             hitRenderer.OnAllJudged += onPass;
 
             //bind ScoreProcessor to ourselves (for a fail situation)

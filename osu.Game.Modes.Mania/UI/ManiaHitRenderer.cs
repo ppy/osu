@@ -20,11 +20,13 @@ namespace osu.Game.Modes.Mania.UI
             this.columns = columns;
         }
 
+        public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
+
         protected override IBeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
 
         protected override IBeatmapProcessor<ManiaBaseHit> CreateBeatmapProcessor() => new ManiaBeatmapProcessor();
-        protected override Playfield<ManiaBaseHit, ManiaJudgementInfo> CreatePlayfield() => new ManiaPlayfield(columns);
 
+        protected override Playfield<ManiaBaseHit, ManiaJudgementInfo> CreatePlayfield() => new ManiaPlayfield(columns);
 
         protected override DrawableHitObject<ManiaBaseHit, ManiaJudgementInfo> GetVisualRepresentation(ManiaBaseHit h) => null;
     }

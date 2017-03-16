@@ -17,11 +17,13 @@ namespace osu.Game.Modes.Catch.UI
         {
         }
 
+        public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
+
         protected override IBeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
 
         protected override IBeatmapProcessor<CatchBaseHit> CreateBeatmapProcessor() => new CatchBeatmapProcessor();
-        protected override Playfield<CatchBaseHit, CatchJudgementInfo> CreatePlayfield() => new CatchPlayfield();
 
+        protected override Playfield<CatchBaseHit, CatchJudgementInfo> CreatePlayfield() => new CatchPlayfield();
 
         protected override DrawableHitObject<CatchBaseHit, CatchJudgementInfo> GetVisualRepresentation(CatchBaseHit h) => null;
     }
