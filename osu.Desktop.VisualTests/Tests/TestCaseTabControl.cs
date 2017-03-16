@@ -1,14 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Diagnostics;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using OpenTK;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Select.Filter;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -22,24 +20,16 @@ namespace osu.Desktop.VisualTests.Tests
 
             OsuSpriteText text;
             OsuTabControl<GroupMode> filter;
-
-            Add(new FillFlowContainer
+            Add(filter = new OsuTabControl<GroupMode>
             {
-                Direction = FillDirection.Horizontal,
-                AutoSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    filter = new OsuTabControl<GroupMode>
-                    {
-                        Width = 229,
-                        AutoSort = true
-                    },
-                    text = new OsuSpriteText
-                    {
-                        Text = "None",
-                        Margin = new MarginPadding(4)
-                    }
-                }
+                Width = 229,
+                AutoSort = true
+            });
+            Add(text = new OsuSpriteText
+            {
+                Text = "None",
+                Margin = new MarginPadding(4),
+                Position = new Vector2(275, 5)
             });
 
             filter.PinTab(GroupMode.All);
@@ -47,8 +37,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             filter.ValueChanged += (sender, mode) =>
             {
-                Debug.WriteLine($"Selected {mode}");
-                text.Text = mode.ToString();
+                text.Text = "Currently Selected: " + mode.ToString();
             };
         }
     }
