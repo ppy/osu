@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem<T> { Value = value };
 
-        public OsuTabControl(float offset = 0) : base(offset)
+        public OsuTabControl()
         {
             if (!typeof(T).IsEnum)
                 throw new InvalidOperationException("OsuTabControl only supports enums as the generic type argument");
@@ -44,6 +44,13 @@ namespace osu.Game.Graphics.UserInterface
                 foreach (var item in TabContainer.Children.OfType<OsuTabItem<T>>())
                     item.AccentColour = value;
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            DropDown.Header.Height = DrawHeight;
         }
     }
 }

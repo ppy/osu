@@ -26,7 +26,7 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new FillFlowContainer
             {
                 Direction = FillDirection.Horizontal,
-                AutoSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
                     filter = new OsuTabControl<GroupMode>

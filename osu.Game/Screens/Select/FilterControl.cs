@@ -26,7 +26,9 @@ namespace osu.Game.Screens.Select
         public string Search => searchTextBox.Text;
 
         private OsuTabControl<SortMode> sortTabs;
-        
+
+        TabControl<GroupMode> groupTabs;
+
         private SortMode sort = SortMode.Title;
         public SortMode Sort
         { 
@@ -55,34 +57,30 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private OsuSpriteText spriteText;
-
         public Action Exit;
 
         private SearchTextBox searchTextBox;
 
-        public FilterControl(float height)
-        {
-            TabControl<GroupMode> groupTabs;
+        public override bool Contains(Vector2 screenSpacePos) => base.Contains(screenSpacePos) || groupTabs.Contains(screenSpacePos) || sortTabs.Contains(screenSpacePos);
 
+        public FilterControl()
+        {
             Children = new Drawable[]
             {
                 new Box
                 {
                     Colour = Color4.Black,
                     Alpha = 0.8f,
-                    RelativeSizeAxes = Axes.X,
-                    Height = height
+                    RelativeSizeAxes = Axes.Both,
                 },
-                new FillFlowContainer
+                new Container
                 {
                     Padding = new MarginPadding(20),
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
+                    BypassContainsCheck = true,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 500,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Width = 0.4f, // TODO: InnerWidth property or something
-                    Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
                         searchTextBox = new SearchTextBox
@@ -95,53 +93,50 @@ namespace osu.Game.Screens.Select
                             },
                             Exit = () => Exit?.Invoke(),
                         },
-                        new Container
+                        new Box
                         {
                             RelativeSizeAxes = Axes.X,
+                            Height = 1,
+                            Y = 24,
+                            Colour = OsuColour.Gray(80),
+                            Origin = Anchor.BottomLeft,
+                            Anchor = Anchor.BottomLeft,
+                        },
+                        new FillFlowContainer
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            Direction = FillDirection.Horizontal,
+                            RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            BypassContainsCheck = true,
                             Children = new Drawable[]
                             {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 1,
-                                    Colour = OsuColour.Gray(80),
-                                    Origin = Anchor.TopLeft,
-                                    Anchor = Anchor.TopLeft,
-                                    Position = new Vector2(0, 23)
-                                },
                                 groupTabs = new OsuTabControl<GroupMode>
                                 {
-                                    Width = 230,
+                                    RelativeSizeAxes = Axes.X,
+                                    Width = 0.5f,
                                     AutoSort = true
                                 },
-                                new Container
+                                //spriteText = new OsuSpriteText
+                                //{
+                                //    Font = @"Exo2.0-Bold",
+                                //    Text = "Sort results by",
+                                //    TextSize = 14,
+                                //    Margin = new MarginPadding
+                                //    {
+                                //        Top = 5,
+                                //        Bottom = 5
+                                //    },
+                                //},
+                                sortTabs = new OsuTabControl<SortMode>()
                                 {
-                                    AutoSizeAxes = Axes.Both,
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
-                                    Children = new Drawable[]
-                                    {
-                                        spriteText = new OsuSpriteText
-                                        {
-                                            Font = @"Exo2.0-Bold",
-                                            Text = "Sort results by",
-                                            TextSize = 14,
-                                            Margin = new MarginPadding
-                                            {
-                                                Top = 5,
-                                                Bottom = 5
-                                            },
-                                        },
-                                        sortTabs = new OsuTabControl<SortMode>(87)
-                                        {
-                                            Width = 191,
-                                            AutoSort = true,
-                                        }
-                                    }
+                                    RelativeSizeAxes = Axes.X,
+                                    Width = 0.5f,
+                                    AutoSort = true,
                                 }
                             }
-                        }
+                        },
                     }
                 }
             };
@@ -166,7 +161,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            sortTabs.AccentColour = spriteText.Colour = colours.GreenLight;
+            sortTabs.AccentColour = colours.GreenLight;
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;

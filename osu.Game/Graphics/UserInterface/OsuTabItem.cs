@@ -81,12 +81,16 @@ namespace osu.Game.Graphics.UserInterface
 
         public OsuTabItem()
         {
-            AutoSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.X;
+            RelativeSizeAxes = Axes.Y;
+
             Children = new Drawable[]
             {
                 text = new OsuSpriteText
                 {
                     Margin = new MarginPadding(5),
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
                     TextSize = 14,
                     Font = @"Exo2.0-Bold", // Font should only turn bold when active?
                 },
