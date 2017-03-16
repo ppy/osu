@@ -43,6 +43,11 @@ namespace osu.Game.Modes
         /// </summary>
         public readonly BindableInt HighestCombo = new BindableInt();
 
+        /// <summary>
+        /// Whether the score is in a failed state.
+        /// </summary>
+        public virtual bool HasFailed { get; }
+
         protected ScoreProcessor()
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
@@ -78,12 +83,6 @@ namespace osu.Game.Modes
         {
             Failed?.Invoke();
         }
-
-        /// <summary>
-        /// Checks if the score is in a failing state.
-        /// </summary>
-        /// <returns>Whether the score is in a failing state.</returns>
-        public abstract bool CheckFailed();
     }
 
     public abstract class ScoreProcessor<TObject, TJudgement> : ScoreProcessor
@@ -95,15 +94,12 @@ namespace osu.Game.Modes
         /// </summary>
         protected readonly List<TJudgement> Judgements = new List<TJudgement>();
 
-        /// <summary>
-        /// Whether the score is in a failable state.
-        /// </summary>
-        protected virtual bool IsFailable => Health.Value == Health.MinValue;
+        public override bool HasFailed => Health.Value == Health.MinValue;
 
         /// <summary>
         /// Whether this ScoreProcessor has already failed.
         /// </summary>
-        private bool hasFailed;
+        private bool alreadyFailed;
 
         protected ScoreProcessor()
         {
@@ -117,17 +113,6 @@ namespace osu.Game.Modes
             ComputeTargets(hitRenderer.Beatmap);
 
             Reset();
-        }
-
-        public override bool CheckFailed()
-        {
-            if (!hasFailed && IsFailable)
-            {
-                hasFailed = true;
-                TriggerFailed();
-            }
-
-            return hasFailed;
         }
 
         /// <summary>
@@ -148,14 +133,27 @@ namespace osu.Game.Modes
 
             judgement.ComboAtHit = (ulong)Combo.Value;
 
-            CheckFailed();
+            updateFailed();
+        }
+
+        /// <summary>
+        /// Checks if the score is in a failing state.
+        /// </summary>
+        /// <returns>Whether the score is in a failing state.</returns>
+        private void updateFailed()
+        {
+            if (alreadyFailed || !HasFailed)
+                return;
+
+            alreadyFailed = true;
+            TriggerFailed();
         }
 
         protected override void Reset()
         {
             Judgements.Clear();
 
-            hasFailed = false;
+            alreadyFailed = false;
         }
 
         /// <summary>
