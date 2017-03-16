@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using osu.Game.Modes.Judgements;
 using osu.Game.Modes.UI;
 using osu.Game.Modes.Objects;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes
 {
@@ -42,6 +43,13 @@ namespace osu.Game.Modes
         /// </summary>
         public readonly BindableInt HighestCombo = new BindableInt();
 
+        protected ScoreProcessor()
+        {
+            Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
+
+            Reset();
+        }
+
         public virtual Score GetScore() => new Score
         {
             TotalScore = TotalScore,
@@ -52,10 +60,16 @@ namespace osu.Game.Modes
         };
 
         /// <summary>
-        /// Checks if the score is in a failing state.
+        /// Resets this ScoreProcessor to a stale state.
         /// </summary>
-        /// <returns>Whether the score is in a failing state.</returns>
-        public abstract bool CheckFailed();
+        protected virtual void Reset()
+        {
+            TotalScore.Value = 0;
+            Accuracy.Value = 0;
+            Health.Value = 0;
+            Combo.Value = 0;
+            HighestCombo.Value = 0;
+        }
 
         /// <summary>
         /// Notifies subscribers that the score is in a failed state.
@@ -64,6 +78,12 @@ namespace osu.Game.Modes
         {
             Failed?.Invoke();
         }
+
+        /// <summary>
+        /// Checks if the score is in a failing state.
+        /// </summary>
+        /// <returns>Whether the score is in a failing state.</returns>
+        public abstract bool CheckFailed();
     }
 
     public abstract class ScoreProcessor<TObject, TJudgement> : ScoreProcessor
@@ -87,17 +107,34 @@ namespace osu.Game.Modes
 
         protected ScoreProcessor()
         {
-            Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
+        }
+
+        protected ScoreProcessor(HitRenderer<TObject, TJudgement> hitRenderer)
+        {
+            Judgements.Capacity = hitRenderer.Beatmap.HitObjects.Count;
+            hitRenderer.OnJudgement += addJudgement;
+
+            ComputeTargets(hitRenderer.Beatmap);
 
             Reset();
         }
 
-        protected ScoreProcessor(HitRenderer<TObject, TJudgement> hitRenderer)
-            : this()
+        public override bool CheckFailed()
         {
-            Judgements.Capacity = hitRenderer.Beatmap.HitObjects.Count;
-            hitRenderer.OnJudgement += addJudgement;
+            if (!hasFailed && IsFailable)
+            {
+                hasFailed = true;
+                TriggerFailed();
+            }
+
+            return hasFailed;
         }
+
+        /// <summary>
+        /// Computes target scoring values for this ScoreProcessor. This is equivalent to performing an auto-play of the score to find the values.
+        /// </summary>
+        /// <param name="beatmap">The Beatmap containing the objects that will be judged by this ScoreProcessor.</param>
+        protected virtual void ComputeTargets(Beatmap<TObject> beatmap) { }
 
         /// <summary>
         /// Adds a judgement to this ScoreProcessor.
@@ -114,30 +151,11 @@ namespace osu.Game.Modes
             CheckFailed();
         }
 
-        public override bool CheckFailed()
-        {
-            if (!hasFailed && IsFailable)
-            {
-                hasFailed = true;
-                TriggerFailed();
-            }
-
-            return hasFailed;
-        }
-
-        /// <summary>
-        /// Resets this ScoreProcessor to a stale state.
-        /// </summary>
-        protected virtual void Reset()
+        protected override void Reset()
         {
             Judgements.Clear();
 
             hasFailed = false;
-            TotalScore.Value = 0;
-            Accuracy.Value = 0;
-            Health.Value = 0;
-            Combo.Value = 0;
-            HighestCombo.Value = 0;
         }
 
         /// <summary>
