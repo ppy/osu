@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Select
 
         private SearchTextBox searchTextBox;
 
-        public override bool Contains(Vector2 screenSpacePos) => base.Contains(screenSpacePos) || groupTabs.Contains(screenSpacePos) || sortTabs.Contains(screenSpacePos);
+        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || groupTabs.Contains(screenSpacePos) || sortTabs.Contains(screenSpacePos);
 
         public FilterControl()
         {
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Select
                 new Container
                 {
                     Padding = new MarginPadding(20),
-                    BypassContainsCheck = true,
+                    AlwaysReceiveInput = true,
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
                     Anchor = Anchor.TopRight,
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Select
                             Direction = FillDirection.Horizontal,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            BypassContainsCheck = true,
+                            AlwaysReceiveInput = true,
                             Children = new Drawable[]
                             {
                                 groupTabs = new OsuTabControl<GroupMode>

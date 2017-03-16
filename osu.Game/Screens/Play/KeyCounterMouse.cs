@@ -13,6 +13,7 @@ namespace osu.Game.Screens.Play
 
         public KeyCounterMouse(MouseButton button) : base(getStringRepresentation(button))
         {
+            AlwaysReceiveInput = true;
             Button = button;
         }
 
@@ -28,8 +29,6 @@ namespace osu.Game.Screens.Play
                     return @"M2";
             }
         }
-
-        public override bool Contains(Vector2 screenSpacePos) => true;
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
