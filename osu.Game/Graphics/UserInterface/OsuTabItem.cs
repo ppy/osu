@@ -8,7 +8,8 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface.Tab;
+using osu.Framework.Graphics.Transforms;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 
@@ -46,6 +47,8 @@ namespace osu.Game.Graphics.UserInterface
             get { return base.Active; }
             set
             {
+                if (Active == value) return;
+
                 if (value)
                     fadeActive();
                 else
@@ -54,16 +57,18 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        private const float transition_length = 500;
+
         private void fadeActive()
         {
-            box.FadeIn(300);
-            text.FadeColour(Color4.White, 300);
+            box.FadeIn(transition_length, EasingTypes.OutQuint);
+            text.FadeColour(Color4.White, transition_length, EasingTypes.OutQuint);
         }
 
         private void fadeInactive()
         {
-            box.FadeOut(300);
-            text.FadeColour(AccentColour, 300);
+            box.FadeOut(transition_length, EasingTypes.OutQuint);
+            text.FadeColour(AccentColour, transition_length, EasingTypes.OutQuint);
         }
 
         protected override bool OnHover(InputState state)

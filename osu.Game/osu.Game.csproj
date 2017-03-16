@@ -350,8 +350,6 @@
     <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
-    <Compile Include="Graphics\UserInterface\OsuTabDropDownMenu.cs" />
-    <Compile Include="Graphics\UserInterface\OsuTabDropDownMenuItem.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabItem.cs" />
   </ItemGroup>
   <ItemGroup>
