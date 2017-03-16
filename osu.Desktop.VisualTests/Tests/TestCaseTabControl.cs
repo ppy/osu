@@ -22,7 +22,7 @@ namespace osu.Desktop.VisualTests.Tests
             OsuTabControl<GroupMode> filter;
             Add(filter = new OsuTabControl<GroupMode>
             {
-                Width = 229,
+                Size = new Vector2(229, 24),
                 AutoSort = true
             });
             Add(text = new OsuSpriteText
