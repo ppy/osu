@@ -7,12 +7,64 @@ using System.Collections.Generic;
 using osu.Game.Modes.Judgements;
 using osu.Game.Modes.UI;
 using osu.Game.Modes.Objects;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes
 {
     public abstract class ScoreProcessor
     {
-        public virtual Score GetScore() => new Score
+        /// <summary>
+        /// Invoked when the ScoreProcessor is in a failed state.
+        /// </summary>
+        public event Action Failed;
+
+        /// <summary>
+        /// The current total score.
+        /// </summary>
+        public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
+
+        /// <summary>
+        /// The current accuracy.
+        /// </summary>
+        public readonly BindableDouble Accuracy = new BindableDouble { MinValue = 0, MaxValue = 1 };
+
+        /// <summary>
+        /// The current health.
+        /// </summary>
+        public readonly BindableDouble Health = new BindableDouble { MinValue = 0, MaxValue = 1 };
+
+        /// <summary>
+        /// The current combo.
+        /// </summary>
+        public readonly BindableInt Combo = new BindableInt();
+
+        /// <summary>
+        /// THe highest combo achieved by this score.
+        /// </summary>
+        public readonly BindableInt HighestCombo = new BindableInt();
+
+        /// <summary>
+        /// Whether the score is in a failed state.
+        /// </summary>
+        public virtual bool HasFailed => false;
+
+        /// <summary>
+        /// Whether this ScoreProcessor has already triggered the failed state.
+        /// </summary>
+        private bool alreadyFailed;
+
+        protected ScoreProcessor()
+        {
+            Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
+
+            Reset();
+        }
+
+        /// <summary>
+        /// Creates a Score applicable to the game mode in which this ScoreProcessor resides.
+        /// </summary>
+        /// <returns>The Score.</returns>
+        public virtual Score CreateScore() => new Score
         {
             TotalScore = TotalScore,
             Combo = Combo,
@@ -21,30 +73,32 @@ namespace osu.Game.Modes
             Health = Health,
         };
 
-        public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
-
-        public readonly BindableDouble Accuracy = new BindableDouble { MinValue = 0, MaxValue = 1 };
-
-        public readonly BindableDouble Health = new BindableDouble { MinValue = 0, MaxValue = 1 };
-
-        public readonly BindableInt Combo = new BindableInt();
-
         /// <summary>
-        /// Keeps track of the highest combo ever achieved in this play.
-        /// This is handled automatically by ScoreProcessor.
+        /// Resets this ScoreProcessor to a default state.
         /// </summary>
-        public readonly BindableInt HighestCombo = new BindableInt();
-
-        /// <summary>
-        /// Called when we reach a failing health of zero.
-        /// </summary>
-        public event Action Failed;
-
-        /// <summary>
-        /// Notifies subscribers that the score is in a failed state.
-        /// </summary>
-        protected void TriggerFailed()
+        protected virtual void Reset()
         {
+            TotalScore.Value = 0;
+            Accuracy.Value = 0;
+            Health.Value = 0;
+            Combo.Value = 0;
+            HighestCombo.Value = 0;
+
+            alreadyFailed = false;
+        }
+
+        /// <summary>
+        /// Checks if the score is in a failed state and notifies subscribers.
+        /// <para>
+        /// This can only ever notify subscribers once.
+        /// </para>
+        /// </summary>
+        protected void UpdateFailed()
+        {
+            if (alreadyFailed || !HasFailed)
+                return;
+
+            alreadyFailed = true;
             Failed?.Invoke();
         }
     }
@@ -56,32 +110,35 @@ namespace osu.Game.Modes
         /// <summary>
         /// All judgements held by this ScoreProcessor.
         /// </summary>
-        protected List<TJudgement> Judgements;
+        protected readonly List<TJudgement> Judgements = new List<TJudgement>();
 
-        /// <summary>
-        /// Are we allowed to fail?
-        /// </summary>
-        protected bool CanFail => true;
-
-        /// <summary>
-        /// Whether this ScoreProcessor has already triggered the failed event.
-        /// </summary>
-        protected bool HasFailed { get; private set; }
+        public override bool HasFailed => Health.Value == Health.MinValue;
 
         protected ScoreProcessor()
         {
-            Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
+        }
+
+        protected ScoreProcessor(HitRenderer<TObject, TJudgement> hitRenderer)
+        {
+            Judgements.Capacity = hitRenderer.Beatmap.HitObjects.Count;
+
+            hitRenderer.OnJudgement += addJudgement;
+
+            ComputeTargets(hitRenderer.Beatmap);
 
             Reset();
         }
 
-        protected ScoreProcessor(HitRenderer<TObject, TJudgement> hitRenderer)
-            : this()
-        {
-            Judgements = new List<TJudgement>(hitRenderer.Beatmap.HitObjects.Count);
-            hitRenderer.OnJudgement += addJudgement;
-        }
+        /// <summary>
+        /// Computes target scoring values for this ScoreProcessor. This is equivalent to performing an auto-play of the score to find the values.
+        /// </summary>
+        /// <param name="beatmap">The Beatmap containing the objects that will be judged by this ScoreProcessor.</param>
+        protected virtual void ComputeTargets(Beatmap<TObject> beatmap) { }
 
+        /// <summary>
+        /// Adds a judgement to this ScoreProcessor.
+        /// </summary>
+        /// <param name="judgement">The judgement to add.</param>
         private void addJudgement(TJudgement judgement)
         {
             Judgements.Add(judgement);
@@ -89,17 +146,14 @@ namespace osu.Game.Modes
             UpdateCalculations(judgement);
 
             judgement.ComboAtHit = (ulong)Combo.Value;
-            if (Health.Value == Health.MinValue && !HasFailed)
-            {
-                HasFailed = true;
-                TriggerFailed();
-            }
+
+            UpdateFailed();
         }
 
-        /// <summary>
-        /// Resets this ScoreProcessor to a stale state.
-        /// </summary>
-        protected virtual void Reset() { }
+        protected override void Reset()
+        {
+            Judgements.Clear();
+        }
 
         /// <summary>
         /// Update any values that potentially need post-processing on a judgement change.

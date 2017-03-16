@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.BindHitRenderer(hitRenderer);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
-            hitRenderer.OnAllJudged += onPass;
+            hitRenderer.OnAllJudged += onCompletion;
 
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
@@ -237,15 +237,19 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private void onPass()
+        private void onCompletion()
         {
+            // Only show the completion screen if the player hasn't failed
+            if (scoreProcessor.HasFailed)
+                return;
+
             Delay(1000);
             Schedule(delegate
             {
                 ValidForResume = false;
                 Push(new Results
                 {
-                    Score = scoreProcessor.GetScore()
+                    Score = scoreProcessor.CreateScore()
                 });
             });
         }

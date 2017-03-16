@@ -141,10 +141,10 @@ namespace osu.Game.Screens.Select
                 }
             };
 
-            groupTabs.PinTab(GroupMode.All);
-            groupTabs.PinTab(GroupMode.RecentlyPlayed);
-            groupTabs.ValueChanged += (sender, value) => Group = value;
-            sortTabs.ValueChanged += (sender, value) => Sort = value;
+            groupTabs.PinItem(GroupMode.All);
+            groupTabs.PinItem(GroupMode.RecentlyPlayed);
+            groupTabs.ItemChanged += (sender, value) => Group = value;
+            sortTabs.ItemChanged += (sender, value) => Sort = value;
         }
 
         public void Deactivate()
