@@ -51,7 +51,7 @@ namespace osu.Game.Modes.Osu.Objects
         {
             base.SetDefaultsFromBeatmap(beatmap);
 
-            var baseDifficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            var baseDifficulty = beatmap.BeatmapInfo.Difficulty;
 
             ControlPoint overridePoint;
             ControlPoint timingPoint = beatmap.TimingInfo.TimingPointAt(StartTime, out overridePoint);

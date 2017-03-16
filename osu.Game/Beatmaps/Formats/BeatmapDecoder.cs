@@ -45,7 +45,7 @@ namespace osu.Game.Beatmaps.Formats
                 BeatmapInfo = new BeatmapInfo
                 {
                     Metadata = new BeatmapMetadata(),
-                    BaseDifficulty = new BaseDifficulty(),
+                    Difficulty = new BeatmapDifficulty(),
                 },
             };
             ParseFile(stream, beatmap);
