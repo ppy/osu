@@ -47,6 +47,8 @@ namespace osu.Game.Graphics.UserInterface
             get { return base.Active; }
             set
             {
+                if (Active == value) return;
+
                 if (value)
                     fadeActive();
                 else
