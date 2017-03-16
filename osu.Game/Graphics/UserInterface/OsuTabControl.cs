@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
                 throw new InvalidOperationException("OsuTabControl only supports enums as the generic type argument");
 
             foreach (var val in (T[])Enum.GetValues(typeof(T)))
-                AddTab(val);
+                AddItem(val);
         }
 
         [BackgroundDependencyLoader]
