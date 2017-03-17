@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Select
 
         private readonly Bindable<PlayMode> playMode = new Bindable<PlayMode>();
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(permitNulls:true)]
         private void load(OsuColour colours, OsuGame osu)
         {
             sortTabs.AccentColour = colours.GreenLight;
