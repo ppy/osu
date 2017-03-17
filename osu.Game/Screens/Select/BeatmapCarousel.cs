@@ -201,7 +201,7 @@ namespace osu.Game.Screens.Select
 
                 computeYPositions();
 
-                if (selectedGroup.State == BeatmapGroupState.Hidden)
+                if (selectedGroup == null || selectedGroup.State == BeatmapGroupState.Hidden)
                     SelectNext();
             };
 
