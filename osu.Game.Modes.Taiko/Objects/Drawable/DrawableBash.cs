@@ -10,7 +10,7 @@ using System;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
-    public class DrawableBash : DrawableTaikoHitObject<Bash>
+    public class DrawableBash : DrawableTaikoHitObject
     {
         /// <summary>
         /// A list of keys which this HitObject will accept. These are the standard Taiko keys for now.
@@ -23,9 +23,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// </summary>
         private int userHits;
 
+        private Bash bash;
+
         public DrawableBash(Bash bash)
             : base(bash)
         {
+            this.bash = bash;
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -37,7 +40,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
                 userHits++;
 
-                if (userHits == HitObject.RequiredHits)
+                if (userHits == bash.RequiredHits)
                 {
                     Judgement.Result = HitResult.Hit;
                     Judgement.Score = TaikoScoreResult.Great;
@@ -48,7 +51,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 if (Judgement.TimeOffset < 0)
                     return;
 
-                if (userHits > HitObject.RequiredHits / 2)
+                if (userHits > bash.RequiredHits / 2)
                 {
                     Judgement.Result = HitResult.Hit;
                     Judgement.Score = TaikoScoreResult.Good;
