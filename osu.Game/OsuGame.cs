@@ -277,7 +277,7 @@ namespace osu.Game
             }
 
             //central game mode change logic.
-            if (currentScreen.ShowOverlays != true)
+            if (!currentScreen.ShowOverlays)
             {
                 Toolbar.State = Visibility.Hidden;
                 musicController.State = Visibility.Hidden;
