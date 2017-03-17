@@ -52,6 +52,7 @@
     <Compile Include="Judgements\TaikoJudgementInfo.cs" />
     <Compile Include="Judgements\TaikoScoreResult.cs" />
     <Compile Include="Objects\Drawable\DrawableHit.cs" />
+    <Compile Include="Objects\Drawable\DrawableHitFinisher.cs" />
     <Compile Include="Objects\Drawable\DrawableTaikoHitObject.cs" />
     <Compile Include="Objects\TaikoHitType.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
