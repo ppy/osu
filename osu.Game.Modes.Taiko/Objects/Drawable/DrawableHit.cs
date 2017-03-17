@@ -65,7 +65,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             return UpdateJudgement(true);
         }
 
-        protected sealed override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             // Make sure we don't handle held-down keys
             if (args.Repeat)
