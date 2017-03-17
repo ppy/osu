@@ -33,6 +33,11 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 
         private TaikoHitObject convertHitObject(HitObject original)
         {
+            // Check if this HitObject is already a TaikoHitObject, and return it if so
+            TaikoHitObject originalTaiko = original as TaikoHitObject;
+            if (originalTaiko != null)
+                return originalTaiko;
+
             IHasDistance distanceData = original as IHasDistance;
             IHasRepeats repeatsData = original as IHasRepeats;
             IHasEndTime endTimeData = original as IHasEndTime;
