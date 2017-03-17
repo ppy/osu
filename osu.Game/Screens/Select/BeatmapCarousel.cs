@@ -21,7 +21,7 @@ using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
 {
-    internal class CarouselContainer : ScrollContainer, IEnumerable<BeatmapGroup>
+    internal class BeatmapCarousel : ScrollContainer, IEnumerable<BeatmapGroup>
     {
         public BeatmapInfo SelectedBeatmap => selectedPanel?.Beatmap;
 
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Select
 
         private BeatmapPanel selectedPanel;
 
-        public CarouselContainer()
+        public BeatmapCarousel()
         {
             Add(scrollableContent = new Container<Panel>
             {
