@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
-    public abstract class DrawableHit : DrawableTaikoHitObject<TaikoHitObject>
+    public abstract class DrawableHit : DrawableTaikoHitObject
     {
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
