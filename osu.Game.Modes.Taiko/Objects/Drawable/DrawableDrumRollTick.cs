@@ -7,7 +7,7 @@ using osu.Framework.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
-    public class DrawableDrumRollTick : DrawableTaikoHitObject<DrumRollTick>
+    public class DrawableDrumRollTick : DrawableTaikoHitObject
     {
         /// <summary>
         /// A list of keys which this HitObject will accept. These are the standard Taiko keys for now.
@@ -15,9 +15,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// </summary>
         private List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
 
+        private DrumRollTick tick;
+
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
         {
+            this.tick = tick;
         }
 
         protected override TaikoJudgementInfo CreateJudgementInfo() => new TaikoDrumRollTickJudgementInfo();
@@ -26,12 +29,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > HitObject.TickTimeDistance / 2)
+                if (Judgement.TimeOffset > tick.TickTimeDistance / 2)
                     Judgement.Result = Modes.Objects.Drawables.HitResult.Miss;
                 return;
             }
 
-            if (Math.Abs(Judgement.TimeOffset) < HitObject.TickTimeDistance / 2)
+            if (Math.Abs(Judgement.TimeOffset) < tick.TickTimeDistance / 2)
             {
                 Judgement.Result = HitResult.Hit;
                 Judgement.Score = TaikoScoreResult.Great;
