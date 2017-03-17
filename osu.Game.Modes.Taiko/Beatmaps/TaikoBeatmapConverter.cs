@@ -13,10 +13,12 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 {
     internal class TaikoBeatmapConverter : IBeatmapConverter<TaikoHitObject>
     {
+        private const float legacy_velocity_scale = 1.4f;
+
         public Beatmap<TaikoHitObject> Convert(Beatmap original)
         {
             if (original is IIsLegacy)
-                original.TimingInfo.ControlPoints.ForEach(c => c.VelocityAdjustment *= 1.4);
+                original.TimingInfo.ControlPoints.ForEach(c => c.VelocityAdjustment /= legacy_velocity_scale);
 
             return new Beatmap<TaikoHitObject>(original)
             {
