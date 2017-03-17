@@ -17,7 +17,7 @@ using osu.Framework.MathUtils;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Game.Screens.Select.Filter;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Select
 {
@@ -40,19 +40,20 @@ namespace osu.Game.Screens.Select
                 panels.Clear();
                 groups.Clear();
 
-                IEnumerable<BeatmapGroup> newGroups = null;
+                List<BeatmapGroup> newGroups = null;
 
                 Task.Run(() =>
                 {
                     newGroups = value.Select(createGroup).ToList();
+                    criteria.Filter(newGroups);
                 }).ContinueWith(t =>
                 {
                     Schedule(() =>
                     {
                         foreach (var g in newGroups)
                             addGroup(g);
-                        computeYPositions();
 
+                        computeYPositions();
                         BeatmapsChanged?.Invoke();
                     });
                 });
@@ -173,36 +174,42 @@ namespace osu.Game.Screens.Select
             selectGroup(group, panel);
         }
 
-        public void Sort(SortMode mode)
+        private FilterCriteria criteria = new FilterCriteria();
+
+        private ScheduledDelegate filterTask;
+
+        public void Filter(FilterCriteria newCriteria = null, bool debounce = true)
         {
-            List<BeatmapGroup> sortedGroups = new List<BeatmapGroup>(groups);
-            switch (mode)
+            if (!IsLoaded) return;
+
+            criteria = newCriteria ?? criteria ?? new FilterCriteria();
+
+            Action perform = delegate
             {
-                case SortMode.Artist:
-                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist, StringComparison.InvariantCultureIgnoreCase));
-                    break;
-                case SortMode.Title:
-                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title, StringComparison.InvariantCultureIgnoreCase));
-                    break;
-                case SortMode.Author:
-                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author, StringComparison.InvariantCultureIgnoreCase));
-                    break;
-                case SortMode.Difficulty:
-                    sortedGroups.Sort((x, y) => x.BeatmapSet.MaxStarDifficulty.CompareTo(y.BeatmapSet.MaxStarDifficulty));
-                    break;
-                default:
-                    Sort(SortMode.Artist); // Temporary
-                    break;
-            }
+                filterTask = null;
 
-            scrollableContent.Clear(false);
-            panels.Clear();
-            groups.Clear();
+                criteria.Filter(groups);
 
-            foreach (var g in sortedGroups)
-                addGroup(g);
+                var filtered = new List<BeatmapGroup>(groups);
 
-            computeYPositions();
+                scrollableContent.Clear(false);
+                panels.Clear();
+                groups.Clear();
+
+                foreach (var g in filtered)
+                    addGroup(g);
+
+                computeYPositions();
+
+                if (selectedGroup.State == BeatmapGroupState.Hidden)
+                    SelectNext();
+            };
+
+            filterTask?.Cancel();
+            if (debounce)
+                filterTask = Scheduler.AddDelayed(perform, 250);
+            else
+                perform();
         }
 
         public IEnumerator<BeatmapGroup> GetEnumerator() => groups.GetEnumerator();
