@@ -193,6 +193,7 @@
     <Compile Include="Tests\TestCaseMenuButtonSystem.cs" />
     <Compile Include="Tests\TestCaseReplay.cs" />
     <Compile Include="Tests\TestCaseScoreCounter.cs" />
+    <Compile Include="Tests\TestCaseTabControl.cs" />
     <Compile Include="Tests\TestCaseTextAwesome.cs" />
     <Compile Include="Tests\TestCasePlaySongSelect.cs" />
     <Compile Include="Tests\TestCaseTwoLayerButton.cs" />

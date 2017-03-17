@@ -144,7 +144,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleDifficulty(Beatmap beatmap, string key, string val)
         {
-            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            var difficulty = beatmap.BeatmapInfo.Difficulty;
             switch (key)
             {
                 case @"HPDrainRate":
@@ -197,7 +197,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (split.Length > 2)
             {
-                //int kiaiFlags = split.Length > 7 ? Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : 0;
+                int effectFlags = split.Length > 7 ? Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : 0;
                 double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
                 cp = new ControlPoint
                 {
@@ -205,11 +205,13 @@ namespace osu.Game.Beatmaps.Formats
                     BeatLength = beatLength > 0 ? beatLength : 0,
                     VelocityAdjustment = beatLength < 0 ? -beatLength / 100.0 : 1,
                     TimingChange = split.Length <= 6 || split[6][0] == '1',
+                    KiaiMode = (effectFlags & 1) > 0,
+                    OmitFirstBarLine = (effectFlags & 8) > 0
                 };
             }
 
             if (cp != null)
-                beatmap.ControlPoints.Add(cp);
+                beatmap.TimingInfo.ControlPoints.Add(cp);
         }
 
         private void handleColours(Beatmap beatmap, string key, string val, ref bool hasCustomColours)

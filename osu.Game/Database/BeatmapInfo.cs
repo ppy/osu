@@ -31,11 +31,11 @@ namespace osu.Game.Database
         [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BeatmapMetadata Metadata { get; set; }
 
-        [ForeignKey(typeof(BaseDifficulty)), NotNull]
+        [ForeignKey(typeof(BeatmapDifficulty)), NotNull]
         public int BaseDifficultyID { get; set; }
 
         [OneToOne(CascadeOperations = CascadeOperation.All)]
-        public BaseDifficulty BaseDifficulty { get; set; }
+        public BeatmapDifficulty Difficulty { get; set; }
 
         public string Path { get; set; }
 
@@ -75,16 +75,7 @@ namespace osu.Game.Database
         // Metadata
         public string Version { get; set; }
 
-        private float starDifficulty = -1;
-        public float StarDifficulty
-        {
-            get
-            {
-                return starDifficulty < 0 ? (BaseDifficulty?.OverallDifficulty ?? 5) : starDifficulty;
-            }
-
-            set { starDifficulty = value; }
-        }
+        public double StarDifficulty { get; set; }
 
         public bool Equals(BeatmapInfo other)
         {

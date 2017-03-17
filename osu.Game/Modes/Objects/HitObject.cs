@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps.Samples;
+using osu.Game.Beatmaps.Timing;
+using osu.Game.Database;
 
 namespace osu.Game.Modes.Objects
 {
@@ -22,5 +24,12 @@ namespace osu.Game.Modes.Objects
         /// The sample to be played when this HitObject is hit.
         /// </summary>
         public HitSampleInfo Sample { get; set; }
+
+        /// <summary>
+        /// Applies default values to this HitObject.
+        /// </summary>
+        /// <param name="difficulty">The difficulty settings to use.</param>
+        /// <param name="timing">The timing settings to use.</param>
+        public virtual void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty) { }
     }
 }

@@ -12,7 +12,7 @@ using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    internal class Panel : Container, IStateful<PanelSelectedState>
+    public class Panel : Container, IStateful<PanelSelectedState>
     {
         public const float MAX_HEIGHT = 80;
 
@@ -51,6 +51,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected virtual void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
         {
+            if (!IsLoaded) return;
+
             switch (state)
             {
                 case PanelSelectedState.Hidden:
@@ -115,7 +117,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
     }
 
-    internal enum PanelSelectedState
+    public enum PanelSelectedState
     {
         Hidden,
         NotSelected,

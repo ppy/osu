@@ -26,12 +26,7 @@ namespace osu.Game.Modes.UI
     public abstract class HitRenderer : Container
     {
         /// <summary>
-        /// The event that's fired when a hit object is judged.
-        /// </summary>
-        public event Action<JudgementInfo> OnJudgement;
-
-        /// <summary>
-        /// The event that's fired when all hit objects have been judged.
+        /// Invoked when all the judgeable HitObjects have been judged.
         /// </summary>
         public event Action OnAllJudged;
 
@@ -57,16 +52,15 @@ namespace osu.Game.Modes.UI
         }
 
         /// <summary>
-        /// Triggers a judgement for further processing.
+        /// Checks whether all HitObjects have been judged, and invokes OnAllJudged.
         /// </summary>
-        /// <param name="j">The judgement to trigger.</param>
-        protected void TriggerOnJudgement(JudgementInfo j)
+        protected void CheckAllJudged()
         {
-            OnJudgement?.Invoke(j);
-
             if (AllObjectsJudged)
                 OnAllJudged?.Invoke();
         }
+
+        public abstract ScoreProcessor CreateScoreProcessor();
 
         /// <summary>
         /// Creates a key conversion input manager.
@@ -95,15 +89,25 @@ namespace osu.Game.Modes.UI
         {
             Debug.Assert(beatmap != null, "HitRenderer initialized with a null beatmap.");
 
-            // Convert + process the beatmap
-            Beatmap = CreateBeatmapConverter().Convert(beatmap.Beatmap);
-            Beatmap.HitObjects.ForEach(h => CreateBeatmapProcessor().SetDefaults(h, Beatmap));
-            CreateBeatmapProcessor().PostProcess(Beatmap);
-
-            applyMods(beatmap.Mods.Value);
-
             RelativeSizeAxes = Axes.Both;
+
+            IBeatmapConverter<TObject> converter = CreateBeatmapConverter();
+            IBeatmapProcessor<TObject> processor = CreateBeatmapProcessor();
+
+            // Convert the beatmap
+            Beatmap = converter.Convert(beatmap.Beatmap);
+
+            // Apply defaults
+            foreach (var h in Beatmap.HitObjects)
+                h.ApplyDefaults(Beatmap.TimingInfo, Beatmap.BeatmapInfo.Difficulty);
+
+            // Post-process the beatmap
+            processor.PostProcess(Beatmap);
+
+            // Add mods, should always be the last thing applied to give full control to mods
+            applyMods(beatmap.Mods.Value);
         }
+
 
         /// <summary>
         /// Applies the active mods to this HitRenderer.
@@ -141,6 +145,8 @@ namespace osu.Game.Modes.UI
         where TObject : HitObject
         where TJudgement : JudgementInfo
     {
+        public event Action<TJudgement> OnJudgement;
+
         protected override Container<Drawable> Content => content;
         protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
 
@@ -197,8 +203,11 @@ namespace osu.Game.Modes.UI
         /// <param name="judgedObject">The object that Judgement has been updated for.</param>
         private void onJudgement(DrawableHitObject<TObject, TJudgement> judgedObject)
         {
-            TriggerOnJudgement(judgedObject.Judgement);
             Playfield.OnJudgement(judgedObject);
+
+            OnJudgement?.Invoke(judgedObject.Judgement);
+
+            CheckAllJudged();
         }
 
         /// <summary>
