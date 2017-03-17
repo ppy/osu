@@ -96,22 +96,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        public override void Hide() => State = Visibility.Hidden;
-        public override void Show() => State = Visibility.Visible;
-        public void ToggleVisibility() => State = State == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
-
-        protected override bool OnHover(Framework.Input.InputState state)
-        {
-            background.FadeTo(0.5f, 300, EasingTypes.OutQuint);
-            return base.OnHover(state);
-        }
-
-        protected override void OnHoverLost(Framework.Input.InputState state)
-        {
-            background.FadeTo(background_alpha, 200, EasingTypes.OutQuint);
-            base.OnHoverLost(state);
-        }
-
         public LeaderboardScore(Score score, int rank)
         {
             Score = score;
@@ -270,6 +254,23 @@ namespace osu.Game.Screens.Select.Leaderboards
                     modsContainer.Add(new ScoreModIcon(mod.Icon, OsuColour.FromHex(@"ffcc22")));
                 }
             }
+        }
+
+        public void ToggleVisibility() => State = State == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
+
+        public override void Hide() => State = Visibility.Hidden;
+        public override void Show() => State = Visibility.Visible;
+
+        protected override bool OnHover(Framework.Input.InputState state)
+        {
+            background.FadeTo(0.5f, 300, EasingTypes.OutQuint);
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(Framework.Input.InputState state)
+        {
+            background.FadeTo(background_alpha, 200, EasingTypes.OutQuint);
+            base.OnHoverLost(state);
         }
 
         private class GlowingSpriteText : Container
