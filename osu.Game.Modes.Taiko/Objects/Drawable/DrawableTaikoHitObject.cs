@@ -8,15 +8,14 @@ using osu.Game.Modes.Taiko.Judgements;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
-    public class DrawableTaikoHitObject<TTaikoObject> : DrawableHitObject<TTaikoObject, TaikoJudgementInfo>
-        where TTaikoObject : TaikoHitObject
+    public class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject, TaikoJudgementInfo>
     {
         /// <summary>
         /// The colour used for various elements of this DrawableHitObject.
         /// </summary>
         public virtual Color4 AccentColour { get; }
 
-        public DrawableTaikoHitObject(TTaikoObject hitObject)
+        public DrawableTaikoHitObject(TaikoHitObject hitObject)
             : base(hitObject)
         {
             Anchor = Anchor.CentreLeft;
