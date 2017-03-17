@@ -14,6 +14,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
     internal class TaikoBeatmapConverter : IBeatmapConverter<TaikoHitObject>
     {
         private const float legacy_velocity_scale = 1.4f;
+        private const float bash_convert_factor = 1.65f;
 
         public Beatmap<TaikoHitObject> Convert(Beatmap original)
         {
@@ -55,12 +56,13 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 
             if (endTimeData != null)
             {
+                // We compute the end time manually to add in the Bash convert factor
                 return new Bash
                 {
                     StartTime = original.StartTime,
                     Sample = original.Sample,
 
-                    EndTime = endTimeData.EndTime
+                    EndTime = original.StartTime + endTimeData.Duration * bash_convert_factor 
                 };
             }
 
