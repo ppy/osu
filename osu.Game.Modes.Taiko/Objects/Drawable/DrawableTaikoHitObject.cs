@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 
@@ -17,7 +18,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         public DrawableTaikoHitObject(TaikoHitObject hitObject)
             : base(hitObject)
         {
-            LifetimeStart = HitObject.StartTime - HitObject.PreEmpt;
+            Anchor = Anchor.CentreLeft;
+            Origin = Anchor.Centre;
+
+            RelativePositionAxes = Axes.X;
+
+            LifetimeStart = HitObject.StartTime - HitObject.PreEmpt * 2;
             LifetimeEnd = HitObject.StartTime + HitObject.PreEmpt;
         }
 
