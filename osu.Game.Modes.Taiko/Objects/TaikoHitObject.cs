@@ -1,20 +1,77 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps.Samples;
+using osu.Game.Beatmaps.Timing;
+using osu.Game.Database;
 using osu.Game.Modes.Objects;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
     public class TaikoHitObject : HitObject
     {
-        public float Scale = 1;
+        /// <summary>
+        /// HitCircle radius.
+        /// </summary>
+        public const float CIRCLE_RADIUS = 64;
 
-        public TaikoColour Type;
-    }
+        /// <summary>
+        /// The hit window that results in a "GREAT" hit.
+        /// </summary>
+        public double HitWindowGreat = 35;
 
-    public enum TaikoColour
-    {
-        Red,
-        Blue
+        /// <summary>
+        /// The hit window that results in a "GOOD" hit.
+        /// </summary>
+        public double HitWindowGood = 80;
+
+        /// <summary>
+        /// The hit window that results in a "MISS".
+        /// </summary>
+        public double HitWindowMiss = 95;
+
+        /// <summary>
+        /// The time to scroll in the HitObject.
+        /// </summary>
+        public double PreEmpt;
+
+        /// <summary>
+        /// Whether this HitObject is in Kiai time.
+        /// </summary>
+        public bool Kiai;
+
+        /// <summary>
+        /// The type of HitObject.
+        /// </summary>
+        public virtual TaikoHitType Type
+        {
+            get
+            {
+                SampleType st = Sample?.Type ?? SampleType.None;
+
+                return
+                    // Centre/Rim
+                    ((st & ~(SampleType.Finish | SampleType.Normal)) == 0 ? TaikoHitType.CentreHit : TaikoHitType.RimHit)
+                    // Finisher
+                    | ((st & SampleType.Finish) > 0 ? TaikoHitType.Finisher : TaikoHitType.None);
+            }
+        }
+
+        public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
+        {
+            base.ApplyDefaults(timing, difficulty);
+
+            PreEmpt = 600 / (timing.SliderVelocityAt(StartTime) * difficulty.SliderMultiplier) * 1000;
+
+            ControlPoint overridePoint;
+            Kiai = timing.TimingPointAt(StartTime, out overridePoint).KiaiMode;
+
+            if (overridePoint != null)
+                Kiai |= overridePoint.KiaiMode;
+
+            HitWindowGreat = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 50, 35, 20);
+            HitWindowGood = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 120, 80, 50);
+            HitWindowMiss = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 135, 95, 70);
+        }
     }
 }
