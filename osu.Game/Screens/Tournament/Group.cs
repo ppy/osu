@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Tournament
             };
         }
 
-        public void AddTeam(Region team)
+        public void AddTeam(Country team)
         {
             GroupTeam gt = new GroupTeam(team);
 
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Tournament
             return allTeams.Any(t => t.Team.FullName == fullName);
         }
 
-        public bool RemoveTeam(Region team)
+        public bool RemoveTeam(Country team)
         {
             allTeams.RemoveAll(gt => gt.Team == team);
 
@@ -122,12 +122,12 @@ namespace osu.Game.Screens.Tournament
 
         private class GroupTeam : Container
         {
-            public Region Team;
+            public Country Team;
 
             private FillFlowContainer innerContainer;
             private Sprite flagSprite;
 
-            public GroupTeam(Region team)
+            public GroupTeam(Country team)
             {
                 Team = team;
 

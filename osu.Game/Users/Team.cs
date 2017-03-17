@@ -10,14 +10,10 @@ namespace osu.Game.Users
     public class Team : IHasDrawableRepresentation<Sprite>
     {
         public string Name;
-        public Texture Flag; // TODO: Replace this with something better
 
         public Sprite CreateDrawable()
         {
-            return new Sprite
-            {
-                Texture = Flag,
-            };
+            return new Sprite { };
         }
     }
 }

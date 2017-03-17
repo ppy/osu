@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Tournament
         private GroupContainer groupsContainer;
         private OsuSpriteText fullTeamNameText;
 
-        private List<Region> allTeams = new List<Region>();
+        private List<Country> allTeams = new List<Country>();
 
         private DrawingsConfigManager drawingsConfig;
 
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Tournament
             reset(true);
         }
 
-        private void onTeamSelected(Region team)
+        private void onTeamSelected(Country team)
         {
             groupsContainer.AddTeam(team);
 
@@ -276,13 +276,13 @@ namespace osu.Game.Screens.Tournament
             teamsContainer.ClearTeams();
             allTeams.Clear();
 
-            foreach (Region r in TeamList.Teams)
+            foreach (Country t in TeamList.Teams)
             {
-                if (groupsContainer.ContainsTeam(r.FullName))
+                if (groupsContainer.ContainsTeam(t.FullName))
                     continue;
 
-                allTeams.Add(r);
-                teamsContainer.AddTeam(r);
+                allTeams.Add(t);
+                teamsContainer.AddTeam(t);
             }
         }
 
@@ -312,7 +312,7 @@ namespace osu.Game.Screens.Tournament
                             if (line.ToUpper().StartsWith("GROUP"))
                                 continue;
 
-                            Region teamToAdd = allTeams.FirstOrDefault(r => r.FullName == line);
+                            Country teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
 
                             if (teamToAdd == null)
                                 continue;

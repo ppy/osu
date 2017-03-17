@@ -8,6 +8,6 @@ namespace osu.Game.Screens.Tournament.Teams
 {
     public interface ITeamList
     {
-        IEnumerable<Region> Teams { get; }
+        IEnumerable<Country> Teams { get; }
     }
 }

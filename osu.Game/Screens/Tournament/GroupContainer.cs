@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        public void AddTeam(Region team)
+        public void AddTeam(Country team)
         {
             if (groups[currentGroup].TeamsCount == maxTeams)
                 return;
