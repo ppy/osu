@@ -5,7 +5,7 @@ using osu.Game.Modes.Objects;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    public class TaikoBaseHit : HitObject
+    public class TaikoHitObject : HitObject
     {
         public float Scale = 1;
 
