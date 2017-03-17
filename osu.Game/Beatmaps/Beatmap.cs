@@ -70,5 +70,14 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <returns>The star difficulty.</returns>
         public double CalculateStarDifficulty() => Ruleset.GetRuleset(BeatmapInfo.Mode).CreateDifficultyCalculator(this).Calculate();
+
+        /// <summary>
+        /// Constructs a new beatmap.
+        /// </summary>
+        /// <param name="original">The original beatmap to use the parameters of.</param>
+        public Beatmap(Beatmap original = null)
+            : base(original)
+        {
+        }
     }
 }
