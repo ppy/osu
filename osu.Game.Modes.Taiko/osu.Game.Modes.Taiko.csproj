@@ -52,6 +52,7 @@
     <Compile Include="Judgements\TaikoDrumRollTickJudgementInfo.cs" />
     <Compile Include="Judgements\TaikoJudgementInfo.cs" />
     <Compile Include="Judgements\TaikoScoreResult.cs" />
+    <Compile Include="Objects\Drawable\DrawableDrumRoll.cs" />
     <Compile Include="Objects\Drawable\DrawableDrumRollTick.cs" />
     <Compile Include="Objects\Drawable\DrawableTaikoHitObject.cs" />
     <Compile Include="Objects\DrumRoll.cs" />
