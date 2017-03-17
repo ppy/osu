@@ -10,9 +10,9 @@ namespace osu.Game.Modes.Taiko.Objects
 {
     public class Bash : TaikoHitObject, IHasEndTime
     {
-        public double EndTime => StartTime + Duration;
+        public double EndTime { get; set; }
 
-        public double Duration { get; set; }
+        public double Duration => EndTime - StartTime;
 
         /// <summary>
         /// The number of hits required to complete the bash successfully.
