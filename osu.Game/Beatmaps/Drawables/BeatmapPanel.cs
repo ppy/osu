@@ -59,6 +59,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected override void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
         {
+            if (!IsLoaded) return;
+
             base.ApplyState(last);
 
             if (last == PanelSelectedState.Hidden && State != last)

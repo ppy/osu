@@ -51,6 +51,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected virtual void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
         {
+            if (!IsLoaded) return;
+
             switch (state)
             {
                 case PanelSelectedState.Hidden:
