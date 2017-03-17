@@ -75,9 +75,11 @@
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\IBeatmapCoverter.cs" />
     <Compile Include="Beatmaps\IBeatmapProcessor.cs" />
+    <Compile Include="Beatmaps\Timing\TimingInfo.cs" />
     <Compile Include="Database\ScoreDatabase.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
+    <Compile Include="Graphics\Cursor\GameplayCursor.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
     <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
@@ -119,7 +121,7 @@
     <Compile Include="Modes\Objects\Legacy\LegacyHitObjectType.cs" />
     <Compile Include="Modes\Replay.cs" />
     <Compile Include="Modes\Score.cs" />
-    <Compile Include="Modes\ScoreProcesssor.cs" />
+    <Compile Include="Modes\ScoreProcessor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />
     <Compile Include="Modes\UI\HudOverlay.cs" />
     <Compile Include="Modes\UI\StandardHealthDisplay.cs" />
@@ -196,7 +198,10 @@
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Modes\UI\StandardComboCounter.cs" />
-    <Compile Include="Screens\Select\CarouselContainer.cs" />
+    <Compile Include="Screens\Select\BeatmapCarousel.cs" />
+    <Compile Include="Screens\Select\FilterCriteria.cs" />
+    <Compile Include="Screens\Select\Filter\GroupMode.cs" />
+    <Compile Include="Screens\Select\Filter\SortMode.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\OsuGameScreen.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
@@ -219,7 +224,7 @@
     <Compile Include="Input\GlobalHotkeys.cs" />
     <Compile Include="Graphics\Backgrounds\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
-    <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
+    <Compile Include="Graphics\Cursor\MenuCursor.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\TextAwesome.cs" />
     <Compile Include="Screens\Play\KeyCounter.cs" />
@@ -355,6 +360,8 @@
     <Compile Include="Modes\ScoreRank.cs" />
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

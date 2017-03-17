@@ -19,8 +19,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
     public class SpinnerDisc : CircularContainer
     {
-        public override bool Contains(Vector2 screenSpacePos) => true;
-
         protected Sprite Disc;
 
         public SRGBColour DiscColour
@@ -101,6 +99,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 
         public SpinnerDisc()
         {
+            AlwaysReceiveInput = true;
+
             RelativeSizeAxes = Axes.Both;
 
             Children = new Drawable[]

@@ -24,6 +24,8 @@ namespace osu.Game.Screens
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
+        internal virtual bool HasLocalCursorDisplayed => false;
+
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         public WorkingBeatmap Beatmap

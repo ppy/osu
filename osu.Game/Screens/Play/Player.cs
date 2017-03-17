@@ -32,6 +32,10 @@ namespace osu.Game.Screens.Play
 
         internal override bool ShowOverlays => false;
 
+        internal override bool HasLocalCursorDisplayed => !hasReplayLoaded && !IsPaused;
+
+        private bool hasReplayLoaded => hitRenderer.InputManager.ReplayInputHandler != null;
+
         public BeatmapInfo BeatmapInfo;
 
         public bool IsPaused { get; private set; }
@@ -108,10 +112,13 @@ namespace osu.Game.Screens.Play
             });
 
             ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
+            hitRenderer = ruleset.CreateHitRendererWith(Beatmap);
+
+            scoreProcessor = hitRenderer.CreateScoreProcessor();
 
             hudOverlay = new StandardHudOverlay();
             hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
-            hudOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
+            hudOverlay.BindProcessor(scoreProcessor);
 
             pauseOverlay = new PauseOverlay
             {
@@ -125,7 +132,6 @@ namespace osu.Game.Screens.Play
                 OnQuit = Exit
             };
 
-            hitRenderer = ruleset.CreateHitRendererWith(Beatmap);
 
             if (ReplayInputHandler != null)
                 hitRenderer.InputManager.ReplayInputHandler = ReplayInputHandler;
@@ -133,8 +139,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.BindHitRenderer(hitRenderer);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
-            hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
-            hitRenderer.OnAllJudged += onPass;
+            hitRenderer.OnAllJudged += onCompletion;
 
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
@@ -236,15 +241,19 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private void onPass()
+        private void onCompletion()
         {
+            // Only show the completion screen if the player hasn't failed
+            if (scoreProcessor.HasFailed)
+                return;
+
             Delay(1000);
             Schedule(delegate
             {
                 ValidForResume = false;
                 Push(new Results
                 {
-                    Score = scoreProcessor.GetScore()
+                    Score = scoreProcessor.CreateScore()
                 });
             });
         }
@@ -299,7 +308,7 @@ namespace osu.Game.Screens.Play
         {
             if (pauseOverlay == null) return false;
 
-            if (hitRenderer.InputManager.ReplayInputHandler != null)
+            if (hasReplayLoaded)
                 return false;
 
             if (pauseOverlay.State != Visibility.Visible && !canPause) return true;
