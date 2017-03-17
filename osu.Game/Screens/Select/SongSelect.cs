@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Select
         private BeatmapDatabase database;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
-        private CarouselContainer carousel;
+        private BeatmapCarousel carousel;
         private TrackManager trackManager;
         private DialogOverlay dialogOverlay;
 
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Select
                     }
                 }
             });
-            Add(carousel = new CarouselContainer
+            Add(carousel = new BeatmapCarousel
             {
                 RelativeSizeAxes = Axes.Y,
                 Size = new Vector2(carousel_width, 1),
