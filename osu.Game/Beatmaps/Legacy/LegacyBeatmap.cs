@@ -15,6 +15,7 @@ namespace osu.Game.Beatmaps.Legacy
         public LegacyBeatmap(Beatmap original = null)
             : base(original)
         {
+            HitObjects = original?.HitObjects ?? null;
         }
     }
 }
