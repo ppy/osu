@@ -8,17 +8,10 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Processes a post-converted Beatmap.
     /// </summary>
-    /// <typeparam name="T">The type of HitObject contained in the Beatmap.</typeparam>
-    public interface IBeatmapProcessor<T>
-        where T : HitObject
+    /// <typeparam name="TObject">The type of HitObject contained in the Beatmap.</typeparam>
+    public interface IBeatmapProcessor<TObject>
+        where TObject : HitObject
     {
-        /// <summary>
-        /// Sets default values for a HitObject.
-        /// </summary>
-        /// <param name="hitObject">The HitObject to set default values for.</param>
-        /// <param name="beatmap">The Beatmap to extract the default values from.</param>
-        void SetDefaults(T hitObject, Beatmap<T> beatmap);
-
         /// <summary>
         /// Post-processes a Beatmap to add mode-specific components that aren't added during conversion.
         /// <para>
@@ -26,6 +19,6 @@ namespace osu.Game.Beatmaps
         /// </para>
         /// </summary>
         /// <param name="beatmap">The Beatmap to process.</param>
-        void PostProcess(Beatmap<T> beatmap);
+        void PostProcess(Beatmap<TObject> beatmap);
     }
 }

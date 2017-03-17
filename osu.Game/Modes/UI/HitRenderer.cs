@@ -89,15 +89,25 @@ namespace osu.Game.Modes.UI
         {
             Debug.Assert(beatmap != null, "HitRenderer initialized with a null beatmap.");
 
-            // Convert + process the beatmap
-            Beatmap = CreateBeatmapConverter().Convert(beatmap.Beatmap);
-            Beatmap.HitObjects.ForEach(h => CreateBeatmapProcessor().SetDefaults(h, Beatmap));
-            CreateBeatmapProcessor().PostProcess(Beatmap);
-
-            applyMods(beatmap.Mods.Value);
-
             RelativeSizeAxes = Axes.Both;
+
+            IBeatmapConverter<TObject> converter = CreateBeatmapConverter();
+            IBeatmapProcessor<TObject> processor = CreateBeatmapProcessor();
+
+            // Convert the beatmap
+            Beatmap = converter.Convert(beatmap.Beatmap);
+
+            // Apply defaults
+            foreach (var h in Beatmap.HitObjects)
+                h.ApplyDefaults(Beatmap.TimingInfo, Beatmap.BeatmapInfo.Difficulty);
+
+            // Post-process the beatmap
+            processor.PostProcess(Beatmap);
+
+            // Add mods, should always be the last thing applied to give full control to mods
+            applyMods(beatmap.Mods.Value);
         }
+
 
         /// <summary>
         /// Applies the active mods to this HitRenderer.
