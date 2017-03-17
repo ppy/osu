@@ -197,7 +197,8 @@
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Modes\UI\StandardComboCounter.cs" />
-    <Compile Include="Screens\Select\CarouselContainer.cs" />
+    <Compile Include="Screens\Select\BeatmapCarousel.cs" />
+    <Compile Include="Screens\Select\FilterCriteria.cs" />
     <Compile Include="Screens\Select\Filter\GroupMode.cs" />
     <Compile Include="Screens\Select\Filter\SortMode.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
