@@ -10,7 +10,7 @@ using System;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
-    public class DrawableBash : DrawableTaikoHitObject
+    public class DrawableBash : DrawableTaikoHitObject<Bash>
     {
         /// <summary>
         /// A list of keys which this HitObject will accept. These are the standard Taiko keys for now.
@@ -23,8 +23,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// </summary>
         private int userHits;
 
-        public DrawableBash(TaikoHitObject hitObject)
-            : base(hitObject)
+        public DrawableBash(Bash bash)
+            : base(bash)
         {
         }
 
