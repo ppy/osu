@@ -82,7 +82,7 @@ namespace osu.Game.Graphics.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuConfigManager config, TextureStore textures)
+            private void load(OsuConfigManager config, TextureStore textures, OsuColour colour)
             {
                 cursorScale = config.GetBindable<double>(OsuConfig.CursorSize);
 
@@ -90,7 +90,7 @@ namespace osu.Game.Graphics.Cursor
                 {
                     cursorContainer = new Container
                     {
-                        Size = new Vector2(28),
+                        Size = new Vector2(32),
                         Children = new Drawable[]
                         {
                             new Sprite
@@ -102,8 +102,9 @@ namespace osu.Game.Graphics.Cursor
                             {
                                 FillMode = FillMode.Fit,
                                 BlendingMode = BlendingMode.Additive,
+                                Colour = colour.Pink,
                                 Alpha = 0,
-                                Texture = textures.Get(@"Cursor/menu-cursor"),
+                                Texture = textures.Get(@"Cursor/menu-cursor-additive"),
                             },
                         }
                     }
