@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private const float corner_radius = 5;
         private const float edge_margin = 10;
         private const float background_alpha = 0.25f;
-        private const float index_width = 40;
+        private const float rank_width = 30;
 
         private readonly EdgeEffect imageShadow = new EdgeEffect
         {
@@ -124,14 +124,12 @@ namespace osu.Game.Screens.Select.Leaderboards
             flag.Width = 30;
             flag.RelativeSizeAxes = Axes.Y;
 
-            const float rank_width = 30;
-
             Children = new Drawable[]
             {
                 new Container
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Width = index_width,
+                    Width = rank_width,
                     Children = new[]
                     {
                         new OsuSpriteText
@@ -147,7 +145,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = index_width, },
+                    Padding = new MarginPadding { Left = rank_width, },
                     Children = new Drawable[]
                     {
                         new Container
@@ -235,10 +233,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        scoreLabel = new GlowingSpriteText(Score.TotalScore.ToString(@"N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa"))
-                                        {
-                                            
-                                        },
+                                        scoreLabel = new GlowingSpriteText(Score.TotalScore.ToString(@"N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa")),
                                         new Container
                                         {
                                             Size = new Vector2(40f, 20f),

@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Users
@@ -13,7 +12,7 @@ namespace osu.Game.Users
 
         public Sprite CreateDrawable()
         {
-            return new Sprite { };
+            return new Sprite();
         }
     }
 }
