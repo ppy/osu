@@ -236,6 +236,8 @@ namespace osu.Game.Database
                         // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
                         beatmap.BeatmapInfo.Metadata = null;
 
+                        beatmap.BeatmapInfo.StarDifficulty = beatmap.CalculateStarDifficulty();
+
                         beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
                     }
                 beatmapSet.StoryboardFile = archive.StoryboardFilename;
