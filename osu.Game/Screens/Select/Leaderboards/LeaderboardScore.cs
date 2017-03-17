@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public class LeaderboardScore : Container, IStateful<Visibility>
     {
-        private const float height = 70;
+        public static readonly float HEIGHT = 70;
         private const float corner_radius = 5;
         private const float edge_margin = 10;
         private const float background_alpha = 0.25f;
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             Rank = rank;
 
             RelativeSizeAxes = Axes.X;
-            Height = height;
+            Height = HEIGHT;
 
             var flag = Score.User?.Region.CreateDrawable() ?? new DrawableFlag();
             flag.Width = 30;
@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             {
                                 avatar = new Avatar
                                 {
-                                    Size = new Vector2(height - edge_margin * 2, height - edge_margin * 2),
+                                    Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),
                                     CornerRadius = corner_radius,
                                     Masking = true,
                                     EdgeEffect = imageShadow,
@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                 {
                                     RelativeSizeAxes = Axes.Y,
                                     AutoSizeAxes = Axes.X,
-                                    Position = new Vector2(height - edge_margin, 0f),
+                                    Position = new Vector2(HEIGHT - edge_margin, 0f),
                                     Children = new Drawable[]
                                     {
                                         nameLabel = new OsuSpriteText
