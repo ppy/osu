@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Select
                 if (sort != value)
                 {
                     sort = value;
-                    FilterChanged?.Invoke(Criteria);
+                    FilterChanged?.Invoke(CreateCriteria());
                 }
             }
         }
@@ -51,12 +51,12 @@ namespace osu.Game.Screens.Select
                 if (group != value)
                 {
                     group = value;
-                    FilterChanged?.Invoke(Criteria);
+                    FilterChanged?.Invoke(CreateCriteria());
                 }
             }
         }
 
-        public FilterCriteria Criteria => new FilterCriteria
+        public FilterCriteria CreateCriteria() => new FilterCriteria
         {
             Group = group,
             Sort = sort,
@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Select
                             OnChange = (sender, newText) =>
                             {
                                 if (newText)
-                                    FilterChanged?.Invoke(Criteria);
+                                    FilterChanged?.Invoke(CreateCriteria());
                             },
                             Exit = () => Exit?.Invoke(),
                         },
