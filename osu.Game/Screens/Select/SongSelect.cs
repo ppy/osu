@@ -17,7 +17,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Screens;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
@@ -95,7 +94,7 @@ namespace osu.Game.Screens.Select
             {
                 RelativeSizeAxes = Axes.X,
                 Height = filter_height,
-                FilterChanged = () => filterChanged(),
+                FilterChanged = criteria => filterChanged(criteria),
                 Exit = Exit,
             });
             Add(beatmapInfoWedge = new BeatmapInfoWedge
@@ -181,61 +180,9 @@ namespace osu.Game.Screens.Select
 
         protected abstract void OnSelected();
 
-        private ScheduledDelegate filterTask;
-
-        private void filterChanged(bool debounce = true, bool eagerSelection = true)
+        private void filterChanged(FilterCriteria criteria, bool debounce = true)
         {
-            if (!carousel.IsLoaded) return;
-
-            if (Beatmap == null) return;
-
-            filterTask?.Cancel();
-            filterTask = Scheduler.AddDelayed(() =>
-            {
-                filterTask = null;
-                var search = FilterControl.Search;
-                BeatmapGroup newSelection = null;
-
-                carousel.Sort(FilterControl.Sort);
-                foreach (var beatmapGroup in carousel)
-                {
-                    var set = beatmapGroup.BeatmapSet;
-
-                    bool hasCurrentMode = set.Beatmaps.Any(bm => bm.Mode == playMode);
-
-                    bool match = hasCurrentMode;
-
-                    match &= string.IsNullOrEmpty(search)
-                        || (set.Metadata.Artist ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
-                        || (set.Metadata.ArtistUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
-                        || (set.Metadata.Title ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1
-                        || (set.Metadata.TitleUnicode ?? "").IndexOf(search, StringComparison.InvariantCultureIgnoreCase) != -1;
-
-                    if (match)
-                    {
-                        if (newSelection == null || beatmapGroup.BeatmapSet.OnlineBeatmapSetID == Beatmap.BeatmapSetInfo.OnlineBeatmapSetID)
-                        {
-                            if (newSelection != null)
-                                newSelection.State = BeatmapGroupState.Collapsed;
-                            newSelection = beatmapGroup;
-                        }
-                        else
-                            beatmapGroup.State = BeatmapGroupState.Collapsed;
-                    }
-                    else
-                    {
-                        beatmapGroup.State = BeatmapGroupState.Hidden;
-                    }
-                }
-
-                if (newSelection != null)
-                {
-                    if (newSelection.BeatmapPanels.Any(b => b.Beatmap.ID == Beatmap.BeatmapInfo.ID))
-                        carousel.SelectBeatmap(Beatmap.BeatmapInfo, false);
-                    else if (eagerSelection)
-                        carousel.SelectBeatmap(newSelection.BeatmapSet.Beatmaps[0], false);
-                }
-            }, debounce ? 250 : 0);
+            carousel.Filter(criteria, debounce);
         }
 
         private void onBeatmapSetAdded(BeatmapSetInfo s) => carousel.AddBeatmap(s);
@@ -299,10 +246,7 @@ namespace osu.Game.Screens.Select
             initialAddSetsTask.Cancel();
         }
 
-        private void playMode_ValueChanged(object sender, EventArgs e)
-        {
-            filterChanged(false);
-        }
+        private void playMode_ValueChanged(object sender, EventArgs e) => carousel.Filter();
 
         private void changeBackground(WorkingBeatmap beatmap)
         {
