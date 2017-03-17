@@ -15,47 +15,227 @@ using OpenTK.Input;
 using System.Collections;
 using osu.Framework.MathUtils;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
 {
     internal class CarouselContainer : ScrollContainer, IEnumerable<BeatmapGroup>
     {
-        private Container<Panel> scrollableContent;
-        private List<BeatmapGroup> groups = new List<BeatmapGroup>();
-        private List<Panel> panels = new List<Panel>();
+        public BeatmapInfo SelectedBeatmap => selectedPanel?.Beatmap;
 
-        public BeatmapGroup SelectedGroup { get; private set; }
-        public BeatmapPanel SelectedPanel { get; private set; }
+        public Action BeatmapsChanged;
+
+        public IEnumerable<BeatmapSetInfo> Beatmaps
+        {
+            get
+            {
+                return groups.Select(g => g.BeatmapSet);
+            }
+
+            set
+            {
+                scrollableContent.Clear(false);
+                panels.Clear();
+                groups.Clear();
+
+                IEnumerable<BeatmapGroup> newGroups = null;
+
+                Task.Run(() =>
+                {
+                    newGroups = value.Select(createGroup).ToList();
+                }).ContinueWith(t =>
+                {
+                    Schedule(() =>
+                    {
+                        foreach (var g in newGroups)
+                            addGroup(g);
+                        computeYPositions();
+
+                        BeatmapsChanged?.Invoke();
+                    });
+                });
+            }
+        }
 
         private List<float> yPositions = new List<float>();
 
+        /// <summary>
+        /// Required for now unfortunately.
+        /// </summary>
+        private BeatmapDatabase database;
+
+        private Container<Panel> scrollableContent;
+
+        private List<BeatmapGroup> groups = new List<BeatmapGroup>();
+
+        private List<Panel> panels = new List<Panel>();
+
+        private BeatmapGroup selectedGroup;
+
+        private BeatmapPanel selectedPanel;
+
         public CarouselContainer()
         {
-            DistanceDecayJump = 0.01;
-
             Add(scrollableContent = new Container<Panel>
             {
                 RelativeSizeAxes = Axes.X,
             });
         }
 
-        public void AddGroup(BeatmapGroup group)
+        public void AddBeatmap(BeatmapSetInfo beatmapSet)
         {
-            groups.Add(group);
+            var group = createGroup(beatmapSet);
 
-            panels.Add(group.Header);
-            group.Header.UpdateClock(Clock);
-            foreach (BeatmapPanel panel in group.BeatmapPanels)
+            //for the time being, let's completely load the difficulty panels in the background.
+            //this likely won't scale so well, but allows us to completely async the loading flow.
+            Schedule(delegate
             {
-                panels.Add(panel);
-                panel.UpdateClock(Clock);
+                addGroup(group);
+                computeYPositions();
+                if (selectedGroup == null)
+                    selectGroup(group);
+            });
+        }
+
+        public void SelectBeatmap(BeatmapInfo beatmap, bool animated = true)
+        {
+            if (beatmap == null)
+            {
+                SelectNext();
+                return;
             }
+
+            foreach (BeatmapGroup group in groups)
+            {
+                var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
+                if (panel != null)
+                {
+                    selectGroup(group, panel, animated);
+                    return;
+                }
+            }
+        }
+
+        public void RemoveBeatmap(BeatmapSetInfo info) => removeGroup(groups.Find(b => b.BeatmapSet.ID == info.ID));
+
+        public Action<BeatmapGroup, BeatmapInfo> SelectionChanged;
+
+        public Action StartRequested;
+
+        public void SelectNext(int direction = 1, bool skipDifficulties = true)
+        {
+            if (groups.Count == 0)
+            {
+                selectedGroup = null;
+                selectedPanel = null;
+                return;
+            }
+
+            if (!skipDifficulties && selectedGroup != null)
+            {
+                int i = selectedGroup.BeatmapPanels.IndexOf(selectedPanel) + direction;
+
+                if (i >= 0 && i < selectedGroup.BeatmapPanels.Count)
+                {
+                    //changing difficulty panel, not set.
+                    selectGroup(selectedGroup, selectedGroup.BeatmapPanels[i]);
+                    return;
+                }
+            }
+
+            int startIndex = groups.IndexOf(selectedGroup);
+            int index = startIndex;
+
+            do
+            {
+                index = (index + direction + groups.Count) % groups.Count;
+                if (groups[index].State != BeatmapGroupState.Hidden)
+                {
+                    SelectBeatmap(groups[index].BeatmapPanels.First().Beatmap);
+                    return;
+                }
+            } while (index != startIndex);
+        }
+
+        public void SelectRandom()
+        {
+            List<BeatmapGroup> visibleGroups = groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden).ToList();
+            if (visibleGroups.Count < 1)
+                return;
+            BeatmapGroup group = visibleGroups[RNG.Next(visibleGroups.Count)];
+            BeatmapPanel panel = group?.BeatmapPanels.First();
+
+            if (panel == null)
+                return;
+
+            selectGroup(group, panel);
+        }
+
+        public void Sort(SortMode mode)
+        {
+            List<BeatmapGroup> sortedGroups = new List<BeatmapGroup>(groups);
+            switch (mode)
+            {
+                case SortMode.Artist:
+                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist, StringComparison.InvariantCultureIgnoreCase));
+                    break;
+                case SortMode.Title:
+                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title, StringComparison.InvariantCultureIgnoreCase));
+                    break;
+                case SortMode.Author:
+                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author, StringComparison.InvariantCultureIgnoreCase));
+                    break;
+                case SortMode.Difficulty:
+                    sortedGroups.Sort((x, y) => x.BeatmapSet.MaxStarDifficulty.CompareTo(y.BeatmapSet.MaxStarDifficulty));
+                    break;
+                default:
+                    Sort(SortMode.Artist); // Temporary
+                    break;
+            }
+
+            scrollableContent.Clear(false);
+            panels.Clear();
+            groups.Clear();
+
+            foreach (var g in sortedGroups)
+                addGroup(g);
 
             computeYPositions();
         }
 
-        public void RemoveGroup(BeatmapGroup group)
+        public IEnumerator<BeatmapGroup> GetEnumerator() => groups.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        private BeatmapGroup createGroup(BeatmapSetInfo beatmapSet)
+        {
+            database.GetChildren(beatmapSet);
+            beatmapSet.Beatmaps.ForEach(b => { if (b.Metadata == null) b.Metadata = beatmapSet.Metadata; });
+
+            return new BeatmapGroup(beatmapSet, database)
+            {
+                SelectionChanged = SelectionChanged,
+                StartRequested = b => StartRequested?.Invoke(),
+                State = BeatmapGroupState.Collapsed
+            };
+        }
+
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(BeatmapDatabase database)
+        {
+            this.database = database;
+        }
+
+        private void addGroup(BeatmapGroup group)
+        {
+            groups.Add(group);
+            panels.Add(group.Header);
+            panels.AddRange(group.BeatmapPanels);
+        }
+
+        private void removeGroup(BeatmapGroup group)
         {
             groups.Remove(group);
             panels.Remove(group.Header);
@@ -65,16 +245,10 @@ namespace osu.Game.Screens.Select
             scrollableContent.Remove(group.Header);
             scrollableContent.Remove(group.BeatmapPanels);
 
+            if (selectedGroup == group)
+                SelectNext();
+
             computeYPositions();
-        }
-
-        private void movePanel(Panel panel, bool advance, bool animated, ref float currentY)
-        {
-            yPositions.Add(currentY);
-            panel.MoveToY(currentY, animated ? 750 : 0, EasingTypes.OutExpo);
-
-            if (advance)
-                currentY += panel.DrawHeight + 5;
         }
 
         /// <summary>
@@ -99,7 +273,7 @@ namespace osu.Game.Screens.Select
 
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
                     {
-                        if (panel == SelectedPanel)
+                        if (panel == selectedPanel)
                             selectedY = currentY + panel.DrawHeight / 2 - DrawHeight / 2;
 
                         panel.MoveToX(-50, 500, EasingTypes.OutExpo);
@@ -129,105 +303,62 @@ namespace osu.Game.Screens.Select
             return selectedY;
         }
 
-        public void SelectBeatmap(BeatmapInfo beatmap, bool animated = true)
+        private void movePanel(Panel panel, bool advance, bool animated, ref float currentY)
         {
-            foreach (BeatmapGroup group in groups)
-            {
-                var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
-                if (panel != null)
-                {
-                    selectGroup(group, panel, animated);
-                    return;
-                }
-            }
+            yPositions.Add(currentY);
+            panel.MoveToY(currentY, animated ? 750 : 0, EasingTypes.OutExpo);
+
+            if (advance)
+                currentY += panel.DrawHeight + 5;
         }
 
-        private void selectGroup(BeatmapGroup group, BeatmapPanel panel, bool animated = true)
+        private void selectGroup(BeatmapGroup group, BeatmapPanel panel = null, bool animated = true)
         {
+            if (panel == null)
+                panel = group.BeatmapPanels.First();
+
             Trace.Assert(group.BeatmapPanels.Contains(panel), @"Selected panel must be in provided group");
 
-            if (SelectedGroup != null && SelectedGroup != group && SelectedGroup.State != BeatmapGroupState.Hidden)
-                SelectedGroup.State = BeatmapGroupState.Collapsed;
+            if (selectedGroup != null && selectedGroup != group && selectedGroup.State != BeatmapGroupState.Hidden)
+                selectedGroup.State = BeatmapGroupState.Collapsed;
 
             group.State = BeatmapGroupState.Expanded;
-            SelectedGroup = group;
+            selectedGroup = group;
             panel.State = PanelSelectedState.Selected;
-            SelectedPanel = panel;
+            selectedPanel = panel;
 
             float selectedY = computeYPositions(animated);
             ScrollTo(selectedY, animated);
         }
 
-        public void Sort(SortMode mode)
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            List<BeatmapGroup> sortedGroups = new List<BeatmapGroup>(groups);
-            switch (mode)
+            int direction = 0;
+            bool skipDifficulties = false;
+
+            switch (args.Key)
             {
-                case SortMode.Artist:
-                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist, StringComparison.InvariantCultureIgnoreCase));
+                case Key.Up:
+                    direction = -1;
                     break;
-                case SortMode.Title:
-                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title, StringComparison.InvariantCultureIgnoreCase));
+                case Key.Down:
+                    direction = 1;
                     break;
-                case SortMode.Author:
-                    sortedGroups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author, StringComparison.InvariantCultureIgnoreCase));
+                case Key.Left:
+                    direction = -1;
+                    skipDifficulties = true;
                     break;
-                case SortMode.Difficulty:
-                    sortedGroups.Sort((x, y) => x.BeatmapSet.MaxStarDifficulty.CompareTo(y.BeatmapSet.MaxStarDifficulty));
-                    break;
-                default:
-                    Sort(SortMode.Artist); // Temporary
+                case Key.Right:
+                    direction = 1;
+                    skipDifficulties = true;
                     break;
             }
 
-            scrollableContent.Clear(false);
-            panels.Clear();
-            groups.Clear();
+            if (direction == 0)
+                return base.OnKeyDown(state, args);
 
-            foreach (BeatmapGroup group in sortedGroups)
-                AddGroup(group);
-        }
-
-        /// <summary>
-        /// Computes the x-offset of currently visible panels. Makes the carousel appear round.
-        /// </summary>
-        /// <param name="dist">
-        /// Vertical distance from the center of the carousel container
-        /// ranging from -1 to 1.
-        /// </param>
-        /// <param name="halfHeight">Half the height of the carousel container.</param>
-        private static float offsetX(float dist, float halfHeight)
-        {
-            // The radius of the circle the carousel moves on.
-            const float circle_radius = 3;
-            double discriminant = Math.Max(0, circle_radius * circle_radius - dist * dist);
-            float x = (circle_radius - (float)Math.Sqrt(discriminant)) * halfHeight;
-
-            return 125 + x;
-        }
-
-        /// <summary>
-        /// Update a panel's x position and multiplicative alpha based on its y position and
-        /// the current scroll position.
-        /// </summary>
-        /// <param name="p">The panel to be updated.</param>
-        /// <param name="halfHeight">Half the draw height of the carousel container.</param>
-        private void updatePanel(Panel p, float halfHeight)
-        {
-            var height = p.IsPresent ? p.DrawHeight : 0;
-
-            float panelDrawY = p.Position.Y - Current + height / 2;
-            float dist = Math.Abs(1f - panelDrawY / halfHeight);
-
-            // Setting the origin position serves as an additive position on top of potential
-            // local transformation we may want to apply (e.g. when a panel gets selected, we
-            // may want to smoothly transform it leftwards.)
-            p.OriginPosition = new Vector2(-offsetX(dist, halfHeight), 0);
-
-            // We are applying a multiplicative alpha (which is internally done by nesting an
-            // additional container and setting that container's alpha) such that we can
-            // layer transformations on top, with a similar reasoning to the previous comment.
-            p.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
+            SelectNext(direction, skipDifficulties);
+            return true;
         }
 
         protected override void Update()
@@ -276,80 +407,46 @@ namespace osu.Game.Screens.Select
                 updatePanel(p, halfHeight);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        /// <summary>
+        /// Computes the x-offset of currently visible panels. Makes the carousel appear round.
+        /// </summary>
+        /// <param name="dist">
+        /// Vertical distance from the center of the carousel container
+        /// ranging from -1 to 1.
+        /// </param>
+        /// <param name="halfHeight">Half the height of the carousel container.</param>
+        private static float offsetX(float dist, float halfHeight)
         {
-            int direction = 0;
-            bool skipDifficulties = false;
+            // The radius of the circle the carousel moves on.
+            const float circle_radius = 3;
+            double discriminant = Math.Max(0, circle_radius * circle_radius - dist * dist);
+            float x = (circle_radius - (float)Math.Sqrt(discriminant)) * halfHeight;
 
-            switch (args.Key)
-            {
-                case Key.Up:
-                    direction = -1;
-                    break;
-                case Key.Down:
-                    direction = 1;
-                    break;
-                case Key.Left:
-                    direction = -1;
-                    skipDifficulties = true;
-                    break;
-                case Key.Right:
-                    direction = 1;
-                    skipDifficulties = true;
-                    break;
-            }
-
-            if (direction == 0)
-                return base.OnKeyDown(state, args);
-
-            SelectNext(direction, skipDifficulties);
-            return true;
+            return 125 + x;
         }
 
-        public void SelectNext(int direction = 1, bool skipDifficulties = true)
+        /// <summary>
+        /// Update a panel's x position and multiplicative alpha based on its y position and
+        /// the current scroll position.
+        /// </summary>
+        /// <param name="p">The panel to be updated.</param>
+        /// <param name="halfHeight">Half the draw height of the carousel container.</param>
+        private void updatePanel(Panel p, float halfHeight)
         {
-            if (!skipDifficulties && SelectedGroup != null)
-            {
-                int i = SelectedGroup.BeatmapPanels.IndexOf(SelectedPanel) + direction;
+            var height = p.IsPresent ? p.DrawHeight : 0;
 
-                if (i >= 0 && i < SelectedGroup.BeatmapPanels.Count)
-                {
-                    //changing difficulty panel, not set.
-                    selectGroup(SelectedGroup, SelectedGroup.BeatmapPanels[i]);
-                    return;
-                }
-            }
+            float panelDrawY = p.Position.Y - Current + height / 2;
+            float dist = Math.Abs(1f - panelDrawY / halfHeight);
 
-            int startIndex = groups.IndexOf(SelectedGroup);
-            int index = startIndex;
+            // Setting the origin position serves as an additive position on top of potential
+            // local transformation we may want to apply (e.g. when a panel gets selected, we
+            // may want to smoothly transform it leftwards.)
+            p.OriginPosition = new Vector2(-offsetX(dist, halfHeight), 0);
 
-            do
-            {
-                index = (index + direction + groups.Count) % groups.Count;
-                if (groups[index].State != BeatmapGroupState.Hidden)
-                {
-                    SelectBeatmap(groups[index].BeatmapPanels.First().Beatmap);
-                    return;
-                }
-            } while (index != startIndex);
+            // We are applying a multiplicative alpha (which is internally done by nesting an
+            // additional container and setting that container's alpha) such that we can
+            // layer transformations on top, with a similar reasoning to the previous comment.
+            p.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
         }
-
-        public void SelectRandom()
-        {
-            List<BeatmapGroup> visibleGroups = groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden).ToList();
-            if (visibleGroups.Count < 1)
-                return;
-            BeatmapGroup group = visibleGroups[RNG.Next(visibleGroups.Count)];
-            BeatmapPanel panel = group?.BeatmapPanels.First();
-
-            if (panel == null)
-                return;
-
-            selectGroup(group, panel);
-        }
-
-        public IEnumerator<BeatmapGroup> GetEnumerator() => groups.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

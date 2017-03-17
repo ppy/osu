@@ -2,10 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Allocation;
@@ -51,8 +49,6 @@ namespace osu.Game.Screens.Select
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
 
-        private List<BeatmapGroup> beatmapGroups;
-
         protected virtual bool ShowFooter => true;
 
         /// <summary>
@@ -72,7 +68,6 @@ namespace osu.Game.Screens.Select
             const float carousel_width = 640;
             const float filter_height = 100;
 
-            beatmapGroups = new List<BeatmapGroup>();
             Add(new ParallaxContainer
             {
                 Padding = new MarginPadding { Top = filter_height },
@@ -93,6 +88,8 @@ namespace osu.Game.Screens.Select
                 Size = new Vector2(carousel_width, 1),
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
+                SelectionChanged = selectionChanged,
+                StartRequested = raiseSelect
             });
             Add(FilterControl = new FilterControl
             {
@@ -132,8 +129,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase beatmaps, AudioManager audio, DialogOverlay dialog, Framework.Game game,
-            OsuGame osu, OsuColour colours)
+        private void load(BeatmapDatabase beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
         {
             if (Footer != null)
             {
@@ -161,7 +157,16 @@ namespace osu.Game.Screens.Select
 
             initialAddSetsTask = new CancellationTokenSource();
 
-            Task.Factory.StartNew(() => addBeatmapSets(game, initialAddSetsTask.Token), initialAddSetsTask.Token);
+            carousel.BeatmapsChanged = beatmapsLoaded;
+            carousel.Beatmaps = database.Query<BeatmapSetInfo>().Where(b => !b.DeletePending);
+        }
+
+        private void beatmapsLoaded()
+        {
+            if (Beatmap != null)
+                carousel.SelectBeatmap(Beatmap.BeatmapInfo, false);
+            else
+                carousel.SelectNext();
         }
 
         private void raiseSelect()
@@ -173,18 +178,24 @@ namespace osu.Game.Screens.Select
         }
 
         public void SelectRandom() => carousel.SelectRandom();
+
         protected abstract void OnSelected();
 
         private ScheduledDelegate filterTask;
 
         private void filterChanged(bool debounce = true, bool eagerSelection = true)
         {
+            if (!carousel.IsLoaded) return;
+
+            if (Beatmap == null) return;
+
             filterTask?.Cancel();
             filterTask = Scheduler.AddDelayed(() =>
             {
                 filterTask = null;
                 var search = FilterControl.Search;
                 BeatmapGroup newSelection = null;
+
                 carousel.Sort(FilterControl.Sort);
                 foreach (var beatmapGroup in carousel)
                 {
@@ -227,7 +238,7 @@ namespace osu.Game.Screens.Select
             }, debounce ? 250 : 0);
         }
 
-        private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => addBeatmapSet(s, Game, true));
+        private void onBeatmapSetAdded(BeatmapSetInfo s) => carousel.AddBeatmap(s);
 
         private void onBeatmapSetRemoved(BeatmapSetInfo s) => Schedule(() => removeBeatmapSet(s));
 
@@ -352,80 +363,15 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private BeatmapGroup prepareBeatmapSet(BeatmapSetInfo beatmapSet)
-        {
-            database.GetChildren(beatmapSet);
-            beatmapSet.Beatmaps.ForEach(b => { if (b.Metadata == null) b.Metadata = beatmapSet.Metadata; });
-
-            return new BeatmapGroup(beatmapSet, database)
-            {
-                SelectionChanged = selectionChanged,
-                StartRequested = b => raiseSelect()
-            };
-        }
-
-        private void addBeatmapSet(BeatmapSetInfo beatmapSet, Framework.Game game, bool select = false)
-        {
-            var group = prepareBeatmapSet(beatmapSet);
-
-            //for the time being, let's completely load the difficulty panels in the background.
-            //this likely won't scale so well, but allows us to completely async the loading flow.
-            Task.WhenAll(group.BeatmapPanels.Select(panel => panel.LoadAsync(game))).ContinueWith(task => Schedule(delegate
-            {
-                addGroup(group);
-
-                if (Beatmap == null || select)
-                    selectBeatmap(beatmapSet);
-                else
-                    selectBeatmap();
-            }));
-        }
-
-        private void addGroup(BeatmapGroup group)
-        {
-            beatmapGroups.Add(group);
-
-            group.State = BeatmapGroupState.Collapsed;
-            carousel.AddGroup(group);
-
-            filterChanged(false, false);
-        }
-
         private void selectBeatmap(BeatmapSetInfo beatmapSet = null)
         {
-            carousel.SelectBeatmap(beatmapSet != null ? beatmapSet.Beatmaps.First() : Beatmap.BeatmapInfo);
-        }
-
-        private void addBeatmapSets(Framework.Game game, CancellationToken token)
-        {
-            List<BeatmapGroup> groups = new List<BeatmapGroup>();
-
-            foreach (var beatmapSet in database.Query<BeatmapSetInfo>().Where(b => !b.DeletePending))
-            {
-                if (token.IsCancellationRequested) return;
-
-                groups.Add(prepareBeatmapSet(beatmapSet));
-            }
-
-            Schedule(() =>
-            {
-                groups.ForEach(addGroup);
-                selectBeatmap(Beatmap?.BeatmapSetInfo ?? groups.First().BeatmapSet);
-            });
+            carousel.SelectBeatmap(beatmapSet != null ? beatmapSet.Beatmaps.First() : Beatmap?.BeatmapInfo);
         }
 
         private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            var group = beatmapGroups.Find(b => b.BeatmapSet.ID == beatmapSet.ID);
-            if (group == null) return;
-
-            if (carousel.SelectedGroup == group)
-                carousel.SelectNext();
-
-            beatmapGroups.Remove(group);
-            carousel.RemoveGroup(group);
-
-            if (beatmapGroups.Count == 0)
+            carousel.RemoveBeatmap(beatmapSet);
+            if (carousel.SelectedBeatmap == null)
                 Beatmap = null;
         }
 
