@@ -1,0 +1,50 @@
+﻿using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Taiko.Judgements;
+using System.Linq;
+
+namespace osu.Game.Modes.Taiko.Objects.Drawable
+{
+    public class DrawableDrumRoll : DrawableTaikoHitObject
+    {
+        private DrumRoll drumRoll;
+
+        public DrawableDrumRoll(DrumRoll drumRoll)
+            : base(drumRoll)
+        {
+            this.drumRoll = drumRoll;
+
+            int tickIndex = 0;
+            foreach (var tick in drumRoll.Ticks)
+            {
+                var newTick = new DrawableDrumRollTick(tick)
+                {
+                    Depth = tickIndex,
+                    X = (float)((tick.StartTime - HitObject.StartTime) / drumRoll.Duration)
+                };
+
+                AddNested(newTick);
+
+                tickIndex++;
+            }
+        }
+
+        protected override void CheckJudgement(bool userTriggered)
+        {
+            if (userTriggered)
+                return;
+
+            if (Judgement.TimeOffset < 0)
+                return;
+
+            int countHit = NestedHitObjects.Count(o => o.Judgement.Result == HitResult.Hit);
+
+            if (countHit > drumRoll.RequiredGoodHits)
+            {
+                Judgement.Result = HitResult.Hit;
+                Judgement.Score = countHit >= drumRoll.RequiredGreatHits ? TaikoScoreResult.Great : TaikoScoreResult.Good;
+            }
+            else
+                Judgement.Result = HitResult.Miss;
+        }
+    }
+}
