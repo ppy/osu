@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private Container flagBadgeContainer;
         private FillFlowContainer<ScoreModIcon> modsContainer;
 
-        public readonly int Index;
+        public readonly int Rank;
         public readonly Score Score;
 
         private Visibility state;
@@ -112,10 +112,10 @@ namespace osu.Game.Screens.Select.Leaderboards
             base.OnHoverLost(state);
         }
 
-        public LeaderboardScore(Score score, int i)
+        public LeaderboardScore(Score score, int rank)
         {
             Score = score;
-            Index = i;
+            Rank = rank;
 
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -123,6 +123,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             var flag = Score.User?.Region.CreateDrawable() ?? new DrawableFlag();
             flag.Width = 30;
             flag.RelativeSizeAxes = Axes.Y;
+
+            const float rank_width = 30;
 
             Children = new Drawable[]
             {
@@ -138,7 +140,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Origin = Anchor.CentreLeft,
                             Font = @"Exo2.0-MediumItalic",
                             TextSize = 22,
-                            Text = Index.ToString(),
+                            Text = Rank.ToString(),
                         },
                     },
                 },

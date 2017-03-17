@@ -58,20 +58,21 @@ namespace osu.Game.Screens.Select
         {
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
 
+            updateLeaderboard(beatmap);
+
+            base.OnBeatmapChanged(beatmap);
+        }
+
+        private void updateLeaderboard(WorkingBeatmap beatmap)
+        {
             leaderboard.Scores = null;
             getScoresRequest?.Cancel();
 
-            if (beatmap != null)
-            {
-                getScoresRequest = new GetScoresRequest(beatmap.BeatmapInfo);
-                getScoresRequest.Success += res =>
-                {
-                    leaderboard.Scores = res.Scores;
-                };
-                Game.API.Queue(getScoresRequest);
-            }
+            if (beatmap?.BeatmapInfo == null) return;
 
-            base.OnBeatmapChanged(beatmap);
+            getScoresRequest = new GetScoresRequest(beatmap.BeatmapInfo);
+            getScoresRequest.Success += r => leaderboard.Scores = r.Scores;
+            Game.API.Queue(getScoresRequest);
         }
 
         protected override void OnResuming(Screen last)
