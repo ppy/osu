@@ -21,11 +21,11 @@ namespace osu.Game.Screens.Tournament.Teams
             this.storage = storage;
         }
 
-        public IEnumerable<Region> Teams
+        public IEnumerable<Country> Teams
         {
             get
             {
-                var teams = new List<Region>();
+                var teams = new List<Country>();
 
                 try
                 {
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Tournament.Teams
                             string acronym = split.Length >= 3 ? split[2].Trim() : teamName;
                             acronym = acronym.Substring(0, Math.Min(3, acronym.Length));
 
-                            teams.Add(new Region
+                            teams.Add(new Country
                             {
                                 FlagName = flagName,
                                 FullName = teamName,

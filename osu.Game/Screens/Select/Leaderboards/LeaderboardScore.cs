@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private const float corner_radius = 5;
         private const float edge_margin = 10;
         private const float background_alpha = 0.25f;
-        private const float score_rank_size = 40f;
+        private const float index_width = 40;
 
         private readonly EdgeEffect imageShadow = new EdgeEffect
         {
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 new Container
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Width = 40,
+                    Width = index_width,
                     Children = new[]
                     {
                         new OsuSpriteText
@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = 40, },
+                    Padding = new MarginPadding { Left = index_width, },
                     Children = new Drawable[]
                     {
                         new Container
@@ -213,7 +213,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10f, 0f),
-                                                    Margin = new MarginPadding { Left = 10, },
+                                                    Margin = new MarginPadding { Left = edge_margin, },
                                                     Children = new Drawable[]
                                                     {
                                                         maxCombo = new ScoreComponentLabel(FontAwesome.fa_link, Score.MaxCombo.ToString()),
@@ -224,26 +224,39 @@ namespace osu.Game.Screens.Select.Leaderboards
                                         },
                                     },
                                 },
-                                scoreRank = new DrawableRank(Score.Rank)
+                                new FillFlowContainer
                                 {
+                                    AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    Size = new Vector2(score_rank_size),
-                                    Position = new Vector2(0f, -10f),
-                                },
-                                scoreLabel = new GlowingSpriteText(Score.TotalScore.ToString(@"N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa"))
-                                {
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
-                                    Position = new Vector2(-score_rank_size - 5f, 0f),
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(5f, 0f),
+                                    Children = new Drawable[]
+                                    {
+                                        scoreLabel = new GlowingSpriteText(Score.TotalScore.ToString(@"N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa"))
+                                        {
+                                            
+                                        },
+                                        new Container
+                                        {
+                                            Size = new Vector2(40f, 20f),
+                                            Children = new[]
+                                            {
+                                                scoreRank = new DrawableRank(Score.Rank)
+                                                {
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
+                                                    Size = new Vector2(40f),
+                                                },
+                                            },
+                                        },
+                                    },
                                 },
                                 modsContainer = new FillFlowContainer<ScoreModIcon>
                                 {
                                     Anchor = Anchor.BottomRight,
                                     Origin = Anchor.BottomRight,
                                     AutoSizeAxes = Axes.Both,
-                                    // TODO: Probably remove? Seems like others don't like this kind of thing
-                                    Position = new Vector2(0f, 4f), //properly align the mod icons
                                     Direction = FillDirection.Horizontal,
                                 },
                             },
@@ -325,6 +338,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         Colour = colour,
                         Shadow = true,
                         TextSize = 30,
+                        UseFullGlyphHeight = false,
                     },
                     new TextAwesome
                     {
@@ -333,6 +347,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                         Icon = icon,
                         Colour = OsuColour.Gray(84),
                         TextSize = 18,
+                        Position = new Vector2(0f, 2f),
+                        UseFullGlyphHeight = false,
                     },
                 };
             }

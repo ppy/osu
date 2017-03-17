@@ -10,10 +10,10 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Users
 {
-    public class Region : IHasDrawableRepresentation<DrawableFlag>
+    public class Country : IHasDrawableRepresentation<DrawableFlag>
     {
         /// <summary>
-        /// The name of this team.
+        /// The name of this country.
         /// </summary>
         public string FullName;
 

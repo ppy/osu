@@ -25,57 +25,57 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class TestTeamList : ITeamList
         {
-            public IEnumerable<Region> Teams { get; } = new[]
+            public IEnumerable<Country> Teams { get; } = new[]
             {
-                new Region
+                new Country
                 {
                     FlagName = "GB",
                     FullName = "United Kingdom",
                     Acronym = "UK"
                 },
-                new Region
+                new Country
                 {
                     FlagName = "FR",
                     FullName = "France",
                     Acronym = "FRA"
                 },
-                new Region
+                new Country
                 {
                     FlagName = "CN",
                     FullName = "China",
                     Acronym = "CHN"
                 },
-                new Region
+                new Country
                 {
                     FlagName = "AU",
                     FullName = "Australia",
                     Acronym = "AUS"
                 },
-                new Region
+                new Country
                 {
                     FlagName = "JP",
                     FullName = "Japan",
                     Acronym = "JPN"
                 },
-                new Region
+                new Country
                 {
                     FlagName = "RO",
                     FullName = "Romania",
                     Acronym = "ROM"
                 },
-                new Region
+                new Country
                 {
                     FlagName = "IT",
                     FullName = "Italy",
                     Acronym = "PIZZA"
                 },
-                new Region
+                new Country
                 {
                     FlagName = "VE",
                     FullName = "Venezuela",
                     Acronym = "VNZ"
                 },
-                new Region
+                new Country
                 {
                     FlagName = "US",
                     FullName = "United States of America",

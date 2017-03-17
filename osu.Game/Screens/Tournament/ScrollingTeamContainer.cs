@@ -22,9 +22,9 @@ namespace osu.Game.Screens.Tournament
     public class ScrollingTeamContainer : Container
     {
         public event Action OnScrollStarted;
-        public event Action<Region> OnSelected;
+        public event Action<Country> OnSelected;
 
-        private readonly List<Region> availableTeams = new List<Region>();
+        private readonly List<Country> availableTeams = new List<Country>();
 
         private Container tracker;
 
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        public void AddTeam(Region team)
+        public void AddTeam(Country team)
         {
             if (availableTeams.Contains(team))
                 return;
@@ -169,12 +169,12 @@ namespace osu.Game.Screens.Tournament
             scrollState = ScrollState.Idle;
         }
 
-        public void AddTeams(IEnumerable<Region> teams)
+        public void AddTeams(IEnumerable<Country> teams)
         {
             if (teams == null)
                 return;
 
-            foreach (Region t in teams)
+            foreach (Country t in teams)
                 AddTeam(t);
         }
 
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Tournament
             scrollState = ScrollState.Idle;
         }
 
-        public void RemoveTeam(Region team)
+        public void RemoveTeam(Country team)
         {
             availableTeams.Remove(team);
 
@@ -270,9 +270,9 @@ namespace osu.Game.Screens.Tournament
 
         private void addFlags()
         {
-            foreach (Region r in availableTeams)
+            foreach (Country t in availableTeams)
             {
-                Add(new ScrollingTeam(r)
+                Add(new ScrollingTeam(t)
                 {
                     X = leftPos + DrawWidth
                 });
@@ -326,7 +326,7 @@ namespace osu.Game.Screens.Tournament
             public const float WIDTH = 58;
             public const float HEIGHT = 41;
 
-            public Region Team;
+            public Country Team;
 
             private Sprite flagSprite;
             private Box outline;
@@ -346,7 +346,7 @@ namespace osu.Game.Screens.Tournament
                 }
             }
 
-            public ScrollingTeam(Region team)
+            public ScrollingTeam(Country team)
             {
                 Team = team;
 
