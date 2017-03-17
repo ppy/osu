@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects.Types;
 using System;
@@ -68,7 +67,7 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.ApplyDefaults(timing, difficulty);
 
-            Velocity = (timing.SliderVelocityAt(StartTime) * difficulty.SliderMultiplier) / 1000;
+            Velocity = timing.SliderVelocityAt(StartTime) * difficulty.SliderMultiplier / 1000;
             TickTimeDistance = timing.BeatLengthAt(StartTime);
 
             if (difficulty.SliderTickRate == 3)
