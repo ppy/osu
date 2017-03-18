@@ -88,8 +88,15 @@ namespace osu.Game.Screens.Select.Leaderboards
                 var topY = scrollContainer.ScrollContent.DrawPosition.Y + s.DrawPosition.Y;
                 var bottomY = topY + LeaderboardScore.HEIGHT;
 
-                s.ColourInfo = ColourInfo.GradientVertical(Color4.White.Opacity(System.Math.Min((fadeStart - topY) / LeaderboardScore.HEIGHT, 1)),
+                if (topY < fadeStart - (LeaderboardScore.HEIGHT * 2))
+                {
+                    s.ColourInfo = ColourInfo.GradientVertical(Color4.White, Color4.White);
+                }
+                else
+                {
+                    s.ColourInfo = ColourInfo.GradientVertical(Color4.White.Opacity(System.Math.Min((fadeStart - topY) / LeaderboardScore.HEIGHT, 1)),
                                                            Color4.White.Opacity(System.Math.Min((fadeStart - bottomY) / LeaderboardScore.HEIGHT, 1)));
+                }
             }
         }
     }
