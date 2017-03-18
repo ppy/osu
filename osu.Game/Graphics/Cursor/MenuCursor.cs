@@ -20,6 +20,26 @@ namespace osu.Game.Graphics.Cursor
     {
         protected override Drawable CreateCursor() => new Cursor();
 
+        protected override bool OnMouseMove(InputState state)
+        {
+            if (state.Mouse.HasMainButtonPressed)
+            {
+                Vector2 offset = state.Mouse.Delta;
+                offset = state.Mouse.Position - state.Mouse.PositionMouseDown ?? state.Mouse.Delta;
+                float degrees = (float)MathHelper.RadiansToDegrees(Math.Atan2(-offset.X, offset.Y)) + 24.3f;
+
+                // Always rotate in the direction of least distance
+                float diff = (degrees - ActiveCursor.Rotation) % 360;
+                if (diff < -180) diff += 360;
+                if (diff > 180) diff -= 360;
+                degrees = ActiveCursor.Rotation + diff;
+
+                ActiveCursor.RotateTo(degrees, 600, EasingTypes.OutQuint);
+            }
+
+            return base.OnMouseMove(state);
+        }
+
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             ActiveCursor.Scale = new Vector2(1);
@@ -35,7 +55,7 @@ namespace osu.Game.Graphics.Cursor
             if (!state.Mouse.HasMainButtonPressed)
             {
                 ((Cursor)ActiveCursor).AdditiveLayer.FadeOut(500, EasingTypes.OutQuint);
-                ActiveCursor.RotateTo(0, 200, EasingTypes.OutQuint);
+                ActiveCursor.RotateTo(0, 600, EasingTypes.OutElasticHalf);
                 ActiveCursor.ScaleTo(1, 500, EasingTypes.OutElastic);
             }
 
@@ -47,12 +67,6 @@ namespace osu.Game.Graphics.Cursor
             ((Cursor)ActiveCursor).AdditiveLayer.FadeOutFromOne(500, EasingTypes.OutQuint);
 
             return base.OnClick(state);
-        }
-
-        protected override bool OnDragStart(InputState state)
-        {
-            ActiveCursor.RotateTo(-30, 600, EasingTypes.OutElastic);
-            return base.OnDragStart(state);
         }
 
         protected override void PopIn()
