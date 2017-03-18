@@ -94,11 +94,7 @@ namespace osu.Game.Overlays.Toolbar
 
                     userId = value;
 
-                    Sprite newSprite;
-                    if (userId > 1)
-                        newSprite = new OnlineSprite($@"https://a.ppy.sh/{userId}");
-                    else
-                        newSprite = new Sprite { Texture = guestTexture };
+                    var newSprite = userId > 1 ? new OnlineSprite($@"https://a.ppy.sh/{userId}") : new Sprite { Texture = guestTexture };
 
                     newSprite.FillMode = FillMode.Fit;
 

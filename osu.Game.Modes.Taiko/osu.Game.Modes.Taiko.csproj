@@ -47,16 +47,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Beatmaps\TaikoBeatmapConverter.cs" />
+    <Compile Include="Beatmaps\TaikoBeatmapProcessor.cs" />
+    <Compile Include="Judgements\TaikoJudgementInfo.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
     <Compile Include="Objects\Drawable\DrawableTaikoHit.cs" />
     <Compile Include="Objects\TaikoBaseHit.cs" />
-    <Compile Include="Objects\TaikoConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\TaikoComboCounter.cs" />
+    <Compile Include="TaikoScoreProcessor.cs" />
     <Compile Include="UI\TaikoHitRenderer.cs" />
     <Compile Include="UI\TaikoPlayfield.cs" />
     <Compile Include="TaikoRuleset.cs" />
-    <Compile Include="TaikoMod.cs" />
+    <Compile Include="Mods\TaikoMod.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\osu.licenseheader">

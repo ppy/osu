@@ -19,7 +19,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class ButtonSystem : Container, IStateful<MenuState>
+    public class ButtonSystem : Container, IStateful<MenuState>
     {
         public Action OnEdit;
         public Action OnExit;

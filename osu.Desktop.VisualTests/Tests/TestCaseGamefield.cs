@@ -1,20 +1,22 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Framework.Screens.Testing;
+using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
+using osu.Framework.Screens.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.IO;
+using osu.Game.Database;
 using osu.Game.Modes.Catch.UI;
 using osu.Game.Modes.Mania.UI;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.Taiko.UI;
-using OpenTK;
+using System.Collections.Generic;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -41,10 +43,20 @@ namespace osu.Desktop.VisualTests.Tests
                 time += RNG.Next(50, 500);
             }
 
-            Beatmap beatmap = new Beatmap
+            WorkingBeatmap beatmap = new TestWorkingBeatmap(new Beatmap
             {
-                HitObjects = objects
-            };
+                HitObjects = objects,
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty(),
+                    Metadata = new BeatmapMetadata
+                    {
+                        Artist = @"Unknown",
+                        Title = @"Sample Beatmap",
+                        Author = @"peppy",
+                    }
+                }
+            });
 
             Add(new Drawable[]
             {
@@ -55,30 +67,26 @@ namespace osu.Desktop.VisualTests.Tests
                     Clock = new FramedClock(),
                     Children = new Drawable[]
                     {
-                        new OsuHitRenderer
+                        new OsuHitRenderer(beatmap)
                         {
-                            Beatmap = beatmap,
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft
                         },
-                        new TaikoHitRenderer
+                        new TaikoHitRenderer(beatmap)
                         {
-                            Beatmap = beatmap,
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight
                         },
-                        new CatchHitRenderer
+                        new CatchHitRenderer(beatmap)
                         {
-                            Beatmap = beatmap,
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft
                         },
-                        new ManiaHitRenderer
+                        new ManiaHitRenderer(beatmap)
                         {
-                            Beatmap = beatmap,
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight
@@ -86,6 +94,17 @@ namespace osu.Desktop.VisualTests.Tests
                     }
                 }
             });
+        }
+
+        private class TestWorkingBeatmap : WorkingBeatmap
+        {
+            public TestWorkingBeatmap(Beatmap beatmap)
+                : base(beatmap.BeatmapInfo, beatmap.BeatmapInfo.BeatmapSet)
+            {
+                Beatmap = beatmap;
+            }
+
+            protected override ArchiveReader GetReader() => null;
         }
     }
 }

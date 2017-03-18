@@ -1,21 +1,35 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Modes.Objects;
+using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Osu.Beatmaps;
+using osu.Game.Modes.Osu.Judgements;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Game.Modes.UI;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.Osu.UI
 {
-    public class OsuHitRenderer : HitRenderer<OsuHitObject>
+    public class OsuHitRenderer : HitRenderer<OsuHitObject, OsuJudgementInfo>
     {
-        protected override HitObjectConverter<OsuHitObject> Converter => new OsuHitObjectConverter();
+        public OsuHitRenderer(WorkingBeatmap beatmap)
+            : base(beatmap)
+        {
+        }
 
-        protected override Playfield<OsuHitObject> CreatePlayfield() => new OsuPlayfield();
+        public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor(this);
 
-        protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
+        protected override IBeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
+
+        protected override IBeatmapProcessor<OsuHitObject> CreateBeatmapProcessor() => new OsuBeatmapProcessor();
+
+        protected override Playfield<OsuHitObject, OsuJudgementInfo> CreatePlayfield() => new OsuPlayfield();
+
+        protected override KeyConversionInputManager CreateKeyConversionInputManager() => new OsuKeyConversionInputManager();
+
+        protected override DrawableHitObject<OsuHitObject, OsuJudgementInfo> GetVisualRepresentation(OsuHitObject h)
         {
             var circle = h as HitCircle;
             if (circle != null)

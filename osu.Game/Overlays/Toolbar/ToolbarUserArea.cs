@@ -15,10 +15,10 @@ namespace osu.Game.Overlays.Toolbar
 
         public override RectangleF BoundingBox => button.BoundingBox;
 
-        public override bool Contains(Vector2 screenSpacePos) => true;
-
         public ToolbarUserArea()
         {
+            AlwaysReceiveInput = true;
+
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 

@@ -30,9 +30,9 @@ namespace osu.Desktop
             base.LoadComplete();
 
             versionManager.LoadAsync(this);
-            ModeChanged += m =>
+            ScreenChanged += s =>
             {
-                if (!versionManager.IsAlive && m is Intro)
+                if (!versionManager.IsAlive && s is Intro)
                     Add(versionManager);
             };
         }
@@ -67,7 +67,7 @@ namespace osu.Desktop
                 });
         }
 
-        static readonly string[] allowed_extensions = { @".osz", @".osr" };
+        private static readonly string[] allowed_extensions = { @".osz", @".osr" };
 
         private void dragEnter(DragEventArgs e)
         {
@@ -76,10 +76,7 @@ namespace osu.Desktop
             if (isFile)
             {
                 var paths = ((object[])e.Data.GetData(DataFormats.FileDrop)).Select(f => f.ToString()).ToArray();
-                if (allowed_extensions.Any(ext => paths.All(p => p.EndsWith(ext))))
-                    e.Effect = DragDropEffects.Copy;
-                else
-                    e.Effect = DragDropEffects.None;
+                e.Effect = allowed_extensions.Any(ext => paths.All(p => p.EndsWith(ext))) ? DragDropEffects.Copy : DragDropEffects.None;
             }
         }
     }

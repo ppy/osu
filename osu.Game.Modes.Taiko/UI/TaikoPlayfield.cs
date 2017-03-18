@@ -9,10 +9,11 @@ using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.UI;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Modes.Taiko.Judgements;
 
 namespace osu.Game.Modes.Taiko.UI
 {
-    public class TaikoPlayfield : Playfield<TaikoBaseHit>
+    public class TaikoPlayfield : Playfield<TaikoBaseHit, TaikoJudgementInfo>
     {
         public TaikoPlayfield()
         {

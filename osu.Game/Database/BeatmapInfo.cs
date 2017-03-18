@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Linq;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
+using System;
+using System.Linq;
 
 namespace osu.Game.Database
 {
@@ -31,11 +31,11 @@ namespace osu.Game.Database
         [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BeatmapMetadata Metadata { get; set; }
 
-        [ForeignKey(typeof(BaseDifficulty)), NotNull]
+        [ForeignKey(typeof(BeatmapDifficulty)), NotNull]
         public int BaseDifficultyID { get; set; }
 
         [OneToOne(CascadeOperations = CascadeOperation.All)]
-        public BaseDifficulty BaseDifficulty { get; set; }
+        public BeatmapDifficulty Difficulty { get; set; }
 
         public string Path { get; set; }
 
@@ -75,16 +75,7 @@ namespace osu.Game.Database
         // Metadata
         public string Version { get; set; }
 
-        private float starDifficulty = -1;
-        public float StarDifficulty
-        {
-            get
-            {
-                return starDifficulty < 0 ? (BaseDifficulty?.OverallDifficulty ?? 5) : starDifficulty;
-            }
-            
-            set { starDifficulty = value; }
-        }
+        public double StarDifficulty { get; set; }
 
         public bool Equals(BeatmapInfo other)
         {

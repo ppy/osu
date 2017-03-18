@@ -21,11 +21,10 @@ namespace osu.Game.Screens
     {
         private BackButton popButton;
 
-        private const int transition_time = 1000;
+        private const double transition_time = 1000;
 
         protected virtual IEnumerable<Type> PossibleChildren => null;
 
-        private FillFlowContainer childModeButtons;
         private Container textContainer;
         private Box box;
 
@@ -80,6 +79,8 @@ namespace osu.Game.Screens
 
         public ScreenWhiteBox()
         {
+            FillFlowContainer childModeButtons;
+
             Children = new Drawable[]
             {
                 box = new Box

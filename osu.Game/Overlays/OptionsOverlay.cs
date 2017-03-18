@@ -167,11 +167,8 @@ namespace osu.Game.Overlays
 
                 var previous = sidebarButtons.SingleOrDefault(sb => sb.Selected);
                 var next = sidebarButtons.SingleOrDefault(sb => sb.Section == bestCandidate);
-                if (next != null)
-                {
-                    previous.Selected = false;
-                    next.Selected = true;
-                }
+                if (previous != null) previous.Selected = false;
+                if (next != null) next.Selected = true;
             }
         }
 

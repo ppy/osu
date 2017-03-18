@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Input.Handlers;
@@ -58,7 +59,7 @@ namespace osu.Game.Modes
             public LegacyReplayFrame CurrentFrame => !hasFrames ? null : replayContent[currentFrameIndex];
             public LegacyReplayFrame NextFrame => !hasFrames ? null : replayContent[nextFrameIndex];
 
-            int currentFrameIndex;
+            private int currentFrameIndex;
 
             private int nextFrameIndex => MathHelper.Clamp(currentFrameIndex + (currentDirection > 0 ? 1 : -1), 0, replayContent.Count - 1);
 
@@ -95,24 +96,17 @@ namespace osu.Game.Modes
 
             public override List<InputState> GetPendingStates()
             {
+                var buttons = new HashSet<MouseButton>();
+                if (CurrentFrame?.MouseLeft ?? false)
+                    buttons.Add(MouseButton.Left);
+                if (CurrentFrame?.MouseRight ?? false)
+                    buttons.Add(MouseButton.Right);
+
                 return new List<InputState>
                 {
                     new InputState
                     {
-                        Mouse = new ReplayMouseState(
-                            ToScreenSpace(position ?? Vector2.Zero),
-                            new List<MouseState.ButtonState>
-                            {
-                                new MouseState.ButtonState(MouseButton.Left)
-                                {
-                                    State = CurrentFrame?.MouseLeft ?? false
-                                },
-                                new MouseState.ButtonState(MouseButton.Right)
-                                {
-                                    State = CurrentFrame?.MouseRight ?? false
-                                },
-                            }
-                        ),
+                        Mouse = new ReplayMouseState(ToScreenSpace(position ?? Vector2.Zero), buttons),
                         Keyboard = new ReplayKeyboardState(new List<Key>())
                     }
                 };
@@ -125,8 +119,8 @@ namespace osu.Game.Modes
 
             private const double sixty_frame_time = 1000.0 / 60;
 
-            double currentTime;
-            int currentDirection;
+            private double currentTime;
+            private int currentDirection;
 
             /// <summary>
             /// When set, we will ensure frames executed by nested drawables are frame-accurate to replay data.
@@ -136,7 +130,7 @@ namespace osu.Game.Modes
 
             private bool hasFrames => replayContent.Count > 0;
 
-            bool inImportantSection =>
+            private bool inImportantSection =>
                 FrameAccuratePlayback &&
                 //a button is in a pressed state
                 (currentDirection > 0 ? CurrentFrame : NextFrame)?.ButtonState > LegacyButtonState.None &&
@@ -171,10 +165,10 @@ namespace osu.Game.Modes
 
             private class ReplayMouseState : MouseState
             {
-                public ReplayMouseState(Vector2 position, List<ButtonState> list)
+                public ReplayMouseState(Vector2 position, IEnumerable<MouseButton> list)
                 {
                     Position = position;
-                    ButtonStates = list;
+                    list.ForEach(b => PressedButtons.Add(b));
                 }
             }
 
@@ -253,7 +247,7 @@ namespace osu.Game.Modes
 
             public void ReadFromStream(SerializationReader sr)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             public void WriteToStream(SerializationWriter sw)

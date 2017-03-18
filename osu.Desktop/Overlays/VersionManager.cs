@@ -189,7 +189,7 @@ namespace osu.Desktop.Overlays
 
         private class UpdateProgressNotification : ProgressNotification
         {
-            protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification(this)
+            protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification()
             {
                 Text = @"Update ready to install. Click to restart!",
                 Activated = () =>

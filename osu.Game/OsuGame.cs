@@ -220,7 +220,7 @@ namespace osu.Game
                 }
             };
 
-            Cursor.Alpha = 0;
+            Cursor.State = Visibility.Hidden;
         }
 
         private bool globalHotkeyPressed(InputState state, KeyDownEventArgs args)
@@ -258,16 +258,26 @@ namespace osu.Game
             return false;
         }
 
-        public event Action<Screen> ModeChanged;
+        public event Action<Screen> ScreenChanged;
 
         private Container mainContent;
 
         private Container overlayContent;
 
-        private void modeChanged(Screen newScreen)
+        private OsuScreen currentScreen;
+
+        private void screenChanged(Screen newScreen)
         {
+            currentScreen = newScreen as OsuScreen;
+
+            if (currentScreen == null)
+            {
+                Exit();
+                return;
+            }
+
             //central game mode change logic.
-            if ((newScreen as OsuScreen)?.ShowOverlays != true)
+            if (!currentScreen.ShowOverlays)
             {
                 Toolbar.State = Visibility.Hidden;
                 musicController.State = Visibility.Hidden;
@@ -278,13 +288,7 @@ namespace osu.Game
                 Toolbar.State = Visibility.Visible;
             }
 
-            if (newScreen is MainMenu)
-                Cursor.FadeIn(100);
-
-            ModeChanged?.Invoke(newScreen);
-
-            if (newScreen == null)
-                Exit();
+            ScreenChanged?.Invoke(newScreen);
         }
 
         protected override bool OnExiting()
@@ -308,6 +312,8 @@ namespace osu.Game
 
             if (intro?.ChildScreen != null)
                 intro.ChildScreen.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
+
+            Cursor.State = currentScreen == null || currentScreen.HasLocalCursorDisplayed ? Visibility.Hidden : Visibility.Visible;
         }
 
         private void screenAdded(Screen newScreen)
@@ -315,12 +321,12 @@ namespace osu.Game
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
 
-            modeChanged(newScreen);
+            screenChanged(newScreen);
         }
 
         private void screenRemoved(Screen newScreen)
         {
-            modeChanged(newScreen);
+            screenChanged(newScreen);
         }
     }
 }
