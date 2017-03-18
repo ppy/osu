@@ -40,23 +40,6 @@ namespace osu.Game.Modes.Taiko.Objects
         /// </summary>
         public bool Kiai;
 
-        /// <summary>
-        /// The type of HitObject.
-        /// </summary>
-        public virtual TaikoHitType Type
-        {
-            get
-            {
-                SampleType st = Sample?.Type ?? SampleType.None;
-
-                return
-                    // Centre/Rim
-                    ((st & ~(SampleType.Finish | SampleType.Normal)) == 0 ? TaikoHitType.CentreHit : TaikoHitType.RimHit)
-                    // Finisher
-                    | ((st & SampleType.Finish) > 0 ? TaikoHitType.Finisher : TaikoHitType.None);
-            }
-        }
-
         public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaults(timing, difficulty);
