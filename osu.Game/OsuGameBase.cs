@@ -132,8 +132,6 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            Host.Window.CursorState = CursorState.Hidden;
-
             AddInternal(ratioContainer = new RatioAdjust
             {
                 Children = new[]
