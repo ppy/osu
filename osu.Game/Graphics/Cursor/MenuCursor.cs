@@ -24,8 +24,7 @@ namespace osu.Game.Graphics.Cursor
         {
             if (state.Mouse.HasMainButtonPressed)
             {
-                Vector2 offset = state.Mouse.Delta;
-                offset = state.Mouse.Position - state.Mouse.PositionMouseDown ?? state.Mouse.Delta;
+                Vector2 offset = state.Mouse.Position - state.Mouse.PositionMouseDown ?? state.Mouse.Delta;
                 float degrees = (float)MathHelper.RadiansToDegrees(Math.Atan2(-offset.X, offset.Y)) + 24.3f;
 
                 // Always rotate in the direction of least distance
