@@ -18,7 +18,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 
         public Beatmap<TaikoHitObject> Convert(Beatmap original)
         {
-            if (original is IIsLegacy)
+            if (original is LegacyBeatmap)
                 original.TimingInfo.ControlPoints.ForEach(c => c.VelocityAdjustment /= legacy_velocity_scale);
 
             return new Beatmap<TaikoHitObject>(original)
