@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 var topY = scrollContainer.ScrollContent.DrawPosition.Y + s.DrawPosition.Y;
                 var bottomY = topY + LeaderboardScore.HEIGHT;
 
-                if (topY < fadeStart - (LeaderboardScore.HEIGHT * 2))
+                if (topY < fadeStart - LeaderboardScore.HEIGHT * 2)
                 {
                     s.ColourInfo = ColourInfo.GradientVertical(Color4.White, Color4.White);
                 }
