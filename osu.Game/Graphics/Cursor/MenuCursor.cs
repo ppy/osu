@@ -55,7 +55,7 @@ namespace osu.Game.Graphics.Cursor
             if (!state.Mouse.HasMainButtonPressed)
             {
                 ((Cursor)ActiveCursor).AdditiveLayer.FadeOut(500, EasingTypes.OutQuint);
-                ActiveCursor.RotateTo(0, 600, EasingTypes.OutElasticHalf);
+                ActiveCursor.RotateTo(0, 600 * Math.Abs(ActiveCursor.Rotation / 720 + 1), EasingTypes.OutElasticHalf);
                 ActiveCursor.ScaleTo(1, 500, EasingTypes.OutElastic);
             }
 
