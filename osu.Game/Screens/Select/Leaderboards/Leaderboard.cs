@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                 if (topY < fadeStart - LeaderboardScore.HEIGHT * 2)
                 {
-                    s.ColourInfo = ColourInfo.GradientVertical(Color4.White, Color4.White);
+                    s.Colour = Color4.White;
                 }
                 else
                 {
