@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
-using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Options
@@ -18,16 +18,17 @@ namespace osu.Game.Overlays.Options
         private Container<Drawable> content;
 
         public string[] Keywords => new[] { Header };
-        public bool LastMatch { get; set; }
-        public IEnumerable<Drawable> SearchableChildren => Children;
-        public override bool RemoveWhenNotAlive => false;
-        public Action AfterSearch => delegate 
+        public bool Matching
         {
-            if (LastMatch)
-                FadeIn(250);
-            else
-                FadeOut(250);
-        };
+            set
+            {
+                if (value)
+                    FadeIn(250);
+                else
+                    FadeOut(250);
+            }
+        }
+        public IEnumerable<ISearchable> SearchableChildren => Children.OfType<ISearchable>();
 
         protected abstract string Header { get; }
 

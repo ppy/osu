@@ -98,28 +98,15 @@ namespace osu.Game.Overlays
                                 new OptionTextBox()
                                 {
                                     Width = width - CONTENT_MARGINS * 2,
-                                    OnChange = (sender, newText) => searchContainer.Filter = sender.Text,
+                                    OnChange = (sender, newText) => searchContainer.SearchTerm = sender.Text,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS },
                                     PlaceholderText = "Type to search!",
                                 },
-                                searchContainer = new SearchContainer
+                                searchContainer = new SectionContainer
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                    Children = new []
-                                    {
-                                        new FillFlowContainer
-                                        {
-                                            AutoSizeAxes = Axes.Y,
-                                            RelativeSizeAxes = Axes.X,
-                                            Direction = FillDirection.Vertical,
-                                            Children = sections,
-                                        },
-                                    },
-                                    SearchableContent = sections,
-                                    OnMatch = drawable => drawable.FadeIn(250),
-                                    OnMismatch = drawable => drawable.FadeOut(250),
-                                    RematchDelay = 300,
+                                    Children = sections,
                                 },
                                 new OptionsFooter()
                             }

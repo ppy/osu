@@ -12,7 +12,16 @@ namespace osu.Game.Overlays.Options
     public class OptionTextBox : OsuTextBox, ISearchable
     {
         public string[] Keywords => new[] { PlaceholderText };
-        public bool LastMatch { get; set; }
+        public bool Matching
+        {
+            set
+            {
+                if (value)
+                    FadeIn(250);
+                else
+                    FadeOut(250);
+            }
+        }
 
         private Bindable<string> bindable;
 

@@ -28,7 +28,16 @@ namespace osu.Game.Overlays.Options
         }
 
         public string[] Keywords => new[] { LabelText };
-        public bool LastMatch { get; set; }
+        public bool Matching
+        {
+            set
+            {
+                if (value)
+                    FadeIn(250);
+                else
+                    FadeOut(250);
+            }
+        }
 
         public BindableNumber<T> Bindable
         {
