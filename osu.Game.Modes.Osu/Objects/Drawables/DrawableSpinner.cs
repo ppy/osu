@@ -24,6 +24,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         public DrawableSpinner(Spinner s) : base(s)
         {
+            AlwaysReceiveInput = true;
+
             Origin = Anchor.Centre;
             Position = s.Position;
 
@@ -46,7 +48,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Alpha = 0,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    DiscColour = s.Colour
+                    DiscColour = s.ComboColour
                 },
                 circleContainer = new Container
                 {
@@ -69,48 +71,44 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             disc.Scale = scaleToCircle;
         }
 
-        public override bool Contains(Vector2 screenSpacePos) => true;
-
         protected override void CheckJudgement(bool userTriggered)
         {
             if (Time.Current < HitObject.StartTime) return;
-
-            var j = Judgement as OsuJudgementInfo;
 
             disc.ScaleTo(Interpolation.ValueAt(Math.Sqrt(Progress), scaleToCircle, Vector2.One, 0, 1), 100);
 
             if (Progress >= 1)
                 disc.Complete = true;
 
-            if (!userTriggered && Time.Current >= HitObject.EndTime)
+            if (!userTriggered && Time.Current >= spinner.EndTime)
             {
                 if (Progress >= 1)
                 {
-                    j.Score = OsuScoreResult.Hit300;
-                    j.Result = HitResult.Hit;
+                    Judgement.Score = OsuScoreResult.Hit300;
+                    Judgement.Result = HitResult.Hit;
                 }
                 else if (Progress > .9)
                 {
-                    j.Score = OsuScoreResult.Hit100;
-                    j.Result = HitResult.Hit;
+                    Judgement.Score = OsuScoreResult.Hit100;
+                    Judgement.Result = HitResult.Hit;
                 }
                 else if (Progress > .75)
                 {
-                    j.Score = OsuScoreResult.Hit50;
-                    j.Result = HitResult.Hit;
+                    Judgement.Score = OsuScoreResult.Hit50;
+                    Judgement.Result = HitResult.Hit;
                 }
                 else
                 {
-                    j.Score = OsuScoreResult.Miss;
-                    if (Time.Current >= HitObject.EndTime)
-                        j.Result = HitResult.Miss;
+                    Judgement.Score = OsuScoreResult.Miss;
+                    if (Time.Current >= spinner.EndTime)
+                        Judgement.Result = HitResult.Miss;
                 }
             }
         }
 
-        private Vector2 scaleToCircle => (circle.Scale * circle.DrawWidth / DrawWidth) * 0.95f;
+        private Vector2 scaleToCircle => circle.Scale * circle.DrawWidth / DrawWidth * 0.95f;
 
-        private float spinsPerMinuteNeeded = 100 + (5 * 15); //TODO: read per-map OD and place it on the 5
+        private float spinsPerMinuteNeeded = 100 + 5 * 15; //TODO: read per-map OD and place it on the 5
 
         private float rotationsNeeded => (float)(spinsPerMinuteNeeded * (spinner.EndTime - spinner.StartTime) / 60000f);
 
@@ -140,7 +138,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             base.UpdateState(state);
 
-            Delay(HitObject.Duration, true);
+            Delay(spinner.Duration, true);
 
             FadeOut(160);
 
@@ -148,9 +146,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             {
                 case ArmedState.Hit:
                     ScaleTo(Scale * 1.2f, 320, EasingTypes.Out);
+                    Expire();
                     break;
                 case ArmedState.Miss:
                     ScaleTo(Scale * 0.8f, 320, EasingTypes.In);
+                    Expire();
                     break;
             }
         }

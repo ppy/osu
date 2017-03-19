@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -144,7 +145,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleDifficulty(Beatmap beatmap, string key, string val)
         {
-            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            var difficulty = beatmap.BeatmapInfo.Difficulty;
             switch (key)
             {
                 case @"HPDrainRate":
@@ -197,7 +198,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (split.Length > 2)
             {
-                int kiaiFlags = split.Length > 7 ? Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : 0;
+                int effectFlags = split.Length > 7 ? Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : 0;
                 double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
                 cp = new ControlPoint
                 {
@@ -205,40 +206,65 @@ namespace osu.Game.Beatmaps.Formats
                     BeatLength = beatLength > 0 ? beatLength : 0,
                     VelocityAdjustment = beatLength < 0 ? -beatLength / 100.0 : 1,
                     TimingChange = split.Length <= 6 || split[6][0] == '1',
+                    KiaiMode = (effectFlags & 1) > 0,
+                    OmitFirstBarLine = (effectFlags & 8) > 0
                 };
             }
 
             if (cp != null)
-                beatmap.ControlPoints.Add(cp);
+                beatmap.TimingInfo.ControlPoints.Add(cp);
         }
 
-        private void handleColours(Beatmap beatmap, string key, string val)
+        private void handleColours(Beatmap beatmap, string key, string val, ref bool hasCustomColours)
         {
             string[] split = val.Split(',');
+
             if (split.Length != 3)
                 throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {val}");
+
             byte r, g, b;
             if (!byte.TryParse(split[0], out r) || !byte.TryParse(split[1], out g) || !byte.TryParse(split[2], out b))
-                throw new InvalidOperationException($@"Color must be specified with 8-bit integer components");
-            // Note: the combo index specified in the beatmap is discarded
-            beatmap.ComboColors.Add(new Color4
+                throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
+
+            if (!hasCustomColours)
             {
-                R = r / 255f,
-                G = g / 255f,
-                B = b / 255f,
-                A = 1f,
-            });
+                beatmap.ComboColors.Clear();
+                hasCustomColours = true;
+            }
+
+            // Note: the combo index specified in the beatmap is discarded
+            if (key.StartsWith(@"Combo"))
+            {
+                beatmap.ComboColors.Add(new Color4
+                {
+                    R = r / 255f,
+                    G = g / 255f,
+                    B = b / 255f,
+                    A = 1f,
+                });
+            }
+        }
+
+        protected override Beatmap ParseFile(TextReader stream)
+        {
+            return new LegacyBeatmap(base.ParseFile(stream));
+        }
+
+        public override Beatmap Decode(TextReader stream)
+        {
+            return new LegacyBeatmap(base.Decode(stream));
         }
 
         protected override void ParseFile(TextReader stream, Beatmap beatmap)
         {
             HitObjectParser parser = null;
 
+            bool hasCustomColours = false;
+
             var section = Section.None;
-            string line;
             while (true)
             {
-                line = stream.ReadLine();
+                var line = stream.ReadLine();
                 if (line == null)
                     break;
                 if (string.IsNullOrEmpty(line))
@@ -263,7 +289,7 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     case Section.General:
                         handleGeneral(beatmap, key, val);
-                        parser = Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).CreateHitObjectParser();
+                        parser = new LegacyHitObjectParser();
                         break;
                     case Section.Editor:
                         handleEditor(beatmap, key, val);
@@ -281,16 +307,14 @@ namespace osu.Game.Beatmaps.Formats
                         handleTimingPoints(beatmap, val);
                         break;
                     case Section.Colours:
-                        handleColours(beatmap, key, val);
+                        handleColours(beatmap, key, val, ref hasCustomColours);
                         break;
                     case Section.HitObjects:
                         var obj = parser?.Parse(val);
 
                         if (obj != null)
-                        {
-                            obj.SetDefaultsFromBeatmap(beatmap);
                             beatmap.HitObjects.Add(obj);
-                        }
+
                         break;
                 }
             }

@@ -27,9 +27,7 @@ namespace osu.Game.Overlays
 {
     public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent
     {
-        const float textbox_height = 40;
-
-        private DrawableChannel channelDisplay;
+        private const float textbox_height = 40;
 
         private ScheduledDelegate messageRequest;
 
@@ -126,7 +124,7 @@ namespace osu.Game.Overlays
 
         private void addChannel(Channel channel)
         {
-            Add(channelDisplay = new DrawableChannel(channel));
+            Add(new DrawableChannel(channel));
             careChannels.Add(channel);
         }
 

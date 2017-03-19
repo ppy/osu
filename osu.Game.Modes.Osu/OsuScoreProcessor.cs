@@ -2,19 +2,32 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Modes.Osu.Objects.Drawables;
+using osu.Game.Modes.Osu.Judgements;
+using osu.Game.Modes.Osu.Objects;
+using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Osu
 {
-    class OsuScoreProcessor : ScoreProcessor
+    internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject, OsuJudgementInfo>
     {
-        public OsuScoreProcessor(int hitObjectCount)
-            : base(hitObjectCount)
+        public OsuScoreProcessor()
         {
-            Health.Value = 1;
         }
 
-        protected override void UpdateCalculations(JudgementInfo judgement)
+        public OsuScoreProcessor(HitRenderer<OsuHitObject, OsuJudgementInfo> hitRenderer)
+            : base(hitRenderer)
+        {
+        }
+
+        protected override void Reset()
+        {
+            base.Reset();
+
+            Health.Value = 1;
+            Accuracy.Value = 1;
+        }
+
+        protected override void UpdateCalculations(OsuJudgementInfo judgement)
         {
             if (judgement != null)
             {
@@ -34,8 +47,9 @@ namespace osu.Game.Modes.Osu
             int score = 0;
             int maxScore = 0;
 
-            foreach (OsuJudgementInfo j in Judgements)
+            foreach (var judgementInfo in Judgements)
             {
+                var j = judgementInfo;
                 score += j.ScoreValue;
                 maxScore += j.MaxScoreValue;
             }

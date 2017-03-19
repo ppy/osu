@@ -15,7 +15,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         private readonly Slider slider;
         private Box follow;
 
-        const float width = 128;
+        private const float width = 128;
 
         public SliderBall(Slider slider)
         {
@@ -51,7 +51,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     {
                         new Box
                         {
-                            Colour = slider.Colour,
+                            Colour = slider.ComboColour,
                             Alpha = 0.4f,
                             Width = width,
                             Height = width,
@@ -81,7 +81,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             return base.OnMouseMove(state);
         }
 
-        bool tracking;
+        private bool tracking;
         public bool Tracking
         {
             get { return tracking; }

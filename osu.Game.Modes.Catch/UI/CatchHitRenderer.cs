@@ -1,19 +1,30 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps;
+using osu.Game.Modes.Catch.Beatmaps;
+using osu.Game.Modes.Catch.Judgements;
 using osu.Game.Modes.Catch.Objects;
-using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Catch.UI
 {
-    public class CatchHitRenderer : HitRenderer<CatchBaseHit>
+    public class CatchHitRenderer : HitRenderer<CatchBaseHit, CatchJudgementInfo>
     {
-        protected override HitObjectConverter<CatchBaseHit> Converter => new CatchConverter();
+        public CatchHitRenderer(WorkingBeatmap beatmap)
+            : base(beatmap)
+        {
+        }
 
-        protected override Playfield CreatePlayfield() => new CatchPlayfield();
+        public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
 
-        protected override DrawableHitObject GetVisualRepresentation(CatchBaseHit h) => null;// new DrawableFruit(h);
+        protected override IBeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
+
+        protected override IBeatmapProcessor<CatchBaseHit> CreateBeatmapProcessor() => new CatchBeatmapProcessor();
+
+        protected override Playfield<CatchBaseHit, CatchJudgementInfo> CreatePlayfield() => new CatchPlayfield();
+
+        protected override DrawableHitObject<CatchBaseHit, CatchJudgementInfo> GetVisualRepresentation(CatchBaseHit h) => null;
     }
 }

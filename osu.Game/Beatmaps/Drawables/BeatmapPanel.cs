@@ -18,7 +18,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class BeatmapPanel : Panel
+    public class BeatmapPanel : Panel
     {
         public BeatmapInfo Beatmap;
         private Sprite background;
@@ -59,6 +59,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected override void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
         {
+            if (!IsLoaded) return;
+
             base.ApplyState(last);
 
             if (last == PanelSelectedState.Hidden && State != last)
@@ -83,10 +85,10 @@ namespace osu.Game.Beatmaps.Drawables
                     ColourLight = OsuColour.FromHex(@"3a7285"),
                     ColourDark = OsuColour.FromHex(@"123744")
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     Padding = new MarginPadding(5),
-                    Direction = FlowDirections.Horizontal,
+                    Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -95,21 +97,19 @@ namespace osu.Game.Beatmaps.Drawables
                         new DifficultyIcon(beatmap)
                         {
                             Scale = new Vector2(1.8f),
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             Padding = new MarginPadding { Left = 5 },
-                            Direction = FlowDirections.Vertical,
+                            Direction = FillDirection.Vertical,
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                new FlowContainer
+                                new FillFlowContainer
                                 {
-                                    Direction = FlowDirections.Horizontal,
-                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(4, 0),
+                                    AutoSizeAxes = Axes.Both,
                                     Children = new[]
                                     {
                                         new OsuSpriteText
@@ -140,7 +140,7 @@ namespace osu.Game.Beatmaps.Drawables
                                 },
                                 starCounter = new StarCounter
                                 {
-                                    Count = beatmap.StarDifficulty,
+                                    Count = (float)beatmap.StarDifficulty,
                                     Scale = new Vector2(0.8f),
                                 }
                             }

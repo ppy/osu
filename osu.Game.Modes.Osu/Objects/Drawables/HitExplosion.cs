@@ -8,12 +8,13 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Osu.Judgements;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class HitExplosion : FlowContainer
+    public class HitExplosion : FillFlowContainer
     {
         private readonly OsuJudgementInfo judgement;
         private SpriteText line1;
@@ -25,7 +26,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             AutoSizeAxes = Axes.Both;
             Origin = Anchor.Centre;
 
-            Direction = FlowDirections.Vertical;
+            Direction = FillDirection.Vertical;
             Spacing = new Vector2(0, 2);
             Position = (h?.StackedEndPosition ?? Vector2.Zero) + judgement.PositionOffset;
 

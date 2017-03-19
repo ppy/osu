@@ -16,7 +16,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class NotificationSection : FlowContainer
+    public class NotificationSection : FillFlowContainer
     {
         private OsuSpriteText titleText;
         private OsuSpriteText countText;
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Notifications
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FlowDirections.Vertical;
+            Direction = FillDirection.Vertical;
 
             Padding = new MarginPadding
             {
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Notifications
                             Origin = Anchor.TopRight,
                             Action = clearAll
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             Margin = new MarginPadding
                             {
@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Notifications
                         },
                     },
                 },
-                notifications = new FlowContainer<Notification>
+                notifications = new FillFlowContainer<Notification>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Notifications
             countText.Text = notifications.Children.Count(c => c.Alpha > 0.99f).ToString();
         }
 
-        class ClearAllButton : ClickableContainer
+        private class ClearAllButton : ClickableContainer
         {
             private OsuSpriteText text;
 

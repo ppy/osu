@@ -23,10 +23,12 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         internal bool DidLoadMenu;
 
-        MainMenu mainMenu;
+        private MainMenu mainMenu;
         private SampleChannel welcome;
         private SampleChannel seeya;
         private Track bgm;
+
+        internal override bool HasLocalCursorDisplayed => true;
 
         internal override bool ShowOverlays => false;
 
@@ -69,23 +71,20 @@ namespace osu.Game.Screens.Menu
         {
             base.OnEntering(last);
 
-            Scheduler.Add(delegate
+            welcome.Play();
+
+            Scheduler.AddDelayed(delegate
             {
-                welcome.Play();
+                bgm.Start();
+
+                (mainMenu = new MainMenu()).LoadAsync(Game);
 
                 Scheduler.AddDelayed(delegate
                 {
-                    bgm.Start();
-
-                    (mainMenu = new MainMenu()).LoadAsync(Game);
-
-                    Scheduler.AddDelayed(delegate
-                    {
-                        DidLoadMenu = true;
-                        Push(mainMenu);
-                    }, 2300);
-                }, 600);
-            });
+                    DidLoadMenu = true;
+                    Push(mainMenu);
+                }, 2300);
+            }, 600);
 
             logo.ScaleTo(0.4f);
             logo.FadeOut();

@@ -16,10 +16,8 @@ using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Graphics.Cursor
 {
-
-    class CursorTrail : Drawable
+    internal class CursorTrail : Drawable
     {
-        public override bool Contains(Vector2 screenSpacePos) => true;
         public override bool HandleInput => true;
 
         private int currentIndex;
@@ -32,7 +30,7 @@ namespace osu.Game.Graphics.Cursor
         private double timeOffset;
 
         private float time;
-        
+
         private TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
         private const int max_sprites = 2048;
 
@@ -46,7 +44,7 @@ namespace osu.Game.Graphics.Cursor
         {
             base.ApplyDrawNode(node);
 
-            TrailDrawNode tNode = node as TrailDrawNode;
+            TrailDrawNode tNode = (TrailDrawNode)node;
             tNode.Shader = shader;
             tNode.Texture = texture;
             tNode.Size = size;
@@ -60,6 +58,7 @@ namespace osu.Game.Graphics.Cursor
 
         public CursorTrail()
         {
+            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
 
             for (int i = 0; i < max_sprites; i++)
@@ -75,6 +74,12 @@ namespace osu.Game.Graphics.Cursor
             shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.Texture);
             texture = textures.Get(@"Cursor/cursortrail");
             Scale = new Vector2(1 / texture.ScaleAdjust);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            resetTime();
         }
 
         protected override void Update()
@@ -117,7 +122,7 @@ namespace osu.Game.Graphics.Cursor
             float distance = diff.Length;
             Vector2 direction = diff / distance;
 
-            float interval = (size.X / 2) * 0.9f;
+            float interval = size.X / 2 * 0.9f;
 
             for (float d = interval; d < distance; d += interval)
             {
@@ -137,7 +142,7 @@ namespace osu.Game.Graphics.Cursor
             currentIndex = (currentIndex + 1) % max_sprites;
         }
 
-        struct TrailPart
+        private struct TrailPart
         {
             public Vector2 Position;
             public float Time;
@@ -145,12 +150,12 @@ namespace osu.Game.Graphics.Cursor
             public bool WasUpdated;
         }
 
-        class TrailDrawNodeSharedData
+        private class TrailDrawNodeSharedData
         {
             public VertexBuffer<TexturedVertex2D> VertexBuffer;
         }
 
-        class TrailDrawNode : DrawNode
+        private class TrailDrawNode : DrawNode
         {
             public Shader Shader;
             public Texture Texture;

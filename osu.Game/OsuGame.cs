@@ -13,7 +13,6 @@ using osu.Game.Input;
 using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
-using osu.Game.Database;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Timing;
@@ -24,16 +23,16 @@ using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
 using osu.Framework.Graphics.Primitives;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using osu.Framework.Threading;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Screens.Play;
 
 namespace osu.Game
 {
     public class OsuGame : OsuGameBase
     {
-        public virtual bool IsDeployedBuild => false;
-
         public Toolbar Toolbar;
 
         private ChatOverlay chat;
@@ -41,6 +40,8 @@ namespace osu.Game
         private MusicController musicController;
 
         private NotificationManager notificationManager;
+
+        private DialogOverlay dialogOverlay;
 
         private Intro intro
         {
@@ -59,7 +60,7 @@ namespace osu.Game
 
         public Bindable<PlayMode> PlayMode;
 
-        string[] args;
+        private string[] args;
 
         private OptionsOverlay options;
 
@@ -82,7 +83,7 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                ImportBeatmapsAsync(paths);
+                Task.Run(() => BeatmapDatabase.Import(paths));
             }
 
             Dependencies.Cache(this);
@@ -90,9 +91,41 @@ namespace osu.Game
             PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
         }
 
-        protected async void ImportBeatmapsAsync(IEnumerable<string> paths)
+        private ScheduledDelegate scoreLoad;
+
+        protected void LoadScore(Score s)
         {
-            await Task.Run(() => BeatmapDatabase.Import(paths));
+            scoreLoad?.Cancel();
+
+            var menu = intro.ChildScreen;
+
+            if (menu == null)
+            {
+                scoreLoad = Schedule(() => LoadScore(s));
+                return;
+            }
+
+            if (!menu.IsCurrentScreen)
+            {
+                menu.MakeCurrent();
+                Delay(500);
+                scoreLoad = Schedule(() => LoadScore(s));
+                return;
+            }
+
+            if (s.Beatmap == null)
+            {
+                notificationManager.Post(new SimpleNotification
+                {
+                    Text = @"Tried to load a score for a beatmap we don't have!",
+                    Icon = FontAwesome.fa_life_saver,
+                });
+                return;
+            }
+
+            Beatmap.Value = BeatmapDatabase.GetWorkingBeatmap(s.Beatmap);
+
+            menu.Push(new PlayerLoader(new Player { ReplayInputHandler = s.Replay.GetInputHandler() }));
         }
 
         protected override void LoadComplete()
@@ -127,7 +160,7 @@ namespace osu.Game
             //overlay elements
             (chat = new ChatOverlay { Depth = 0 }).LoadAsync(this, overlayContent.Add);
             (options = new OptionsOverlay { Depth = -1 }).LoadAsync(this, overlayContent.Add);
-            (musicController = new MusicController()
+            (musicController = new MusicController
             {
                 Depth = -2,
                 Position = new Vector2(0, Toolbar.HEIGHT),
@@ -140,6 +173,11 @@ namespace osu.Game
                 Depth = -2,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
+            }).LoadAsync(this, overlayContent.Add);
+
+            (dialogOverlay = new DialogOverlay
+            {
+                Depth = -4,
             }).LoadAsync(this, overlayContent.Add);
 
             Logger.NewEntry += entry =>
@@ -155,6 +193,7 @@ namespace osu.Game
             Dependencies.Cache(options);
             Dependencies.Cache(musicController);
             Dependencies.Cache(notificationManager);
+            Dependencies.Cache(dialogOverlay);
 
             (Toolbar = new Toolbar
             {
@@ -181,12 +220,12 @@ namespace osu.Game
                 }
             };
 
-            Cursor.Alpha = 0;
+            Cursor.State = Visibility.Hidden;
         }
 
         private bool globalHotkeyPressed(InputState state, KeyDownEventArgs args)
         {
-            if (args.Repeat) return false;
+            if (args.Repeat || intro == null) return false;
 
             switch (args.Key)
             {
@@ -195,9 +234,11 @@ namespace osu.Game
                     return true;
                 case Key.PageUp:
                 case Key.PageDown:
-                    var rate = ((Clock as ThrottledFrameClock).Source as StopwatchClock).Rate * (args.Key == Key.PageUp ? 1.1f : 0.9f);
-                    ((Clock as ThrottledFrameClock).Source as StopwatchClock).Rate = rate;
-                    Logger.Log($@"Adjusting game clock to {rate}", LoggingTarget.Debug);
+                    var swClock = (Clock as ThrottledFrameClock)?.Source as StopwatchClock;
+                    if (swClock == null) return false;
+
+                    swClock.Rate *= args.Key == Key.PageUp ? 1.1f : 0.9f;
+                    Logger.Log($@"Adjusting game clock to {swClock.Rate}", LoggingTarget.Debug);
                     return true;
             }
 
@@ -214,19 +255,29 @@ namespace osu.Game
                 }
             }
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
 
-        public event Action<Screen> ModeChanged;
+        public event Action<Screen> ScreenChanged;
 
         private Container mainContent;
 
         private Container overlayContent;
 
-        private void modeChanged(Screen newScreen)
+        private OsuScreen currentScreen;
+
+        private void screenChanged(Screen newScreen)
         {
+            currentScreen = newScreen as OsuScreen;
+
+            if (currentScreen == null)
+            {
+                Exit();
+                return;
+            }
+
             //central game mode change logic.
-            if ((newScreen as OsuScreen)?.ShowOverlays != true)
+            if (!currentScreen.ShowOverlays)
             {
                 Toolbar.State = Visibility.Hidden;
                 musicController.State = Visibility.Hidden;
@@ -237,13 +288,7 @@ namespace osu.Game
                 Toolbar.State = Visibility.Visible;
             }
 
-            if (newScreen is MainMenu)
-                Cursor.FadeIn(100);
-
-            ModeChanged?.Invoke(newScreen);
-
-            if (newScreen == null)
-                Exit();
+            ScreenChanged?.Invoke(newScreen);
         }
 
         protected override bool OnExiting()
@@ -267,6 +312,8 @@ namespace osu.Game
 
             if (intro?.ChildScreen != null)
                 intro.ChildScreen.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
+
+            Cursor.State = currentScreen == null || currentScreen.HasLocalCursorDisplayed ? Visibility.Hidden : Visibility.Visible;
         }
 
         private void screenAdded(Screen newScreen)
@@ -274,12 +321,12 @@ namespace osu.Game
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
 
-            modeChanged(newScreen);
+            screenChanged(newScreen);
         }
 
         private void screenRemoved(Screen newScreen)
         {
-            modeChanged(newScreen);
+            screenChanged(newScreen);
         }
     }
 }

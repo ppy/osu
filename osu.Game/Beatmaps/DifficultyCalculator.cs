@@ -1,20 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Modes;
 using osu.Game.Modes.Objects;
-using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Beatmaps
 {
     public abstract class DifficultyCalculator
     {
-        protected abstract PlayMode PlayMode { get; }
-
         protected double TimeRate = 1;
 
-        protected abstract double CalculateInternal(Dictionary<String, String> categoryDifficulty);
+        protected abstract double CalculateInternal(Dictionary<string, string> categoryDifficulty);
 
         private void loadTiming()
         {
@@ -35,16 +31,16 @@ namespace osu.Game.Beatmaps
     {
         protected List<T> Objects;
 
-        protected abstract HitObjectConverter<T> Converter { get; }
-
-        public DifficultyCalculator(Beatmap beatmap)
+        protected DifficultyCalculator(Beatmap beatmap)
         {
-            Objects = Converter.Convert(beatmap);
+            Objects = CreateBeatmapConverter().Convert(beatmap).HitObjects;
             PreprocessHitObjects();
         }
 
         protected virtual void PreprocessHitObjects()
         {
         }
+
+        protected abstract IBeatmapConverter<T> CreateBeatmapConverter();
     }
 }

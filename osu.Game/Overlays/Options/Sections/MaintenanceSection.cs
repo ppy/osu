@@ -38,12 +38,6 @@ namespace osu.Game.Overlays.Options.Sections
                     RelativeSizeAxes = Axes.X,
                     Text = "Run osu! updater",
                 },
-                new OptionLabel
-                {
-                    Text = "TODO: osu version here",
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                },
             };
         }
     }

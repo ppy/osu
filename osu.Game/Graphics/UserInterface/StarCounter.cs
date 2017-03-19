@@ -14,8 +14,6 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly Container<Star> stars;
 
-        private double transformStartTime;
-
         /// <summary>
         /// Maximum amount of stars displayed.
         /// </summary>
@@ -34,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface
         private float minStarAlpha => 0.5f;
 
         private const float star_size = 20;
-        private float star_spacing = 4;
+        private const float star_spacing = 4;
 
         private float count;
 
@@ -70,10 +68,10 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                stars = new FlowContainer<Star>
+                stars = new FillFlowContainer<Star>
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FlowDirections.Horizontal,
+                    Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(star_spacing),
                 }
             };
@@ -125,7 +123,7 @@ namespace osu.Game.Graphics.UserInterface
             if (value <= i)
                 return minStarScale;
 
-            return i + 1 <= value ? 1.0f : Interpolation.ValueAt(value, minStarScale, 1.0f, i, i + 1);
+            return i + 1 <= value ? 1.0f : (float)Interpolation.ValueAt(value, minStarScale, 1.0f, i, i + 1);
         }
 
         private void transformCount(float newValue)
@@ -147,7 +145,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        class Star : Container
+        private class Star : Container
         {
             public TextAwesome Icon;
             public Star()

@@ -73,11 +73,11 @@ namespace osu.Game.Overlays
                     Margin = new MarginPadding { Left = SIDEBAR_WIDTH },
                     Children = new[]
                     {
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Direction = FlowDirections.Vertical,
+                            Direction = FillDirection.Vertical,
 
                             Children = new Drawable[]
                             {
@@ -94,13 +94,14 @@ namespace osu.Game.Overlays
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
                                 },
-                                new FlowContainer
+                                new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                    Direction = FlowDirections.Vertical,
+                                    Direction = FillDirection.Vertical,
                                     Children = sections,
-                                }
+                                },
+                                new OptionsFooter()
                             }
                         }
                     }
@@ -146,11 +147,8 @@ namespace osu.Game.Overlays
 
                 var previous = sidebarButtons.SingleOrDefault(sb => sb.Selected);
                 var next = sidebarButtons.SingleOrDefault(sb => sb.Section == bestCandidate);
-                if (next != null)
-                {
-                    previous.Selected = false;
-                    next.Selected = true;
-                }
+                if (previous != null) previous.Selected = false;
+                if (next != null) next.Selected = true;
             }
         }
 

@@ -7,9 +7,8 @@ using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseTwoLayerButton : TestCase
+    internal class TestCaseTwoLayerButton : TestCase
     {
-        public override string Name => @"TwoLayerButton";
         public override string Description => @"Back and skip and what not";
 
         public override void Reset()

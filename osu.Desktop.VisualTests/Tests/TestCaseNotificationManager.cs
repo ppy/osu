@@ -8,15 +8,15 @@ using osu.Framework.MathUtils;
 using osu.Game.Overlays;
 using System.Linq;
 using osu.Game.Overlays.Notifications;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseNotificationManager : TestCase
+    internal class TestCaseNotificationManager : TestCase
     {
-        public override string Name => @"Notification Manager";
         public override string Description => @"I handle notifications";
 
-        NotificationManager manager;
+        private NotificationManager manager;
 
         public override void Reset()
         {
@@ -30,7 +30,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Origin = Anchor.TopRight,
             });
 
-            AddToggle(@"show", manager.ToggleVisibility);
+            AddToggle(@"show", state => manager.State = state ? Visibility.Visible : Visibility.Hidden);
 
             AddButton(@"simple #1", sendNotification1);
             AddButton(@"simple #2", sendNotification2);
@@ -95,7 +95,7 @@ namespace osu.Desktop.VisualTests.Tests
             progressingNotifications.Add(n);
         }
 
-        List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
+        private List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
 
         private void sendProgress1()
         {

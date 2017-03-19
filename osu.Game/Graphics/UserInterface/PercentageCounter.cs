@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.MathUtils;
 using System;
 
 namespace osu.Game.Graphics.UserInterface
@@ -10,7 +11,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// Used as an accuracy counter. Represented visually as a percentage.
     /// </summary>
-    public class PercentageCounter : RollingCounter<float>
+    public class PercentageCounter : RollingCounter<double>
     {
         protected override Type TransformType => typeof(TransformAccuracy);
 
@@ -20,36 +21,48 @@ namespace osu.Game.Graphics.UserInterface
 
         public void SetFraction(float numerator, float denominator)
         {
-            Count = Math.Abs(denominator) < epsilon ? 1.0f : numerator / denominator;
+            Current.Value = Math.Abs(denominator) < epsilon ? 1.0f : numerator / denominator;
         }
 
         public PercentageCounter()
         {
             DisplayedCountSpriteText.FixedWidth = true;
-            Count = 1.0f;
+            Current.Value = DisplayedCount = 1.0f;
         }
 
-        protected override string FormatCount(float count)
+        protected override string FormatCount(double count)
         {
             return $@"{count:P2}";
         }
 
-        protected override double GetProportionalDuration(float currentValue, float newValue)
+        protected override double GetProportionalDuration(double currentValue, double newValue)
         {
             return Math.Abs(currentValue - newValue) * RollingDuration * 100.0f;
         }
 
-        public override void Increment(float amount)
+        public override void Increment(double amount)
         {
-            Count = Count + amount;
+            Current.Value = Current + amount;
         }
 
-        protected class TransformAccuracy : TransformFloat
+        protected class TransformAccuracy : Transform<double>
         {
+            protected override double CurrentValue
+            {
+                get
+                {
+                    double time = Time?.Current ?? 0;
+                    if (time < StartTime) return StartValue;
+                    if (time >= EndTime) return EndValue;
+
+                    return Interpolation.ValueAt(time, (float)StartValue, (float)EndValue, StartTime, EndTime, Easing);
+                }
+            }
+
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as PercentageCounter).DisplayedCount = CurrentValue;
+                ((PercentageCounter)d).DisplayedCount = CurrentValue;
             }
         }
     }

@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -11,13 +10,14 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using Squirrel;
-using System.Reflection;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using System.Net.Http;
+using osu.Framework.Logging;
+using osu.Game;
 
 namespace osu.Desktop.Overlays
 {
@@ -26,61 +26,46 @@ namespace osu.Desktop.Overlays
         private UpdateManager updateManager;
         private NotificationManager notificationManager;
 
-        AssemblyName assembly = Assembly.GetEntryAssembly().GetName();
-
-        public bool IsDeployedBuild => assembly.Version.Major > 0;
-
         protected override bool HideOnEscape => false;
 
         public override bool HandleInput => false;
 
         [BackgroundDependencyLoader]
-        private void load(NotificationManager notification, OsuColour colours, TextureStore textures)
+        private void load(NotificationManager notification, OsuColour colours, TextureStore textures, OsuGameBase game)
         {
-            this.notificationManager = notification;
+            notificationManager = notification;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Alpha = 0;
 
-            bool isDebug = false;
-            Debug.Assert(isDebug = true);
-
-            string version;
-            if (!IsDeployedBuild)
-            {
-                version = @"local " + (isDebug ? @"debug" : @"release");
-            }
-            else
-                version = $@"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}";
-
             Children = new Drawable[]
             {
-                new FlowContainer
+                new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Direction = FlowDirections.Horizontal,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(5),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
                                 new OsuSpriteText
                                 {
                                     Font = @"Exo2.0-Bold",
-                                    Text = $@"osu!lazer"
+                                    Text = game.Name
                                 },
                                 new OsuSpriteText
                                 {
-                                    Colour = isDebug ? colours.Red : Color4.White,
-                                    Text = version
+                                    Colour = game.IsDebug ? colours.Red : Color4.White,
+                                    Text = game.Version
                                 },
                             }
                         },
@@ -91,17 +76,19 @@ namespace osu.Desktop.Overlays
                             TextSize = 12,
                             Colour = colours.Yellow,
                             Font = @"Venera",
-                            Text = $@"Development Build"
+                            Text = @"Development Build"
                         },
                         new Sprite
                         {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             Texture = textures.Get(@"Menu/dev-build-footer"),
                         },
                     }
                 }
             };
 
-            if (IsDeployedBuild)
+            if (game.IsDeployedBuild)
                 checkForUpdateAsync();
         }
 
@@ -157,14 +144,20 @@ namespace osu.Desktop.Overlays
 
                     Schedule(() => notification.State = ProgressNotificationState.Completed);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     if (useDeltaPatching)
                     {
+                        Logger.Error(e, @"delta patching failed!");
+
                         //could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
                         //try again without deltas.
                         checkForUpdateAsync(false, notification);
                         scheduleRetry = false;
+                    }
+                    else
+                    {
+                        Logger.Error(e, @"update failed!");
                     }
                 }
             }
@@ -194,9 +187,9 @@ namespace osu.Desktop.Overlays
         {
         }
 
-        class UpdateProgressNotification : ProgressNotification
+        private class UpdateProgressNotification : ProgressNotification
         {
-            protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification(this)
+            protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification()
             {
                 Text = @"Update ready to install. Click to restart!",
                 Activated = () =>
@@ -219,6 +212,7 @@ namespace osu.Desktop.Overlays
                     new TextAwesome
                     {
                         Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_upload,
                         Colour = Color4.White,
                     }

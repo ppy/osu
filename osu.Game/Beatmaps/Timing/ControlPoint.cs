@@ -15,7 +15,9 @@ namespace osu.Game.Beatmaps.Timing
         public double BeatLength;
         public double VelocityAdjustment;
         public bool TimingChange;
-        
+        public bool KiaiMode;
+        public bool OmitFirstBarLine;
+
     }
 
     internal enum TimeSignatures

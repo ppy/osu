@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using osu.Game.Modes.Osu.Objects.Drawables.Connections;
 using System;
 using System.Collections.Generic;
+using OpenTK;
+using osu.Game.Modes.Objects.Types;
 
-namespace osu.Game.Modes.Osu.Objects.Drawables
+namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
 {
     public class FollowPointRenderer : ConnectionRenderer<OsuHitObject>
     {
@@ -64,7 +64,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 {
                     Vector2 startPosition = prevHitObject.EndPosition;
                     Vector2 endPosition = currHitObject.Position;
-                    double startTime = prevHitObject.EndTime;
+                    double startTime = (prevHitObject as IHasEndTime)?.EndTime ?? prevHitObject.StartTime;
                     double endTime = currHitObject.StartTime;
 
                     Vector2 distanceVector = endPosition - startPosition;
@@ -74,13 +74,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
                     for (int d = (int)(PointDistance * 1.5); d < distance - PointDistance; d += PointDistance)
                     {
-                        float fraction = ((float)d / distance);
+                        float fraction = (float)d / distance;
                         Vector2 pointStartPosition = startPosition + (fraction - 0.1f) * distanceVector;
                         Vector2 pointEndPosition = startPosition + fraction * distanceVector;
                         double fadeOutTime = startTime + fraction * duration;
                         double fadeInTime = fadeOutTime - PreEmpt;
 
-                        Add(new FollowPoint()
+                        Add(new FollowPoint
                         {
                             StartTime = fadeInTime,
                             EndTime = fadeOutTime,

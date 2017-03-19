@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -62,10 +63,10 @@ namespace osu.Game.Overlays.Toolbar
         protected TextAwesome DrawableIcon;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
-        private FlowContainer tooltipContainer;
+        private FillFlowContainer tooltipContainer;
         private SpriteText tooltip1;
         private SpriteText tooltip2;
-        protected FlowContainer Flow;
+        protected FillFlowContainer Flow;
         private SampleChannel sampleClick;
 
         public ToolbarButton()
@@ -82,21 +83,21 @@ namespace osu.Game.Overlays.Toolbar
                     BlendingMode = BlendingMode.Additive,
                     Alpha = 0,
                 },
-                Flow = new FlowContainer
+                Flow = new FillFlowContainer
                 {
-                    Direction = FlowDirections.Horizontal,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(5),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding { Left = Toolbar.HEIGHT / 2, Right = Toolbar.HEIGHT / 2 },
-                    Spacing = new Vector2(5),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         DrawableIcon = new TextAwesome
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                         },
                         DrawableText = new OsuSpriteText
                         {
@@ -105,9 +106,9 @@ namespace osu.Game.Overlays.Toolbar
                         },
                     },
                 },
-                tooltipContainer = new FlowContainer
+                tooltipContainer = new FillFlowContainer
                 {
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.Both, //stops us being considered in parent's autosize
                     Anchor = (TooltipAnchor & Anchor.x0) > 0 ? Anchor.BottomLeft : Anchor.BottomRight,
                     Origin = TooltipAnchor,

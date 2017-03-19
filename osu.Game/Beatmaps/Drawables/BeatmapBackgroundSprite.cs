@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class BeatmapBackgroundSprite : Sprite
+    internal class BeatmapBackgroundSprite : Sprite
     {
         private readonly WorkingBeatmap working;
 
@@ -16,7 +16,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load()
         {
             if (working.Background != null)
                 Texture = working.Background;

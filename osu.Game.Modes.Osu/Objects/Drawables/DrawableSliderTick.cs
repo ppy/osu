@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Osu.Judgements;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -26,7 +27,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         public override bool RemoveWhenNotAlive => false;
 
-        public override JudgementInfo CreateJudgementInfo() => new OsuJudgementInfo { MaxScore = OsuScoreResult.SliderTick };
+        protected override OsuJudgementInfo CreateJudgementInfo() => new OsuJudgementInfo { MaxScore = OsuScoreResult.SliderTick };
 
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
@@ -47,7 +48,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = sliderTick.Colour,
+                    Colour = sliderTick.ComboColour,
                     Alpha = 0.3f,
                 }
             };
@@ -71,12 +72,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void CheckJudgement(bool userTriggered)
         {
-            var j = Judgement as OsuJudgementInfo;
-
             if (Judgement.TimeOffset >= 0)
             {
-                j.Result = Tracking ? HitResult.Hit : HitResult.Miss;
-                j.Score = Tracking ? OsuScoreResult.SliderTick : OsuScoreResult.Miss;
+                Judgement.Result = Tracking ? HitResult.Hit : HitResult.Miss;
+                Judgement.Score = Tracking ? OsuScoreResult.SliderTick : OsuScoreResult.Miss;
             }
         }
         

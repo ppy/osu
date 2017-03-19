@@ -2,19 +2,36 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Modes.Objects.Types;
 using System;
 using System.Collections.Generic;
+using osu.Game.Modes.Objects;
+using osu.Game.Database;
 
 namespace osu.Game.Modes.Osu.Objects
 {
-    public class Slider : OsuHitObject
+    public class Slider : OsuHitObject, IHasCurve
     {
-        public override double EndTime => StartTime + RepeatCount * Curve.Length / Velocity;
+        public IHasCurve CurveObject { get; set; }
 
-        public override Vector2 EndPosition => RepeatCount % 2 == 0 ? Position : Curve.PositionAt(1);
+        public SliderCurve Curve => CurveObject.Curve;
+
+        public double EndTime => StartTime + RepeatCount * Curve.Distance / Velocity;
+        public double Duration => EndTime - StartTime;
+
+        public override Vector2 EndPosition => PositionAt(1);
+
+        public Vector2 PositionAt(double progress) => CurveObject.PositionAt(progress);
+        public double ProgressAt(double progress) => CurveObject.ProgressAt(progress);
+        public int RepeatAt(double progress) => CurveObject.RepeatAt(progress);
+
+        public List<Vector2> ControlPoints => CurveObject.ControlPoints;
+        public CurveType CurveType => CurveObject.CurveType;
+        public double Distance => CurveObject.Distance;
+
+        public int RepeatCount => CurveObject.RepeatCount;
 
         private int stackHeight;
         public override int StackHeight
@@ -27,45 +44,21 @@ namespace osu.Game.Modes.Osu.Objects
             }
         }
 
-        public List<Vector2> ControlPoints
-        {
-            get { return Curve.ControlPoints; }
-            set { Curve.ControlPoints = value; }
-        }
-
-        public double Length
-        {
-            get { return Curve.Length; }
-            set { Curve.Length = value; }
-        }
-
-        public CurveTypes CurveType
-        {
-            get { return Curve.CurveType; }
-            set { Curve.CurveType = value; }
-        }
-
         public double Velocity;
         public double TickDistance;
 
-        public override void SetDefaultsFromBeatmap(Beatmap beatmap)
+        public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
         {
-            base.SetDefaultsFromBeatmap(beatmap);
-
-            var baseDifficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            base.ApplyDefaults(timing, difficulty);
 
             ControlPoint overridePoint;
-            ControlPoint timingPoint = beatmap.TimingPointAt(StartTime, out overridePoint);
+            ControlPoint timingPoint = timing.TimingPointAt(StartTime, out overridePoint);
             var velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
-            var baseVelocity = 100 * baseDifficulty.SliderMultiplier / velocityAdjustment;
+            var baseVelocity = 100 * difficulty.SliderMultiplier / velocityAdjustment;
 
             Velocity = baseVelocity / timingPoint.BeatLength;
-            TickDistance = baseVelocity / baseDifficulty.SliderTickRate;
+            TickDistance = baseVelocity / difficulty.SliderTickRate;
         }
-
-        public int RepeatCount = 1;
-
-        internal readonly SliderCurve Curve = new SliderCurve();
 
         public IEnumerable<SliderTick> Ticks
         {
@@ -73,7 +66,7 @@ namespace osu.Game.Modes.Osu.Objects
             {
                 if (TickDistance == 0) yield break;
 
-                var length = Curve.Length;
+                var length = Curve.Distance;
                 var tickDistance = Math.Min(TickDistance, length);
                 var repeatDuration = length / Velocity;
 
@@ -99,7 +92,7 @@ namespace osu.Game.Modes.Osu.Objects
                             Position = Curve.PositionAt(distanceProgress),
                             StackHeight = StackHeight,
                             Scale = Scale,
-                            Colour = Colour,
+                            ComboColour = ComboColour,
                             Sample = new HitSampleInfo
                             {
                                 Type = SampleType.None,
@@ -112,13 +105,5 @@ namespace osu.Game.Modes.Osu.Objects
         }
 
         public override HitObjectType Type => HitObjectType.Slider;
-    }
-
-    public enum CurveTypes
-    {
-        Catmull,
-        Bezier,
-        Linear,
-        PerfectCurve
     }
 }

@@ -3,35 +3,29 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps.Samples;
-using OpenTK;
+using osu.Game.Modes.Judgements;
 using Container = osu.Framework.Graphics.Containers.Container;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Objects.Drawables
 {
-    public abstract class DrawableHitObject : Container, IStateful<ArmedState>
+    public abstract class DrawableHitObject<TJudgement> : Container, IStateful<ArmedState>
+        where TJudgement : JudgementInfo
     {
-        public event Action<DrawableHitObject, JudgementInfo> OnJudgement;
-
         public override bool HandleInput => Interactive;
 
         public bool Interactive = true;
 
-        public JudgementInfo Judgement;
+        public TJudgement Judgement;
 
-        public abstract JudgementInfo CreateJudgementInfo();
+        protected abstract TJudgement CreateJudgementInfo();
 
-        public HitObject HitObject;
-
-        public DrawableHitObject(HitObject hitObject)
-        {
-            HitObject = hitObject;
-        }
+        protected abstract void UpdateState(ArmedState state);
 
         private ArmedState state;
         public ArmedState State
@@ -40,32 +34,22 @@ namespace osu.Game.Modes.Objects.Drawables
 
             set
             {
-                if (state == value) return;
+                if (state == value)
+                    return;
                 state = value;
 
                 UpdateState(state);
-                if (IsLoaded)
-                    Expire();
 
                 if (State == ArmedState.Hit)
                     PlaySample();
             }
         }
 
-        SampleChannel sample;
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            string hitType = ((HitObject.Sample?.Type ?? SampleType.None) == SampleType.None ? SampleType.Normal : HitObject.Sample.Type).ToString().ToLower();
-            string sampleSet = (HitObject.Sample?.Set ?? SampleSet.Normal).ToString().ToLower();
-
-            sample = audio.Sample.Get($@"Gameplay/{sampleSet}-hit{hitType}");
-        }
+        protected SampleChannel Sample;
 
         protected virtual void PlaySample()
         {
-            sample?.Play();
+            Sample?.Play();
         }
 
         protected override void LoadComplete()
@@ -78,34 +62,34 @@ namespace osu.Game.Modes.Objects.Drawables
 
             //force application of the state that was set before we loaded.
             UpdateState(State);
-
-            Expire(true);
         }
+    }
 
-        private List<DrawableHitObject> nestedHitObjects;
+    public abstract class DrawableHitObject<TObject, TJudgement> : DrawableHitObject<TJudgement>
+        where TObject : HitObject
+        where TJudgement : JudgementInfo
+    {
+        public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
 
-        protected IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects;
+        public TObject HitObject;
 
-        protected void AddNested(DrawableHitObject h)
+        protected DrawableHitObject(TObject hitObject)
         {
-            if (nestedHitObjects == null)
-                nestedHitObjects = new List<DrawableHitObject>();
-
-            h.OnJudgement += (d, j) => { OnJudgement?.Invoke(d, j); } ;
-            nestedHitObjects.Add(h);
+            HitObject = hitObject;
         }
 
         /// <summary>
         /// Process a hit of this hitobject. Carries out judgement.
         /// </summary>
-        /// <param name="judgement">Preliminary judgement information provided by the hit source.</param>
         /// <returns>Whether a hit was processed.</returns>
         protected bool UpdateJudgement(bool userTriggered)
         {
             if (Judgement.Result != null)
                 return false;
 
-            Judgement.TimeOffset = Time.Current - HitObject.EndTime;
+            double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+
+            Judgement.TimeOffset = Time.Current - endTime;
 
             CheckJudgement(userTriggered);
 
@@ -122,7 +106,7 @@ namespace osu.Game.Modes.Objects.Drawables
                     break;
             }
 
-            OnJudgement?.Invoke(this, Judgement);
+            OnJudgement?.Invoke(this);
 
             return true;
         }
@@ -143,33 +127,29 @@ namespace osu.Game.Modes.Objects.Drawables
             UpdateJudgement(false);
         }
 
-        protected abstract void UpdateState(ArmedState state);
-    }
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            SampleType type = HitObject.Sample?.Type ?? SampleType.None;
+            if (type == SampleType.None)
+                type = SampleType.Normal;
 
-    public enum ArmedState
-    {
-        Idle,
-        Hit,
-        Miss
-    }
+            SampleSet sampleSet = HitObject.Sample?.Set ?? SampleSet.Normal;
 
-    public class PositionalJudgementInfo : JudgementInfo
-    {
-        public Vector2 PositionOffset;
-    }
+            Sample = audio.Sample.Get($@"Gameplay/{sampleSet.ToString().ToLower()}-hit{type.ToString().ToLower()}");
+        }
 
-    public class JudgementInfo
-    {
-        public ulong? ComboAtHit;
-        public HitResult? Result;
-        public double TimeOffset;
-    }
+        private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;
 
-    public enum HitResult
-    {
-        [Description(@"Miss")]
-        Miss,
-        [Description(@"Hit")]
-        Hit,
+        protected IEnumerable<DrawableHitObject<TObject, TJudgement>> NestedHitObjects => nestedHitObjects;
+
+        protected void AddNested(DrawableHitObject<TObject, TJudgement> h)
+        {
+            if (nestedHitObjects == null)
+                nestedHitObjects = new List<DrawableHitObject<TObject, TJudgement>>();
+
+            h.OnJudgement += d => OnJudgement?.Invoke(d);
+            nestedHitObjects.Add(h);
+        }
     }
 }

@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -10,11 +11,10 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Online.API;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    class ToolbarUserButton : ToolbarButton, IOnlineComponent
+    internal class ToolbarUserButton : ToolbarButton, IOnlineComponent
     {
         private Avatar avatar;
 
@@ -94,11 +94,7 @@ namespace osu.Game.Overlays.Toolbar
 
                     userId = value;
 
-                    Sprite newSprite;
-                    if (userId > 1)
-                        newSprite = new OnlineSprite($@"https://a.ppy.sh/{userId}");
-                    else
-                        newSprite = new Sprite { Texture = guestTexture };
+                    var newSprite = userId > 1 ? new OnlineSprite($@"https://a.ppy.sh/{userId}") : new Sprite { Texture = guestTexture };
 
                     newSprite.FillMode = FillMode.Fit;
 
