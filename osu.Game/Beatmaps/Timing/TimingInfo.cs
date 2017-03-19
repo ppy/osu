@@ -102,5 +102,21 @@ namespace osu.Game.Beatmaps.Timing
 
             return timingPoint ?? ControlPoint.Default;
         }
+
+        /// <summary>
+        /// Finds the slider velocity at a time.
+        /// </summary>
+        /// <param name="time">The time to find the slider velocity at.</param>
+        /// <returns>The slider velocity in milliseconds.</returns>
+        public double SliderVelocityAt(double time)
+        {
+            const double base_scoring_distance = 100;
+
+            double beatDistance = BeatDistanceAt(time);
+
+            if (beatDistance > 0)
+                return base_scoring_distance / beatDistance * 1000;
+            return base_scoring_distance;
+        }
     }
 }
