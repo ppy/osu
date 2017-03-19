@@ -26,13 +26,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         private const float background_alpha = 0.25f;
         private const float rank_width = 30;
 
-        private readonly EdgeEffect imageShadow = new EdgeEffect
-        {
-            Type = EdgeEffectType.Shadow,
-            Radius = 1,
-            Colour = Color4.Black.Opacity(0.2f),
-        };
-
         private Box background;
         private Container content, avatar;
         private DrawableRank scoreRank;
@@ -154,7 +147,12 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),
                                     CornerRadius = corner_radius,
                                     Masking = true,
-                                    EdgeEffect = imageShadow,
+                                    EdgeEffect = new EdgeEffect
+                                    {
+                                        Type = EdgeEffectType.Shadow,
+                                        Radius = 1,
+                                        Colour = Color4.Black.Opacity(0.2f),
+                                    },
                                     UserId = Score.User?.Id ?? Score.UserID,
                                 },
                                 new Container
