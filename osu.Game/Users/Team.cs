@@ -6,13 +6,8 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Users
 {
-    public class Team : IHasDrawableRepresentation<Sprite>
+    public class Team
     {
         public string Name;
-
-        public Sprite CreateDrawable()
-        {
-            return new Sprite();
-        }
     }
 }

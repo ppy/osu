@@ -33,7 +33,7 @@ namespace osu.Desktop.VisualTests.Tests
                     {
                         Id = 6602580,
                         Username = @"waaiiru",
-                        Region = new Country
+                        Country = new Country
                         {
                             FullName = @"Spain",
                             FlagName = @"ES",
@@ -51,7 +51,7 @@ namespace osu.Desktop.VisualTests.Tests
                     {
                         Id = 4608074,
                         Username = @"Skycries",
-                        Region = new Country
+                        Country = new Country
                         {
                             FullName = @"Brazil",
                             FlagName = @"BR",
@@ -69,7 +69,7 @@ namespace osu.Desktop.VisualTests.Tests
                     {
                         Id = 1014222,
                         Username = @"eLy",
-                        Region = new Country
+                        Country = new Country
                         {
                             FullName = @"Japan",
                             FlagName = @"JP",
@@ -87,7 +87,7 @@ namespace osu.Desktop.VisualTests.Tests
                     {
                         Id = 1541390,
                         Username = @"Toukai",
-                        Region = new Country
+                        Country = new Country
                         {
                             FullName = @"Canada",
                             FlagName = @"CA",
@@ -105,7 +105,7 @@ namespace osu.Desktop.VisualTests.Tests
                     {
                         Id = 2243452,
                         Username = @"Satoruu",
-                        Region = new Country
+                        Country = new Country
                         {
                             FullName = @"Venezuela",
                             FlagName = @"VE",
@@ -123,7 +123,7 @@ namespace osu.Desktop.VisualTests.Tests
                     {
                         Id = 2705430,
                         Username = @"Mooha",
-                        Region = new Country
+                        Country = new Country
                         {
                             FullName = @"France",
                             FlagName = @"FR",
@@ -141,7 +141,7 @@ namespace osu.Desktop.VisualTests.Tests
                     {
                         Id = 7151382,
                         Username = @"Mayuri Hana",
-                        Region = new Country
+                        Country = new Country
                         {
                             FullName = @"Thailand",
                             FlagName = @"TH",
@@ -159,7 +159,7 @@ namespace osu.Desktop.VisualTests.Tests
                     {
                         Id = 2051389,
                         Username = @"FunOrange",
-                        Region = new Country
+                        Country = new Country
                         {
                             FullName = @"Canada",
                             FlagName = @"CA",
@@ -177,7 +177,7 @@ namespace osu.Desktop.VisualTests.Tests
                     {
                         Id = 6169483,
                         Username = @"-Hebel-",
-                        Region = new Country
+                        Country = new Country
                         {
                             FullName = @"Mexico",
                             FlagName = @"MX",
@@ -195,7 +195,7 @@ namespace osu.Desktop.VisualTests.Tests
                     {
                         Id = 6702666,
                         Username = @"prhtnsm",
-                        Region = new Country
+                        Country = new Country
                         {
                             FullName = @"Germany",
                             FlagName = @"DE",

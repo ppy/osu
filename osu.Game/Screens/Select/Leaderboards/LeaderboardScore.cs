@@ -104,10 +104,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
 
-            var flag = Score.User?.Region.CreateDrawable() ?? new DrawableFlag();
-            flag.Width = 30;
-            flag.RelativeSizeAxes = Axes.Y;
-
             Children = new Drawable[]
             {
                 new Container
@@ -189,7 +185,11 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        flag,
+                                                        new DrawableFlag(Score.User?.Country?.FlagName ?? "__")
+                                                        {
+                                                            Width = 30,
+                                                            RelativeSizeAxes = Axes.Y,
+                                                        },
                                                     },
                                                 },
                                                 new FillFlowContainer
