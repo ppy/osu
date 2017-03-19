@@ -20,9 +20,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public class LeaderboardScore : Container, IStateful<Visibility>
     {
-        public static readonly float HEIGHT = 70;
+        public static readonly float HEIGHT = 60;
         private const float corner_radius = 5;
-        private const float edge_margin = 10;
+        private const float edge_margin = 5;
         private const float background_alpha = 0.25f;
         private const float rank_width = 30;
 
