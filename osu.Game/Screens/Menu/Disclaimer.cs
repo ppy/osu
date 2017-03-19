@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Menu
 
         internal override bool ShowOverlays => false;
 
-        internal override bool HasLocalCursorDisplayed => false;
+        internal override bool HasLocalCursorDisplayed => true;
 
         public Disclaimer()
         {
