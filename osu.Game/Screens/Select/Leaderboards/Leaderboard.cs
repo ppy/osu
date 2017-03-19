@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Modes;
+using System;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -80,22 +81,25 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             base.Update();
 
-            var fadeStart = scrollContainer.DrawHeight - 10;
-            fadeStart += scrollContainer.IsScrolledToEnd() ? LeaderboardScore.HEIGHT : 0;
+            var fadeStart = scrollContainer.Current + scrollContainer.DrawHeight;
 
-            foreach (var s in scrollFlow.Children)
+            if (!scrollContainer.IsScrolledToEnd())
+                fadeStart -= LeaderboardScore.HEIGHT;
+
+            foreach (var c in scrollFlow.Children)
             {
-                var topY = scrollContainer.ScrollContent.DrawPosition.Y + s.DrawPosition.Y;
+                var topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scrollFlow).Y;
                 var bottomY = topY + LeaderboardScore.HEIGHT;
 
-                if (topY < fadeStart - LeaderboardScore.HEIGHT * 2)
-                {
-                    s.Colour = Color4.White;
-                }
+                if (bottomY < fadeStart)
+                    c.Colour = Color4.White;
+                else if (topY > fadeStart + LeaderboardScore.HEIGHT)
+                    c.Colour = Color4.Transparent;
                 else
                 {
-                    s.ColourInfo = ColourInfo.GradientVertical(Color4.White.Opacity(System.Math.Min((fadeStart - topY) / LeaderboardScore.HEIGHT, 1)),
-                                                           Color4.White.Opacity(System.Math.Min((fadeStart - bottomY) / LeaderboardScore.HEIGHT, 1)));
+                    c.ColourInfo = ColourInfo.GradientVertical(
+                        Color4.White.Opacity(Math.Min(1 - (topY - fadeStart) / LeaderboardScore.HEIGHT, 1)),
+                        Color4.White.Opacity(Math.Min(1 - (bottomY - fadeStart) / LeaderboardScore.HEIGHT, 1)));
                 }
             }
         }
