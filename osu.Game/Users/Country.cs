@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Users
 {
-    public class Country : IHasDrawableRepresentation<DrawableFlag>
+    public class Country
     {
         /// <summary>
         /// The name of this country.
@@ -26,11 +26,6 @@ namespace osu.Game.Users
         /// Two-letter flag acronym (ISO 3166 standard)
         /// </summary>
         public string FlagName;
-
-        public DrawableFlag CreateDrawable()
-        {
-            return new DrawableFlag(FlagName);
-        }
     }
 
     public class DrawableFlag : Container

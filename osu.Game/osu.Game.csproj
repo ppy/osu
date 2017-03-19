@@ -354,7 +354,6 @@
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
     <Compile Include="Screens\Select\Leaderboards\Leaderboard.cs" />
     <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
-    <Compile Include="Graphics\UserInterface\IHasDrawableRepresentation.cs" />
     <Compile Include="Users\Country.cs" />
     <Compile Include="Users\Team.cs" />
     <Compile Include="Modes\ScoreRank.cs" />
