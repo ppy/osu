@@ -13,7 +13,7 @@ using osu.Game.Modes.Taiko.Judgements;
 
 namespace osu.Game.Modes.Taiko.UI
 {
-    public class TaikoPlayfield : Playfield<TaikoBaseHit, TaikoJudgementInfo>
+    public class TaikoPlayfield : Playfield<TaikoHitObject, TaikoJudgementInfo>
     {
         public TaikoPlayfield()
         {

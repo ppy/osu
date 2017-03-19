@@ -6,13 +6,13 @@ using osu.Game.Modes.Taiko.Objects;
 
 namespace osu.Game.Modes.Taiko.Beatmaps
 {
-    internal class TaikoBeatmapProcessor : IBeatmapProcessor<TaikoBaseHit>
+    internal class TaikoBeatmapProcessor : IBeatmapProcessor<TaikoHitObject>
     {
-        public void SetDefaults(TaikoBaseHit hitObject, Beatmap<TaikoBaseHit> beatmap)
+        public void SetDefaults(TaikoHitObject hitObject, Beatmap<TaikoHitObject> beatmap)
         {
         }
 
-        public void PostProcess(Beatmap<TaikoBaseHit> beatmap)
+        public void PostProcess(Beatmap<TaikoHitObject> beatmap)
         {
         }
     }
