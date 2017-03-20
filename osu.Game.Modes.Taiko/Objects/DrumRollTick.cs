@@ -15,7 +15,5 @@ namespace osu.Game.Modes.Taiko.Objects
         /// <para>Half of this value is the hit window of the tick.</para>
         /// </summary>
         public double TickTimeDistance;
-
-        public override TaikoHitType Type => TaikoHitType.DrumRollTick;
     }
 }
