@@ -1,0 +1,47 @@
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using OpenTK;
+using OpenTK.Graphics;
+
+namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
+{
+    /// <summary>
+    /// A circle piece which is used to visualise RimHit objects.
+    /// </summary>
+    public class RimHitCirclePiece : CirclePiece
+    {
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = colours.BlueDarker;
+        }
+
+        protected override Framework.Graphics.Drawable CreateIcon()
+        {
+            return new CircularContainer
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+
+                Size = new Vector2(61f),
+
+                BorderThickness = 8,
+                BorderColour = Color4.White,
+
+                Children = new[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+
+                        Alpha = 0,
+                        AlwaysPresent = true
+                    }
+                }
+            };
+        }
+    }
+}
