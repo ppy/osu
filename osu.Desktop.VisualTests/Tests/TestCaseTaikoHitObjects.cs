@@ -1,16 +1,13 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -25,26 +22,26 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new CentreHitCirclePiece
             {
                 Position = new Vector2(100, 100),
-                AccentColour = Color4.Red
+                KiaiMode = true
             });
 
             Add(new RimHitCirclePiece
             {
                 Position = new Vector2(100, 250),
-                AccentColour = Color4.Blue
+                KiaiMode = true
             });
 
             Add(new BashCirclePiece
             {
                 Position = new Vector2(100, 400),
-                AccentColour = Color4.Orange
+                KiaiMode = true
             });
 
             Add(new DrumRollCirclePiece
             {
                 Width = 256,
                 Position = new Vector2(100, 550),
-                AccentColour = Color4.Yellow
+                KiaiMode = true
             });
         }
     }
@@ -66,6 +63,12 @@ namespace osu.Desktop.VisualTests.Tests
         public RimHitCirclePiece()
         {
             Height = 128;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = colours.BlueDarker;
         }
 
         protected override Drawable CreateIcon()
@@ -104,6 +107,12 @@ namespace osu.Desktop.VisualTests.Tests
             Height = 128;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = colours.PinkDarker;
+        }
+
         protected override Drawable CreateIcon()
         {
             return new CircularContainer
@@ -136,6 +145,12 @@ namespace osu.Desktop.VisualTests.Tests
             Height = 128;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = colours.YellowDark;
+        }
+
         protected override Drawable CreateIcon()
         {
             return new TextAwesome
@@ -157,6 +172,12 @@ namespace osu.Desktop.VisualTests.Tests
         public DrumRollCirclePiece()
         {
             Height = 128;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = colours.YellowDark;
         }
     }
 
@@ -189,11 +210,13 @@ namespace osu.Desktop.VisualTests.Tests
         /// <summary>
         /// The colour of the inner circle and outer glows.
         /// </summary>
-        public Color4 AccentColour;
+        public Color4 AccentColour { get; protected set; }
 
         private Container innerLayer;
         private Container backingGlowContainer;
         private Container innerCircleContainer;
+        private Box innerBackground;
+        private Triangles triangles;
 
         public CirclePiece()
         {
@@ -246,21 +269,19 @@ namespace osu.Desktop.VisualTests.Tests
 
                             Children = new Drawable[]
                             {
-                                new Box
+                                innerBackground = new Box
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
 
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                new Triangles
+                                triangles = new Triangles
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
 
                                     RelativeSizeAxes = Axes.Both,
-
-                                    Alpha = 0.75f
                                 }
                             }
                         },
@@ -321,7 +342,10 @@ namespace osu.Desktop.VisualTests.Tests
             if (KiaiMode)
                 innerCircleContainer.EdgeEffect = createKiaiEdgeEffect();
 
-            innerCircleContainer.Colour = AccentColour;
+            innerBackground.Colour = AccentColour;
+
+            triangles.ColourLight = AccentColour;
+            triangles.ColourDark = AccentColour.Darken(0.1f);
         }
 
         protected override void Update()
