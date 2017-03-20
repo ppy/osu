@@ -5,6 +5,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -163,26 +164,27 @@ namespace osu.Desktop.VisualTests.Tests
     /// </summary>
     class BashCirclePiece : CirclePiece
     {
+        private Sprite icon;
+
         public BashCirclePiece()
         {
             Height = 128;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, TextureStore textures)
         {
             AccentColour = colours.YellowDark;
+
+            icon.Texture = textures.Get(@"Play/Taiko/bash-hit-inner");
         }
 
         protected override Drawable CreateIcon()
         {
-            return new TextAwesome
+            return icon = new Sprite
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-
-                TextSize = 45f,
-                Icon = FontAwesome.fa_asterisk
             };
         }
     }
