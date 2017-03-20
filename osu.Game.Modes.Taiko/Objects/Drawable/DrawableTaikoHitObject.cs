@@ -25,6 +25,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
             LifetimeStart = HitObject.StartTime - HitObject.PreEmpt * 2;
             LifetimeEnd = HitObject.StartTime + HitObject.PreEmpt;
+
+            // Todo: Remove (suppresses Resharper)
+            AccentColour = Color4.White;
         }
 
         protected override TaikoJudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo();
