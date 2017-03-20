@@ -51,6 +51,8 @@
     <Compile Include="Beatmaps\TaikoBeatmapProcessor.cs" />
     <Compile Include="Judgements\TaikoJudgementInfo.cs" />
     <Compile Include="Judgements\TaikoScoreResult.cs" />
+    <Compile Include="Objects\Drawable\DrawableCentreHit.cs" />
+    <Compile Include="Objects\Drawable\DrawableCentreHitFinisher.cs" />
     <Compile Include="Objects\Drawable\DrawableHit.cs" />
     <Compile Include="Objects\Drawable\DrawableHitFinisher.cs" />
     <Compile Include="Objects\Drawable\DrawableTaikoHitObject.cs" />
