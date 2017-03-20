@@ -32,6 +32,10 @@ namespace osu.Game.Screens.Play
 
         internal override bool ShowOverlays => false;
 
+        internal override bool HasLocalCursorDisplayed => !hasReplayLoaded && !IsPaused;
+
+        private bool hasReplayLoaded => hitRenderer.InputManager.ReplayInputHandler != null;
+
         public BeatmapInfo BeatmapInfo;
 
         public bool IsPaused { get; private set; }
@@ -304,7 +308,7 @@ namespace osu.Game.Screens.Play
         {
             if (pauseOverlay == null) return false;
 
-            if (hitRenderer.InputManager.ReplayInputHandler != null)
+            if (hasReplayLoaded)
                 return false;
 
             if (pauseOverlay.State != Visibility.Visible && !canPause) return true;

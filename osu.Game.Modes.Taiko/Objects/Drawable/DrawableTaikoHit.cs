@@ -12,9 +12,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
     internal class DrawableTaikoHit : Sprite
     {
-        private TaikoBaseHit h;
+        private TaikoHitObject h;
 
-        public DrawableTaikoHit(TaikoBaseHit h)
+        public DrawableTaikoHit(TaikoHitObject h)
         {
             this.h = h;
 
