@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Menu
         internal override bool ShowOverlays => buttons.State != MenuState.Initial;
 
         private BackgroundScreen background;
+        private Screen songSelect;
 
         protected override BackgroundScreen CreateBackground() => background;
 
@@ -46,7 +47,7 @@ namespace osu.Game.Screens.Menu
                             OnChart = delegate { Push(new ChartListing()); },
                             OnDirect = delegate { Push(new OnlineListing()); },
                             OnEdit = delegate { Push(new Editor()); },
-                            OnSolo = delegate { Push(new PlaySongSelect()); },
+                            OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
                             OnTest  = delegate { Push(new TestBrowser()); },
                             OnExit = delegate { Exit(); },
@@ -62,6 +63,24 @@ namespace osu.Game.Screens.Menu
             background.LoadAsync(game);
 
             buttons.OnSettings = game.ToggleOptions;
+
+            preloadSongSelect();
+        }
+
+        private void preloadSongSelect()
+        {
+            if (songSelect == null)
+            {
+                songSelect = new PlaySongSelect();
+                songSelect.LoadAsync(Game);
+            }
+        }
+
+        private Screen consumeSongSelect()
+        {
+            var s = songSelect;
+            songSelect = null;
+            return s;
         }
 
         protected override void OnEntering(Screen last)
@@ -85,6 +104,9 @@ namespace osu.Game.Screens.Menu
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
+
+            //we may have consumed our preloaded instance, so let's make another.
+            preloadSongSelect();
 
             const float length = 300;
 

@@ -123,16 +123,15 @@ namespace osu.Game.Database
         /// <param name="paths">Multiple locations on disk</param>
         public void Import(IEnumerable<string> paths)
         {
-            Stack<BeatmapSetInfo> sets = new Stack<BeatmapSetInfo>();
-
             foreach (string p in paths)
+            {
                 try
                 {
                     BeatmapSetInfo set = getBeatmapSet(p);
 
                     //If we have an ID then we already exist in the database.
                     if (set.ID == 0)
-                        sets.Push(set);
+                        Import(new[] { set });
 
                     // We may or may not want to delete the file depending on where it is stored.
                     //  e.g. reconstructing/repairing database with beatmaps from default storage.
@@ -152,9 +151,7 @@ namespace osu.Game.Database
                     e = e.InnerException ?? e;
                     Logger.Error(e, @"Could not import beatmap set");
                 }
-
-            // Batch commit with multiple sets to database
-            Import(sets);
+            }
         }
 
         /// <summary>
@@ -235,6 +232,8 @@ namespace osu.Game.Database
 
                         // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
                         beatmap.BeatmapInfo.Metadata = null;
+
+                        beatmap.BeatmapInfo.StarDifficulty = beatmap.CalculateStarDifficulty();
 
                         beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
                     }

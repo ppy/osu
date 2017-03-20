@@ -144,5 +144,12 @@ namespace osu.Desktop.VisualTests.Tests
             if (proxyable != null)
                 approachContainer.Add(proxyable.ProxiedLayer.CreateProxy());
         }
+
+        private enum HitObjectType
+        {
+            Circle,
+            Slider,
+            Spinner
+        }
     }
 }
