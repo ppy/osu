@@ -26,7 +26,5 @@ namespace osu.Game.Modes.Taiko.Objects
             double spinnerRotationRatio = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
             RequiredHits = (int)Math.Max(1, Duration / 1000f * spinnerRotationRatio);
         }
-
-        public override TaikoHitType Type => TaikoHitType.Bash;
     }
 }
