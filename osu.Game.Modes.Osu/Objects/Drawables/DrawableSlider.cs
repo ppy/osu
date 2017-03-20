@@ -168,6 +168,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             ball.FadeOut(160);
 
             FadeOut(800);
+
+            Expire();
         }
 
         public Drawable ProxiedLayer => initialCircle.ApproachCircle;

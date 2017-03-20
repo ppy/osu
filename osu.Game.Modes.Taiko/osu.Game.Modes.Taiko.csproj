@@ -54,7 +54,6 @@
     <Compile Include="Objects\Bash.cs" />
     <Compile Include="Objects\Drawable\DrawableBash.cs" />
     <Compile Include="Objects\Drawable\DrawableTaikoHitObject.cs" />
-    <Compile Include="Objects\TaikoHitType.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

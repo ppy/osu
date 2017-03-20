@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Objects.Types;
 using osu.Game.Modes.Osu.Beatmaps;
 using osu.Game.Modes.Osu.Objects;
 using System;
@@ -26,8 +27,7 @@ namespace osu.Game.Modes.Osu
         protected override void PreprocessHitObjects()
         {
             foreach (var h in Objects)
-                if (h.Type == HitObjectType.Slider)
-                    ((Slider)h).Curve.Calculate();
+                (h as IHasCurve)?.Curve?.Calculate();
         }
 
         protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
