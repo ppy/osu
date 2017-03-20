@@ -21,37 +21,60 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(new CentreHitCirclePiece
             {
-                Position = new Vector2(100, 100),
-                KiaiMode = true
+                Position = new Vector2(100, 100)
+            });
+
+            Add(new FinisherPiece(new CentreHitCirclePiece())
+            {
+                Position = new Vector2(350, 100)
             });
 
             Add(new RimHitCirclePiece
             {
-                Position = new Vector2(100, 250),
-                KiaiMode = true
+                Position = new Vector2(100, 280)
+            });
+
+            Add(new FinisherPiece(new RimHitCirclePiece())
+            {
+                Position = new Vector2(350, 280)
             });
 
             Add(new BashCirclePiece
             {
-                Position = new Vector2(100, 400),
-                KiaiMode = true
+                Position = new Vector2(100, 460)
+            });
+
+            Add(new FinisherPiece(new BashCirclePiece())
+            {
+                Position = new Vector2(350, 460)
             });
 
             Add(new DrumRollCirclePiece
             {
-                Width = 256,
-                Position = new Vector2(100, 550),
-                KiaiMode = true
+                Width = 250,
+                Position = new Vector2(100, 640)
+            });
+
+            Add(new FinisherPiece(new DrumRollCirclePiece()
+            {
+                Width = 250
+            })
+            {
+                Position = new Vector2(600, 640)
             });
         }
     }
 
-    class FinisherCirclePiece : Container
+    class FinisherPiece : ScrollingCirclePiece
     {
-        public FinisherCirclePiece()
+        public FinisherPiece(CirclePiece originalPiece)
         {
-            Anchor = Anchor.CentreLeft;
+            Scale = new Vector2(1.5f);
 
+            Children = new[]
+            {
+                originalPiece
+            };
         }
     }
 
@@ -189,7 +212,7 @@ namespace osu.Desktop.VisualTests.Tests
     /// a regular "circle" is created by setting the width of this piece to 0px (resulting in a 64px radius circle).
     /// </para>
     /// </summary>
-    abstract class CirclePiece : Container
+    abstract class CirclePiece : ScrollingCirclePiece
     {
         private bool kiaiMode;
         /// <summary>
@@ -218,11 +241,9 @@ namespace osu.Desktop.VisualTests.Tests
         private Box innerBackground;
         private Triangles triangles;
 
-        public CirclePiece()
+        protected CirclePiece()
         {
             Container iconContainer;
-
-            Origin = Anchor.CentreLeft;
 
             Children = new Drawable[]
             {
@@ -368,5 +389,15 @@ namespace osu.Desktop.VisualTests.Tests
         /// </summary>
         /// <returns>The icon.</returns>
         protected virtual Drawable CreateIcon() => null;
+    }
+
+    class ScrollingCirclePiece : Container
+    {
+        public ScrollingCirclePiece()
+        {
+            Origin = Anchor.CentreLeft;
+
+            // Todo: Relative X position
+        }
     }
 }
