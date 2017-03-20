@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Menu
         private SampleChannel seeya;
         private Track bgm;
 
+        internal override bool HasLocalCursorDisplayed => true;
+
         internal override bool ShowOverlays => false;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenEmpty();

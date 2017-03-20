@@ -146,9 +146,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             {
                 case ArmedState.Hit:
                     ScaleTo(Scale * 1.2f, 320, EasingTypes.Out);
+                    Expire();
                     break;
                 case ArmedState.Miss:
                     ScaleTo(Scale * 0.8f, 320, EasingTypes.In);
+                    Expire();
                     break;
             }
         }
