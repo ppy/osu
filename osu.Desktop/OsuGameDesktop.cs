@@ -43,6 +43,8 @@ namespace osu.Desktop
             var desktopWindow = host.Window as DesktopGameWindow;
             if (desktopWindow != null)
             {
+                desktopWindow.CursorState = CursorState.Hidden;
+
                 desktopWindow.Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
                 desktopWindow.Title = Name;
 
