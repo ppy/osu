@@ -57,6 +57,13 @@
     <Compile Include="Objects\Drawable\DrawableTaikoHitObject.cs" />
     <Compile Include="Objects\DrumRoll.cs" />
     <Compile Include="Objects\DrumRollTick.cs" />
+    <Compile Include="Objects\Drawable\Pieces\BashCirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\CentreHitCirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\CirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\DrumRollCirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\FinisherPiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\RimHitCirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\ScrollingCirclePiece.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -87,6 +94,7 @@
       <Name>osu.Game</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

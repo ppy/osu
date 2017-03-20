@@ -5,17 +5,18 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
+using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
-    public class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject, TaikoJudgementInfo>
+    public abstract class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject, TaikoJudgementInfo>
     {
         /// <summary>
         /// The colour used for various elements of this DrawableHitObject.
         /// </summary>
         public virtual Color4 AccentColour { get; }
 
-        public DrawableTaikoHitObject(TaikoHitObject hitObject)
+        protected DrawableTaikoHitObject(TaikoHitObject hitObject)
             : base(hitObject)
         {
             Anchor = Anchor.CentreLeft;
@@ -28,6 +29,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
             // Todo: Remove (suppresses Resharper)
             AccentColour = Color4.White;
+
+            Children = new[]
+            {
+                CreateCircle()
+            };
         }
 
         protected override TaikoJudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo();
@@ -50,5 +56,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         {
             UpdateScrollPosition(Time.Current);
         }
+
+        protected abstract ScrollingCirclePiece CreateCircle();
     }
 }
