@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    internal class BeatmapSetHeader : Panel
+    public class BeatmapSetHeader : Panel
     {
         public Action<BeatmapSetHeader> GainedSelection;
         private SpriteText title, artist;
@@ -32,10 +32,6 @@ namespace osu.Game.Beatmaps.Drawables
 
             Children = new Drawable[]
             {
-                new PanelBackground(beatmap)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
                 new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
@@ -74,13 +70,23 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, OsuGameBase game)
         {
             this.config = config;
 
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
             preferUnicode.ValueChanged += preferUnicode_changed;
             preferUnicode_changed(preferUnicode, null);
+
+            new PanelBackground(beatmap)
+            {
+                RelativeSizeAxes = Axes.Both,
+                Depth = 1,
+            }.LoadAsync(game, b =>
+            {
+                Add(b);
+                b.FadeInFromZero(200);
+            });
         }
 
         private void preferUnicode_changed(object sender, EventArgs e)
@@ -98,16 +104,18 @@ namespace osu.Game.Beatmaps.Drawables
 
         private class PanelBackground : BufferedContainer
         {
-            private readonly WorkingBeatmap working;
-
             public PanelBackground(WorkingBeatmap working)
             {
-                this.working = working;
-
                 CacheDrawnFrameBuffer = true;
 
-                Children = new[]
+                Children = new Drawable[]
                 {
+                    new BeatmapBackgroundSprite(working)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        FillMode = FillMode.Fill,
+                    },
                     new FillFlowContainer
                     {
                         Depth = -1,
@@ -150,21 +158,6 @@ namespace osu.Game.Beatmaps.Drawables
                         }
                     },
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuGameBase game)
-            {
-                new BeatmapBackgroundSprite(working)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    FillMode = FillMode.Fill,
-                }.LoadAsync(game, bg =>
-                {
-                    Add(bg);
-                    ForceRedraw();
-                });
             }
         }
 
