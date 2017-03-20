@@ -7,13 +7,13 @@ using System.Collections.Generic;
 
 namespace osu.Game.Modes.Taiko.Beatmaps
 {
-    internal class TaikoBeatmapConverter : IBeatmapConverter<TaikoBaseHit>
+    internal class TaikoBeatmapConverter : IBeatmapConverter<TaikoHitObject>
     {
-        public Beatmap<TaikoBaseHit> Convert(Beatmap original)
+        public Beatmap<TaikoHitObject> Convert(Beatmap original)
         {
-            return new Beatmap<TaikoBaseHit>(original)
+            return new Beatmap<TaikoHitObject>(original)
             {
-                HitObjects = new List<TaikoBaseHit>() // Todo: Implement
+                HitObjects = new List<TaikoHitObject>() // Todo: Implement
             };
         }
     }
