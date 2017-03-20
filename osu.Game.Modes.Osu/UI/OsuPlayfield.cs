@@ -12,7 +12,6 @@ using osu.Game.Modes.UI;
 using System.Linq;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Modes.Osu.Judgements;
-using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.UI
 {
@@ -63,7 +62,7 @@ namespace osu.Game.Modes.Osu.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            AddInternal(new OsuCursorContainer { Colour = Color4.LightYellow });
+            AddInternal(new GameplayCursor());
         }
 
         public override void Add(DrawableHitObject<OsuHitObject, OsuJudgementInfo> h)

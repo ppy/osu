@@ -5,6 +5,7 @@ using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -15,14 +16,13 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Input;
+using osu.Game.Modes;
 
 namespace osu.Game.Screens.Select
 {
     public class FilterControl : Container
     {
-        public Action FilterChanged;
-
-        public string Search => searchTextBox.Text;
+        public Action<FilterCriteria> FilterChanged;
 
         private OsuTabControl<SortMode> sortTabs;
 
@@ -30,16 +30,16 @@ namespace osu.Game.Screens.Select
 
         private SortMode sort = SortMode.Title;
         public SortMode Sort
-        { 
-            get { return sort; } 
+        {
+            get { return sort; }
             set
             {
                 if (sort != value)
                 {
                     sort = value;
-                    FilterChanged?.Invoke();
+                    FilterChanged?.Invoke(CreateCriteria());
                 }
-            } 
+            }
         }
 
         private GroupMode group = GroupMode.All;
@@ -51,10 +51,18 @@ namespace osu.Game.Screens.Select
                 if (group != value)
                 {
                     group = value;
-                    FilterChanged?.Invoke();
+                    FilterChanged?.Invoke(CreateCriteria());
                 }
             }
         }
+
+        public FilterCriteria CreateCriteria() => new FilterCriteria
+        {
+            Group = group,
+            Sort = sort,
+            SearchText = searchTextBox.Text,
+            Mode = playMode
+        };
 
         public Action Exit;
 
@@ -88,7 +96,7 @@ namespace osu.Game.Screens.Select
                             OnChange = (sender, newText) =>
                             {
                                 if (newText)
-                                    FilterChanged?.Invoke();
+                                    FilterChanged?.Invoke(CreateCriteria());
                             },
                             Exit = () => Exit?.Invoke(),
                         },
@@ -152,16 +160,21 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = false;
             searchTextBox.TriggerFocusLost();
         }
-        
+
         public void Activate()
         {
             searchTextBox.HoldFocus = true;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private readonly Bindable<PlayMode> playMode = new Bindable<PlayMode>();
+
+        [BackgroundDependencyLoader(permitNulls:true)]
+        private void load(OsuColour colours, OsuGame osu)
         {
             sortTabs.AccentColour = colours.GreenLight;
+
+            if (osu != null)
+                playMode.BindTo(osu.PlayMode);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
