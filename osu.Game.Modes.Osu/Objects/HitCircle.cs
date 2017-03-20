@@ -5,6 +5,5 @@ namespace osu.Game.Modes.Osu.Objects
 {
     public class HitCircle : OsuHitObject
     {
-        public override HitObjectType Type => HitObjectType.Circle;
     }
 }
