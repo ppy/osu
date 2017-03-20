@@ -30,7 +30,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             if (!userTriggered)
             {
                 if (Judgement.TimeOffset > tick.TickTimeDistance / 2)
-                    Judgement.Result = Modes.Objects.Drawables.HitResult.Miss;
+                    Judgement.Result = HitResult.Miss;
                 return;
             }
 
