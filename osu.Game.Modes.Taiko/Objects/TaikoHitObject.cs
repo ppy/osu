@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Modes.Objects;
@@ -39,23 +38,6 @@ namespace osu.Game.Modes.Taiko.Objects
         /// Whether this HitObject is in Kiai time.
         /// </summary>
         public bool Kiai;
-
-        /// <summary>
-        /// The type of HitObject.
-        /// </summary>
-        public virtual TaikoHitType Type
-        {
-            get
-            {
-                SampleType st = Sample?.Type ?? SampleType.None;
-
-                return
-                    // Centre/Rim
-                    ((st & ~(SampleType.Finish | SampleType.Normal)) == 0 ? TaikoHitType.CentreHit : TaikoHitType.RimHit)
-                    // Finisher
-                    | ((st & SampleType.Finish) > 0 ? TaikoHitType.Finisher : TaikoHitType.None);
-            }
-        }
 
         public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
         {
