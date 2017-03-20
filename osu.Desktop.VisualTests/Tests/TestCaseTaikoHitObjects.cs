@@ -24,28 +24,28 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(new RimHitCirclePiece
             {
-                Position = new Vector2(100, 280)
+                Position = new Vector2(100, 300)
             });
 
             Add(new FinisherPiece(new RimHitCirclePiece())
             {
-                Position = new Vector2(350, 280)
+                Position = new Vector2(350, 300)
             });
 
             Add(new BashCirclePiece
             {
-                Position = new Vector2(100, 460)
+                Position = new Vector2(100, 500)
             });
 
             Add(new FinisherPiece(new BashCirclePiece())
             {
-                Position = new Vector2(350, 460)
+                Position = new Vector2(350, 500)
             });
 
             Add(new DrumRollCirclePiece
             {
                 Width = 250,
-                Position = new Vector2(100, 640)
+                Position = new Vector2(575, 100)
             });
 
             Add(new FinisherPiece(new DrumRollCirclePiece()
@@ -53,7 +53,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Width = 250
             })
             {
-                Position = new Vector2(600, 640)
+                Position = new Vector2(575, 300)
             });
         }
     }
