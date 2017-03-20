@@ -19,7 +19,8 @@ namespace osu.Game.Screens.Select.Options
     public class BeatmapOptionsOverlay : FocusedOverlayContainer
     {
         private const float transition_duration = 500;
-        private const float x_position = 290;
+        private const float x_position = 0.2f;
+        private const float x_movement = 0.8f;
 
         private const float height = 100;
 
@@ -30,10 +31,10 @@ namespace osu.Game.Screens.Select.Options
         {
             base.PopIn();
 
-            if (buttonsContainer.Position.X >= DrawWidth || buttonsContainer.Alpha <= 0)
-                buttonsContainer.MoveToX(-buttonsContainer.DrawWidth);
+            FadeIn(transition_duration, EasingTypes.OutQuint);
 
-            buttonsContainer.Alpha = 1;
+            if (buttonsContainer.Position.X == 1 || Alpha == 0)
+                buttonsContainer.MoveToX(x_position - x_movement);
 
             holder.ScaleTo(new Vector2(1, 1), transition_duration / 2, EasingTypes.OutQuint);
 
@@ -47,15 +48,10 @@ namespace osu.Game.Screens.Select.Options
 
             holder.ScaleTo(new Vector2(1, 0), transition_duration / 2, EasingTypes.InSine);
 
-            buttonsContainer.MoveToX(DrawWidth, transition_duration, EasingTypes.InSine);
+            buttonsContainer.MoveToX(x_position + x_movement, transition_duration, EasingTypes.InSine);
             buttonsContainer.TransformSpacingTo(new Vector2(200f, 0f), transition_duration, EasingTypes.InSine);
 
-            Delay(transition_duration);
-            Schedule(() =>
-            {
-                if (State == Visibility.Hidden)
-                    buttonsContainer.Alpha = 0;
-            });
+            FadeOut(transition_duration, EasingTypes.InQuint);
         }
 
         public BeatmapOptionsOverlay()
@@ -79,6 +75,7 @@ namespace osu.Game.Screens.Select.Options
                 buttonsContainer = new ButtonFlow
                 {
                     Height = height,
+                    RelativePositionAxes = Axes.X,
                     AutoSizeAxes = Axes.X,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
