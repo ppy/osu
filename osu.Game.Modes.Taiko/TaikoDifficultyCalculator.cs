@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Modes.Taiko
 {
-    public class TaikoDifficultyCalculator : DifficultyCalculator<TaikoBaseHit>
+    public class TaikoDifficultyCalculator : DifficultyCalculator<TaikoHitObject>
     {
         public TaikoDifficultyCalculator(Beatmap beatmap) : base(beatmap)
         {
@@ -19,6 +19,6 @@ namespace osu.Game.Modes.Taiko
             return 0;
         }
 
-        protected override IBeatmapConverter<TaikoBaseHit> CreateBeatmapConverter() => new TaikoBeatmapConverter();
+        protected override IBeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter();
     }
 }
