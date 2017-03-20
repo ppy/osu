@@ -7,6 +7,7 @@ using osu.Framework.Input;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using System;
+using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -29,6 +30,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             : base(bash)
         {
             this.bash = bash;
+
+            LifetimeEnd = bash.EndTime;
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -78,5 +81,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
             return true;
         }
+
+        protected override ScrollingCirclePiece CreateCircle() => new BashCirclePiece();
     }
 }
