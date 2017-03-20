@@ -4,6 +4,9 @@
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using System.Linq;
+using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -11,10 +14,21 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
     {
         private DrumRoll drumRoll;
 
+        private Container tickContainer;
+
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
             this.drumRoll = drumRoll;
+
+            RelativeSizeAxes = Axes.X;
+            Width = (float)(drumRoll.Duration / HitObject.PreEmpt);
+
+            Add(tickContainer = new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                Depth = -1
+            });
 
             int tickIndex = 0;
             foreach (var tick in drumRoll.Ticks)
@@ -26,6 +40,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 };
 
                 AddNested(newTick);
+                tickContainer.Add(newTick);
 
                 tickIndex++;
             }
@@ -49,5 +64,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             else
                 Judgement.Result = HitResult.Miss;
         }
+
+        protected override ScrollingCirclePiece CreateCircle() => new DrumRollCirclePiece
+        {
+            RelativeSizeAxes = Axes.X
+        };
     }
 }

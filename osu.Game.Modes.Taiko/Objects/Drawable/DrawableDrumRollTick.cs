@@ -6,7 +6,13 @@ using System.Collections.Generic;
 using osu.Game.Modes.Taiko.Judgements;
 using System;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Framework.Graphics;
 using osu.Framework.Input;
+using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
+using osu.Framework.Graphics.Containers;
+using OpenTK.Graphics;
+using osu.Framework.Graphics.Sprites;
+using OpenTK;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -20,10 +26,40 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         private DrumRollTick tick;
 
+        private CircularContainer tickContainer;
+
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
         {
             this.tick = tick;
+
+            Children = new[]
+            {
+                tickContainer = new CircularContainer
+                {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.CentreLeft,
+
+                    Size = new Vector2(26),
+
+                    BorderThickness = 5,
+                    BorderColour = Color4.White,
+
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+
+                            Alpha = tick.FirstTick ? 1 : 0,
+                            AlwaysPresent = true
+                        }
+                    }
+                }
+            };
+
+            LifetimeStart = double.MinValue;
+            LifetimeEnd = double.MaxValue;
         }
 
         protected override TaikoJudgementInfo CreateJudgementInfo() => new TaikoDrumRollTickJudgementInfo();
@@ -62,5 +98,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
             return UpdateJudgement(true);
         }
+
+        /// <summary>
+        /// Empty piece (ticks don't use this).
+        /// </summary>
+        protected override ScrollingCirclePiece CreateCircle() => new ScrollingCirclePiece();
     }
 }
