@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
-        protected override DropDownMenu<T> CreateDropDownMenu() => new OsuTabDropDownMenu<T>();
+        protected override DropDownMenu<T> CreateDropDownMenu() => new OsuTabDropDownMenu();
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem<T> { Value = value };
 
@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                var dropDown = DropDown as OsuTabDropDownMenu<T>;
+                var dropDown = DropDown as OsuTabDropDownMenu;
                 if (dropDown != null)
                     dropDown.AccentColour = value;
                 foreach (var item in TabContainer.Children.OfType<OsuTabItem<T>>())
@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public class OsuTabDropDownMenu<T1> : OsuDropDownMenu<T1>
+        public class OsuTabDropDownMenu : OsuDropDownMenu<T>
         {
             protected override DropDownHeader CreateHeader() => new OsuTabDropDownHeader
             {
@@ -62,7 +62,7 @@ namespace osu.Game.Graphics.UserInterface
                 Origin = Anchor.TopRight,
             };
 
-            protected override DropDownMenuItem<T1> CreateDropDownItem(string key, T1 value)
+            protected override DropDownMenuItem<T> CreateDropDownItem(string key, T value)
             {
                 var item = base.CreateDropDownItem(key, value);
                 item.ForegroundColourHover = Color4.Black;
