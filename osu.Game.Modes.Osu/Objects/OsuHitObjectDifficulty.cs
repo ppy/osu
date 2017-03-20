@@ -148,11 +148,11 @@ namespace osu.Game.Modes.Osu.Objects
             double timeElapsed = (BaseHitObject.StartTime - previousHitObject.BaseHitObject.StartTime) / timeRate;
             double decay = Math.Pow(DECAY_BASE[(int)type], timeElapsed / 1000);
 
-            if (BaseHitObject.Type == HitObjectType.Spinner)
+            if (BaseHitObject is Spinner)
             {
                 // Do nothing for spinners
             }
-            else if (BaseHitObject.Type == HitObjectType.Slider)
+            else if (BaseHitObject is Slider)
             {
                 switch (type)
                 {
@@ -180,7 +180,7 @@ namespace osu.Game.Modes.Osu.Objects
                         break;
                 }
             }
-            else if (BaseHitObject.Type == HitObjectType.Circle)
+            else if (BaseHitObject is HitCircle)
             {
                 addition = spacingWeight(DistanceTo(previousHitObject), type) * spacing_weight_scaling[(int)type];
             }
