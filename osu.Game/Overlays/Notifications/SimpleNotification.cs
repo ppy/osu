@@ -53,6 +53,7 @@ namespace osu.Game.Overlays.Notifications
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Icon = icon,
+                    TextSize = 20
                 }
             });
 
