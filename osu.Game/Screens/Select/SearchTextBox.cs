@@ -26,6 +26,7 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
                     Margin = new MarginPadding { Right = 10 },
+                    TextSize = 20
                 }
             });
 
