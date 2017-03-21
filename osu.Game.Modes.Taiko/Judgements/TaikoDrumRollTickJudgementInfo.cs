@@ -5,18 +5,18 @@ namespace osu.Game.Modes.Taiko.Judgements
 {
     public class TaikoDrumRollTickJudgementInfo : TaikoJudgementInfo
     {
-        protected override int ScoreToInt(TaikoScoreResult result)
+        protected override int NumericResultForScore(TaikoHitResult result)
         {
             switch (result)
             {
                 default:
                     return 0;
-                case TaikoScoreResult.Great:
+                case TaikoHitResult.Great:
                     return 200;
             }
         }
 
-        protected override int AccuracyScoreToInt(TaikoScoreResult result)
+        protected override int NumericResultForAccuracy(TaikoHitResult result)
         {
             return 0;
         }
