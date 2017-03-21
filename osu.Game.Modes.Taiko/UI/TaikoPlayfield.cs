@@ -49,7 +49,7 @@ namespace osu.Game.Modes.Taiko.UI
         private HitTarget hitTarget;
         private Container<RingExplosion> ringExplosionContainer;
         //private Container<DrawableBarLine> barLineContainer;
-        //private Container<JudgementText> judgementContainer;
+        private Container<JudgementText> judgementContainer;
 
         private Container hitObjectContainer;
         private Container topLevelHitContainer;
@@ -126,11 +126,11 @@ namespace osu.Game.Modes.Taiko.UI
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                //judgementContainer = new Container<JudgementText>
-                                //{
-                                //    RelativeSizeAxes = Axes.Both,
-                                //    BlendingMode = BlendingMode.Additive
-                                //},
+                                judgementContainer = new Container<JudgementText>
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    BlendingMode = BlendingMode.Additive
+                                },
                             },
                         },
                     }
@@ -203,6 +203,19 @@ namespace osu.Game.Modes.Taiko.UI
                     ScoreResult = judgedObject.Judgement.Score
                 });
             }
+
+            float judgementOffset = judgedObject.Judgement.Result == HitResult.Hit ? judgedObject.Position.X : 0;
+
+            judgementContainer.Add(new JudgementText
+            {
+                Anchor = judgedObject.Judgement.Result == HitResult.Hit ? Anchor.TopLeft : Anchor.BottomLeft,
+                Origin = judgedObject.Judgement.Result == HitResult.Hit ? Anchor.BottomCentre : Anchor.TopCentre,
+
+                RelativePositionAxes = Axes.X,
+                X = judgementOffset,
+
+                Judgement = judgedObject.Judgement
+            });
         }
     }
 }

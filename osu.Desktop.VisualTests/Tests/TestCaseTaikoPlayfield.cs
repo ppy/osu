@@ -35,6 +35,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             playfield.OnJudgement(new DrawableTestHit(new TaikoHitObject())
             {
+                X = RNG.NextSingle(score == TaikoScoreResult.Good ? -0.1f : -0.05f, score == TaikoScoreResult.Good ? 0.1f : 0.05f),
                 Judgement = new TaikoJudgementInfo
                 {
                     Result = HitResult.Hit,
