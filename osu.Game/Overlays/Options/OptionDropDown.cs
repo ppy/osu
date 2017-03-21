@@ -11,10 +11,11 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System.Collections.Generic;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionDropDown<T> : FillFlowContainer, ISearchable
+    public class OptionDropDown<T> : FillFlowContainer, IFilterable
     {
         private DropDownMenu<T> dropdown;
         private SpriteText text;
@@ -29,7 +30,7 @@ namespace osu.Game.Overlays.Options
         }
 
         public string[] Keywords => new[] { LabelText };
-        public bool Matching
+        public bool FilteredByParent
         {
             set
             {
@@ -52,7 +53,7 @@ namespace osu.Game.Overlays.Options
                 bindable_ValueChanged(null, null);
 
                 if (bindable.Disabled)
-                    Alpha = 0.3f;
+                    Colour = new Color4(255, 255, 255, 64);
             }
         }
 

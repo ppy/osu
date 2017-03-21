@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +13,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionSlider<T> : FillFlowContainer, ISearchable where T : struct
+    public class OptionSlider<T> : FillFlowContainer, IFilterable where T : struct
     {
         private SliderBar<T> slider;
         private SpriteText text;
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays.Options
         }
 
         public string[] Keywords => new[] { LabelText };
-        public bool Matching
+        public bool FilteredByParent
         {
             set
             {
@@ -46,7 +47,7 @@ namespace osu.Game.Overlays.Options
             {
                 slider.Bindable = value;
                 if (value?.Disabled ?? true)
-                    Alpha = 0.3f;
+                    Colour = new Color4(255, 255, 255, 64);
             }
         }
 

@@ -15,14 +15,14 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Options
 {
-    public abstract class OptionsSection : Container, ISearchableChildren
+    public abstract class OptionsSection : Container, IFilterableChildren
     {
         protected FillFlowContainer FlowContent;
         protected override Container<Drawable> Content => FlowContent;
 
         public string[] Keywords => new[] { Header };
-        public IEnumerable<ISearchable> SearchableChildren => Children.OfType<ISearchable>();
-        public bool Matching
+        public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
+        public bool FilteredByParent
         {
             set
             {

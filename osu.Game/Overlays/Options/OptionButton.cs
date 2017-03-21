@@ -6,10 +6,10 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    class OptionButton : OsuButton, ISearchable
+    class OptionButton : OsuButton, IFilterable
     {
         public string[] Keywords => new[] { Text };
-        public bool Matching
+        public bool FilteredByParent
         {
             set
             {

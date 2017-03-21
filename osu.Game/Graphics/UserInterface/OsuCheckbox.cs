@@ -36,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
 
                 if (bindable?.Disabled ?? true)
-                    Alpha = 0.3f;
+                    Colour = new Color4(255,255,255,64);
             }
         }
 

@@ -9,10 +9,10 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionTextBox : OsuTextBox, ISearchable
+    public class OptionTextBox : OsuTextBox, IFilterable
     {
         public string[] Keywords => new[] { PlaceholderText };
-        public bool Matching
+        public bool FilteredByParent
         {
             set
             {

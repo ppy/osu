@@ -11,14 +11,14 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Options
 {
-    public abstract class OptionsSubsection : FillFlowContainer, ISearchableChildren
+    public abstract class OptionsSubsection : FillFlowContainer, IFilterableChildren
     {
         protected override Container<Drawable> Content => content;
 
         private Container<Drawable> content;
 
         public string[] Keywords => new[] { Header };
-        public bool Matching
+        public bool FilteredByParent
         {
             set
             {
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Options
                     FadeOut(250);
             }
         }
-        public IEnumerable<ISearchable> SearchableChildren => Children.OfType<ISearchable>();
+        public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
 
         protected abstract string Header { get; }
 
