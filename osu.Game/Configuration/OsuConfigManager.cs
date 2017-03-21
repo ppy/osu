@@ -23,7 +23,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.SavePassword, false);
             Set(OsuConfig.SaveUsername, true);
 
-            Set(OsuConfig.CursorSize, 1.0, 0.5f, 2);
+            Set(OsuConfig.MenuCursorSize, 1.0, 0.5f, 2);
             Set(OsuConfig.GameplayCursorSize, 1.0, 0.5f, 2);
             Set(OsuConfig.DimLevel, 30, 0, 100);
 
@@ -224,7 +224,7 @@ namespace osu.Game.Configuration
         ComboFireHeight,
         ConfirmExit,
         AutoSendNowPlaying,
-        CursorSize,
+        MenuCursorSize,
         GameplayCursorSize,
         AutomaticCursorSizing,
         DimLevel,

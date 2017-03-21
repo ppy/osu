@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Options.Sections
                 new OptionSlider<double>
                 {
                     LabelText = "Menu cursor size",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.CursorSize)
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.MenuCursorSize)
                 },
                 new OptionSlider<double>
                 {
