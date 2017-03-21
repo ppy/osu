@@ -40,7 +40,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             if (Math.Abs(Judgement.TimeOffset) < tick.TickTimeDistance / 2)
             {
                 Judgement.Result = HitResult.Hit;
-                Judgement.Score = TaikoScoreResult.Great;
+                Judgement.TaikoResult = TaikoHitResult.Great;
             }
         }
 

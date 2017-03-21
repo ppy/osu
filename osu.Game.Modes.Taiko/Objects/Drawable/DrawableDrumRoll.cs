@@ -44,7 +44,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             if (countHit > drumRoll.RequiredGoodHits)
             {
                 Judgement.Result = HitResult.Hit;
-                Judgement.Score = countHit >= drumRoll.RequiredGreatHits ? TaikoScoreResult.Great : TaikoScoreResult.Good;
+                Judgement.TaikoResult = countHit >= drumRoll.RequiredGreatHits ? TaikoHitResult.Great : TaikoHitResult.Good;
             }
             else
                 Judgement.Result = HitResult.Miss;
