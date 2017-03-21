@@ -14,8 +14,14 @@ using osu.Game.Modes.Taiko.Objects;
 
 namespace osu.Game.Modes.Taiko.UI
 {
+    /// <summary>
+    /// A ring that explodes to indicate a judgement has occurred.
+    /// </summary>
     internal class RingExplosion : CircularContainer
     {
+        /// <summary>
+        /// The Judgement to display.
+        /// </summary>
         public TaikoJudgementInfo Judgement;
 
         private Box innerFill;
