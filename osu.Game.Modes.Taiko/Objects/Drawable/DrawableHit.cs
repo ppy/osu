@@ -52,7 +52,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             else if (hitOffset < HitObject.HitWindowGood)
             {
                 Judgement.Result = HitResult.Hit;
-                Judgement.Score = hitOffset < HitObject.HitWindowGreat ? TaikoScoreResult.Great : TaikoScoreResult.Good;
+                Judgement.TaikoResult = hitOffset < HitObject.HitWindowGreat ? TaikoHitResult.Great : TaikoHitResult.Good;
             }
             else
                 Judgement.Result = HitResult.Miss;
