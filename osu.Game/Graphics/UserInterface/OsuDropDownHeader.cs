@@ -54,6 +54,7 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Margin = new MarginPadding { Right = 4 },
+                    TextSize = 20
                 }
             };
         }
