@@ -66,12 +66,14 @@ namespace osu.Game.Modes.UI
                     Anchor = Anchor.Centre,
                     Icon = FontAwesome.fa_osu_mod_bg,
                     Shadow = true,
+                    TextSize = 20
                 },
                 modIcon = new TextAwesome
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Colour = OsuColour.Gray(84),
+                    TextSize = 20
                 },
             };
 
