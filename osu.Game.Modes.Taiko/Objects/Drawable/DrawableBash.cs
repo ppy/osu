@@ -43,7 +43,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 if (userHits == bash.RequiredHits)
                 {
                     Judgement.Result = HitResult.Hit;
-                    Judgement.Score = TaikoScoreResult.Great;
+                    Judgement.TaikoResult = TaikoHitResult.Great;
                 }
             }
             else
@@ -54,7 +54,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 if (userHits > bash.RequiredHits / 2)
                 {
                     Judgement.Result = HitResult.Hit;
-                    Judgement.Score = TaikoScoreResult.Good;
+                    Judgement.TaikoResult = TaikoHitResult.Good;
                 }
                 else
                     Judgement.Result = HitResult.Miss;
