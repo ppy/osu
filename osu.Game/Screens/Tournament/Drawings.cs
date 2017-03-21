@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Text = "Control Panel",
                                     TextSize = 22f,
-                                    Font = "Exo2.0-Boldd"
+                                    Font = "Exo2.0-Bold"
                                 },
                                 new FillFlowContainer
                                 {
