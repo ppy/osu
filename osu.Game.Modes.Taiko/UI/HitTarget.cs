@@ -14,6 +14,7 @@ namespace osu.Game.Modes.Taiko.UI
     {
         private const float normal_diameter = TaikoHitObject.CIRCLE_RADIUS * 2 * TaikoPlayfield.PLAYFIELD_SCALE;
         private const float finisher_diameter = normal_diameter * 1.5f;
+        private const float border_offset = 1;
 
         public HitTarget()
         {
@@ -28,7 +29,9 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
 
-                    Size = new Vector2(3, (TaikoPlayfield.PlayfieldHeight - finisher_diameter) / 2f),
+                    Y = border_offset,
+
+                    Size = new Vector2(3, (TaikoPlayfield.PlayfieldHeight - finisher_diameter) / 2f - border_offset),
 
                     Alpha = 0.1f
                 },
@@ -87,7 +90,9 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
 
-                    Size = new Vector2(3, (TaikoPlayfield.PlayfieldHeight - finisher_diameter) / 2f),
+                    Y = -border_offset,
+
+                    Size = new Vector2(3, (TaikoPlayfield.PlayfieldHeight - finisher_diameter) / 2f - border_offset),
 
                     Alpha = 0.1f
                 },
