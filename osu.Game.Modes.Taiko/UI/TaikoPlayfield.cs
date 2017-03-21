@@ -46,12 +46,14 @@ namespace osu.Game.Modes.Taiko.UI
 
         protected override Container<Drawable> Content => hitObjectContainer;
 
+        // ReSharper disable once NotAccessedField.Local
         private HitTarget hitTarget;
         private Container<RingExplosion> ringExplosionContainer;
         //private Container<DrawableBarLine> barLineContainer;
         private Container<JudgementText> judgementContainer;
 
         private Container hitObjectContainer;
+        // ReSharper disable once NotAccessedField.Local
         private Container topLevelHitContainer;
         private Container leftBackgroundContainer;
         private Container rightBackgroundContainer;
