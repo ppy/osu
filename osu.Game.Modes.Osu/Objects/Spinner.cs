@@ -10,8 +10,6 @@ namespace osu.Game.Modes.Osu.Objects
         public double EndTime { get; set; }
         public double Duration => EndTime - StartTime;
 
-        public override HitObjectType Type => HitObjectType.Spinner;
-
         public override bool NewCombo => true;
     }
 }

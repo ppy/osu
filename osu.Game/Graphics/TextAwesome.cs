@@ -1,11 +1,11 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics
 {
-    public class TextAwesome : SpriteText
+    public class TextAwesome : OsuSpriteText
     {
         //public override FontFace FontFace => (int)Icon < 0xf000 ? FontFace.OsuFont : FontFace.FontAwesome;
 

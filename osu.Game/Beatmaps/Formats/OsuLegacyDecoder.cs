@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -206,7 +207,8 @@ namespace osu.Game.Beatmaps.Formats
                     VelocityAdjustment = beatLength < 0 ? -beatLength / 100.0 : 1,
                     TimingChange = split.Length <= 6 || split[6][0] == '1',
                     KiaiMode = (effectFlags & 1) > 0,
-                    OmitFirstBarLine = (effectFlags & 8) > 0
+                    OmitFirstBarLine = (effectFlags & 8) > 0,
+                    TimeSignature = (TimeSignatures)int.Parse(split[2])
                 };
             }
 
@@ -242,6 +244,16 @@ namespace osu.Game.Beatmaps.Formats
                     A = 1f,
                 });
             }
+        }
+
+        protected override Beatmap ParseFile(TextReader stream)
+        {
+            return new LegacyBeatmap(base.ParseFile(stream));
+        }
+
+        public override Beatmap Decode(TextReader stream)
+        {
+            return new LegacyBeatmap(base.Decode(stream));
         }
 
         protected override void ParseFile(TextReader stream, Beatmap beatmap)

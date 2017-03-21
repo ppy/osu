@@ -24,7 +24,7 @@ namespace osu.Game.Database
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<BeatmapInfo> Beatmaps { get; set; }
 
-        public float MaxStarDifficulty => Beatmaps.Max(b => b.StarDifficulty);
+        public double MaxStarDifficulty => Beatmaps.Max(b => b.StarDifficulty);
 
         public bool DeletePending { get; set; }
 

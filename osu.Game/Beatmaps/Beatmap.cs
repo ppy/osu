@@ -43,21 +43,6 @@ namespace osu.Game.Beatmaps
             TimingInfo = original?.TimingInfo ?? TimingInfo;
             ComboColors = original?.ComboColors ?? ComboColors;
         }
-
-        /// <summary>
-        /// Finds the slider velocity at a time.
-        /// </summary>
-        /// <param name="time">The time to find the slider velocity at.</param>
-        /// <returns>The slider velocity in positional length units.</returns>
-        public double SliderVelocityAt(double time)
-        {
-            double scoringDistance = 100 * BeatmapInfo.Difficulty.SliderMultiplier;
-            double beatDistance = TimingInfo.BeatDistanceAt(time);
-
-            if (beatDistance > 0)
-                return scoringDistance / beatDistance * 1000;
-            return scoringDistance;
-        }
     }
 
     /// <summary>
@@ -70,5 +55,14 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <returns>The star difficulty.</returns>
         public double CalculateStarDifficulty() => Ruleset.GetRuleset(BeatmapInfo.Mode).CreateDifficultyCalculator(this).Calculate();
+
+        /// <summary>
+        /// Constructs a new beatmap.
+        /// </summary>
+        /// <param name="original">The original beatmap to use the parameters of.</param>
+        public Beatmap(Beatmap original = null)
+            : base(original)
+        {
+        }
     }
 }
