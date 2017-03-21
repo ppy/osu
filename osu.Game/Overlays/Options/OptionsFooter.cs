@@ -32,6 +32,7 @@ namespace osu.Game.Overlays.Options
                 {
                     Icon = Ruleset.GetRuleset(m).Icon,
                     Colour = Color4.Gray,
+                    TextSize = 20
                 });
 
             Children = new Drawable[]
