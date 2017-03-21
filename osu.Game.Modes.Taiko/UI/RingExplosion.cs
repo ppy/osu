@@ -16,7 +16,7 @@ namespace osu.Game.Modes.Taiko.UI
 {
     internal class RingExplosion : CircularContainer
     {
-        public TaikoScoreResult ScoreResult;
+        public TaikoJudgementInfo Judgement;
 
         private Box innerFill;
 
@@ -46,7 +46,10 @@ namespace osu.Game.Modes.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            switch (ScoreResult)
+            if (Judgement.SecondHit)
+                Size *= 1.5f;
+
+            switch (Judgement.Score)
             {
                 case TaikoScoreResult.Good:
                     innerFill.Colour = colours.Green;
