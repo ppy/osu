@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Gameplay
 {
@@ -38,22 +37,22 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                     LabelText = "Score meter size",
                     Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.ScoreMeterScale)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuConfig.KeyOverlay)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Show approach circle on first \"Hidden\" object",
                     Bindable = config.GetBindable<bool>(OsuConfig.HiddenShowFirstApproach)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Scale osu!mania scroll speed with BPM",
                     Bindable = config.GetBindable<bool>(OsuConfig.ManiaSpeedBPMScale)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Remember osu!mania scroll speed per beatmap",
                     Bindable = config.GetBindable<bool>(OsuConfig.UsePerBeatmapManiaSpeed)

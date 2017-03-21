@@ -12,7 +12,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionSlider<T> : FillFlowContainer where T : struct
+    public class OptionSlider<T> : FillFlowContainer, ISearchable where T : struct
     {
         private SliderBar<T> slider;
         private SpriteText text;
@@ -24,6 +24,18 @@ namespace osu.Game.Overlays.Options
             {
                 text.Text = value;
                 text.Alpha = string.IsNullOrEmpty(value) ? 0 : 1;
+            }
+        }
+
+        public string[] Keywords => new[] { LabelText };
+        public bool Matching
+        {
+            set
+            {
+                if (value)
+                    FadeIn(250);
+                else
+                    FadeOut(250);
             }
         }
 

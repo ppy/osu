@@ -6,14 +6,29 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Options
 {
-    public abstract class OptionsSubsection : FillFlowContainer
+    public abstract class OptionsSubsection : FillFlowContainer, ISearchableChildren
     {
         protected override Container<Drawable> Content => content;
 
         private Container<Drawable> content;
+
+        public string[] Keywords => new[] { Header };
+        public bool Matching
+        {
+            set
+            {
+                if (value)
+                    FadeIn(250);
+                else
+                    FadeOut(250);
+            }
+        }
+        public IEnumerable<ISearchable> SearchableChildren => Children.OfType<ISearchable>();
 
         protected abstract string Header { get; }
 

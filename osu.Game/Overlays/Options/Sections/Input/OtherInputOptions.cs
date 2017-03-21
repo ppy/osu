@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Input
 {
@@ -17,12 +16,12 @@ namespace osu.Game.Overlays.Options.Sections.Input
         {
             Children = new Drawable[]
             {
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "OS TabletPC support",
                     Bindable = config.GetBindable<bool>(OsuConfig.Tablet)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Wiimote/TaTaCon Drum Support",
                     Bindable = config.GetBindable<bool>(OsuConfig.Wiimote)

@@ -157,12 +157,15 @@
     <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
     <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
+    <Compile Include="Overlays\Options\OptionButton.cs" />
+    <Compile Include="Overlays\Options\OptionCheckbox.cs" />
     <Compile Include="Overlays\Options\OptionDropDown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropDownHeader.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropDownMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropDownMenuItem.cs" />
     <Compile Include="Overlays\Options\OptionsFooter.cs" />
+    <Compile Include="Overlays\Options\SectionContainer.cs" />
     <Compile Include="Overlays\Options\Sections\DebugSection.cs" />
     <Compile Include="Overlays\Options\Sections\Debug\GeneralOptions.cs" />
     <Compile Include="Overlays\Options\Sections\Debug\GCOptions.cs" />

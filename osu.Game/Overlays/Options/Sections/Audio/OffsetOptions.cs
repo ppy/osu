@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Audio
 {
@@ -23,7 +22,7 @@ namespace osu.Game.Overlays.Options.Sections.Audio
                     LabelText = "Universal Offset",
                     Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.Offset)
                 },
-                new OsuButton
+                new OptionButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Offset wizard"

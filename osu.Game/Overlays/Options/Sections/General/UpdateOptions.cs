@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Options.Sections.General
                     Bindable = config.GetBindable<ReleaseStream>(OsuConfig.ReleaseStream),
                 },
                 new OptionLabel { Text = "Your osu! is up to date" }, // TODO: map this to reality
-                new OsuButton
+                new OptionButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Open osu! folder",

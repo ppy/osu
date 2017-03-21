@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Online
 {
@@ -17,22 +16,22 @@ namespace osu.Game.Overlays.Options.Sections.Online
         {
             Children = new Drawable[]
             {
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Integrate with Yahoo! status display",
                     Bindable = config.GetBindable<bool>(OsuConfig.YahooIntegration)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Integrate with MSN Live status display",
                     Bindable = config.GetBindable<bool>(OsuConfig.MsnIntegration)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Automatically start osu!direct downloads",
                     Bindable = config.GetBindable<bool>(OsuConfig.AutomaticDownload)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Prefer no-video downloads",
                     Bindable = config.GetBindable<bool>(OsuConfig.AutomaticDownloadNoVideo)

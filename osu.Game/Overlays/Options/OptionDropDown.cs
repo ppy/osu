@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionDropDown<T> : FillFlowContainer
+    public class OptionDropDown<T> : FillFlowContainer, ISearchable
     {
         private DropDownMenu<T> dropdown;
         private SpriteText text;
@@ -25,6 +25,18 @@ namespace osu.Game.Overlays.Options
             set
             {
                 text.Text = value;
+            }
+        }
+
+        public string[] Keywords => new[] { LabelText };
+        public bool Matching
+        {
+            set
+            {
+                if (value)
+                    FadeIn(250);
+                else
+                    FadeOut(250);
             }
         }
 
@@ -88,7 +100,7 @@ namespace osu.Game.Overlays.Options
         public OptionDropDown()
         {
             Items = new KeyValuePair<string, T>[0];
-
+            
             Direction = FillDirection.Vertical;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

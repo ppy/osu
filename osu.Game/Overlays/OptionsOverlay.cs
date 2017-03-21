@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
         public const float SIDEBAR_WIDTH = Sidebar.DEFAULT_WIDTH;
 
         private const float width = 400;
-        
+
         private const float sidebar_padding = 10;
 
         private ScrollContainer scrollContainer;
@@ -34,6 +34,7 @@ namespace osu.Game.Overlays
         private SidebarButton[] sidebarButtons;
         private OptionsSection[] sections;
         private float lastKnownScroll;
+        private SearchContainer searchContainer;
 
         public OptionsOverlay()
         {
@@ -94,11 +95,17 @@ namespace osu.Game.Overlays
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
                                 },
-                                new FillFlowContainer
+                                new OptionTextBox()
+                                {
+                                    Width = width - CONTENT_MARGINS * 2,
+                                    OnChange = (sender, newText) => searchContainer.SearchTerm = sender.Text,
+                                    Margin = new MarginPadding { Left = CONTENT_MARGINS },
+                                    PlaceholderText = "Type to search!",
+                                },
+                                searchContainer = new SectionContainer
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                    Direction = FillDirection.Vertical,
                                     Children = sections,
                                 },
                                 new OptionsFooter()
@@ -119,7 +126,7 @@ namespace osu.Game.Overlays
                     ).ToArray()
                 }
             };
-        
+
             scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
         }
 
