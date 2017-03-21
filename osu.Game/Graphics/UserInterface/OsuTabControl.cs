@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
-        protected override DropDownMenu<T> CreateDropDownMenu() => new OsuTabDropDownMenu();
+        protected override DropDown<T> CreateDropDownMenu() => new OsuTabDropDown();
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem<T> { Value = value };
 
@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                var dropDown = DropDown as OsuTabDropDownMenu;
+                var dropDown = DropDown as OsuTabDropDown;
                 if (dropDown != null)
                     dropDown.AccentColour = value;
                 foreach (var item in TabContainer.Children.OfType<OsuTabItem<T>>())
@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public class OsuTabDropDownMenu : OsuDropDownMenu<T>
+        public class OsuTabDropDown : OsuDropDown<T>
         {
             protected override DropDownHeader CreateHeader() => new OsuTabDropDownHeader
             {
@@ -62,22 +62,22 @@ namespace osu.Game.Graphics.UserInterface
                 Origin = Anchor.TopRight,
             };
 
-            protected override DropDownMenuItem<T> CreateDropDownItem(string key, T value)
+            protected override DropDownMenuItem<T> CreateMenuItem(string key, T value)
             {
-                var item = base.CreateDropDownItem(key, value);
+                var item = base.CreateMenuItem(key, value);
                 item.ForegroundColourHover = Color4.Black;
                 return item;
             }
 
-            public OsuTabDropDownMenu()
+            public OsuTabDropDown()
             {
-                ContentContainer.Anchor = Anchor.TopRight;
-                ContentContainer.Origin = Anchor.TopRight;
+                DropDownMenu.Anchor = Anchor.TopRight;
+                DropDownMenu.Origin = Anchor.TopRight;
 
                 RelativeSizeAxes = Axes.X;
 
-                ContentBackground.Colour = Color4.Black.Opacity(0.7f);
-                MaxDropDownHeight = 400;
+                DropDownMenu.Colour = Color4.Black.Opacity(0.7f);
+                DropDownMenu.MaxHeight = 400;
             }
 
             public class OsuTabDropDownHeader : OsuDropDownHeader

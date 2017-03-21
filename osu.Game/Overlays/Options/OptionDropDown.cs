@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Options
 {
     public class OptionDropDown<T> : FillFlowContainer
     {
-        private DropDownMenu<T> dropdown;
+        private DropDown<T> dropdown;
         private SpriteText text;
 
         public string LabelText
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Options
                 text = new OsuSpriteText {
                     Alpha = 0,
                 },
-                dropdown = new OsuDropDownMenu<T>
+                dropdown = new OsuDropDown<T>
                 {
                     Margin = new MarginPadding { Top = 5 },
                     RelativeSizeAxes = Axes.X,
