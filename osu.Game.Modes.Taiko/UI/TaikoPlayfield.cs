@@ -181,6 +181,11 @@ namespace osu.Game.Modes.Taiko.UI
             base.Add(h);
         }
 
+        public void AddBarLine(DrawableBarLine barLine)
+        {
+            barLineContainer.Add(barLine);
+        }
+
         public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgementInfo> judgedObject)
         {
             if (judgedObject.Judgement.Result == HitResult.Hit)
