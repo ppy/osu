@@ -7,13 +7,13 @@ using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Taiko
 {
-    internal class TaikoScoreProcessor : ScoreProcessor<TaikoBaseHit, TaikoJudgementInfo>
+    internal class TaikoScoreProcessor : ScoreProcessor<TaikoHitObject, TaikoJudgementInfo>
     {
         public TaikoScoreProcessor()
         {
         }
 
-        public TaikoScoreProcessor(HitRenderer<TaikoBaseHit, TaikoJudgementInfo> hitRenderer)
+        public TaikoScoreProcessor(HitRenderer<TaikoHitObject, TaikoJudgementInfo> hitRenderer)
             : base(hitRenderer)
         {
         }
