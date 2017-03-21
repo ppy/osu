@@ -3,151 +3,95 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Modes.Taiko.Objects;
 
 namespace osu.Game.Modes.Taiko.UI
 {
     internal class HitTarget : Container
     {
-        private Sprite outer;
-        private Sprite inner;
-
-        private Container innerFlash;
-        private Container outerFlash;
+        private const float normal_diameter = TaikoHitObject.CIRCLE_RADIUS * 2 * TaikoPlayfield.PLAYFIELD_SCALE;
+        private const float finisher_diameter = normal_diameter * 1.5f;
 
         public HitTarget()
         {
+            RelativeSizeAxes = Axes.Y;
+
             Children = new Drawable[]
             {
                 new Box
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    Name = "Bar Upper",
 
-                    Size = new Vector2(5, TaikoPlayfield.PlayfieldHeight),
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
 
-                    Colour = Color4.Black
+                    Size = new Vector2(3, (TaikoPlayfield.PlayfieldHeight - finisher_diameter) / 2f),
+
+                    Alpha = 0.1f
                 },
-                new Container
+                new CircularContainer
                 {
+                    Name = "Finisher Ring",
+
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
 
-                    Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2 * 1.5f),
-                    Scale = new Vector2(TaikoPlayfield.PLAYFIELD_SCALE),
+                    Size = new Vector2(finisher_diameter),
 
-                    Children = new Drawable[]
+                    BorderColour = Color4.White,
+                    BorderThickness = 2,
+                    Alpha = 0.1f,
+
+                    Children = new[]
                     {
-                        outer = new Sprite
+                        new Box
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        inner = new Sprite
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(1 / 1.5f)
-                        },
-                        new Container
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-
                             RelativeSizeAxes = Axes.Both,
 
-                            Children = new Drawable[]
-                            {
-                                outerFlash = new Container
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-
-                                    Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2 * 1.5f, 680),
-
-                                    Masking = true,
-                                    CornerRadius = TaikoHitObject.CIRCLE_RADIUS * 2 * 1.5f,
-
-                                    Alpha = 0,
-
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-
-                                            Alpha = 0,
-                                            AlwaysPresent = true
-                                        }
-                                    }
-                                },
-                                innerFlash = new CircularContainer
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-
-                                    RelativeSizeAxes = Axes.Both,
-
-                                    Masking = true,
-
-                                    Alpha = 0,
-
-                                    Children = new[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-
-                                            Colour = Color4.White.Opacity(0.85f),
-                                        }
-                                    },
-                                }
-                            }
+                            Alpha = 0,
+                            AlwaysPresent = true
                         }
                     }
-                }
+                },
+                new CircularContainer
+                {
+                    Name = "Normal Ring",
+
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+
+                    Size = new Vector2(normal_diameter),
+
+                    BorderColour = Color4.White,
+                    BorderThickness = 2,
+                    Alpha = 0.5f,
+
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        }
+                    }
+                },
+                new Box
+                {
+                    Name = "Bar Lower",
+
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+
+                    Size = new Vector2(3, (TaikoPlayfield.PlayfieldHeight - finisher_diameter) / 2f),
+
+                    Alpha = 0.1f
+                },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            outer.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer");
-            inner.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
-        }
-
-        public void Flash(Color4 colour)
-        {
-            innerFlash.EdgeEffect = new EdgeEffect
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = colour,
-                Radius = 20
-            };
-
-            outerFlash.EdgeEffect = new EdgeEffect
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = colour,
-                Radius = 250
-            };
-
-            outerFlash.FadeTo(0.3f, 125, EasingTypes.OutQuint);
-            outerFlash.Delay(125).FadeOut(125);
-
-            innerFlash.FadeIn();
-            innerFlash.FadeOut(250, EasingTypes.OutQuint);
         }
     }
 }
