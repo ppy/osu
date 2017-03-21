@@ -62,7 +62,7 @@ namespace osu.Game.Modes.Taiko.Judgements
         }
 
         /// <summary>
-        /// Computes the score value for the accurac portion of the score.
+        /// Computes the score value for the accuracy portion of the score.
         /// </summary>
         /// <param name="result">The result to compute the score value for.</param>
         /// <returns>The int score value.</returns>
