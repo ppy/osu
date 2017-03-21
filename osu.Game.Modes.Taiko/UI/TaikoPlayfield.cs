@@ -202,7 +202,7 @@ namespace osu.Game.Modes.Taiko.UI
             {
                 ringExplosionContainer.Add(new RingExplosion
                 {
-                    ScoreResult = judgedObject.Judgement.Score
+                    Judgement = judgedObject.Judgement
                 });
             }
 
