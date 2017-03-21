@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Modes.Taiko.UI;
 using OpenTK;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
@@ -49,16 +48,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                     Alpha = 0.75f
                 }
             };
-
-            LifetimeStart = BarLine.StartTime - BarLine.PreEmpt * 2;
-            LifetimeEnd = BarLine.StartTime + BarLine.PreEmpt;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Delay(BarLine.StartTime);
+            LifetimeStart = BarLine.StartTime - BarLine.PreEmpt * 2;
+            LifetimeEnd = BarLine.StartTime + BarLine.PreEmpt;
+
+            Delay(BarLine.StartTime - Time.Current);
             FadeOut(100 * BarLine.PreEmpt / 1000);
         }
 
