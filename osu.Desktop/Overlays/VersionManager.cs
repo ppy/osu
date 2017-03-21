@@ -215,6 +215,7 @@ namespace osu.Desktop.Overlays
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_upload,
                         Colour = Color4.White,
+                        TextSize = 20
                     }
                 });
             }
