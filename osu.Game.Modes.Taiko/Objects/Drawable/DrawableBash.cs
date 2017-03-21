@@ -61,9 +61,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             }
         }
 
-        protected override void Update()
+        protected override void UpdateScrollPosition(double time)
         {
-            UpdateScrollPosition(Math.Min(Time.Current, HitObject.StartTime));
+            base.UpdateScrollPosition(Math.Min(time, HitObject.StartTime));
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
