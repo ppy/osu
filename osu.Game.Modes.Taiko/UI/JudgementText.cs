@@ -97,14 +97,14 @@ namespace osu.Game.Modes.Taiko.UI
                     movementDirection = 1;
                     break;
                 case HitResult.Hit:
-                    switch (Judgement.Score)
+                    switch (Judgement.TaikoResult)
                     {
-                        case TaikoScoreResult.Good:
+                        case TaikoHitResult.Good:
                             judgementColour = colours.Green;
                             judgementText = "GOOD";
                             textContainer.Scale = new Vector2(0.45f);
                             break;
-                        case TaikoScoreResult.Great:
+                        case TaikoHitResult.Great:
                             judgementColour = colours.Blue;
                             judgementText = "GREAT";
                             break;

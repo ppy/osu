@@ -31,15 +31,15 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void addHitJudgement()
         {
-            TaikoScoreResult score = RNG.Next(2) == 0 ? TaikoScoreResult.Good : TaikoScoreResult.Great;
+            TaikoHitResult hitResult = RNG.Next(2) == 0 ? TaikoHitResult.Good : TaikoHitResult.Great;
 
             playfield.OnJudgement(new DrawableTestHit(new TaikoHitObject())
             {
-                X = RNG.NextSingle(score == TaikoScoreResult.Good ? -0.1f : -0.05f, score == TaikoScoreResult.Good ? 0.1f : 0.05f),
+                X = RNG.NextSingle(hitResult == TaikoHitResult.Good ? -0.1f : -0.05f, hitResult == TaikoHitResult.Good ? 0.1f : 0.05f),
                 Judgement = new TaikoJudgementInfo
                 {
                     Result = HitResult.Hit,
-                    Score = score,
+                    TaikoResult = hitResult,
                     TimeOffset = 0,
                     ComboAtHit = 1,
                     SecondHit = RNG.Next(10) == 0

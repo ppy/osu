@@ -55,12 +55,12 @@ namespace osu.Game.Modes.Taiko.UI
             if (Judgement.SecondHit)
                 Size *= 1.5f;
 
-            switch (Judgement.Score)
+            switch (Judgement.TaikoResult)
             {
-                case TaikoScoreResult.Good:
+                case TaikoHitResult.Good:
                     innerFill.Colour = colours.Green;
                     break;
-                case TaikoScoreResult.Great:
+                case TaikoHitResult.Great:
                     innerFill.Colour = colours.Blue;
                     break;
             }
