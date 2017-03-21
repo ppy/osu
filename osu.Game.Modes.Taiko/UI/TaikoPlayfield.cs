@@ -46,8 +46,6 @@ namespace osu.Game.Modes.Taiko.UI
 
         protected override Container<Drawable> Content => hitObjectContainer;
 
-        // ReSharper disable once NotAccessedField.Local
-        private HitTarget hitTarget;
         private Container<RingExplosion> ringExplosionContainer;
         //private Container<DrawableBarLine> barLineContainer;
         private Container<JudgementText> judgementContainer;
@@ -119,7 +117,7 @@ namespace osu.Game.Modes.Taiko.UI
                                 //{
                                 //    RelativeSizeAxes = Axes.Both,
                                 //},
-                                hitTarget = new HitTarget
+                                new HitTarget
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,
