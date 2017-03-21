@@ -97,21 +97,13 @@ namespace osu.Game.Modes.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                new Container
+                                ringExplosionContainer = new Container<RingExplosion>
                                 {
-                                    Name = @"Hit target",
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        ringExplosionContainer = new Container<RingExplosion>
-                                        {
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.Centre,
-                                            Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
-                                            Scale = new Vector2(PLAYFIELD_SCALE),
-                                            BlendingMode = BlendingMode.Additive
-                                        },
-                                    }
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.Centre,
+                                    Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
+                                    Scale = new Vector2(PLAYFIELD_SCALE),
+                                    BlendingMode = BlendingMode.Additive
                                 },
                                 //barLineContainer = new Container<DrawableBarLine>
                                 //{
@@ -145,21 +137,15 @@ namespace osu.Game.Modes.Taiko.UI
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new Container
+                        new InputDrum
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+
                             RelativePositionAxes = Axes.X,
                             Position = new Vector2(0.10f, 0),
-                            Children = new Drawable[]
-                            {
-                                new InputDrum
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Scale = new Vector2(0.9f)
-                                },
-                            }
+
+                            Scale = new Vector2(0.9f)
                         },
                         new Box
                         {
