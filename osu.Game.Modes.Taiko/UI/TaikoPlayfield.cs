@@ -47,7 +47,7 @@ namespace osu.Game.Modes.Taiko.UI
         protected override Container<Drawable> Content => hitObjectContainer;
 
         private HitTarget hitTarget;
-        //private Container<ExplodingRing> explosionRingContainer;
+        private Container<RingExplosion> ringExplosionContainer;
         //private Container<DrawableBarLine> barLineContainer;
         //private Container<JudgementText> judgementContainer;
 
@@ -103,14 +103,14 @@ namespace osu.Game.Modes.Taiko.UI
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        //explosionRingContainer = new Container<ExplodingRing>
-                                        //{
-                                        //    Anchor = Anchor.CentreLeft,
-                                        //    Origin = Anchor.Centre,
-                                        //    Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
-                                        //    Scale = new Vector2(PLAYFIELD_SCALE),
-                                        //    BlendingMode = BlendingMode.Additive
-                                        //},
+                                        ringExplosionContainer = new Container<RingExplosion>
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.Centre,
+                                            Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
+                                            Scale = new Vector2(PLAYFIELD_SCALE),
+                                            BlendingMode = BlendingMode.Additive
+                                        },
                                     }
                                 },
                                 //barLineContainer = new Container<DrawableBarLine>
@@ -196,6 +196,13 @@ namespace osu.Game.Modes.Taiko.UI
 
         public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgementInfo> judgedObject)
         {
+            if (judgedObject.Judgement.Result == HitResult.Hit)
+            {
+                ringExplosionContainer.Add(new RingExplosion
+                {
+                    ScoreResult = judgedObject.Judgement.Score
+                });
+            }
         }
     }
 }
