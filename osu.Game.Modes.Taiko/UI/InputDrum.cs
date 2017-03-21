@@ -15,6 +15,9 @@ using System.Collections.Generic;
 
 namespace osu.Game.Modes.Taiko.UI
 {
+    /// <summary>
+    /// A component of the playfield that captures input and displays input as a drum.
+    /// </summary>
     internal class InputDrum : Container
     {
         public InputDrum()
@@ -25,6 +28,8 @@ namespace osu.Game.Modes.Taiko.UI
             {
                 new TaikoHalfDrum(false)
                 {
+                    Name = "Left Half",
+
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
 
@@ -34,6 +39,8 @@ namespace osu.Game.Modes.Taiko.UI
                 },
                 new TaikoHalfDrum(true)
                 {
+                    Name = "Right Half",
+
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
 
@@ -46,11 +53,16 @@ namespace osu.Game.Modes.Taiko.UI
             };
         }
 
+        /// <summary>
+        /// A half-drum. Contains one centre and one rim hit.
+        /// </summary>
         private class TaikoHalfDrum : Container
         {
             /// <summary>
-            /// Keys[0] -> Inner key
-            /// Keys[0] -> Outer key
+            /// A list of keys which this half-drum accepts.
+            /// <para>
+            /// [0] => Inner key, [1] => Outer key
+            /// </para>
             /// </summary>
             public List<Key> Keys = new List<Key>();
 

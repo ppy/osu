@@ -14,8 +14,14 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Taiko.UI
 {
+    /// <summary>
+    /// Text that is shown as judgement when a hit object is hit or missed.
+    /// </summary>
     public class JudgementText : Container
     {
+        /// <summary>
+        /// The Judgement to display.
+        /// </summary>
         public TaikoJudgementInfo Judgement;
 
         private Container textContainer;

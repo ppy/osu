@@ -10,10 +10,24 @@ using osu.Game.Modes.Taiko.Objects;
 
 namespace osu.Game.Modes.Taiko.UI
 {
+    /// <summary>
+    /// A component that is displayed at the hit position in the taiko playfield.
+    /// </summary>
     internal class HitTarget : Container
     {
+        /// <summary>
+        /// Diameter of normal hit object circles.
+        /// </summary>
         private const float normal_diameter = TaikoHitObject.CIRCLE_RADIUS * 2 * TaikoPlayfield.PLAYFIELD_SCALE;
+        
+        /// <summary>
+        /// Diameter of finisher hit object circles.
+        /// </summary>
         private const float finisher_diameter = normal_diameter * 1.5f;
+
+        /// <summary>
+        /// The 1px inner border of the taiko playfield.
+        /// </summary>
         private const float border_offset = 1;
 
         public HitTarget()
