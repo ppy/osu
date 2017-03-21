@@ -3,7 +3,7 @@
 
 namespace osu.Game.Modes.Taiko.Judgements
 {
-    public enum TaikoScoreResult
+    public enum TaikoHitResult
     {
         Good,
         Great
