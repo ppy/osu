@@ -14,30 +14,18 @@ namespace osu.Game.Screens.Select.Leaderboards
     public class DrawableRank : Container
     {
         private Sprite sprite;
-        private TextureStore textures;
 
-        private ScoreRank rank;
-        public ScoreRank Rank
-        {
-            get { return rank; }
-            set
-            {
-                if (value == rank) return;
-                rank = value;
-                sprite.Texture = textures.Get($@"Badges/ScoreRanks/{rank.GetDescription()}");
-            }
-        }
+        public ScoreRank Rank { get; private set; }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore ts)
+        private void load(TextureStore textures)
         {
-            textures = ts;
-            sprite.Texture = textures.Get($@"Badges/ScoreRanks/{rank.GetDescription()}");
+            sprite.Texture = textures.Get($@"Badges/ScoreRanks/{Rank.GetDescription()}");
         }
 
         public DrawableRank(ScoreRank rank)
         {
-            this.rank = rank;
+            Rank = rank;
 
             Children = new Drawable[]
             {
