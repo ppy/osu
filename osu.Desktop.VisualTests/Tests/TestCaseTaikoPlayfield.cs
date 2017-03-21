@@ -72,11 +72,6 @@ namespace osu.Desktop.VisualTests.Tests
             protected override void UpdateState(ArmedState state)
             {
             }
-
-            protected override void Update()
-            {
-                // Doesn't move
-            }
         }
     }
 }
