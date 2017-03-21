@@ -87,6 +87,7 @@ namespace osu.Game.Overlays.Options
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            TextSize = 20
                         },
                     }
                 },

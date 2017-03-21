@@ -169,6 +169,7 @@ namespace osu.Game.Overlays.Notifications
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_times_circle,
+                        TextSize = 20
                     }
                 };
             }
