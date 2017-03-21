@@ -35,6 +35,6 @@ namespace osu.Game.Graphics.UserInterface
                 AccentColour = colours.PinkDarker;
         }
 
-        protected override DropDownMenuItem<T> CreateMenuItem(string key, T value) => new OsuDropDownMenuItem<T>(key, value) { AccentColour = AccentColour };
+        protected override DropDownMenuItem<T> CreateMenuItem(string text, T value) => new OsuDropDownMenuItem<T>(text, value) { AccentColour = AccentColour };
     }
 }

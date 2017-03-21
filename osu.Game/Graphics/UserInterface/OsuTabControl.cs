@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
-        protected override DropDown<T> CreateDropDownMenu() => new OsuTabDropDown();
+        protected override DropDown<T> CreateDropDown() => new OsuTabDropDown();
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem<T> { Value = value };
 
@@ -62,9 +62,9 @@ namespace osu.Game.Graphics.UserInterface
                 Origin = Anchor.TopRight,
             };
 
-            protected override DropDownMenuItem<T> CreateMenuItem(string key, T value)
+            protected override DropDownMenuItem<T> CreateMenuItem(string text, T value)
             {
-                var item = base.CreateMenuItem(key, value);
+                var item = base.CreateMenuItem(text, value);
                 item.ForegroundColourHover = Color4.Black;
                 return item;
             }
@@ -76,7 +76,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 RelativeSizeAxes = Axes.X;
 
-                DropDownMenu.Colour = Color4.Black.Opacity(0.7f);
+                DropDownMenu.Background.Colour = Color4.Black.Opacity(0.7f);
                 DropDownMenu.MaxHeight = 400;
             }
 
