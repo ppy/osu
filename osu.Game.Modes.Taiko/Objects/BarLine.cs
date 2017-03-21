@@ -1,4 +1,7 @@
-﻿using osu.Game.Beatmaps.Timing;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 
 namespace osu.Game.Modes.Taiko.Objects
@@ -14,11 +17,6 @@ namespace osu.Game.Modes.Taiko.Objects
         /// The time to scroll in the bar line.
         /// </summary>
         public double PreEmpt;
-
-        /// <summary>
-        /// Whether this is a major bar line (affects display).
-        /// </summary>
-        public bool IsMajor;
 
         public void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
         {
