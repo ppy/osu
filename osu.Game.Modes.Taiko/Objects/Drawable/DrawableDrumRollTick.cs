@@ -44,7 +44,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             }
         }
 
-        protected override void Update()
+        protected override void UpdateScrollPosition(double time)
         {
             // Drum roll ticks shouldn't move
         }
