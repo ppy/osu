@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Modes.Taiko.Objects.Drawable;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -47,7 +48,7 @@ namespace osu.Game.Modes.Taiko.UI
         protected override Container<Drawable> Content => hitObjectContainer;
 
         private Container<RingExplosion> ringExplosionContainer;
-        //private Container<DrawableBarLine> barLineContainer;
+        private Container<DrawableBarLine> barLineContainer;
         private Container<JudgementText> judgementContainer;
 
         private Container hitObjectContainer;
@@ -105,10 +106,10 @@ namespace osu.Game.Modes.Taiko.UI
                                     Scale = new Vector2(PLAYFIELD_SCALE),
                                     BlendingMode = BlendingMode.Additive
                                 },
-                                //barLineContainer = new Container<DrawableBarLine>
-                                //{
-                                //    RelativeSizeAxes = Axes.Both,
-                                //},
+                                barLineContainer = new Container<DrawableBarLine>
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
                                 new HitTarget
                                 {
                                     Anchor = Anchor.CentreLeft,
