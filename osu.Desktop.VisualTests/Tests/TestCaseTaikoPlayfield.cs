@@ -42,7 +42,7 @@ namespace osu.Desktop.VisualTests.Tests
                     Score = score,
                     TimeOffset = 0,
                     ComboAtHit = 1,
-                    SecondHit = RNG.Next(2) == 0
+                    SecondHit = RNG.Next(10) == 0
                 }
             });
         }
