@@ -10,7 +10,7 @@ namespace osu.Game.Modes.Taiko.Judgements
         /// <summary>
         /// The maximum score value.
         /// </summary>
-        public const TaikoHitResult MAX_SCORE = TaikoHitResult.Great;
+        public const TaikoHitResult MAX_HIT_RESULT = TaikoHitResult.Great;
 
         /// <summary>
         /// The score value.
@@ -30,12 +30,12 @@ namespace osu.Game.Modes.Taiko.Judgements
         /// <summary>
         /// The maximum score value for the combo portion of the score.
         /// </summary>
-        public int MaxScoreValue => NumericResultForScore(MAX_SCORE);
+        public int MaxScoreValue => NumericResultForScore(MAX_HIT_RESULT);
         
         /// <summary>
         /// The maximum score value for the accuracy portion of the score.
         /// </summary>
-        public int MaxAccuracyScoreValue => NumericResultForAccuracy(MAX_SCORE);
+        public int MaxAccuracyScoreValue => NumericResultForAccuracy(MAX_HIT_RESULT);
 
         /// <summary>
         /// Whether this Judgement has a secondary hit in the case of finishers.
