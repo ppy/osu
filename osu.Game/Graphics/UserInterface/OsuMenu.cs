@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
         public OsuMenu()
         {
             CornerRadius = 4;
-            ContentBackground.Colour = Color4.Black.Opacity(0.5f);
+            Background.Colour = Color4.Black.Opacity(0.5f);
 
             ItemsContainer.Padding = new MarginPadding(5);
         }
