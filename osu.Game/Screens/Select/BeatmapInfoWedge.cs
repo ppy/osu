@@ -237,14 +237,16 @@ namespace osu.Game.Screens.Select
                         Icon = FontAwesome.fa_square,
                         Origin = Anchor.Centre,
                         Colour = new Color4(68, 17, 136, 255),
-                        Rotation = 45
+                        Rotation = 45,
+                        TextSize = 20
                     },
                     new TextAwesome
                     {
                         Icon = statistic.Icon,
                         Origin = Anchor.Centre,
                         Colour = new Color4(255, 221, 85, 255),
-                        Scale = new Vector2(0.8f)
+                        Scale = new Vector2(0.8f),
+                        TextSize = 20
                     },
                     new OsuSpriteText
                     {
