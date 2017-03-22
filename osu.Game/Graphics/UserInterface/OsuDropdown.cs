@@ -43,9 +43,9 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override DropdownMenuItem<T> CreateMenuItem(string text, T value) => new OsuDropdownMenuItem<T>(text, value) { AccentColour = AccentColour };
 
-        private class OsuDropdownMenuItem<U> : DropdownMenuItem<U>
+        private class OsuDropdownMenuItem<T1> : DropdownMenuItem<T1>
         {
-            public OsuDropdownMenuItem(string text, U value) : base(text, value)
+            public OsuDropdownMenuItem(string text, T1 value) : base(text, value)
             {
                 Foreground.Padding = new MarginPadding(2);
 
