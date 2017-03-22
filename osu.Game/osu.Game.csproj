@@ -76,6 +76,7 @@
     <Compile Include="Beatmaps\IBeatmapCoverter.cs" />
     <Compile Include="Beatmaps\IBeatmapProcessor.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
+    <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
     <Compile Include="Beatmaps\Timing\TimingInfo.cs" />
     <Compile Include="Database\ScoreDatabase.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
@@ -129,6 +130,7 @@
     <Compile Include="Modes\UI\StandardHealthDisplay.cs" />
     <Compile Include="Modes\UI\StandardHudOverlay.cs" />
     <Compile Include="Online\API\IOnlineComponent.cs" />
+    <Compile Include="Online\API\Requests\GetScoresRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
     <Compile Include="Overlays\LoginOverlay.cs" />
@@ -241,7 +243,7 @@
     <Compile Include="Online\API\OAuth.cs" />
     <Compile Include="Online\API\OAuthToken.cs" />
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
-    <Compile Include="Online\API\Requests\ListChannels.cs" />
+    <Compile Include="Online\API\Requests\ListChannelsRequest.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\Drawables\DrawableChannel.cs" />
     <Compile Include="Online\Chat\Drawables\ChatLine.cs" />
@@ -265,7 +267,6 @@
     <Compile Include="Screens\Tournament\GroupContainer.cs" />
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
-    <Compile Include="Screens\Tournament\Teams\Team.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
@@ -354,6 +355,13 @@
     <Compile Include="Overlays\WaveOverlayContainer.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
+    <Compile Include="Screens\Select\Leaderboards\Leaderboard.cs" />
+    <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
+    <Compile Include="Users\Country.cs" />
+    <Compile Include="Users\Team.cs" />
+    <Compile Include="Modes\ScoreRank.cs" />
+    <Compile Include="Users\Avatar.cs" />
+    <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabItem.cs" />
   </ItemGroup>
@@ -373,6 +381,7 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />

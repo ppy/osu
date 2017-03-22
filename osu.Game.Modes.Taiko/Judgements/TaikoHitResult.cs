@@ -1,13 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-namespace osu.Game.Users
+namespace osu.Game.Modes.Taiko.Judgements
 {
-    public class User
+    public enum TaikoHitResult
     {
-        public int Id;
-        public string Username;
-        public Country Country;
-        public Team Team;
+        Good,
+        Great
     }
 }

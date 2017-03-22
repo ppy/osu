@@ -279,6 +279,7 @@ namespace osu.Game
             //central game mode change logic.
             if (!currentScreen.ShowOverlays)
             {
+                options.State = Visibility.Hidden;
                 Toolbar.State = Visibility.Hidden;
                 musicController.State = Visibility.Hidden;
                 chat.State = Visibility.Hidden;
