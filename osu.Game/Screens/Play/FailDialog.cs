@@ -10,7 +10,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    class FailDialog : OsuScreen
+    internal class FailDialog : OsuScreen
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 

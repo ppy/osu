@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Cryptography;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -20,19 +20,20 @@ namespace osu.Game.Database
 {
     public class BeatmapDatabase
     {
-        private SQLiteConnection connection { get; set; }
+        private SQLiteConnection connection { get; }
         private Storage storage;
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
-        private BeatmapImporter ipc;
+        // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
+        private BeatmapIPCChannel ipc;
 
-        public BeatmapDatabase(Storage storage, GameHost importHost = null)
+        public BeatmapDatabase(Storage storage, IIpcHost importHost = null)
         {
             this.storage = storage;
 
             if (importHost != null)
-                ipc = new BeatmapImporter(importHost, this);
+                ipc = new BeatmapIPCChannel(importHost, this);
 
             if (connection == null)
             {
@@ -63,7 +64,7 @@ namespace osu.Game.Database
                     foreach (var i in b.Beatmaps)
                     {
                         if (i.Metadata != null) connection.Delete(i.Metadata);
-                        if (i.BaseDifficulty != null) connection.Delete(i.BaseDifficulty);
+                        if (i.Difficulty != null) connection.Delete(i.Difficulty);
 
                         connection.Delete(i);
                     }
@@ -73,7 +74,7 @@ namespace osu.Game.Database
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $@"Could not delete beatmap {b.ToString()}");
+                    Logger.Error(e, $@"Could not delete beatmap {b}");
                 }
             }
 
@@ -89,7 +90,7 @@ namespace osu.Game.Database
             try
             {
                 conn.CreateTable<BeatmapMetadata>();
-                conn.CreateTable<BaseDifficulty>();
+                conn.CreateTable<BeatmapDifficulty>();
                 conn.CreateTable<BeatmapSetInfo>();
                 conn.CreateTable<BeatmapInfo>();
             }
@@ -111,18 +112,63 @@ namespace osu.Game.Database
             }
 
             connection.DeleteAll<BeatmapMetadata>();
-            connection.DeleteAll<BaseDifficulty>();
+            connection.DeleteAll<BeatmapDifficulty>();
             connection.DeleteAll<BeatmapSetInfo>();
             connection.DeleteAll<BeatmapInfo>();
         }
 
+        /// <summary>
+        /// Import multiple <see cref="BeatmapSetInfo"/> from <paramref name="paths"/>.
+        /// </summary>
+        /// <param name="paths">Multiple locations on disk</param>
         public void Import(IEnumerable<string> paths)
         {
             foreach (string p in paths)
-                Import(p);
+            {
+                try
+                {
+                    BeatmapSetInfo set = getBeatmapSet(p);
+
+                    //If we have an ID then we already exist in the database.
+                    if (set.ID == 0)
+                        Import(new[] { set });
+
+                    // We may or may not want to delete the file depending on where it is stored.
+                    //  e.g. reconstructing/repairing database with beatmaps from default storage.
+                    // Also, not always a single file, i.e. for LegacyFilesystemReader
+                    // TODO: Add a check to prevent files from storage to be deleted.
+                    try
+                    {
+                        File.Delete(p);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not delete file at {p}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    e = e.InnerException ?? e;
+                    Logger.Error(e, @"Could not import beatmap set");
+                }
+            }
         }
 
+        /// <summary>
+        /// Import <see cref="BeatmapSetInfo"/> from <paramref name="path"/>.
+        /// </summary>
+        /// <param name="path">Location on disk</param>
         public void Import(string path)
+        {
+            Import(new[] { path });
+        }
+
+        /// <summary>
+        /// Duplicates content from <paramref name="path"/> to storage and returns a representing <see cref="BeatmapSetInfo"/>.
+        /// </summary>
+        /// <param name="path">Content location</param>
+        /// <returns><see cref="BeatmapSetInfo"/></returns>
+        private BeatmapSetInfo getBeatmapSet(string path)
         {
             string hash = null;
 
@@ -133,10 +179,9 @@ namespace osu.Game.Database
 
             if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
             {
-                using (var md5 = MD5.Create())
                 using (var input = storage.GetStream(path))
                 {
-                    hash = BitConverter.ToString(md5.ComputeHash(input)).Replace("-", "").ToLowerInvariant();
+                    hash = input.GetMd5Hash();
                     input.Seek(0, SeekOrigin.Begin);
                     path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
                     if (!storage.Exists(path))
@@ -156,7 +201,7 @@ namespace osu.Game.Database
                     BeatmapSetAdded?.Invoke(existing);
                 }
 
-                return;
+                return existing;
             }
 
             var beatmapSet = new BeatmapSetInfo
@@ -168,27 +213,34 @@ namespace osu.Game.Database
                 Metadata = metadata
             };
 
-            using (var reader = ArchiveReader.GetReader(storage, path))
+            using (var archive = ArchiveReader.GetReader(storage, path))
             {
-                string[] mapNames = reader.BeatmapFilenames;
+                string[] mapNames = archive.BeatmapFilenames;
                 foreach (var name in mapNames)
-                {
-                    using (var stream = new StreamReader(reader.GetStream(name)))
+                    using (var raw = archive.GetStream(name))
+                    using (var ms = new MemoryStream()) //we need a memory stream so we can seek and shit
+                    using (var sr = new StreamReader(ms))
                     {
-                        var decoder = BeatmapDecoder.GetDecoder(stream);
-                        Beatmap beatmap = decoder.Decode(stream);
+                        raw.CopyTo(ms);
+                        ms.Position = 0;
+
+                        var decoder = BeatmapDecoder.GetDecoder(sr);
+                        Beatmap beatmap = decoder.Decode(sr);
+
                         beatmap.BeatmapInfo.Path = name;
+                        beatmap.BeatmapInfo.Hash = ms.GetMd5Hash();
 
                         // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
                         beatmap.BeatmapInfo.Metadata = null;
 
+                        beatmap.BeatmapInfo.StarDifficulty = beatmap.CalculateStarDifficulty();
+
                         beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
                     }
-                    beatmapSet.StoryboardFile = reader.StoryboardFilename;
-                }
+                beatmapSet.StoryboardFile = archive.StoryboardFilename;
             }
 
-            Import(new[] { beatmapSet });
+            return beatmapSet;
         }
 
         public void Import(IEnumerable<BeatmapSetInfo> beatmapSets)
@@ -272,18 +324,17 @@ namespace osu.Game.Database
             return item;
         }
 
-        readonly Type[] validTypes = new[]
-        {
+        private readonly Type[] validTypes = {
             typeof(BeatmapSetInfo),
             typeof(BeatmapInfo),
             typeof(BeatmapMetadata),
-            typeof(BaseDifficulty),
+            typeof(BeatmapDifficulty),
         };
 
         public void Update<T>(T record, bool cascade = true) where T : class
         {
             if (validTypes.All(t => t != typeof(T)))
-                throw new ArgumentException(nameof(T), "Must be a type managed by BeatmapDatabase");
+                throw new ArgumentException("Must be a type managed by BeatmapDatabase", nameof(T));
             if (cascade)
                 connection.UpdateWithChildren(record);
             else

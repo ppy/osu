@@ -1,62 +1,54 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics;
-using osu.Framework.Timing;
-using osu.Game.Database;
-using osu.Game.Modes;
-using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Screens.Backgrounds;
-using OpenTK;
-using osu.Framework.Screens;
-using osu.Game.Modes.UI;
-using osu.Game.Screens.Ranking;
-using osu.Game.Configuration;
-using osu.Game.Overlays.Pause;
 using osu.Framework.Configuration;
-using System;
-using System.Linq;
-using OpenTK.Graphics;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
-using osu.Framework.Logging;
 using osu.Framework.Input;
+using osu.Framework.Logging;
+using osu.Framework.Screens;
+using osu.Framework.Timing;
+using osu.Game.Configuration;
+using osu.Game.Database;
+using osu.Game.Input.Handlers;
+using osu.Game.Modes;
+using osu.Game.Modes.UI;
+using osu.Game.Screens.Backgrounds;
+using osu.Game.Screens.Ranking;
+using System;
+using System.Linq;
 
 namespace osu.Game.Screens.Play
 {
     public class Player : OsuScreen
     {
-        public bool Autoplay;
-
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
 
+        internal override bool HasLocalCursorDisplayed => !hasReplayLoaded && !IsPaused;
+
+        private bool hasReplayLoaded => hitRenderer.InputManager.ReplayInputHandler != null;
+
         public BeatmapInfo BeatmapInfo;
 
-        public PlayMode PreferredPlayMode;
-
-        private bool isPaused;
-        public bool IsPaused
-        {
-            get
-            {
-                return isPaused;
-            }
-        }
+        public bool IsPaused { get; private set; }
 
         public int RestartCount;
 
         private double pauseCooldown = 1000;
-        private double lastPauseActionTime = 0;
+        private double lastPauseActionTime;
 
-        private bool canPause => Time.Current >= (lastPauseActionTime + pauseCooldown);
+        private bool canPause => Time.Current >= lastPauseActionTime + pauseCooldown;
 
         private IAdjustableClock sourceClock;
+        private IFrameBasedClock interpolatedSourceClock;
 
         private Ruleset ruleset;
 
@@ -65,13 +57,21 @@ namespace osu.Game.Screens.Play
         private Bindable<int> dimLevel;
         private SkipButton skipButton;
 
-        private ScoreOverlay scoreOverlay;
+        private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
-        private PlayerInputManager playerInputManager;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
         {
+            var beatmap = Beatmap.Beatmap;
+
+            if (beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
+            {
+                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
+                Exit();
+                return;
+            }
+
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
 
@@ -82,6 +82,9 @@ namespace osu.Game.Screens.Play
 
                 if ((Beatmap?.Beatmap?.HitObjects.Count ?? 0) == 0)
                     throw new Exception("No valid objects were found!");
+
+                if (Beatmap == null)
+                    throw new Exception("Beatmap was not loaded");
             }
             catch (Exception e)
             {
@@ -101,27 +104,21 @@ namespace osu.Game.Screens.Play
             }
 
             sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
+            interpolatedSourceClock = new InterpolatingFramedClock(sourceClock);
 
             Schedule(() =>
             {
                 sourceClock.Reset();
             });
 
-            var beatmap = Beatmap.Beatmap;
+            ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
+            hitRenderer = ruleset.CreateHitRendererWith(Beatmap);
 
-            if (beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
-            {
-                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
-                Exit();
-                return;
-            }
+            scoreProcessor = hitRenderer.CreateScoreProcessor();
 
-            PlayMode usablePlayMode = beatmap.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode;
-
-            ruleset = Ruleset.GetRuleset(usablePlayMode);
-
-            scoreOverlay = ruleset.CreateScoreOverlay();
-            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
+            hudOverlay = new StandardHudOverlay();
+            hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
+            hudOverlay.BindProcessor(scoreProcessor);
 
             pauseOverlay = new PauseOverlay
             {
@@ -135,30 +132,34 @@ namespace osu.Game.Screens.Play
                 OnQuit = Exit
             };
 
-            hitRenderer = ruleset.CreateHitRendererWith(beatmap);
+
+            if (ReplayInputHandler != null)
+                hitRenderer.InputManager.ReplayInputHandler = ReplayInputHandler;
+
+            hudOverlay.BindHitRenderer(hitRenderer);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
-            hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
-            hitRenderer.OnAllJudged += onPass;
+            hitRenderer.OnAllJudged += onCompletion;
 
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
 
-            if (Autoplay)
-                hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Hit));
-
             Children = new Drawable[]
             {
-                playerInputManager = new PlayerInputManager(game.Host)
+                new Container
                 {
-                    Clock = new InterpolatingFramedClock(sourceClock),
+                    RelativeSizeAxes = Axes.Both,
+                    Clock = interpolatedSourceClock,
                     Children = new Drawable[]
                     {
                         hitRenderer,
-                        skipButton = new SkipButton { Alpha = 0 },
+                        skipButton = new SkipButton
+                        {
+                            Alpha = 0
+                        },
                     }
                 },
-                scoreOverlay,
+                hudOverlay,
                 pauseOverlay
             };
         }
@@ -195,30 +196,30 @@ namespace osu.Game.Screens.Play
             if (canPause || force)
             {
                 lastPauseActionTime = Time.Current;
-                scoreOverlay.KeyCounter.IsCounting = false;
+                hudOverlay.KeyCounter.IsCounting = false;
                 pauseOverlay.Retries = RestartCount;
                 pauseOverlay.Show();
                 sourceClock.Stop();
-                isPaused = true;
+                IsPaused = true;
             }
             else
             {
-                isPaused = false;
+                IsPaused = false;
             }
         }
 
         public void Resume()
         {
             lastPauseActionTime = Time.Current;
-            scoreOverlay.KeyCounter.IsCounting = true;
+            hudOverlay.KeyCounter.IsCounting = true;
             pauseOverlay.Hide();
             sourceClock.Start();
-            isPaused = false;
+            IsPaused = false;
         }
 
         public void TogglePaused()
         {
-            isPaused = !IsPaused;
+            IsPaused = !IsPaused;
             if (IsPaused) Pause(); else Resume();
         }
 
@@ -240,15 +241,19 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private void onPass()
+        private void onCompletion()
         {
+            // Only show the completion screen if the player hasn't failed
+            if (scoreProcessor.HasFailed)
+                return;
+
             Delay(1000);
             Schedule(delegate
             {
                 ValidForResume = false;
                 Push(new Results
                 {
-                    Score = scoreProcessor.GetScore()
+                    Score = scoreProcessor.CreateScore()
                 });
             });
         }
@@ -303,6 +308,9 @@ namespace osu.Game.Screens.Play
         {
             if (pauseOverlay == null) return false;
 
+            if (hasReplayLoaded)
+                return false;
+
             if (pauseOverlay.State != Visibility.Visible && !canPause) return true;
 
             if (!IsPaused && sourceClock.IsRunning) // For if the user presses escape quickly when entering the map
@@ -328,6 +336,8 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> mouseWheelDisabled;
 
-        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !isPaused;
+        public ReplayInputHandler ReplayInputHandler;
+
+        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !IsPaused;
     }
 }

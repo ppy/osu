@@ -13,13 +13,13 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Ranking
 {
-    class Results : OsuScreen
+    internal class Results : OsuScreen
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         private static readonly Vector2 background_blur = new Vector2(20);
 
-        ScoreDisplay scoreDisplay;
+        private ScoreDisplay scoreDisplay;
 
         protected override void OnEntering(Screen last)
         {
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Ranking
         }
     }
 
-    class ScoreDisplay : Container
+    internal class ScoreDisplay : Container
     {
         public ScoreDisplay(Score s)
         {
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Ranking
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Down,
+                    Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
                         new OsuSpriteText

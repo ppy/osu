@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Options
 
         private SpriteText headerLabel;
 
-        public OptionsSection()
+        protected OptionsSection()
         {
             Margin = new MarginPadding { Top = 20 };
             AutoSizeAxes = Axes.Y;
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Options
                         FlowContent = new FillFlowContainer
                         {
                             Margin = new MarginPadding { Top = header_size + header_margin },
-                            Direction = FillDirection.Down,
+                            Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0, 30),
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,

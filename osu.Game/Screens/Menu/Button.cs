@@ -16,6 +16,7 @@ using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Menu
 {
@@ -27,32 +28,20 @@ namespace osu.Game.Screens.Menu
     {
         private Container iconText;
         private Container box;
-        private Box boxColourLayer;
         private Box boxHoverLayer;
-        private Color4 colour;
         private TextAwesome icon;
         private string internalName;
-        private readonly FontAwesome symbol;
         private Action clickAction;
-        private readonly float extraWidth;
         private Key triggerKey;
-        private string text;
         private SampleChannel sampleClick;
 
-        public override bool Contains(Vector2 screenSpacePos)
-        {
-            return box.Contains(screenSpacePos);
-        }
+        protected override bool InternalContains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
 
         public Button(string text, string internalName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {
             this.internalName = internalName;
-            this.symbol = symbol;
-            this.colour = colour;
             this.clickAction = clickAction;
-            this.extraWidth = extraWidth;
             this.triggerKey = triggerKey;
-            this.text = text;
 
             AutoSizeAxes = Axes.Both;
             Alpha = 0;
@@ -79,7 +68,7 @@ namespace osu.Game.Screens.Menu
                     Shear = new Vector2(ButtonSystem.WEDGE_WIDTH / boxSize.Y, 0),
                     Children = new []
                     {
-                        boxColourLayer = new Box
+                        new Box
                         {
                             EdgeSmoothness = new Vector2(1.5f, 0),
                             RelativeSizeAxes = Axes.Both,
@@ -107,6 +96,7 @@ namespace osu.Game.Screens.Menu
                         {
                             Shadow = true,
                             Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             TextSize = 30,
                             Position = new Vector2(0, 0),
                             Icon = symbol
@@ -232,9 +222,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleClick = audio.Sample.Get($@"Menu/menu-{internalName}-click");
-            if (sampleClick == null)
-                sampleClick = audio.Sample.Get(internalName.Contains(@"back") ? @"Menu/menuback" : @"Menu/menuhit");
+            sampleClick = audio.Sample.Get($@"Menu/menu-{internalName}-click") ?? audio.Sample.Get(internalName.Contains(@"back") ? @"Menu/menuback" : @"Menu/menuhit");
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -257,7 +245,8 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Repeat) return false;
+            if (args.Repeat || state.Keyboard.ControlPressed || state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
+                return false;
 
             if (triggerKey == args.Key && triggerKey != Key.Unknown)
             {
@@ -289,7 +278,7 @@ namespace osu.Game.Screens.Menu
 
         public int ContractStyle;
 
-        ButtonState state;
+        private ButtonState state;
 
         public ButtonState State
         {
@@ -320,12 +309,12 @@ namespace osu.Game.Screens.Menu
                     case ButtonState.Expanded:
                         const int expand_duration = 500;
                         box.ScaleTo(new Vector2(1, 1), expand_duration, EasingTypes.OutExpo);
-                        FadeIn(expand_duration / 6);
+                        FadeIn(expand_duration / 6f);
                         break;
                     case ButtonState.Exploded:
                         const int explode_duration = 200;
                         box.ScaleTo(new Vector2(2, 1), explode_duration, EasingTypes.OutExpo);
-                        FadeOut(explode_duration / 4 * 3);
+                        FadeOut(explode_duration / 4f * 3);
                         break;
                 }
             }

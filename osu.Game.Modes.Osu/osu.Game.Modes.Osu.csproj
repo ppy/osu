@@ -43,11 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Objects\BezierApproximator.cs" />
-    <Compile Include="Objects\CircularArcApproximator.cs" />
+    <Compile Include="Beatmaps\OsuBeatmapConverter.cs" />
+    <Compile Include="Beatmaps\OsuBeatmapProcessor.cs" />
     <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
     <Compile Include="Objects\Drawables\Connections\ConnectionRenderer.cs" />
     <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
+    <Compile Include="Judgements\OsuJudgementInfo.cs" />
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerBackground.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
@@ -67,24 +68,22 @@
     <Compile Include="Objects\Drawables\Pieces\SliderBall.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
     <Compile Include="Objects\OsuHitObjectDifficulty.cs" />
-    <Compile Include="Objects\OsuHitObjectParser.cs" />
-    <Compile Include="Objects\SliderCurve.cs" />
     <Compile Include="Objects\SliderTick.cs" />
+    <Compile Include="OsuAutoReplay.cs" />
     <Compile Include="OsuDifficultyCalculator.cs" />
+    <Compile Include="OsuKeyConversionInputManager.cs" />
     <Compile Include="OsuScore.cs" />
     <Compile Include="OsuScoreProcessor.cs" />
-    <Compile Include="UI\OsuComboCounter.cs" />
     <Compile Include="UI\OsuHitRenderer.cs" />
     <Compile Include="UI\OsuPlayfield.cs" />
     <Compile Include="OsuRuleset.cs" />
     <Compile Include="Objects\HitCircle.cs" />
     <Compile Include="Objects\Drawables\DrawableHitCircle.cs" />
     <Compile Include="Objects\OsuHitObject.cs" />
-    <Compile Include="Objects\OsuHitObjectConverter.cs" />
     <Compile Include="Objects\Slider.cs" />
     <Compile Include="Objects\Spinner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\OsuScoreOverlay.cs" />
+    <Compile Include="Mods\OsuMod.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -100,7 +99,6 @@
     <None Include="..\osu.licenseheader">
       <Link>osu.licenseheader</Link>
     </None>
-    <None Include="app.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>

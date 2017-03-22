@@ -9,9 +9,8 @@ using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    public class TestCaseSongProgress : TestCase
+    internal class TestCaseSongProgress : TestCase
     {
-        public override string Name => @"Song Progress";
         public override string Description => @"With real data";
 
         private SongProgress progress;

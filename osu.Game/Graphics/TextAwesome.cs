@@ -1,11 +1,11 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics
 {
-    public class TextAwesome : SpriteText
+    public class TextAwesome : OsuSpriteText
     {
         //public override FontFace FontFace => (int)Icon < 0xf000 ? FontFace.OsuFont : FontFace.FontAwesome;
 
@@ -25,11 +25,6 @@ namespace osu.Game.Graphics
                 icon = value;
                 Text = ((char)icon).ToString();
             }
-        }
-
-        public TextAwesome()
-        {
-            Origin = Framework.Graphics.Anchor.Centre;
         }
     }
 
@@ -902,6 +897,6 @@ namespace osu.Game.Graphics
         fa_osu_mod_spunout = 0xe046,
         fa_osu_mod_suddendeath = 0xe047,
         fa_osu_mod_target = 0xe048,
-        fa_osu_mod_bg = 0xe049,
+        fa_osu_mod_bg = 0xe04a,
     }
 }

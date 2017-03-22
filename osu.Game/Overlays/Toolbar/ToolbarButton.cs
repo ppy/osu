@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -84,7 +85,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 Flow = new FillFlowContainer
                 {
-                    Direction = FillDirection.Right,
+                    Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(5),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -97,6 +98,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            TextSize = 20
                         },
                         DrawableText = new OsuSpriteText
                         {
@@ -107,7 +109,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 tooltipContainer = new FillFlowContainer
                 {
-                    Direction = FillDirection.Down,
+                    Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.Both, //stops us being considered in parent's autosize
                     Anchor = (TooltipAnchor & Anchor.x0) > 0 ? Anchor.BottomLeft : Anchor.BottomRight,
                     Origin = TooltipAnchor,

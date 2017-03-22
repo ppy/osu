@@ -21,11 +21,10 @@ namespace osu.Game.Screens
     {
         private BackButton popButton;
 
-        const int transition_time = 1000;
+        private const double transition_time = 1000;
 
         protected virtual IEnumerable<Type> PossibleChildren => null;
 
-        private FillFlowContainer childModeButtons;
         private Container textContainer;
         private Box box;
 
@@ -56,7 +55,7 @@ namespace osu.Game.Screens
 
         protected override bool OnExiting(Screen next)
         {
-            textContainer.MoveTo(new Vector2((DrawSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2(DrawSize.X / 16, 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
 
             return base.OnExiting(next);
@@ -80,6 +79,8 @@ namespace osu.Game.Screens
 
         public ScreenWhiteBox()
         {
+            FillFlowContainer childModeButtons;
+
             Children = new Drawable[]
             {
                 box = new Box
@@ -126,7 +127,7 @@ namespace osu.Game.Screens
                 },
                 childModeButtons = new FillFlowContainer
                 {
-                    Direction = FillDirection.Down,
+                    Direction = FillDirection.Vertical,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Both,

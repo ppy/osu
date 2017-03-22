@@ -8,7 +8,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
-    class VolumeControlReceptor : Container
+    internal class VolumeControlReceptor : Container
     {
         public Action<InputState> ActionRequested;
 

@@ -1,13 +1,17 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.IO;
 using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
+using osu.Game.Modes;
+using osu.Game.Modes.Mods;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace osu.Game.Beatmaps
 {
@@ -16,6 +20,16 @@ namespace osu.Game.Beatmaps
         public readonly BeatmapInfo BeatmapInfo;
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
+
+        /// <summary>
+        /// A play mode that is preferred for this beatmap. PlayMode will become this mode where conversion is feasible,
+        /// or otherwise to the beatmap's default.
+        /// </summary>
+        public PlayMode? PreferredPlayMode;
+
+        public PlayMode PlayMode => beatmap?.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode ?? PlayMode.Osu;
+
+        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
 
         public readonly bool WithStoryboard;
 

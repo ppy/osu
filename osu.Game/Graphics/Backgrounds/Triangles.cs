@@ -10,7 +10,6 @@ using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
-using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -118,7 +117,7 @@ namespace osu.Game.Graphics.Backgrounds
         private void addTriangle(bool randomY)
         {
             var sprite = CreateTriangle();
-            float triangleHeight = (sprite.DrawHeight / DrawHeight);
+            float triangleHeight = sprite.DrawHeight / DrawHeight;
             sprite.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() * (1 + triangleHeight) - triangleHeight : 1);
             Add(sprite);
         }

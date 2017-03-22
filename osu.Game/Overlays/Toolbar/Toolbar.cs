@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -29,41 +30,45 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool BlockPassThroughInput => false;
 
-        private const int transition_time = 500;
+        private const double transition_time = 500;
 
         private const float alpha_hovering = 0.8f;
         private const float alpha_normal = 0.6f;
 
-        public override bool Contains(Vector2 screenSpacePos) => true;
-
         public Toolbar()
         {
+            AlwaysReceiveInput = true;
+
             Children = new Drawable[]
             {
                 new ToolbarBackground(),
                 new FillFlowContainer
                 {
-                    Direction = FillDirection.Right,
+                    Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         new ToolbarSettingsButton(),
-                        new ToolbarHomeButton()
+                        new ToolbarHomeButton
                         {
                             Action = () => OnHome?.Invoke()
                         },
                         modeSelector = new ToolbarModeSelector
                         {
-                            OnPlayModeChange = OnPlayModeChange
+                            OnPlayModeChange = mode =>
+                            {
+                                OnPlayModeChange?.Invoke(mode);
+                            }
                         }
                     }
                 },
-                new PassThroughFlowContainer
+                new FillFlowContainer
                 {
+                    AlwaysReceiveInput = true,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Direction = FillDirection.Right,
+                    Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
@@ -139,12 +144,6 @@ namespace osu.Game.Overlays.Toolbar
 
             MoveToY(-DrawSize.Y, transition_time, EasingTypes.OutQuint);
             FadeOut(transition_time);
-        }
-
-        class PassThroughFlowContainer : FillFlowContainer
-        {
-            //needed to get input to the login overlay.
-            public override bool Contains(Vector2 screenSpacePos) => true;
         }
     }
 }

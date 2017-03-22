@@ -8,7 +8,7 @@ using System;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ScoreCounter : RollingCounter<ulong>
+    public class ScoreCounter : RollingCounter<double>
     {
         protected override Type TransformType => typeof(TransformScore);
 
@@ -34,24 +34,24 @@ namespace osu.Game.Graphics.UserInterface
             LeadingZeroes = leading;
         }
 
-        protected override double GetProportionalDuration(ulong currentValue, ulong newValue)
+        protected override double GetProportionalDuration(double currentValue, double newValue)
         {
             return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
         }
 
-        protected override string FormatCount(ulong count)
+        protected override string FormatCount(double count)
         {
-            return count.ToString("D" + LeadingZeroes);
+            return ((long)count).ToString("D" + LeadingZeroes);
         }
 
-        public override void Increment(ulong amount)
+        public override void Increment(double amount)
         {
-            Count = Count + amount;
+            Current.Value = Current + amount;
         }
 
-        protected class TransformScore : Transform<ulong>
+        protected class TransformScore : Transform<double>
         {
-            protected override ulong CurrentValue
+            protected override double CurrentValue
             {
                 get
                 {
@@ -59,14 +59,14 @@ namespace osu.Game.Graphics.UserInterface
                     if (time < StartTime) return StartValue;
                     if (time >= EndTime) return EndValue;
 
-                    return (ulong)Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+                    return Interpolation.ValueAt(time, (float)StartValue, (float)EndValue, StartTime, EndTime, Easing);
                 }
             }
 
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as ScoreCounter).DisplayedCount = CurrentValue;
+                ((ScoreCounter)d).DisplayedCount = CurrentValue;
             }
         }
     }

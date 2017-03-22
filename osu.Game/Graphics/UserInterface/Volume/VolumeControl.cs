@@ -87,7 +87,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
         }
 
-        ScheduledDelegate popOutDelegate;
+        private ScheduledDelegate popOutDelegate;
 
         private VolumeMeter volumeMeterEffect;
         private VolumeMeter volumeMeterMusic;

@@ -4,9 +4,9 @@
 using OpenTK;
 using OpenTK.Graphics;
 using System.Collections.Generic;
-using osu.Game.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Play
 {

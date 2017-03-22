@@ -38,10 +38,6 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="nunit.framework">
-      <HintPath>$(SolutionDir)\packages\NUnit.3.5.0\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
     <Reference Include="SQLite.Net">
       <HintPath>$(SolutionDir)\packages\SQLite.Net.Core-PCL.3.1.1\lib\portable-win8+net45+wp8+wpa81+MonoAndroid1+MonoTouch1\SQLite.Net.dll</HintPath>
     </Reference>
@@ -56,7 +52,6 @@
     <None Include="..\osu.licenseheader">
       <Link>osu.licenseheader</Link>
     </None>
-    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="OpenTK.dll.config" />
   </ItemGroup>

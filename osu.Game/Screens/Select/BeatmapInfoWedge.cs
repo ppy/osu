@@ -3,27 +3,30 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps;
-using osu.Game.Database;
-using osu.Framework.Graphics.Colour;
-using osu.Game.Beatmaps.Drawables;
-using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes;
+using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Screens.Select
 {
-    class BeatmapInfoWedge : Container
+    internal class BeatmapInfoWedge : OverlayContainer
     {
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
 
@@ -52,11 +55,32 @@ namespace osu.Game.Screens.Select
             this.game = game;
         }
 
+        protected override bool HideOnEscape => false;
+
+        protected override void PopIn()
+        {
+            MoveToX(0, 800, EasingTypes.OutQuint);
+            RotateTo(0, 800, EasingTypes.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            MoveToX(-100, 800, EasingTypes.InQuint);
+            RotateTo(10, 800, EasingTypes.InQuint);
+        }
+
         public void UpdateBeatmap(WorkingBeatmap beatmap)
         {
-            if (beatmap == null)
+            if (beatmap?.BeatmapInfo == null)
+            {
+                State = Visibility.Hidden;
+                beatmapInfoContainer?.FadeOut(250);
+                beatmapInfoContainer?.Expire();
+                beatmapInfoContainer = null;
                 return;
+            }
 
+            State = Visibility.Visible;
             var lastContainer = beatmapInfoContainer;
 
             float newDepth = lastContainer?.Depth + 1 ?? 0;
@@ -68,11 +92,14 @@ namespace osu.Game.Screens.Select
 
             if (beatmap.Beatmap != null)
             {
+                HitObject lastObject = beatmap.Beatmap.HitObjects.LastOrDefault();
+                double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
+
                 labels.Add(new InfoLabel(new BeatmapStatistic
                 {
                     Name = "Length",
                     Icon = FontAwesome.fa_clock_o,
-                    Content = beatmap.Beatmap.HitObjects.Count == 0 ? "-" : TimeSpan.FromMilliseconds(beatmap.Beatmap.HitObjects.Last().EndTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
+                    Content = beatmap.Beatmap.HitObjects.Count == 0 ? "-" : TimeSpan.FromMilliseconds(endTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
                 }));
 
                 labels.Add(new InfoLabel(new BeatmapStatistic
@@ -83,7 +110,7 @@ namespace osu.Game.Screens.Select
                 }));
 
                 //get statistics fromt he current ruleset.
-                Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).GetBeatmapStatistics(beatmap).ForEach(s => labels.Add(new InfoLabel(s)));
+                labels.AddRange(Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
             }
 
             (beatmapInfoContainer = new BufferedContainer
@@ -125,7 +152,7 @@ namespace osu.Game.Screens.Select
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Direction = FillDirection.Down,
+                        Direction = FillDirection.Vertical,
                         Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -147,7 +174,7 @@ namespace osu.Game.Screens.Select
                             new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 10 },
-                                Direction = FillDirection.Right,
+                                Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
                                 Children = new []
                                 {
@@ -190,12 +217,12 @@ namespace osu.Game.Screens.Select
 
         private string getBPMRange(Beatmap beatmap)
         {
-            double bpmMax = beatmap.BPMMaximum; 
-            double bpmMin = beatmap.BPMMinimum;
+            double bpmMax = beatmap.TimingInfo.BPMMaximum;
+            double bpmMin = beatmap.TimingInfo.BPMMinimum;
 
             if (Precision.AlmostEquals(bpmMin, bpmMax)) return Math.Round(bpmMin) + "bpm";
 
-            return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "bpm (mostly " + Math.Round(beatmap.BPMMode) + "bpm)";
+            return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "bpm (mostly " + Math.Round(beatmap.TimingInfo.BPMMode) + "bpm)";
         }
 
         public class InfoLabel : Container
@@ -208,14 +235,18 @@ namespace osu.Game.Screens.Select
                     new TextAwesome
                     {
                         Icon = FontAwesome.fa_square,
+                        Origin = Anchor.Centre,
                         Colour = new Color4(68, 17, 136, 255),
-                        Rotation = 45
+                        Rotation = 45,
+                        TextSize = 20
                     },
                     new TextAwesome
                     {
                         Icon = statistic.Icon,
+                        Origin = Anchor.Centre,
                         Colour = new Color4(255, 221, 85, 255),
-                        Scale = new Vector2(0.8f)
+                        Scale = new Vector2(0.8f),
+                        TextSize = 20
                     },
                     new OsuSpriteText
                     {

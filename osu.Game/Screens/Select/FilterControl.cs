@@ -5,37 +5,70 @@ using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Select.Filter;
+using Container = osu.Framework.Graphics.Containers.Container;
+using osu.Framework.Input;
+using osu.Game.Modes;
 
 namespace osu.Game.Screens.Select
 {
     public class FilterControl : Container
     {
-        public Action FilterChanged;
+        public Action<FilterCriteria> FilterChanged;
 
-        public string Search => searchTextBox.Text;
+        private OsuTabControl<SortMode> sortTabs;
+
+        private TabControl<GroupMode> groupTabs;
+
         private SortMode sort = SortMode.Title;
-        public SortMode Sort { 
-            get { return sort; } 
-            set {
+        public SortMode Sort
+        {
+            get { return sort; }
+            set
+            {
                 if (sort != value)
                 {
                     sort = value;
-                    FilterChanged?.Invoke();
+                    FilterChanged?.Invoke(CreateCriteria());
                 }
-            } 
+            }
         }
+
+        private GroupMode group = GroupMode.All;
+        public GroupMode Group
+        {
+            get { return group; }
+            set
+            {
+                if (group != value)
+                {
+                    group = value;
+                    FilterChanged?.Invoke(CreateCriteria());
+                }
+            }
+        }
+
+        public FilterCriteria CreateCriteria() => new FilterCriteria
+        {
+            Group = group,
+            Sort = sort,
+            SearchText = searchTextBox.Text,
+            Mode = playMode
+        };
 
         public Action Exit;
 
         private SearchTextBox searchTextBox;
+
+        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || groupTabs.Contains(screenSpacePos) || sortTabs.Contains(screenSpacePos);
 
         public FilterControl()
         {
@@ -47,30 +80,79 @@ namespace osu.Game.Screens.Select
                     Alpha = 0.8f,
                     RelativeSizeAxes = Axes.Both,
                 },
-                new FillFlowContainer
+                new Container
                 {
                     Padding = new MarginPadding(20),
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
+                    AlwaysReceiveInput = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.5f,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Width = 0.4f, // TODO: InnerWidth property or something
-                    Direction = FillDirection.Down,
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SearchTextBox {
+                        searchTextBox = new SearchTextBox
+                        {
                             RelativeSizeAxes = Axes.X,
-                            OnChange = (TextBox sender, bool newText) =>
+                            OnChange = (sender, newText) =>
                             {
                                 if (newText)
-                                    FilterChanged?.Invoke();
+                                    FilterChanged?.Invoke(CreateCriteria());
                             },
                             Exit = () => Exit?.Invoke(),
                         },
-                        new GroupSortTabs()
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 1,
+                            Colour = OsuColour.Gray(80),
+                            Origin = Anchor.BottomLeft,
+                            Anchor = Anchor.BottomLeft,
+                        },
+                        new FillFlowContainer
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            Direction = FillDirection.Horizontal,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            AlwaysReceiveInput = true,
+                            Children = new Drawable[]
+                            {
+                                groupTabs = new OsuTabControl<GroupMode>
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 24,
+                                    Width = 0.5f,
+                                    AutoSort = true
+                                },
+                                //spriteText = new OsuSpriteText
+                                //{
+                                //    Font = @"Exo2.0-Bold",
+                                //    Text = "Sort results by",
+                                //    TextSize = 14,
+                                //    Margin = new MarginPadding
+                                //    {
+                                //        Top = 5,
+                                //        Bottom = 5
+                                //    },
+                                //},
+                                sortTabs = new OsuTabControl<SortMode>()
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Width = 0.5f,
+                                    Height = 24,
+                                    AutoSort = true,
+                                }
+                            }
+                        },
                     }
                 }
             };
+
+            groupTabs.PinItem(GroupMode.All);
+            groupTabs.PinItem(GroupMode.RecentlyPlayed);
+            groupTabs.ItemChanged += (sender, value) => Group = value;
+            sortTabs.ItemChanged += (sender, value) => Sort = value;
         }
 
         public void Deactivate()
@@ -78,216 +160,29 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = false;
             searchTextBox.TriggerFocusLost();
         }
-        
+
         public void Activate()
         {
             searchTextBox.HoldFocus = true;
         }
 
-        private class TabItem : ClickableContainer
+        private readonly Bindable<PlayMode> playMode = new Bindable<PlayMode>();
+
+        [BackgroundDependencyLoader(permitNulls:true)]
+        private void load(OsuColour colours, OsuGame osu)
         {
-            public string Text
-            {
-                get { return text.Text; }
-                set { text.Text = value; }
-            }
+            sortTabs.AccentColour = colours.GreenLight;
 
-            private void fadeActive()
-            {
-                box.FadeIn(300);
-                text.FadeColour(Color4.White, 300);
-            }
-
-            private void fadeInactive()
-            {
-                box.FadeOut(300);
-                text.FadeColour(fadeColour, 300);
-            }
-
-            private bool active;
-            public bool Active
-            {
-                get { return active; }
-                set
-                {
-                    active = value;
-                    if (active)
-                        fadeActive();
-                    else
-                        fadeInactive();
-                }
-            }
-        
-            private SpriteText text;
-            private Box box;
-            private Color4 fadeColour;
-            
-            protected override bool OnHover(InputState state)
-            {
-                if (!active)
-                    fadeActive();
-                return true;
-            }
-            
-            protected override void OnHoverLost(InputState state)
-            {
-                if (!active)
-                    fadeInactive();
-            }
-        
-            public TabItem()
-            {
-                AutoSizeAxes = Axes.Both;
-                Children = new Drawable[]
-                {
-                    text = new OsuSpriteText
-                    {
-                        Margin = new MarginPadding(5),
-                        TextSize = 14,
-                        Font = @"Exo2.0-Bold",
-                    },
-                    box = new Box
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 1,
-                        Alpha = 0,
-                        Colour = Color4.White,
-                        Origin = Anchor.BottomLeft,
-                        Anchor = Anchor.BottomLeft,
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                text.Colour = colours.Blue;
-                fadeColour = colours.Blue;
-            }
+            if (osu != null)
+                playMode.BindTo(osu.PlayMode);
         }
 
-        private class GroupSortTabs : Container
-        {
-            private TextAwesome groupsEllipsis, sortEllipsis;
-            private SpriteText sortLabel;
-        
-            public GroupSortTabs()
-            {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 1,
-                        Colour = OsuColour.Gray(80),
-                        Origin = Anchor.BottomLeft,
-                        Anchor = Anchor.BottomLeft,
-                    },
-                    new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Right,
-                        Spacing = new Vector2(10, 0),
-                        Children = new Drawable[]
-                        {
-                            new TabItem
-                            {
-                                Text = "All",
-                                Active = true,
-                            },
-                            new TabItem
-                            {
-                                Text = "Recently Played",
-                                Active = false,
-                            },
-                            new TabItem
-                            {
-                                Text = "Collections",
-                                Active = false,
-                            },
-                            groupsEllipsis = new TextAwesome
-                            {
-                                Icon = FontAwesome.fa_ellipsis_h,
-                                TextSize = 14,
-                                Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                                Origin = Anchor.BottomLeft,
-                                Anchor = Anchor.BottomLeft,
-                            }
-                        }
-                    },
-                    new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Right,
-                        Spacing = new Vector2(10, 0),
-                        Origin = Anchor.TopRight,
-                        Anchor = Anchor.TopRight,
-                        Children = new Drawable[]
-                        {
-                            sortLabel = new OsuSpriteText
-                            {
-                                Font = @"Exo2.0-Bold",
-                                Text = "Sort results by",
-                                TextSize = 14,
-                                Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                            },
-                            new TabItem
-                            {
-                                Text = "Artist",
-                                Active = true,
-                            },
-                            sortEllipsis = new TextAwesome
-                            {
-                                Icon = FontAwesome.fa_ellipsis_h,
-                                TextSize = 14,
-                                Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                                Origin = Anchor.BottomLeft,
-                                Anchor = Anchor.BottomLeft,
-                            }
-                        }
-                    },
-                };
-            }
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                groupsEllipsis.Colour = colours.Blue;
-                sortLabel.Colour = colours.GreenLight;
-                sortEllipsis.Colour = colours.GreenLight;
-            }
-        }
-        
-        public enum SortMode
-        {
-            Artist,
-            BPM,
-            Author,
-            DateAdded,
-            Difficulty,
-            Length,
-            RankAchieved,
-            Title
-        }
+        protected override bool OnMouseMove(InputState state) => true;
 
-        public enum GroupMode
-        {
-            NoGrouping,
-            Artist,
-            BPM,
-            Author,
-            DateAdded,
-            Difficulty,
-            Length,
-            RankAchieved,
-            Title,
-            Collections,
-            Favorites,
-            MyMaps,
-            RankedStatus,
-            RecentlyPlayed
-        }
+        protected override bool OnClick(InputState state) => true;
+
+        protected override bool OnDragStart(InputState state) => true;
     }
 }
