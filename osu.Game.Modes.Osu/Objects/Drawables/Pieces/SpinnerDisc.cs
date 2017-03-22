@@ -33,6 +33,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         private void load(OsuColour colours)
         {
             completeColour = colours.YellowLight.Opacity(0.8f);
+            Masking = true;
         }
 
         private class SpinnerBorder : Container
