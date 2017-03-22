@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabItem<T> : TabItem<T>
     {
-        private SpriteText text;
+        protected readonly SpriteText Text;
         private Box box;
         
         private Color4? accentColour;
@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 accentColour = value;
                 if (!Active)
-                    text.Colour = value;
+                    Text.Colour = value;
             }
         }
 
@@ -38,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 base.Value = value;
-                text.Text = (value as Enum)?.GetDescription();
+                Text.Text = (value as Enum)?.GetDescription();
             }
         }
 
@@ -62,13 +62,13 @@ namespace osu.Game.Graphics.UserInterface
         private void fadeActive()
         {
             box.FadeIn(transition_length, EasingTypes.OutQuint);
-            text.FadeColour(Color4.White, transition_length, EasingTypes.OutQuint);
+            Text.FadeColour(Color4.White, transition_length, EasingTypes.OutQuint);
         }
 
         private void fadeInactive()
         {
             box.FadeOut(transition_length, EasingTypes.OutQuint);
-            text.FadeColour(AccentColour, transition_length, EasingTypes.OutQuint);
+            Text.FadeColour(AccentColour, transition_length, EasingTypes.OutQuint);
         }
 
         protected override bool OnHover(InputState state)
@@ -91,7 +91,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                text = new OsuSpriteText
+                Text = new OsuSpriteText
                 {
                     Margin = new MarginPadding(5),
                     Origin = Anchor.BottomLeft,

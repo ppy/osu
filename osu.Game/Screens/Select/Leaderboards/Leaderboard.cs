@@ -19,6 +19,15 @@ namespace osu.Game.Screens.Select.Leaderboards
         private ScrollContainer scrollContainer;
         private FillFlowContainer<LeaderboardScore> scrollFlow;
 
+        private LeaderboardFilterControl filter;
+
+        // Passed the selected tab and if mods is checked
+        public Action<LeaderboardTab, bool> OnFilter
+        {
+            get { return filter.Action; }
+            set { filter.Action = value; }
+        }
+
         private IEnumerable<Score> scores;
         public IEnumerable<Score> Scores
         {
@@ -65,7 +74,9 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 scrollContainer = new ScrollContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
                     ScrollDraggerVisible = false,
                     Children = new Drawable[]
                     {
@@ -74,10 +85,17 @@ namespace osu.Game.Screens.Select.Leaderboards
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Spacing = new Vector2(0f, 5f),
-                            Padding = new MarginPadding(5),
+                            Padding = new MarginPadding
+                            {
+                                Top = 10,
+                                Bottom = 5,
+                                Left = 5,
+                                Right = 5,
+                            },
                         },
                     },
                 },
+                filter = new LeaderboardFilterControl(),
             };
         }
 
@@ -106,6 +124,9 @@ namespace osu.Game.Screens.Select.Leaderboards
                         Color4.White.Opacity(Math.Min(1 - (bottomY - fadeStart) / LeaderboardScore.HEIGHT, 1)));
                 }
             }
+
+            var h = DrawHeight - LeaderboardFilterControl.HEIGHT;
+            if (scrollContainer.Height != h) scrollContainer.Height = h;
         }
     }
 }
