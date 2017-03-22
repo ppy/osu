@@ -12,7 +12,7 @@ using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuDropDownHeader : DropDownHeader
+    public class OsuDropdownHeader : DropdownHeader
     {
         private SpriteText label;
         protected override string Label
@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public OsuDropDownHeader()
+        public OsuDropdownHeader()
         {
             Foreground.Padding = new MarginPadding(4);
 

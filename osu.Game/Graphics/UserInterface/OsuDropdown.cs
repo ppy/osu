@@ -8,9 +8,9 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuDropDown<T> : DropDown<T>
+    public class OsuDropdown<T> : Dropdown<T>
     {
-        protected override DropDownHeader CreateHeader() => new OsuDropDownHeader { AccentColour = AccentColour };
+        protected override DropdownHeader CreateHeader() => new OsuDropdownHeader { AccentColour = AccentColour };
 
         protected override Menu CreateMenu() => new OsuMenu();
 
@@ -22,8 +22,8 @@ namespace osu.Game.Graphics.UserInterface
             {
                 accentColour = value;
                 if (Header != null)
-                    ((OsuDropDownHeader)Header).AccentColour = value;
-                foreach (var item in MenuItems.OfType<OsuDropDownMenuItem<T>>())
+                    ((OsuDropdownHeader)Header).AccentColour = value;
+                foreach (var item in MenuItems.OfType<OsuDropdownMenuItem<T>>())
                     item.AccentColour = value;
             }
         }
@@ -35,6 +35,6 @@ namespace osu.Game.Graphics.UserInterface
                 AccentColour = colours.PinkDarker;
         }
 
-        protected override DropDownMenuItem<T> CreateMenuItem(string text, T value) => new OsuDropDownMenuItem<T>(text, value) { AccentColour = AccentColour };
+        protected override DropdownMenuItem<T> CreateMenuItem(string text, T value) => new OsuDropdownMenuItem<T>(text, value) { AccentColour = AccentColour };
     }
 }

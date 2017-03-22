@@ -161,9 +161,9 @@
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
     <Compile Include="Overlays\Options\OptionDropDown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
-    <Compile Include="Graphics\UserInterface\OsuDropDownHeader.cs" />
-    <Compile Include="Graphics\UserInterface\OsuDropDown.cs" />
-    <Compile Include="Graphics\UserInterface\OsuDropDownMenuItem.cs" />
+    <Compile Include="Graphics\UserInterface\OsuDropdownHeader.cs" />
+    <Compile Include="Graphics\UserInterface\OsuDropdown.cs" />
+    <Compile Include="Graphics\UserInterface\OsuDropdownMenuItem.cs" />
     <Compile Include="Overlays\Options\OptionsFooter.cs" />
     <Compile Include="Overlays\Options\Sections\DebugSection.cs" />
     <Compile Include="Overlays\Options\Sections\Debug\GeneralOptions.cs" />
