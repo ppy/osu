@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override Dropdown<T> CreateDropdown() => new OsuTabDropdown();
 
-        protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem<T> { Value = value };
+        protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem { Value = value };
 
         protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || Dropdown.Contains(screenSpacePos);
 
@@ -52,12 +52,12 @@ namespace osu.Game.Graphics.UserInterface
                 var dropDown = Dropdown as OsuTabDropdown;
                 if (dropDown != null)
                     dropDown.AccentColour = value;
-                foreach (var item in TabContainer.Children.OfType<OsuTabItem<T>>())
+                foreach (var item in TabContainer.Children.OfType<OsuTabItem>())
                     item.AccentColour = value;
             }
         }
 
-        private class OsuTabItem<T1> : TabItem<T1>
+        private class OsuTabItem : TabItem<T>
         {
             private SpriteText text;
             private Box box;
@@ -74,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            public new T1 Value
+            public new T Value
             {
                 get { return base.Value; }
                 set
