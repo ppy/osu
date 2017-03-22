@@ -21,6 +21,10 @@ namespace osu.Game.Screens.Select.Leaderboards
     public class LeaderboardScore : Container, IStateful<Visibility>
     {
         public static readonly float HEIGHT = 60;
+
+        public readonly int RankPosition;
+        public readonly Score Score;
+
         private const float corner_radius = 5;
         private const float edge_margin = 5;
         private const float background_alpha = 0.25f;
@@ -35,9 +39,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         private Container flagBadgeContainer;
         private FillFlowContainer<ScoreModIcon> modsContainer;
 
-        public readonly int Rank;
-        public readonly Score Score;
-
         private Visibility state;
         public Visibility State
         {
@@ -49,10 +50,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                 switch (state)
                 {
                     case Visibility.Hidden:
-                        foreach (Drawable d in new Drawable[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, maxCombo, accuracy, modsContainer, })
-                        {
+                        foreach (var d in new Drawable[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, maxCombo, accuracy, modsContainer })
                             d.FadeOut();
-                        }
 
                         Alpha = 0;
 
@@ -60,7 +59,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                         avatar.MoveToX(75);
                         nameLabel.MoveToX(150);
                         break;
-
                     case Visibility.Visible:
                         FadeIn(200);
                         content.MoveToY(0, 800, EasingTypes.OutQuint);
@@ -92,7 +90,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         public LeaderboardScore(Score score, int rank)
         {
             Score = score;
-            Rank = rank;
+            RankPosition = rank;
 
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
@@ -111,7 +109,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Origin = Anchor.CentreLeft,
                             Font = @"Exo2.0-MediumItalic",
                             TextSize = 22,
-                            Text = Rank.ToString(),
+                            Text = RankPosition.ToString(),
                         },
                     },
                 },
