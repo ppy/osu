@@ -38,6 +38,9 @@ namespace osu.Game.Modes.Objects.Drawables
                     return;
                 state = value;
 
+                if (!IsLoaded)
+                    return;
+
                 UpdateState(state);
 
                 if (State == ArmedState.Hit)
