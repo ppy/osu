@@ -204,6 +204,7 @@
     <Compile Include="Tests\TestCaseModSelectOverlay.cs" />
     <Compile Include="Tests\TestCaseDialogOverlay.cs" />
     <Compile Include="Tests\TestCaseBeatmapOptionsOverlay.cs" />
+    <Compile Include="Tests\TestCaseLeaderboard.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

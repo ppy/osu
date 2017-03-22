@@ -3,11 +3,8 @@
 
 namespace osu.Game.Users
 {
-    public class User
+    public class Team
     {
-        public int Id;
-        public string Username;
-        public Country Country;
-        public Team Team;
+        public string Name;
     }
 }
