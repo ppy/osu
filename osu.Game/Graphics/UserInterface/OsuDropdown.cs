@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.UserInterface
                 accentColour = value;
                 if (Header != null)
                     ((OsuDropdownHeader)Header).AccentColour = value;
-                foreach (var item in MenuItems.OfType<OsuDropdownMenuItem<T>>())
+                foreach (var item in MenuItems.OfType<OsuDropdownMenuItem>())
                     item.AccentColour = value;
             }
         }
@@ -41,11 +41,11 @@ namespace osu.Game.Graphics.UserInterface
                 AccentColour = colours.PinkDarker;
         }
 
-        protected override DropdownMenuItem<T> CreateMenuItem(string text, T value) => new OsuDropdownMenuItem<T>(text, value) { AccentColour = AccentColour };
+        protected override DropdownMenuItem<T> CreateMenuItem(string text, T value) => new OsuDropdownMenuItem(text, value) { AccentColour = AccentColour };
 
-        private class OsuDropdownMenuItem<T1> : DropdownMenuItem<T1>
+        private class OsuDropdownMenuItem : DropdownMenuItem<T>
         {
-            public OsuDropdownMenuItem(string text, T1 value) : base(text, value)
+            public OsuDropdownMenuItem(string text, T value) : base(text, value)
             {
                 Foreground.Padding = new MarginPadding(2);
 
