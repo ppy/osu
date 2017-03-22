@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             };
 
             tabs.ItemChanged += (sender, e) => invokeAction();
-            mods.Action = (obj) => invokeAction();
+            mods.Action = obj => invokeAction();
         }
 
         private class LeaderboardTabControl<T> : OsuTabControl<T>
