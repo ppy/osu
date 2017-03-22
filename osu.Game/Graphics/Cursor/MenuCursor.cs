@@ -104,6 +104,7 @@ namespace osu.Game.Graphics.Cursor
                     cursorContainer = new Container
                     {
                         Size = new Vector2(32),
+                        Scale = new Vector2((float)cursorScale),
                         Children = new Drawable[]
                         {
                             new Sprite
