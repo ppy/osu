@@ -50,5 +50,17 @@ namespace osu.Game.Modes.UI
             Position = new Vector2(0, 30),
             Margin = new MarginPadding { Right = 5 },
         };
+
+        protected override SongProgress CreateProgress()
+        {
+            var p = new SongProgress()
+            {
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                RelativeSizeAxes = Axes.X,
+            };
+
+            return p;
+        }
     }
 }

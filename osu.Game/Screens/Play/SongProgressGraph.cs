@@ -32,8 +32,8 @@ namespace osu.Game.Screens.Play
         }
 
         private List<int> calculatedValues = new List<int>(); // values but adjusted to fit the amount of columns
-        private List<int> values;
-        public List<int> Values
+        private int[] values;
+        public int[] Values
         {
             get
             {
@@ -84,8 +84,8 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            float step = values.Count / ColumnCount;
-            for (float i = 0; i < values.Count; i += step) 
+            float step = values.Length / (float)ColumnCount;
+            for (float i = 0; i < values.Length; i += step) 
             {
                 calculatedValues.Add(values[(int)i]);
             }

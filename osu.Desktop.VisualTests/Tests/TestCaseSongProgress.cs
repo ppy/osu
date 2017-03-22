@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.MathUtils;
 using osu.Framework.Screens.Testing;
 using osu.Game.Screens.Play;
 
@@ -34,15 +35,13 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void displayNewValues()
         {
-            var random = new Random();
-
             List<int> newValues = new List<int>();
             for (int i = 0; i < 1000; i++)
             {
-                newValues.Add(random.Next(0, 11));
+                newValues.Add(RNG.Next(0, 11));
             }
 
-            progress.DisplayValues(newValues);
+            progress.DisplayValues(newValues.ToArray());
         }
     }
 }

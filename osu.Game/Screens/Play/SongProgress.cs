@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
         {
-            current = osuGame.Beatmap.Value;
+            current = osuGame.Beatmap.Value; 
         }
 
         protected override void Update()
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public void DisplayValues(List<int> values)
+        public void DisplayValues(int[] values)
         {
             graph.Values = values;
         }
