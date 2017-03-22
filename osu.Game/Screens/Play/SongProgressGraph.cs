@@ -4,7 +4,6 @@
 using OpenTK;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
-using System;
 
 namespace osu.Game.Screens.Play
 {
@@ -85,8 +84,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            float step = (float)values.Count / (float)ColumnCount;
-
+            float step = values.Count / ColumnCount;
             for (float i = 0; i < values.Count; i += step) 
             {
                 calculatedValues.Add(values[(int)i]);
@@ -103,7 +101,7 @@ namespace osu.Game.Screens.Play
                 columns.Add(new SongProgressGraphColumn
                 {
                     Position = new Vector2(x + 1, 0),
-                    State = ColumnState.Dimmed
+                    State = ColumnState.Dimmed,
                 });
 
                 Add(columns[columns.Count - 1]);
