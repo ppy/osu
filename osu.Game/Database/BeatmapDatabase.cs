@@ -18,7 +18,7 @@ using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Database
 {
-    public partial class BeatmapDatabase
+    public class BeatmapDatabase
     {
         private SQLiteConnection connection { get; }
         private Storage storage;
