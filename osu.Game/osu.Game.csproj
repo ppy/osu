@@ -363,6 +363,7 @@
     <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabItem.cs" />
+    <Compile Include="Database\DatabaseWorkingBeatmap.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

@@ -17,6 +17,8 @@ using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.Taiko.UI;
 using System.Collections.Generic;
+using osu.Framework.Graphics.Textures;
+using osu.Desktop.VisualTests.Beatmaps;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -94,17 +96,6 @@ namespace osu.Desktop.VisualTests.Tests
                     }
                 }
             });
-        }
-
-        private class TestWorkingBeatmap : WorkingBeatmap
-        {
-            public TestWorkingBeatmap(Beatmap beatmap)
-                : base(beatmap.BeatmapInfo, beatmap.BeatmapInfo.BeatmapSet)
-            {
-                Beatmap = beatmap;
-            }
-
-            protected override ArchiveReader GetReader() => null;
         }
     }
 }
