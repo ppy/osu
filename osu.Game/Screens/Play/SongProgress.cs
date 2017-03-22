@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play
         public static readonly int GRAPH_HEIGHT = 34;
         public static readonly Color4 FILL_COLOUR = new Color4(221, 255, 255, 255);
         public static readonly Color4 GLOW_COLOUR = new Color4(221, 255, 255, 150);
-        private float progress_transition_duration = 100;
+        private const float progress_transition_duration = 100;
 
         private SongProgressBar progress;
         private SongProgressGraph graph;
