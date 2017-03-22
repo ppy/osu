@@ -24,6 +24,8 @@ namespace osu.Game.Screens
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
+        internal virtual bool HasLocalCursorDisplayed => false;
+
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         public WorkingBeatmap Beatmap
@@ -68,6 +70,8 @@ namespace osu.Game.Screens
             OsuScreen lastOsu = last as OsuScreen;
 
             BackgroundScreen bg = CreateBackground();
+
+            OnBeatmapChanged(Beatmap);
 
             if (lastOsu?.Background != null)
             {

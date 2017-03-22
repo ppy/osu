@@ -19,7 +19,6 @@ namespace osu.Game.Screens.Play
         private Container textLayer;
         private SpriteText countSpriteText;
 
-        public override string Name { get; }
         public bool IsCounting { get; set; }
         private int count;
         public int Count
@@ -54,7 +53,7 @@ namespace osu.Game.Screens.Play
         //further: change default values here and in KeyCounterCollection if needed, instead of passing them in every constructor
         public Color4 KeyDownTextColor { get; set; } = Color4.DarkGray;
         public Color4 KeyUpTextColor { get; set; } = Color4.White;
-        public int FadeTime { get; set; } = 0;
+        public int FadeTime { get; set; }
 
         protected KeyCounter(string name)
         {

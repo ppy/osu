@@ -8,9 +8,9 @@ using OpenTK.Graphics;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes;
-using osu.Game.Modes.Osu;
-using osu.Game.Modes.Osu.Objects;
 using osu.Game.Tests.Resources;
+using osu.Game.Modes.Osu;
+using osu.Game.Modes.Objects.Legacy;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             {
                 var beatmap = decoder.Decode(new StreamReader(stream));
-                var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
+                var difficulty = beatmap.BeatmapInfo.Difficulty;
                 Assert.AreEqual(6.5f, difficulty.DrainRate);
                 Assert.AreEqual(4, difficulty.CircleSize);
                 Assert.AreEqual(8, difficulty.OverallDifficulty);
@@ -133,16 +133,16 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             {
                 var beatmap = decoder.Decode(new StreamReader(stream));
-                var slider = beatmap.HitObjects[0] as Slider;
+                var slider = beatmap.HitObjects[0] as LegacySlider;
                 Assert.IsNotNull(slider);
                 Assert.AreEqual(new Vector2(192, 168), slider.Position);
                 Assert.AreEqual(956, slider.StartTime);
                 Assert.AreEqual(SampleType.None, slider.Sample.Type);
-                var circle = beatmap.HitObjects[1] as HitCircle;
-                Assert.IsNotNull(circle);
-                Assert.AreEqual(new Vector2(304, 56), circle.Position);
-                Assert.AreEqual(1285, circle.StartTime);
-                Assert.AreEqual(SampleType.Clap, circle.Sample.Type);
+                var hit = beatmap.HitObjects[1] as LegacyHit;
+                Assert.IsNotNull(hit);
+                Assert.AreEqual(new Vector2(304, 56), hit.Position);
+                Assert.AreEqual(1285, hit.StartTime);
+                Assert.AreEqual(SampleType.Clap, hit.Sample.Type);
             }
         }
     }

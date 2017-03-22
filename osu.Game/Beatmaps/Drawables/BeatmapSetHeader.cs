@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class BeatmapSetHeader : Panel
+    public class BeatmapSetHeader : Panel
     {
         public Action<BeatmapSetHeader> GainedSelection;
         private SpriteText title, artist;
@@ -32,13 +32,9 @@ namespace osu.Game.Beatmaps.Drawables
 
             Children = new Drawable[]
             {
-                new PanelBackground(beatmap)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
                 new FillFlowContainer
                 {
-                    Direction = FillDirection.Down,
+                    Direction = FillDirection.Vertical,
                     Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
@@ -52,7 +48,6 @@ namespace osu.Game.Beatmaps.Drawables
                         },
                         artist = new OsuSpriteText
                         {
-                            Margin = new MarginPadding { Top = -1 },
                             Font = @"Exo2.0-SemiBoldItalic",
                             Text = beatmap.BeatmapSetInfo.Metadata.Artist,
                             TextSize = 17,
@@ -75,13 +70,23 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, OsuGameBase game)
         {
             this.config = config;
 
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
             preferUnicode.ValueChanged += preferUnicode_changed;
             preferUnicode_changed(preferUnicode, null);
+
+            new PanelBackground(beatmap)
+            {
+                RelativeSizeAxes = Axes.Both,
+                Depth = 1,
+            }.LoadAsync(game, b =>
+            {
+                Add(b);
+                b.FadeInFromZero(200);
+            });
         }
 
         private void preferUnicode_changed(object sender, EventArgs e)
@@ -97,22 +102,24 @@ namespace osu.Game.Beatmaps.Drawables
             base.Dispose(isDisposing);
         }
 
-        class PanelBackground : BufferedContainer
+        private class PanelBackground : BufferedContainer
         {
-            private readonly WorkingBeatmap working;
-
             public PanelBackground(WorkingBeatmap working)
             {
-                this.working = working;
-
                 CacheDrawnFrameBuffer = true;
 
-                Children = new[]
+                Children = new Drawable[]
                 {
+                    new BeatmapBackgroundSprite(working)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        FillMode = FillMode.Fill,
+                    },
                     new FillFlowContainer
                     {
                         Depth = -1,
-                        Direction = FillDirection.Right,
+                        Direction = FillDirection.Horizontal,
                         RelativeSizeAxes = Axes.Both,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),
@@ -151,21 +158,6 @@ namespace osu.Game.Beatmaps.Drawables
                         }
                     },
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuGameBase game)
-            {
-                new BeatmapBackgroundSprite(working)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    FillMode = FillMode.Fill,
-                }.LoadAsync(game, (bg) =>
-                {
-                    Add(bg);
-                    ForceRedraw();
-                });
             }
         }
 

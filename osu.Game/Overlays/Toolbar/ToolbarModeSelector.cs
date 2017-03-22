@@ -15,9 +15,9 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    class ToolbarModeSelector : Container
+    internal class ToolbarModeSelector : Container
     {
-        const float padding = 10;
+        private const float padding = 10;
 
         private FillFlowContainer modeButtons;
         private Drawable modeButtonLine;
@@ -29,14 +29,14 @@ namespace osu.Game.Overlays.Toolbar
         {
             RelativeSizeAxes = Axes.Y;
 
-            Children = new Drawable[]
+            Children = new[]
             {
                 new OpaqueBackground(),
                 modeButtons = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Direction = FillDirection.Right,
+                    Direction = FillDirection.Horizontal,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding { Left = padding, Right = padding },
@@ -64,11 +64,8 @@ namespace osu.Game.Overlays.Toolbar
                 }
             };
 
-            int amountButtons = 0;
-            foreach (PlayMode m in Enum.GetValues(typeof(PlayMode)))
+            foreach (PlayMode m in Ruleset.PlayModes)
             {
-                ++amountButtons;
-
                 var localMode = m;
                 modeButtons.Add(new ToolbarModeButton
                 {

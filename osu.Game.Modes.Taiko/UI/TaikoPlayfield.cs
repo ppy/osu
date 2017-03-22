@@ -5,13 +5,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.UI;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Modes.Taiko.Judgements;
 
 namespace osu.Game.Modes.Taiko.UI
 {
-    public class TaikoPlayfield : Playfield
+    public class TaikoPlayfield : Playfield<TaikoHitObject, TaikoJudgementInfo>
     {
         public TaikoPlayfield()
         {

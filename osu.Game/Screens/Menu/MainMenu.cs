@@ -10,20 +10,24 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
 using osu.Game.Screens.Direct;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multiplayer;
 using OpenTK;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Tournament;
+using osu.Framework.Input;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
     public class MainMenu : OsuScreen
     {
         private ButtonSystem buttons;
-        public override string Name => @"Main Menu";
 
         internal override bool ShowOverlays => buttons.State != MenuState.Initial;
 
         private BackgroundScreen background;
+        private Screen songSelect;
 
         protected override BackgroundScreen CreateBackground() => background;
 
@@ -42,8 +46,8 @@ namespace osu.Game.Screens.Menu
                         {
                             OnChart = delegate { Push(new ChartListing()); },
                             OnDirect = delegate { Push(new OnlineListing()); },
-                            OnEdit = delegate { Push(new EditSongSelect()); },
-                            OnSolo = delegate { Push(new PlaySongSelect()); },
+                            OnEdit = delegate { Push(new Editor()); },
+                            OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
                             OnTest  = delegate { Push(new TestBrowser()); },
                             OnExit = delegate { Exit(); },
@@ -59,6 +63,24 @@ namespace osu.Game.Screens.Menu
             background.LoadAsync(game);
 
             buttons.OnSettings = game.ToggleOptions;
+
+            preloadSongSelect();
+        }
+
+        private void preloadSongSelect()
+        {
+            if (songSelect == null)
+            {
+                songSelect = new PlaySongSelect();
+                songSelect.LoadAsync(Game);
+            }
+        }
+
+        private Screen consumeSongSelect()
+        {
+            var s = songSelect;
+            songSelect = null;
+            return s;
         }
 
         protected override void OnEntering(Screen last)
@@ -83,6 +105,9 @@ namespace osu.Game.Screens.Menu
         {
             base.OnResuming(last);
 
+            //we may have consumed our preloaded instance, so let's make another.
+            preloadSongSelect();
+
             const float length = 300;
 
             buttons.State = MenuState.TopLevel;
@@ -96,6 +121,17 @@ namespace osu.Game.Screens.Menu
             buttons.State = MenuState.Exit;
             Content.FadeOut(3000);
             return base.OnExiting(next);
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (!args.Repeat && state.Keyboard.ControlPressed && state.Keyboard.ShiftPressed && args.Key == Key.D)
+            {
+                Push(new Drawings());
+                return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
     }
 }

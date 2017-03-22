@@ -11,16 +11,12 @@ namespace osu.Game.Beatmaps.Timing
             TimingChange = true,
         };
 
+        public TimeSignatures TimeSignature;
         public double Time;
         public double BeatLength;
         public double VelocityAdjustment;
         public bool TimingChange;
-        
-    }
-
-    internal enum TimeSignatures
-    {
-        SimpleQuadruple = 4,
-        SimpleTriple = 3
+        public bool KiaiMode;
+        public bool OmitFirstBarLine;
     }
 }

@@ -12,16 +12,16 @@ using osu.Framework.Configuration;
 
 namespace osu.Game.Graphics.Containers
 {
-    class ParallaxContainer : Container
+    internal class ParallaxContainer : Container
     {
         public float ParallaxAmount = 0.02f;
 
         private Bindable<bool> parallaxEnabled;
 
-        public override bool Contains(Vector2 screenSpacePos) => true;
-
         public ParallaxContainer()
         {
+            AlwaysReceiveInput = true;
+
             RelativeSizeAxes = Axes.Both;
             AddInternal(content = new Container
             {
@@ -51,7 +51,7 @@ namespace osu.Game.Graphics.Containers
             };
         }
 
-        bool firstUpdate = true;
+        private bool firstUpdate = true;
 
         protected override void Update()
         {

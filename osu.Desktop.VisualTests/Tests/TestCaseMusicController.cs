@@ -9,9 +9,8 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseMusicController : TestCase
+    internal class TestCaseMusicController : TestCase
     {
-        public override string Name => @"Music Controller";
         public override string Description => @"Tests music controller ui.";
 
         private MusicController mc;
@@ -31,7 +30,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Anchor = Anchor.Centre
             };
             Add(mc);
-            AddToggle(@"Show", (state) => mc.State = state ? Visibility.Visible : Visibility.Hidden);
+            AddToggle(@"Show", state => mc.State = state ? Visibility.Visible : Visibility.Hidden);
         }
     }
 }

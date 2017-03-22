@@ -3,11 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -23,6 +23,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays
 {
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays
     {
         private MusicControllerBackground backgroundSprite;
         private DragBar progress;
-        private TextAwesome playButton, listButton;
+        private TextAwesome playButton;
         private SpriteText title, artist;
 
         private List<BeatmapSetInfo> playList;
@@ -59,10 +60,12 @@ namespace osu.Game.Overlays
 
         protected override bool OnDrag(InputState state)
         {
-            Vector2 change = (state.Mouse.Position - state.Mouse.PositionMouseDown.Value);
+            Trace.Assert(state.Mouse.PositionMouseDown != null, "state.Mouse.PositionMouseDown != null");
+
+            Vector2 change = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
 
             // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-            change *= (float)Math.Pow(change.Length, 0.7f) / change.Length;
+            change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
 
             dragContainer.MoveTo(change);
             return base.OnDrag(state);
@@ -187,7 +190,7 @@ namespace osu.Game.Overlays
                             Position = new Vector2(20, -30),
                             Children = new Drawable[]
                             {
-                                listButton = new TextAwesome
+                                new TextAwesome
                                 {
                                     TextSize = 15,
                                     Icon = FontAwesome.fa_bars,
@@ -207,7 +210,7 @@ namespace osu.Game.Overlays
                     }
                 }
             };
-        
+
             this.beatmaps = beatmaps;
             trackManager = osuGame.Audio.Track;
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
@@ -244,16 +247,18 @@ namespace osu.Game.Overlays
 
                 if (current.Track.HasCompleted && !current.Track.Looping) next();
             }
+            else
+                playButton.Icon = FontAwesome.fa_play_circle_o;
         }
 
-        void preferUnicode_changed(object sender, EventArgs e)
+        private void preferUnicode_changed(object sender, EventArgs e)
         {
             updateDisplay(current, TransformDirection.None);
         }
 
         private void workingChanged(object sender = null, EventArgs e = null)
         {
-            progress.IsEnabled = (beatmapSource.Value != null);
+            progress.IsEnabled = beatmapSource.Value != null;
             if (beatmapSource.Value == current) return;
             bool audioEquals = current?.BeatmapInfo?.AudioEquals(beatmapSource?.Value?.BeatmapInfo) ?? false;
             current = beatmapSource.Value;
@@ -323,7 +328,7 @@ namespace osu.Game.Overlays
             updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
-        Action pendingBeatmapSwitch;
+        private Action pendingBeatmapSwitch;
 
         private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
         {
@@ -334,12 +339,16 @@ namespace osu.Game.Overlays
                 Task.Run(() =>
                 {
                     if (beatmap?.Beatmap == null)
-                        //todo: we may need to display some default text here (currently in the constructor).
-                        return;
-
-                    BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
-                    title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
-                    artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
+                    {
+                        title.Text = @"Nothing to play";
+                        artist.Text = @"Nothing to play";
+                    }
+                    else
+                    {
+                        BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
+                        title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
+                        artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
+                    }
                 });
 
                 MusicControllerBackground newBackground;
@@ -384,7 +393,7 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        const float transition_length = 800;
+        private const float transition_length = 800;
 
         protected override void PopIn()
         {

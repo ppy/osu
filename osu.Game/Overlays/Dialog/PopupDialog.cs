@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -11,6 +12,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -172,7 +174,7 @@ namespace osu.Game.Overlays.Dialog
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Position = new Vector2(0f, -50f),
-                            Direction = FillDirection.Down,
+                            Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0f, 10f),
                             Children = new Drawable[]
                             {
@@ -211,7 +213,7 @@ namespace osu.Game.Overlays.Dialog
                                         },
                                     },
                                 },
-                                header = new SpriteText
+                                header = new OsuSpriteText
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
@@ -219,7 +221,7 @@ namespace osu.Game.Overlays.Dialog
                                     TextSize = 25,
                                     Shadow = true,
                                 },
-                                body = new SpriteText
+                                body = new OsuSpriteText
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
@@ -235,7 +237,7 @@ namespace osu.Game.Overlays.Dialog
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Down,
+                            Direction = FillDirection.Vertical,
                         },
                     },
                 },

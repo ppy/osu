@@ -5,11 +5,11 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Configuration;
@@ -17,7 +17,7 @@ using System;
 
 namespace osu.Game.Graphics.Cursor
 {
-    class OsuCursorContainer : CursorContainer
+    public class OsuCursorContainer : CursorContainer
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 
@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.Cursor
             return base.OnMouseUp(state, args);
         }
 
-        class OsuCursor : Container
+        public class OsuCursor : Container
         {
             private Container cursorContainer;
             private Bindable<double> cursorScale;

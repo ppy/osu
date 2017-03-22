@@ -7,7 +7,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
 {
-    class OptionLabel : OsuSpriteText
+    internal class OptionLabel : OsuSpriteText
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
