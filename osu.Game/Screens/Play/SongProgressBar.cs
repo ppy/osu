@@ -7,15 +7,12 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Screens.Play
 {
     public class SongProgressBar : DragBar
     {
         public static readonly Vector2 HANDLE_SIZE = new Vector2(14, 25);
-
-        private Container handle;
 
         public SongProgressBar()
         {
@@ -29,7 +26,7 @@ namespace osu.Game.Screens.Play
                 Alpha = 0.5f,
                 Depth = 1
             });
-            FillContainer.Add(handle = new Container
+            FillContainer.Add(new Container
             {
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,

@@ -11,7 +11,7 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseSongProgress : TestCase
     {
-        public override string Description => @"With real data";
+        public override string Description => @"With (half)real data";
 
         private SongProgress progress;
 
