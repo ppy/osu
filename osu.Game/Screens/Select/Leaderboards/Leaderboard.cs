@@ -27,11 +27,15 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 scores = value;
 
-                int i = 0;
+                int i = 150;
                 if (scores == null)
                 {
                     foreach (var c in scrollFlow.Children)
-                        c.FadeOut(150 + i++ * 10);
+                        c.FadeOut(i += 10);
+
+                    foreach (var c in scrollFlow.Children)
+                        c.LifetimeEnd = Time.Current + i;
+
                     return;
                 }
 
