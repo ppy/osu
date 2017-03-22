@@ -22,14 +22,14 @@ namespace osu.Game.Database
                 this.database = database;
             }
 
-            private ArchiveReader GetReader() => database?.GetReader(BeatmapSetInfo);
+            private ArchiveReader getReader() => database?.GetReader(BeatmapSetInfo);
             
             protected override Beatmap GetBeatmap()
             {
                 Beatmap beatmap;
                 try
                 {
-                    using (var reader = GetReader())
+                    using (var reader = getReader())
                     {
                         BeatmapDecoder decoder;
                         using (var stream = new StreamReader(reader.GetStream(BeatmapInfo.Path)))
@@ -40,7 +40,7 @@ namespace osu.Game.Database
 
                         if (WithStoryboard && beatmap != null && BeatmapSetInfo.StoryboardFile != null)
                             using (var stream = new StreamReader(reader.GetStream(BeatmapSetInfo.StoryboardFile)))
-                                decoder?.Decode(stream, beatmap);
+                                decoder.Decode(stream, beatmap);
                     }
                 }
                 catch { return null; }
@@ -54,7 +54,7 @@ namespace osu.Game.Database
                     return null;
                 try
                 {
-                    using (var reader = GetReader())
+                    using (var reader = getReader())
                     {
                         background = new TextureStore(
                             new RawTextureLoaderStore(reader),
@@ -72,7 +72,7 @@ namespace osu.Game.Database
                 try
                 {
                     //store a reference to the reader as we may continue accessing the stream in the background.
-                    trackReader = GetReader();
+                    trackReader = getReader();
                     var trackData = trackReader?.GetStream(BeatmapInfo.Metadata.AudioFile);
                     track = trackData == null ? null : new TrackBass(trackData);
                 }

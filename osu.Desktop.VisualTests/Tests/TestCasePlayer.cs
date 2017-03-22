@@ -8,7 +8,6 @@ using osu.Framework.Screens.Testing;
 using osu.Game.Beatmaps;
 using OpenTK;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
@@ -23,7 +22,6 @@ namespace osu.Desktop.VisualTests.Tests
     {
         protected Player Player;
         private BeatmapDatabase db;
-
 
         public override string Description => @"Showing everything to play the game.";
 

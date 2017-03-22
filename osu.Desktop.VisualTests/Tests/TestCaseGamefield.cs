@@ -8,7 +8,6 @@ using osu.Framework.MathUtils;
 using osu.Framework.Screens.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Modes.Catch.UI;
 using osu.Game.Modes.Mania.UI;
@@ -17,7 +16,6 @@ using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.Taiko.UI;
 using System.Collections.Generic;
-using osu.Framework.Graphics.Textures;
 using osu.Desktop.VisualTests.Beatmaps;
 
 namespace osu.Desktop.VisualTests.Tests
