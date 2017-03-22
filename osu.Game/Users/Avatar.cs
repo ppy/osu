@@ -52,7 +52,7 @@ namespace osu.Game.Users
         {
             if (loadTask != null || Sprite != null) return;
 
-            var newSprite = userId > 1 ? new OnlineSprite($@"https://a.ppy.sh/{userId}") : new Sprite { Texture = guestTexture };
+            var newSprite = userId > 1 ? new OnlineSprite($@"https://a.ppy.sh/{userId}", guestTexture) : new Sprite { Texture = guestTexture };
 
             newSprite.FillMode = FillMode.Fill;
 
@@ -95,17 +95,19 @@ namespace osu.Game.Users
         public class OnlineSprite : Sprite
         {
             private readonly string url;
+            private readonly Texture fallbackTexture;
 
-            public OnlineSprite(string url)
+            public OnlineSprite(string url, Texture fallbackTexture = null)
             {
                 Debug.Assert(url != null);
                 this.url = url;
+                this.fallbackTexture = fallbackTexture;
             }
 
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                Texture = textures.Get(url);
+                Texture = textures.Get(url) ?? fallbackTexture;
             }
         }
     }
