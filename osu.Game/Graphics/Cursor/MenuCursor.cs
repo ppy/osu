@@ -97,8 +97,6 @@ namespace osu.Game.Graphics.Cursor
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config, TextureStore textures, OsuColour colour)
             {
-                cursorScale = config.GetBindable<double>(OsuConfig.CursorSize);
-
                 Children = new Drawable[]
                 {
                     cursorContainer = new Container
@@ -122,7 +120,10 @@ namespace osu.Game.Graphics.Cursor
                         }
                     }
                 };
+
+                cursorScale = config.GetBindable<double>(OsuConfig.MenuCursorSize);
                 cursorScale.ValueChanged += scaleChanged;
+                cursorScale.TriggerChange();
             }
 
             private void scaleChanged(object sender, EventArgs e)
