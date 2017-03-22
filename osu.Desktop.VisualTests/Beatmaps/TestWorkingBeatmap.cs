@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
@@ -15,18 +18,9 @@ namespace osu.Desktop.VisualTests.Beatmaps
         }
 
         private Beatmap beatmap;
-        public override Beatmap Beatmap => beatmap;
-        public override Texture Background => null;
-        public override Track Track => null;
         
-        public override void Dispose()
-        {
-            // This space intentionally left blank
-        }
-        
-        public override void TransferTo(WorkingBeatmap other)
-        {
-            // This space intentionally left blank
-        }
+        protected override Beatmap GetBeatmap() => beatmap;
+        protected override Texture GetBackground() => null;
+        protected override Track GetTrack() => null;
     }
 }

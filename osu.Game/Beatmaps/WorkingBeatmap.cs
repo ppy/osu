@@ -36,14 +36,64 @@ namespace osu.Game.Beatmaps
             BeatmapSetInfo = beatmapSetInfo;
             WithStoryboard = withStoryboard;
         }
+
+        protected abstract Beatmap GetBeatmap();
+        protected abstract Texture GetBackground();
+        protected abstract Track GetTrack();
         
-        public abstract Beatmap Beatmap { get; }
-        public abstract Texture Background { get; }
-        public abstract Track Track { get; }
+        private Beatmap beatmap;
+        private object beatmapLock = new object();
+        public Beatmap Beatmap
+        {
+            get
+            {
+                lock (beatmapLock)
+                {
+                    return beatmap ?? (beatmap = GetBeatmap());
+                }
+            }
+        }
+        
+        private object backgroundLock = new object();
+        private Texture background;
+        public Texture Background
+        {
+            get
+            {
+                lock (backgroundLock)
+                {
+                    return background ?? (background = GetBackground());
+                }
+            }
+        }
 
-        public abstract void TransferTo(WorkingBeatmap other);
-        public abstract void Dispose();
+        private Track track;
+        private object trackLock = new object();
+        public Track Track
+        {
+            get
+            {
+                lock (trackLock)
+                {
+                    return track ?? (track = GetTrack());
+                }
+            }
+        }
 
-        public virtual bool TrackLoaded => Track != null;
+        public bool TrackLoaded => track != null;
+
+        public void TransferTo(WorkingBeatmap other)
+        {
+            if (track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
+                other.track = track;
+        }
+        
+        public virtual void Dispose()
+        {
+            track?.Dispose();
+            track = null;
+            background?.Dispose();
+            background = null;
+        }
     }
 }
