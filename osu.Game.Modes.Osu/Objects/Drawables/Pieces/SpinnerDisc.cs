@@ -61,6 +61,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     {
                         Colour = Color4.White,
                         RelativePositionAxes = Axes.Both,
+                        Masking = true,
                         Origin = Anchor.Centre,
                         Size = new Vector2(1 / ScreenSpaceDrawQuad.Width * 2000),
                         Children = new[]
