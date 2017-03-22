@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
             }
 
-            var h = DrawHeight - LeaderboardFilterControl.HEIGHT;
+            var h = DrawHeight - LeaderboardFilterControl.HEIGHT - Padding.TotalVertical;
             if (scrollContainer.Height != h) scrollContainer.Height = h;
         }
     }
