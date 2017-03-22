@@ -4,7 +4,13 @@
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -36,5 +42,131 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         protected override DropdownMenuItem<T> CreateMenuItem(string text, T value) => new OsuDropdownMenuItem<T>(text, value) { AccentColour = AccentColour };
+
+        private class OsuDropdownMenuItem<U> : DropdownMenuItem<U>
+        {
+            public OsuDropdownMenuItem(string text, U value) : base(text, value)
+            {
+                Foreground.Padding = new MarginPadding(2);
+
+                Masking = true;
+                CornerRadius = 6;
+
+                Children = new[]
+                {
+                new FillFlowContainer
+                {
+                    Direction = FillDirection.Horizontal,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
+                    {
+                        chevron = new TextAwesome
+                        {
+                            AlwaysPresent = true,
+                            Icon = FontAwesome.fa_chevron_right,
+                            UseFullGlyphHeight = false,
+                            Colour = Color4.Black,
+                            Alpha = 0.5f,
+                            TextSize = 8,
+                            Margin = new MarginPadding { Left = 3, Right = 3 },
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.CentreLeft,
+                        },
+                        new OsuSpriteText {
+                            Text = text,
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.CentreLeft,
+                        }
+                    }
+                }
+            };
+            }
+
+            private Color4? accentColour;
+
+            private TextAwesome chevron;
+
+            protected override void FormatForeground(bool hover = false)
+            {
+                base.FormatForeground(hover);
+                chevron.Alpha = hover ? 1 : 0;
+            }
+
+            public Color4 AccentColour
+            {
+                get { return accentColour.GetValueOrDefault(); }
+                set
+                {
+                    accentColour = value;
+                    BackgroundColourHover = BackgroundColourSelected = value;
+                    FormatBackground();
+                    FormatForeground();
+                }
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                BackgroundColour = Color4.Transparent;
+                BackgroundColourHover = accentColour ?? colours.PinkDarker;
+                BackgroundColourSelected = Color4.Black.Opacity(0.5f);
+            }
+        }
+
+        protected class OsuDropdownHeader : DropdownHeader
+        {
+            private SpriteText label;
+            protected override string Label
+            {
+                get { return label.Text; }
+                set { label.Text = value; }
+            }
+
+            private Color4? accentColour;
+            public virtual Color4 AccentColour
+            {
+                get { return accentColour.GetValueOrDefault(); }
+                set
+                {
+                    accentColour = value;
+                    BackgroundColourHover = value;
+                }
+            }
+
+            public OsuDropdownHeader()
+            {
+                Foreground.Padding = new MarginPadding(4);
+
+                AutoSizeAxes = Axes.None;
+                Margin = new MarginPadding { Bottom = 4 };
+                CornerRadius = 4;
+                Height = 40;
+
+                Foreground.Children = new Drawable[]
+                {
+                label = new OsuSpriteText
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                new TextAwesome
+                {
+                    Icon = FontAwesome.fa_chevron_down,
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Margin = new MarginPadding { Right = 4 },
+                    TextSize = 20
+                }
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                BackgroundColour = Color4.Black.Opacity(0.5f);
+                BackgroundColourHover = accentColour ?? colours.PinkDarker;
+            }
+        }
     }
 }

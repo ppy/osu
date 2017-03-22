@@ -6,11 +6,15 @@ using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -53,7 +57,111 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public class OsuTabDropdown : OsuDropdown<T>
+        private class OsuTabItem<U> : TabItem<U>
+        {
+            private SpriteText text;
+            private Box box;
+
+            private Color4? accentColour;
+            public Color4 AccentColour
+            {
+                get { return accentColour.GetValueOrDefault(); }
+                set
+                {
+                    accentColour = value;
+                    if (!Active)
+                        text.Colour = value;
+                }
+            }
+
+            public new U Value
+            {
+                get { return base.Value; }
+                set
+                {
+                    base.Value = value;
+                    text.Text = (value as Enum)?.GetDescription();
+                }
+            }
+
+            public override bool Active
+            {
+                get { return base.Active; }
+                set
+                {
+                    if (Active == value) return;
+
+                    if (value)
+                        fadeActive();
+                    else
+                        fadeInactive();
+                    base.Active = value;
+                }
+            }
+
+            private const float transition_length = 500;
+
+            private void fadeActive()
+            {
+                box.FadeIn(transition_length, EasingTypes.OutQuint);
+                text.FadeColour(Color4.White, transition_length, EasingTypes.OutQuint);
+            }
+
+            private void fadeInactive()
+            {
+                box.FadeOut(transition_length, EasingTypes.OutQuint);
+                text.FadeColour(AccentColour, transition_length, EasingTypes.OutQuint);
+            }
+
+            protected override bool OnHover(InputState state)
+            {
+                if (!Active)
+                    fadeActive();
+                return true;
+            }
+
+            protected override void OnHoverLost(InputState state)
+            {
+                if (!Active)
+                    fadeInactive();
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                if (accentColour == null)
+                    AccentColour = colours.Blue;
+            }
+
+            public OsuTabItem()
+            {
+                AutoSizeAxes = Axes.X;
+                RelativeSizeAxes = Axes.Y;
+
+                Children = new Drawable[]
+                {
+                text = new OsuSpriteText
+                {
+                    Margin = new MarginPadding(5),
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
+                    TextSize = 14,
+                    Font = @"Exo2.0-Bold", // Font should only turn bold when active?
+                },
+                box = new Box
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 1,
+                    Alpha = 0,
+                    Colour = Color4.White,
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
+                }
+                };
+            }
+        }
+
+        private class OsuTabDropdown : OsuDropdown<T>
         {
             protected override DropdownHeader CreateHeader() => new OsuTabDropdownHeader
             {
@@ -80,7 +188,7 @@ namespace osu.Game.Graphics.UserInterface
                 DropdownMenu.MaxHeight = 400;
             }
 
-            public class OsuTabDropdownHeader : OsuDropdownHeader
+            protected class OsuTabDropdownHeader : OsuDropdownHeader
             {
                 public override Color4 AccentColour
                 {

@@ -161,9 +161,7 @@
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
     <Compile Include="Overlays\Options\OptionDropDown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
-    <Compile Include="Graphics\UserInterface\OsuDropdownHeader.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropdown.cs" />
-    <Compile Include="Graphics\UserInterface\OsuDropdownMenuItem.cs" />
     <Compile Include="Overlays\Options\OptionsFooter.cs" />
     <Compile Include="Overlays\Options\Sections\DebugSection.cs" />
     <Compile Include="Overlays\Options\Sections\Debug\GeneralOptions.cs" />
@@ -363,7 +361,6 @@
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
-    <Compile Include="Graphics\UserInterface\OsuTabItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
