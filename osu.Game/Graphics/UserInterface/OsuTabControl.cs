@@ -16,11 +16,11 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
-        protected override DropDown<T> CreateDropDown() => new OsuTabDropDown();
+        protected override Dropdown<T> CreateDropdown() => new OsuTabDropdown();
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem<T> { Value = value };
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || DropDown.Contains(screenSpacePos);
+        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || Dropdown.Contains(screenSpacePos);
 
         public OsuTabControl()
         {
@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                var dropDown = DropDown as OsuTabDropDown;
+                var dropDown = Dropdown as OsuTabDropdown;
                 if (dropDown != null)
                     dropDown.AccentColour = value;
                 foreach (var item in TabContainer.Children.OfType<OsuTabItem<T>>())
@@ -53,34 +53,34 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public class OsuTabDropDown : OsuDropDown<T>
+        public class OsuTabDropdown : OsuDropdown<T>
         {
-            protected override DropDownHeader CreateHeader() => new OsuTabDropDownHeader
+            protected override DropdownHeader CreateHeader() => new OsuTabDropdownHeader
             {
                 AccentColour = AccentColour,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             };
 
-            protected override DropDownMenuItem<T> CreateMenuItem(string text, T value)
+            protected override DropdownMenuItem<T> CreateMenuItem(string text, T value)
             {
                 var item = base.CreateMenuItem(text, value);
                 item.ForegroundColourHover = Color4.Black;
                 return item;
             }
 
-            public OsuTabDropDown()
+            public OsuTabDropdown()
             {
-                DropDownMenu.Anchor = Anchor.TopRight;
-                DropDownMenu.Origin = Anchor.TopRight;
+                DropdownMenu.Anchor = Anchor.TopRight;
+                DropdownMenu.Origin = Anchor.TopRight;
 
                 RelativeSizeAxes = Axes.X;
 
-                DropDownMenu.Background.Colour = Color4.Black.Opacity(0.7f);
-                DropDownMenu.MaxHeight = 400;
+                DropdownMenu.Background.Colour = Color4.Black.Opacity(0.7f);
+                DropdownMenu.MaxHeight = 400;
             }
 
-            public class OsuTabDropDownHeader : OsuDropDownHeader
+            public class OsuTabDropdownHeader : OsuDropdownHeader
             {
                 public override Color4 AccentColour
                 {
@@ -104,7 +104,7 @@ namespace osu.Game.Graphics.UserInterface
                     base.OnHoverLost(state);
                 }
 
-                public OsuTabDropDownHeader()
+                public OsuTabDropdownHeader()
                 {
                     RelativeSizeAxes = Axes.None;
                     AutoSizeAxes = Axes.X;

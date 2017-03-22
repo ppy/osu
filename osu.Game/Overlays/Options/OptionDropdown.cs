@@ -13,9 +13,9 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionDropDown<T> : FillFlowContainer
+    public class OptionDropdown<T> : FillFlowContainer
     {
-        private DropDown<T> dropdown;
+        private Dropdown<T> dropdown;
         private SpriteText text;
 
         public string LabelText
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Options
             }
         }
 
-        public OptionDropDown()
+        public OptionDropdown()
         {
             Items = new KeyValuePair<string, T>[0];
 
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Options
                 text = new OsuSpriteText {
                     Alpha = 0,
                 },
-                dropdown = new OsuDropDown<T>
+                dropdown = new OsuDropdown<T>
                 {
                     Margin = new MarginPadding { Top = 5 },
                     RelativeSizeAxes = Axes.X,

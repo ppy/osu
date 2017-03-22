@@ -8,9 +8,9 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionEnumDropDown<T> : OptionDropDown<T>
+    public class OptionEnumDropdown<T> : OptionDropdown<T>
     {
-        public OptionEnumDropDown()
+        public OptionEnumDropdown()
         {
             if (!typeof(T).IsEnum)
                 throw new InvalidOperationException("OptionsDropdown only supports enums as the generic type argument");

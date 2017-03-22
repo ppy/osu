@@ -12,9 +12,9 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuDropDownMenuItem<U> : DropDownMenuItem<U>
+    public class OsuDropdownMenuItem<T> : DropdownMenuItem<T>
     {
-        public OsuDropDownMenuItem(string text, U value) : base(text, value)
+        public OsuDropdownMenuItem(string text, T value) : base(text, value)
         {
             Foreground.Padding = new MarginPadding(2);
 
