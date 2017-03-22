@@ -158,8 +158,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
-            if (!IsLoaded) return;
-
             base.UpdateState(state);
 
             ball.FadeIn();
