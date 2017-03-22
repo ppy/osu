@@ -57,7 +57,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private class OsuTabItem<U> : TabItem<U>
+        private class OsuTabItem<T1> : TabItem<T1>
         {
             private SpriteText text;
             private Box box;
@@ -74,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            public new U Value
+            public new T1 Value
             {
                 get { return base.Value; }
                 set
