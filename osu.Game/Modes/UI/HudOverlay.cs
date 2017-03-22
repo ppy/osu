@@ -19,6 +19,7 @@ namespace osu.Game.Modes.UI
         public readonly ScoreCounter ScoreCounter;
         public readonly PercentageCounter AccuracyCounter;
         public readonly HealthDisplay HealthDisplay;
+        public readonly SongProgress Progress;
 
         private Bindable<bool> showKeyCounter;
 
@@ -27,6 +28,7 @@ namespace osu.Game.Modes.UI
         protected abstract PercentageCounter CreateAccuracyCounter();
         protected abstract ScoreCounter CreateScoreCounter();
         protected abstract HealthDisplay CreateHealthDisplay();
+        protected abstract SongProgress CreateProgress();
 
         protected HudOverlay()
         {
@@ -39,6 +41,7 @@ namespace osu.Game.Modes.UI
                 ScoreCounter = CreateScoreCounter(),
                 AccuracyCounter = CreateAccuracyCounter(),
                 HealthDisplay = CreateHealthDisplay(),
+                Progress = CreateProgress(),
             };
         }
 

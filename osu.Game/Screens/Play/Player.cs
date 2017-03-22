@@ -125,6 +125,7 @@ namespace osu.Game.Screens.Play
                 Depth = -1,
                 OnResume = delegate
                 {
+                    hudOverlay.Progress.State = Visibility.Visible;
                     Delay(400);
                     Schedule(Resume);
                 },
@@ -212,6 +213,7 @@ namespace osu.Game.Screens.Play
         {
             lastPauseActionTime = Time.Current;
             hudOverlay.KeyCounter.IsCounting = true;
+            hudOverlay.Progress.State = Visibility.Hidden;
             pauseOverlay.Hide();
             sourceClock.Start();
             IsPaused = false;

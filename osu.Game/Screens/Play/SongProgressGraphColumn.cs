@@ -12,8 +12,8 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressGraphColumn : Container
     {
-        private int rows = 11;
-        private readonly Color4 emptyColour = Color4.White.Opacity(50);
+        private readonly int rows = 11;
+        private readonly Color4 emptyColour = Color4.White.Opacity(100);
         private readonly Color4 litColour = SongProgress.FILL_COLOUR;
         private readonly Color4 dimmedColour = Color4.White.Opacity(175);
 
@@ -90,6 +90,7 @@ namespace osu.Game.Screens.Play
 
     public enum ColumnState
     {
-        Lit, Dimmed
+        Lit,
+        Dimmed
     }
 }
