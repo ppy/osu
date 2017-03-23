@@ -176,11 +176,11 @@ namespace osu.Game.Configuration
                 ConfineMouseMode.Fullscreen : ConfineMouseMode.Never).Disabled = true;
 
 
-            GetBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate
+            GetOriginalBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate
             {
                 if (Get<bool>(OsuConfig.SavePassword)) Set(OsuConfig.SaveUsername, true);
             };
-            GetBindable<bool>(OsuConfig.SaveUsername).ValueChanged += delegate
+            GetOriginalBindable<bool>(OsuConfig.SaveUsername).ValueChanged += delegate
             {
                 if (!Get<bool>(OsuConfig.SaveUsername)) Set(OsuConfig.SavePassword, false);
             };

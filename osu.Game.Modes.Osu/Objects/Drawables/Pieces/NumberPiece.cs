@@ -29,6 +29,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             {
                 new CircularContainer
                 {
+                    Masking = true,
+                    Origin = Anchor.Centre,
                     EdgeEffect = new EdgeEffect
                     {
                         Type = EdgeEffectType.Glow,

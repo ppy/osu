@@ -33,6 +33,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         private void load(OsuColour colours)
         {
             completeColour = colours.YellowLight.Opacity(0.8f);
+            Masking = true;
         }
 
         private class SpinnerBorder : Container
@@ -61,6 +62,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     {
                         Colour = Color4.White,
                         RelativePositionAxes = Axes.Both,
+                        Masking = true,
                         Origin = Anchor.Centre,
                         Size = new Vector2(1 / ScreenSpaceDrawQuad.Width * 2000),
                         Children = new[]
