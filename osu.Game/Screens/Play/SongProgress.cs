@@ -14,7 +14,6 @@ namespace osu.Game.Screens.Play
     public class SongProgress : OverlayContainer
     {
         private const int bar_height = 5;
-        private const int graph_height = 34;
         private readonly Vector2 handleSize = new Vector2(14, 25);
         private readonly Color4 fillColour = new Color4(221, 255, 255, 255);
         private const float transition_duration = 200;
@@ -55,30 +54,30 @@ namespace osu.Game.Screens.Play
         public SongProgress()
         {
             RelativeSizeAxes = Axes.X;
-            Height = bar_height + graph_height + SongProgressGraph.Column.HEIGHT + handleSize.Y;
+            Height = bar_height + SongProgressGraph.Column.HEIGHT + handleSize.Y;
 
             Children = new Drawable[]
             {
                 graph = new SongProgressGraph
                 {
                     RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
-                    Height = graph_height,
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
+                    Height = SongProgressGraph.Column.HEIGHT,
                     Margin = new MarginPadding
                     {
-                        Bottom = bar_height
-                    }
+                        Bottom = bar_height,
+                    },
                 },
-                bar = new SongProgressBar(bar_height, graph_height, handleSize, fillColour)
+                bar = new SongProgressBar(bar_height, SongProgressGraph.Column.HEIGHT, handleSize, fillColour)
                 {
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
                     SeekRequested = delegate (float position)
                     {
                         OnSeek?.Invoke(Length * position);
-                    }
-                }
+                    },
+                },
             };
         }
 

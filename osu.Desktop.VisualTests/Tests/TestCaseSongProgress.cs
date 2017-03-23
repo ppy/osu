@@ -39,7 +39,7 @@ namespace osu.Desktop.VisualTests.Tests
             List<int> newValues = new List<int>();
             for (int i = 0; i < 1000; i++)
             {
-                newValues.Add(RNG.Next(0, 11));
+                newValues.Add(RNG.Next(0, 6));
             }
 
             progress.Values = newValues.ToArray();

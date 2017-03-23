@@ -5,10 +5,12 @@ using OpenTK;
 using OpenTK.Graphics;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Screens.Play
 {
@@ -124,6 +126,8 @@ namespace osu.Game.Screens.Play
             {
                 newColumns.Add(new Column
                 {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
                     Position = new Vector2(x, 0),
                     State = ColumnState.Dimmed,
                 });
@@ -180,14 +184,15 @@ namespace osu.Game.Screens.Play
             public Column()
             {
                 Size = new Vector2(WIDTH, HEIGHT);
+                Margin = new MarginPadding { Bottom = 1 }; //todo: probably find a better fix, not quite sure why this works
 
-                for (int r = 0; r<cube_count; r++)
+                for (int r = 0; r < cube_count; r++)
                 {
                     drawableRows.Add(new Box
                     {
                         EdgeSmoothness = new Vector2(padding / 4),
                         Size = new Vector2(cube_size),
-                        Position = new Vector2(0, r* WIDTH + padding)
+                        Position = new Vector2(0, r * WIDTH),
                     });
 
                     Add(drawableRows[drawableRows.Count - 1]);
