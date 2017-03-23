@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Options.Sections.Audio
         protected override string Header => "Devices";
 
         private AudioManager audio;
-        private OptionDropDown<string> dropdown;
+        private OptionDropdown<string> dropdown;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Options.Sections.Audio
 
             Children = new Drawable[]
             {
-                dropdown = new OptionDropDown<string>
+                dropdown = new OptionDropdown<string>
                 {
                     Bindable = audio.AudioDevice
                 },

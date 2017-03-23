@@ -98,6 +98,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            TextSize = 20
                         },
                         DrawableText = new OsuSpriteText
                         {

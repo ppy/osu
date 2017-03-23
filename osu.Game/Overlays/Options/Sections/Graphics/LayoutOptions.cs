@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
+using System;
 
 namespace osu.Game.Overlays.Options.Sections.Graphics
 {
@@ -12,13 +13,20 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
     {
         protected override string Header => "Layout";
 
+        private OptionSlider<int> letterboxPositionX;
+        private OptionSlider<int> letterboxPositionY;
+
+        private Bindable<bool> letterboxing;
+
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config)
         {
+            letterboxing = config.GetBindable<bool>(FrameworkConfig.Letterboxing);
+
             Children = new Drawable[]
             {
                 new OptionLabel { Text = "Resolution: TODO dropdown" },
-                new OptionEnumDropDown<WindowMode>
+                new OptionEnumDropdown<WindowMode>
                 {
                     LabelText = "Screen mode",
                     Bindable = config.GetBindable<WindowMode>(FrameworkConfig.WindowMode),
@@ -26,19 +34,36 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 new OsuCheckbox
                 {
                     LabelText = "Letterboxing",
-                    Bindable = config.GetBindable<bool>(FrameworkConfig.Letterboxing),
+                    Bindable = letterboxing,
                 },
-                new OptionSlider<int>
+                letterboxPositionX = new OptionSlider<int>
                 {
                     LabelText = "Horizontal position",
                     Bindable = (BindableInt)config.GetBindable<int>(FrameworkConfig.LetterboxPositionX)
                 },
-                new OptionSlider<int>
+                letterboxPositionY = new OptionSlider<int>
                 {
                     LabelText = "Vertical position",
                     Bindable = (BindableInt)config.GetBindable<int>(FrameworkConfig.LetterboxPositionY)
                 },
             };
+
+            letterboxing.ValueChanged += visibilityChanged;
+            letterboxing.TriggerChange();
+        }
+
+        private void visibilityChanged(object sender, EventArgs e)
+        {
+            if (letterboxing)
+            {
+                letterboxPositionX.Show();
+                letterboxPositionY.Show();
+            }
+            else
+            {
+                letterboxPositionX.Hide();
+                letterboxPositionY.Hide();
+            }
         }
     }
 }
