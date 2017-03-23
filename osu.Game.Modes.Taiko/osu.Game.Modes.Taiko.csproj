@@ -49,7 +49,7 @@
   <ItemGroup>
     <Compile Include="Beatmaps\TaikoBeatmapConverter.cs" />
     <Compile Include="Beatmaps\TaikoBeatmapProcessor.cs" />
-    <Compile Include="Judgements\TaikoDrumRollTickJudgementInfo.cs" />
+    <Compile Include="Judgements\TaikoDrumRollTickJudgement.cs" />
     <Compile Include="Judgements\TaikoJudgement.cs" />
     <Compile Include="Judgements\TaikoHitResult.cs" />
     <Compile Include="Objects\Drawable\DrawableTaikoHitObject.cs" />
