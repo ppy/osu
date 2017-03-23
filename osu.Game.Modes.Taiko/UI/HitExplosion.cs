@@ -19,10 +19,10 @@ namespace osu.Game.Modes.Taiko.UI
     /// </summary>
     internal class HitExplosion : CircularContainer
     {
-        private readonly TaikoJudgementInfo judgement;
+        private readonly TaikoJudgement judgement;
         private readonly Box innerFill;
 
-        public HitExplosion(TaikoJudgementInfo judgement)
+        public HitExplosion(TaikoJudgement judgement)
         {
             this.judgement = judgement;
 

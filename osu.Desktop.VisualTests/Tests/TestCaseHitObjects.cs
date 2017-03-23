@@ -136,7 +136,7 @@ namespace osu.Desktop.VisualTests.Tests
             if (auto)
             {
                 h.State = ArmedState.Hit;
-                h.Judgement = new OsuJudgementInfo { Result = HitResult.Hit };
+                h.Judgement = new OsuJudgement { Result = HitResult.Hit };
             }
 
             playfieldContainer.Add(h);
