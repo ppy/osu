@@ -96,6 +96,7 @@
     <Compile Include="IO\Legacy\SerializationReader.cs" />
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
+    <Compile Include="Modes\Judgements\DrawableJudgementInfo.cs" />
     <Compile Include="Modes\LegacyReplay.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
