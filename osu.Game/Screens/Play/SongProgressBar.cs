@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,
                 Width = 2,
-                Height = SongProgress.BAR_HEIGHT + SongProgress.GRAPH_HEIGHT,
+                Height = SongProgress.BAR_HEIGHT + SongProgressGraphColumn.HEIGHT,
                 Colour = Color4.White,
                 Position = new Vector2(2, 0),
                 Children = new Drawable[]
