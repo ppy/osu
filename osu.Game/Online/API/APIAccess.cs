@@ -17,7 +17,7 @@ namespace osu.Game.Online.API
 {
     public class APIAccess : IUpdateable
     {
-        private OAuth authentication;
+        private readonly OAuth authentication;
 
         public string Endpoint = @"https://new.ppy.sh";
         private const string client_id = @"5";
@@ -44,9 +44,9 @@ namespace osu.Game.Online.API
         protected bool HasLogin => Token != null || !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password);
 
         // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (should dispose of this or at very least keep a reference).
-        private Thread thread;
+        private readonly Thread thread;
 
-        private Logger log;
+        private readonly Logger log;
 
         public APIAccess()
         {
@@ -57,7 +57,7 @@ namespace osu.Game.Online.API
             thread.Start();
         }
 
-        private List<IOnlineComponent> components = new List<IOnlineComponent>();
+        private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
 
         public void Register(IOnlineComponent component)
         {
