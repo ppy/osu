@@ -5,6 +5,16 @@ namespace osu.Game.Modes.Taiko.Judgements
 {
     public class TaikoDrumRollTickJudgementInfo : TaikoJudgementInfo
     {
+        /// <summary>
+        /// Drum roll ticks don't display judgement text.
+        /// </summary>
+        public override string ScoreString => string.Empty;
+
+        /// <summary>
+        /// Drum roll ticks don't display judgement text.
+        /// </summary>
+        public override string MaxScoreString => string.Empty;
+
         protected override int NumericResultForScore(TaikoHitResult result)
         {
             switch (result)
