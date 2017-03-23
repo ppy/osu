@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Options
 {
     public class Sidebar : Container
     {
-        private FillFlowContainer content;
+        private readonly FillFlowContainer content;
         internal const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
         internal const int EXPANDED_WIDTH = 200;
         protected override Container<Drawable> Content => content;

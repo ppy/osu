@@ -17,9 +17,9 @@ namespace osu.Game.Modes.Osu.UI
 {
     public class OsuPlayfield : Playfield<OsuHitObject, OsuJudgementInfo>
     {
-        private Container approachCircles;
-        private Container judgementLayer;
-        private ConnectionRenderer<OsuHitObject> connectionLayer;
+        private readonly Container approachCircles;
+        private readonly Container judgementLayer;
+        private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
         public override Vector2 Size
         {

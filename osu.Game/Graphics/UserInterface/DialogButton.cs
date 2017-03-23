@@ -81,9 +81,14 @@ namespace osu.Game.Graphics.UserInterface
 
         public SampleChannel SampleClick, SampleHover;
 
-        private Container backgroundContainer, colourContainer, glowContainer;
-        private Box leftGlow, centerGlow, rightGlow, background;
-        private SpriteText spriteText;
+        private readonly Container backgroundContainer;
+        private readonly Container colourContainer;
+        private readonly Container glowContainer;
+        private readonly Box leftGlow;
+        private readonly Box centerGlow;
+        private readonly Box rightGlow;
+        private readonly Box background;
+        private readonly SpriteText spriteText;
         private Vector2 hoverSpacing => new Vector2(3f, 0f);
 
         private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's when clicking

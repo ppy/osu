@@ -64,8 +64,8 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private Nub nub;
-        private SpriteText labelSpriteText;
+        private readonly Nub nub;
+        private readonly SpriteText labelSpriteText;
         private SampleChannel sampleChecked;
         private SampleChannel sampleUnchecked;
 

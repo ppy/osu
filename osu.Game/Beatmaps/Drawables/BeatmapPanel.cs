@@ -21,12 +21,12 @@ namespace osu.Game.Beatmaps.Drawables
     public class BeatmapPanel : Panel
     {
         public BeatmapInfo Beatmap;
-        private Sprite background;
+        private readonly Sprite background;
 
         public Action<BeatmapPanel> GainedSelection;
         public Action<BeatmapPanel> StartRequested;
-        private Triangles triangles;
-        private StarCounter starCounter;
+        private readonly Triangles triangles;
+        private readonly StarCounter starCounter;
 
         protected override void Selected()
         {

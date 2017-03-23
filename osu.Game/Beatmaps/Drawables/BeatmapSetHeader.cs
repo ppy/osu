@@ -20,11 +20,12 @@ namespace osu.Game.Beatmaps.Drawables
     public class BeatmapSetHeader : Panel
     {
         public Action<BeatmapSetHeader> GainedSelection;
-        private SpriteText title, artist;
+        private readonly SpriteText title;
+        private readonly SpriteText artist;
         private OsuConfigManager config;
         private Bindable<bool> preferUnicode;
-        private WorkingBeatmap beatmap;
-        private FillFlowContainer difficultyIcons;
+        private readonly WorkingBeatmap beatmap;
+        private readonly FillFlowContainer difficultyIcons;
 
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {

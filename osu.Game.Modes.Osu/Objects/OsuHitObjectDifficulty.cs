@@ -47,11 +47,11 @@ namespace osu.Game.Modes.Osu.Objects
 
         internal int MaxCombo = 1;
 
-        private float scalingFactor;
+        private readonly float scalingFactor;
         private float lazySliderLength;
 
-        private Vector2 startPosition;
-        private Vector2 endPosition;
+        private readonly Vector2 startPosition;
+        private readonly Vector2 endPosition;
 
         internal OsuHitObjectDifficulty(OsuHitObject baseHitObject)
         {

@@ -10,7 +10,7 @@ namespace osu.Game.IPC
 {
     public class ScoreIPCChannel : IpcChannel<ScoreImportMessage>
     {
-        private ScoreDatabase scores;
+        private readonly ScoreDatabase scores;
 
         public ScoreIPCChannel(IIpcHost host, ScoreDatabase scores = null)
             : base(host)
