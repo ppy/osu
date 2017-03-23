@@ -62,10 +62,10 @@ namespace osu.Game.Modes.Taiko.UI
             /// </summary>
             public Key CentreKey;
 
-            private Sprite rim;
-            private Sprite rimHit;
-            private Sprite centre;
-            private Sprite centreHit;
+            private readonly Sprite rim;
+            private readonly Sprite rimHit;
+            private readonly Sprite centre;
+            private readonly Sprite centreHit;
 
             public TaikoHalfDrum(bool flipped)
             {

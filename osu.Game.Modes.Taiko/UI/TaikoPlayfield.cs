@@ -46,16 +46,16 @@ namespace osu.Game.Modes.Taiko.UI
 
         protected override Container<Drawable> Content => hitObjectContainer;
 
-        private Container<HitExplosion> hitExplosionContainer;
+        private readonly Container<HitExplosion> hitExplosionContainer;
         //private Container<DrawableBarLine> barLineContainer;
-        private Container<JudgementText> judgementContainer;
+        private readonly Container<JudgementText> judgementContainer;
 
-        private Container hitObjectContainer;
+        private readonly Container hitObjectContainer;
         //private Container topLevelHitContainer;
-        private Container leftBackgroundContainer;
-        private Container rightBackgroundContainer;
-        private Box leftBackground;
-        private Box rightBackground;
+        private readonly Container leftBackgroundContainer;
+        private readonly Container rightBackgroundContainer;
+        private readonly Box leftBackground;
+        private readonly Box rightBackground;
 
         public TaikoPlayfield()
         {
