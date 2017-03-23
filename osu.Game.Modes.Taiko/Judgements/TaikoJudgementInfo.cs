@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Modes.Judgements;
+using osu.Framework.Extensions;
 
 namespace osu.Game.Modes.Taiko.Judgements
 {
@@ -36,6 +37,10 @@ namespace osu.Game.Modes.Taiko.Judgements
         /// The maximum score value for the accuracy portion of the score.
         /// </summary>
         public int MaxAccuracyScoreValue => NumericResultForAccuracy(MAX_HIT_RESULT);
+
+        public override string ScoreString => TaikoResult.GetDescription();
+
+        public override string MaxScoreString => MAX_HIT_RESULT.GetDescription();
 
         /// <summary>
         /// Whether this Judgement has a secondary hit in the case of finishers.
