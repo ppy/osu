@@ -35,6 +35,7 @@ namespace osu.Game.Screens.Select
             LeftContent.Add(leaderboard = new Leaderboard
             {
                 RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding { Top = 5 },
             });
         }
 
