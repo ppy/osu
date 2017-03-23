@@ -44,7 +44,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             IHasRepeats repeatsData = original as IHasRepeats;
             IHasEndTime endTimeData = original as IHasEndTime;
 
-            bool isFinisher = (original.Sample.Type & SampleType.Finish) > 0;
+            bool isFinisher = ((original.Sample?.Type ?? SampleType.None) & SampleType.Finish) > 0;
 
             if (distanceData != null)
             {
