@@ -6,7 +6,7 @@ using osu.Framework.Extensions;
 
 namespace osu.Game.Modes.Taiko.Judgements
 {
-    public class TaikoJudgementInfo : JudgementInfo
+    public class TaikoJudgement : Judgement
     {
         /// <summary>
         /// The maximum score value.
