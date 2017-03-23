@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests;
 using osu.Game.Screens.Select.Leaderboards;
@@ -14,8 +13,6 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapDetailArea : Container
     {
-        private const float transition_duration = 500;
-
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
@@ -42,13 +39,12 @@ namespace osu.Game.Screens.Select
                         switch (tab)
                         {
                             case BeatmapDetailTab.Details:
-                                Details.FadeIn(transition_duration, EasingTypes.OutQuint);
-                                Leaderboard.FadeOut(transition_duration, EasingTypes.OutQuint);
+                                Details.Show();
+                                Leaderboard.Hide();
                                 break;
-
                             default:
-                                Details.FadeOut(transition_duration, EasingTypes.OutQuint);
-                                Leaderboard.FadeIn(transition_duration, EasingTypes.OutQuint);
+                                Details.Hide();
+                                Leaderboard.Show();
                                 break;
                         }
                     },
