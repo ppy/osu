@@ -10,32 +10,32 @@ namespace osu.Game.Modes.Taiko.Judgements
         /// <summary>
         /// The maximum score value.
         /// </summary>
-        public const TaikoScoreResult MAX_SCORE = TaikoScoreResult.Great;
+        public const TaikoHitResult MAX_HIT_RESULT = TaikoHitResult.Great;
 
         /// <summary>
         /// The score value.
         /// </summary>
-        public TaikoScoreResult Score;
+        public TaikoHitResult TaikoResult;
 
         /// <summary>
         /// The score value for the combo portion of the score.
         /// </summary>
-        public int ScoreValue => ScoreToInt(Score);
+        public int ScoreValue => NumericResultForScore(TaikoResult);
         
         /// <summary>
         /// The score value for the accuracy portion of the score.
         /// </summary>
-        public int AccuracyScoreValue => AccuracyScoreToInt(Score);
+        public int AccuracyScoreValue => NumericResultForAccuracy(TaikoResult);
 
         /// <summary>
         /// The maximum score value for the combo portion of the score.
         /// </summary>
-        public int MaxScoreValue => ScoreToInt(MAX_SCORE);
+        public int MaxScoreValue => NumericResultForScore(MAX_HIT_RESULT);
         
         /// <summary>
         /// The maximum score value for the accuracy portion of the score.
         /// </summary>
-        public int MaxAccuracyScoreValue => AccuracyScoreToInt(MAX_SCORE);
+        public int MaxAccuracyScoreValue => NumericResultForAccuracy(MAX_HIT_RESULT);
 
         /// <summary>
         /// Whether this Judgement has a secondary hit in the case of finishers.
@@ -43,38 +43,39 @@ namespace osu.Game.Modes.Taiko.Judgements
         public bool SecondHit;
 
         /// <summary>
-        /// Computes the score value for the combo portion of the score.
-        /// For the accuracy portion of the score (including accuracy percentage), see <see cref="AccuracyScoreToInt(TaikoScoreResult)"/>.
+        /// Computes the numeric score value for the combo portion of the score.
+        /// For the accuracy portion of the score (including accuracy percentage), see <see cref="NumericResultForAccuracy(TaikoHitResult)"/>.
         /// </summary>
         /// <param name="result">The result to compute the score value for.</param>
-        /// <returns>The int score value.</returns>
-        protected virtual int ScoreToInt(TaikoScoreResult result)
+        /// <returns>The numeric score value.</returns>
+        protected virtual int NumericResultForScore(TaikoHitResult result)
         {
             switch (result)
             {
                 default:
                     return 0;
-                case TaikoScoreResult.Good:
+                case TaikoHitResult.Good:
                     return 100;
-                case TaikoScoreResult.Great:
+                case TaikoHitResult.Great:
                     return 300;
             }
         }
 
         /// <summary>
-        /// Computes the score value for the accurac portion of the score.
+        /// Computes the numeric score value for the accuracy portion of the score.
+        /// For the combo portion of the score, see <see cref="NumericResultForScore(TaikoHitResult)"/>.
         /// </summary>
         /// <param name="result">The result to compute the score value for.</param>
-        /// <returns>The int score value.</returns>
-        protected virtual int AccuracyScoreToInt(TaikoScoreResult result)
+        /// <returns>The numeric score value.</returns>
+        protected virtual int NumericResultForAccuracy(TaikoHitResult result)
         {
             switch (result)
             {
                 default:
                     return 0;
-                case TaikoScoreResult.Good:
+                case TaikoHitResult.Good:
                     return 150;
-                case TaikoScoreResult.Great:
+                case TaikoHitResult.Great:
                     return 300;
             }
         }

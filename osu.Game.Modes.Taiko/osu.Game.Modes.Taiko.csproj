@@ -50,7 +50,7 @@
     <Compile Include="Beatmaps\TaikoBeatmapConverter.cs" />
     <Compile Include="Beatmaps\TaikoBeatmapProcessor.cs" />
     <Compile Include="Judgements\TaikoJudgementInfo.cs" />
-    <Compile Include="Judgements\TaikoScoreResult.cs" />
+    <Compile Include="Judgements\TaikoHitResult.cs" />
     <Compile Include="Objects\BarLine.cs" />
     <Compile Include="Objects\Drawable\DrawableBarLine.cs" />
     <Compile Include="Objects\Drawable\DrawableMajorBarLine.cs" />
