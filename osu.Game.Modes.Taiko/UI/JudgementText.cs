@@ -1,12 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
-using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Framework.Allocation;

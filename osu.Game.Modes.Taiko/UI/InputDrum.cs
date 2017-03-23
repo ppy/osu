@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
-using System.Collections.Generic;
 
 namespace osu.Game.Modes.Taiko.UI
 {
