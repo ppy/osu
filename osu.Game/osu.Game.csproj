@@ -362,7 +362,6 @@
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
-    <Compile Include="Graphics\UserInterface\OsuTabItem.cs" />
     <Compile Include="Screens\Select\Leaderboards\LeaderboardFilterControl.cs" />
   </ItemGroup>
   <ItemGroup>

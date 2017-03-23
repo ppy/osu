@@ -67,12 +67,12 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private class LeaderboardTabControl<T> : OsuTabControl<T>
         {
-            protected override TabItem<T> CreateTabItem(T value) => new LeaderboardTabItem<T> { Value = value };
+            //protected override TabItem<T> CreateTabItem(T value) => new LeaderboardTabItem<T> { Value = value };
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                AccentColour = colours.YellowLight;
+                AccentColour = colours.GreenLight;
             }
 
             public LeaderboardTabControl()
@@ -81,13 +81,13 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        private class LeaderboardTabItem<T> : OsuTabItem<T>
-        {
-            public LeaderboardTabItem()
-            {
-                Text.Margin = new MarginPadding { Top = 8, Bottom = 8, };
-            }
-        }
+        //private class LeaderboardTabItem<T> : OsuTabItem<T>
+        //{
+        //    public LeaderboardTabItem()
+        //    {
+        //        Text.Margin = new MarginPadding { Top = 8, Bottom = 8, };
+        //    }
+        //}
 
         private class ModCheckbox : CheckBox
         {
