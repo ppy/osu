@@ -21,9 +21,10 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(progress = new SongProgress
             {
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
-                RelativeSizeAxes = Axes.X
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                RelativeSizeAxes = Axes.X,
+                Length = 100,
             });
 
             AddButton("Toggle Bar", progress.ToggleVisibility);
@@ -40,7 +41,8 @@ namespace osu.Desktop.VisualTests.Tests
                 newValues.Add(RNG.Next(0, 11));
             }
 
-            progress.DisplayValues(newValues.ToArray());
+            progress.Values = newValues.ToArray();
+            progress.CurrentTime = RNG.Next(0, 100);
         }
     }
 }

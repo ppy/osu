@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play
         private readonly int graph_height = 34;
         private readonly Vector2 handle_size = new Vector2(14, 25);
         private readonly Color4 fill_colour = new Color4(221, 255, 255, 255);
-        private const float transition_duration = 100;
+        private const float transition_duration = 200;
 
         private SongProgressBar bar;
         private SongProgressGraph graph;
@@ -35,21 +35,27 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private double duration;
-        public double Duration
+        private double length;
+        public double Length
         {
-            get { return duration; }
+            get { return length; }
             set
             {
-                duration = value;
+                length = value;
                 updateProgress();
             }
+        }
+
+        public int[] Values
+        {
+            get { return graph.Values; }
+            set { graph.Values = value; }
         }
 
         public SongProgress()
         {
             RelativeSizeAxes = Axes.X;
-            Height = bar_height + graph_height + handle_size.Y;
+            Height = bar_height + graph_height + SongProgressGraph.Column.HEIGHT + handle_size.Y;
 
             Children = new Drawable[]
             {
@@ -71,32 +77,31 @@ namespace osu.Game.Screens.Play
                     Height = bar_height,
                     SeekRequested = delegate (float position)
                     {
-                        OnSeek?.Invoke(Duration * position);
+                        OnSeek?.Invoke(Length * position);
                     }
                 }
             };
         }
 
-        public void DisplayValues(int[] values)
-        {
-            graph.Values = values;
-        }
-
         private void updateProgress()
         {
-            float currentProgress = (float)(CurrentTime / Duration);
+            float currentProgress = (float)(CurrentTime / Length);
             bar.UpdatePosition(currentProgress);
             graph.Progress = (int)(graph.ColumnCount * currentProgress);
         }
 
         protected override void PopIn()
         {
+            bar.IsEnabled = true;
+            updateProgress(); //in case progress was changed while the bar was hidden
+
             bar.FadeTo(1f, transition_duration, EasingTypes.In);
             MoveTo(Vector2.Zero, transition_duration, EasingTypes.In);
         }
 
         protected override void PopOut()
         {
+            bar.IsEnabled = false;
             bar.FadeTo(0f, transition_duration, EasingTypes.In);
             MoveTo(new Vector2(0f, bar_height), transition_duration, EasingTypes.In);
         }
