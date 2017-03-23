@@ -23,12 +23,12 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                     LabelText = "Background dim",
                     Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.DimLevel)
                 },
-                new OptionEnumDropDown<ProgressBarType>
+                new OptionEnumDropdown<ProgressBarType>
                 {
                     LabelText = "Progress display",
                     Bindable = config.GetBindable<ProgressBarType>(OsuConfig.ProgressBarType)
                 },
-                new OptionEnumDropDown<ScoreMeterType>
+                new OptionEnumDropdown<ScoreMeterType>
                 {
                     LabelText = "Score meter type",
                     Bindable = config.GetBindable<ScoreMeterType>(OsuConfig.ScoreMeter)
