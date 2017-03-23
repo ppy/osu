@@ -140,10 +140,8 @@ namespace osu.Game.Modes.Taiko.UI
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-
                             RelativePositionAxes = Axes.X,
                             Position = new Vector2(0.10f, 0),
-
                             Scale = new Vector2(0.9f)
                         },
                         new Box
@@ -192,7 +190,6 @@ namespace osu.Game.Modes.Taiko.UI
             {
                 Anchor = judgedObject.Judgement.Result == HitResult.Hit ? Anchor.TopLeft : Anchor.BottomLeft,
                 Origin = judgedObject.Judgement.Result == HitResult.Hit ? Anchor.BottomCentre : Anchor.TopCentre,
-
                 RelativePositionAxes = Axes.X,
                 X = judgementOffset,
             });
