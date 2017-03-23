@@ -9,19 +9,23 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapDetailArea : Container
     {
+        private Container content;
+        protected override Container<Drawable> Content => content;
+
         public BeatmapDetailArea()
         {
-            Children = new Drawable[]
+            AddInternal(new Drawable[]
             {
                 new BeatmapDetailAreaTabControl
                 {
                     RelativeSizeAxes = Axes.X,
                 },
-                new Container
+                content = new Container
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = BeatmapDetailAreaTabControl.HEIGHT },
                 },
-            };
+            });
         }
     }
 }
