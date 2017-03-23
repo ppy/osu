@@ -10,7 +10,7 @@ namespace osu.Desktop.VisualTests
 {
     public class Benchmark : OsuGameBase
     {
-        private double timePerTest = 200;
+        private const double time_per_test = 200;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -27,7 +27,7 @@ namespace osu.Desktop.VisualTests
             TestBrowser f = new TestBrowser();
             Add(f);
 
-            Console.WriteLine($@"{Time}: Running {f.TestCount} tests for {timePerTest}ms each...");
+            Console.WriteLine($@"{Time}: Running {f.TestCount} tests for {time_per_test}ms each...");
 
             for (int i = 1; i < f.TestCount; i++)
             {
@@ -36,10 +36,10 @@ namespace osu.Desktop.VisualTests
                 {
                     f.LoadTest(loadableCase);
                     Console.WriteLine($@"{Time}: Switching to test #{loadableCase}");
-                }, loadableCase * timePerTest);
+                }, loadableCase * time_per_test);
             }
 
-            Scheduler.AddDelayed(Host.Exit, f.TestCount * timePerTest);
+            Scheduler.AddDelayed(Host.Exit, f.TestCount * time_per_test);
         }
     }
 }

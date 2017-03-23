@@ -14,8 +14,8 @@ namespace osu.Game.Overlays.Options
 {
     public class OptionSlider<T> : FillFlowContainer where T : struct
     {
-        private SliderBar<T> slider;
-        private SpriteText text;
+        private readonly SliderBar<T> slider;
+        private readonly SpriteText text;
 
         public string LabelText
         {

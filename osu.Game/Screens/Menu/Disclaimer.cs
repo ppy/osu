@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Menu
     internal class Disclaimer : OsuScreen
     {
         private Intro intro;
-        private TextAwesome icon;
+        private readonly TextAwesome icon;
         private Color4 iconColour;
 
         internal override bool ShowOverlays => false;
