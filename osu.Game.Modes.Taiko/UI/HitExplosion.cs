@@ -15,19 +15,17 @@ using osu.Game.Modes.Taiko.Objects;
 namespace osu.Game.Modes.Taiko.UI
 {
     /// <summary>
-    /// A ring that explodes to indicate a judgement has occurred.
+    /// A circle explodes from the hit target to indicate a hitobject has been hit.
     /// </summary>
-    internal class RingExplosion : CircularContainer
+    internal class HitExplosion : CircularContainer
     {
-        /// <summary>
-        /// The Judgement to display.
-        /// </summary>
-        public TaikoJudgementInfo Judgement;
-
+        private TaikoJudgementInfo judgement;
         private Box innerFill;
 
-        public RingExplosion()
+        public HitExplosion(TaikoJudgementInfo judgement)
         {
+            this.judgement = judgement;
+
             Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2);
 
             Anchor = Anchor.Centre;
@@ -53,10 +51,10 @@ namespace osu.Game.Modes.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (Judgement.SecondHit)
+            if (judgement.SecondHit)
                 Size *= 1.5f;
 
-            switch (Judgement.TaikoResult)
+            switch (judgement.TaikoResult)
             {
                 case TaikoHitResult.Good:
                     innerFill.Colour = colours.Green;
