@@ -22,22 +22,24 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class OsuTabControlCheckBox : CheckBox
     {
-        private const float transition_length = 500;
+        private Box box;
+        private SpriteText text;
+        private TextAwesome icon;
 
         public event EventHandler<CheckBoxState> Action;
 
-        private Color4 accentColour;
+        private Color4? accentColour;
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get { return accentColour.GetValueOrDefault(); }
             set
             {
                 accentColour = value;
 
-                if (State == CheckBoxState.Unchecked)
+                if (State != CheckBoxState.Checked)
                 {
-                    text.Colour = accentColour;
-                    icon.Colour = accentColour;
+                    text.Colour = AccentColour;
+                    icon.Colour = AccentColour;
                 }
             }
         }
@@ -46,22 +48,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             get { return text.Text; }
             set { text.Text = value; }
-        }
-
-        private Box box;
-        private SpriteText text;
-        private TextAwesome icon;
-
-        private void fadeIn()
-        {
-            box.FadeIn(transition_length, EasingTypes.OutQuint);
-            text.FadeColour(Color4.White, transition_length, EasingTypes.OutQuint);
-        }
-
-        private void fadeOut()
-        {
-            box.FadeOut(transition_length, EasingTypes.OutQuint);
-            text.FadeColour(accentColour, transition_length, EasingTypes.OutQuint);
         }
 
         protected override void OnChecked()
@@ -78,6 +64,20 @@ namespace osu.Game.Graphics.UserInterface
             Action?.Invoke(this, State);
         }
 
+        private const float transition_length = 500;
+
+        private void fadeIn()
+        {
+            box.FadeIn(transition_length, EasingTypes.OutQuint);
+            text.FadeColour(Color4.White, transition_length, EasingTypes.OutQuint);
+        }
+
+        private void fadeOut()
+        {
+            box.FadeOut(transition_length, EasingTypes.OutQuint);
+            text.FadeColour(AccentColour, transition_length, EasingTypes.OutQuint);
+        }
+
         protected override bool OnHover(InputState state)
         {
             fadeIn();
@@ -90,6 +90,13 @@ namespace osu.Game.Graphics.UserInterface
                 fadeOut();
 
             base.OnHoverLost(state);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            if (accentColour == null)
+                AccentColour = colours.Blue;
         }
 
         public OsuTabControlCheckBox()
