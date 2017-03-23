@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play
     public class PlayerLoader : OsuScreen
     {
         private readonly Player player;
-        private OsuLogo logo;
+        private readonly OsuLogo logo;
         private BeatmapMetadataDisplay info;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
