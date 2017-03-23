@@ -57,7 +57,7 @@ namespace osu.Game.Modes.UI
             Origin = Anchor.BottomLeft,
             RelativeSizeAxes = Axes.X,
             Depth = -2, //todo: find out why this doesn't put progress on top of PauseOverlay
-            Values = new int[] { 3 }, //todo: removeme
+            Values = new[] { 3 }, //todo: removeme
         };
     }
 }
