@@ -4,24 +4,26 @@
 using OpenTK;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using OpenTK.Graphics;
+using osu.Framework;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Play
 {
     public class SongProgressGraph : BufferedContainer
     {
-        private List<SongProgressGraphColumn> columns = new List<SongProgressGraphColumn>();
+        private Column[] columns;
         private float lastDrawWidth;
 
+        public int ColumnCount => columns.Length;
+
         public override bool HandleInput => false;
-        public int ColumnCount => columns.Count;
 
         private int progress;
         public int Progress
         {
-            get
-            {
-                return progress;
-            }
+            get { return progress; }
             set
             {
                 if (value == progress) return;
@@ -31,14 +33,11 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private List<int> calculatedValues = new List<int>(); // values but adjusted to fit the amount of columns
+        private int[] calculatedValues = { }; // values but adjusted to fit the amount of columns
         private int[] values;
         public int[] Values
         {
-            get
-            {
-                return values;
-            }
+            get { return values; }
             set
             {
                 if (value == values) return;
@@ -47,9 +46,28 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        public SongProgressGraph()
+        {
+            CacheDrawnFrameBuffer = true;
+            PixelSnapping = true;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // todo: Recreating in update is probably not the best idea
+            if (DrawWidth == lastDrawWidth) return;
+            recreateGraph();
+            lastDrawWidth = DrawWidth;
+        }
+
+        /// <summary>
+        /// Redraws all the columns to match their lit/dimmed state.
+        /// </summary>
         private void redrawProgress()
         {
-            for (int i = 0; i < columns.Count; i++)
+            for (int i = 0; i < columns.Length; i++)
             {
                 columns[i].State = i <= progress ? ColumnState.Lit : ColumnState.Dimmed;
             }
@@ -57,28 +75,29 @@ namespace osu.Game.Screens.Play
             ForceRedraw();
         }
 
+        /// <summary>
+        /// Redraws the filled amount of all the columns.
+        /// </summary>
         private void redrawFilled()
         {
             for (int i = 0; i < ColumnCount; i++)
             {
                 columns[i].Filled = calculatedValues[i];
             }
-
-            ForceRedraw();
         }
 
+        /// <summary>
+        /// Takes <see cref="Values"> and adjusts it to fit the amount of columns.
+        /// </summary>
         private void recalculateValues()
         {
-            // Resizes values to fit the amount of columns and stores it in calculatedValues
-            // Defaults to all zeros if values is null
-
-            calculatedValues.RemoveAll(delegate { return true; });
+            var newValues = new List<int>();
 
             if (values == null)
             {
                 for (float i = 0; i < ColumnCount; i++)
                 {
-                    calculatedValues.Add(0);
+                    newValues.Add(0);
                 }
 
                 return;
@@ -87,44 +106,112 @@ namespace osu.Game.Screens.Play
             float step = values.Length / (float)ColumnCount;
             for (float i = 0; i < values.Length; i += step) 
             {
-                calculatedValues.Add(values[(int)i]);
+                newValues.Add(values[(int)i]);
             }
+
+            calculatedValues = newValues.ToArray();
         }
 
+        /// <summary>
+        /// Recreates the entire graph.
+        /// </summary>
         private void recreateGraph()
         {
-            RemoveAll(delegate { return true; });
-            columns.RemoveAll(delegate { return true; });
+            var newColumns = new List<Column>();
 
             for (int x = 0; x < DrawWidth; x += 3)
             {
-                columns.Add(new SongProgressGraphColumn
+                newColumns.Add(new Column
                 {
                     Position = new Vector2(x + 1, 0),
                     State = ColumnState.Dimmed,
                 });
-
-                Add(columns[columns.Count - 1]);
             }
+
+            columns = newColumns.ToArray();
+            Children = columns;
 
             recalculateValues();
             redrawFilled();
             redrawProgress();
         }
 
-        protected override void Update()
+        private class Column : Container, IStateful<ColumnState>
         {
-            base.Update();
+            private readonly int rows = 11;
+            private readonly Color4 emptyColour = Color4.White.Opacity(100);
+            private readonly Color4 litColour = new Color4(221, 255, 255, 255);
+            private readonly Color4 dimmedColour = Color4.White.Opacity(175);
 
-            if (DrawWidth == lastDrawWidth) return;
-            recreateGraph();
-            lastDrawWidth = DrawWidth;
+            private List<Box> drawableRows = new List<Box>();
+
+            private int filled;
+            public int Filled
+            {
+                get { return filled; }
+                set
+                {
+                    if (value == filled) return;
+                    filled = value;
+
+                    fillActive();
+                }
+            }
+
+            private ColumnState state;
+            public ColumnState State
+            {
+                get { return state; }
+                set
+                {
+                    if (value == state) return;
+                    state = value;
+
+                    fillActive();
+                }
+            }
+
+            public Column()
+            {
+                Size = new Vector2(4, rows * 3);
+
+                for (int row = 0; row < rows * 3; row += 3)
+                {
+                    drawableRows.Add(new Box
+                    {
+                        Size = new Vector2(2),
+                        Position = new Vector2(0, row + 1)
+                    });
+
+                    Add(drawableRows[drawableRows.Count - 1]);
+                }
+
+                // Reverse drawableRows so when iterating through them they start at the bottom
+                drawableRows.Reverse();
+            }
+
+            private void fillActive()
+            {
+                Color4 colour = State == ColumnState.Lit ? litColour : dimmedColour;
+
+                for (int i = 0; i < drawableRows.Count; i++)
+                {
+                    if (Filled == 0) // i <= Filled doesn't work for zero fill
+                    {
+                        drawableRows[i].Colour = emptyColour;
+                    }
+                    else
+                    {
+                        drawableRows[i].Colour = i <= Filled ? colour : emptyColour;
+                    }
+                }
+            }
         }
 
-        public SongProgressGraph()
+        private enum ColumnState
         {
-            CacheDrawnFrameBuffer = true;
-            PixelSnapping = true;
+            Lit,
+            Dimmed
         }
     }
 }

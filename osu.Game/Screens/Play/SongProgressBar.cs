@@ -12,12 +12,9 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressBar : DragBar
     {
-        public static readonly Vector2 HANDLE_SIZE = new Vector2(14, 25);
-
-        public SongProgressBar()
+        public SongProgressBar(float barHeight, Vector2 handleSize, Color4 fillColour)
         {
-            Fill.Colour = SongProgress.FILL_COLOUR;
-            Height = SongProgress.BAR_HEIGHT;
+            Fill.Colour = fillColour;
 
             Add(new Box
             {
@@ -31,7 +28,7 @@ namespace osu.Game.Screens.Play
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,
                 Width = 2,
-                Height = SongProgress.BAR_HEIGHT + SongProgress.GRAPH_HEIGHT,
+                Height = barHeight,
                 Colour = Color4.White,
                 Position = new Vector2(2, 0),
                 Children = new Drawable[]
@@ -44,7 +41,7 @@ namespace osu.Game.Screens.Play
                     {
                         Origin = Anchor.BottomCentre,
                         Anchor = Anchor.TopCentre,
-                        Size = HANDLE_SIZE,
+                        Size = handleSize,
                         CornerRadius = 5,
                         Masking = true,
                         Children = new Drawable[]
