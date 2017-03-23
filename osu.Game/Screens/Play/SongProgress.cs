@@ -93,14 +93,14 @@ namespace osu.Game.Screens.Play
             bar.IsEnabled = true;
             updateProgress(); //in case progress was changed while the bar was hidden
 
-            bar.FadeTo(1f, transition_duration, EasingTypes.In);
+            bar.FadeIn(transition_duration, EasingTypes.In);
             MoveTo(Vector2.Zero, transition_duration, EasingTypes.In);
         }
 
         protected override void PopOut()
         {
             bar.IsEnabled = false;
-            bar.FadeTo(0f, transition_duration, EasingTypes.In);
+            bar.FadeOut(transition_duration, EasingTypes.In);
             MoveTo(new Vector2(0f, bar_height), transition_duration, EasingTypes.In);
         }
     }
