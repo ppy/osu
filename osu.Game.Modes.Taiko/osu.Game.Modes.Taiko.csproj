@@ -51,11 +51,11 @@
     <Compile Include="Beatmaps\TaikoBeatmapProcessor.cs" />
     <Compile Include="Judgements\TaikoJudgementInfo.cs" />
     <Compile Include="Judgements\TaikoHitResult.cs" />
+    <Compile Include="Objects\Drawable\DrawableTaikoHitObject.cs" />
     <Compile Include="Objects\Bash.cs" />
     <Compile Include="Objects\DrumRoll.cs" />
     <Compile Include="Objects\DrumRollTick.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
-    <Compile Include="Objects\Drawable\DrawableTaikoHit.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TaikoScoreProcessor.cs" />
