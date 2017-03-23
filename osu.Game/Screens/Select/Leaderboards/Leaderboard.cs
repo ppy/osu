@@ -16,8 +16,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public class Leaderboard : Container
     {
-        private ScrollContainer scrollContainer;
-        private FillFlowContainer<LeaderboardScore> scrollFlow;
+        private readonly ScrollContainer scrollContainer;
+        private readonly FillFlowContainer<LeaderboardScore> scrollFlow;
 
         private IEnumerable<Score> scores;
         public IEnumerable<Score> Scores
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Spacing = new Vector2(0f, 5f),
-                            Padding = new MarginPadding(5),
+                            Padding = new MarginPadding { Top = 10, Bottom = 5 },
                         },
                     },
                 },

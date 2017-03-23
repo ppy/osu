@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private class BeatmapBackground : Background
         {
-            private WorkingBeatmap beatmap;
+            private readonly WorkingBeatmap beatmap;
 
             public BeatmapBackground(WorkingBeatmap beatmap)
             {

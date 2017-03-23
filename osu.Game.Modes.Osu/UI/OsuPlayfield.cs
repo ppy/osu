@@ -17,9 +17,9 @@ namespace osu.Game.Modes.Osu.UI
 {
     public class OsuPlayfield : Playfield<OsuHitObject, OsuJudgementInfo>
     {
-        private Container approachCircles;
-        private Container judgementLayer;
-        private ConnectionRenderer<OsuHitObject> connectionLayer;
+        private readonly Container approachCircles;
+        private readonly Container judgementLayer;
+        private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
         public override Vector2 Size
         {
@@ -85,7 +85,11 @@ namespace osu.Game.Modes.Osu.UI
 
         public override void OnJudgement(DrawableHitObject<OsuHitObject, OsuJudgementInfo> judgedObject)
         {
-            HitExplosion explosion = new HitExplosion(judgedObject.Judgement, judgedObject.HitObject);
+            DrawableOsuJudgementInfo explosion = new DrawableOsuJudgementInfo(judgedObject.Judgement)
+            {
+                Origin = Anchor.Centre,
+                Position = judgedObject.HitObject.StackedEndPosition + judgedObject.Judgement.PositionOffset
+            };
 
             judgementLayer.Add(explosion);
         }
