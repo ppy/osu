@@ -39,6 +39,7 @@ namespace osu.Game.Modes.Taiko.UI
             BorderThickness = 1;
 
             Alpha = 0.15f;
+            Masking = true;
 
             Children = new[]
             {

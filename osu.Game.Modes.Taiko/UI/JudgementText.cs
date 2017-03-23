@@ -40,31 +40,24 @@ namespace osu.Game.Modes.Taiko.UI
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    
                     AutoSizeAxes = Axes.Both,
-
                     Children = new Drawable[]
                     {
                         new BufferedContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-
                             BlurSigma = new Vector2(10),
                             CacheDrawnFrameBuffer = true,
-
                             RelativeSizeAxes = Axes.Both,
                             Size = new Vector2(3),
-
                             BlendingMode = BlendingMode.Additive,
-
                             Children = new[]
                             {
                                 glowText = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-
                                     Font = "Venera",
                                     TextSize = 22f,
                                 }
@@ -74,7 +67,6 @@ namespace osu.Game.Modes.Taiko.UI
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-
                             Font = "Venera",
                             TextSize = 22f,
                         }
