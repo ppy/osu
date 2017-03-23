@@ -39,8 +39,14 @@ namespace osu.Game.Screens.Select
         private TrackManager trackManager;
         private DialogOverlay dialogOverlay;
 
-        private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
+
+        private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
+
+        private const float left_area_padding = 20;
+
         private BeatmapInfoWedge beatmapInfoWedge;
+
+        protected Container LeftContent;
 
         private static readonly Vector2 background_blur = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
@@ -81,6 +87,20 @@ namespace osu.Game.Screens.Select
                     }
                 }
             });
+            Add(LeftContent = new Container
+            {
+                Origin = Anchor.BottomLeft,
+                Anchor = Anchor.BottomLeft,
+                RelativeSizeAxes = Axes.Both,
+                Size = new Vector2(wedged_container_size.X, 1),
+                Padding = new MarginPadding
+                {
+                    Bottom = 50,
+                    Top = wedged_container_size.Y + left_area_padding,
+                    Left = left_area_padding,
+                    Right = left_area_padding * 2,
+                }
+            });
             Add(carousel = new BeatmapCarousel
             {
                 RelativeSizeAxes = Axes.Y,
@@ -104,8 +124,8 @@ namespace osu.Game.Screens.Select
                 RelativeSizeAxes = Axes.X,
                 Margin = new MarginPadding
                 {
-                    Top = 20,
-                    Right = 20,
+                    Top = left_area_padding,
+                    Right = left_area_padding,
                 },
                 X = -50,
             });
