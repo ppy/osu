@@ -13,18 +13,18 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableSlider : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
-        private Slider slider;
+        private readonly Slider slider;
 
-        private DrawableHitCircle initialCircle;
+        private readonly DrawableHitCircle initialCircle;
 
-        private List<ISliderProgress> components = new List<ISliderProgress>();
+        private readonly List<ISliderProgress> components = new List<ISliderProgress>();
 
-        private Container<DrawableSliderTick> ticks;
+        private readonly Container<DrawableSliderTick> ticks;
 
-        private SliderBody body;
-        private SliderBall ball;
+        private readonly SliderBody body;
+        private readonly SliderBall ball;
 
-        private SliderBouncer bouncer2;
+        private readonly SliderBouncer bouncer2;
 
         public DrawableSlider(Slider s) : base(s)
         {
@@ -39,6 +39,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             {
                 body = new SliderBody(s)
                 {
+                    AccentColour = AccentColour,
                     Position = s.StackedPosition,
                     PathWidth = s.Scale * 64,
                 },
@@ -56,6 +57,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 ball = new SliderBall(s)
                 {
                     Scale = new Vector2(s.Scale),
+                    AccentColour = AccentColour
                 },
                 initialCircle = new DrawableHitCircle(new HitCircle
                 {

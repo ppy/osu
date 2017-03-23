@@ -12,7 +12,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
     public class NumberPiece : Container
     {
-        private SpriteText number;
+        private readonly SpriteText number;
 
         public string Text
         {
@@ -29,6 +29,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             {
                 new CircularContainer
                 {
+                    Masking = true,
+                    Origin = Anchor.Centre,
                     EdgeEffect = new EdgeEffect
                     {
                         Type = EdgeEffectType.Glow,

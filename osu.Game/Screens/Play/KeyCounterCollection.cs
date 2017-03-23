@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Play
 
         public class Receptor : Drawable
         {
-            private KeyCounterCollection target;
+            private readonly KeyCounterCollection target;
 
             public Receptor(KeyCounterCollection target)
             {

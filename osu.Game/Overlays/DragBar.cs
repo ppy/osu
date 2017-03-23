@@ -11,8 +11,8 @@ namespace osu.Game.Overlays
 {
     public class DragBar : Container
     {
-        protected Container FillContainer;
-        protected Box Fill;
+        protected readonly Container FillContainer;
+        protected readonly Box Fill;
 
         public Action<float> SeekRequested;
         private bool isDragging;

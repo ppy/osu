@@ -24,8 +24,8 @@ namespace osu.Game.Screens.Select.Options
 
         private const float height = 100;
 
-        private Box holder;
-        private FillFlowContainer<BeatmapOptionsButton> buttonsContainer;
+        private readonly Box holder;
+        private readonly FillFlowContainer<BeatmapOptionsButton> buttonsContainer;
 
         protected override void PopIn()
         {

@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Tournament
         private GroupContainer groupsContainer;
         private OsuSpriteText fullTeamNameText;
 
-        private List<Country> allTeams = new List<Country>();
+        private readonly List<Country> allTeams = new List<Country>();
 
         private DrawingsConfigManager drawingsConfig;
 

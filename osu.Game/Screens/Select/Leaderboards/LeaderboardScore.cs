@@ -30,14 +30,16 @@ namespace osu.Game.Screens.Select.Leaderboards
         private const float background_alpha = 0.25f;
         private const float rank_width = 30;
 
-        private Box background;
-        private Container content, avatar;
-        private DrawableRank scoreRank;
-        private OsuSpriteText nameLabel;
-        private GlowingSpriteText scoreLabel;
-        private ScoreComponentLabel maxCombo, accuracy;
-        private Container flagBadgeContainer;
-        private FillFlowContainer<ScoreModIcon> modsContainer;
+        private readonly Box background;
+        private readonly Container content;
+        private readonly Container avatar;
+        private readonly DrawableRank scoreRank;
+        private readonly OsuSpriteText nameLabel;
+        private readonly GlowingSpriteText scoreLabel;
+        private readonly ScoreComponentLabel maxCombo;
+        private readonly ScoreComponentLabel accuracy;
+        private readonly Container flagBadgeContainer;
+        private readonly FillFlowContainer<ScoreModIcon> modsContainer;
 
         private Visibility state;
         public Visibility State

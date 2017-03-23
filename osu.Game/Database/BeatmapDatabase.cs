@@ -21,7 +21,7 @@ namespace osu.Game.Database
     public class BeatmapDatabase
     {
         private SQLiteConnection connection { get; }
-        private Storage storage;
+        private readonly Storage storage;
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
@@ -342,18 +342,5 @@ namespace osu.Game.Database
         }
 
         public bool Exists(BeatmapSetInfo beatmapSet) => storage.Exists(beatmapSet.Path);
-
-        private class DatabaseWorkingBeatmap : WorkingBeatmap
-        {
-            private readonly BeatmapDatabase database;
-
-            public DatabaseWorkingBeatmap(BeatmapDatabase database, BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, bool withStoryboard = false)
-                : base(beatmapInfo, beatmapSetInfo, withStoryboard)
-            {
-                this.database = database;
-            }
-
-            protected override ArchiveReader GetReader() => database?.GetReader(BeatmapSetInfo);
-        }
     }
 }

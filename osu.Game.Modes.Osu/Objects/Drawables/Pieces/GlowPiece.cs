@@ -11,7 +11,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
     public class GlowPiece : Container
     {
-        private Sprite layer;
+        private readonly Sprite layer;
 
         public GlowPiece()
         {
