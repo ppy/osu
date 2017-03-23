@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Select
         {
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
 
-            beatmapDetails.PresentScores(beatmap);
+            beatmapDetails.Beatmap = beatmap;
 
             base.OnBeatmapChanged(beatmap);
         }
