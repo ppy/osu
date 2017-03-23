@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -19,6 +19,7 @@ namespace osu.Game.Graphics.UserInterface
     public class OsuCheckbox : CheckBox
     {
         private Bindable<bool> bindable;
+        private int nubType;
 
         public Bindable<bool> Bindable
         {
@@ -53,6 +54,29 @@ namespace osu.Game.Graphics.UserInterface
                     labelSpriteText.Text = value;
             }
         }
+        
+        public string LabelFont
+        {
+            set { labelSpriteText.Font = value; }
+        }
+        public Color4 LabelColor
+        {
+            set { labelSpriteText.Colour = value; }
+        }
+
+        public Anchor NubAnchor
+        {
+            set { nub.Anchor = value; }
+        }
+        public Anchor NubOrigin
+        {
+            set{ nub.Origin = value; }
+        }
+        public MarginPadding NubMargin
+        {
+            set{ nub.Margin = value; }
+        }
+
 
         public MarginPadding LabelPadding
         {
@@ -69,15 +93,16 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleChecked;
         private SampleChannel sampleUnchecked;
 
-        public OsuCheckbox()
+        public OsuCheckbox(int type = 0)
         {
+            nubType = type;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
             Children = new Drawable[]
             {
                 labelSpriteText = new OsuSpriteText(),
-                nub = new Nub
+                nub = new Nub(nubType)
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
@@ -101,14 +126,14 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(InputState state)
         {
             nub.Glowing = true;
-            nub.Expanded = true;
+            if (nubType == 0) nub.Expanded = true;
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
             nub.Glowing = false;
-            nub.Expanded = false;
+            if (nubType == 0) nub.Expanded = false;
             base.OnHoverLost(state);
         }
 
