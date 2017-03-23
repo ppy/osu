@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Tournament.Teams
     {
         private const string teams_filename = "drawings.txt";
 
-        private Storage storage;
+        private readonly Storage storage;
 
         public StorageBackedTeamList(Storage storage)
         {

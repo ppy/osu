@@ -10,9 +10,9 @@ namespace osu.Game.Modes.Objects
 {
     public class CircularArcApproximator
     {
-        private Vector2 a;
-        private Vector2 b;
-        private Vector2 c;
+        private readonly Vector2 a;
+        private readonly Vector2 b;
+        private readonly Vector2 c;
 
         private int amountPoints;
 

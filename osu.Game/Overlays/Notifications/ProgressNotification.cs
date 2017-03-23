@@ -104,12 +104,12 @@ namespace osu.Game.Overlays.Notifications
 
         public override bool DisplayOnTop => false;
 
-        private ProgressBar progressBar;
+        private readonly ProgressBar progressBar;
         private Color4 colourQueued;
         private Color4 colourActive;
         private Color4 colourCancelled;
 
-        private SpriteText textDrawable;
+        private readonly SpriteText textDrawable;
 
         public ProgressNotification()
         {

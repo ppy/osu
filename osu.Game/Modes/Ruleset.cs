@@ -21,9 +21,9 @@ namespace osu.Game.Modes
 
     public abstract class Ruleset
     {
-        private static ConcurrentDictionary<PlayMode, Type> availableRulesets = new ConcurrentDictionary<PlayMode, Type>();
+        private static readonly ConcurrentDictionary<PlayMode, Type> available_rulesets = new ConcurrentDictionary<PlayMode, Type>();
 
-        public static IEnumerable<PlayMode> PlayModes => availableRulesets.Keys;
+        public static IEnumerable<PlayMode> PlayModes => available_rulesets.Keys;
 
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
@@ -35,7 +35,7 @@ namespace osu.Game.Modes
 
         public abstract ScoreProcessor CreateScoreProcessor();
 
-        public static void Register(Ruleset ruleset) => availableRulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
+        public static void Register(Ruleset ruleset) => available_rulesets.TryAdd(ruleset.PlayMode, ruleset.GetType());
 
         protected abstract PlayMode PlayMode { get; }
 
@@ -49,7 +49,7 @@ namespace osu.Game.Modes
         {
             Type type;
 
-            if (!availableRulesets.TryGetValue(mode, out type))
+            if (!available_rulesets.TryGetValue(mode, out type))
                 return null;
 
             return Activator.CreateInstance(type) as Ruleset;

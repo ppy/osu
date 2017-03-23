@@ -60,7 +60,7 @@ namespace osu.Game
 
         public Bindable<PlayMode> PlayMode;
 
-        private string[] args;
+        private readonly string[] args;
 
         private OptionsOverlay options;
 

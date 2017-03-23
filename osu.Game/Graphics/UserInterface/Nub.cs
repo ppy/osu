@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
         public const float COLLAPSED_SIZE = 20;
         public const float EXPANDED_SIZE = 40;
 
-        private Box fill;
+        private readonly Box fill;
 
         private const float border_width = 3;
         private Color4 glowingColour, idleColour;

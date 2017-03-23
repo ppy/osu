@@ -12,7 +12,7 @@ namespace osu.Game.Modes.Catch.Objects.Drawable
 {
     internal class DrawableFruit : Sprite
     {
-        private CatchBaseHit h;
+        private readonly CatchBaseHit h;
 
         public DrawableFruit(CatchBaseHit h)
         {
@@ -29,7 +29,7 @@ namespace osu.Game.Modes.Catch.Objects.Drawable
         {
             Texture = textures.Get(@"Menu/logo");
 
-            double duration = 0;
+            const double duration = 0;
 
             Transforms.Add(new TransformPosition { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = new Vector2(h.Position, -0.1f), EndValue = new Vector2(h.Position, 0.9f) });
             Transforms.Add(new TransformAlpha { StartTime = h.StartTime + duration + 200, EndTime = h.StartTime + duration + 400, StartValue = 1, EndValue = 0 });
