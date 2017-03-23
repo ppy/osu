@@ -7,5 +7,8 @@ namespace osu.Game.Modes.Mania.Judgements
 {
     public class ManiaJudgementInfo : JudgementInfo
     {
+        public override string ScoreString => string.Empty;
+
+        public override string MaxScoreString => string.Empty;
     }
 }

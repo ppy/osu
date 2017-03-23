@@ -55,10 +55,15 @@
     <Compile Include="Objects\Bash.cs" />
     <Compile Include="Objects\DrumRoll.cs" />
     <Compile Include="Objects\DrumRollTick.cs" />
+    <Compile Include="Objects\Hit.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TaikoScoreProcessor.cs" />
+    <Compile Include="UI\HitTarget.cs" />
+    <Compile Include="UI\InputDrum.cs" />
+    <Compile Include="UI\DrawableTaikoJudgementInfo.cs" />
+    <Compile Include="UI\HitExplosion.cs" />
     <Compile Include="UI\TaikoHitRenderer.cs" />
     <Compile Include="UI\TaikoPlayfield.cs" />
     <Compile Include="TaikoRuleset.cs" />
@@ -75,10 +80,6 @@
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
       <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
       <Name>osu.Framework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Modes.Osu\osu.Game.Modes.Osu.csproj">
-      <Project>{C92A607B-1FDD-4954-9F92-03FF547D9080}</Project>
-      <Name>osu.Game.Modes.Osu</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
       <Project>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</Project>
