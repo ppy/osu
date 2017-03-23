@@ -155,7 +155,7 @@ namespace osu.Game.Modes.UI
         /// </summary>
         protected Playfield<TObject, TJudgement> Playfield;
 
-        private Container content;
+        private readonly Container content;
 
         protected HitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)

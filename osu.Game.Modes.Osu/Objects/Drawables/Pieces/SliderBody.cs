@@ -18,8 +18,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
     public class SliderBody : Container, ISliderProgress
     {
-        private Path path;
-        private BufferedContainer container;
+        private readonly Path path;
+        private readonly BufferedContainer container;
 
         public float PathWidth
         {
@@ -33,7 +33,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         public double? SnakedStart { get; private set; }
         public double? SnakedEnd { get; private set; }
 
-        private Slider slider;
+        private readonly Slider slider;
         public SliderBody(Slider s)
         {
             slider = s;
@@ -122,7 +122,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             path.Texture = texture;
         }
 
-        private List<Vector2> currentCurve = new List<Vector2>();
+        private readonly List<Vector2> currentCurve = new List<Vector2>();
         private bool updateSnaking(double p0, double p1)
         {
             if (SnakedStart == p0 && SnakedEnd == p1) return false;

@@ -10,7 +10,7 @@ namespace osu.Desktop.VisualTests
 {
     public class Benchmark : OsuGameBase
     {
-        private double timePerTest = 200;
+        private readonly double timePerTest = 200;
 
         [BackgroundDependencyLoader]
         private void load()

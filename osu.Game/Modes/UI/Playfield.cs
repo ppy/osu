@@ -23,7 +23,7 @@ namespace osu.Game.Modes.UI
         internal Container<Drawable> ScaledContent;
 
         protected override Container<Drawable> Content => content;
-        private Container<Drawable> content;
+        private readonly Container<Drawable> content;
 
         /// <summary>
         /// A container for keeping track of DrawableHitObjects.

@@ -10,7 +10,8 @@ namespace osu.Game.Modes.UI
 {
     public class ModIcon : Container
     {
-        private TextAwesome modIcon, background;
+        private readonly TextAwesome modIcon;
+        private readonly TextAwesome background;
 
         private float iconSize = 80;
         public float IconSize

@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Menu
 {
     public class Intro : OsuScreen
     {
-        private OsuLogo logo;
+        private readonly OsuLogo logo;
 
         /// <summary>
         /// Whether we have loaded the menu previously.

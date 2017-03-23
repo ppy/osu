@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class TwoLayerButton : ClickableContainer
     {
-        private TextAwesome icon;
+        private readonly TextAwesome icon;
 
         public Box IconLayer;
         public Box TextLayer;
@@ -29,11 +29,11 @@ namespace osu.Game.Graphics.UserInterface
         public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
         public SampleChannel ActivationSound;
-        private SpriteText text;
+        private readonly SpriteText text;
 
         public Color4 HoverColour;
-        private Container c1;
-        private Container c2;
+        private readonly Container c1;
+        private readonly Container c2;
 
         public Color4 BackgroundColour
         {

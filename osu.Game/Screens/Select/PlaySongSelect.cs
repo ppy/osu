@@ -19,8 +19,8 @@ namespace osu.Game.Screens.Select
     public class PlaySongSelect : SongSelect
     {
         private OsuScreen player;
-        private ModSelectOverlay modSelect;
-        private Leaderboard leaderboard;
+        private readonly ModSelectOverlay modSelect;
+        private readonly Leaderboard leaderboard;
 
         public PlaySongSelect()
         {
