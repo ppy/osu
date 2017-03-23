@@ -46,7 +46,7 @@ namespace osu.Game.Modes.Taiko.UI
 
         protected override Container<Drawable> Content => hitObjectContainer;
 
-        private Container<RingExplosion> ringExplosionContainer;
+        private Container<HitExplosion> hitExplosionContainer;
         //private Container<DrawableBarLine> barLineContainer;
         private Container<JudgementText> judgementContainer;
 
@@ -96,7 +96,7 @@ namespace osu.Game.Modes.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                ringExplosionContainer = new Container<RingExplosion>
+                                hitExplosionContainer = new Container<HitExplosion>
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,
@@ -183,10 +183,7 @@ namespace osu.Game.Modes.Taiko.UI
         {
             if (judgedObject.Judgement.Result == HitResult.Hit)
             {
-                ringExplosionContainer.Add(new RingExplosion
-                {
-                    Judgement = judgedObject.Judgement
-                });
+                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement));
             }
 
             float judgementOffset = judgedObject.Judgement.Result == HitResult.Hit ? judgedObject.Position.X : 0;
