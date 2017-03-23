@@ -140,12 +140,6 @@ namespace osu.Game.Screens.Play
 
             hudOverlay.BindHitRenderer(hitRenderer);
             hudOverlay.Progress.Length = Beatmap.Track.Length;
-            hudOverlay.Progress.OnSeek = (time) =>
-            {
-                //todo: temporary
-                Beatmap.Track.Seek(time);
-                Beatmap.Track.Start();
-            };
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             hitRenderer.OnAllJudged += onCompletion;
