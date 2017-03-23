@@ -333,7 +333,6 @@
     <Compile Include="Screens\Select\Footer.cs" />
     <Compile Include="Screens\Play\SongProgress.cs" />
     <Compile Include="Screens\Play\SongProgressGraph.cs" />
-    <Compile Include="Screens\Play\SongProgressGraphColumn.cs" />
     <Compile Include="Screens\Play\SongProgressBar.cs" />
     <Compile Include="Screens\Play\PauseOverlay.cs" />
     <Compile Include="Screens\Play\Pause\PauseProgressBar.cs" />

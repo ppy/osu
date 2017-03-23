@@ -56,6 +56,7 @@ namespace osu.Game.Modes.UI
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
             RelativeSizeAxes = Axes.X,
+            Depth = -2, //make it on top of the pause overlay
         };
     }
 }

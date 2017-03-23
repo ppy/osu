@@ -3,72 +3,53 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Beatmaps;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Transforms;
+using System;
 
 namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer
     {
-        public static readonly int BAR_HEIGHT = 5;
-        public static readonly int GRAPH_HEIGHT = 34;
-        public static readonly Color4 FILL_COLOUR = new Color4(221, 255, 255, 255);
-        public static readonly Color4 GLOW_COLOUR = new Color4(221, 255, 255, 150);
-        private const float progress_transition_duration = 100;
+        private readonly int bar_height = 5;
+        private readonly int graph_height = 34;
+        private readonly Vector2 handle_size = new Vector2(14, 25);
+        private readonly Color4 fill_colour = new Color4(221, 255, 255, 255);
+        private const float transition_duration = 100;
 
-        private SongProgressBar progress;
+        private SongProgressBar bar;
         private SongProgressGraph graph;
-        private WorkingBeatmap current;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        public Action<double> OnSeek;
+
+        private double currentTime;
+        public double CurrentTime
         {
-            current = osuGame.Beatmap.Value; 
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (current?.TrackLoaded ?? false)
+            get { return currentTime; }
+            set
             {
-                float currentProgress = (float)(current.Track.CurrentTime / current.Track.Length);
-
-                progress.IsEnabled = true;
-                progress.UpdatePosition(currentProgress);
-                graph.Progress = (int)(graph.ColumnCount * currentProgress);
-            }
-            else
-            {
-                progress.IsEnabled = false;
+                currentTime = value;
+                updateProgress();
             }
         }
 
-        public void DisplayValues(int[] values)
+        private double duration;
+        public double Duration
         {
-            graph.Values = values;
-        }
-
-        protected override void PopIn()
-        {
-            progress.FadeTo(1f, progress_transition_duration, EasingTypes.In);
-            MoveTo(Vector2.Zero, progress_transition_duration, EasingTypes.In);
-        }
-
-        protected override void PopOut()
-        {
-            progress.FadeTo(0f, progress_transition_duration, EasingTypes.In);
-            MoveTo(new Vector2(0f, BAR_HEIGHT), progress_transition_duration, EasingTypes.In);
+            get { return duration; }
+            set
+            {
+                duration = value;
+                updateProgress();
+            }
         }
 
         public SongProgress()
         {
             RelativeSizeAxes = Axes.X;
-            Height = BAR_HEIGHT + GRAPH_HEIGHT + SongProgressBar.HANDLE_SIZE.Y;
+            Height = bar_height + graph_height + handle_size.Y;
 
             Children = new Drawable[]
             {
@@ -77,23 +58,47 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
-                    Height = GRAPH_HEIGHT,
+                    Height = graph_height,
                     Margin = new MarginPadding
                     {
-                        Bottom = BAR_HEIGHT
+                        Bottom = bar_height
                     }
                 },
-                progress = new SongProgressBar
+                bar = new SongProgressBar(bar_height + graph_height, handle_size, fill_colour)
                 {
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
+                    Height = bar_height,
                     SeekRequested = delegate (float position)
                     {
-                        current?.Track?.Seek(current.Track.Length * position);
-                        current?.Track?.Start();
+                        OnSeek?.Invoke(Duration * position);
                     }
                 }
             };
+        }
+
+        public void DisplayValues(int[] values)
+        {
+            graph.Values = values;
+        }
+
+        private void updateProgress()
+        {
+            float currentProgress = (float)(CurrentTime / Duration);
+            bar.UpdatePosition(currentProgress);
+            graph.Progress = (int)(graph.ColumnCount * currentProgress);
+        }
+
+        protected override void PopIn()
+        {
+            bar.FadeTo(1f, transition_duration, EasingTypes.In);
+            MoveTo(Vector2.Zero, transition_duration, EasingTypes.In);
+        }
+
+        protected override void PopOut()
+        {
+            bar.FadeTo(0f, transition_duration, EasingTypes.In);
+            MoveTo(new Vector2(0f, bar_height), transition_duration, EasingTypes.In);
         }
     }
 }
