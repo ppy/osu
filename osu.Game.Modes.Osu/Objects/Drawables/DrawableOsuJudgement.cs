@@ -9,9 +9,9 @@ using osu.Game.Modes.Judgements;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class DrawableOsuJudgementInfo : DrawableJudgementInfo<OsuJudgementInfo>
+    public class DrawableOsuJudgement : DrawableJudgement<OsuJudgement>
     {
-        public DrawableOsuJudgementInfo(OsuJudgementInfo judgement) : base(judgement)
+        public DrawableOsuJudgement(OsuJudgement judgement) : base(judgement)
         {
         }
 
