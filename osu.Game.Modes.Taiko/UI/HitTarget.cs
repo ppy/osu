@@ -39,35 +39,27 @@ namespace osu.Game.Modes.Taiko.UI
                 new Box
                 {
                     Name = "Bar Upper",
-
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-
                     Y = border_offset,
-
                     Size = new Vector2(3, (TaikoPlayfield.PlayfieldHeight - finisher_diameter) / 2f - border_offset),
-
                     Alpha = 0.1f
                 },
                 new CircularContainer
                 {
                     Name = "Finisher Ring",
-
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-
                     Size = new Vector2(finisher_diameter),
-
+                    Masking = true,
                     BorderColour = Color4.White,
                     BorderThickness = 2,
                     Alpha = 0.1f,
-
                     Children = new[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-
                             Alpha = 0,
                             AlwaysPresent = true
                         }
@@ -76,22 +68,18 @@ namespace osu.Game.Modes.Taiko.UI
                 new CircularContainer
                 {
                     Name = "Normal Ring",
-
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-
                     Size = new Vector2(normal_diameter),
-
+                    Masking = true,
                     BorderColour = Color4.White,
                     BorderThickness = 2,
                     Alpha = 0.5f,
-
                     Children = new[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-
                             Alpha = 0,
                             AlwaysPresent = true
                         }
@@ -100,14 +88,10 @@ namespace osu.Game.Modes.Taiko.UI
                 new Box
                 {
                     Name = "Bar Lower",
-
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-
                     Y = -border_offset,
-
                     Size = new Vector2(3, (TaikoPlayfield.PlayfieldHeight - finisher_diameter) / 2f - border_offset),
-
                     Alpha = 0.1f
                 },
             };
