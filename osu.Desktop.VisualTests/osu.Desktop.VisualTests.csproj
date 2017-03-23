@@ -204,9 +204,14 @@
     <Compile Include="Tests\TestCaseModSelectOverlay.cs" />
     <Compile Include="Tests\TestCaseDialogOverlay.cs" />
     <Compile Include="Tests\TestCaseBeatmapOptionsOverlay.cs" />
+    <Compile Include="Tests\TestCaseLeaderboard.cs" />
+    <Compile Include="Beatmaps\TestWorkingBeatmap.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Beatmaps\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
