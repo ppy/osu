@@ -17,7 +17,7 @@ using osu.Game.Graphics.Sprites;
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
-    /// A checkbox styled to be placed in line with an <see cref="OsuTabControl"/>
+    /// A checkbox styled to be placed in line with an <see cref="OsuTabControl{T}"/>
     /// </summary>
     public class OsuTabControlCheckBox : CheckBox
     {
