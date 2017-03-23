@@ -25,8 +25,6 @@ namespace osu.Game.Modes.Judgements
 
         protected readonly SpriteText JudgementText;
 
-        protected double HitVisibleLength => 600;
-
         /// <summary>
         /// Creates a drawable which visualises a <see cref="JudgementInfo"/>.
         /// </summary>
