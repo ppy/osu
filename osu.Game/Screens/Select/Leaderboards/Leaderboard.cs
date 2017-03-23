@@ -16,8 +16,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public class Leaderboard : Container
     {
-        private ScrollContainer scrollContainer;
-        private FillFlowContainer<LeaderboardScore> scrollFlow;
+        private readonly ScrollContainer scrollContainer;
+        private readonly FillFlowContainer<LeaderboardScore> scrollFlow;
 
         private IEnumerable<Score> scores;
         public IEnumerable<Score> Scores

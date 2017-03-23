@@ -15,8 +15,8 @@ namespace osu.Game.Overlays.Options
 {
     public class OptionDropdown<T> : FillFlowContainer
     {
-        private Dropdown<T> dropdown;
-        private SpriteText text;
+        private readonly Dropdown<T> dropdown;
+        private readonly SpriteText text;
 
         public string LabelText
         {

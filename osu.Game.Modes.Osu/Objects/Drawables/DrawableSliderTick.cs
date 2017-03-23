@@ -18,7 +18,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableSliderTick : DrawableOsuHitObject
     {
-        private SliderTick sliderTick;
+        private readonly SliderTick sliderTick;
 
         public double FadeInTime;
         public double FadeOutTime;
