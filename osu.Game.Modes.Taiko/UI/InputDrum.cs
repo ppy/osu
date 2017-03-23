@@ -29,25 +29,18 @@ namespace osu.Game.Modes.Taiko.UI
                 new TaikoHalfDrum(false)
                 {
                     Name = "Left Half",
-
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
-
                     RelativeSizeAxes = Axes.Both,
-
                     Keys = new List<Key>(new[] { Key.F, Key.D })
                 },
                 new TaikoHalfDrum(true)
                 {
                     Name = "Right Half",
-
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
-
                     RelativeSizeAxes = Axes.Both,
-
                     Position = new Vector2(-1f, 0),
-
                     Keys = new List<Key>(new[] { Key.J, Key.K })
                 }
             };
@@ -81,25 +74,20 @@ namespace osu.Game.Modes.Taiko.UI
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
-
                         RelativeSizeAxes = Axes.Both
                     },
                     outerHit = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
-
                         RelativeSizeAxes = Axes.Both,
-
                         Alpha = 0,
-
                         BlendingMode = BlendingMode.Additive
                     },
                     inner = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
-
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.7f)
                     },
@@ -107,12 +95,9 @@ namespace osu.Game.Modes.Taiko.UI
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
-
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.7f),
-
                         Alpha = 0,
-
                         BlendingMode = BlendingMode.Additive
                     }
                 };
