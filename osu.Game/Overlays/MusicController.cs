@@ -35,7 +35,7 @@ namespace osu.Game.Overlays
         private SpriteText title, artist;
 
         private List<BeatmapSetInfo> playList;
-        private List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
+        private readonly List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
         private int playListIndex;
         private int playHistoryIndex = -1;
 
@@ -415,8 +415,8 @@ namespace osu.Game.Overlays
 
         private class MusicControllerBackground : BufferedContainer
         {
-            private Sprite sprite;
-            private WorkingBeatmap beatmap;
+            private readonly Sprite sprite;
+            private readonly WorkingBeatmap beatmap;
 
             public MusicControllerBackground(WorkingBeatmap beatmap = null)
             {

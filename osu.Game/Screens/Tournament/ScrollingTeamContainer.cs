@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Tournament
 
         private readonly List<Country> availableTeams = new List<Country>();
 
-        private Container tracker;
+        private readonly Container tracker;
 
         private float speed;
         private int expiredCount;
@@ -328,8 +328,8 @@ namespace osu.Game.Screens.Tournament
 
             public Country Team;
 
-            private Sprite flagSprite;
-            private Box outline;
+            private readonly Sprite flagSprite;
+            private readonly Box outline;
 
             private bool selected;
             public bool Selected

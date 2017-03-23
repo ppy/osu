@@ -11,8 +11,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class HitExplosion : DrawableJudgementInfo<OsuJudgementInfo>
     {
-        public HitExplosion(OsuJudgementInfo judgement)
-            : base(judgement)
+        public HitExplosion(OsuJudgementInfo judgement) : base(judgement)
         {
         }
 

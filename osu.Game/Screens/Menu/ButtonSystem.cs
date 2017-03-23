@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Menu
 
         private Toolbar toolbar;
 
-        private FlowContainerWithOrigin buttonFlow;
+        private readonly FlowContainerWithOrigin buttonFlow;
 
         //todo: make these non-internal somehow.
         internal const float BUTTON_AREA_HEIGHT = 100;
@@ -41,16 +41,16 @@ namespace osu.Game.Screens.Menu
 
         public const int EXIT_DELAY = 3000;
 
-        private OsuLogo osuLogo;
-        private Drawable iconFacade;
-        private Container buttonArea;
-        private Box buttonAreaBackground;
+        private readonly OsuLogo osuLogo;
+        private readonly Drawable iconFacade;
+        private readonly Container buttonArea;
+        private readonly Box buttonAreaBackground;
 
-        private Button backButton;
-        private Button settingsButton;
+        private readonly Button backButton;
+        private readonly Button settingsButton;
 
-        private List<Button> buttonsTopLevel = new List<Button>();
-        private List<Button> buttonsPlay = new List<Button>();
+        private readonly List<Button> buttonsTopLevel = new List<Button>();
+        private readonly List<Button> buttonsPlay = new List<Button>();
 
         public ButtonSystem()
         {

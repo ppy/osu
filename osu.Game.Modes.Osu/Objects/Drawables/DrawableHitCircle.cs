@@ -13,15 +13,15 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
-        private OsuHitObject osuObject;
+        private readonly OsuHitObject osuObject;
 
         public ApproachCircle ApproachCircle;
-        private CirclePiece circle;
-        private RingPiece ring;
-        private FlashPiece flash;
-        private ExplodePiece explode;
-        private NumberPiece number;
-        private GlowPiece glow;
+        private readonly CirclePiece circle;
+        private readonly RingPiece ring;
+        private readonly FlashPiece flash;
+        private readonly ExplodePiece explode;
+        private readonly NumberPiece number;
+        private readonly GlowPiece glow;
 
         public DrawableHitCircle(OsuHitObject h) : base(h)
         {

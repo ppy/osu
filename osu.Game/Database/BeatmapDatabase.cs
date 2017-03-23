@@ -21,7 +21,7 @@ namespace osu.Game.Database
     public class BeatmapDatabase
     {
         private SQLiteConnection connection { get; }
-        private Storage storage;
+        private readonly Storage storage;
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
