@@ -21,10 +21,18 @@ namespace osu.Game.Screens.Select
 
         private OsuGame game;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGame game)
+        private WorkingBeatmap beatmap;
+        public WorkingBeatmap Beatmap
         {
-            this.game = game;
+            get
+            {
+                return beatmap;
+            }
+            set
+            {
+                beatmap = value;
+                if (IsLoaded) Schedule(updateScores);
+            }
         }
 
         public BeatmapDetailArea()
@@ -47,6 +55,9 @@ namespace osu.Game.Screens.Select
                                 Leaderboard.Show();
                                 break;
                         }
+
+                        //for now let's always update scores.
+                        updateScores();
                     },
                 },
                 content = new Container
@@ -69,15 +80,27 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        private GetScoresRequest getScoresRequest;
-        public void PresentScores(WorkingBeatmap beatmap)
+        protected override void LoadComplete()
         {
-            if (game == null) return;
+            base.LoadComplete();
+            updateScores();
+        }
+
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuGame game)
+        {
+            this.game = game;
+        }
+
+        private GetScoresRequest getScoresRequest;
+        private void updateScores()
+        {
+            if (game == null || !IsLoaded) return;
 
             Leaderboard.Scores = null;
             getScoresRequest?.Cancel();
 
-            if (beatmap?.BeatmapInfo == null) return;
+            if (beatmap?.BeatmapInfo == null || !Leaderboard.IsPresent) return;
 
             getScoresRequest = new GetScoresRequest(beatmap.BeatmapInfo);
             getScoresRequest.Success += r => Leaderboard.Scores = r.Scores;
