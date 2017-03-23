@@ -20,6 +20,11 @@ namespace osu.Game.Modes.Taiko.Objects
         public double PreEmpt;
 
         /// <summary>
+        /// Whether this HitObject is a finisher.
+        /// </summary>
+        public bool IsFinisher;
+
+        /// <summary>
         /// Whether this HitObject is in Kiai time.
         /// </summary>
         public bool Kiai { get; protected set; }
