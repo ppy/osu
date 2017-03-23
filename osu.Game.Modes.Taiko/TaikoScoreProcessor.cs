@@ -140,11 +140,11 @@ namespace osu.Game.Modes.Taiko
             // 3 times bonus points for hitting a finisher with both keys with 120 finishers in the map
             finisherScoreScale = -7d / 90d * MathHelper.Clamp(finishers.Count, 30, 120) + 111d / 9d;
 
-            foreach (TaikoHitObject obj in beatmap.HitObjects)
+            foreach (var obj in beatmap.HitObjects)
             {
                 if (obj is Hit)
                 {
-                    AddJudgement(new TaikoJudgementInfo
+                    AddJudgement(new TaikoJudgement
                     {
                         Result = HitResult.Hit,
                         TaikoResult = TaikoHitResult.Great,
@@ -155,7 +155,7 @@ namespace osu.Game.Modes.Taiko
                 {
                     for (int i = 0; i < ((DrumRoll)obj).TotalTicks; i++)
                     {
-                        AddJudgement(new TaikoDrumRollTickJudgementInfo
+                        AddJudgement(new TaikoDrumRollTickJudgement
                         {
                             Result = HitResult.Hit,
                             TaikoResult = TaikoHitResult.Great,
@@ -163,7 +163,7 @@ namespace osu.Game.Modes.Taiko
                         });
                     }
 
-                    AddJudgement(new TaikoJudgementInfo
+                    AddJudgement(new TaikoJudgement
                     {
                         Result = HitResult.Hit,
                         TaikoResult = TaikoHitResult.Great,
@@ -172,7 +172,7 @@ namespace osu.Game.Modes.Taiko
                 }
                 else if (obj is Bash)
                 {
-                    AddJudgement(new TaikoJudgementInfo
+                    AddJudgement(new TaikoJudgement
                     {
                         Result = HitResult.Hit,
                         TaikoResult = TaikoHitResult.Great
@@ -184,9 +184,9 @@ namespace osu.Game.Modes.Taiko
             maxComboPortion = comboPortion;
         }
 
-        protected override void UpdateCalculations(TaikoJudgementInfo newJudgement)
+        protected override void UpdateCalculations(TaikoJudgement newJudgement)
         {
-            TaikoDrumRollTickJudgementInfo tickJudgement = newJudgement as TaikoDrumRollTickJudgementInfo;
+            var tickJudgement = newJudgement as TaikoDrumRollTickJudgement;
 
             // Don't consider ticks as a type of hit that counts towards map completion
             if (tickJudgement == null)
