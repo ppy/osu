@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Allocation;
@@ -23,6 +24,8 @@ namespace osu.Game.Modes.Taiko.UI
         {
             Size = new Vector2(TaikoPlayfield.PlayfieldHeight);
 
+            const float middle_split = 10;
+
             Children = new Drawable[]
             {
                 new TaikoHalfDrum(false)
@@ -31,6 +34,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
                     RelativeSizeAxes = Axes.Both,
+                    X = -middle_split / 2,
                     RimKey = Key.D,
                     CentreKey = Key.F
                 },
@@ -40,6 +44,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.Both,
+                    X = middle_split / 2,
                     Position = new Vector2(-1f, 0),
                     RimKey = Key.K,
                     CentreKey = Key.J
@@ -85,7 +90,7 @@ namespace osu.Game.Modes.Taiko.UI
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                        BlendingMode = BlendingMode.Additive
+                        BlendingMode = BlendingMode.Additive,
                     },
                     centre = new Sprite
                     {
@@ -123,16 +128,18 @@ namespace osu.Game.Modes.Taiko.UI
                 if (args.Repeat)
                     return false;
 
-                if (args.Key == CentreKey)
-                {
-                    centreHit.FadeIn();
-                    centreHit.FadeOut(500, EasingTypes.OutQuint);
-                }
+                Drawable target = null;
 
-                if (args.Key == RimKey)
+                if (args.Key == CentreKey)
+                    target = centreHit;
+                else if (args.Key == RimKey)
+                    target = rimHit;
+
+                if (target != null)
                 {
-                    rimHit.FadeIn();
-                    rimHit.FadeOut(500, EasingTypes.OutQuint);
+                    target.FadeTo(Math.Min(target.Alpha + 0.4f, 1), 40, EasingTypes.OutQuint);
+                    target.Delay(40);
+                    target.FadeOut(600, EasingTypes.OutQuint);
                 }
 
                 return false;
