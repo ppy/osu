@@ -22,12 +22,11 @@ namespace osu.Game.Screens.Select
 
         public PlaySongSelect()
         {
-            Add(modSelect = new ModSelectOverlay
+            FooterPanels.Add(modSelect = new ModSelectOverlay
             {
                 RelativeSizeAxes = Axes.X,
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.BottomCentre,
-                Margin = new MarginPadding { Bottom = 50 }
             });
 
             LeftContent.Add(beatmapDetails = new BeatmapDetailArea
