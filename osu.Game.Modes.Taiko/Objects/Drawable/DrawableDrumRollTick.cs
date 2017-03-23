@@ -26,7 +26,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             this.tick = tick;
         }
 
-        protected override TaikoJudgementInfo CreateJudgementInfo() => new TaikoDrumRollTickJudgementInfo();
+        protected override TaikoJudgement CreateJudgement() => new TaikoDrumRollTickJudgement();
 
         protected override void CheckJudgement(bool userTriggered)
         {
@@ -42,6 +42,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 Judgement.Result = HitResult.Hit;
                 Judgement.TaikoResult = TaikoHitResult.Great;
             }
+        }
+
+        protected override void UpdateState(ArmedState state)
+        {
         }
 
         protected override void UpdateScrollPosition(double time)

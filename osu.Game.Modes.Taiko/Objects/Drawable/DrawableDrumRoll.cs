@@ -31,6 +31,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             }
         }
 
+        protected override void UpdateState(ArmedState state)
+        {
+        }
+
         protected override void CheckJudgement(bool userTriggered)
         {
             if (userTriggered)
