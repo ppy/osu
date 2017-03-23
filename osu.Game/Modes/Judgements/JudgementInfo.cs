@@ -5,10 +5,31 @@ using osu.Game.Modes.Objects.Drawables;
 
 namespace osu.Game.Modes.Judgements
 {
-    public class JudgementInfo
+    public abstract class JudgementInfo
     {
-        public ulong? ComboAtHit;
+        /// <summary>
+        /// Whether this judgement is the result of a hit or a miss.
+        /// </summary>
         public HitResult? Result;
+
+        /// <summary>
+        /// The offset at which this judgement occurred.
+        /// </summary>
         public double TimeOffset;
+
+        /// <summary>
+        /// The combo after this judgement was processed.
+        /// </summary>
+        public ulong? ComboAtHit;
+
+        /// <summary>
+        /// The string representation for the score achieved.
+        /// </summary>
+        public abstract string ScoreString { get; }
+
+        /// <summary>
+        /// The string representation for the max score achievable.
+        /// </summary>
+        public abstract string MaxScoreString { get; }
     }
 }
