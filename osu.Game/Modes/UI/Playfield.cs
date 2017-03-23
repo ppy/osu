@@ -13,7 +13,7 @@ namespace osu.Game.Modes.UI
 {
     public abstract class Playfield<TObject, TJudgement> : Container
         where TObject : HitObject
-        where TJudgement : JudgementInfo
+        where TJudgement : Judgement
     {
         /// <summary>
         /// The HitObjects contained in this Playfield.

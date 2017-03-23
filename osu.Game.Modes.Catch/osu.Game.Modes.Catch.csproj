@@ -51,7 +51,7 @@
     <Compile Include="Beatmaps\CatchBeatmapProcessor.cs" />
     <Compile Include="CatchDifficultyCalculator.cs" />
     <Compile Include="CatchScoreProcessor.cs" />
-    <Compile Include="Judgements\CatchJudgementInfo.cs" />
+    <Compile Include="Judgements\CatchJudgement.cs" />
     <Compile Include="Objects\CatchBaseHit.cs" />
     <Compile Include="Objects\Drawable\DrawableFruit.cs" />
     <Compile Include="Objects\Droplet.cs" />

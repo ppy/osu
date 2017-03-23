@@ -11,7 +11,7 @@ using osu.Game.Modes.Mania.Judgements;
 
 namespace osu.Game.Modes.Mania.UI
 {
-    public class ManiaPlayfield : Playfield<ManiaBaseHit, ManiaJudgementInfo>
+    public class ManiaPlayfield : Playfield<ManiaBaseHit, ManiaJudgement>
     {
         public ManiaPlayfield(int columns)
         {
