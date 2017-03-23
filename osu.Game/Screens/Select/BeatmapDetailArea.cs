@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Screens.Select.Leaderboards;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Screens.Select
         public readonly Container Details; //todo: replace with a real details view when added
         public readonly Leaderboard Leaderboard;
 
-        private OsuGame game;
+        private APIAccess api;
 
         private WorkingBeatmap beatmap;
         public WorkingBeatmap Beatmap
@@ -87,24 +88,24 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGame game)
+        private void load(APIAccess api)
         {
-            this.game = game;
+            this.api = api;
         }
 
         private GetScoresRequest getScoresRequest;
         private void updateScores()
         {
-            if (game == null || !IsLoaded) return;
+            if (!IsLoaded) return;
 
             Leaderboard.Scores = null;
             getScoresRequest?.Cancel();
 
-            if (beatmap?.BeatmapInfo == null || !Leaderboard.IsPresent) return;
+            if (api == null || beatmap?.BeatmapInfo == null || !Leaderboard.IsPresent) return;
 
             getScoresRequest = new GetScoresRequest(beatmap.BeatmapInfo);
             getScoresRequest.Success += r => Leaderboard.Scores = r.Scores;
-            game.API.Queue(getScoresRequest);
+            api.Queue(getScoresRequest);
         }
     }
 }
