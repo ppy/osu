@@ -9,23 +9,18 @@ using osu.Game.Modes.Judgements;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class DrawableOsuJudgementInfo : DrawableJudgementInfo<OsuJudgementInfo>
+    public class DrawableOsuJudgement : DrawableJudgement<OsuJudgement>
     {
-        public DrawableOsuJudgementInfo(OsuJudgementInfo judgement) : base(judgement)
+        public DrawableOsuJudgement(OsuJudgement judgement) : base(judgement)
         {
         }
 
         protected override void LoadComplete()
         {
-            base.LoadComplete();
-
             if (Judgement.Result != HitResult.Miss)
-            {
                 JudgementText.TransformSpacingTo(new Vector2(14, 0), 1800, EasingTypes.OutQuint);
-                FadeOut(500);
-            }
 
-            Expire();
+            base.LoadComplete();
         }
     }
 }

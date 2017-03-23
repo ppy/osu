@@ -10,7 +10,7 @@ using osu.Game.Modes.Catch.Judgements;
 
 namespace osu.Game.Modes.Catch.UI
 {
-    public class CatchPlayfield : Playfield<CatchBaseHit, CatchJudgementInfo>
+    public class CatchPlayfield : Playfield<CatchBaseHit, CatchJudgement>
     {
         public CatchPlayfield()
         {

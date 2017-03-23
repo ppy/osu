@@ -8,7 +8,7 @@ using osu.Framework.Extensions;
 
 namespace osu.Game.Modes.Osu.Judgements
 {
-    public class OsuJudgementInfo : JudgementInfo
+    public class OsuJudgement : Judgement
     {
         /// <summary>
         /// The positional hit offset.

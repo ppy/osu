@@ -10,7 +10,7 @@ using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Catch.UI
 {
-    public class CatchHitRenderer : HitRenderer<CatchBaseHit, CatchJudgementInfo>
+    public class CatchHitRenderer : HitRenderer<CatchBaseHit, CatchJudgement>
     {
         public CatchHitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
@@ -23,8 +23,8 @@ namespace osu.Game.Modes.Catch.UI
 
         protected override IBeatmapProcessor<CatchBaseHit> CreateBeatmapProcessor() => new CatchBeatmapProcessor();
 
-        protected override Playfield<CatchBaseHit, CatchJudgementInfo> CreatePlayfield() => new CatchPlayfield();
+        protected override Playfield<CatchBaseHit, CatchJudgement> CreatePlayfield() => new CatchPlayfield();
 
-        protected override DrawableHitObject<CatchBaseHit, CatchJudgementInfo> GetVisualRepresentation(CatchBaseHit h) => null;
+        protected override DrawableHitObject<CatchBaseHit, CatchJudgement> GetVisualRepresentation(CatchBaseHit h) => null;
     }
 }
