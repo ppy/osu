@@ -193,6 +193,7 @@ namespace osu.Game.Overlays.Dialog
                                         {
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.Centre,
+                                            Masking = true,
                                             BorderColour = Color4.White,
                                             BorderThickness = 5f,
                                             Children = new Drawable[]

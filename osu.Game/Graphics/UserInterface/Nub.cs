@@ -30,6 +30,8 @@ namespace osu.Game.Graphics.UserInterface
             BorderColour = Color4.White;
             BorderThickness = border_width;
 
+            Masking = true;
+
             Children = new[]
             {
                 fill = new Box
