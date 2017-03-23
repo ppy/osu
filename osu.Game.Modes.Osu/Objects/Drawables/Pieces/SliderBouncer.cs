@@ -11,7 +11,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
     {
         private readonly Slider slider;
         private readonly bool isEnd;
-        private TextAwesome icon;
+        private readonly TextAwesome icon;
 
         public SliderBouncer(Slider slider, bool isEnd)
         {

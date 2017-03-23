@@ -7,6 +7,7 @@ using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
 using OpenTK;
 using osu.Game.Modes.Judgements;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Modes.UI
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Modes.UI
         internal Container<Drawable> ScaledContent;
 
         protected override Container<Drawable> Content => content;
-        private Container<Drawable> content;
+        private readonly Container<Drawable> content;
 
         /// <summary>
         /// A container for keeping track of DrawableHitObjects.
@@ -45,10 +46,16 @@ namespace osu.Game.Modes.UI
                 }
             });
 
-            Add(HitObjects = new HitObjectContainer<DrawableHitObject<TObject, TJudgement>>
+            HitObjects = new HitObjectContainer<DrawableHitObject<TObject, TJudgement>>
             {
                 RelativeSizeAxes = Axes.Both,
-            });
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Add(HitObjects);
         }
 
         /// <summary>

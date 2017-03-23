@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.Notifications
 
         private class ClearAllButton : ClickableContainer
         {
-            private OsuSpriteText text;
+            private readonly OsuSpriteText text;
 
             public ClearAllButton()
             {

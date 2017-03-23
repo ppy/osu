@@ -60,7 +60,7 @@ namespace osu.Game
 
         public Bindable<PlayMode> PlayMode;
 
-        private string[] args;
+        private readonly string[] args;
 
         private OptionsOverlay options;
 
@@ -279,6 +279,7 @@ namespace osu.Game
             //central game mode change logic.
             if (!currentScreen.ShowOverlays)
             {
+                options.State = Visibility.Hidden;
                 Toolbar.State = Visibility.Hidden;
                 musicController.State = Visibility.Hidden;
                 chat.State = Visibility.Hidden;

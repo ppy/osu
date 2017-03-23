@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Mods
 {
     public abstract class ModSection : Container
     {
-        private OsuSpriteText headerLabel;
+        private readonly OsuSpriteText headerLabel;
 
         public FillFlowContainer<ModButton> ButtonsContainer { get; }
 

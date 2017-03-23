@@ -15,12 +15,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableSpinner : DrawableOsuHitObject
     {
-        private Spinner spinner;
+        private readonly Spinner spinner;
 
-        private SpinnerDisc disc;
-        private SpinnerBackground background;
-        private Container circleContainer;
-        private DrawableHitCircle circle;
+        private readonly SpinnerDisc disc;
+        private readonly SpinnerBackground background;
+        private readonly Container circleContainer;
+        private readonly DrawableHitCircle circle;
 
         public DrawableSpinner(Spinner s) : base(s)
         {
@@ -108,9 +108,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         private Vector2 scaleToCircle => circle.Scale * circle.DrawWidth / DrawWidth * 0.95f;
 
-        private float spinsPerMinuteNeeded = 100 + 5 * 15; //TODO: read per-map OD and place it on the 5
+        private const float spins_per_minute_needed = 100 + 5 * 15; //TODO: read per-map OD and place it on the 5
 
-        private float rotationsNeeded => (float)(spinsPerMinuteNeeded * (spinner.EndTime - spinner.StartTime) / 60000f);
+        private float rotationsNeeded => (float)(spins_per_minute_needed * (spinner.EndTime - spinner.StartTime) / 60000f);
 
         public float Progress => MathHelper.Clamp(disc.RotationAbsolute / 360 / rotationsNeeded, 0, 1);
 
@@ -134,8 +134,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
-            if (!IsLoaded) return;
-
             base.UpdateState(state);
 
             Delay(spinner.Duration, true);

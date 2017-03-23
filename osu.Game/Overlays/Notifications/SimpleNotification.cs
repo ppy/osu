@@ -34,8 +34,8 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        private SpriteText textDrawable;
-        private TextAwesome iconDrawable;
+        private readonly SpriteText textDrawable;
+        private readonly TextAwesome iconDrawable;
 
         protected Box IconBackgound;
 
@@ -53,6 +53,7 @@ namespace osu.Game.Overlays.Notifications
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Icon = icon,
+                    TextSize = 20
                 }
             });
 

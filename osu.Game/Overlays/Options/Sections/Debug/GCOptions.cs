@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Options.Sections.Debug
         {
             Children = new Drawable[]
             {
-                new OptionEnumDropDown<GCLatencyMode>
+                new OptionEnumDropdown<GCLatencyMode>
                 {
                     LabelText = "Active mode",
                     Bindable = config.GetBindable<GCLatencyMode>(FrameworkDebugConfig.ActiveGCMode)
