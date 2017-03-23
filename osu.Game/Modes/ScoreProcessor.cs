@@ -122,7 +122,7 @@ namespace osu.Game.Modes
         {
             Judgements.Capacity = hitRenderer.Beatmap.HitObjects.Count;
 
-            hitRenderer.OnJudgement += addJudgement;
+            hitRenderer.OnJudgement += AddJudgement;
 
             ComputeTargets(hitRenderer.Beatmap);
 
@@ -139,7 +139,7 @@ namespace osu.Game.Modes
         /// Adds a judgement to this ScoreProcessor.
         /// </summary>
         /// <param name="judgement">The judgement to add.</param>
-        private void addJudgement(TJudgement judgement)
+        protected void AddJudgement(TJudgement judgement)
         {
             Judgements.Add(judgement);
 
