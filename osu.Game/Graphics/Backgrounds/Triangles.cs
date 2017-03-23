@@ -89,13 +89,13 @@ namespace osu.Game.Graphics.Backgrounds
 
         protected virtual Triangle CreateTriangle()
         {
-            float stdDev = 0.16f;
-            float mean = 0.5f;
+            const float std_dev = 0.16f;
+            const float mean = 0.5f;
 
             float u1 = 1 - RNG.NextSingle(); //uniform(0,1] random floats
             float u2 = 1 - RNG.NextSingle();
             float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); //random normal(0,1)
-            var scale = Math.Max(triangleScale * (mean + stdDev * randStdNormal), 0.1f); //random normal(mean,stdDev^2)
+            var scale = Math.Max(triangleScale * (mean + std_dev * randStdNormal), 0.1f); //random normal(mean,stdDev^2)
 
             const float size = 100;
 

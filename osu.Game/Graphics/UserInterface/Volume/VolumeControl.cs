@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
 {
     internal class VolumeControl : OverlayContainer
     {
-        private VolumeMeter volumeMeterMaster;
+        private readonly VolumeMeter volumeMeterMaster;
 
         protected override bool HideOnEscape => false;
 
@@ -89,8 +89,8 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         private ScheduledDelegate popOutDelegate;
 
-        private VolumeMeter volumeMeterEffect;
-        private VolumeMeter volumeMeterMusic;
+        private readonly VolumeMeter volumeMeterEffect;
+        private readonly VolumeMeter volumeMeterMusic;
 
         protected override void PopIn()
         {

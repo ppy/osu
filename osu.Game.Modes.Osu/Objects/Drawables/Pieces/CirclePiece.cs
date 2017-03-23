@@ -14,7 +14,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
     public class CirclePiece : Container
     {
-        private Sprite disc;
+        private readonly Sprite disc;
 
 
         public Func<bool> Hit;

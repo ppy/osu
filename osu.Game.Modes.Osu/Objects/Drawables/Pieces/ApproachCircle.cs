@@ -11,7 +11,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
     public class ApproachCircle : Container
     {
-        private Sprite approachCircle;
+        private readonly Sprite approachCircle;
 
         public ApproachCircle()
         {

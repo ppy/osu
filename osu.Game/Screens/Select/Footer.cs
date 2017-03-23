@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select
 {
     public class Footer : Container
     {
-        private Box modeLight;
+        private readonly Box modeLight;
 
         private const float play_song_select_button_width = 100;
         private const float play_song_select_button_height = 50;
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
         public Action OnBack;
         public Action OnStart;
 
-        private FillFlowContainer buttons;
+        private readonly FillFlowContainer buttons;
 
         public OsuLogo StartButton;
 

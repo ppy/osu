@@ -18,12 +18,14 @@ namespace osu.Game.Screens.Select.Options
 {
     public class BeatmapOptionsButton : ClickableContainer
     {
-        private static readonly float width = 130;
+        private const float width = 130;
 
-        private Box background, flash;
-        private TextAwesome iconText;
-        private OsuSpriteText firstLine, secondLine;
-        private Container box;
+        private readonly Box background;
+        private readonly Box flash;
+        private readonly TextAwesome iconText;
+        private readonly OsuSpriteText firstLine;
+        private readonly OsuSpriteText secondLine;
+        private readonly Container box;
 
         public Color4 ButtonColour
         {

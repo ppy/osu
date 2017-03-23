@@ -21,9 +21,9 @@ namespace osu.Game.Beatmaps.IO
             OsuLegacyDecoder.Register();
         }
 
-        private Stream archiveStream;
-        private ZipFile archive;
-        private Beatmap firstMap;
+        private readonly Stream archiveStream;
+        private readonly ZipFile archive;
+        private readonly Beatmap firstMap;
 
         public OszArchiveReader(Stream archiveStream)
         {

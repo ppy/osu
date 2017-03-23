@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public class PasswordMaskChar : Container
         {
-            private CircularContainer circle;
+            private readonly CircularContainer circle;
 
             public PasswordMaskChar(float size)
             {

@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Options
     {
         protected override Container<Drawable> Content => content;
 
-        private Container<Drawable> content;
+        private readonly Container<Drawable> content;
 
         protected abstract string Header { get; }
 

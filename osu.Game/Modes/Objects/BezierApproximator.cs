@@ -8,10 +8,10 @@ namespace osu.Game.Modes.Objects
 {
     public class BezierApproximator
     {
-        private int count;
-        private List<Vector2> controlPoints;
-        private Vector2[] subdivisionBuffer1;
-        private Vector2[] subdivisionBuffer2;
+        private readonly int count;
+        private readonly List<Vector2> controlPoints;
+        private readonly Vector2[] subdivisionBuffer1;
+        private readonly Vector2[] subdivisionBuffer2;
 
         private const float tolerance = 0.25f;
         private const float tolerance_sq = tolerance * tolerance;
