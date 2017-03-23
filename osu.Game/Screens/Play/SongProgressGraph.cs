@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Takes <see cref="Values"> and adjusts it to fit the amount of columns.
+        /// Takes <see cref="Values"/> and adjusts it to fit the amount of columns.
         /// </summary>
         private void recalculateValues()
         {
