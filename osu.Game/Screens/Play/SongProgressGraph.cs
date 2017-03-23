@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Play
             private const float cube_size = 4;
             private const float padding = 2;
             public const float WIDTH = cube_size + padding;
-            public const float HEIGHT = cube_count * WIDTH;
+            public const float HEIGHT = (cube_count * WIDTH) + padding + 1;
 
             private readonly List<Box> drawableRows = new List<Box>();
 
@@ -184,7 +184,6 @@ namespace osu.Game.Screens.Play
             public Column()
             {
                 Size = new Vector2(WIDTH, HEIGHT);
-                Margin = new MarginPadding { Bottom = 1 }; //todo: probably find a better fix, not quite sure why this works
 
                 for (int r = 0; r < cube_count; r++)
                 {
@@ -192,7 +191,7 @@ namespace osu.Game.Screens.Play
                     {
                         EdgeSmoothness = new Vector2(padding / 4),
                         Size = new Vector2(cube_size),
-                        Position = new Vector2(0, r * WIDTH),
+                        Position = new Vector2(0, r * WIDTH + padding),
                     });
 
                     Add(drawableRows[drawableRows.Count - 1]);
