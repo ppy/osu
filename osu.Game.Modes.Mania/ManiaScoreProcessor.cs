@@ -7,18 +7,18 @@ using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Mania
 {
-    internal class ManiaScoreProcessor : ScoreProcessor<ManiaBaseHit, ManiaJudgementInfo>
+    internal class ManiaScoreProcessor : ScoreProcessor<ManiaBaseHit, ManiaJudgement>
     {
         public ManiaScoreProcessor()
         {
         }
 
-        public ManiaScoreProcessor(HitRenderer<ManiaBaseHit, ManiaJudgementInfo> hitRenderer)
+        public ManiaScoreProcessor(HitRenderer<ManiaBaseHit, ManiaJudgement> hitRenderer)
             : base(hitRenderer)
         {
         }
 
-        protected override void UpdateCalculations(ManiaJudgementInfo newJudgement)
+        protected override void UpdateCalculations(ManiaJudgement newJudgement)
         {
         }
     }

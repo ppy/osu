@@ -17,7 +17,7 @@ using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Modes.Taiko.UI
 {
-    public class TaikoPlayfield : Playfield<TaikoHitObject, TaikoJudgementInfo>
+    public class TaikoPlayfield : Playfield<TaikoHitObject, TaikoJudgement>
     {
         /// <summary>
         /// The default play field height.
@@ -48,7 +48,7 @@ namespace osu.Game.Modes.Taiko.UI
 
         private readonly Container<HitExplosion> hitExplosionContainer;
         //private Container<DrawableBarLine> barLineContainer;
-        private readonly Container<DrawableTaikoJudgementInfo> judgementContainer;
+        private readonly Container<DrawableTaikoJudgement> judgementContainer;
 
         private readonly Container hitObjectContainer;
         //private Container topLevelHitContainer;
@@ -117,7 +117,7 @@ namespace osu.Game.Modes.Taiko.UI
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                judgementContainer = new Container<DrawableTaikoJudgementInfo>
+                                judgementContainer = new Container<DrawableTaikoJudgement>
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     BlendingMode = BlendingMode.Additive
@@ -170,21 +170,21 @@ namespace osu.Game.Modes.Taiko.UI
             rightBackground.Colour = colours.Gray0;
         }
 
-        public override void Add(DrawableHitObject<TaikoHitObject, TaikoJudgementInfo> h)
+        public override void Add(DrawableHitObject<TaikoHitObject, TaikoJudgement> h)
         {
             h.Depth = (float)h.HitObject.StartTime;
 
             base.Add(h);
         }
 
-        public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgementInfo> judgedObject)
+        public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> judgedObject)
         {
             bool wasHit = judgedObject.Judgement.Result == HitResult.Hit;
 
             if (wasHit)
                 hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement));
 
-            judgementContainer.Add(new DrawableTaikoJudgementInfo(judgedObject.Judgement)
+            judgementContainer.Add(new DrawableTaikoJudgement(judgedObject.Judgement)
             {
                 Anchor = wasHit ? Anchor.TopLeft : Anchor.CentreLeft,
                 Origin = wasHit ? Anchor.BottomCentre : Anchor.Centre,

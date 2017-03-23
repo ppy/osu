@@ -5,7 +5,7 @@ using osu.Game.Modes.Objects.Drawables;
 
 namespace osu.Game.Modes.Judgements
 {
-    public abstract class JudgementInfo
+    public abstract class Judgement
     {
         /// <summary>
         /// Whether this judgement is the result of a hit or a miss.
