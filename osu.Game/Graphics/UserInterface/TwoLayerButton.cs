@@ -171,7 +171,7 @@ namespace osu.Game.Graphics.UserInterface
 
             IconLayer.FadeColour(HoverColour, transform_time, EasingTypes.OutElastic);
 
-            double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
+            const double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
             double startTime = Time.Current + offset;
 
             // basic pulse
@@ -200,7 +200,7 @@ namespace osu.Game.Graphics.UserInterface
             int duration = 0; //(int)(Game.Audio.BeatLength);
             if (duration == 0) duration = pulse_length * 2;
 
-            double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
+            const double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
             double startTime = Time.Current + offset;
 
             // slow pulse

@@ -88,10 +88,10 @@ namespace osu.Game.Graphics.Cursor
 
             Invalidate(Invalidation.DrawNode, shallPropagate: false);
 
-            int fadeClockResetThreshold = 1000000;
+            const int fade_clock_reset_threshold = 1000000;
 
             time = (float)(Time.Current - timeOffset) / 500f;
-            if (time > fadeClockResetThreshold)
+            if (time > fade_clock_reset_threshold)
                 resetTime();
         }
 

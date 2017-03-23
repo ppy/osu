@@ -108,9 +108,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         private Vector2 scaleToCircle => circle.Scale * circle.DrawWidth / DrawWidth * 0.95f;
 
-        private readonly float spinsPerMinuteNeeded = 100 + 5 * 15; //TODO: read per-map OD and place it on the 5
+        private const float spins_per_minute_needed = 100 + 5 * 15; //TODO: read per-map OD and place it on the 5
 
-        private float rotationsNeeded => (float)(spinsPerMinuteNeeded * (spinner.EndTime - spinner.StartTime) / 60000f);
+        private float rotationsNeeded => (float)(spins_per_minute_needed * (spinner.EndTime - spinner.StartTime) / 60000f);
 
         public float Progress => MathHelper.Clamp(disc.RotationAbsolute / 360 / rotationsNeeded, 0, 1);
 

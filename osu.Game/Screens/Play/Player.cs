@@ -42,10 +42,10 @@ namespace osu.Game.Screens.Play
 
         public int RestartCount;
 
-        private readonly double pauseCooldown = 1000;
+        private const double pause_cooldown = 1000;
         private double lastPauseActionTime;
 
-        private bool canPause => Time.Current >= lastPauseActionTime + pauseCooldown;
+        private bool canPause => Time.Current >= lastPauseActionTime + pause_cooldown;
 
         private IAdjustableClock sourceClock;
         private IFrameBasedClock interpolatedSourceClock;
