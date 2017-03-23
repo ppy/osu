@@ -11,115 +11,53 @@ using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
+using osu.Game.Modes.Judgements;
 
 namespace osu.Game.Modes.Taiko.UI
 {
     /// <summary>
     /// Text that is shown as judgement when a hit object is hit or missed.
     /// </summary>
-    public class JudgementText : Container
+    public class JudgementText : DrawableJudgementInfo<TaikoJudgementInfo>
     {
         /// <summary>
-        /// The Judgement to display.
+        /// Creates a new judgement text.
         /// </summary>
-        public TaikoJudgementInfo Judgement;
-
-        private Container textContainer;
-        private OsuSpriteText glowText;
-        private OsuSpriteText normalText;
-
-        private int movementDirection;
-
-        public JudgementText()
+        /// <param name="judgement">The judgement to visualise.</param>
+        public JudgementText(TaikoJudgementInfo judgement)
+            : base(judgement)
         {
-            AutoSizeAxes = Axes.Both;
-
-            Children = new Drawable[]
-            {
-                textContainer = new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new BufferedContainer
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            BlurSigma = new Vector2(10),
-                            CacheDrawnFrameBuffer = true,
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(3),
-                            BlendingMode = BlendingMode.Additive,
-                            Children = new[]
-                            {
-                                glowText = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = "Venera",
-                                    TextSize = 22f,
-                                }
-                            }
-                        },
-                        normalText = new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Font = "Venera",
-                            TextSize = 22f,
-                        }
-                    }
-                }
-            };
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Color4 judgementColour = Color4.White;
-            string judgementText = string.Empty;
-
             switch (Judgement.Result)
             {
-                case HitResult.Miss:
-                    judgementColour = colours.Red;
-                    judgementText = "MISS";
-                    movementDirection = 1;
-                    break;
                 case HitResult.Hit:
                     switch (Judgement.TaikoResult)
                     {
                         case TaikoHitResult.Good:
-                            judgementColour = colours.Green;
-                            judgementText = "GOOD";
-                            textContainer.Scale = new Vector2(0.45f);
+                            Colour = colours.Green;
                             break;
                         case TaikoHitResult.Great:
-                            judgementColour = colours.Blue;
-                            judgementText = "GREAT";
+                            Colour = colours.Blue;
                             break;
                     }
-
-                    movementDirection = -1;
                     break;
             }
-
-            glowText.Colour = judgementColour;
-            glowText.Text = normalText.Text = judgementText;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            ScaleTo(1.5f, 250, EasingTypes.OutQuint);
-            MoveToY(movementDirection * 100, 500);
-
-            Delay(250);
-            ScaleTo(0.75f, 250);
-            FadeOut(250);
+            if (Judgement.Result == HitResult.Hit)
+            {
+                MoveToY(-100, 500);
+                Delay(250);
+                FadeOut(250);
+            }
 
             Expire();
         }

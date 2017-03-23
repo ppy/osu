@@ -192,15 +192,13 @@ namespace osu.Game.Modes.Taiko.UI
 
             float judgementOffset = judgedObject.Judgement.Result == HitResult.Hit ? judgedObject.Position.X : 0;
 
-            judgementContainer.Add(new JudgementText
+            judgementContainer.Add(new JudgementText(judgedObject.Judgement)
             {
                 Anchor = judgedObject.Judgement.Result == HitResult.Hit ? Anchor.TopLeft : Anchor.BottomLeft,
                 Origin = judgedObject.Judgement.Result == HitResult.Hit ? Anchor.BottomCentre : Anchor.TopCentre,
 
                 RelativePositionAxes = Axes.X,
                 X = judgementOffset,
-
-                Judgement = judgedObject.Judgement
             });
         }
     }
