@@ -23,7 +23,8 @@ namespace osu.Game.Configuration
             Set(OsuConfig.SavePassword, false);
             Set(OsuConfig.SaveUsername, true);
 
-            Set(OsuConfig.CursorSize, 1.0, 0.5f, 2);
+            Set(OsuConfig.MenuCursorSize, 1.0, 0.5f, 2);
+            Set(OsuConfig.GameplayCursorSize, 1.0, 0.5f, 2);
             Set(OsuConfig.DimLevel, 30, 0, 100);
 
             Set(OsuConfig.MouseDisableButtons, false);
@@ -175,11 +176,11 @@ namespace osu.Game.Configuration
                 ConfineMouseMode.Fullscreen : ConfineMouseMode.Never).Disabled = true;
 
 
-            GetBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate
+            GetOriginalBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate
             {
                 if (Get<bool>(OsuConfig.SavePassword)) Set(OsuConfig.SaveUsername, true);
             };
-            GetBindable<bool>(OsuConfig.SaveUsername).ValueChanged += delegate
+            GetOriginalBindable<bool>(OsuConfig.SaveUsername).ValueChanged += delegate
             {
                 if (!Get<bool>(OsuConfig.SaveUsername)) Set(OsuConfig.SavePassword, false);
             };
@@ -223,7 +224,8 @@ namespace osu.Game.Configuration
         ComboFireHeight,
         ConfirmExit,
         AutoSendNowPlaying,
-        CursorSize,
+        MenuCursorSize,
+        GameplayCursorSize,
         AutomaticCursorSizing,
         DimLevel,
         Display,
