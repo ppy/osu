@@ -39,6 +39,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             {
                 body = new SliderBody(s)
                 {
+                    AccentColour = AccentColour,
                     Position = s.StackedPosition,
                     PathWidth = s.Scale * 64,
                 },

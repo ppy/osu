@@ -44,7 +44,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     return;
                 accentColour = value;
 
-                reloadTexture();
+                if (LoadState == LoadState.Loaded)
+                    Schedule(reloadTexture);
             }
         }
 
@@ -99,15 +100,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             snakingIn = config.GetBindable<bool>(OsuConfig.SnakingInSliders);
             snakingOut = config.GetBindable<bool>(OsuConfig.SnakingOutSliders);
 
-            path.Texture = new Texture(textureWidth, 1);
-
             reloadTexture();
         }
 
         private void reloadTexture()
         {
-            if (path.Texture == null)
-                return;
+            var texture = new Texture(textureWidth, 1);
 
             //initialise background
             var upload = new TextureUpload(textureWidth * 4);
@@ -142,8 +140,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                 }
             }
 
-            path.Texture.SetData(upload);
-            path.Invalidate(Invalidation.DrawNode, this);
+            texture.SetData(upload);
+            path.Texture = texture;
         }
 
         private readonly List<Vector2> currentCurve = new List<Vector2>();
