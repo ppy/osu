@@ -1,12 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
@@ -17,6 +19,13 @@ namespace osu.Game.Screens.Select
         public static readonly float HEIGHT = 24;
         private OsuTabControlCheckBox modsCheckbox;
         private OsuTabControl<BeatmapDetailTab> tabs;
+
+        public Action<BeatmapDetailTab, bool> OnFilter; //passed the selected tab and if mods is checked
+
+        private void invokeOnFilter()
+        {
+            OnFilter?.Invoke(tabs.SelectedItem, modsCheckbox.State == CheckBoxState.Checked);
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
@@ -52,15 +61,8 @@ namespace osu.Game.Screens.Select
                 },
             };
 
-            tabs.ItemChanged += (sender, e) =>
-            {
-                
-            };
-
-            modsCheckbox.Action += (sender, e) =>
-            {
-                
-            };
+            tabs.ItemChanged += (sender, e) => invokeOnFilter();
+            modsCheckbox.Action += (sender, e) => invokeOnFilter();
         }
     }
 
