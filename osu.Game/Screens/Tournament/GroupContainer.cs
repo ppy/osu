@@ -14,9 +14,9 @@ namespace osu.Game.Screens.Tournament
 {
     public class GroupContainer : Container
     {
-        private List<Group> groups = new List<Group>();
+        private readonly List<Group> groups = new List<Group>();
 
-        private int maxTeams;
+        private readonly int maxTeams;
         private int currentGroup;
 
         public GroupContainer(int numGroups, int teamsPerGroup)

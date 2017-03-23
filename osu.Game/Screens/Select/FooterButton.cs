@@ -51,9 +51,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private SpriteText spriteText;
-        private Box box;
-        private Box light;
+        private readonly SpriteText spriteText;
+        private readonly Box box;
+        private readonly Box light;
 
         public FooterButton()
         {

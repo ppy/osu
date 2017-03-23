@@ -19,8 +19,8 @@ namespace osu.Game.Modes.Objects
 
         public Vector2 Offset;
 
-        private List<Vector2> calculatedPath = new List<Vector2>();
-        private List<double> cumulativeLength = new List<double>();
+        private readonly List<Vector2> calculatedPath = new List<Vector2>();
+        private readonly List<double> cumulativeLength = new List<double>();
 
         private List<Vector2> calculateSubpath(List<Vector2> subControlPoints)
         {
