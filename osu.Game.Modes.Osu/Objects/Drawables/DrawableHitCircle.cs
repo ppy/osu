@@ -13,8 +13,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
-        private readonly OsuHitObject osuObject;
-
         public ApproachCircle ApproachCircle;
         private readonly CirclePiece circle;
         private readonly RingPiece ring;
@@ -27,20 +25,18 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         {
             Origin = Anchor.Centre;
 
-            osuObject = h;
-
-            Position = osuObject.StackedPosition;
-            Scale = new Vector2(osuObject.Scale);
+            Position = HitObject.StackedPosition;
+            Scale = new Vector2(HitObject.Scale);
 
             Children = new Drawable[]
             {
                 glow = new GlowPiece
                 {
-                    Colour = osuObject.ComboColour
+                    Colour = AccentColour
                 },
                 circle = new CirclePiece
                 {
-                    Colour = osuObject.ComboColour,
+                    Colour = AccentColour,
                     Hit = () =>
                     {
                         if (Judgement.Result.HasValue) return false;
@@ -58,11 +54,11 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 flash = new FlashPiece(),
                 explode = new ExplodePiece
                 {
-                    Colour = osuObject.ComboColour,
+                    Colour = AccentColour,
                 },
                 ApproachCircle = new ApproachCircle
                 {
-                    Colour = osuObject.ComboColour,
+                    Colour = AccentColour,
                 }
             };
 
@@ -115,8 +111,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
             ApproachCircle.FadeOut();
 
-            double endTime = (osuObject as IHasEndTime)?.EndTime ?? osuObject.StartTime;
-            double duration = endTime - osuObject.StartTime;
+            double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+            double duration = endTime - HitObject.StartTime;
 
             glow.Delay(duration);
             glow.FadeOut(400);

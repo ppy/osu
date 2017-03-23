@@ -56,6 +56,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 ball = new SliderBall(s)
                 {
                     Scale = new Vector2(s.Scale),
+                    AccentColour = AccentColour
                 },
                 initialCircle = new DrawableHitCircle(new HitCircle
                 {
