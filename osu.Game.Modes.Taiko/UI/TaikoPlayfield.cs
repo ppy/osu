@@ -51,8 +51,7 @@ namespace osu.Game.Modes.Taiko.UI
         private Container<JudgementText> judgementContainer;
 
         private Container hitObjectContainer;
-        // ReSharper disable once NotAccessedField.Local
-        private Container topLevelHitContainer;
+        //private Container topLevelHitContainer;
         private Container leftBackgroundContainer;
         private Container rightBackgroundContainer;
         private Box leftBackground;
@@ -156,10 +155,10 @@ namespace osu.Game.Modes.Taiko.UI
                         },
                     }
                 },
-                topLevelHitContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                }
+                //topLevelHitContainer = new Container
+                //{
+                //    RelativeSizeAxes = Axes.Both,
+                //}
             });
         }
 
