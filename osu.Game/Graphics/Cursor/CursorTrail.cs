@@ -31,10 +31,10 @@ namespace osu.Game.Graphics.Cursor
 
         private float time;
 
-        private TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
+        private readonly TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
         private const int max_sprites = 2048;
 
-        private TrailPart[] parts = new TrailPart[max_sprites];
+        private readonly TrailPart[] parts = new TrailPart[max_sprites];
 
         private Vector2? lastPosition;
 
@@ -163,7 +163,7 @@ namespace osu.Game.Graphics.Cursor
             public float Time;
             public TrailDrawNodeSharedData Shared;
 
-            public TrailPart[] Parts = new TrailPart[max_sprites];
+            public readonly TrailPart[] Parts = new TrailPart[max_sprites];
             public Vector2 Size;
 
             public TrailDrawNode()

@@ -15,12 +15,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableSpinner : DrawableOsuHitObject
     {
-        private Spinner spinner;
+        private readonly Spinner spinner;
 
-        private SpinnerDisc disc;
-        private SpinnerBackground background;
-        private Container circleContainer;
-        private DrawableHitCircle circle;
+        private readonly SpinnerDisc disc;
+        private readonly SpinnerBackground background;
+        private readonly Container circleContainer;
+        private readonly DrawableHitCircle circle;
 
         public DrawableSpinner(Spinner s) : base(s)
         {
@@ -108,7 +108,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         private Vector2 scaleToCircle => circle.Scale * circle.DrawWidth / DrawWidth * 0.95f;
 
-        private float spinsPerMinuteNeeded = 100 + 5 * 15; //TODO: read per-map OD and place it on the 5
+        private readonly float spinsPerMinuteNeeded = 100 + 5 * 15; //TODO: read per-map OD and place it on the 5
 
         private float rotationsNeeded => (float)(spinsPerMinuteNeeded * (spinner.EndTime - spinner.StartTime) / 60000f);
 

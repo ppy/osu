@@ -12,7 +12,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
     public class NumberPiece : Container
     {
-        private SpriteText number;
+        private readonly SpriteText number;
 
         public string Text
         {

@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Toolbar
 {
     internal class ToolbarUserButton : ToolbarButton, IOnlineComponent
     {
-        private Avatar avatar;
+        private readonly Avatar avatar;
 
         public ToolbarUserButton()
         {

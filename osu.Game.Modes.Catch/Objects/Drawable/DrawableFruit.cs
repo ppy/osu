@@ -12,7 +12,7 @@ namespace osu.Game.Modes.Catch.Objects.Drawable
 {
     internal class DrawableFruit : Sprite
     {
-        private CatchBaseHit h;
+        private readonly CatchBaseHit h;
 
         public DrawableFruit(CatchBaseHit h)
         {

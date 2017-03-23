@@ -17,8 +17,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
     public class HitExplosion : FillFlowContainer
     {
         private readonly OsuJudgementInfo judgement;
-        private SpriteText line1;
-        private SpriteText line2;
+        private readonly SpriteText line1;
+        private readonly SpriteText line2;
 
         public HitExplosion(OsuJudgementInfo judgement, OsuHitObject h = null)
         {
