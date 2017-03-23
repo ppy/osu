@@ -70,11 +70,10 @@ namespace osu.Game.Screens.Play
                         Bottom = bar_height
                     }
                 },
-                bar = new SongProgressBar(bar_height + graph_height, handleSize, fillColour)
+                bar = new SongProgressBar(bar_height, graph_height, handleSize, fillColour)
                 {
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
-                    Height = bar_height,
                     SeekRequested = delegate (float position)
                     {
                         OnSeek?.Invoke(Length * position);

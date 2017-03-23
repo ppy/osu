@@ -25,6 +25,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Origin = Anchor.BottomLeft,
                 RelativeSizeAxes = Axes.X,
                 Length = 100,
+                OnSeek = (time) => progress.CurrentTime = time,
             });
 
             AddButton("Toggle Bar", progress.ToggleVisibility);
