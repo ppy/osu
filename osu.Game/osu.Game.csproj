@@ -86,6 +86,7 @@
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
     <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
     <Compile Include="Graphics\UserInterface\Nub.cs" />
+    <Compile Include="Graphics\UserInterface\OsuMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuPasswordTextBox.cs" />
     <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="IO\Legacy\SerializationReader.cs" />
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
+    <Compile Include="Modes\Judgements\DrawableJudgementInfo.cs" />
     <Compile Include="Modes\LegacyReplay.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
@@ -129,6 +131,7 @@
     <Compile Include="Modes\UI\StandardHealthDisplay.cs" />
     <Compile Include="Modes\UI\StandardHudOverlay.cs" />
     <Compile Include="Online\API\IOnlineComponent.cs" />
+    <Compile Include="Online\API\Requests\GetScoresRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
     <Compile Include="Overlays\LoginOverlay.cs" />
@@ -159,9 +162,7 @@
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
     <Compile Include="Overlays\Options\OptionDropDown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
-    <Compile Include="Graphics\UserInterface\OsuDropDownHeader.cs" />
-    <Compile Include="Graphics\UserInterface\OsuDropDownMenu.cs" />
-    <Compile Include="Graphics\UserInterface\OsuDropDownMenuItem.cs" />
+    <Compile Include="Graphics\UserInterface\OsuDropdown.cs" />
     <Compile Include="Overlays\Options\OptionsFooter.cs" />
     <Compile Include="Overlays\Options\Sections\DebugSection.cs" />
     <Compile Include="Overlays\Options\Sections\Debug\GeneralOptions.cs" />
@@ -241,7 +242,7 @@
     <Compile Include="Online\API\OAuth.cs" />
     <Compile Include="Online\API\OAuthToken.cs" />
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
-    <Compile Include="Online\API\Requests\ListChannels.cs" />
+    <Compile Include="Online\API\Requests\ListChannelsRequest.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\Drawables\DrawableChannel.cs" />
     <Compile Include="Online\Chat\Drawables\ChatLine.cs" />
@@ -265,7 +266,6 @@
     <Compile Include="Screens\Tournament\GroupContainer.cs" />
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
-    <Compile Include="Screens\Tournament\Teams\Team.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
@@ -280,6 +280,7 @@
     <Compile Include="Database\BeatmapMetadata.cs" />
     <Compile Include="Database\BeatmapInfo.cs" />
     <Compile Include="Database\BaseDifficulty.cs" />
+    <Compile Include="Database\DatabaseWorkingBeatmap.cs" />
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />
     <Compile Include="Overlays\Options\Sections\MaintenanceSection.cs" />
     <Compile Include="Overlays\Options\OptionsSection.cs" />
@@ -354,8 +355,17 @@
     <Compile Include="Overlays\WaveOverlayContainer.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
+    <Compile Include="Screens\Select\Leaderboards\Leaderboard.cs" />
+    <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
+    <Compile Include="Users\Country.cs" />
+    <Compile Include="Users\Team.cs" />
+    <Compile Include="Modes\ScoreRank.cs" />
+    <Compile Include="Users\Avatar.cs" />
+    <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
-    <Compile Include="Graphics\UserInterface\OsuTabItem.cs" />
+    <Compile Include="Screens\Select\BeatmapDetailArea.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabControlCheckBox.cs" />
+    <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -373,6 +383,7 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />

@@ -11,9 +11,9 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -23,9 +23,9 @@ namespace osu.Game.Screens.Tournament
 
         public int TeamsCount { get; private set; }
 
-        private FlowContainer<GroupTeam> teams;
+        private readonly FlowContainer<GroupTeam> teams;
 
-        private List<GroupTeam> allTeams = new List<GroupTeam>();
+        private readonly List<GroupTeam> allTeams = new List<GroupTeam>();
 
         public Group(string name)
         {
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Tournament
             };
         }
 
-        public void AddTeam(Team team)
+        public void AddTeam(Country team)
         {
             GroupTeam gt = new GroupTeam(team);
 
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Tournament
             return allTeams.Any(t => t.Team.FullName == fullName);
         }
 
-        public bool RemoveTeam(Team team)
+        public bool RemoveTeam(Country team)
         {
             allTeams.RemoveAll(gt => gt.Team == team);
 
@@ -122,12 +122,12 @@ namespace osu.Game.Screens.Tournament
 
         private class GroupTeam : Container
         {
-            public Team Team;
+            public readonly Country Team;
 
-            private FillFlowContainer innerContainer;
-            private Sprite flagSprite;
+            private readonly FillFlowContainer innerContainer;
+            private readonly Sprite flagSprite;
 
-            public GroupTeam(Team team)
+            public GroupTeam(Country team)
             {
                 Team = team;
 

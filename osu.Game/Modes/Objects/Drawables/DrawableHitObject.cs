@@ -11,6 +11,7 @@ using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Judgements;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Game.Modes.Objects.Types;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Objects.Drawables
 {
@@ -37,6 +38,9 @@ namespace osu.Game.Modes.Objects.Drawables
                 if (state == value)
                     return;
                 state = value;
+
+                if (!IsLoaded)
+                    return;
 
                 UpdateState(state);
 
@@ -72,6 +76,11 @@ namespace osu.Game.Modes.Objects.Drawables
         public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
 
         public TObject HitObject;
+
+        /// <summary>
+        /// The colour used for various elements of this DrawableHitObject.
+        /// </summary>
+        public Color4 AccentColour { get; protected set; }
 
         protected DrawableHitObject(TObject hitObject)
         {

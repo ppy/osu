@@ -31,11 +31,11 @@ namespace osu.Game.Overlays
 
         private ScheduledDelegate messageRequest;
 
-        private Container content;
+        private readonly Container content;
 
         protected override Container<Drawable> Content => content;
 
-        private FocusedTextBox inputTextBox;
+        private readonly FocusedTextBox inputTextBox;
 
         private APIAccess api;
 

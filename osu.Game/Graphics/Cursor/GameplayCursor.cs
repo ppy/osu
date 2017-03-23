@@ -54,8 +54,6 @@ namespace osu.Game.Graphics.Cursor
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
-                cursorScale = config.GetBindable<double>(OsuConfig.CursorSize);
-
                 Children = new Drawable[]
                 {
                     cursorContainer = new CircularContainer
@@ -63,7 +61,6 @@ namespace osu.Game.Graphics.Cursor
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Scale = new Vector2((float)cursorScale),
                         Masking = true,
                         BorderThickness = Size.X / 6,
                         BorderColour = Color4.White,
@@ -119,7 +116,9 @@ namespace osu.Game.Graphics.Cursor
                     },
                 };
 
+                cursorScale = config.GetBindable<double>(OsuConfig.GameplayCursorSize);
                 cursorScale.ValueChanged += scaleChanged;
+                cursorScale.TriggerChange();
             }
 
             private void scaleChanged(object sender, EventArgs e)
