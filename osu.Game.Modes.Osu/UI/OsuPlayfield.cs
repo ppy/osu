@@ -85,7 +85,7 @@ namespace osu.Game.Modes.Osu.UI
 
         public override void OnJudgement(DrawableHitObject<OsuHitObject, OsuJudgementInfo> judgedObject)
         {
-            HitExplosion explosion = new HitExplosion(judgedObject.Judgement)
+            DrawableOsuJudgementInfo explosion = new DrawableOsuJudgementInfo(judgedObject.Judgement)
             {
                 Origin = Anchor.Centre,
                 Position = judgedObject.HitObject.StackedEndPosition + judgedObject.Judgement.PositionOffset
