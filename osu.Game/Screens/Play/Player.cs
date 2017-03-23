@@ -125,7 +125,8 @@ namespace osu.Game.Screens.Play
                 Depth = -1,
                 OnResume = delegate
                 {
-                    hudOverlay.Progress.State = Visibility.Visible;
+                    hudOverlay.Progress.Hide();
+
                     Delay(400);
                     Schedule(Resume);
                 },
@@ -138,6 +139,7 @@ namespace osu.Game.Screens.Play
                 hitRenderer.InputManager.ReplayInputHandler = ReplayInputHandler;
 
             hudOverlay.BindHitRenderer(hitRenderer);
+            hudOverlay.Progress.Length = Beatmap.Track.Length;
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             hitRenderer.OnAllJudged += onCompletion;
@@ -163,6 +165,13 @@ namespace osu.Game.Screens.Play
                 hudOverlay,
                 pauseOverlay
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            hudOverlay.Progress.CurrentTime = Beatmap.Track.CurrentTime;
         }
 
         private void initializeSkipButton()
@@ -198,6 +207,7 @@ namespace osu.Game.Screens.Play
             {
                 lastPauseActionTime = Time.Current;
                 hudOverlay.KeyCounter.IsCounting = false;
+                hudOverlay.Progress.Show();
                 pauseOverlay.Retries = RestartCount;
                 pauseOverlay.Show();
                 sourceClock.Stop();
@@ -213,7 +223,7 @@ namespace osu.Game.Screens.Play
         {
             lastPauseActionTime = Time.Current;
             hudOverlay.KeyCounter.IsCounting = true;
-            hudOverlay.Progress.State = Visibility.Hidden;
+            hudOverlay.Progress.Hide();
             pauseOverlay.Hide();
             sourceClock.Start();
             IsPaused = false;

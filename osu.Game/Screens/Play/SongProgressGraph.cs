@@ -2,10 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using OpenTK.Graphics;
+using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 
@@ -13,7 +14,7 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressGraph : BufferedContainer
     {
-        private Column[] columns;
+        private Column[] columns = { };
         private float lastDrawWidth;
 
         public int ColumnCount => columns.Length;
@@ -82,7 +83,7 @@ namespace osu.Game.Screens.Play
         {
             for (int i = 0; i < ColumnCount; i++)
             {
-                columns[i].Filled = calculatedValues[i];
+                columns[i].Filled = calculatedValues.ElementAtOrDefault(i);
             }
         }
 
@@ -119,11 +120,11 @@ namespace osu.Game.Screens.Play
         {
             var newColumns = new List<Column>();
 
-            for (int x = 0; x < DrawWidth; x += 3)
+            for (float x = 0; x < DrawWidth; x += Column.WIDTH)
             {
                 newColumns.Add(new Column
                 {
-                    Position = new Vector2(x + 1, 0),
+                    Position = new Vector2(x, 0),
                     State = ColumnState.Dimmed,
                 });
             }
@@ -136,14 +137,19 @@ namespace osu.Game.Screens.Play
             redrawProgress();
         }
 
-        private class Column : Container, IStateful<ColumnState>
+        public class Column : Container, IStateful<ColumnState>
         {
-            private readonly int rows = 11;
             private readonly Color4 emptyColour = Color4.White.Opacity(100);
             private readonly Color4 litColour = new Color4(221, 255, 255, 255);
             private readonly Color4 dimmedColour = Color4.White.Opacity(175);
 
-            private List<Box> drawableRows = new List<Box>();
+            private const float cube_count = 6;
+            private const float cube_size = 4;
+            private const float padding = 2;
+            public const float WIDTH = cube_size + padding;
+            public const float HEIGHT = cube_count * WIDTH;
+
+            private readonly List<Box> drawableRows = new List<Box>();
 
             private int filled;
             public int Filled
@@ -173,14 +179,15 @@ namespace osu.Game.Screens.Play
 
             public Column()
             {
-                Size = new Vector2(4, rows * 3);
+                Size = new Vector2(WIDTH, HEIGHT);
 
-                for (int row = 0; row < rows * 3; row += 3)
+                for (int r = 0; r<cube_count; r++)
                 {
                     drawableRows.Add(new Box
                     {
-                        Size = new Vector2(2),
-                        Position = new Vector2(0, row + 1)
+                        EdgeSmoothness = new Vector2(padding / 4),
+                        Size = new Vector2(cube_size),
+                        Position = new Vector2(0, r* WIDTH + padding)
                     });
 
                     Add(drawableRows[drawableRows.Count - 1]);
@@ -208,7 +215,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private enum ColumnState
+        public enum ColumnState
         {
             Lit,
             Dimmed
