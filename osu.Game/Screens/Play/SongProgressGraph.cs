@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Play
             private const float cube_size = 4;
             private const float padding = 2;
             public const float WIDTH = cube_size + padding;
-            public const float HEIGHT = (cube_count * WIDTH) + padding + 1;
+            public const float HEIGHT = cube_count * WIDTH + padding;
 
             private readonly List<Box> drawableRows = new List<Box>();
 
