@@ -179,19 +179,17 @@ namespace osu.Game.Modes.Taiko.UI
 
         public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgementInfo> judgedObject)
         {
-            if (judgedObject.Judgement.Result == HitResult.Hit)
-            {
-                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement));
-            }
+            bool wasHit = judgedObject.Judgement.Result == HitResult.Hit;
 
-            float judgementOffset = judgedObject.Judgement.Result == HitResult.Hit ? judgedObject.Position.X : 0;
+            if (wasHit)
+                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement));
 
             judgementContainer.Add(new DrawableTaikoJudgementInfo(judgedObject.Judgement)
             {
-                Anchor = judgedObject.Judgement.Result == HitResult.Hit ? Anchor.TopLeft : Anchor.BottomLeft,
-                Origin = judgedObject.Judgement.Result == HitResult.Hit ? Anchor.BottomCentre : Anchor.TopCentre,
+                Anchor = wasHit ? Anchor.TopLeft : Anchor.CentreLeft,
+                Origin = wasHit ? Anchor.BottomCentre : Anchor.Centre,
                 RelativePositionAxes = Axes.X,
-                X = judgementOffset,
+                X = wasHit ? judgedObject.Position.X : 0,
             });
         }
     }

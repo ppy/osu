@@ -44,16 +44,14 @@ namespace osu.Game.Modes.Taiko.UI
 
         protected override void LoadComplete()
         {
-            base.LoadComplete();
-
-            if (Judgement.Result == HitResult.Hit)
+            switch (Judgement.Result)
             {
-                MoveToY(-100, 500);
-                Delay(250);
-                FadeOut(250);
+                case HitResult.Hit:
+                    MoveToY(-100, 500);
+                    break;
             }
 
-            Expire();
+            base.LoadComplete();
         }
     }
 }
