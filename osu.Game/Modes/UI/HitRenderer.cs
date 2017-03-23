@@ -143,7 +143,7 @@ namespace osu.Game.Modes.UI
     /// <typeparam name="TJudgement">The type of Judgement of DrawableHitObjects contained by this HitRenderer.</typeparam>
     public abstract class HitRenderer<TObject, TJudgement> : HitRenderer<TObject>
         where TObject : HitObject
-        where TJudgement : JudgementInfo
+        where TJudgement : Judgement
     {
         public event Action<TJudgement> OnJudgement;
 
