@@ -80,10 +80,6 @@
       <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
       <Name>osu.Framework</Name>
     </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Modes.Osu\osu.Game.Modes.Osu.csproj">
-      <Project>{C92A607B-1FDD-4954-9F92-03FF547D9080}</Project>
-      <Name>osu.Game.Modes.Osu</Name>
-    </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
       <Project>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</Project>
       <Name>osu.Game</Name>
