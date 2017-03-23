@@ -25,6 +25,8 @@ namespace osu.Game.Modes.Judgements
 
         protected readonly SpriteText JudgementText;
 
+        protected double HitVisibleLength => 600;
+
         /// <summary>
         /// Creates a drawable which visualises a <see cref="JudgementInfo"/>.
         /// </summary>
@@ -65,18 +67,27 @@ namespace osu.Game.Modes.Judgements
         {
             base.LoadComplete();
 
-            if (Judgement.Result == HitResult.Miss)
+            FadeInFromZero(100, EasingTypes.OutQuint);
+
+            switch (Judgement.Result)
             {
-                FadeInFromZero(60);
+                case HitResult.Miss:
+                    ScaleTo(1.6f);
+                    ScaleTo(1, 100, EasingTypes.In);
 
-                ScaleTo(1.6f);
-                ScaleTo(1, 100, EasingTypes.In);
+                    MoveToOffset(new Vector2(0, 100), 800, EasingTypes.InQuint);
+                    RotateTo(40, 800, EasingTypes.InQuint);
 
-                MoveToOffset(new Vector2(0, 100), 800, EasingTypes.InQuint);
-                RotateTo(40, 800, EasingTypes.InQuint);
+                    Delay(600);
+                    FadeOut(200);
+                    break;
+                case HitResult.Hit:
+                    ScaleTo(0.9f);
+                    ScaleTo(1, 500, EasingTypes.OutElastic);
 
-                Delay(600);
-                FadeOut(200);
+                    Delay(250);
+                    FadeOut(250, EasingTypes.OutQuint);
+                    break;
             }
 
             Expire();
