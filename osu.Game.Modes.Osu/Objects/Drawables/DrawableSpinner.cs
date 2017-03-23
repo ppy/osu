@@ -48,7 +48,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Alpha = 0,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    DiscColour = s.ComboColour
+                    DiscColour = AccentColour
                 },
                 circleContainer = new Container
                 {

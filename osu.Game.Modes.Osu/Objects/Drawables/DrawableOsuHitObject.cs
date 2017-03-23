@@ -13,9 +13,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         public const float TIME_FADEIN = 400;
         public const float TIME_FADEOUT = 500;
 
-        public DrawableOsuHitObject(OsuHitObject hitObject)
+        protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
+            AccentColour = HitObject.ComboColour;
         }
 
         protected override OsuJudgementInfo CreateJudgementInfo() => new OsuJudgementInfo { MaxScore = OsuScoreResult.Hit300 };
