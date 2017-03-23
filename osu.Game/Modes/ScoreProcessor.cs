@@ -105,7 +105,7 @@ namespace osu.Game.Modes
 
     public abstract class ScoreProcessor<TObject, TJudgement> : ScoreProcessor
         where TObject : HitObject
-        where TJudgement : JudgementInfo
+        where TJudgement : Judgement
     {
         /// <summary>
         /// All judgements held by this ScoreProcessor.
@@ -158,7 +158,7 @@ namespace osu.Game.Modes
         /// <summary>
         /// Update any values that potentially need post-processing on a judgement change.
         /// </summary>
-        /// <param name="newJudgement">A new JudgementInfo that triggered this calculation. May be null.</param>
+        /// <param name="newJudgement">A new Judgement that triggered this calculation. May be null.</param>
         protected abstract void UpdateCalculations(TJudgement newJudgement);
     }
 }
