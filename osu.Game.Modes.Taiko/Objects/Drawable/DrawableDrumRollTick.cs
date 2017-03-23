@@ -39,18 +39,15 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.CentreLeft,
-
                     Size = new Vector2(26),
-
                     BorderThickness = 5,
                     BorderColour = Color4.White,
-
+                    Masking = true,
                     Children = new[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-
                             Alpha = tick.FirstTick ? 1 : 0,
                             AlwaysPresent = true
                         }
