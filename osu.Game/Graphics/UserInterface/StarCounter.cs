@@ -147,7 +147,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private class Star : Container
         {
-            public TextAwesome Icon;
+            public readonly TextAwesome Icon;
             public Star()
             {
                 Size = new Vector2(star_size);
