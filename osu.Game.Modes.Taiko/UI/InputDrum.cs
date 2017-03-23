@@ -32,7 +32,8 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
                     RelativeSizeAxes = Axes.Both,
-                    Keys = new List<Key>(new[] { Key.F, Key.D })
+                    RimKey = Key.D,
+                    CentreKey = Key.F
                 },
                 new TaikoHalfDrum(true)
                 {
@@ -41,7 +42,8 @@ namespace osu.Game.Modes.Taiko.UI
                     Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.Both,
                     Position = new Vector2(-1f, 0),
-                    Keys = new List<Key>(new[] { Key.J, Key.K })
+                    RimKey = Key.K,
+                    CentreKey = Key.J
                 }
             };
         }
@@ -52,17 +54,19 @@ namespace osu.Game.Modes.Taiko.UI
         private class TaikoHalfDrum : Container
         {
             /// <summary>
-            /// A list of keys which this half-drum accepts.
-            /// <para>
-            /// [0] => Inner key, [1] => Outer key
-            /// </para>
+            /// The key to be used for the rim of the half-drum.
             /// </summary>
-            public List<Key> Keys = new List<Key>();
+            public Key RimKey;
+            
+            /// <summary>
+            /// The key to be used for the centre of the half-drum.
+            /// </summary>
+            public Key CentreKey;
 
-            private Sprite outer;
-            private Sprite outerHit;
-            private Sprite inner;
-            private Sprite innerHit;
+            private Sprite rim;
+            private Sprite rimHit;
+            private Sprite centre;
+            private Sprite centreHit;
 
             public TaikoHalfDrum(bool flipped)
             {
@@ -70,13 +74,13 @@ namespace osu.Game.Modes.Taiko.UI
 
                 Children = new Drawable[]
                 {
-                    outer = new Sprite
+                    rim = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both
                     },
-                    outerHit = new Sprite
+                    rimHit = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
@@ -84,14 +88,14 @@ namespace osu.Game.Modes.Taiko.UI
                         Alpha = 0,
                         BlendingMode = BlendingMode.Additive
                     },
-                    inner = new Sprite
+                    centre = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.7f)
                     },
-                    innerHit = new Sprite
+                    centreHit = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
@@ -106,13 +110,13 @@ namespace osu.Game.Modes.Taiko.UI
             [BackgroundDependencyLoader]
             private void load(TextureStore textures, OsuColour colours)
             {
-                outer.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer");
-                outerHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer-hit");
-                inner.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
-                innerHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner-hit");
+                rim.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer");
+                rimHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer-hit");
+                centre.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
+                centreHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner-hit");
 
-                outerHit.Colour = colours.Blue;
-                innerHit.Colour = colours.Pink;
+                rimHit.Colour = colours.Blue;
+                centreHit.Colour = colours.Pink;
             }
 
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -120,16 +124,16 @@ namespace osu.Game.Modes.Taiko.UI
                 if (args.Repeat)
                     return false;
 
-                if (args.Key == Keys[0])
+                if (args.Key == CentreKey)
                 {
-                    innerHit.FadeIn();
-                    innerHit.FadeOut(500, EasingTypes.OutQuint);
+                    centreHit.FadeIn();
+                    centreHit.FadeOut(500, EasingTypes.OutQuint);
                 }
 
-                if (args.Key == Keys[1])
+                if (args.Key == RimKey)
                 {
-                    outerHit.FadeIn();
-                    outerHit.FadeOut(500, EasingTypes.OutQuint);
+                    rimHit.FadeIn();
+                    rimHit.FadeOut(500, EasingTypes.OutQuint);
                 }
 
                 return false;
