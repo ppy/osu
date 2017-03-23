@@ -21,12 +21,13 @@ namespace osu.Game.Database
         }
 
         private ArchiveReader getReader() => database?.GetReader(BeatmapSetInfo);
-        
+
         protected override Beatmap GetBeatmap()
         {
-            Beatmap beatmap;
             try
             {
+                Beatmap beatmap;
+
                 using (var reader = getReader())
                 {
                     BeatmapDecoder decoder;
@@ -40,42 +41,33 @@ namespace osu.Game.Database
                         using (var stream = new StreamReader(reader.GetStream(BeatmapSetInfo.StoryboardFile)))
                             decoder.Decode(stream, beatmap);
                 }
+
+                return beatmap;
             }
             catch { return null; }
-            return beatmap;
         }
-        
+
         protected override Texture GetBackground()
         {
-            Texture background;
             if (BeatmapInfo?.Metadata?.BackgroundFile == null)
                 return null;
+
             try
             {
                 using (var reader = getReader())
-                {
-                    background = new TextureStore(
-                        new RawTextureLoaderStore(reader),
-                        false).Get(BeatmapInfo.Metadata.BackgroundFile);
-                }
+                    return new TextureStore(new RawTextureLoaderStore(reader), false).Get(BeatmapInfo.Metadata.BackgroundFile);
             }
             catch { return null; }
-            return background;
         }
 
-        private ArchiveReader trackReader;
         protected override Track GetTrack()
         {
-            Track track;
             try
             {
-                //store a reference to the reader as we may continue accessing the stream in the background.
-                trackReader = getReader();
-                var trackData = trackReader?.GetStream(BeatmapInfo.Metadata.AudioFile);
-                track = trackData == null ? null : new TrackBass(trackData);
+                var trackData = getReader()?.GetStream(BeatmapInfo.Metadata.AudioFile);
+                return trackData == null ? null : new TrackBass(trackData);
             }
             catch { return null; }
-            return track;
         }
     }
 }
