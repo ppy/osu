@@ -9,7 +9,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
     public class DrawableDrumRoll : DrawableTaikoHitObject
     {
-        private DrumRoll drumRoll;
+        private readonly DrumRoll drumRoll;
 
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
