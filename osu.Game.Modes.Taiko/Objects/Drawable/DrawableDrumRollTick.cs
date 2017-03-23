@@ -16,9 +16,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// A list of keys which this HitObject will accept. These are the standard Taiko keys for now.
         /// These should be moved to bindings later.
         /// </summary>
-        private List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
+        private readonly List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
 
-        private DrumRollTick tick;
+        private readonly DrumRollTick tick;
 
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
