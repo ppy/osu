@@ -93,14 +93,14 @@ namespace osu.Game.Screens.Play
 
         private void recreateGraph()
         {
-            RemoveAll(delegate { return true; });
-            columns.RemoveAll(delegate { return true; });
+            Clear();
+            columns.Clear();
 
-            for (int x = 0; x < DrawWidth; x += 3)
+            for (float x = 0; x < DrawWidth; x += SongProgressGraphColumn.WIDTH)
             {
                 columns.Add(new SongProgressGraphColumn
                 {
-                    Position = new Vector2(x + 1, 0),
+                    Position = new Vector2(x, 0),
                     State = ColumnState.Dimmed,
                 });
 

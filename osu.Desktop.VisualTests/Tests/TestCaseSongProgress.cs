@@ -21,8 +21,8 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(progress = new SongProgress
             {
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
                 RelativeSizeAxes = Axes.X
             });
 

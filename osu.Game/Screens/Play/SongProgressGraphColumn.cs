@@ -12,12 +12,19 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressGraphColumn : Container
     {
-        private readonly int rows = 11;
+        private const float cube_count = 6;
+        private const float cube_size = 4;
+        private const float padding = 2;
+
+        public const float WIDTH = cube_size + padding;
+
+        public const float HEIGHT = cube_count * WIDTH;
+
         private readonly Color4 emptyColour = Color4.White.Opacity(100);
         private readonly Color4 litColour = SongProgress.FILL_COLOUR;
         private readonly Color4 dimmedColour = Color4.White.Opacity(175);
 
-        private List<Box> drawableRows = new List<Box>();
+        private readonly List<Box> drawableRows = new List<Box>();
 
         private int filled;
         public int Filled
@@ -51,6 +58,26 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        public SongProgressGraphColumn()
+        {
+            Size = new Vector2(WIDTH, HEIGHT);
+
+            for (int r = 0; r < cube_count; r++)
+            {
+                drawableRows.Add(new Box
+                {
+                    EdgeSmoothness = new Vector2(padding / 4),
+                    Size = new Vector2(cube_size),
+                    Position = new Vector2(0, r * WIDTH + padding)
+                });
+
+                Add(drawableRows[drawableRows.Count - 1]);
+            }
+
+            // Reverse drawableRows so when iterating through them they start at the bottom
+            drawableRows.Reverse();
+        }
+
         private void fillActive()
         {
             Color4 colour = State == ColumnState.Lit ? litColour : dimmedColour;
@@ -66,25 +93,6 @@ namespace osu.Game.Screens.Play
                     drawableRows[i].Colour = i <= Filled ? colour : emptyColour;
                 }
             }
-        }
-
-        public SongProgressGraphColumn()
-        {
-            Size = new Vector2(4, rows * 3);
-
-            for (int row = 0; row < rows * 3; row += 3)
-            {
-                drawableRows.Add(new Box
-                {
-                    Size = new Vector2(2),
-                    Position = new Vector2(0, row + 1)
-                });
-
-                Add(drawableRows[drawableRows.Count - 1]);
-            }
-
-            // Reverse drawableRows so when iterating through them they start at the bottom
-            drawableRows.Reverse();
         }
     }
 
