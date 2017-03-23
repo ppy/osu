@@ -20,7 +20,7 @@ namespace osu.Game.Modes.Osu
 
         private const float spin_radius = 50;
 
-        private Beatmap<OsuHitObject> beatmap;
+        private readonly Beatmap<OsuHitObject> beatmap;
 
         public OsuAutoReplay(Beatmap<OsuHitObject> beatmap)
         {
@@ -37,11 +37,11 @@ namespace osu.Game.Modes.Osu
             }
         }
 
-        private static IComparer<LegacyReplayFrame> replayFrameComparer = new LegacyReplayFrameComparer();
+        private static readonly IComparer<LegacyReplayFrame> replay_frame_comparer = new LegacyReplayFrameComparer();
 
         private int findInsertionIndex(LegacyReplayFrame frame)
         {
-            int index = Frames.BinarySearch(frame, replayFrameComparer);
+            int index = Frames.BinarySearch(frame, replay_frame_comparer);
 
             if (index < 0)
             {

@@ -18,7 +18,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableSliderTick : DrawableOsuHitObject
     {
-        private SliderTick sliderTick;
+        private readonly SliderTick sliderTick;
 
         public double FadeInTime;
         public double FadeOutTime;
@@ -95,8 +95,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
-            if (!IsLoaded) return;
-
             base.UpdateState(state);
 
             switch (state)

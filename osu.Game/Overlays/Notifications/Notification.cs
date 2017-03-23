@@ -35,9 +35,9 @@ namespace osu.Game.Overlays.Notifications
         public virtual bool DisplayOnTop => true;
 
         protected NotificationLight Light;
-        private CloseButton closeButton;
+        private readonly CloseButton closeButton;
         protected Container IconContent;
-        private Container content;
+        private readonly Container content;
 
         protected override Container<Drawable> Content => content;
 
@@ -169,6 +169,7 @@ namespace osu.Game.Overlays.Notifications
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_times_circle,
+                        TextSize = 20
                     }
                 };
             }

@@ -21,6 +21,7 @@ using osu.Game.Screens.Tournament.Components;
 using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -36,7 +37,7 @@ namespace osu.Game.Screens.Tournament
         private GroupContainer groupsContainer;
         private OsuSpriteText fullTeamNameText;
 
-        private List<Team> allTeams = new List<Team>();
+        private readonly List<Country> allTeams = new List<Country>();
 
         private DrawingsConfigManager drawingsConfig;
 
@@ -160,7 +161,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Text = "Control Panel",
                                     TextSize = 22f,
-                                    Font = "Exo2.0-Boldd"
+                                    Font = "Exo2.0-Bold"
                                 },
                                 new FillFlowContainer
                                 {
@@ -238,7 +239,7 @@ namespace osu.Game.Screens.Tournament
             reset(true);
         }
 
-        private void onTeamSelected(Team team)
+        private void onTeamSelected(Country team)
         {
             groupsContainer.AddTeam(team);
 
@@ -275,7 +276,7 @@ namespace osu.Game.Screens.Tournament
             teamsContainer.ClearTeams();
             allTeams.Clear();
 
-            foreach (Team t in TeamList.Teams)
+            foreach (Country t in TeamList.Teams)
             {
                 if (groupsContainer.ContainsTeam(t.FullName))
                     continue;
@@ -311,7 +312,7 @@ namespace osu.Game.Screens.Tournament
                             if (line.ToUpper().StartsWith("GROUP"))
                                 continue;
 
-                            Team teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
+                            Country teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
 
                             if (teamToAdd == null)
                                 continue;

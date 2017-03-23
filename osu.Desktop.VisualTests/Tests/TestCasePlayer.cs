@@ -8,13 +8,13 @@ using osu.Framework.Screens.Testing;
 using osu.Game.Beatmaps;
 using OpenTK;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Screens.Play;
 using OpenTK.Graphics;
+using osu.Desktop.VisualTests.Beatmaps;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -22,7 +22,6 @@ namespace osu.Desktop.VisualTests.Tests
     {
         protected Player Player;
         private BeatmapDatabase db;
-
 
         public override string Description => @"Showing everything to play the game.";
 
@@ -96,17 +95,6 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 Beatmap = beatmap
             };
-        }
-
-        private class TestWorkingBeatmap : WorkingBeatmap
-        {
-            public TestWorkingBeatmap(Beatmap beatmap)
-                : base(beatmap.BeatmapInfo, beatmap.BeatmapInfo.BeatmapSet)
-            {
-                Beatmap = beatmap;
-            }
-
-            protected override ArchiveReader GetReader() => null;
         }
     }
 }

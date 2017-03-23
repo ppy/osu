@@ -8,16 +8,19 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
 {
     public class PlaySongSelect : SongSelect
     {
         private OsuScreen player;
-        private ModSelectOverlay modSelect;
+        private readonly ModSelectOverlay modSelect;
+        private readonly Leaderboard leaderboard;
 
         public PlaySongSelect()
         {
@@ -27,6 +30,11 @@ namespace osu.Game.Screens.Select
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.BottomCentre,
                 Margin = new MarginPadding { Bottom = 50 }
+            });
+
+            LeftContent.Add(leaderboard = new Leaderboard
+            {
+                RelativeSizeAxes = Axes.Both,
             });
         }
 
@@ -44,10 +52,27 @@ namespace osu.Game.Screens.Select
             }, Key.Number3);
         }
 
+        private GetScoresRequest getScoresRequest;
+
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
+
+            updateLeaderboard(beatmap);
+
             base.OnBeatmapChanged(beatmap);
+        }
+
+        private void updateLeaderboard(WorkingBeatmap beatmap)
+        {
+            leaderboard.Scores = null;
+            getScoresRequest?.Cancel();
+
+            if (beatmap?.BeatmapInfo == null) return;
+
+            getScoresRequest = new GetScoresRequest(beatmap.BeatmapInfo);
+            getScoresRequest.Success += r => leaderboard.Scores = r.Scores;
+            Game.API.Queue(getScoresRequest);
         }
 
         protected override void OnResuming(Screen last)
