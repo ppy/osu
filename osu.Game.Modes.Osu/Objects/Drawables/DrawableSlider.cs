@@ -39,6 +39,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             {
                 body = new SliderBody(s)
                 {
+                    AccentColour = AccentColour,
                     Position = s.StackedPosition,
                     PathWidth = s.Scale * 64,
                 },
@@ -56,6 +57,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 ball = new SliderBall(s)
                 {
                     Scale = new Vector2(s.Scale),
+                    AccentColour = AccentColour
                 },
                 initialCircle = new DrawableHitCircle(new HitCircle
                 {

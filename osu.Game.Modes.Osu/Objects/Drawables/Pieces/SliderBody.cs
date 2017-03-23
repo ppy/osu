@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Configuration;
 using OpenTK;
 using OpenTK.Graphics.ES30;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
@@ -24,14 +25,31 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
         public float PathWidth
         {
             get { return path.PathWidth; }
-            set
-            {
-                path.PathWidth = value;
-            }
+            set { path.PathWidth = value; }
         }
 
         public double? SnakedStart { get; private set; }
         public double? SnakedEnd { get; private set; }
+
+        private Color4 accentColour;
+        /// <summary>
+        /// Used to colour the path.
+        /// </summary>
+        public Color4 AccentColour
+        {
+            get { return accentColour; }
+            set
+            {
+                if (accentColour == value)
+                    return;
+                accentColour = value;
+
+                if (LoadState == LoadState.Loaded)
+                    Schedule(reloadTexture);
+            }
+        }
+
+        private int textureWidth => (int)PathWidth * 2;
 
         private readonly Slider slider;
         public SliderBody(Slider s)
@@ -82,7 +100,12 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
             snakingIn = config.GetBindable<bool>(OsuConfig.SnakingInSliders);
             snakingOut = config.GetBindable<bool>(OsuConfig.SnakingOutSliders);
 
-            int textureWidth = (int)PathWidth * 2;
+            reloadTexture();
+        }
+
+        private void reloadTexture()
+        {
+            var texture = new Texture(textureWidth, 1);
 
             //initialise background
             var upload = new TextureUpload(textureWidth * 4);
@@ -110,14 +133,13 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                 {
                     progress -= border_portion;
 
-                    bytes[i * 4] = (byte)(slider.ComboColour.R * 255);
-                    bytes[i * 4 + 1] = (byte)(slider.ComboColour.G * 255);
-                    bytes[i * 4 + 2] = (byte)(slider.ComboColour.B * 255);
-                    bytes[i * 4 + 3] = (byte)((opacity_at_edge - (opacity_at_edge - opacity_at_centre) * progress / gradient_portion) * (slider.ComboColour.A * 255));
+                    bytes[i * 4] = (byte)(AccentColour.R * 255);
+                    bytes[i * 4 + 1] = (byte)(AccentColour.G * 255);
+                    bytes[i * 4 + 2] = (byte)(AccentColour.B * 255);
+                    bytes[i * 4 + 3] = (byte)((opacity_at_edge - (opacity_at_edge - opacity_at_centre) * progress / gradient_portion) * (AccentColour.A * 255));
                 }
             }
 
-            var texture = new Texture(textureWidth, 1);
             texture.SetData(upload);
             path.Texture = texture;
         }
