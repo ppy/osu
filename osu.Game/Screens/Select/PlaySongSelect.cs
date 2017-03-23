@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Select
     {
         private OsuScreen player;
         private ModSelectOverlay modSelect;
-        private Leaderboard leaderboard;
+        private BeatmapDetailArea beatmapDetails;
 
         public PlaySongSelect()
         {
@@ -32,9 +32,10 @@ namespace osu.Game.Screens.Select
                 Margin = new MarginPadding { Bottom = 50 }
             });
 
-            LeftContent.Add(leaderboard = new Leaderboard
+            LeftContent.Add(beatmapDetails = new BeatmapDetailArea
             {
                 RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding { Top = 5, Right = 5 },
             });
         }
 
@@ -58,21 +59,9 @@ namespace osu.Game.Screens.Select
         {
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
 
-            updateLeaderboard(beatmap);
+            beatmapDetails.PresentScores(beatmap);
 
             base.OnBeatmapChanged(beatmap);
-        }
-
-        private void updateLeaderboard(WorkingBeatmap beatmap)
-        {
-            leaderboard.Scores = null;
-            getScoresRequest?.Cancel();
-
-            if (beatmap?.BeatmapInfo == null) return;
-
-            getScoresRequest = new GetScoresRequest(beatmap.BeatmapInfo);
-            getScoresRequest.Success += r => leaderboard.Scores = r.Scores;
-            Game.API.Queue(getScoresRequest);
         }
 
         protected override void OnResuming(Screen last)
