@@ -12,13 +12,13 @@ namespace osu.Game.Modes.Taiko.UI
     /// <summary>
     /// Text that is shown as judgement when a hit object is hit or missed.
     /// </summary>
-    public class DrawableTaikoJudgementInfo : DrawableJudgementInfo<TaikoJudgementInfo>
+    public class DrawableTaikoJudgement : DrawableJudgement<TaikoJudgement>
     {
         /// <summary>
         /// Creates a new judgement text.
         /// </summary>
         /// <param name="judgement">The judgement to visualise.</param>
-        public DrawableTaikoJudgementInfo(TaikoJudgementInfo judgement)
+        public DrawableTaikoJudgement(TaikoJudgement judgement)
             : base(judgement)
         {
         }

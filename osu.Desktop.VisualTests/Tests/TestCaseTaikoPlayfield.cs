@@ -36,7 +36,7 @@ namespace osu.Desktop.VisualTests.Tests
             playfield.OnJudgement(new DrawableTestHit(new Hit())
             {
                 X = RNG.NextSingle(hitResult == TaikoHitResult.Good ? -0.1f : -0.05f, hitResult == TaikoHitResult.Good ? 0.1f : 0.05f),
-                Judgement = new TaikoJudgementInfo
+                Judgement = new TaikoJudgement
                 {
                     Result = HitResult.Hit,
                     TaikoResult = hitResult,
@@ -51,7 +51,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             playfield.OnJudgement(new DrawableTestHit(new Hit())
             {
-                Judgement = new TaikoJudgementInfo
+                Judgement = new TaikoJudgement
                 {
                     Result = HitResult.Miss,
                     TimeOffset = 0,
@@ -60,14 +60,14 @@ namespace osu.Desktop.VisualTests.Tests
             });
         }
 
-        private class DrawableTestHit : DrawableHitObject<TaikoHitObject, TaikoJudgementInfo>
+        private class DrawableTestHit : DrawableHitObject<TaikoHitObject, TaikoJudgement>
         {
             public DrawableTestHit(TaikoHitObject hitObject)
                 : base(hitObject)
             {
             }
 
-            protected override TaikoJudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo();
+            protected override TaikoJudgement CreateJudgement() => new TaikoJudgement();
 
             protected override void UpdateState(ArmedState state)
             {

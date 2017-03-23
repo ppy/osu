@@ -3,7 +3,7 @@
 
 namespace osu.Game.Modes.Taiko.Judgements
 {
-    public class TaikoDrumRollTickJudgementInfo : TaikoJudgementInfo
+    public class TaikoDrumRollTickJudgement : TaikoJudgement
     {
         /// <summary>
         /// Drum roll ticks don't display judgement text.

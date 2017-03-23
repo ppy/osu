@@ -12,7 +12,7 @@ using System;
 
 namespace osu.Game.Modes.Taiko
 {
-    internal class TaikoScoreProcessor : ScoreProcessor<TaikoHitObject, TaikoJudgementInfo>
+    internal class TaikoScoreProcessor : ScoreProcessor<TaikoHitObject, TaikoJudgement>
     {
         /// <summary>
         /// The maximum score achievable.
@@ -119,7 +119,7 @@ namespace osu.Game.Modes.Taiko
         {
         }
 
-        public TaikoScoreProcessor(HitRenderer<TaikoHitObject, TaikoJudgementInfo> hitRenderer)
+        public TaikoScoreProcessor(HitRenderer<TaikoHitObject, TaikoJudgement> hitRenderer)
             : base(hitRenderer)
         {
         }
