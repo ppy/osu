@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Select
             LeftContent.Add(beatmapDetails = new BeatmapDetailArea
             {
                 RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding { Top = 5, Right = 5 },
+                Padding = new MarginPadding { Top = 10, Right = 5 },
             });
         }
 
