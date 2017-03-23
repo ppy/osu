@@ -8,11 +8,9 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
 {
@@ -52,8 +50,6 @@ namespace osu.Game.Screens.Select
                 Push(new Editor());
             }, Key.Number3);
         }
-
-        private GetScoresRequest getScoresRequest;
 
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
