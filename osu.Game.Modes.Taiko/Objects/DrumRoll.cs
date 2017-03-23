@@ -62,6 +62,7 @@ namespace osu.Game.Modes.Taiko.Objects
             Velocity = timing.SliderVelocityAt(StartTime) * difficulty.SliderMultiplier / 1000;
             TickTimeDistance = timing.BeatLengthAt(StartTime);
 
+            //TODO: move this to legacy conversion code to allow for direct division without special case.
             if (difficulty.SliderTickRate == 3)
                 TickTimeDistance /= 3;
             else
