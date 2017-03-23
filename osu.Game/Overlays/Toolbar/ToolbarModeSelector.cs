@@ -19,8 +19,8 @@ namespace osu.Game.Overlays.Toolbar
     {
         private const float padding = 10;
 
-        private FillFlowContainer modeButtons;
-        private Drawable modeButtonLine;
+        private readonly FillFlowContainer modeButtons;
+        private readonly Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
         public Action<PlayMode> OnPlayModeChange;

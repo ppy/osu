@@ -17,7 +17,8 @@ namespace osu.Game.Screens.Select
     public class PlaySongSelect : SongSelect
     {
         private OsuScreen player;
-        private ModSelectOverlay modSelect;
+        private readonly ModSelectOverlay modSelect;
+        private readonly BeatmapDetailArea beatmapDetails;
 
         public PlaySongSelect()
         {
@@ -27,6 +28,12 @@ namespace osu.Game.Screens.Select
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.BottomCentre,
                 Margin = new MarginPadding { Bottom = 50 }
+            });
+
+            LeftContent.Add(beatmapDetails = new BeatmapDetailArea
+            {
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding { Top = 10, Right = 5 },
             });
         }
 
@@ -47,6 +54,9 @@ namespace osu.Game.Screens.Select
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
+
+            beatmapDetails.Beatmap = beatmap;
+
             base.OnBeatmapChanged(beatmap);
         }
 

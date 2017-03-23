@@ -58,7 +58,7 @@
     <Compile Include="Objects\Drawables\Pieces\ExplodePiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\FlashPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
-    <Compile Include="Objects\Drawables\HitExplosion.cs" />
+    <Compile Include="Objects\Drawables\DrawableOsuJudgementInfo.cs" />
     <Compile Include="Objects\Drawables\Pieces\NumberPiece.cs" />
     <Compile Include="Objects\Drawables\DrawableSliderTick.cs" />
     <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />

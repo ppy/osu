@@ -13,20 +13,20 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
-using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Tournament
 {
     public class ScrollingTeamContainer : Container
     {
         public event Action OnScrollStarted;
-        public event Action<Team> OnSelected;
+        public event Action<Country> OnSelected;
 
-        private readonly List<Team> availableTeams = new List<Team>();
+        private readonly List<Country> availableTeams = new List<Country>();
 
-        private Container tracker;
+        private readonly Container tracker;
 
         private float speed;
         private int expiredCount;
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        public void AddTeam(Team team)
+        public void AddTeam(Country team)
         {
             if (availableTeams.Contains(team))
                 return;
@@ -169,12 +169,12 @@ namespace osu.Game.Screens.Tournament
             scrollState = ScrollState.Idle;
         }
 
-        public void AddTeams(IEnumerable<Team> teams)
+        public void AddTeams(IEnumerable<Country> teams)
         {
             if (teams == null)
                 return;
 
-            foreach (Team t in teams)
+            foreach (Country t in teams)
                 AddTeam(t);
         }
 
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Tournament
             scrollState = ScrollState.Idle;
         }
 
-        public void RemoveTeam(Team team)
+        public void RemoveTeam(Country team)
         {
             availableTeams.Remove(team);
 
@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Tournament
 
         private void addFlags()
         {
-            foreach (Team t in availableTeams)
+            foreach (Country t in availableTeams)
             {
                 Add(new ScrollingTeam(t)
                 {
@@ -326,10 +326,10 @@ namespace osu.Game.Screens.Tournament
             public const float WIDTH = 58;
             public const float HEIGHT = 41;
 
-            public Team Team;
+            public Country Team;
 
-            private Sprite flagSprite;
-            private Box outline;
+            private readonly Sprite flagSprite;
+            private readonly Box outline;
 
             private bool selected;
             public bool Selected
@@ -346,7 +346,7 @@ namespace osu.Game.Screens.Tournament
                 }
             }
 
-            public ScrollingTeam(Team team)
+            public ScrollingTeam(Country team)
             {
                 Team = team;
 
