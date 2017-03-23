@@ -31,7 +31,7 @@ namespace osu.Game.Graphics.Containers
             });
         }
 
-        private Container content;
+        private readonly Container content;
         private InputManager input;
 
         protected override Container<Drawable> Content => content;

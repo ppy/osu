@@ -13,7 +13,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
     public class SliderBall : CircularContainer, ISliderProgress
     {
         private readonly Slider slider;
-        private Box follow;
+        private readonly Box follow;
 
         private const float width = 128;
 
