@@ -48,7 +48,7 @@ namespace osu.Game.Modes.Taiko.UI
 
         private readonly Container<HitExplosion> hitExplosionContainer;
         //private Container<DrawableBarLine> barLineContainer;
-        private readonly Container<JudgementText> judgementContainer;
+        private readonly Container<DrawableTaikoJudgementInfo> judgementContainer;
 
         private readonly Container hitObjectContainer;
         //private Container topLevelHitContainer;
@@ -117,7 +117,7 @@ namespace osu.Game.Modes.Taiko.UI
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                judgementContainer = new Container<JudgementText>
+                                judgementContainer = new Container<DrawableTaikoJudgementInfo>
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     BlendingMode = BlendingMode.Additive
@@ -186,7 +186,7 @@ namespace osu.Game.Modes.Taiko.UI
 
             float judgementOffset = judgedObject.Judgement.Result == HitResult.Hit ? judgedObject.Position.X : 0;
 
-            judgementContainer.Add(new JudgementText(judgedObject.Judgement)
+            judgementContainer.Add(new DrawableTaikoJudgementInfo(judgedObject.Judgement)
             {
                 Anchor = judgedObject.Judgement.Result == HitResult.Hit ? Anchor.TopLeft : Anchor.BottomLeft,
                 Origin = judgedObject.Judgement.Result == HitResult.Hit ? Anchor.BottomCentre : Anchor.TopCentre,

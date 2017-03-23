@@ -12,13 +12,13 @@ namespace osu.Game.Modes.Taiko.UI
     /// <summary>
     /// Text that is shown as judgement when a hit object is hit or missed.
     /// </summary>
-    public class JudgementText : DrawableJudgementInfo<TaikoJudgementInfo>
+    public class DrawableTaikoJudgementInfo : DrawableJudgementInfo<TaikoJudgementInfo>
     {
         /// <summary>
         /// Creates a new judgement text.
         /// </summary>
         /// <param name="judgement">The judgement to visualise.</param>
-        public JudgementText(TaikoJudgementInfo judgement)
+        public DrawableTaikoJudgementInfo(TaikoJudgementInfo judgement)
             : base(judgement)
         {
         }
@@ -32,10 +32,10 @@ namespace osu.Game.Modes.Taiko.UI
                     switch (Judgement.TaikoResult)
                     {
                         case TaikoHitResult.Good:
-                            Colour = colours.Green;
+                            Colour = colours.GreenLight;
                             break;
                         case TaikoHitResult.Great:
-                            Colour = colours.Blue;
+                            Colour = colours.BlueLight;
                             break;
                     }
                     break;
