@@ -44,11 +44,8 @@ namespace osu.Game.Modes.Osu.Beatmaps
                 {
                     StartTime = original.StartTime,
                     Sample = original.Sample,
-
                     CurveObject = curveData,
-
                     Position = positionData?.Position ?? Vector2.Zero,
-
                     NewCombo = comboData?.NewCombo ?? false
                 };
             }
@@ -60,7 +57,6 @@ namespace osu.Game.Modes.Osu.Beatmaps
                     StartTime = original.StartTime,
                     Sample = original.Sample,
                     Position = new Vector2(512, 384) / 2,
-
                     EndTime = endTimeData.EndTime
                 };
             }
@@ -69,9 +65,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
             {
                 StartTime = original.StartTime,
                 Sample = original.Sample,
-
                 Position = positionData?.Position ?? Vector2.Zero,
-
                 NewCombo = comboData?.NewCombo ?? false
             };
         }

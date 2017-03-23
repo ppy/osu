@@ -10,7 +10,7 @@ using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Mania.UI
 {
-    public class ManiaHitRenderer : HitRenderer<ManiaBaseHit, ManiaJudgementInfo>
+    public class ManiaHitRenderer : HitRenderer<ManiaBaseHit, ManiaJudgement>
     {
         private readonly int columns;
 
@@ -26,8 +26,8 @@ namespace osu.Game.Modes.Mania.UI
 
         protected override IBeatmapProcessor<ManiaBaseHit> CreateBeatmapProcessor() => new ManiaBeatmapProcessor();
 
-        protected override Playfield<ManiaBaseHit, ManiaJudgementInfo> CreatePlayfield() => new ManiaPlayfield(columns);
+        protected override Playfield<ManiaBaseHit, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(columns);
 
-        protected override DrawableHitObject<ManiaBaseHit, ManiaJudgementInfo> GetVisualRepresentation(ManiaBaseHit h) => null;
+        protected override DrawableHitObject<ManiaBaseHit, ManiaJudgement> GetVisualRepresentation(ManiaBaseHit h) => null;
     }
 }
