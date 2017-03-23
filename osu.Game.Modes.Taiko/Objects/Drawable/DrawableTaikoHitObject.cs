@@ -16,9 +16,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             Origin = Anchor.Centre;
 
             RelativePositionAxes = Axes.X;
+        }
 
+        protected override void LoadComplete()
+        {
             LifetimeStart = HitObject.StartTime - HitObject.PreEmpt * 2;
             LifetimeEnd = HitObject.StartTime + HitObject.PreEmpt;
+
+            base.LoadComplete();
         }
 
         protected override TaikoJudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo();
