@@ -44,11 +44,8 @@ namespace osu.Game.Modes.Osu.Beatmaps
                 {
                     StartTime = original.StartTime,
                     Sample = original.Sample,
-
                     CurveObject = curveData,
-
                     Position = positionData?.Position ?? Vector2.Zero,
-
                     NewCombo = comboData?.NewCombo ?? false
                 };
             }
@@ -60,7 +57,6 @@ namespace osu.Game.Modes.Osu.Beatmaps
                     StartTime = original.StartTime,
                     Sample = original.Sample,
                     Position = new Vector2(512, 384) / 2,
-
                     EndTime = endTimeData.EndTime
                 };
             }
@@ -69,9 +65,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
             {
                 StartTime = original.StartTime,
                 Sample = original.Sample,
-
                 Position = positionData?.Position ?? Vector2.Zero,
-
                 NewCombo = comboData?.NewCombo ?? false
             };
         }
@@ -81,7 +75,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
             if (endIndex == -1)
                 endIndex = hitObjects.Count - 1;
 
-            int stackDistance = 3;
+            const int stack_distance = 3;
             float stackThreshold = DrawableOsuHitObject.TIME_PREEMPT * stackLeniency;
 
             // Reset stacking inside the update range
@@ -108,8 +102,8 @@ namespace osu.Game.Modes.Osu.Beatmaps
                         //We are no longer within stacking range of the next object.
                         break;
 
-                    if (Vector2.Distance(stackBaseObject.Position, objectN.Position) < stackDistance ||
-                        stackBaseObject is Slider && Vector2.Distance(stackBaseObject.EndPosition, objectN.Position) < stackDistance)
+                    if (Vector2.Distance(stackBaseObject.Position, objectN.Position) < stack_distance ||
+                        stackBaseObject is Slider && Vector2.Distance(stackBaseObject.EndPosition, objectN.Position) < stack_distance)
                     {
                         stackBaseIndex = n;
 
@@ -174,14 +168,14 @@ namespace osu.Game.Modes.Osu.Beatmaps
                             *        o <- hitCircle has stack of -1
                             *         o <- hitCircle has stack of -2
                             */
-                        if (objectN is Slider && Vector2.Distance(objectN.EndPosition, objectI.Position) < stackDistance)
+                        if (objectN is Slider && Vector2.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
                         {
                             int offset = objectI.StackHeight - objectN.StackHeight + 1;
                             for (int j = n + 1; j <= i; j++)
                             {
                                 //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
                                 OsuHitObject objectJ = hitObjects[j];
-                                if (Vector2.Distance(objectN.EndPosition, objectJ.Position) < stackDistance)
+                                if (Vector2.Distance(objectN.EndPosition, objectJ.Position) < stack_distance)
                                     objectJ.StackHeight -= offset;
                             }
 
@@ -190,7 +184,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
                             break;
                         }
 
-                        if (Vector2.Distance(objectN.Position, objectI.Position) < stackDistance)
+                        if (Vector2.Distance(objectN.Position, objectI.Position) < stack_distance)
                         {
                             //Keep processing as if there are no sliders.  If we come across a slider, this gets cancelled out.
                             //NOTE: Sliders with start positions stacking are a special case that is also handled here.
@@ -214,7 +208,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
                             //We are no longer within stacking range of the previous object.
                             break;
 
-                        if (Vector2.Distance(objectN.EndPosition, objectI.Position) < stackDistance)
+                        if (Vector2.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
                         {
                             objectN.StackHeight = objectI.StackHeight + 1;
                             objectI = objectN;

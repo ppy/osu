@@ -5,7 +5,10 @@ using osu.Game.Modes.Judgements;
 
 namespace osu.Game.Modes.Catch.Judgements
 {
-    public class CatchJudgementInfo : JudgementInfo
+    public class CatchJudgement : Judgement
     {
+        public override string ScoreString => string.Empty;
+
+        public override string MaxScoreString => string.Empty;
     }
 }

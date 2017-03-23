@@ -29,7 +29,7 @@ namespace osu.Game.Users
 
     public class DrawableFlag : Container
     {
-        private Sprite sprite;
+        private readonly Sprite sprite;
         private TextureStore textures;
 
         private string flagName;

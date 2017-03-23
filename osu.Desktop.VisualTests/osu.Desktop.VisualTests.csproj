@@ -23,7 +23,7 @@
     <SignAssembly>false</SignAssembly>
     <TargetZone>LocalIntranet</TargetZone>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects> 
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -194,6 +194,7 @@
     <Compile Include="Tests\TestCaseReplay.cs" />
     <Compile Include="Tests\TestCaseScoreCounter.cs" />
     <Compile Include="Tests\TestCaseTabControl.cs" />
+    <Compile Include="Tests\TestCaseTaikoPlayfield.cs" />
     <Compile Include="Tests\TestCaseTextAwesome.cs" />
     <Compile Include="Tests\TestCasePlaySongSelect.cs" />
     <Compile Include="Tests\TestCaseTwoLayerButton.cs" />
@@ -205,9 +206,14 @@
     <Compile Include="Tests\TestCaseDialogOverlay.cs" />
     <Compile Include="Tests\TestCaseBeatmapOptionsOverlay.cs" />
     <Compile Include="Tests\TestCaseLeaderboard.cs" />
+    <Compile Include="Beatmaps\TestWorkingBeatmap.cs" />
+    <Compile Include="Tests\TestCaseBeatmapDetailArea.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Beatmaps\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

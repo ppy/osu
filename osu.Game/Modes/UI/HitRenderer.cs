@@ -143,7 +143,7 @@ namespace osu.Game.Modes.UI
     /// <typeparam name="TJudgement">The type of Judgement of DrawableHitObjects contained by this HitRenderer.</typeparam>
     public abstract class HitRenderer<TObject, TJudgement> : HitRenderer<TObject>
         where TObject : HitObject
-        where TJudgement : JudgementInfo
+        where TJudgement : Judgement
     {
         public event Action<TJudgement> OnJudgement;
 
@@ -155,7 +155,7 @@ namespace osu.Game.Modes.UI
         /// </summary>
         protected Playfield<TObject, TJudgement> Playfield;
 
-        private Container content;
+        private readonly Container content;
 
         protected HitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)

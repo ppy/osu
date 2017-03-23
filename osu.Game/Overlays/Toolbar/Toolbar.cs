@@ -23,8 +23,8 @@ namespace osu.Game.Overlays.Toolbar
         public Action OnHome;
         public Action<PlayMode> OnPlayModeChange;
 
-        private ToolbarModeSelector modeSelector;
-        private ToolbarUserArea userArea;
+        private readonly ToolbarModeSelector modeSelector;
+        private readonly ToolbarUserArea userArea;
 
         protected override bool HideOnEscape => false;
 
@@ -90,8 +90,8 @@ namespace osu.Game.Overlays.Toolbar
 
         public class ToolbarBackground : Container
         {
-            private Box solidBackground;
-            private Box gradientBackground;
+            private readonly Box solidBackground;
+            private readonly Box gradientBackground;
 
             public ToolbarBackground()
             {

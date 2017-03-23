@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public class DrawableRank : Container
     {
-        private Sprite sprite;
+        private readonly Sprite sprite;
 
         public ScoreRank Rank { get; private set; }
 

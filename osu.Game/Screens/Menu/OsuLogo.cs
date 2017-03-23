@@ -25,22 +25,22 @@ namespace osu.Game.Screens.Menu
     {
         public Color4 OsuPink = OsuColour.FromHex(@"e967a1");
 
-        private Sprite logo;
-        private CircularContainer logoContainer;
-        private Container logoBounceContainer;
-        private Container logoHoverContainer;
+        private readonly Sprite logo;
+        private readonly CircularContainer logoContainer;
+        private readonly Container logoBounceContainer;
+        private readonly Container logoHoverContainer;
 
         private SampleChannel sampleClick;
 
-        private Container colourAndTriangles;
+        private readonly Container colourAndTriangles;
 
         public Action Action;
 
         public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X * 0.78f;
 
-        private Sprite ripple;
+        private readonly Sprite ripple;
 
-        private Container rippleContainer;
+        private readonly Container rippleContainer;
 
         public bool Triangles
         {
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Menu
         }
 
         public bool Interactive = true;
-        private Box flashLayer;
+        private readonly Box flashLayer;
 
         public OsuLogo()
         {
@@ -91,8 +91,10 @@ namespace osu.Game.Screens.Menu
                                         logoContainer = new CircularContainer
                                         {
                                             Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
                                             RelativeSizeAxes = Axes.Both,
                                             Scale = new Vector2(0.8f),
+                                            Masking = true,
                                             Children = new Drawable[]
                                             {
                                                 colourAndTriangles = new Container
