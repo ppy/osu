@@ -66,7 +66,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                 };
             }
 
-            return new TaikoHitObject
+            return new Hit
             {
                 StartTime = original.StartTime,
                 Sample = original.Sample,
