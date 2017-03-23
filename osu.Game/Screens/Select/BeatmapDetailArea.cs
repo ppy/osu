@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Select
     {
         private const float transition_duration = 500;
 
-        private Container content;
+        private readonly Container content;
         protected override Container<Drawable> Content => content;
 
         public readonly Container Details; //todo: replace with a real details view when added

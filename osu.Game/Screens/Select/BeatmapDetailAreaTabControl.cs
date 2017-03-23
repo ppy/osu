@@ -17,8 +17,8 @@ namespace osu.Game.Screens.Select
     public class BeatmapDetailAreaTabControl : Container
     {
         public static readonly float HEIGHT = 24;
-        private OsuTabControlCheckBox modsCheckbox;
-        private OsuTabControl<BeatmapDetailTab> tabs;
+        private readonly OsuTabControlCheckBox modsCheckbox;
+        private readonly OsuTabControl<BeatmapDetailTab> tabs;
 
         public Action<BeatmapDetailTab, bool> OnFilter; //passed the selected tab and if mods is checked
 

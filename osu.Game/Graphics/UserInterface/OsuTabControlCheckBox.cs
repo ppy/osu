@@ -21,9 +21,9 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class OsuTabControlCheckBox : CheckBox
     {
-        private Box box;
-        private SpriteText text;
-        private TextAwesome icon;
+        private readonly Box box;
+        private readonly SpriteText text;
+        private readonly TextAwesome icon;
 
         public event EventHandler<CheckBoxState> Action;
 
