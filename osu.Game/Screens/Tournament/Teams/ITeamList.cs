@@ -2,11 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Tournament.Teams
 {
     public interface ITeamList
     {
-        IEnumerable<Team> Teams { get; }
+        IEnumerable<Country> Teams { get; }
     }
 }
