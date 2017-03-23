@@ -83,8 +83,8 @@ namespace osu.Game.Modes.Judgements
                     ScaleTo(0.9f);
                     ScaleTo(1, 500, EasingTypes.OutElastic);
 
-                    Delay(250);
-                    FadeOut(250, EasingTypes.OutQuint);
+                    Delay(100);
+                    FadeOut(400);
                     break;
             }
 

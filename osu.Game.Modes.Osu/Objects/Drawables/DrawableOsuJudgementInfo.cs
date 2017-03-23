@@ -17,15 +17,10 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         protected override void LoadComplete()
         {
-            base.LoadComplete();
-
             if (Judgement.Result != HitResult.Miss)
-            {
                 JudgementText.TransformSpacingTo(new Vector2(14, 0), 1800, EasingTypes.OutQuint);
-                FadeOut(500);
-            }
 
-            Expire();
+            base.LoadComplete();
         }
     }
 }
