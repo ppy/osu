@@ -33,7 +33,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             TaikoHitResult hitResult = RNG.Next(2) == 0 ? TaikoHitResult.Good : TaikoHitResult.Great;
 
-            playfield.OnJudgement(new DrawableTestHit(new TaikoHitObject())
+            playfield.OnJudgement(new DrawableTestHit(new Hit())
             {
                 X = RNG.NextSingle(hitResult == TaikoHitResult.Good ? -0.1f : -0.05f, hitResult == TaikoHitResult.Good ? 0.1f : 0.05f),
                 Judgement = new TaikoJudgementInfo
@@ -49,7 +49,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void addMissJudgement()
         {
-            playfield.OnJudgement(new DrawableTestHit(new TaikoHitObject())
+            playfield.OnJudgement(new DrawableTestHit(new Hit())
             {
                 Judgement = new TaikoJudgementInfo
                 {
