@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Options
         public abstract FontAwesome Icon { get; }
         public abstract string Header { get; }
 
-        private SpriteText headerLabel;
+        private readonly SpriteText headerLabel;
 
         protected OptionsSection()
         {

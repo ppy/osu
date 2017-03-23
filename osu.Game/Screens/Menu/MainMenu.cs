@@ -22,11 +22,11 @@ namespace osu.Game.Screens.Menu
 {
     public class MainMenu : OsuScreen
     {
-        private ButtonSystem buttons;
+        private readonly ButtonSystem buttons;
 
         internal override bool ShowOverlays => buttons.State != MenuState.Initial;
 
-        private BackgroundScreen background;
+        private readonly BackgroundScreen background;
         private Screen songSelect;
 
         protected override BackgroundScreen CreateBackground() => background;
