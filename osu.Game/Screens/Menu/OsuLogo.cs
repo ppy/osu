@@ -91,8 +91,10 @@ namespace osu.Game.Screens.Menu
                                         logoContainer = new CircularContainer
                                         {
                                             Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
                                             RelativeSizeAxes = Axes.Both,
                                             Scale = new Vector2(0.8f),
+                                            Masking = true,
                                             Children = new Drawable[]
                                             {
                                                 colourAndTriangles = new Container
