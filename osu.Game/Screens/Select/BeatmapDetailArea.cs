@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,8 +18,9 @@ namespace osu.Game.Screens.Select
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
-        public readonly Container Details; //todo: replace with a real details view when added
+        public readonly Details Details;
         public readonly Leaderboard Leaderboard;
+        private BeatmapDetailTab currentTab;
 
         private APIAccess api;
 
@@ -32,7 +34,11 @@ namespace osu.Game.Screens.Select
             set
             {
                 beatmap = value;
-                if (IsLoaded) Schedule(updateScores);
+                if (IsLoaded)
+                    if(currentTab == BeatmapDetailTab.Details)
+                        Schedule(updateDetails);
+                    else
+                        Schedule(updateScores);
             }
         }
 
@@ -50,15 +56,15 @@ namespace osu.Game.Screens.Select
                             case BeatmapDetailTab.Details:
                                 Details.Show();
                                 Leaderboard.Hide();
+                                updateDetails();
                                 break;
                             default:
                                 Details.Hide();
                                 Leaderboard.Show();
+                                updateScores();
                                 break;
                         }
-
-                        //for now let's always update scores.
-                        updateScores();
+                        currentTab = tab;
                     },
                 },
                 content = new Container
@@ -70,7 +76,7 @@ namespace osu.Game.Screens.Select
 
             Add(new Drawable[]
             {
-                Details = new Container
+                Details = new Details
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -106,6 +112,17 @@ namespace osu.Game.Screens.Select
             getScoresRequest = new GetScoresRequest(beatmap.BeatmapInfo);
             getScoresRequest.Success += r => Leaderboard.Scores = r.Scores;
             api.Queue(getScoresRequest);
+        }
+
+
+
+        private void updateDetails()
+        {
+            if (!IsLoaded) return;
+
+            if (api == null || beatmap?.BeatmapInfo == null) return;
+
+            Details.Metadata = beatmap.Beatmap.Metadata;
         }
     }
 }
