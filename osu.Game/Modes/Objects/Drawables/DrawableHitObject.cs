@@ -11,11 +11,12 @@ using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Judgements;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Game.Modes.Objects.Types;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Objects.Drawables
 {
     public abstract class DrawableHitObject<TJudgement> : Container, IStateful<ArmedState>
-        where TJudgement : JudgementInfo
+        where TJudgement : Judgement
     {
         public override bool HandleInput => Interactive;
 
@@ -23,7 +24,7 @@ namespace osu.Game.Modes.Objects.Drawables
 
         public TJudgement Judgement;
 
-        protected abstract TJudgement CreateJudgementInfo();
+        protected abstract TJudgement CreateJudgement();
 
         protected abstract void UpdateState(ArmedState state);
 
@@ -61,7 +62,7 @@ namespace osu.Game.Modes.Objects.Drawables
 
             //we may be setting a custom judgement in test cases or what not.
             if (Judgement == null)
-                Judgement = CreateJudgementInfo();
+                Judgement = CreateJudgement();
 
             //force application of the state that was set before we loaded.
             UpdateState(State);
@@ -70,11 +71,16 @@ namespace osu.Game.Modes.Objects.Drawables
 
     public abstract class DrawableHitObject<TObject, TJudgement> : DrawableHitObject<TJudgement>
         where TObject : HitObject
-        where TJudgement : JudgementInfo
+        where TJudgement : Judgement
     {
         public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
 
         public TObject HitObject;
+
+        /// <summary>
+        /// The colour used for various elements of this DrawableHitObject.
+        /// </summary>
+        public Color4 AccentColour { get; protected set; }
 
         protected DrawableHitObject(TObject hitObject)
         {

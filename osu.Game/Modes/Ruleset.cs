@@ -9,6 +9,7 @@ using osu.Game.Screens.Play;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Modes
 {

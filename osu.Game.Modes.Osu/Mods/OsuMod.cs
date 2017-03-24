@@ -7,6 +7,7 @@ using osu.Game.Modes.Mods;
 using osu.Game.Modes.Osu.Objects;
 using System;
 using System.Linq;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Modes.Osu.Mods
 {
