@@ -16,21 +16,21 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
     {
         private Sprite icon;
 
+        protected override Framework.Graphics.Drawable CreateIcon()
+        {
+            return icon ?? (icon = new Sprite
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, TextureStore textures)
         {
             AccentColour = colours.YellowDark;
 
             icon.Texture = textures.Get(@"Play/Taiko/bash-hit-inner");
-        }
-
-        protected override Framework.Graphics.Drawable CreateIcon()
-        {
-            return icon = new Sprite
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            };
         }
     }
 }
