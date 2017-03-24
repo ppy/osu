@@ -8,12 +8,12 @@ namespace osu.Game.Modes.Taiko.Judgements
         /// <summary>
         /// Drum roll ticks don't display judgement text.
         /// </summary>
-        public override string ScoreString => string.Empty;
+        public override string ResultString => string.Empty;
 
         /// <summary>
         /// Drum roll ticks don't display judgement text.
         /// </summary>
-        public override string MaxScoreString => string.Empty;
+        public override string MaxResultString => string.Empty;
 
         protected override int NumericResultForScore(TaikoHitResult result)
         {
