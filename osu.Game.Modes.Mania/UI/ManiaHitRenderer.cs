@@ -5,12 +5,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Modes.Mania.Beatmaps;
 using osu.Game.Modes.Mania.Judgements;
 using osu.Game.Modes.Mania.Objects;
+using osu.Game.Modes.Mania.Scoring;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Scoring;
 using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Mania.UI
 {
-    public class ManiaHitRenderer : HitRenderer<ManiaBaseHit, ManiaJudgementInfo>
+    public class ManiaHitRenderer : HitRenderer<ManiaBaseHit, ManiaJudgement>
     {
         private readonly int columns;
 
@@ -26,8 +28,8 @@ namespace osu.Game.Modes.Mania.UI
 
         protected override IBeatmapProcessor<ManiaBaseHit> CreateBeatmapProcessor() => new ManiaBeatmapProcessor();
 
-        protected override Playfield<ManiaBaseHit, ManiaJudgementInfo> CreatePlayfield() => new ManiaPlayfield(columns);
+        protected override Playfield<ManiaBaseHit, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(columns);
 
-        protected override DrawableHitObject<ManiaBaseHit, ManiaJudgementInfo> GetVisualRepresentation(ManiaBaseHit h) => null;
+        protected override DrawableHitObject<ManiaBaseHit, ManiaJudgement> GetVisualRepresentation(ManiaBaseHit h) => null;
     }
 }

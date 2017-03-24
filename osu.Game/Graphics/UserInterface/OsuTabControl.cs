@@ -28,6 +28,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public OsuTabControl()
         {
+            TabContainer.Spacing = new Vector2(10f, 0f);
+
             if (!typeof(T).IsEnum)
                 throw new InvalidOperationException("OsuTabControl only supports enums as the generic type argument");
 
@@ -59,8 +61,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private class OsuTabItem : TabItem<T>
         {
-            private SpriteText text;
-            private Box box;
+            private readonly SpriteText text;
+            private readonly Box box;
 
             private Color4? accentColour;
             public Color4 AccentColour
@@ -142,7 +144,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                 text = new OsuSpriteText
                 {
-                    Margin = new MarginPadding(5),
+                    Margin = new MarginPadding { Top = 5, Bottom = 5 },
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     TextSize = 14,

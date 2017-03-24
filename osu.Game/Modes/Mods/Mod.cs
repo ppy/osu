@@ -6,6 +6,7 @@ using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
 using System;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Modes.Mods
 {

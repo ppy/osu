@@ -17,10 +17,12 @@ namespace osu.Game.Screens.Select
 {
     public class Footer : Container
     {
-        private Box modeLight;
+        private readonly Box modeLight;
 
         private const float play_song_select_button_width = 100;
         private const float play_song_select_button_height = 50;
+
+        public const float HEIGHT = 50;
 
         public const int TRANSITION_LENGTH = 300;
 
@@ -29,7 +31,7 @@ namespace osu.Game.Screens.Select
         public Action OnBack;
         public Action OnStart;
 
-        private FillFlowContainer buttons;
+        private readonly FillFlowContainer buttons;
 
         public OsuLogo StartButton;
 
@@ -69,10 +71,8 @@ namespace osu.Game.Screens.Select
         {
             AlwaysReceiveInput = true;
 
-            const float bottom_tool_height = 50;
-
             RelativeSizeAxes = Axes.X;
-            Height = bottom_tool_height;
+            Height = HEIGHT;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
