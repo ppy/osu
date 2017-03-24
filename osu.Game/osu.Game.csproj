@@ -366,6 +366,7 @@
     <Compile Include="Screens\Select\BeatmapDetailArea.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControlCheckBox.cs" />
     <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
+    <Compile Include="Overlays\PlaylistController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
