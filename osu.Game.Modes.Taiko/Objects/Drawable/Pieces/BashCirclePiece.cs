@@ -18,11 +18,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
 
         protected override Framework.Graphics.Drawable CreateIcon()
         {
-            return icon = new Sprite
+            return icon ?? (icon = new Sprite
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-            };
+            });
         }
 
         [BackgroundDependencyLoader]
