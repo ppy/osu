@@ -20,9 +20,10 @@ namespace osu.Game.Modes.Taiko.Objects
         public double PreEmpt;
 
         /// <summary>
-        /// Whether this HitObject is a finisher.
+        /// Whether this HitObject is accented.
+        /// Accented hit objects give more points for hitting the hit object with both keys.
         /// </summary>
-        public bool IsFinisher;
+        public bool Accented;
 
         /// <summary>
         /// Whether this HitObject is in Kiai time.

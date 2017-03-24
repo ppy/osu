@@ -134,7 +134,7 @@ namespace osu.Game.Modes.Taiko.Scoring
             hpIncreaseGood = hpMultiplierNormal * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, hp_hit_good_max, hp_hit_good, hp_hit_good);
             hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
 
-            var finishers = beatmap.HitObjects.FindAll(o => o is Hit && o.IsFinisher);
+            var finishers = beatmap.HitObjects.FindAll(o => o is Hit && o.Accented);
 
             // This is a linear function that awards:
             // 10 times bonus points for hitting a finisher with both keys with 30 finishers in the map
@@ -149,7 +149,7 @@ namespace osu.Game.Modes.Taiko.Scoring
                     {
                         Result = HitResult.Hit,
                         TaikoResult = TaikoHitResult.Great,
-                        SecondHit = obj.IsFinisher
+                        SecondHit = obj.Accented
                     });
                 }
                 else if (obj is DrumRoll)
@@ -160,7 +160,7 @@ namespace osu.Game.Modes.Taiko.Scoring
                         {
                             Result = HitResult.Hit,
                             TaikoResult = TaikoHitResult.Great,
-                            SecondHit = obj.IsFinisher
+                            SecondHit = obj.Accented
                         });
                     }
 
@@ -168,7 +168,7 @@ namespace osu.Game.Modes.Taiko.Scoring
                     {
                         Result = HitResult.Hit,
                         TaikoResult = TaikoHitResult.Great,
-                        SecondHit = obj.IsFinisher
+                        SecondHit = obj.Accented
                     });
                 }
                 else if (obj is Bash)
