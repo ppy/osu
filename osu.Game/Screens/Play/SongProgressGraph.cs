@@ -16,7 +16,6 @@ namespace osu.Game.Screens.Play
     public class SongProgressGraph : BufferedContainer
     {
         private Column[] columns = { };
-        private float lastDrawWidth;
 
         public int ColumnCount => columns.Length;
 
@@ -54,6 +53,7 @@ namespace osu.Game.Screens.Play
             PixelSnapping = true;
         }
 
+        private float lastDrawWidth;
         protected override void Update()
         {
             base.Update();
@@ -98,9 +98,7 @@ namespace osu.Game.Screens.Play
             if (values == null)
             {
                 for (float i = 0; i < ColumnCount; i++)
-                {
                     newValues.Add(0);
-                }
 
                 return;
             }
@@ -192,9 +190,9 @@ namespace osu.Game.Screens.Play
                         Size = new Vector2(cube_size),
                         Position = new Vector2(0, r * WIDTH + padding),
                     });
-
-                    Add(drawableRows[drawableRows.Count - 1]);
                 }
+
+                Children = drawableRows;
 
                 // Reverse drawableRows so when iterating through them they start at the bottom
                 drawableRows.Reverse();
@@ -207,13 +205,9 @@ namespace osu.Game.Screens.Play
                 for (int i = 0; i < drawableRows.Count; i++)
                 {
                     if (Filled == 0) // i <= Filled doesn't work for zero fill
-                    {
                         drawableRows[i].Colour = emptyColour;
-                    }
                     else
-                    {
                         drawableRows[i].Colour = i <= Filled ? colour : emptyColour;
-                    }
                 }
             }
         }
