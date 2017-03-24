@@ -42,20 +42,9 @@ namespace osu.Game.Modes.Taiko.Scoring
         private const double hp_hit_great = 0.03;
 
         /// <summary>
-        /// The minimum HP awarded for a <see cref="TaikoHitResult.Good"/> hit.
-        /// This occurs when HP Drain >= 5.
+        /// The HP awarded for a <see cref="TaikoHitResult.Good"/> hit.
         /// </summary>
-        private const double hp_hit_good_min = 0.011;
-
-        /// <summary>
-        /// The maximum HP awarded for a <see cref="TaikoHitResult.Good"/> hit.
-        /// This occurs when HP Drain = 0.
-        /// <para>
-        /// Yes, this is incorrect, and goods at HP = 0 will award more HP than greats.
-        /// This is legacy and should be fixed, but is kept as is for now for compatibility.
-        /// </para>
-        /// </summary>
-        private const double hp_hit_good_max = hp_hit_good_min * 8;
+        private const double hp_hit_good = 0.011;
 
         /// <summary>
         /// The minimum HP deducted for a <see cref="HitResult.Miss"/>.
@@ -136,7 +125,7 @@ namespace osu.Game.Modes.Taiko.Scoring
 
             hpIncreaseTick = hp_hit_tick;
             hpIncreaseGreat = hpMultiplierNormal * hp_hit_great;
-            hpIncreaseGood = hpMultiplierNormal * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, hp_hit_good_max, hp_hit_good_min, hp_hit_good_min);
+            hpIncreaseGood = hpMultiplierNormal * hp_hit_good;
             hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
 
             var accentedHits = beatmap.HitObjects.FindAll(o => o is Hit && o.Accented);
