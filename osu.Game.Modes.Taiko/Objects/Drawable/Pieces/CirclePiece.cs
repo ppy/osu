@@ -14,8 +14,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
     /// <summary>
     /// A circle piece which is used uniformly through osu!taiko to visualise hitobjects.
     /// <para>
-    /// The body of this piece will overshoot it by <see cref="CirclePiece.Height"/> to form 
-    /// a rounded (_[-Width-]_) figure such that a regular "circle" is the result of setting Width to 0.
+    /// The body of this piece will overshoot its parent by <see cref="CirclePiece.Height"/> to form 
+    /// a rounded (_[-Width-]_) figure such that a regular "circle" is the result of a parent with Width = 0.
     /// </para>
     /// </summary>
     public class CirclePiece : Container
@@ -71,6 +71,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
 
         public CirclePiece()
         {
+            RelativeSizeAxes = Axes.X;
             Height = TaikoHitObject.CIRCLE_RADIUS * 2;
 
             // The "inner layer" is the body of the CirclePiece that overshoots it by Height/2 px on both sides
