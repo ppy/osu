@@ -19,8 +19,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         private double firstHitTime;
         private Key firstHitKey;
 
-        protected DrawableHitFinisher(TaikoHitObject hitObject)
-            : base(hitObject)
+        protected DrawableHitFinisher(Hit hit)
+            : base(hit)
         {
         }
 

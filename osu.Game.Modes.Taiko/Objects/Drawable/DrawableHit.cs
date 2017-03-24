@@ -21,38 +21,41 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// A list of keys which this hit object will accept. These are the standard Taiko keys for now.
         /// These should be moved to bindings later.
         /// </summary>
-        private List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
+        private readonly List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
+
+        private readonly Hit hit;
 
         /// <summary>
         /// Whether the last key pressed is a valid hit key.
         /// </summary>
         private bool validKeyPressed;
 
-        protected DrawableHit(TaikoHitObject hitObject)
-            : base(hitObject)
+        protected DrawableHit(Hit hit)
+            : base(hit)
         {
+            this.hit = hit;
         }
 
         protected override void CheckJudgement(bool userTriggered)
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > HitObject.HitWindowGood)
+                if (Judgement.TimeOffset > hit.HitWindowGood)
                     Judgement.Result = HitResult.Miss;
                 return;
             }
 
             double hitOffset = Math.Abs(Judgement.TimeOffset);
 
-            if (hitOffset > HitObject.HitWindowMiss)
+            if (hitOffset > hit.HitWindowMiss)
                 return;
 
             if (!validKeyPressed)
                 Judgement.Result = HitResult.Miss;
-            else if (hitOffset < HitObject.HitWindowGood)
+            else if (hitOffset < hit.HitWindowGood)
             {
                 Judgement.Result = HitResult.Hit;
-                Judgement.TaikoResult = hitOffset < HitObject.HitWindowGreat ? TaikoHitResult.Great : TaikoHitResult.Good;
+                Judgement.TaikoResult = hitOffset < hit.HitWindowGreat ? TaikoHitResult.Great : TaikoHitResult.Good;
             }
             else
                 Judgement.Result = HitResult.Miss;
