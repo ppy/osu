@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Play
                 hitRenderer.InputManager.ReplayInputHandler = ReplayInputHandler;
 
             hudOverlay.BindHitRenderer(hitRenderer);
-            hudOverlay.Progress.Length = Beatmap.Track.Length;
+            hudOverlay.Progress.Length = Beatmap?.Track?.Length ?? 0;
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             hitRenderer.OnAllJudged += onCompletion;
