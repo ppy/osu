@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Toolbar
 {
     internal class ToolbarOverlayToggleButton : ToolbarButton
     {
-        private Box stateBackground;
+        private readonly Box stateBackground;
 
         private OverlayContainer stateContainer;
 

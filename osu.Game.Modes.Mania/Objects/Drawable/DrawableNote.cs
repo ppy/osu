@@ -26,7 +26,7 @@ namespace osu.Game.Modes.Mania.Objects.Drawable
         {
             Texture = textures.Get(@"Menu/logo");
 
-            double duration = 0;
+            const double duration = 0;
 
             Transforms.Add(new TransformPositionY { StartTime = note.StartTime - 200, EndTime = note.StartTime, StartValue = -0.1f, EndValue = 0.9f });
             Transforms.Add(new TransformAlpha { StartTime = note.StartTime + duration + 200, EndTime = note.StartTime + duration + 400, StartValue = 1, EndValue = 0 });

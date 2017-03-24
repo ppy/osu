@@ -9,7 +9,7 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetMessagesRequest : APIRequest<List<Message>>
     {
-        private List<Channel> channels;
+        private readonly List<Channel> channels;
         private long? since;
 
         public GetMessagesRequest(List<Channel> channels, long? sinceId)

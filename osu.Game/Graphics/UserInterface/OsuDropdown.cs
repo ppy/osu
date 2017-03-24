@@ -85,7 +85,7 @@ namespace osu.Game.Graphics.UserInterface
 
             private Color4? accentColour;
 
-            private TextAwesome chevron;
+            private readonly TextAwesome chevron;
 
             protected override void FormatForeground(bool hover = false)
             {
@@ -116,7 +116,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected class OsuDropdownHeader : DropdownHeader
         {
-            private SpriteText label;
+            private readonly SpriteText label;
             protected override string Label
             {
                 get { return label.Text; }

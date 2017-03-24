@@ -17,7 +17,7 @@ namespace osu.Game.Modes.Taiko.Objects
         /// <summary>
         /// The number of hits required to complete the bash successfully.
         /// </summary>
-        public int RequiredHits;
+        public int RequiredHits { get; protected set; }
 
         public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
         {

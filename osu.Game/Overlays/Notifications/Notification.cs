@@ -35,9 +35,9 @@ namespace osu.Game.Overlays.Notifications
         public virtual bool DisplayOnTop => true;
 
         protected NotificationLight Light;
-        private CloseButton closeButton;
+        private readonly CloseButton closeButton;
         protected Container IconContent;
-        private Container content;
+        private readonly Container content;
 
         protected override Container<Drawable> Content => content;
 
