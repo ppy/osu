@@ -12,7 +12,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
     /// A scrolling circle piece must always have a centre-left origin due to how scroll position is calculated.
     /// </para>
     /// </summary>
-    public class ScrollingCirclePiece : Container
+    public class ScrollingPiece : Container
     {
         public override Anchor Origin => Anchor.CentreLeft;
     }
