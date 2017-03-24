@@ -17,6 +17,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             Origin = Anchor.Centre;
 
             RelativePositionAxes = Axes.X;
+
+            Children = new[]
+            {
+                CreateCircle()
+            };
         }
 
         protected override void LoadComplete()
