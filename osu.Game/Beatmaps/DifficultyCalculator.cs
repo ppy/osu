@@ -15,8 +15,8 @@ namespace osu.Game.Beatmaps
         private void loadTiming()
         {
             // TODO: Handle mods
-            int audioRate = 100;
-            TimeRate = audioRate / 100.0;
+            const int audio_rate = 100;
+            TimeRate = audio_rate / 100.0;
         }
 
         public double Calculate(Dictionary<string, string> categoryDifficulty = null)

@@ -3,11 +3,11 @@
 
 using System;
 using Newtonsoft.Json;
-using osu.Game.Users;
 using osu.Game.Database;
 using osu.Game.Modes.Mods;
+using osu.Game.Users;
 
-namespace osu.Game.Modes
+namespace osu.Game.Modes.Scoring
 {
     public class Score
     {

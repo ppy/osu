@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Tournament.Components
             }
         }
 
-        private List<VisualiserLine> allLines = new List<VisualiserLine>();
+        private readonly List<VisualiserLine> allLines = new List<VisualiserLine>();
 
         private float offset;
 

@@ -195,6 +195,7 @@
     <Compile Include="Tests\TestCaseScoreCounter.cs" />
     <Compile Include="Tests\TestCaseTabControl.cs" />
     <Compile Include="Tests\TestCaseTaikoHitObjects.cs" />
+    <Compile Include="Tests\TestCaseTaikoPlayfield.cs" />
     <Compile Include="Tests\TestCaseTextAwesome.cs" />
     <Compile Include="Tests\TestCasePlaySongSelect.cs" />
     <Compile Include="Tests\TestCaseTwoLayerButton.cs" />
@@ -207,6 +208,7 @@
     <Compile Include="Tests\TestCaseBeatmapOptionsOverlay.cs" />
     <Compile Include="Tests\TestCaseLeaderboard.cs" />
     <Compile Include="Beatmaps\TestWorkingBeatmap.cs" />
+    <Compile Include="Tests\TestCaseBeatmapDetailArea.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

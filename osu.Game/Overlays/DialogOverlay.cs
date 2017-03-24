@@ -13,7 +13,7 @@ namespace osu.Game.Overlays
 {
     public class DialogOverlay : FocusedOverlayContainer
     {
-        private Container dialogContainer;
+        private readonly Container dialogContainer;
         private PopupDialog currentDialog;
 
         public void Push(PopupDialog dialog)

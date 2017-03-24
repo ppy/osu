@@ -12,6 +12,8 @@ using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Modes.Osu.Scoring;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Modes.Osu
 {

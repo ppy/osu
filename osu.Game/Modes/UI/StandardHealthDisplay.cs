@@ -15,7 +15,7 @@ namespace osu.Game.Modes.UI
 {
     public class StandardHealthDisplay : HealthDisplay
     {
-        private Container fill;
+        private readonly Container fill;
 
         public StandardHealthDisplay()
         {
