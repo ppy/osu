@@ -2,10 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics;
+using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -26,7 +31,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Reset();
             });
 
-            Add(new CentreHitCircle(new CirclePiece(@"centre")
+            Add(new CentreHitCircle(new CirclePiece()
             {
                 KiaiMode = kiai
             })
@@ -34,7 +39,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(100, 100)
             });
 
-            Add(new CentreHitCircle(new AccentedCirclePiece(@"centre")
+            Add(new CentreHitCircle(new AccentedCirclePiece()
             {
                 KiaiMode = kiai
             })
@@ -42,7 +47,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(350, 100)
             });
 
-            Add(new RimHitCircle(new CirclePiece(@"rim")
+            Add(new RimHitCircle(new CirclePiece()
             {
                 KiaiMode = kiai
             })
@@ -50,7 +55,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(100, 300)
             });
 
-            Add(new RimHitCircle(new AccentedCirclePiece(@"rim")
+            Add(new RimHitCircle(new AccentedCirclePiece()
             {
                 KiaiMode = kiai
             })
@@ -58,7 +63,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(350, 300)
             });
 
-            Add(new SwellCircle(new CirclePiece(@"swell")
+            Add(new SwellCircle(new CirclePiece()
             {
                 KiaiMode = kiai
             })
@@ -66,7 +71,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(100, 500)
             });
 
-            Add(new SwellCircle(new AccentedCirclePiece(@"swell")
+            Add(new SwellCircle(new AccentedCirclePiece()
             {
                 KiaiMode = kiai
             })
@@ -74,7 +79,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(350, 500)
             });
 
-            Add(new DrumRollCircle(new CirclePiece(string.Empty)
+            Add(new DrumRollCircle(new CirclePiece()
             {
                 Width = 250,
                 KiaiMode = kiai
@@ -83,7 +88,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(575, 100)
             });
 
-            Add(new DrumRollCircle(new AccentedCirclePiece(string.Empty)
+            Add(new DrumRollCircle(new AccentedCirclePiece()
             {
                 Width = 250,
                 KiaiMode = kiai
@@ -95,13 +100,22 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class SwellCircle : BaseCircle
         {
+            private const float symbol_size = TaikoHitObject.CIRCLE_RADIUS * 2f * 0.35f;
+
             public SwellCircle(CirclePiece piece)
                 : base(piece)
             {
+                Piece.Add(new TextAwesome
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    TextSize = symbol_size,
+                    Shadow = false
+                });
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, TextureStore textures)
             {
                 Piece.AccentColour = colours.YellowDark;
             }
@@ -123,9 +137,25 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class CentreHitCircle : BaseCircle
         {
+            private const float symbol_size = TaikoHitObject.CIRCLE_RADIUS * 2f * 0.35f;
+
             public CentreHitCircle(CirclePiece piece)
                 : base(piece)
             {
+                Piece.Add(new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(symbol_size),
+                    Masking = true,
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }
+                    }
+                });
             }
 
             [BackgroundDependencyLoader]
@@ -137,9 +167,29 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class RimHitCircle : BaseCircle
         {
+            private const float symbol_size = TaikoHitObject.CIRCLE_RADIUS * 2f * 0.45f;
+
             public RimHitCircle(CirclePiece piece)
                 : base(piece)
             {
+                Piece.Add(new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(symbol_size),
+                    BorderThickness = 8,
+                    BorderColour = Color4.White,
+                    Masking = true,
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        }
+                    }
+                });
             }
 
             [BackgroundDependencyLoader]

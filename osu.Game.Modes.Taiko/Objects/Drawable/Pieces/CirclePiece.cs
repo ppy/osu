@@ -7,8 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Backgrounds;
 using OpenTK.Graphics;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Allocation;
 using System;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
@@ -63,18 +61,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
             set { throw new InvalidOperationException($"{nameof(CirclePiece)} must always use CentreLeft origin."); }
         }
 
+        protected override Container<Framework.Graphics.Drawable> Content => SymbolContainer;
+        protected readonly Container SymbolContainer;
+
         private readonly Container innerLayer;
         private readonly Container innerCircleContainer;
         private readonly Box innerBackground;
         private readonly Triangles triangles;
-        private readonly Sprite symbol;
 
-        private readonly string symbolName;
-
-        public CirclePiece(string symbolName)
+        public CirclePiece()
         {
-            this.symbolName = symbolName;
-
             Height = TaikoHitObject.CIRCLE_RADIUS * 2;
 
             // The "inner layer" is the body of the CirclePiece that overshoots it by Height/2 px on both sides
@@ -130,22 +126,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                             }
                         }
                     },
-                    symbol = new Sprite
+                    SymbolContainer = new Container
                     {
                         Name = "Symbol",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both
                     }
                 }
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            if (!string.IsNullOrEmpty(symbolName))
-                symbol.Texture = textures.Get($@"Play/Taiko/{symbolName}-symbol");
         }
 
         protected override void Update()
