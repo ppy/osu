@@ -3,9 +3,9 @@
 
 using osu.Game.Modes.Judgements;
 
-namespace osu.Game.Modes.Mania.Judgements
+namespace osu.Game.Modes.Catch.Judgements
 {
-    public class ManiaJudgementInfo : JudgementInfo
+    public class CatchJudgement : Judgement
     {
         public override string ScoreString => string.Empty;
 

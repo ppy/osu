@@ -7,7 +7,7 @@ using osu.Game.Modes.Osu.Judgements;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
-    public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject, OsuJudgementInfo>
+    public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject, OsuJudgement>
     {
         public const float TIME_PREEMPT = 600;
         public const float TIME_FADEIN = 400;
@@ -19,7 +19,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             AccentColour = HitObject.ComboColour;
         }
 
-        protected override OsuJudgementInfo CreateJudgementInfo() => new OsuJudgementInfo { MaxScore = OsuScoreResult.Hit300 };
+        protected override OsuJudgement CreateJudgement() => new OsuJudgement { MaxScore = OsuScoreResult.Hit300 };
 
         protected override void UpdateState(ArmedState state)
         {

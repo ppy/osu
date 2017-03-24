@@ -15,21 +15,21 @@ using osu.Game.Modes.Objects.Drawables;
 namespace osu.Game.Modes.Judgements
 {
     /// <summary>
-    /// A drawable object which visualises the hit result of a <see cref="JudgementInfo"/>.
+    /// A drawable object which visualises the hit result of a <see cref="Judgements.Judgement"/>.
     /// </summary>
     /// <typeparam name="TJudgement">The type of judgement to visualise.</typeparam>
-    public class DrawableJudgementInfo<TJudgement> : Container
-        where TJudgement : JudgementInfo
+    public class DrawableJudgement<TJudgement> : Container
+        where TJudgement : Judgement
     {
         protected readonly TJudgement Judgement;
 
         protected readonly SpriteText JudgementText;
 
         /// <summary>
-        /// Creates a drawable which visualises a <see cref="JudgementInfo"/>.
+        /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
         /// <param name="judgement">The judgement to visualise.</param>
-        public DrawableJudgementInfo(TJudgement judgement)
+        public DrawableJudgement(TJudgement judgement)
         {
             Judgement = judgement;
 
@@ -83,8 +83,8 @@ namespace osu.Game.Modes.Judgements
                     ScaleTo(0.9f);
                     ScaleTo(1, 500, EasingTypes.OutElastic);
 
-                    Delay(250);
-                    FadeOut(250, EasingTypes.OutQuint);
+                    Delay(100);
+                    FadeOut(400);
                     break;
             }
 

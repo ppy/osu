@@ -96,7 +96,7 @@
     <Compile Include="IO\Legacy\SerializationReader.cs" />
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
-    <Compile Include="Modes\Judgements\DrawableJudgementInfo.cs" />
+    <Compile Include="Modes\Judgements\DrawableJudgement.cs" />
     <Compile Include="Modes\LegacyReplay.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
@@ -113,7 +113,7 @@
     <Compile Include="Modes\Objects\SliderCurve.cs" />
     <Compile Include="Modes\Objects\Types\CurveType.cs" />
     <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
-    <Compile Include="Modes\Judgements\JudgementInfo.cs" />
+    <Compile Include="Modes\Judgements\Judgement.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Modes\Objects\Types\IHasCombo.cs" />
     <Compile Include="Modes\Objects\Types\IHasEndTime.cs" />

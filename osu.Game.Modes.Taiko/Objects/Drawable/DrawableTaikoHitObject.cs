@@ -7,7 +7,7 @@ using osu.Game.Modes.Taiko.Judgements;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
-    public abstract class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject, TaikoJudgementInfo>
+    public abstract class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject, TaikoJudgement>
     {
         protected DrawableTaikoHitObject(TaikoHitObject hitObject)
             : base(hitObject)
@@ -26,7 +26,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             base.LoadComplete();
         }
 
-        protected override TaikoJudgementInfo CreateJudgementInfo() => new TaikoJudgementInfo();
+        protected override TaikoJudgement CreateJudgement() => new TaikoJudgement();
 
         /// <summary>
         /// Sets the scroll position of the DrawableHitObject relative to the offset between

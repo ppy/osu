@@ -8,13 +8,13 @@ using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Osu
 {
-    internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject, OsuJudgementInfo>
+    internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject, OsuJudgement>
     {
         public OsuScoreProcessor()
         {
         }
 
-        public OsuScoreProcessor(HitRenderer<OsuHitObject, OsuJudgementInfo> hitRenderer)
+        public OsuScoreProcessor(HitRenderer<OsuHitObject, OsuJudgement> hitRenderer)
             : base(hitRenderer)
         {
         }
@@ -27,7 +27,7 @@ namespace osu.Game.Modes.Osu
             Accuracy.Value = 1;
         }
 
-        protected override void UpdateCalculations(OsuJudgementInfo judgement)
+        protected override void UpdateCalculations(OsuJudgement judgement)
         {
             if (judgement != null)
             {
@@ -47,9 +47,8 @@ namespace osu.Game.Modes.Osu
             int score = 0;
             int maxScore = 0;
 
-            foreach (var judgementInfo in Judgements)
+            foreach (var j in Judgements)
             {
-                var j = judgementInfo;
                 score += j.ScoreValue;
                 maxScore += j.MaxScoreValue;
             }
