@@ -21,7 +21,7 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseHitObjects : TestCase
     {
-        private FramedClock framedClock;
+        private readonly FramedClock framedClock;
 
         private bool auto;
 
@@ -34,7 +34,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private HitObjectType mode = HitObjectType.Slider;
 
-        private BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
+        private readonly BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
         private Container playfieldContainer;
         private Container approachContainer;
 
@@ -136,7 +136,7 @@ namespace osu.Desktop.VisualTests.Tests
             if (auto)
             {
                 h.State = ArmedState.Hit;
-                h.Judgement = new OsuJudgementInfo { Result = HitResult.Hit };
+                h.Judgement = new OsuJudgement { Result = HitResult.Hit };
             }
 
             playfieldContainer.Add(h);

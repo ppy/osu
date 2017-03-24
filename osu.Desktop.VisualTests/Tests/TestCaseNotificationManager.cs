@@ -95,7 +95,7 @@ namespace osu.Desktop.VisualTests.Tests
             progressingNotifications.Add(n);
         }
 
-        private List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
+        private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
 
         private void sendProgress1()
         {

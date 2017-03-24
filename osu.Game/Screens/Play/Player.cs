@@ -23,6 +23,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Screens.Play
 {
@@ -42,10 +43,10 @@ namespace osu.Game.Screens.Play
 
         public int RestartCount;
 
-        private double pauseCooldown = 1000;
+        private const double pause_cooldown = 1000;
         private double lastPauseActionTime;
 
-        private bool canPause => Time.Current >= lastPauseActionTime + pauseCooldown;
+        private bool canPause => Time.Current >= lastPauseActionTime + pause_cooldown;
 
         private IAdjustableClock sourceClock;
         private IFrameBasedClock interpolatedSourceClock;

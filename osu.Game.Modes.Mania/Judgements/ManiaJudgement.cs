@@ -5,7 +5,10 @@ using osu.Game.Modes.Judgements;
 
 namespace osu.Game.Modes.Mania.Judgements
 {
-    public class ManiaJudgementInfo : JudgementInfo
+    public class ManiaJudgement : Judgement
     {
+        public override string ResultString => string.Empty;
+
+        public override string MaxResultString => string.Empty;
     }
 }

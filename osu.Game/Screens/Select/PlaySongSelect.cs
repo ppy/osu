@@ -4,6 +4,7 @@
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -17,16 +18,22 @@ namespace osu.Game.Screens.Select
     public class PlaySongSelect : SongSelect
     {
         private OsuScreen player;
-        private ModSelectOverlay modSelect;
+        private readonly ModSelectOverlay modSelect;
+        private readonly BeatmapDetailArea beatmapDetails;
 
         public PlaySongSelect()
         {
-            Add(modSelect = new ModSelectOverlay
+            FooterPanels.Add(modSelect = new ModSelectOverlay
             {
                 RelativeSizeAxes = Axes.X,
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.BottomCentre,
-                Margin = new MarginPadding { Bottom = 50 }
+            });
+
+            LeftContent.Add(beatmapDetails = new BeatmapDetailArea
+            {
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding { Top = 10, Right = 5 },
             });
         }
 
@@ -47,6 +54,9 @@ namespace osu.Game.Screens.Select
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
+
+            beatmapDetails.Beatmap = beatmap;
+
             base.OnBeatmapChanged(beatmap);
         }
 
@@ -54,6 +64,17 @@ namespace osu.Game.Screens.Select
         {
             player = null;
             base.OnResuming(last);
+        }
+
+        protected override bool OnExiting(Screen next)
+        {
+            if (modSelect.State == Visibility.Visible)
+            {
+                modSelect.Hide();
+                return true;
+            }
+
+            return base.OnExiting(next);
         }
 
         protected override void OnSelected()

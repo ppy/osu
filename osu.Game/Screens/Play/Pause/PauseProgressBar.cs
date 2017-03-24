@@ -13,10 +13,10 @@ namespace osu.Game.Screens.Play.Pause
 {
     public class PauseProgressBar : Container
     {
-        private Color4 fillColour = new Color4(221, 255, 255, 255);
-        private Color4 glowColour = new Color4(221, 255, 255, 150);
+        private readonly Color4 fillColour = new Color4(221, 255, 255, 255);
+        private readonly Color4 glowColour = new Color4(221, 255, 255, 150);
 
-        private Container fill;
+        private readonly Container fill;
         private WorkingBeatmap current;
 
         [BackgroundDependencyLoader]
