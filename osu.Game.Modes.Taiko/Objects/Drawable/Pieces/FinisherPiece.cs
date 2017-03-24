@@ -11,9 +11,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
     /// Finisher hitobjects are 1.5x larger, while maintaining the same length.
     /// </para>
     /// </summary>
-    public class FinisherPiece : ScrollingCirclePiece
+    public class FinisherPiece : ScrollingPiece
     {
-        public FinisherPiece(ScrollingCirclePiece original)
+        public FinisherPiece(ScrollingPiece original)
         {
             // First we scale the note up
             Scale = new Vector2(1.5f);
