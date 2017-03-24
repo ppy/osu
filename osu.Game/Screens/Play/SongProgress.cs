@@ -19,8 +19,8 @@ namespace osu.Game.Screens.Play
         private readonly Vector2 handleSize = new Vector2(14, 25);
         private const float transition_duration = 200;
 
-        private SongProgressBar bar;
-        private SongProgressGraph graph;
+        private readonly SongProgressBar bar;
+        private readonly SongProgressGraph graph;
 
         public Action<double> OnSeek;
 
