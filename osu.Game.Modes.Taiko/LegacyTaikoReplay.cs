@@ -11,6 +11,10 @@ namespace osu.Game.Modes.Taiko
 {
     public class LegacyTaikoReplay : LegacyReplay
     {
+        protected LegacyTaikoReplay()
+        {
+        }
+
         public LegacyTaikoReplay(StreamReader reader)
             : base(reader)
         {
