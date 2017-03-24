@@ -46,11 +46,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
 
         public override Vector2 Size => new Vector2(base.Size.X, 128);
 
-        private Container innerLayer;
-        private Container backingGlowContainer;
-        private Container innerCircleContainer;
-        private Box innerBackground;
-        private Triangles triangles;
+        private readonly Container innerLayer;
+        private readonly Container backingGlowContainer;
+        private readonly Container innerCircleContainer;
+        private readonly Box innerBackground;
+        private readonly Triangles triangles;
 
         protected CirclePiece()
         {
