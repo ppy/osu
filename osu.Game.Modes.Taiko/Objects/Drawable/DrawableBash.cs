@@ -23,7 +23,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// </summary>
         private int userHits;
 
-        private Bash bash;
+        private readonly Bash bash;
 
         public DrawableBash(Bash bash)
             : base(bash)
@@ -59,6 +59,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 else
                     Judgement.Result = HitResult.Miss;
             }
+        }
+
+        protected override void UpdateState(ArmedState state)
+        {
         }
 
         protected override void UpdateScrollPosition(double time)
