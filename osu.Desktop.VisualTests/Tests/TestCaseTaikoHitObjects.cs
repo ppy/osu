@@ -81,19 +81,19 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(new DrumRollCircle(new CirclePiece()
             {
-                Width = 250,
                 KiaiMode = kiai
             })
             {
+                Width = 250,
                 Position = new Vector2(575, 100)
             });
 
             Add(new DrumRollCircle(new AccentedCirclePiece()
             {
-                Width = 250,
                 KiaiMode = kiai
             })
             {
+                Width = 250,
                 Position = new Vector2(575, 300)
             });
         }
