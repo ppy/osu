@@ -49,6 +49,13 @@
   <ItemGroup>
     <Compile Include="Beatmaps\TaikoBeatmapConverter.cs" />
     <Compile Include="Beatmaps\TaikoBeatmapProcessor.cs" />
+    <Compile Include="Objects\Drawable\Pieces\BashCirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\CentreHitCirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\CirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\DrumRollCirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\FinisherPiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\RimHitCirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\ScrollingPiece.cs" />
     <Compile Include="Judgements\TaikoDrumRollTickJudgement.cs" />
     <Compile Include="Judgements\TaikoJudgement.cs" />
     <Compile Include="Judgements\TaikoHitResult.cs" />
