@@ -49,6 +49,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             UpdateScrollPosition(Time.Current);
         }
 
-        protected abstract ScrollingPiece CreateCircle();
+        protected abstract CirclePiece CreateCircle();
     }
 }
