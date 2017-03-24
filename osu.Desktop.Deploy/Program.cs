@@ -53,7 +53,7 @@ namespace osu.Desktop.Deploy
         private static string nupkgFilename(string ver) => $"{PackageName}.{ver}.nupkg";
         private static string nupkgDistroFilename(string ver) => $"{PackageName}-{ver}-full.nupkg";
 
-        private static Stopwatch sw = new Stopwatch();
+        private static readonly Stopwatch sw = new Stopwatch();
 
         private static string codeSigningPassword;
 

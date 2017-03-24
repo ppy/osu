@@ -7,5 +7,7 @@ namespace osu.Game.Users
     {
         public int Id;
         public string Username;
+        public Country Country;
+        public Team Team;
     }
 }

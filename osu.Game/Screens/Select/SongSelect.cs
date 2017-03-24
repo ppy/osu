@@ -31,16 +31,21 @@ namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen
     {
-        private Bindable<PlayMode> playMode = new Bindable<PlayMode>();
+        private readonly Bindable<PlayMode> playMode = new Bindable<PlayMode>();
         private BeatmapDatabase database;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
-        private BeatmapCarousel carousel;
+        private readonly BeatmapCarousel carousel;
         private TrackManager trackManager;
         private DialogOverlay dialogOverlay;
 
-        private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 225);
-        private BeatmapInfoWedge beatmapInfoWedge;
+        private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
+
+        private const float left_area_padding = 20;
+
+        private readonly BeatmapInfoWedge beatmapInfoWedge;
+
+        protected Container LeftContent;
 
         private static readonly Vector2 background_blur = new Vector2(20);
         private CancellationTokenSource initialAddSetsTask;
@@ -59,6 +64,12 @@ namespace osu.Game.Screens.Select
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
         protected readonly Footer Footer;
+
+        /// <summary>
+        /// Contains any panel which is triggered by a footer button.
+        /// Helps keep them located beneath the footer itself.
+        /// </summary>
+        protected readonly Container FooterPanels;
 
         public readonly FilterControl FilterControl;
 
@@ -79,6 +90,20 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Right = carousel_width * 0.76f },
                     }
+                }
+            });
+            Add(LeftContent = new Container
+            {
+                Origin = Anchor.BottomLeft,
+                Anchor = Anchor.BottomLeft,
+                RelativeSizeAxes = Axes.Both,
+                Size = new Vector2(wedged_container_size.X, 1),
+                Padding = new MarginPadding
+                {
+                    Bottom = 50,
+                    Top = wedged_container_size.Y + left_area_padding,
+                    Left = left_area_padding,
+                    Right = left_area_padding * 2,
                 }
             });
             Add(carousel = new BeatmapCarousel
@@ -104,19 +129,23 @@ namespace osu.Game.Screens.Select
                 RelativeSizeAxes = Axes.X,
                 Margin = new MarginPadding
                 {
-                    Top = 20,
-                    Right = 20,
+                    Top = left_area_padding,
+                    Right = left_area_padding,
                 },
                 X = -50,
             });
 
             if (ShowFooter)
             {
-                Add(BeatmapOptions = new BeatmapOptionsOverlay
+                Add(FooterPanels = new Container
                 {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Margin = new MarginPadding
                     {
-                        Bottom = 50,
+                        Bottom = Footer.HEIGHT,
                     },
                 });
                 Add(Footer = new Footer
@@ -124,6 +153,8 @@ namespace osu.Game.Screens.Select
                     OnBack = Exit,
                     OnStart = raiseSelect,
                 });
+
+                FooterPanels.Add(BeatmapOptions = new BeatmapOptionsOverlay());
             }
         }
 

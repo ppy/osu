@@ -7,12 +7,14 @@ using osu.Game.Modes.Osu.Beatmaps;
 using osu.Game.Modes.Osu.Judgements;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
+using osu.Game.Modes.Osu.Scoring;
+using osu.Game.Modes.Scoring;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Modes.Osu.UI
 {
-    public class OsuHitRenderer : HitRenderer<OsuHitObject, OsuJudgementInfo>
+    public class OsuHitRenderer : HitRenderer<OsuHitObject, OsuJudgement>
     {
         public OsuHitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
@@ -25,11 +27,11 @@ namespace osu.Game.Modes.Osu.UI
 
         protected override IBeatmapProcessor<OsuHitObject> CreateBeatmapProcessor() => new OsuBeatmapProcessor();
 
-        protected override Playfield<OsuHitObject, OsuJudgementInfo> CreatePlayfield() => new OsuPlayfield();
+        protected override Playfield<OsuHitObject, OsuJudgement> CreatePlayfield() => new OsuPlayfield();
 
         protected override KeyConversionInputManager CreateKeyConversionInputManager() => new OsuKeyConversionInputManager();
 
-        protected override DrawableHitObject<OsuHitObject, OsuJudgementInfo> GetVisualRepresentation(OsuHitObject h)
+        protected override DrawableHitObject<OsuHitObject, OsuJudgement> GetVisualRepresentation(OsuHitObject h)
         {
             var circle = h as HitCircle;
             if (circle != null)
