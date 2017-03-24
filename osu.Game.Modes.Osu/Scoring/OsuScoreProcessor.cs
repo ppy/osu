@@ -28,7 +28,7 @@ namespace osu.Game.Modes.Osu.Scoring
             Accuracy.Value = 1;
         }
 
-        protected override void UpdateCalculations(OsuJudgement judgement)
+        protected override void OnNewJugement(OsuJudgement judgement)
         {
             if (judgement != null)
             {

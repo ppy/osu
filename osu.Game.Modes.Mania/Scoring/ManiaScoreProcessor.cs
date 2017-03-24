@@ -19,7 +19,7 @@ namespace osu.Game.Modes.Mania.Scoring
         {
         }
 
-        protected override void UpdateCalculations(ManiaJudgement newJudgement)
+        protected override void OnNewJugement(ManiaJudgement judgement)
         {
         }
     }
