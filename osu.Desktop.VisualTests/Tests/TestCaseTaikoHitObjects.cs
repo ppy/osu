@@ -6,6 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics;
@@ -99,8 +100,6 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class SwellCircle : BaseCircle
         {
-            private const float symbol_size = TaikoHitObject.CIRCLE_RADIUS * 2f * 0.35f;
-
             public SwellCircle(CirclePiece piece)
                 : base(piece)
             {
@@ -108,7 +107,8 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    TextSize = symbol_size,
+                    TextSize = SYMBOL_INNER_SIZE,
+                    Icon = FontAwesome.fa_asterisk,
                     Shadow = false
                 });
             }
@@ -136,8 +136,6 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class CentreHitCircle : BaseCircle
         {
-            private const float symbol_size = TaikoHitObject.CIRCLE_RADIUS * 2f * 0.35f;
-
             public CentreHitCircle(CirclePiece piece)
                 : base(piece)
             {
@@ -145,7 +143,7 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(symbol_size),
+                    Size = new Vector2(SYMBOL_INNER_SIZE),
                     Masking = true,
                     Children = new[]
                     {
@@ -166,8 +164,6 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class RimHitCircle : BaseCircle
         {
-            private const float symbol_size = TaikoHitObject.CIRCLE_RADIUS * 2f * 0.45f;
-
             public RimHitCircle(CirclePiece piece)
                 : base(piece)
             {
@@ -175,8 +171,8 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(symbol_size),
-                    BorderThickness = 8,
+                    Size = new Vector2(SYMBOL_SIZE),
+                    BorderThickness = SYMBOL_BORDER,
                     BorderColour = Color4.White,
                     Masking = true,
                     Children = new[]
@@ -200,6 +196,10 @@ namespace osu.Desktop.VisualTests.Tests
 
         private abstract class BaseCircle : Container
         {
+            protected const float SYMBOL_SIZE = TaikoHitObject.CIRCLE_RADIUS * 2f * 0.45f;
+            protected const float SYMBOL_BORDER = 8;
+            protected const float SYMBOL_INNER_SIZE = SYMBOL_SIZE - 2 * SYMBOL_BORDER;
+
             protected readonly CirclePiece Piece;
 
             protected BaseCircle(CirclePiece piece)
