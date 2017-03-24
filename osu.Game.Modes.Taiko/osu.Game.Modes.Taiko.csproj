@@ -55,7 +55,7 @@
     <Compile Include="Objects\Drawable\Pieces\DrumRollCirclePiece.cs" />
     <Compile Include="Objects\Drawable\Pieces\FinisherPiece.cs" />
     <Compile Include="Objects\Drawable\Pieces\RimHitCirclePiece.cs" />
-    <Compile Include="Objects\Drawable\Pieces\ScrollingCirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\ScrollingPiece.cs" />
     <Compile Include="Judgements\TaikoDrumRollTickJudgement.cs" />
     <Compile Include="Judgements\TaikoJudgement.cs" />
     <Compile Include="Judgements\TaikoHitResult.cs" />

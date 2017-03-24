@@ -21,7 +21,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
     /// Hitobjects that have a length need only to set Width and the extra corner radius will be added internally.
     /// </para>
     /// </summary>
-    public abstract class CirclePiece : ScrollingCirclePiece
+    public abstract class CirclePiece : ScrollingPiece
     {
         /// <summary>
         /// The colour of the inner circle and outer glows.
