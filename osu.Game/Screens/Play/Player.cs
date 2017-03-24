@@ -23,6 +23,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Screens.Play
 {

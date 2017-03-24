@@ -10,11 +10,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Modes.Mods;
 using osu.Game.Users;
 using osu.Framework;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {

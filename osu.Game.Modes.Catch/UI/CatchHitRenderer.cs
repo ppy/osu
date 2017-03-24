@@ -5,7 +5,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Modes.Catch.Beatmaps;
 using osu.Game.Modes.Catch.Judgements;
 using osu.Game.Modes.Catch.Objects;
+using osu.Game.Modes.Catch.Scoring;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Scoring;
 using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Catch.UI
