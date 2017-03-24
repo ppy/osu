@@ -5,7 +5,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Modes.Mania.Beatmaps;
 using osu.Game.Modes.Mania.Judgements;
 using osu.Game.Modes.Mania.Objects;
+using osu.Game.Modes.Mania.Scoring;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Scoring;
 using osu.Game.Modes.UI;
 
 namespace osu.Game.Modes.Mania.UI

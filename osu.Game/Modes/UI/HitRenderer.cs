@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Modes.UI
 {

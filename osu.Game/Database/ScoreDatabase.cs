@@ -8,6 +8,7 @@ using osu.Framework.Platform;
 using osu.Game.IO.Legacy;
 using osu.Game.IPC;
 using osu.Game.Modes;
+using osu.Game.Modes.Scoring;
 using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Database
