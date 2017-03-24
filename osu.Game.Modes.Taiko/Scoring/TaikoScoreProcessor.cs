@@ -179,21 +179,21 @@ namespace osu.Game.Modes.Taiko.Scoring
             maxComboPortion = comboPortion;
         }
 
-        protected override void UpdateCalculations(TaikoJudgement newJudgement)
+        protected override void OnNewJugement(TaikoJudgement judgement)
         {
-            bool isTick = newJudgement is TaikoDrumRollTickJudgement;
+            bool isTick = judgement is TaikoDrumRollTickJudgement;
 
             // Don't consider ticks as a type of hit that counts towards map completion
             if (!isTick)
                 totalHits++;
 
             // Apply score changes
-            if (newJudgement.Result == HitResult.Hit)
+            if (judgement.Result == HitResult.Hit)
             {
-                double baseValue = newJudgement.ResultValueForScore;
+                double baseValue = judgement.ResultValueForScore;
 
                 // Add bonus points for hitting an accented hit object with the second key
-                if (newJudgement.SecondHit)
+                if (judgement.SecondHit)
                     baseValue += baseValue * accentedHitScale;
 
                 // Add score to portions
@@ -212,7 +212,7 @@ namespace osu.Game.Modes.Taiko.Scoring
             }
 
             // Apply HP changes
-            switch (newJudgement.Result)
+            switch (judgement.Result)
             {
                 case HitResult.Miss:
                     // Missing ticks shouldn't drop HP
@@ -220,7 +220,7 @@ namespace osu.Game.Modes.Taiko.Scoring
                         Health.Value += hpIncreaseMiss;
                     break;
                 case HitResult.Hit:
-                    switch (newJudgement.TaikoResult)
+                    switch (judgement.TaikoResult)
                     {
                         case TaikoHitResult.Good:
                             Health.Value += hpIncreaseGood;

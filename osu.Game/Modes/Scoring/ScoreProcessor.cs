@@ -143,7 +143,7 @@ namespace osu.Game.Modes.Scoring
         {
             Judgements.Add(judgement);
 
-            UpdateCalculations(judgement);
+            OnNewJugement(judgement);
 
             judgement.ComboAtHit = (ulong)Combo.Value;
 
@@ -158,7 +158,7 @@ namespace osu.Game.Modes.Scoring
         /// <summary>
         /// Update any values that potentially need post-processing on a judgement change.
         /// </summary>
-        /// <param name="newJudgement">A new Judgement that triggered this calculation. May be null.</param>
-        protected abstract void UpdateCalculations(TJudgement newJudgement);
+        /// <param name="judgement">The judgement that triggered this calculation.</param>
+        protected abstract void OnNewJugement(TJudgement judgement);
     }
 }
