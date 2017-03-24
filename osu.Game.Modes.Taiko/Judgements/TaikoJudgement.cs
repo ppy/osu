@@ -9,38 +9,38 @@ namespace osu.Game.Modes.Taiko.Judgements
     public class TaikoJudgement : Judgement
     {
         /// <summary>
-        /// The maximum score value.
+        /// The maximum result.
         /// </summary>
         public const TaikoHitResult MAX_HIT_RESULT = TaikoHitResult.Great;
 
         /// <summary>
-        /// The score value.
+        /// The result.
         /// </summary>
         public TaikoHitResult TaikoResult;
 
         /// <summary>
-        /// The score value for the combo portion of the score.
+        /// The result value for the combo portion of the score.
         /// </summary>
-        public int ScoreValue => NumericResultForScore(TaikoResult);
+        public int ResultValueForScore => NumericResultForScore(TaikoResult);
         
         /// <summary>
-        /// The score value for the accuracy portion of the score.
+        /// The result value for the accuracy portion of the score.
         /// </summary>
-        public int AccuracyScoreValue => NumericResultForAccuracy(TaikoResult);
+        public int ResultValueForAccuracy => NumericResultForAccuracy(TaikoResult);
 
         /// <summary>
-        /// The maximum score value for the combo portion of the score.
+        /// The maximum result value for the combo portion of the score.
         /// </summary>
-        public int MaxScoreValue => NumericResultForScore(MAX_HIT_RESULT);
+        public int MaxResultValueForScore => NumericResultForScore(MAX_HIT_RESULT);
         
         /// <summary>
-        /// The maximum score value for the accuracy portion of the score.
+        /// The maximum result value for the accuracy portion of the score.
         /// </summary>
-        public int MaxAccuracyScoreValue => NumericResultForAccuracy(MAX_HIT_RESULT);
+        public int MaxResultValueForAccuracy => NumericResultForAccuracy(MAX_HIT_RESULT);
 
-        public override string ScoreString => TaikoResult.GetDescription();
+        public override string ResultString => TaikoResult.GetDescription();
 
-        public override string MaxScoreString => MAX_HIT_RESULT.GetDescription();
+        public override string MaxResultString => MAX_HIT_RESULT.GetDescription();
 
         /// <summary>
         /// Whether this Judgement has a secondary hit in the case of finishers.
@@ -48,11 +48,11 @@ namespace osu.Game.Modes.Taiko.Judgements
         public bool SecondHit;
 
         /// <summary>
-        /// Computes the numeric score value for the combo portion of the score.
+        /// Computes the numeric result value for the combo portion of the score.
         /// For the accuracy portion of the score (including accuracy percentage), see <see cref="NumericResultForAccuracy(TaikoHitResult)"/>.
         /// </summary>
-        /// <param name="result">The result to compute the score value for.</param>
-        /// <returns>The numeric score value.</returns>
+        /// <param name="result">The result to compute the value for.</param>
+        /// <returns>The numeric result value.</returns>
         protected virtual int NumericResultForScore(TaikoHitResult result)
         {
             switch (result)
@@ -67,11 +67,11 @@ namespace osu.Game.Modes.Taiko.Judgements
         }
 
         /// <summary>
-        /// Computes the numeric score value for the accuracy portion of the score.
+        /// Computes the numeric result value for the accuracy portion of the score.
         /// For the combo portion of the score, see <see cref="NumericResultForScore(TaikoHitResult)"/>.
         /// </summary>
-        /// <param name="result">The result to compute the score value for.</param>
-        /// <returns>The numeric score value.</returns>
+        /// <param name="result">The result to compute the value for.</param>
+        /// <returns>The numeric result value.</returns>
         protected virtual int NumericResultForAccuracy(TaikoHitResult result)
         {
             switch (result)

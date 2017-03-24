@@ -23,13 +23,13 @@ namespace osu.Game.Modes.Judgements
         public ulong? ComboAtHit;
 
         /// <summary>
-        /// The string representation for the score achieved.
+        /// The string representation for the result achieved.
         /// </summary>
-        public abstract string ScoreString { get; }
+        public abstract string ResultString { get; }
 
         /// <summary>
-        /// The string representation for the max score achievable.
+        /// The string representation for the max result achievable.
         /// </summary>
-        public abstract string MaxScoreString { get; }
+        public abstract string MaxResultString { get; }
     }
 }

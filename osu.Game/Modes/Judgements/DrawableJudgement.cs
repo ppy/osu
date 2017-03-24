@@ -35,7 +35,7 @@ namespace osu.Game.Modes.Judgements
 
             AutoSizeAxes = Axes.Both;
 
-            string scoreString = judgement.Result == HitResult.Hit ? judgement.ScoreString : judgement.Result.GetDescription();
+            string resultString = judgement.Result == HitResult.Hit ? judgement.ResultString : judgement.Result.GetDescription();
 
             Children = new[]
             {
@@ -43,7 +43,7 @@ namespace osu.Game.Modes.Judgements
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Text = scoreString.ToUpper(),
+                    Text = resultString.ToUpper(),
                     Font = @"Venera",
                     TextSize = 16
                 }
