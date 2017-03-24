@@ -47,6 +47,19 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        private Color4 fillColour;
+        public Color4 FillColour
+        {
+            get { return fillColour; }
+            set
+            {
+                if (value == fillColour) return;
+                fillColour = value;
+
+                redrawFilled();
+            }
+        }
+
         public SongProgressGraph()
         {
             CacheDrawnFrameBuffer = true;
@@ -121,7 +134,7 @@ namespace osu.Game.Screens.Play
 
             for (float x = 0; x < DrawWidth; x += Column.WIDTH)
             {
-                newColumns.Add(new Column
+                newColumns.Add(new Column(fillColour)
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -141,7 +154,7 @@ namespace osu.Game.Screens.Play
         public class Column : Container, IStateful<ColumnState>
         {
             private readonly Color4 emptyColour = Color4.White.Opacity(100);
-            private readonly Color4 litColour = new Color4(221, 255, 255, 255);
+            private readonly Color4 litColour;
             private readonly Color4 dimmedColour = Color4.White.Opacity(175);
 
             private const float cube_count = 6;
@@ -178,9 +191,10 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public Column()
+            public Column(Color4 litColour)
             {
                 Size = new Vector2(WIDTH, HEIGHT);
+                this.litColour = litColour;
 
                 for (int r = 0; r < cube_count; r++)
                 {
