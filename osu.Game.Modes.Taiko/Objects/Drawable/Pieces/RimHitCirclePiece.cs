@@ -16,12 +16,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
     /// </summary>
     public class RimHitCirclePiece : CirclePiece
     {
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            AccentColour = colours.BlueDarker;
-        }
-
         protected override Framework.Graphics.Drawable CreateIcon()
         {
             return new CircularContainer
@@ -42,6 +36,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = colours.BlueDarker;
         }
     }
 }
