@@ -1,15 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Configuration;
 using System;
 using System.Collections.Generic;
-using osu.Game.Modes.Judgements;
-using osu.Game.Modes.UI;
-using osu.Game.Modes.Objects;
+using osu.Framework.Configuration;
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Judgements;
+using osu.Game.Modes.Objects;
+using osu.Game.Modes.UI;
 
-namespace osu.Game.Modes
+namespace osu.Game.Modes.Scoring
 {
     public abstract class ScoreProcessor
     {
@@ -122,7 +122,7 @@ namespace osu.Game.Modes
         {
             Judgements.Capacity = hitRenderer.Beatmap.HitObjects.Count;
 
-            hitRenderer.OnJudgement += addJudgement;
+            hitRenderer.OnJudgement += AddJudgement;
 
             ComputeTargets(hitRenderer.Beatmap);
 
@@ -139,11 +139,11 @@ namespace osu.Game.Modes
         /// Adds a judgement to this ScoreProcessor.
         /// </summary>
         /// <param name="judgement">The judgement to add.</param>
-        private void addJudgement(TJudgement judgement)
+        protected void AddJudgement(TJudgement judgement)
         {
             Judgements.Add(judgement);
 
-            UpdateCalculations(judgement);
+            OnNewJugement(judgement);
 
             judgement.ComboAtHit = (ulong)Combo.Value;
 
@@ -158,7 +158,7 @@ namespace osu.Game.Modes
         /// <summary>
         /// Update any values that potentially need post-processing on a judgement change.
         /// </summary>
-        /// <param name="newJudgement">A new Judgement that triggered this calculation. May be null.</param>
-        protected abstract void UpdateCalculations(TJudgement newJudgement);
+        /// <param name="judgement">The judgement that triggered this calculation.</param>
+        protected abstract void OnNewJugement(TJudgement judgement);
     }
 }
