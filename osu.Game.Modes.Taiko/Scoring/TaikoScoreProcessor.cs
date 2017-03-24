@@ -85,17 +85,17 @@ namespace osu.Game.Modes.Taiko.Scoring
         public override bool HasFailed => totalHits == maxTotalHits && Health.Value <= 0.5;
 
         /// <summary>
-        /// The final combo portion of the score.
+        /// The cumulative combo portion of the score.
         /// </summary>
         private double comboScore => combo_portion_max * comboPortion / maxComboPortion;
 
         /// <summary>
-        /// The final accuracy portion of the score.
+        /// The cumulative accuracy portion of the score.
         /// </summary>
         private double accuracyScore => accuracy_portion_max * Math.Pow(Accuracy, 3.6) * totalHits / maxTotalHits;
 
         /// <summary>
-        /// The final bonus score.
+        /// The cumulative bonus score.
         /// This is added on top of <see cref="max_score"/>, thus the total score can exceed <see cref="max_score"/>.
         /// </summary>
         private double bonusScore;
