@@ -16,14 +16,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
     {
         private Sprite icon;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures)
-        {
-            AccentColour = colours.YellowDark;
-
-            icon.Texture = textures.Get(@"Play/Taiko/bash-hit-inner");
-        }
-
         protected override Framework.Graphics.Drawable CreateIcon()
         {
             return icon = new Sprite
@@ -31,6 +23,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, TextureStore textures)
+        {
+            AccentColour = colours.YellowDark;
+
+            icon.Texture = textures.Get(@"Play/Taiko/bash-hit-inner");
         }
     }
 }
