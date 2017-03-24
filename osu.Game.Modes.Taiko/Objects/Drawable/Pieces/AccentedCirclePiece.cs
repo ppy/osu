@@ -7,11 +7,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
 {
     public class AccentedCirclePiece : CirclePiece
     {
+        /// <summary>
+        /// The amount to scale up the base circle to show it as an "accented" piece.
+        /// </summary>
+        private const float accent_scale = 1.5f;
+
         public AccentedCirclePiece(string symbolName)
             : base(symbolName)
         {
         }
 
-        public override Vector2 Size => new Vector2(base.Size.X, base.Size.Y * 1.5f);
+        public override Vector2 Size => new Vector2(base.Size.X, base.Size.Y * accent_scale);
     }
 }
