@@ -27,15 +27,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-
                 Size = new Vector2(45f),
-
+                Masking = true,
                 Children = new[]
                 {
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-
                         Alpha = 1
                     }
                 }

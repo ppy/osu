@@ -62,29 +62,23 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                 innerLayer = new Container
                 {
                     Name = "Inner Layer",
-
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-
                     RelativeSizeAxes = Axes.Y,
-
                     Children = new Framework.Graphics.Drawable[]
                     {
                         backingGlowContainer = new CircularContainer
                         {
                             Name = "Backing Glow",
-
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-
                             RelativeSizeAxes = Axes.Both,
-
+                            Masking = true,
                             Children = new[]
                             {
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-
                                     Alpha = 0,
                                     AlwaysPresent = true
                                 }
@@ -93,26 +87,22 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                         innerCircleContainer = new CircularContainer
                         {
                             Name = "Inner Circle",
-
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-
                             RelativeSizeAxes = Axes.Both,
-
+                            Masking = true,
                             Children = new Framework.Graphics.Drawable[]
                             {
                                 innerBackground = new Box
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-
                                     RelativeSizeAxes = Axes.Both,
                                 },
                                 triangles = new Triangles
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-
                                     RelativeSizeAxes = Axes.Both,
                                 }
                             }
@@ -120,24 +110,19 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                         new CircularContainer
                         {
                             Name = "Ring",
-
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-
                             RelativeSizeAxes = Axes.Both,
-
                             BorderThickness = 8,
                             BorderColour = Color4.White,
-
+                            Masking = true,
                             Children = new[]
                             {
                                 new Box
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-
                                     RelativeSizeAxes = Axes.Both,
-
                                     Alpha = 0,
                                     AlwaysPresent = true
                                 }
@@ -146,7 +131,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                         iconContainer = new Container
                         {
                             Name = "Icon Container",
-
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         }
