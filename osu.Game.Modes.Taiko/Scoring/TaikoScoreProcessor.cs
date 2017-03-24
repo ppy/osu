@@ -42,31 +42,36 @@ namespace osu.Game.Modes.Taiko.Scoring
         private const double hp_hit_great = 0.03;
 
         /// <summary>
-        /// The HP awarded for a <see cref="TaikoHitResult.Good"/> hit at HP >= 5.
+        /// The minimum HP awarded for a <see cref="TaikoHitResult.Good"/> hit.
+        /// This occurs when HP Drain >= 5.
         /// </summary>
-        private const double hp_hit_good = 0.011;
+        private const double hp_hit_good_min = 0.011;
 
         /// <summary>
-        /// The HP awarded for a <see cref="TaikoHitResult.Good"/> hit at HP = 0.
+        /// The maximum HP awarded for a <see cref="TaikoHitResult.Good"/> hit.
+        /// This occurs when HP Drain = 0.
         /// <para>
         /// Yes, this is incorrect, and goods at HP = 0 will award more HP than greats.
         /// This is legacy and should be fixed, but is kept as is for now for compatibility.
         /// </para>
         /// </summary>
-        private const double hp_hit_good_max = hp_hit_good * 8;
+        private const double hp_hit_good_max = hp_hit_good_min * 8;
 
         /// <summary>
-        /// The HP deducted for a <see cref="HitResult.Miss"/> at HP = 0.
+        /// The minimum HP deducted for a <see cref="HitResult.Miss"/>.
+        /// This occurs when HP Drain = 0.
         /// </summary>
         private const double hp_miss_min = -0.0018;
 
         /// <summary>
-        /// The HP deducted for a <see cref="HitResult.Miss"/> at HP = 5.
+        /// The median HP deducted for a <see cref="HitResult.Miss"/>.
+        /// This occurs when HP Drain = 5.
         /// </summary>
         private const double hp_miss_mid = -0.0075;
 
         /// <summary>
-        /// The HP deducted for a <see cref="HitResult.Miss"/> at HP = 10.
+        /// The maximum HP deducted for a <see cref="HitResult.Miss"/>.
+        /// This occurs when HP Drain = 10.
         /// </summary>
         private const double hp_miss_max = -0.12;
 
@@ -102,9 +107,9 @@ namespace osu.Game.Modes.Taiko.Scoring
 
         /// <summary>
         /// The multiple of the original score added to the combo portion of the score
-        /// for correctly hitting a finisher with both keys.
+        /// for correctly hitting an accented hit object with both keys.
         /// </summary>
-        private double finisherScoreScale;
+        private double accentedHitScale;
 
         private double hpIncreaseTick;
         private double hpIncreaseGreat;
@@ -131,15 +136,15 @@ namespace osu.Game.Modes.Taiko.Scoring
 
             hpIncreaseTick = hp_hit_tick;
             hpIncreaseGreat = hpMultiplierNormal * hp_hit_great;
-            hpIncreaseGood = hpMultiplierNormal * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, hp_hit_good_max, hp_hit_good, hp_hit_good);
+            hpIncreaseGood = hpMultiplierNormal * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, hp_hit_good_max, hp_hit_good_min, hp_hit_good_min);
             hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
 
-            var finishers = beatmap.HitObjects.FindAll(o => o is Hit && o.Accented);
+            var accentedHits = beatmap.HitObjects.FindAll(o => o is Hit && o.Accented);
 
             // This is a linear function that awards:
-            // 10 times bonus points for hitting a finisher with both keys with 30 finishers in the map
-            // 3 times bonus points for hitting a finisher with both keys with 120 finishers in the map
-            finisherScoreScale = -7d / 90d * MathHelper.Clamp(finishers.Count, 30, 120) + 111d / 9d;
+            // 10 times bonus points for hitting an accented hit object with both keys with 30 accented hit objects in the map
+            // 3 times bonus points for hitting an accented hit object with both keys with 120 accented hit objects in the map
+            accentedHitScale = -7d / 90d * MathHelper.Clamp(accentedHits.Count, 30, 120) + 111d / 9d;
 
             foreach (var obj in beatmap.HitObjects)
             {
@@ -198,9 +203,9 @@ namespace osu.Game.Modes.Taiko.Scoring
             {
                 double baseValue = newJudgement.ResultValueForScore;
 
-                // Add bonus points for hitting a finisher with the second key
+                // Add bonus points for hitting an accented hit object with the second key
                 if (newJudgement.SecondHit)
-                    baseValue += baseValue * finisherScoreScale;
+                    baseValue += baseValue * accentedHitScale;
 
                 // Add score to portions
                 if (isTick)
