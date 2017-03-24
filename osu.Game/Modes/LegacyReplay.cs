@@ -46,7 +46,7 @@ namespace osu.Game.Modes
             }
         }
 
-        public override ReplayInputHandler GetInputHandler() => new LegacyReplayInputHandler(Frames);
+        public override ReplayInputHandler CreateInputHandler() => new LegacyReplayInputHandler(Frames);
 
         /// <summary>
         /// The ReplayHandler will take a replay and handle the propagation of updates to the input stack.

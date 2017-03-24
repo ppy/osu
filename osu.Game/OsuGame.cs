@@ -126,7 +126,7 @@ namespace osu.Game
 
             Beatmap.Value = BeatmapDatabase.GetWorkingBeatmap(s.Beatmap);
 
-            menu.Push(new PlayerLoader(new Player { ReplayInputHandler = s.Replay.GetInputHandler() }));
+            menu.Push(new PlayerLoader(new Player { ReplayInputHandler = s.Replay.CreateInputHandler() }));
         }
 
         protected override void LoadComplete()
