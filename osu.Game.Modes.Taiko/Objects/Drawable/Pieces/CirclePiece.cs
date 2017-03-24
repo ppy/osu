@@ -67,7 +67,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
             set { throw new InvalidOperationException($"{nameof(CirclePiece)} must always use CentreLeft origin."); }
         }
 
-        public override Vector2 Size => new Vector2(base.Size.X, TaikoHitObject.CIRCLE_RADIUS * 2);
 
         private readonly Container innerLayer;
         private readonly Container innerCircleContainer;
@@ -82,6 +81,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
             this.symbolName = symbolName;
 
             // The "inner layer" overshoots the the CirclePiece by Height/2 px on both sides
+            Height = TaikoHitObject.CIRCLE_RADIUS * 2;
             AddInternal(innerLayer = new Container
             {
                 Name = "Inner Layer",
