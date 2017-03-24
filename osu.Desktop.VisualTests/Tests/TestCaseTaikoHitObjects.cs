@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics;
 using osu.Game.Modes.Taiko.Objects;
@@ -115,7 +114,7 @@ namespace osu.Desktop.VisualTests.Tests
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, TextureStore textures)
+            private void load(OsuColour colours)
             {
                 Piece.AccentColour = colours.YellowDark;
             }
