@@ -8,6 +8,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Transforms;
 using System;
+using osu.Game.Graphics;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play
 {
@@ -15,11 +17,10 @@ namespace osu.Game.Screens.Play
     {
         private const int progress_height = 5;
         private readonly Vector2 handleSize = new Vector2(14, 25);
-        private readonly Color4 fillColour = new Color4(221, 255, 255, 255);
         private const float transition_duration = 200;
 
-        private readonly SongProgressBar bar;
-        private readonly SongProgressGraph graph;
+        private SongProgressBar bar;
+        private SongProgressGraph graph;
 
         public Action<double> OnSeek;
 
@@ -51,6 +52,12 @@ namespace osu.Game.Screens.Play
             set { graph.Values = value; }
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            graph.FillColour = bar.FillColour = colours.BlueLighter;
+        }
+
         public SongProgress()
         {
             RelativeSizeAxes = Axes.X;
@@ -64,12 +71,9 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Height = SongProgressGraph.Column.HEIGHT,
-                    Margin = new MarginPadding
-                    {
-                        Bottom = progress_height,
-                    },
+                    Margin = new MarginPadding { Bottom = progress_height },
                 },
-                bar = new SongProgressBar(progress_height, SongProgressGraph.Column.HEIGHT, handleSize, fillColour)
+                bar = new SongProgressBar(progress_height, SongProgressGraph.Column.HEIGHT, handleSize)
                 {
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,

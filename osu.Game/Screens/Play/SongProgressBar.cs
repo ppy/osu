@@ -12,9 +12,14 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressBar : DragBar
     {
-        public SongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize, Color4 fillColour)
+        public Color4 FillColour
         {
-            Fill.Colour = fillColour;
+            get { return Fill.Colour; }
+            set { Fill.Colour = value; }
+        }
+
+        public SongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
+        {
             Height = barHeight + handleBarHeight + handleSize.Y;
             FillContainer.RelativeSizeAxes = Axes.X;
             FillContainer.Height = barHeight;
