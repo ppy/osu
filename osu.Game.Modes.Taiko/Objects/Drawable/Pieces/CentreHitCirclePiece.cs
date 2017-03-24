@@ -27,8 +27,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                 {
                     new Box
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 1
+                        RelativeSizeAxes = Axes.Both
                     }
                 }
             };
