@@ -10,6 +10,8 @@ using osu.Game.Modes.Mods;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;
 using System.Collections.Generic;
+using osu.Game.Modes.Catch.Scoring;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Modes.Catch
 {

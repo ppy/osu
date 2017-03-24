@@ -15,11 +15,11 @@ using osu.Game.Modes.Osu.Judgements;
 
 namespace osu.Game.Modes.Osu.UI
 {
-    public class OsuPlayfield : Playfield<OsuHitObject, OsuJudgementInfo>
+    public class OsuPlayfield : Playfield<OsuHitObject, OsuJudgement>
     {
-        private Container approachCircles;
-        private Container judgementLayer;
-        private ConnectionRenderer<OsuHitObject> connectionLayer;
+        private readonly Container approachCircles;
+        private readonly Container judgementLayer;
+        private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
         public override Vector2 Size
         {
@@ -65,7 +65,7 @@ namespace osu.Game.Modes.Osu.UI
             AddInternal(new GameplayCursor());
         }
 
-        public override void Add(DrawableHitObject<OsuHitObject, OsuJudgementInfo> h)
+        public override void Add(DrawableHitObject<OsuHitObject, OsuJudgement> h)
         {
             h.Depth = (float)h.HitObject.StartTime;
 
@@ -83,9 +83,13 @@ namespace osu.Game.Modes.Osu.UI
                 .OrderBy(h => h.StartTime);
         }
 
-        public override void OnJudgement(DrawableHitObject<OsuHitObject, OsuJudgementInfo> judgedObject)
+        public override void OnJudgement(DrawableHitObject<OsuHitObject, OsuJudgement> judgedObject)
         {
-            HitExplosion explosion = new HitExplosion(judgedObject.Judgement, judgedObject.HitObject);
+            DrawableOsuJudgement explosion = new DrawableOsuJudgement(judgedObject.Judgement)
+            {
+                Origin = Anchor.Centre,
+                Position = judgedObject.HitObject.StackedEndPosition + judgedObject.Judgement.PositionOffset
+            };
 
             judgementLayer.Add(explosion);
         }

@@ -3,22 +3,23 @@
 
 using osu.Game.Modes.Catch.Judgements;
 using osu.Game.Modes.Catch.Objects;
+using osu.Game.Modes.Scoring;
 using osu.Game.Modes.UI;
 
-namespace osu.Game.Modes.Catch
+namespace osu.Game.Modes.Catch.Scoring
 {
-    internal class CatchScoreProcessor : ScoreProcessor<CatchBaseHit, CatchJudgementInfo>
+    internal class CatchScoreProcessor : ScoreProcessor<CatchBaseHit, CatchJudgement>
     {
         public CatchScoreProcessor()
         {
         }
 
-        public CatchScoreProcessor(HitRenderer<CatchBaseHit, CatchJudgementInfo> hitRenderer)
+        public CatchScoreProcessor(HitRenderer<CatchBaseHit, CatchJudgement> hitRenderer)
             : base(hitRenderer)
         {
         }
 
-        protected override void UpdateCalculations(CatchJudgementInfo newJudgement)
+        protected override void OnNewJugement(CatchJudgement judgement)
         {
         }
     }

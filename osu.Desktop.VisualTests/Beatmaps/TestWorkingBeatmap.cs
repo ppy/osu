@@ -15,7 +15,7 @@ namespace osu.Desktop.VisualTests.Beatmaps
             this.beatmap = beatmap;
         }
 
-        private Beatmap beatmap;
+        private readonly Beatmap beatmap;
         
         protected override Beatmap GetBeatmap() => beatmap;
         protected override Texture GetBackground() => null;

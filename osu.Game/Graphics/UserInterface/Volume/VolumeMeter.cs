@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
 {
     internal class VolumeMeter : Container
     {
-        private Box meterFill;
+        private readonly Box meterFill;
         public BindableDouble Bindable { get; } = new BindableDouble();
 
         public VolumeMeter(string meterName)

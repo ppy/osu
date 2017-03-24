@@ -3,22 +3,23 @@
 
 using osu.Game.Modes.Mania.Judgements;
 using osu.Game.Modes.Mania.Objects;
+using osu.Game.Modes.Scoring;
 using osu.Game.Modes.UI;
 
-namespace osu.Game.Modes.Mania
+namespace osu.Game.Modes.Mania.Scoring
 {
-    internal class ManiaScoreProcessor : ScoreProcessor<ManiaBaseHit, ManiaJudgementInfo>
+    internal class ManiaScoreProcessor : ScoreProcessor<ManiaBaseHit, ManiaJudgement>
     {
         public ManiaScoreProcessor()
         {
         }
 
-        public ManiaScoreProcessor(HitRenderer<ManiaBaseHit, ManiaJudgementInfo> hitRenderer)
+        public ManiaScoreProcessor(HitRenderer<ManiaBaseHit, ManiaJudgement> hitRenderer)
             : base(hitRenderer)
         {
         }
 
-        protected override void UpdateCalculations(ManiaJudgementInfo newJudgement)
+        protected override void OnNewJugement(ManiaJudgement judgement)
         {
         }
     }

@@ -60,18 +60,18 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private List<float> yPositions = new List<float>();
+        private readonly List<float> yPositions = new List<float>();
 
         /// <summary>
         /// Required for now unfortunately.
         /// </summary>
         private BeatmapDatabase database;
 
-        private Container<Panel> scrollableContent;
+        private readonly Container<Panel> scrollableContent;
 
-        private List<BeatmapGroup> groups = new List<BeatmapGroup>();
+        private readonly List<BeatmapGroup> groups = new List<BeatmapGroup>();
 
-        private List<Panel> panels = new List<Panel>();
+        private readonly List<Panel> panels = new List<Panel>();
 
         private BeatmapGroup selectedGroup;
 

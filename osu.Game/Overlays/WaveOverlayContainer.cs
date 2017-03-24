@@ -20,9 +20,12 @@ namespace osu.Game.Overlays
         private const EasingTypes easing_show = EasingTypes.OutSine;
         private const EasingTypes easing_hide = EasingTypes.InSine;
 
-        private Wave firstWave, secondWave, thirdWave, fourthWave;
+        private readonly Wave firstWave;
+        private readonly Wave secondWave;
+        private readonly Wave thirdWave;
+        private readonly Wave fourthWave;
 
-        private Container<Wave> wavesContainer;
+        private readonly Container<Wave> wavesContainer;
 
         private readonly Container contentContainer;
 

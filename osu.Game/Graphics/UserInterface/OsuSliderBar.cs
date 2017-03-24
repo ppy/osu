@@ -19,8 +19,9 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sample;
         private double lastSampleTime;
 
-        private Nub nub;
-        private Box leftBox, rightBox;
+        private readonly Nub nub;
+        private readonly Box leftBox;
+        private readonly Box rightBox;
 
         public OsuSliderBar()
         {

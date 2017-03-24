@@ -96,6 +96,7 @@
     <Compile Include="IO\Legacy\SerializationReader.cs" />
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
+    <Compile Include="Modes\Judgements\DrawableJudgement.cs" />
     <Compile Include="Modes\LegacyReplay.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
@@ -112,7 +113,7 @@
     <Compile Include="Modes\Objects\SliderCurve.cs" />
     <Compile Include="Modes\Objects\Types\CurveType.cs" />
     <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
-    <Compile Include="Modes\Judgements\JudgementInfo.cs" />
+    <Compile Include="Modes\Judgements\Judgement.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Modes\Objects\Types\IHasCombo.cs" />
     <Compile Include="Modes\Objects\Types\IHasEndTime.cs" />
@@ -123,8 +124,8 @@
     <Compile Include="Modes\Objects\Types\IHasHold.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacyHitObjectType.cs" />
     <Compile Include="Modes\Replay.cs" />
-    <Compile Include="Modes\Score.cs" />
-    <Compile Include="Modes\ScoreProcessor.cs" />
+    <Compile Include="Modes\Scoring\Score.cs" />
+    <Compile Include="Modes\Scoring\ScoreProcessor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />
     <Compile Include="Modes\UI\HudOverlay.cs" />
     <Compile Include="Modes\UI\StandardHealthDisplay.cs" />
@@ -358,10 +359,13 @@
     <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
     <Compile Include="Users\Country.cs" />
     <Compile Include="Users\Team.cs" />
-    <Compile Include="Modes\ScoreRank.cs" />
+    <Compile Include="Modes\Scoring\ScoreRank.cs" />
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
+    <Compile Include="Screens\Select\BeatmapDetailArea.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabControlCheckBox.cs" />
+    <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
