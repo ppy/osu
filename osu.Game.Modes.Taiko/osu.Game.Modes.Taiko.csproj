@@ -54,9 +54,11 @@
     <Compile Include="Judgements\TaikoHitResult.cs" />
     <Compile Include="Objects\Drawable\DrawableTaikoHitObject.cs" />
     <Compile Include="Objects\Bash.cs" />
+    <Compile Include="Objects\Drawable\Pieces\AccentedCirclePiece.cs" />
     <Compile Include="Objects\DrumRoll.cs" />
     <Compile Include="Objects\DrumRollTick.cs" />
     <Compile Include="Objects\Hit.cs" />
+    <Compile Include="Objects\Drawable\Pieces\CirclePiece.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
