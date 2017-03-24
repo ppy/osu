@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer
     {
-        private const int bar_height = 5;
+        private const int progress_height = 5;
         private readonly Vector2 handleSize = new Vector2(14, 25);
         private readonly Color4 fillColour = new Color4(221, 255, 255, 255);
         private const float transition_duration = 200;
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play
         public SongProgress()
         {
             RelativeSizeAxes = Axes.X;
-            Height = bar_height + SongProgressGraph.Column.HEIGHT + handleSize.Y;
+            Height = progress_height + SongProgressGraph.Column.HEIGHT + handleSize.Y;
 
             Children = new Drawable[]
             {
@@ -66,10 +66,10 @@ namespace osu.Game.Screens.Play
                     Height = SongProgressGraph.Column.HEIGHT,
                     Margin = new MarginPadding
                     {
-                        Bottom = bar_height,
+                        Bottom = progress_height,
                     },
                 },
-                bar = new SongProgressBar(bar_height, SongProgressGraph.Column.HEIGHT, handleSize, fillColour)
+                bar = new SongProgressBar(progress_height, SongProgressGraph.Column.HEIGHT, handleSize, fillColour)
                 {
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Play
         {
             bar.IsEnabled = false;
             bar.FadeOut(transition_duration, EasingTypes.In);
-            MoveTo(new Vector2(0f, bar_height), transition_duration, EasingTypes.In);
+            MoveTo(new Vector2(0f, progress_height), transition_duration, EasingTypes.In);
         }
     }
 }
