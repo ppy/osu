@@ -187,10 +187,10 @@ namespace osu.Game.Modes.Taiko.Scoring
 
         protected override void UpdateCalculations(TaikoJudgement newJudgement)
         {
-            var tickJudgement = newJudgement as TaikoDrumRollTickJudgement;
+            bool isTick = newJudgement is TaikoDrumRollTickJudgement;
 
             // Don't consider ticks as a type of hit that counts towards map completion
-            if (tickJudgement == null)
+            if (!isTick)
                 totalHits++;
 
             // Apply score changes
@@ -203,7 +203,7 @@ namespace osu.Game.Modes.Taiko.Scoring
                     baseValue += baseValue * finisherScoreScale;
 
                 // Add score to portions
-                if (tickJudgement != null)
+                if (isTick)
                     bonusScore += baseValue;
                 else
                 {
@@ -222,7 +222,7 @@ namespace osu.Game.Modes.Taiko.Scoring
             {
                 case HitResult.Miss:
                     // Missing ticks shouldn't drop HP
-                    if (tickJudgement == null)
+                    if (!isTick)
                         Health.Value += hpIncreaseMiss;
                     break;
                 case HitResult.Hit:
@@ -232,8 +232,7 @@ namespace osu.Game.Modes.Taiko.Scoring
                             Health.Value += hpIncreaseGood;
                             break;
                         case TaikoHitResult.Great:
-                            // Ticks only give out a different portion of HP because they're more spammable
-                            if (tickJudgement != null)
+                            if (isTick)
                                 Health.Value += hpIncreaseTick;
                             else
                                 Health.Value += hpIncreaseGreat;
