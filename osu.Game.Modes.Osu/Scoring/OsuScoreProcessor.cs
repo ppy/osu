@@ -4,9 +4,10 @@
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Judgements;
 using osu.Game.Modes.Osu.Objects;
+using osu.Game.Modes.Scoring;
 using osu.Game.Modes.UI;
 
-namespace osu.Game.Modes.Osu
+namespace osu.Game.Modes.Osu.Scoring
 {
     internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject, OsuJudgement>
     {

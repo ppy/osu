@@ -9,6 +9,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
 using System;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Modes.UI
 {

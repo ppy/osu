@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Game.Database;
-using osu.Game.Modes;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Online.API.Requests
 {

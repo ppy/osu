@@ -9,8 +9,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Game.Modes;
 using System;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {

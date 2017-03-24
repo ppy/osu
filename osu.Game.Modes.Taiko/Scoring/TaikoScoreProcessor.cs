@@ -1,16 +1,17 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Scoring;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.UI;
-using System;
+using OpenTK;
 
-namespace osu.Game.Modes.Taiko
+namespace osu.Game.Modes.Taiko.Scoring
 {
     internal class TaikoScoreProcessor : ScoreProcessor<TaikoHitObject, TaikoJudgement>
     {
