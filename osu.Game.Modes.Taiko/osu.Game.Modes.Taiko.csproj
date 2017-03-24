@@ -59,6 +59,7 @@
     <Compile Include="Objects\DrumRollTick.cs" />
     <Compile Include="Objects\Hit.cs" />
     <Compile Include="Objects\HitType.cs" />
+    <Compile Include="TaikoAutoReplay.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
