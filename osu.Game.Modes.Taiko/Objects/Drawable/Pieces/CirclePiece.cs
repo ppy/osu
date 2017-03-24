@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Backgrounds;
 using OpenTK.Graphics;
-using OpenTK;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Allocation;
 using System;
@@ -17,11 +16,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
     /// <summary>
     /// A circle piece which is used uniformly through osu!taiko to visualise hitobjects.
     /// <para>
-    /// The body of this piece will overshoot it by Height/2 on both sides of its length, such that
-    /// a regular "circle" is the result of setting Width to 0.
-    /// </para>
-    /// <para>
-    /// Hitobjects that have a length (e.g. DrumRolls) need only to set Width and the extra corner radius will be added internally.
+    /// The body of this piece will overshoot it by <see cref="CirclePiece.Height"/> to form 
+    /// a rounded (_[-Width-]_) figure such that a regular "circle" is the result of setting Width to 0.
     /// </para>
     /// </summary>
     public class CirclePiece : Container
@@ -67,7 +63,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
             set { throw new InvalidOperationException($"{nameof(CirclePiece)} must always use CentreLeft origin."); }
         }
 
-
         private readonly Container innerLayer;
         private readonly Container innerCircleContainer;
         private readonly Box innerBackground;
@@ -80,8 +75,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
         {
             this.symbolName = symbolName;
 
-            // The "inner layer" overshoots the the CirclePiece by Height/2 px on both sides
             Height = TaikoHitObject.CIRCLE_RADIUS * 2;
+
+            // The "inner layer" is the body of the CirclePiece that overshoots it by Height/2 px on both sides
             AddInternal(innerLayer = new Container
             {
                 Name = "Inner Layer",
@@ -154,6 +150,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
 
         protected override void Update()
         {
+            // Add the overshoot to compensate for corner radius
             innerLayer.Width = DrawWidth + DrawHeight;
         }
 
