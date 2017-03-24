@@ -44,7 +44,10 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             IHasRepeats repeatsData = original as IHasRepeats;
             IHasEndTime endTimeData = original as IHasEndTime;
 
-            bool accented = ((original.Sample?.Type ?? SampleType.None) & SampleType.Finish) > 0;
+            // Old osu! used hit sounding to determine hits
+            SampleType sample = original.Sample?.Type ?? SampleType.None;
+
+            bool accented = (sample & SampleType.Finish) > 0;
 
             if (distanceData != null)
             {
@@ -71,11 +74,14 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                 };
             }
 
+            HitType type = (sample & ~(SampleType.Finish | SampleType.Normal)) == 0 ? HitType.Centre : HitType.Rim;
+
             return new Hit
             {
                 StartTime = original.StartTime,
                 Sample = original.Sample,
-                Accented = accented
+                Accented = accented,
+                Type = type
             };
         }
     }
