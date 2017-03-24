@@ -196,7 +196,7 @@ namespace osu.Game.Modes.Taiko.Scoring
             // Apply score changes
             if (newJudgement.Result == HitResult.Hit)
             {
-                double baseValue = newJudgement.ScoreValue;
+                double baseValue = newJudgement.ResultValueForScore;
 
                 // Add bonus points for hitting a finisher with the second key
                 if (newJudgement.SecondHit)
@@ -243,16 +243,16 @@ namespace osu.Game.Modes.Taiko.Scoring
             }
 
             // Compute the new score + accuracy
-            int score = 0;
-            int maxScore = 0;
+            int scoreForAccuracy = 0;
+            int maxScoreForAccuracy = 0;
 
             foreach (var j in Judgements)
             {
-                score += j.AccuracyScoreValue;
-                maxScore = j.MaxAccuracyScoreValue;
+                scoreForAccuracy += j.ResultValueForAccuracy;
+                maxScoreForAccuracy = j.MaxResultValueForAccuracy;
             }
 
-            Accuracy.Value = (double)score / maxScore;
+            Accuracy.Value = (double)scoreForAccuracy / maxScoreForAccuracy;
             TotalScore.Value = comboScore + accuracyScore + bonusScore;
         }
 
