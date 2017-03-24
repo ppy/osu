@@ -4,15 +4,14 @@
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
 {
@@ -20,21 +19,21 @@ namespace osu.Game.Screens.Select
     {
         private OsuScreen player;
         private readonly ModSelectOverlay modSelect;
-        private readonly Leaderboard leaderboard;
+        private readonly BeatmapDetailArea beatmapDetails;
 
         public PlaySongSelect()
         {
-            Add(modSelect = new ModSelectOverlay
+            FooterPanels.Add(modSelect = new ModSelectOverlay
             {
                 RelativeSizeAxes = Axes.X,
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.BottomCentre,
-                Margin = new MarginPadding { Bottom = 50 }
             });
 
-            LeftContent.Add(leaderboard = new Leaderboard
+            LeftContent.Add(beatmapDetails = new BeatmapDetailArea
             {
                 RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding { Top = 10, Right = 5 },
             });
         }
 
@@ -52,33 +51,30 @@ namespace osu.Game.Screens.Select
             }, Key.Number3);
         }
 
-        private GetScoresRequest getScoresRequest;
-
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
 
-            updateLeaderboard(beatmap);
+            beatmapDetails.Beatmap = beatmap;
 
             base.OnBeatmapChanged(beatmap);
-        }
-
-        private void updateLeaderboard(WorkingBeatmap beatmap)
-        {
-            leaderboard.Scores = null;
-            getScoresRequest?.Cancel();
-
-            if (beatmap?.BeatmapInfo == null) return;
-
-            getScoresRequest = new GetScoresRequest(beatmap.BeatmapInfo);
-            getScoresRequest.Success += r => leaderboard.Scores = r.Scores;
-            Game.API.Queue(getScoresRequest);
         }
 
         protected override void OnResuming(Screen last)
         {
             player = null;
             base.OnResuming(last);
+        }
+
+        protected override bool OnExiting(Screen next)
+        {
+            if (modSelect.State == Visibility.Visible)
+            {
+                modSelect.Hide();
+                return true;
+            }
+
+            return base.OnExiting(next);
         }
 
         protected override void OnSelected()

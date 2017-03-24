@@ -4,10 +4,11 @@
 using OpenTK;
 using osu.Game.Modes.Judgements;
 using osu.Game.Modes.Osu.Objects.Drawables;
+using osu.Framework.Extensions;
 
 namespace osu.Game.Modes.Osu.Judgements
 {
-    public class OsuJudgementInfo : JudgementInfo
+    public class OsuJudgement : Judgement
     {
         /// <summary>
         /// The positional hit offset.
@@ -23,6 +24,10 @@ namespace osu.Game.Modes.Osu.Judgements
         /// The score which would be achievable on a perfect hit.
         /// </summary>
         public OsuScoreResult MaxScore = OsuScoreResult.Hit300;
+
+        public override string ResultString => Score.GetDescription();
+
+        public override string MaxResultString => MaxScore.GetDescription();
 
         public int ScoreValue => scoreToInt(Score);
 
