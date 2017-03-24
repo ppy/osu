@@ -15,7 +15,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
     /// A circle piece which is used uniformly through osu!taiko to visualise hitobjects.
     /// <para>
     /// The body of this piece will overshoot it by Height/2 on both sides of its length, such that
-    /// a regular "circle" the result of setting Width to 0.
+    /// a regular "circle" is the result of setting Width to 0.
     /// </para>
     /// <para>
     /// Hitobjects that have a length need only to set Width and the extra corner radius will be added internally.
@@ -44,7 +44,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
             }
         }
 
-        public override Vector2 Size => new Vector2(base.Size.X, 128);
+        public override Vector2 Size => new Vector2(base.Size.X, TaikoHitObject.CIRCLE_RADIUS * 2);
 
         private readonly Container innerLayer;
         private readonly Container backingGlowContainer;
