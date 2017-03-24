@@ -30,7 +30,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
 
         private bool kiaiMode;
         /// <summary>
-        /// Whether Kiai mode is active for this object.
+        /// Whether Kiai mode effects are enabled for this circle piece.
         /// </summary>
         public bool KiaiMode
         {
