@@ -65,6 +65,12 @@ namespace osu.Game.Screens.Select
         /// </summary>
         protected readonly Footer Footer;
 
+        /// <summary>
+        /// Contains any panel which is triggered by a footer button.
+        /// Helps keep them located beneath the footer itself.
+        /// </summary>
+        protected readonly Container FooterPanels;
+
         public readonly FilterControl FilterControl;
 
         protected SongSelect()
@@ -131,11 +137,15 @@ namespace osu.Game.Screens.Select
 
             if (ShowFooter)
             {
-                Add(BeatmapOptions = new BeatmapOptionsOverlay
+                Add(FooterPanels = new Container
                 {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Margin = new MarginPadding
                     {
-                        Bottom = 50,
+                        Bottom = Footer.HEIGHT,
                     },
                 });
                 Add(Footer = new Footer
@@ -143,6 +153,8 @@ namespace osu.Game.Screens.Select
                     OnBack = Exit,
                     OnStart = raiseSelect,
                 });
+
+                FooterPanels.Add(BeatmapOptions = new BeatmapOptionsOverlay());
             }
         }
 
