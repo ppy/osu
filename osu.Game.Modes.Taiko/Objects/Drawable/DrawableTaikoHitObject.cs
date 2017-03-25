@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
-using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -17,11 +16,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             Origin = Anchor.Centre;
 
             RelativePositionAxes = Axes.X;
-
-            Children = new[]
-            {
-                CreateCircle()
-            };
         }
 
         protected override void LoadComplete()
@@ -48,7 +42,5 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         {
             UpdateScrollPosition(Time.Current);
         }
-
-        protected abstract CirclePiece CreateCircle();
     }
 }
