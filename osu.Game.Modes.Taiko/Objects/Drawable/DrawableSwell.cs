@@ -10,7 +10,7 @@ using System;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
-    public class DrawableBash : DrawableTaikoHitObject
+    public class DrawableSwell : DrawableTaikoHitObject
     {
         /// <summary>
         /// A list of keys which this HitObject will accept. These are the standard Taiko keys for now.
@@ -19,16 +19,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         private List<Key> validKeys { get; } = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
 
         /// <summary>
-        /// The amount of times the user has hit this bash.
+        /// The amount of times the user has hit this swell.
         /// </summary>
         private int userHits;
 
-        private readonly Bash bash;
+        private readonly Swell swell;
 
-        public DrawableBash(Bash bash)
-            : base(bash)
+        public DrawableSwell(Swell swell)
+            : base(swell)
         {
-            this.bash = bash;
+            this.swell = swell;
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -40,7 +40,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
                 userHits++;
 
-                if (userHits == bash.RequiredHits)
+                if (userHits == swell.RequiredHits)
                 {
                     Judgement.Result = HitResult.Hit;
                     Judgement.TaikoResult = TaikoHitResult.Great;
@@ -51,7 +51,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 if (Judgement.TimeOffset < 0)
                     return;
 
-                if (userHits > bash.RequiredHits / 2)
+                if (userHits > swell.RequiredHits / 2)
                 {
                     Judgement.Result = HitResult.Hit;
                     Judgement.TaikoResult = TaikoHitResult.Good;
