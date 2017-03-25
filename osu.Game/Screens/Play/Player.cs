@@ -356,7 +356,7 @@ namespace osu.Game.Screens.Play
                 switch (args.Key)
                 {
                     case Key.Tab:
-                        showInterface.Value = (showInterface.Value) ? false : true;
+                        showInterface.Value = !showInterface.Value;
                         return true;
                 }
             }
