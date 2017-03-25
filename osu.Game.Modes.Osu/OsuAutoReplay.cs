@@ -29,7 +29,7 @@ namespace osu.Game.Modes.Osu
             createAutoReplay();
         }
 
-        internal class LegacyReplayFrameComparer : IComparer<LegacyReplayFrame>
+        private class LegacyReplayFrameComparer : IComparer<LegacyReplayFrame>
         {
             public int Compare(LegacyReplayFrame f1, LegacyReplayFrame f2)
             {
