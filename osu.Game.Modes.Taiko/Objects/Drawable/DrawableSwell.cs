@@ -2,8 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Input;
-using System.Collections.Generic;
-using osu.Framework.Input;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using System;
@@ -12,12 +10,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
     public class DrawableSwell : DrawableTaikoHitObject
     {
-        /// <summary>
-        /// A list of keys which this HitObject will accept. These are the standard Taiko keys for now.
-        /// These should be moved to bindings later.
-        /// </summary>
-        private List<Key> validKeys { get; } = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
-
         /// <summary>
         /// The amount of times the user has hit this swell.
         /// </summary>
@@ -70,12 +62,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             base.UpdateScrollPosition(Math.Min(time, HitObject.StartTime));
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool HandleKeyPress(Key key)
         {
             if (Judgement.Result.HasValue)
-                return false;
-
-            if (!validKeys.Contains(args.Key))
                 return false;
 
             UpdateJudgement(true);
