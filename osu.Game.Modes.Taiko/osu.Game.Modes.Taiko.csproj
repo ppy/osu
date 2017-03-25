@@ -53,7 +53,7 @@
     <Compile Include="Judgements\TaikoJudgement.cs" />
     <Compile Include="Judgements\TaikoHitResult.cs" />
     <Compile Include="Objects\Drawable\DrawableHit.cs" />
-    <Compile Include="Objects\Drawable\DrawableHitFinisher.cs" />
+    <Compile Include="Objects\Drawable\DrawableAccentedHit.cs" />
     <Compile Include="Objects\Drawable\DrawableTaikoHitObject.cs" />
     <Compile Include="Objects\Bash.cs" />
     <Compile Include="Objects\Drawable\Pieces\AccentedCirclePiece.cs" />
