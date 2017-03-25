@@ -79,6 +79,7 @@ namespace osu.Game.Screens.Select
                 Details = new Details
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding(5),
                 },
                 Leaderboard = new Leaderboard
                 {
@@ -121,8 +122,8 @@ namespace osu.Game.Screens.Select
             if (!IsLoaded) return;
 
             if (api == null || beatmap?.BeatmapInfo == null) return;
-
-            Details.Metadata = beatmap.Beatmap.Metadata;
+            
+            Details.Beatmap = beatmap.Beatmap.BeatmapInfo;
         }
     }
 }
