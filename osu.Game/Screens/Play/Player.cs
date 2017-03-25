@@ -24,6 +24,7 @@ using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
 using osu.Game.Modes.Scoring;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -55,11 +56,16 @@ namespace osu.Game.Screens.Play
 
         private ScoreProcessor scoreProcessor;
         private HitRenderer hitRenderer;
+
         private Bindable<int> dimLevel;
-        private SkipButton skipButton;
+        private Bindable<bool> showInterface;
+        private Bindable<bool> mouseWheelDisabled;
 
         private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
+        private SkipButton skipButton;
+
+        public ReplayInputHandler ReplayInputHandler;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
@@ -74,6 +80,8 @@ namespace osu.Game.Screens.Play
             }
 
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
+            showInterface = config.GetBindable<bool>(OsuConfig.ShowInterface);
+            showInterface.ValueChanged += hudVisibilityChanged;
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
 
             try
@@ -163,6 +171,8 @@ namespace osu.Game.Screens.Play
                 hudOverlay,
                 pauseOverlay
             };
+
+            showInterface.TriggerChange();
         }
 
         private void initializeSkipButton()
@@ -335,10 +345,31 @@ namespace osu.Game.Screens.Play
             Background?.FadeTo((100f - dimLevel) / 100, 800);
         }
 
-        private Bindable<bool> mouseWheelDisabled;
-
-        public ReplayInputHandler ReplayInputHandler;
-
         protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !IsPaused;
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat) return false;
+
+            if (state.Keyboard.ShiftPressed)
+            {
+                switch (args.Key)
+                {
+                    case Key.Tab:
+                        showInterface.Value = (showInterface.Value) ? false : true;
+                        return true;
+                }
+            }
+
+            return base.OnKeyDown(state, args);
+        }
+
+        private void hudVisibilityChanged(object sender, EventArgs e)
+        {
+            if (showInterface.Value)
+                hudOverlay.Show();
+            else
+                hudOverlay.Hide();
+        }
     }
 }
