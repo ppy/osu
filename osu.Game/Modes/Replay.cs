@@ -7,6 +7,6 @@ namespace osu.Game.Modes
 {
     public abstract class Replay
     {
-        public virtual ReplayInputHandler GetInputHandler() => null;
+        public virtual ReplayInputHandler CreateInputHandler() => null;
     }
 }
