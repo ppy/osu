@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Padding = new MarginPadding(edge_margin),
                             Children = new Drawable[]
                             {
-                                avatar = new Avatar
+                                avatar = new Avatar(Score.User ?? new User { Id = Score.UserID })
                                 {
                                     Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),
                                     CornerRadius = corner_radius,
@@ -153,7 +153,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                                         Radius = 1,
                                         Colour = Color4.Black.Opacity(0.2f),
                                     },
-                                    UserId = Score.User?.Id ?? Score.UserID,
                                 },
                                 new Container
                                 {
