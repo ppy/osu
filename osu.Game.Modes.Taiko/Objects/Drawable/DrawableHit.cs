@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Input;
-using osu.Framework.Input;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using System;
@@ -16,12 +15,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
         protected abstract List<Key> HitKeys { get; }
-
-        /// <summary>
-        /// A list of keys which this hit object will accept. These are the standard Taiko keys for now.
-        /// These should be moved to bindings later.
-        /// </summary>
-        private readonly List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
 
         private readonly Hit hit;
 
@@ -61,7 +54,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 Judgement.Result = HitResult.Miss;
         }
 
-        protected virtual bool HandleKeyPress(Key key)
+        protected override bool HandleKeyPress(Key key)
         {
             if (Judgement.Result.HasValue)
                 return false;
@@ -69,20 +62,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             validKeyPressed = HitKeys.Contains(key);
 
             return UpdateJudgement(true);
-        }
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            // Make sure we don't handle held-down keys
-            if (args.Repeat)
-                return false;
-
-            // Check if we've pressed a valid taiko key
-            if (!validKeys.Contains(args.Key))
-                return false;
-
-            // Handle it!
-            return HandleKeyPress(args.Key);
         }
     }
 }
