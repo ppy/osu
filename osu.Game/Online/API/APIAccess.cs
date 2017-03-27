@@ -118,7 +118,7 @@ namespace osu.Game.Online.API
                             //todo: this fails even on network-related issues. we should probably handle those differently.
                             //NotificationManager.ShowMessage("Login failed!");
                             log.Add(@"Login failed!");
-                            clearCredentials();
+                            Password = null;
                             continue;
                         }
 
