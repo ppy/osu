@@ -52,7 +52,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             UpdateScrollPosition(Time.Current);
         }
 
-        protected virtual bool HandleKeyPress(Key key) { return false; }
+        protected virtual bool HandleKeyPress(Key key) => false;
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
