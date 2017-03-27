@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Diagnostics;
+using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,68 +13,60 @@ namespace osu.Game.Users
 {
     public class Avatar : Container
     {
-        public Drawable Sprite;
+        private const int time_before_load = 500;
 
-        private long userId;
-        private OsuGameBase game;
-        private Texture guestTexture;
+        private Drawable sprite;
+        private readonly User user;
+        private readonly bool delayedLoad;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGameBase game, TextureStore textures)
+        /// <summary>
+        /// An avatar for specified user.
+        /// </summary>
+        /// <param name="user">The user. A null value will get a placeholder avatar.</param>
+        /// <param name="delayedLoad">Whether we should delay the load of the avatar until it has been on-screen for a specified duration.</param>
+        public Avatar(User user = null, bool delayedLoad = true)
         {
-            this.game = game;
-            guestTexture = textures.Get(@"Online/avatar-guest");
+            this.user = user;
+            this.delayedLoad = delayedLoad;
         }
 
-        public long UserId
-        {
-            get { return userId; }
-            set
-            {
-                if (userId == value)
-                    return;
-
-                userId = value;
-                invalidateSprite();
-            }
-        }
-
+        private Action performLoad;
         private Task loadTask;
 
-        private void invalidateSprite()
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(TextureStore textures)
         {
-            Sprite?.FadeOut(100);
-            Sprite?.Expire();
-            Sprite = null;
-        }
-
-        private void updateSprite()
-        {
-            if (loadTask != null || Sprite != null) return;
-
-            var newSprite = userId > 1 ? new OnlineSprite($@"https://a.ppy.sh/{userId}", guestTexture) : new Sprite { Texture = guestTexture };
-
-            newSprite.FillMode = FillMode.Fill;
-
-            loadTask = newSprite.LoadAsync(game, s =>
+            performLoad = () =>
             {
-                Sprite = s;
-                Add(Sprite);
+                Texture texture = null;
+                if (user?.Id > 1) texture = textures.Get($@"https://a.ppy.sh/{user.Id}");
+                if (texture == null) texture = textures.Get(@"Online/avatar-guest");
 
-                Sprite.FadeInFromZero(200);
-                loadTask = null;
-            });
+                sprite = new Sprite
+                {
+                    Texture = texture,
+                    FillMode = FillMode.Fit,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                };
+
+                Schedule(() =>
+                {
+                    Add(sprite);
+                    sprite.FadeInFromZero(150);
+                });
+            };
         }
 
         private double timeVisible;
 
-        private bool shouldUpdate => Sprite != null || timeVisible > 500;
+        private bool shouldLoad => !delayedLoad || timeVisible > time_before_load;
 
         protected override void Update()
         {
             base.Update();
 
-            if (!shouldUpdate)
+            if (!shouldLoad)
             {
                 //Special optimisation to not start loading until we are within bounds of our closest ScrollContainer parent.
                 ScrollContainer scroll = null;
@@ -88,27 +80,8 @@ namespace osu.Game.Users
                     timeVisible = 0;
             }
 
-            if (shouldUpdate)
-                updateSprite();
-        }
-
-        public class OnlineSprite : Sprite
-        {
-            private readonly string url;
-            private readonly Texture fallbackTexture;
-
-            public OnlineSprite(string url, Texture fallbackTexture = null)
-            {
-                Debug.Assert(url != null);
-                this.url = url;
-                this.fallbackTexture = fallbackTexture;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                Texture = textures.Get(url) ?? fallbackTexture;
-            }
+            if (shouldLoad && loadTask == null)
+                (loadTask = Task.Factory.StartNew(performLoad, TaskCreationOptions.LongRunning)).ConfigureAwait(false);
         }
     }
 }
