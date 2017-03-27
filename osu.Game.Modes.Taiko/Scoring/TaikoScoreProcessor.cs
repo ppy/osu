@@ -165,7 +165,7 @@ namespace osu.Game.Modes.Taiko.Scoring
                         SecondHit = obj.Accented
                     });
                 }
-                else if (obj is Bash)
+                else if (obj is Swell)
                 {
                     AddJudgement(new TaikoJudgement
                     {
