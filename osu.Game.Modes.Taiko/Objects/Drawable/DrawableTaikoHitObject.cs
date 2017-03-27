@@ -5,7 +5,6 @@ using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
-using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 using System.Collections.Generic;
 using osu.Framework.Input;
 
@@ -26,11 +25,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             Origin = Anchor.Centre;
 
             RelativePositionAxes = Axes.X;
-
-            Children = new[]
-            {
-                CreateCircle()
-            };
         }
 
         protected override void LoadComplete()
@@ -73,7 +67,5 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             // Handle it!
             return HandleKeyPress(args.Key);
         }
-
-        protected abstract CirclePiece CreateCircle();
     }
 }

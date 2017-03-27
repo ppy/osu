@@ -61,7 +61,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             if (endTimeData != null)
             {
                 // We compute the end time manually to add in the Bash convert factor
-                return new Bash
+                return new Swell
                 {
                     StartTime = original.StartTime,
                     Sample = original.Sample,
