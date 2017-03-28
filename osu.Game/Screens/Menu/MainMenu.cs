@@ -2,10 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Screens;
-using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
+using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
@@ -16,6 +14,7 @@ using OpenTK;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
 using osu.Framework.Input;
+using osu.Framework.Screens.Testing;
 using OpenTK.Input;
 
 namespace osu.Game.Screens.Menu

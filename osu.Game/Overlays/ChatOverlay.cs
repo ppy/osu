@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
