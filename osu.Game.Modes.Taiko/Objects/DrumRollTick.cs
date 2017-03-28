@@ -15,5 +15,10 @@ namespace osu.Game.Modes.Taiko.Objects
         /// <para>Half of this value is the hit window of the tick.</para>
         /// </summary>
         public double TickTimeDistance;
+
+        /// <summary>
+        /// The time allowed to hit this tick.
+        /// </summary>
+        public double HitWindow => TickTimeDistance / 2;
     }
 }

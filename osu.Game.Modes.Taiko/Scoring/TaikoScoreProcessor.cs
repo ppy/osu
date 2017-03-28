@@ -128,7 +128,7 @@ namespace osu.Game.Modes.Taiko.Scoring
             hpIncreaseGood = hpMultiplierNormal * hp_hit_good;
             hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
 
-            var accentedHits = beatmap.HitObjects.FindAll(o => o is Hit && o.Accented);
+            var accentedHits = beatmap.HitObjects.FindAll(o => o is Hit && o.IsStrong);
 
             // This is a linear function that awards:
             // 10 times bonus points for hitting an accented hit object with both keys with 30 accented hit objects in the map
@@ -143,7 +143,7 @@ namespace osu.Game.Modes.Taiko.Scoring
                     {
                         Result = HitResult.Hit,
                         TaikoResult = TaikoHitResult.Great,
-                        SecondHit = obj.Accented
+                        SecondHit = obj.IsStrong
                     });
                 }
                 else if (obj is DrumRoll)
@@ -154,7 +154,7 @@ namespace osu.Game.Modes.Taiko.Scoring
                         {
                             Result = HitResult.Hit,
                             TaikoResult = TaikoHitResult.Great,
-                            SecondHit = obj.Accented
+                            SecondHit = obj.IsStrong
                         });
                     }
 
@@ -162,7 +162,7 @@ namespace osu.Game.Modes.Taiko.Scoring
                     {
                         Result = HitResult.Hit,
                         TaikoResult = TaikoHitResult.Great,
-                        SecondHit = obj.Accented
+                        SecondHit = obj.IsStrong
                     });
                 }
                 else if (obj is Swell)
