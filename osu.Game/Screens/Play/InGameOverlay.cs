@@ -12,7 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Play.Pause;
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 
