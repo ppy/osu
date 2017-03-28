@@ -6,6 +6,7 @@ using osu.Framework.Screens.Testing;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
+using osu.Game.Modes.Taiko.Objects.Drawable;
 using osu.Game.Modes.Taiko.UI;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -22,6 +23,8 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddButton("Hit!", addHitJudgement);
             AddButton("Miss :(", addMissJudgement);
+            AddButton("DrumRoll", () => addDrumRoll(false));
+            AddButton("Strong DrumRoll", () => addDrumRoll(true));
 
             Add(playfield = new TaikoPlayfield
             {
@@ -58,6 +61,21 @@ namespace osu.Desktop.VisualTests.Tests
                     ComboAtHit = 0
                 }
             });
+        }
+
+        private void addDrumRoll(bool strong)
+        {
+            var d = new DrumRoll
+            {
+                StartTime = Time.Current + 1000,
+                Distance = 2000,
+                PreEmpt = 1000,
+            };
+
+            if (strong)
+                playfield.Add(new DrawableStrongDrumRoll(d));
+            else
+                playfield.Add(new DrawableDrumRoll(d));
         }
 
         private class DrawableTestHit : DrawableHitObject<TaikoHitObject, TaikoJudgement>
