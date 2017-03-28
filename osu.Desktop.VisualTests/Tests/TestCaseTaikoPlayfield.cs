@@ -72,10 +72,7 @@ namespace osu.Desktop.VisualTests.Tests
                 PreEmpt = 1000,
             };
 
-            if (strong)
-                playfield.Add(new DrawableStrongDrumRoll(d));
-            else
-                playfield.Add(new DrawableDrumRoll(d));
+            playfield.Add(strong ? new DrawableStrongDrumRoll(d) : new DrawableDrumRoll(d));
         }
 
         private class DrawableTestHit : DrawableHitObject<TaikoHitObject, TaikoJudgement>
