@@ -2,11 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics;
 using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
@@ -29,7 +27,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Reset();
             });
 
-            Add(new CentreHitCirclePiece(new CirclePiece()
+            Add(new CentreHitCirclePiece(new CirclePiece
             {
                 KiaiMode = kiai
             })
@@ -37,7 +35,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(100, 100)
             });
 
-            Add(new CentreHitCirclePiece(new StrongCirclePiece()
+            Add(new CentreHitCirclePiece(new StrongCirclePiece
             {
                 KiaiMode = kiai
             })
@@ -45,7 +43,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(350, 100)
             });
 
-            Add(new RimHitCircle(new CirclePiece()
+            Add(new RimHitCirclePiece(new CirclePiece
             {
                 KiaiMode = kiai
             })
@@ -53,7 +51,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(100, 300)
             });
 
-            Add(new RimHitCircle(new StrongCirclePiece()
+            Add(new RimHitCirclePiece(new StrongCirclePiece
             {
                 KiaiMode = kiai
             })
@@ -61,7 +59,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(350, 300)
             });
 
-            Add(new SwellCircle(new CirclePiece()
+            Add(new SwellCircle(new CirclePiece
             {
                 KiaiMode = kiai
             })
@@ -69,7 +67,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(100, 500)
             });
 
-            Add(new SwellCircle(new StrongCirclePiece()
+            Add(new SwellCircle(new StrongCirclePiece
             {
                 KiaiMode = kiai
             })
@@ -77,7 +75,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(350, 500)
             });
 
-            Add(new DrumRollCircle(new CirclePiece()
+            Add(new DrumRollCircle(new CirclePiece
             {
                 KiaiMode = kiai
             })
@@ -86,7 +84,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(575, 100)
             });
 
-            Add(new DrumRollCircle(new StrongCirclePiece()
+            Add(new DrumRollCircle(new StrongCirclePiece
             {
                 KiaiMode = kiai
             })
@@ -129,38 +127,6 @@ namespace osu.Desktop.VisualTests.Tests
             private void load(OsuColour colours)
             {
                 Piece.AccentColour = colours.YellowDark;
-            }
-        }
-
-        private class RimHitCircle : BaseCircle
-        {
-            public RimHitCircle(CirclePiece piece)
-                : base(piece)
-            {
-                Piece.Add(new CircularContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(CirclePiece.SYMBOL_SIZE),
-                    BorderThickness = CirclePiece.SYMBOL_BORDER,
-                    BorderColour = Color4.White,
-                    Masking = true,
-                    Children = new[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            AlwaysPresent = true
-                        }
-                    }
-                });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Piece.AccentColour = colours.BlueDarker;
             }
         }
 
