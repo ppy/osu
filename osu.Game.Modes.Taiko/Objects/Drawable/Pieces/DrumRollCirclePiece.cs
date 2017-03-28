@@ -8,6 +8,9 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
 {
+    /// <summary>
+    /// A circle piece used for drumrolls.
+    /// </summary>
     public class DrumRollCirclePiece : Container
     {
         private readonly CirclePiece circle;
