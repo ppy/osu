@@ -4,7 +4,6 @@
 using OpenTK.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Screens.Testing;
-using osu.Game.Graphics;
 using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests

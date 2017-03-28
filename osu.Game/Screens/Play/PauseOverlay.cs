@@ -26,10 +26,10 @@ namespace osu.Game.Screens.Play
 
         public Action OnResume;
 
-        protected OsuSpriteText title;
-        protected OsuSpriteText description;
+        protected OsuSpriteText Title;
+        protected OsuSpriteText Description;
 
-        private FillFlowContainer buttons;
+        private readonly FillFlowContainer buttons;
 
         public int Retries
         {
@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private FillFlowContainer retryCounterContainer;
+        private readonly FillFlowContainer retryCounterContainer;
 
         public override bool HandleInput => State == Visibility.Visible;
 
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Play
                             Spacing = new Vector2(0, 20),
                             Children = new Drawable[]
                             {
-                                title = new OsuSpriteText
+                                Title = new OsuSpriteText
                                 {
                                     Text = @"paused",
                                     Font = @"Exo2.0-Medium",
@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Play
                                     Shadow = true,
                                     ShadowColour = new Color4(0, 0, 0, 0.25f)
                                 },
-                                description = new OsuSpriteText
+                                Description = new OsuSpriteText
                                 {
                                     Text = @"you're not going to do what i think you're going to do, are ya?",
                                     Origin = Anchor.TopCentre,

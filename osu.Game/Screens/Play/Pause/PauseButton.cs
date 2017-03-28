@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.Pause
