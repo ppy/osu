@@ -12,7 +12,6 @@ using osu.Framework.Input;
 using osu.Game.Configuration;
 using System;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Graphics.Cursor
 {
