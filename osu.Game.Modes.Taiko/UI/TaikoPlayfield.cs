@@ -26,6 +26,7 @@ namespace osu.Game.Modes.Taiko.UI
 
         /// <summary>
         /// The play field height scale.
+        /// This also uniformly scales the notes to match the new playfield height.
         /// </summary>
         public const float PLAYFIELD_SCALE = 0.65f;
 
