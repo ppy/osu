@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Play
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     TextSize = 30,
-                                    Colour = Color4.Yellow,
+                                    Colour = colours.Yellow,
                                     Shadow = true,
                                     ShadowColour = new Color4(0, 0, 0, 0.25f)
                                 },
