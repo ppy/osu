@@ -67,6 +67,8 @@ namespace osu.Game.Overlays
 
             optionsSection.Bounding = true;
             FadeIn(transition_time, EasingTypes.OutQuint);
+
+            optionsSection.TriggerFocus();
         }
 
         protected override void PopOut()

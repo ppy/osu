@@ -142,18 +142,26 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Padding = new MarginPadding(edge_margin),
                             Children = new Drawable[]
                             {
-                                avatar = new Avatar
+                                avatar = new DelayedLoadContainer
                                 {
+                                    TimeBeforeLoad = 500,
+                                    FinishedLoading = d => d.FadeInFromZero(200),
                                     Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),
-                                    CornerRadius = corner_radius,
-                                    Masking = true,
-                                    EdgeEffect = new EdgeEffect
+                                    Children = new Drawable[]
                                     {
-                                        Type = EdgeEffectType.Shadow,
-                                        Radius = 1,
-                                        Colour = Color4.Black.Opacity(0.2f),
-                                    },
-                                    UserId = Score.User?.Id ?? Score.UserID,
+                                        new Avatar(Score.User ?? new User { Id = Score.UserID })
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            CornerRadius = corner_radius,
+                                            Masking = true,
+                                            EdgeEffect = new EdgeEffect
+                                            {
+                                                Type = EdgeEffectType.Shadow,
+                                                Radius = 1,
+                                                Colour = Color4.Black.Opacity(0.2f),
+                                            },
+                                        },
+                                    }
                                 },
                                 new Container
                                 {
