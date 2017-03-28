@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Toolbar
 {
     internal class ToolbarUserButton : ToolbarButton, IOnlineComponent
     {
-        private readonly Avatar avatar;
+        private readonly UpdateableAvatar avatar;
 
         public ToolbarUserButton()
         {
@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Toolbar
 
             Add(new OpaqueBackground { Depth = 1 });
 
-            Flow.Add(avatar = new Avatar
+            Flow.Add(avatar = new UpdateableAvatar
             {
                 Masking = true,
                 Size = new Vector2(32),
@@ -52,11 +52,11 @@ namespace osu.Game.Overlays.Toolbar
             {
                 default:
                     Text = @"Guest";
-                    avatar.UserId = 1;
+                    avatar.User = new User();
                     break;
                 case APIState.Online:
                     Text = api.Username;
-                    avatar.UserId = api.LocalUser.Value.Id;
+                    avatar.User = api.LocalUser;
                     break;
             }
         }
