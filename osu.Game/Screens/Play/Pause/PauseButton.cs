@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Play.Pause
     public class PauseButton : DialogButton
     {
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private void load(AudioManager audio)
         {
             SampleHover = audio.Sample.Get(@"Menu/menuclick");
             SampleClick = audio.Sample.Get(@"Menu/menuback");
