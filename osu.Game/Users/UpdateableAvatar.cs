@@ -43,6 +43,7 @@ namespace osu.Game.Users
             Add(displayedAvatar = new AsyncLoadContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                FinishedLoading = d => d.FadeInFromZero(200),
                 Children = new[]
                 {
                     new Avatar(user) { RelativeSizeAxes = Axes.Both }
