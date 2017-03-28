@@ -1,0 +1,17 @@
+﻿using System.Collections.Generic;
+using OpenTK.Input;
+using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
+
+namespace osu.Game.Modes.Taiko.Objects.Drawable
+{
+    public class DrawableStrongCentreHit : DrawableStrongHit
+    {
+        protected override List<Key> HitKeys { get; } = new List<Key>(new Key[] { Key.F, Key.J });
+
+        public DrawableStrongCentreHit(Hit hit)
+            : base(hit)
+        {
+            Add(new CentreHitCirclePiece(new StrongCirclePiece()));
+        }
+    }
+}

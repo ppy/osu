@@ -52,7 +52,10 @@
     <Compile Include="Judgements\TaikoDrumRollTickJudgement.cs" />
     <Compile Include="Judgements\TaikoJudgement.cs" />
     <Compile Include="Judgements\TaikoHitResult.cs" />
+    <Compile Include="Objects\Drawable\CentreHitCirclePiece.cs" />
+    <Compile Include="Objects\Drawable\DrawableCentreHit.cs" />
     <Compile Include="Objects\Drawable\DrawableHit.cs" />
+    <Compile Include="Objects\Drawable\DrawableStrongCentreHit.cs" />
     <Compile Include="Objects\Drawable\DrawableStrongHit.cs" />
     <Compile Include="Objects\Drawable\Pieces\StrongCirclePiece.cs" />
     <Compile Include="Objects\Drawable\DrawableSwell.cs" />
