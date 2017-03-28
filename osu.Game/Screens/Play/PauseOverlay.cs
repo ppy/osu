@@ -27,8 +27,11 @@ namespace osu.Game.Screens.Play
         protected override bool HideOnEscape => false;
 
         public Action OnResume;
-        public Action OnRetry;
-        public Action OnQuit;
+
+        protected OsuSpriteText title;
+        protected OsuSpriteText description;
+
+        private FillFlowContainer buttons;
 
         public int Retries
         {
@@ -92,9 +95,33 @@ namespace osu.Game.Screens.Play
             return base.OnKeyDown(state, args);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void resume()
         {
+            OnResume?.Invoke();
+            Hide();
+        }
+
+        public void AddButton(string text, Color4 colour, Action action)
+        {
+            buttons.Add(new PauseButton
+            {
+                Text = text,
+                ButtonColour = colour,
+                Origin = Anchor.TopCentre,
+                Anchor = Anchor.TopCentre,
+                Height = button_height,
+                Action = delegate {
+                    action?.Invoke();
+                    Hide();
+                }
+            });
+        }
+
+        public PauseOverlay()
+        {
+            AlwaysReceiveInput = true;
+
+            RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
                 new Box
@@ -123,7 +150,7 @@ namespace osu.Game.Screens.Play
                             Spacing = new Vector2(0, 20),
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                title = new OsuSpriteText
                                 {
                                     Text = @"paused",
                                     Font = @"Exo2.0-Medium",
@@ -131,11 +158,11 @@ namespace osu.Game.Screens.Play
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     TextSize = 30,
-                                    Colour = colours.Yellow,
+                                    Colour = Color4.Yellow,
                                     Shadow = true,
                                     ShadowColour = new Color4(0, 0, 0, 0.25f)
                                 },
-                                new OsuSpriteText
+                                description = new OsuSpriteText
                                 {
                                     Text = @"you're not going to do what i think you're going to do, are ya?",
                                     Origin = Anchor.TopCentre,
@@ -145,12 +172,13 @@ namespace osu.Game.Screens.Play
                                 }
                             }
                         },
-                        new FillFlowContainer
+                        buttons = new FillFlowContainer
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
                             Masking = true,
                             EdgeEffect = new EdgeEffect
                             {
@@ -158,38 +186,6 @@ namespace osu.Game.Screens.Play
                                 Colour = Color4.Black.Opacity(0.6f),
                                 Radius = 50
                             },
-                            Children = new Drawable[]
-                            {
-                                new ResumeButton
-                                {
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Height = button_height,
-                                    Action = resume
-                                },
-                                new RetryButton
-                                {
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Height = button_height,
-                                    Action = delegate
-                                    {
-                                        OnRetry?.Invoke();
-                                        Hide();
-                                    }
-                                },
-                                new QuitButton
-                                {
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Height = button_height,
-                                    Action = delegate
-                                    {
-                                        OnQuit?.Invoke();
-                                        Hide();
-                                    }
-                                }
-                            }
                         },
                         retryCounterContainer = new FillFlowContainer
                         {
@@ -208,18 +204,6 @@ namespace osu.Game.Screens.Play
             };
 
             Retries = 0;
-        }
-
-        private void resume()
-        {
-            OnResume?.Invoke();
-            Hide();
-        }
-
-        public PauseOverlay()
-        {
-            AlwaysReceiveInput = true;
-            RelativeSizeAxes = Axes.Both;
         }
     }
 }

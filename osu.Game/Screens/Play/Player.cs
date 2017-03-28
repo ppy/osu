@@ -24,6 +24,7 @@ using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
 using osu.Game.Modes.Scoring;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -33,13 +34,15 @@ namespace osu.Game.Screens.Play
 
         internal override bool ShowOverlays => false;
 
-        internal override bool HasLocalCursorDisplayed => !hasReplayLoaded && !IsPaused;
+        internal override bool HasLocalCursorDisplayed => !hasReplayLoaded && !IsPaused && !IsFailed;
 
         private bool hasReplayLoaded => hitRenderer.InputManager.ReplayInputHandler != null;
 
         public BeatmapInfo BeatmapInfo;
 
         public bool IsPaused { get; private set; }
+
+        public bool IsFailed { get; private set; }
 
         public int RestartCount;
 
@@ -60,9 +63,10 @@ namespace osu.Game.Screens.Play
 
         private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
+        private FailOverlay failOverlay;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuColour colours)
         {
             var beatmap = Beatmap.Beatmap;
 
@@ -129,9 +133,19 @@ namespace osu.Game.Screens.Play
                     Delay(400);
                     Schedule(Resume);
                 },
-                OnRetry = Restart,
-                OnQuit = Exit
             };
+            pauseOverlay.AddButton(@"Continue", colours.Green, delegate { Delay(400); Schedule(Resume); });
+            pauseOverlay.AddButton(@"Retry", colours.YellowDark, Restart);
+            pauseOverlay.AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), Exit);
+
+
+            failOverlay = new FailOverlay
+            {
+                Depth = -1,
+                OnQuit = Exit,
+            };
+            failOverlay.AddButton(@"Retry", colours.YellowDark, Restart);
+            failOverlay.AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), Exit);
 
 
             if (ReplayInputHandler != null)
@@ -161,7 +175,8 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 hudOverlay,
-                pauseOverlay
+                pauseOverlay,
+                failOverlay
             };
         }
 
@@ -261,15 +276,13 @@ namespace osu.Game.Screens.Play
 
         private void onFail()
         {
-            Content.FadeColour(Color4.Red, 500);
             sourceClock.Stop();
 
             Delay(500);
-            Schedule(delegate
-            {
-                ValidForResume = false;
-                Push(new FailDialog());
-            });
+
+            IsFailed = true;
+            failOverlay.Retries = RestartCount;
+            failOverlay.Show();
         }
 
         protected override void OnEntering(Screen last)
@@ -339,6 +352,6 @@ namespace osu.Game.Screens.Play
 
         public ReplayInputHandler ReplayInputHandler;
 
-        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !IsPaused;
+        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !IsPaused && !IsFailed;
     }
 }
