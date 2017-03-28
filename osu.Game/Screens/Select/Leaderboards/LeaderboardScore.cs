@@ -145,6 +145,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                 avatar = new DelayedLoadContainer
                                 {
                                     TimeBeforeLoad = 500,
+                                    FinishedLoading = d => d.FadeInFromZero(200),
                                     Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),
                                     Children = new Drawable[]
                                     {
