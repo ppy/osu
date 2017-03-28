@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens.Testing;
 using osu.Game.Graphics;
-using osu.Game.Modes.Taiko.Objects.Drawable;
 using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 
 namespace osu.Desktop.VisualTests.Tests

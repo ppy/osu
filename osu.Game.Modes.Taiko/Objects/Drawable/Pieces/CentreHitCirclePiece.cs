@@ -1,15 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
+using OpenTK;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawable
+namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
 {
     /// <summary>
     /// A circle piece used for centre hits.
