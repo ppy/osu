@@ -20,10 +20,10 @@ namespace osu.Game.Modes.Taiko.Objects
         public double PreEmpt;
 
         /// <summary>
-        /// Whether this HitObject is accented.
-        /// Accented hit objects give more points for hitting the hit object with both keys.
+        /// Whether this HitObject is a "strong" type.
+        /// Strong hit objects give more points for hitting the hit object with both keys.
         /// </summary>
-        public bool Accented;
+        public bool IsStrong;
 
         /// <summary>
         /// Whether this HitObject is in Kiai time.

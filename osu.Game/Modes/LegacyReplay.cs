@@ -46,13 +46,13 @@ namespace osu.Game.Modes
             }
         }
 
-        public override ReplayInputHandler GetInputHandler() => new LegacyReplayInputHandler(Frames);
+        public override ReplayInputHandler CreateInputHandler() => new LegacyReplayInputHandler(Frames);
 
         /// <summary>
         /// The ReplayHandler will take a replay and handle the propagation of updates to the input stack.
         /// It handles logic of any frames which *must* be executed.
         /// </summary>
-        public class LegacyReplayInputHandler : ReplayInputHandler
+        protected class LegacyReplayInputHandler : ReplayInputHandler
         {
             private readonly List<LegacyReplayFrame> replayContent;
 
@@ -163,7 +163,7 @@ namespace osu.Game.Modes
                 return currentTime = time;
             }
 
-            private class ReplayMouseState : MouseState
+            protected class ReplayMouseState : MouseState
             {
                 public ReplayMouseState(Vector2 position, IEnumerable<MouseButton> list)
                 {
@@ -172,7 +172,7 @@ namespace osu.Game.Modes
                 }
             }
 
-            private class ReplayKeyboardState : KeyboardState
+            protected class ReplayKeyboardState : KeyboardState
             {
                 public ReplayKeyboardState(List<Key> keys)
                 {
@@ -182,7 +182,7 @@ namespace osu.Game.Modes
         }
 
         [Flags]
-        public enum LegacyButtonState
+        protected enum LegacyButtonState
         {
             None = 0,
             Left1 = 1,
@@ -192,7 +192,7 @@ namespace osu.Game.Modes
             Smoke = 16
         }
 
-        public class LegacyReplayFrame
+        protected class LegacyReplayFrame
         {
             public Vector2 Position => new Vector2(MouseX, MouseY);
 
