@@ -116,7 +116,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         {
             base.LoadComplete();
 
-            LifetimeEnd = swell.EndTime + HitObject.PreEmpt;
+            LifetimeEnd = double.MaxValue;
 
             targetRing.Delay(HitObject.StartTime - Time.Current).ScaleTo(target_ring_scale, 600, EasingTypes.OutQuint);
         }
@@ -162,11 +162,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 case ArmedState.Idle:
                     break;
                 case ArmedState.Miss:
-                    bodyContainer.FadeOut(100);
+                    FadeOut(100);
+                    Expire();
                     break;
                 case ArmedState.Hit:
                     bodyContainer.ScaleTo(1.2f, 400, EasingTypes.OutQuad);
-                    bodyContainer.FadeOut(600, EasingTypes.OutQuint);
+
+                    FadeOut(600);
+                    Expire();
                     break;
             }
         }
