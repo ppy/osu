@@ -10,7 +10,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class PauseOverlay : FailOverlay
+    public class PauseOverlay : InGameOverlay
     {
         public Action OnResume;
 
