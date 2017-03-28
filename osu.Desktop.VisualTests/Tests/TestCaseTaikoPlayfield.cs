@@ -26,6 +26,10 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddButton("Hit!", addHitJudgement);
             AddButton("Miss :(", addMissJudgement);
+            AddButton("Centre", () => addCentreHit(false));
+            AddButton("Strong Centre", () => addCentreHit(true));
+            AddButton("Rim", () => addRimHit(false));
+            AddButton("Strong Rim", () => addRimHit(true));
 
             Add(new Container
             {
