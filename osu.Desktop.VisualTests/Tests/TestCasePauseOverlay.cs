@@ -12,24 +12,22 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Tests the pause overlay";
 
-        private StopOverlay pauseOverlay;
+        private PauseOverlay pauseOverlay;
         private int retryCount;
 
         public override void Reset()
         {
             base.Reset();
 
-            Add(pauseOverlay = new StopOverlay
+            Add(pauseOverlay = new PauseOverlay
             {
                 Depth = -1,
-                OnEscPressed = () => Logger.Log(@"Resume"),
+                OnResume = () => Logger.Log(@"Resume"),
+                OnRetry = () => Logger.Log(@"Retry"),
+                OnQuit = () => Logger.Log(@"Quit"),
                 Title = @"paused",
                 Description = @"you're not going to do what i think you're going to do, are ya?",
             });
-
-            pauseOverlay.AddButton(@"Continue", Color4.Green, delegate { Logger.Log(@"Resume"); });
-            pauseOverlay.AddButton(@"Retry", Color4.Yellow, delegate { Logger.Log(@"Retry"); });
-            pauseOverlay.AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), delegate { Logger.Log(@"Quit"); });
 
             AddButton("Pause", pauseOverlay.Show);
             AddButton("Add Retry", delegate

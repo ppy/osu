@@ -13,10 +13,11 @@ using osu.Game.Screens.Play.Pause;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class StopOverlay : OverlayContainer
+    public class FailOverlay : OverlayContainer
     {
         private const int transition_duration = 200;
         private const int button_height = 70;
@@ -24,7 +25,8 @@ namespace osu.Game.Screens.Play
 
         protected override bool HideOnEscape => false;
 
-        public Action OnEscPressed;
+        public Action OnRetry;
+        public Action OnQuit;
 
         private string title;
         private string description;
@@ -98,17 +100,11 @@ namespace osu.Game.Screens.Play
             if (args.Key == Key.Escape)
             {
                 if (State == Visibility.Hidden) return false;
-                onEscPressed();
+                OnQuit();
                 return true;
             }
 
             return base.OnKeyDown(state, args);
-        }
-
-        private void onEscPressed()
-        {
-            OnEscPressed?.Invoke();
-            Hide();
         }
 
         public void AddButton(string text, Color4 colour, Action action)
@@ -127,7 +123,7 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        public StopOverlay()
+        public FailOverlay()
         {
             AlwaysReceiveInput = true;
 
@@ -214,6 +210,9 @@ namespace osu.Game.Screens.Play
             };
 
             Retries = 0;
+
+            AddButton(@"Retry", Color4.Yellow, OnRetry);
+            AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), OnQuit);
         }
     }
 }
