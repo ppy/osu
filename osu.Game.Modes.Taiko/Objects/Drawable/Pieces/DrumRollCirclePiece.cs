@@ -1,0 +1,28 @@
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
+
+namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
+{
+    public class DrumRollCirclePiece : Container
+    {
+        private readonly CirclePiece circle;
+
+        public DrumRollCirclePiece(CirclePiece piece)
+        {
+            RelativeSizeAxes = Axes.X;
+
+            Add(circle = piece);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            circle.AccentColour = colours.YellowDark;
+        }
+    }
+}

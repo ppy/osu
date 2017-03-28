@@ -1,8 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
+using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 using System.Linq;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
@@ -16,23 +18,21 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         {
             this.drumRoll = drumRoll;
 
-            int tickIndex = 0;
+            RelativeSizeAxes = Axes.X;
+            Width = (float)(drumRoll.Duration / drumRoll.PreEmpt);
+
+            Add(new DrumRollCirclePiece(CreateCirclePiece()));
+
             foreach (var tick in drumRoll.Ticks)
             {
                 var newTick = new DrawableDrumRollTick(tick)
                 {
-                    Depth = tickIndex,
                     X = (float)((tick.StartTime - HitObject.StartTime) / drumRoll.Duration)
                 };
 
                 AddNested(newTick);
-
-                tickIndex++;
+                Add(newTick);
             }
-        }
-
-        protected override void UpdateState(ArmedState state)
-        {
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -53,5 +53,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             else
                 Judgement.Result = HitResult.Miss;
         }
+
+        protected override void UpdateState(ArmedState state)
+        {
+        }
+
+        protected virtual CirclePiece CreateCirclePiece() => new CirclePiece();
     }
 }
