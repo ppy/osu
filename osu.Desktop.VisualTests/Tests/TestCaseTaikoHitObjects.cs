@@ -78,21 +78,21 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(350, 500)
             });
 
-            Add(new DrumRollCircle(new CirclePiece()
+            Add(new DrumRollCirclePiece(new CirclePiece
             {
                 KiaiMode = kiai
             })
             {
-                Width = 250,
+                Width = 0.25f,
                 Position = new Vector2(575, 100)
             });
 
-            Add(new DrumRollCircle(new StrongCirclePiece()
+            Add(new DrumRollCirclePiece(new StrongCirclePiece
             {
                 KiaiMode = kiai
             })
             {
-                Width = 250,
+                Width = 0.25f,
                 Position = new Vector2(575, 300)
             });
         }
@@ -110,20 +110,6 @@ namespace osu.Desktop.VisualTests.Tests
                     Icon = FontAwesome.fa_asterisk,
                     Shadow = false
                 });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Piece.AccentColour = colours.YellowDark;
-            }
-        }
-
-        private class DrumRollCircle : BaseCircle
-        {
-            public DrumRollCircle(CirclePiece piece)
-                : base(piece)
-            {
             }
 
             [BackgroundDependencyLoader]
