@@ -20,6 +20,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
     /// </summary>
     public class CirclePiece : Container
     {
+        public const float SYMBOL_SIZE = TaikoHitObject.CIRCLE_RADIUS * 2f * 0.45f;
+        public const float SYMBOL_BORDER = 8;
+        public const float SYMBOL_INNER_SIZE = SYMBOL_SIZE - 2 * SYMBOL_BORDER;
+
         private Color4 accentColour;
         /// <summary>
         /// The colour of the inner circle and outer glows.
