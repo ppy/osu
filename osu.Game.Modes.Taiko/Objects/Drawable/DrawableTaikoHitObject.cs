@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             : base(hitObject)
         {
             Anchor = Anchor.CentreLeft;
-            Origin = Anchor.Centre;
+            Origin = Anchor.CentreLeft;
 
             RelativePositionAxes = Axes.X;
         }
