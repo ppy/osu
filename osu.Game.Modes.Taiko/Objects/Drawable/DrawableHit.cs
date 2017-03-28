@@ -28,7 +28,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// </summary>
         private bool validKeyPressed;
 
-        private Container bodyContainer;
+        private readonly Container bodyContainer;
 
         protected DrawableHit(Hit hit)
             : base(hit)

@@ -1,15 +1,13 @@
-﻿using OpenTK;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -18,7 +16,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
     /// </summary>
     public class CentreHitCirclePiece : Container
     {
-        private CirclePiece circle;
+        private readonly CirclePiece circle;
 
         public CentreHitCirclePiece(CirclePiece piece)
         {
