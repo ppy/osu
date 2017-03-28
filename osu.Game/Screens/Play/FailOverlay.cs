@@ -32,8 +32,8 @@ namespace osu.Game.Screens.Play
 
         public FailOverlay()
         {
-            title.Text = @"failed";
-            description.Text = @"you're dead, try again?";
+            Title.Text = @"failed";
+            Description.Text = @"you're dead, try again?";
         }
     }
 }
