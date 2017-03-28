@@ -195,6 +195,7 @@
     <Compile Include="Screens\Multiplayer\Match.cs" />
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
     <Compile Include="Screens\Play\FailOverlay.cs" />
+    <Compile Include="Screens\Play\InGameOverlay.cs" />
     <Compile Include="Screens\Play\KeyConversionInputManager.cs" />
     <Compile Include="Screens\Play\PauseOverlay.cs" />
     <Compile Include="Screens\Play\Pause\PauseButton.cs" />
