@@ -20,9 +20,11 @@ namespace osu.Game.Graphics.Cursor
     {
         protected override Drawable CreateCursor() => new Cursor();
 
+        private bool dragging;
+
         protected override bool OnMouseMove(InputState state)
         {
-            if (state.Mouse.HasMainButtonPressed)
+            if (dragging)
             {
                 Vector2 offset = state.Mouse.Position - state.Mouse.PositionMouseDown ?? state.Mouse.Delta;
                 float degrees = (float)MathHelper.RadiansToDegrees(Math.Atan2(-offset.X, offset.Y)) + 24.3f;
@@ -39,6 +41,12 @@ namespace osu.Game.Graphics.Cursor
             return base.OnMouseMove(state);
         }
 
+        protected override bool OnDragStart(InputState state)
+        {
+            dragging = true;
+            return base.OnDragStart(state);
+        }
+
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             ActiveCursor.Scale = new Vector2(1);
@@ -53,6 +61,8 @@ namespace osu.Game.Graphics.Cursor
         {
             if (!state.Mouse.HasMainButtonPressed)
             {
+                dragging = false;
+
                 ((Cursor)ActiveCursor).AdditiveLayer.FadeOut(500, EasingTypes.OutQuint);
                 ActiveCursor.RotateTo(0, 600 * (1 + Math.Abs(ActiveCursor.Rotation / 720)), EasingTypes.OutElasticHalf);
                 ActiveCursor.ScaleTo(1, 500, EasingTypes.OutElastic);
