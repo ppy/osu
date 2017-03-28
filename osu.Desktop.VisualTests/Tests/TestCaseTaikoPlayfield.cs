@@ -6,6 +6,7 @@ using osu.Framework.Screens.Testing;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
+using osu.Game.Modes.Taiko.Objects.Drawable;
 using osu.Game.Modes.Taiko.UI;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -22,6 +23,15 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddButton("Hit!", addHitJudgement);
             AddButton("Miss :(", addMissJudgement);
+            AddButton("Centre", () =>
+            {
+                playfield.Add(new DrawableCentreHit(new Hit
+                {
+                    StartTime = Time.Current + 1000,
+                    PreEmpt = 1000,
+                    IsStrong = false
+                }));
+            });
 
             Add(playfield = new TaikoPlayfield
             {
