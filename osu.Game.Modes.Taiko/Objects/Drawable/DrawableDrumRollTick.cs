@@ -24,12 +24,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > tick.TickTimeDistance / 2)
+                if (Judgement.TimeOffset > tick.HitWindow)
                     Judgement.Result = HitResult.Miss;
                 return;
             }
 
-            if (Math.Abs(Judgement.TimeOffset) < tick.TickTimeDistance / 2)
+            if (Math.Abs(Judgement.TimeOffset) < tick.HitWindow)
             {
                 Judgement.Result = HitResult.Hit;
                 Judgement.TaikoResult = TaikoHitResult.Great;
