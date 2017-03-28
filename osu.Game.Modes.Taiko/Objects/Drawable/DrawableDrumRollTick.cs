@@ -22,8 +22,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         private const float tick_size = TaikoHitObject.CIRCLE_RADIUS / 2;
         
         /// <summary>
-        /// Any tick that is not the first is not filled, but is displayed
-        /// as a circle instead. This is what controls the stroke width of that circle.
+        /// Any tick that is not the first for a drumroll is not filled, but is instead displayed
+        /// as a hollow circle. This is what controls the border width of that circle.
         /// </summary>
         private const float tick_border_width = tick_size / 4;
 
