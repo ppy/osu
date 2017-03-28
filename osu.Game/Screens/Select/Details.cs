@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace osu.Game.Screens.Select
@@ -23,9 +24,14 @@ namespace osu.Game.Screens.Select
 
         private DifficultyRow circleSize;
         private DifficultyRow drainRate;
-        private DifficultyRow approachRate;
         private DifficultyRow overallDifficulty;
+        private DifficultyRow approachRate;
         private DifficultyRow stars;
+
+        private DetailsBar ratingsBar;
+        private SpriteText negativeRatings;
+        private SpriteText positiveRatings;
+        private FillFlowContainer<DetailsBar> ratingsGraph;
 
         private BeatmapInfo beatmap;
         public BeatmapInfo Beatmap
@@ -50,11 +56,42 @@ namespace osu.Game.Screens.Select
 
                 circleSize.Value = beatmap.Difficulty.CircleSize;
                 drainRate.Value = beatmap.Difficulty.DrainRate;
-                approachRate.Value = beatmap.Difficulty.ApproachRate;
                 overallDifficulty.Value = beatmap.Difficulty.OverallDifficulty;
+                approachRate.Value = beatmap.Difficulty.ApproachRate;
                 stars.Value = (float) beatmap.StarDifficulty;
             }
         }
+
+        private List<int> ratings;
+        public IEnumerable<int> Ratings
+        {
+            get
+            {
+                return ratings;
+            }
+            set
+            {
+                ratings = value.ToList();
+                negativeRatings.Text = ratings.GetRange(0, 5).Sum().ToString();
+                positiveRatings.Text = ratings.GetRange(5, 5).Sum().ToString();
+                ratingsBar.Length = (float)ratings.GetRange(0, 5).Sum() / ratings.Sum();
+
+                List<DetailsBar> ratingsGraphBars = ratingsGraph.Children.ToList();
+                for (int i = 0; i < 10; i++)
+                    if(ratingsGraphBars.Count > i)
+                        ratingsGraphBars[i].Length = (float)ratings[i] / ratings.Max();
+                    else
+                        ratingsGraph.Add(new DetailsBar
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 0.1f,
+                            Length = (float)ratings[i] / ratings.Max(),
+                            Direction = BarDirection.BottomToTop,
+                            BackgroundColour = new Color4(0, 0, 0, 0),
+                        });
+            }
+        }
+        
 
         public Details()
         {
@@ -74,7 +111,7 @@ namespace osu.Game.Screens.Select
                     AutoSizeAxes = Axes.Y,
                     Width = 0.4f,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding(5),
+                    Padding = new MarginPadding(10) { Top = 25 },
                     Children = new Drawable[]
                     {
                         new SpriteText
@@ -116,59 +153,143 @@ namespace osu.Game.Screens.Select
                         },
                     },
                 },
-                new Container
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Width = 0.6f,
-                    Padding = new MarginPadding(5) { Top = 0 },
-                    Children = new Drawable[]
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0,15),
+                    Padding = new MarginPadding(10) { Top = 0 },
+                    Children = new []
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                            Alpha = 0.5f,
-                        },
-                        new FillFlowContainer
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0,10),
-                            Padding = new MarginPadding(7),
-                            Children = new []
+                            Children = new Drawable[]
                             {
-                                circleSize = new DifficultyRow
+                                new Box
                                 {
-                                    DifficultyName = "Circle Size",
-                                    AutoSizeAxes = Axes.Y,
-                                    RelativeSizeAxes = Axes.X,
-                                    MaxValue = 7,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.Black,
+                                    Alpha = 0.5f,
                                 },
-                                drainRate = new DifficultyRow
+                                new FillFlowContainer
                                 {
-                                    DifficultyName = "HP Drain",
-                                    AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(0,10),
+                                    Padding = new MarginPadding(15) { Top = 25 },
+                                    Children = new []
+                                    {
+                                        circleSize = new DifficultyRow
+                                        {
+                                            DifficultyName = "Circle Size",
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                            MaxValue = 7,
+                                        },
+                                        drainRate = new DifficultyRow
+                                        {
+                                            DifficultyName = "HP Drain",
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                        },
+                                        overallDifficulty = new DifficultyRow
+                                        {
+                                            DifficultyName = "Accuracy",
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                        },
+                                        approachRate = new DifficultyRow
+                                        {
+                                            DifficultyName = "Approach Rate",
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                        },
+                                        stars = new DifficultyRow
+                                        {
+                                            DifficultyName = "Star Difficulty",
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                        },
+                                    },
                                 },
-                                approachRate = new DifficultyRow
+                            },
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
+                            {
+                                new Box
                                 {
-                                    DifficultyName = "Accuracy",
-                                    AutoSizeAxes = Axes.Y,
-                                    RelativeSizeAxes = Axes.X,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.Black,
+                                    Alpha = 0.5f,
                                 },
-                                overallDifficulty = new DifficultyRow
+                                new FillFlowContainer
                                 {
-                                    DifficultyName = "Limit Break",
-                                    AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                },
-                                stars = new DifficultyRow
-                                {
-                                    DifficultyName = "Star Difficulty",
                                     AutoSizeAxes = Axes.Y,
-                                    RelativeSizeAxes = Axes.X,
+                                    Direction = FillDirection.Vertical,
+                                    Padding = new MarginPadding(15) { Top = 25, Bottom = 0 },
+                                    Children = new Drawable[]
+                                    {
+                                        new SpriteText
+                                        {
+                                            Text = "User Rating",
+                                            TextSize = 14,
+                                            Font = @"Exo2.0-Medium",
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                        },
+                                        ratingsBar = new DetailsBar
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = 5,
+                                            Length = 0,
+                                        },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Children = new[]
+                                            {
+                                                negativeRatings = new SpriteText
+                                                {
+                                                    TextSize = 14,
+                                                    Font = @"Exo2.0-Medium",
+                                                    Text = "0",
+                                                },
+                                                positiveRatings = new SpriteText
+                                                {
+                                                    TextSize = 14,
+                                                    Font = @"Exo2.0-Medium",
+                                                    Text = "0",
+                                                    Anchor = Anchor.TopRight,
+                                                    Origin = Anchor.TopRight,
+                                                },
+                                            },
+                                        },
+                                        new SpriteText
+                                        {
+                                            Text = "Rating Spread",
+                                            TextSize = 14,
+                                            Font = @"Exo2.0-Medium",
+                                            Anchor = Anchor.BottomCentre,
+                                            Origin = Anchor.TopCentre,
+                                        },
+                                        ratingsGraph = new FillFlowContainer<DetailsBar>
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Direction = FillDirection.Horizontal,
+                                            Height = 50,
+                                        }
+                                    },
                                 },
                             },
                         },
@@ -183,7 +304,13 @@ namespace osu.Game.Screens.Select
             description.Colour = colour.GrayB;
             source.Colour = colour.GrayB;
             tags.Colour = colour.YellowLight;
+
             stars.BarColour = colour.YellowLight;
+
+            ratingsBar.BackgroundColour = colour.Green;
+            ratingsBar.BarColour = colour.YellowDark;
+
+            ratingsGraph.Colour = colour.BlueDark;
         }
 
         private class DifficultyRow : Container
@@ -202,7 +329,7 @@ namespace osu.Game.Screens.Select
                 set
                 {
                     difficultyValue = value;
-                    bar.Value = value/maxValue;
+                    bar.Length = value/maxValue;
                     valueText.Text = value.ToString();
                 }
             }
@@ -217,7 +344,7 @@ namespace osu.Game.Screens.Select
                 set
                 {
                     maxValue = value;
-                    bar.Value = Value/value;
+                    bar.Length = Value/value;
                 }
             }
 

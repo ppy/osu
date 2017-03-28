@@ -212,7 +212,7 @@
     <Compile Include="Tests\TestCaseBeatmapDetailArea.cs" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup />  
+  <ItemGroup />
   <ItemGroup>
     <Folder Include="Beatmaps\" />
   </ItemGroup>
