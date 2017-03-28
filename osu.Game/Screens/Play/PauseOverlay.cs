@@ -26,9 +26,11 @@ namespace osu.Game.Screens.Play
             return base.OnKeyDown(state, args);
         }
 
-        public PauseOverlay()
+        protected override void AddButtons(OsuColour colours)
         {
-            AddButton(@"Continue", Color4.Green, OnResume);
+            AddButton(@"Continue", colours.Green, OnResume);
+            AddButton(@"Retry", colours.YellowDark, OnRetry);
+            AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), OnQuit);
         }
     }
 }
