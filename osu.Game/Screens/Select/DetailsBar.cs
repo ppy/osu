@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using System;
 
 namespace osu.Game.Screens.Select
 {
@@ -14,7 +15,7 @@ namespace osu.Game.Screens.Select
         private Box background;
         private Box bar;
 
-        private const int resizeDuration = 250;
+        private const int resize_duration = 250;
 
         private float length;
         public float Length
@@ -89,11 +90,11 @@ namespace osu.Game.Screens.Select
             {
                 case BarDirection.LeftToRight:
                 case BarDirection.RightToLeft:
-                    bar.ResizeTo(new Vector2(length, 1), resizeDuration);
+                    bar.ResizeTo(new Vector2(length, 1), resize_duration);
                     break;
                 case BarDirection.TopToBottom:
                 case BarDirection.BottomToTop:
-                    bar.ResizeTo(new Vector2(1, length), resizeDuration);
+                    bar.ResizeTo(new Vector2(1, length), resize_duration);
                     break;
             }
 

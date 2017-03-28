@@ -13,6 +13,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace osu.Game.Screens.Select
 {
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.Select
         private SpriteText negativeRatings;
         private SpriteText positiveRatings;
         private FillFlowContainer<DetailsBar> ratingsGraph;
+
+        private FillFlowContainer<RetryAndFailBar> retryAndFailGraph;
 
         private BeatmapInfo beatmap;
         public BeatmapInfo Beatmap
@@ -91,7 +94,53 @@ namespace osu.Game.Screens.Select
                         });
             }
         }
-        
+
+        private List<int> retries = Enumerable.Repeat(0,100).ToList();
+        public IEnumerable<int> Retries
+        {
+            get
+            {
+                return retries;
+            }
+            set
+            {
+                retries = value.ToList();
+                calcRetryAndFailBarLength();
+            }
+        }
+
+        private List<int> fails = Enumerable.Repeat(0,100).ToList();
+        public IEnumerable<int> Fails
+        {
+            get
+            {
+                return fails;
+            }
+            set
+            {
+                fails = value.ToList();
+                calcRetryAndFailBarLength();
+            }
+        }
+
+        private void calcRetryAndFailBarLength()
+        {
+            List<RetryAndFailBar> retryAndFailGraphBars = retryAndFailGraph.Children.ToList();
+            for (int i = 0; i < 100; i++)
+                if (retryAndFailGraphBars.Count > i)
+                {
+                    retryAndFailGraphBars[i].FailLength = (float)fails[i] / ((fails?.Max() ?? 0) + (retries?.Max() ?? 0));
+                    retryAndFailGraphBars[i].RetryLength = (float)retries[i] / ((fails?.Max() ?? 0) + (retries?.Max() ?? 0));
+                }
+                else
+                    retryAndFailGraph.Add(new RetryAndFailBar
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 0.01f,
+                        FailLength = (float)fails[i] / ((fails?.Max() ?? 0) + (retries?.Max() ?? 0)),
+                        RetryLength = (float)retries[i] / ((fails?.Max() ?? 0) + (retries?.Max() ?? 0)),
+                    });
+        }
 
         public Details()
         {
@@ -280,7 +329,7 @@ namespace osu.Game.Screens.Select
                                             Text = "Rating Spread",
                                             TextSize = 14,
                                             Font = @"Exo2.0-Medium",
-                                            Anchor = Anchor.BottomCentre,
+                                            Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
                                         },
                                         ratingsGraph = new FillFlowContainer<DetailsBar>
@@ -288,10 +337,37 @@ namespace osu.Game.Screens.Select
                                             RelativeSizeAxes = Axes.X,
                                             Direction = FillDirection.Horizontal,
                                             Height = 50,
-                                        }
+                                        },
                                     },
                                 },
                             },
+                        },
+                    },
+                },
+                new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding { Left = 10, Right = 10 },
+                    Children = new Drawable[]
+                    {
+						retryAndFailGraph = new FillFlowContainer<RetryAndFailBar>
+						{
+							RelativeSizeAxes = Axes.X,
+							Direction = FillDirection.Horizontal,
+							Height = 50,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                        },
+                        new SpriteText
+                        {
+                            Text = "Points of Failure",
+                            TextSize = 14,
+                            Font = @"Exo2.0-Medium",
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
                         },
                     },
                 },
@@ -305,11 +381,10 @@ namespace osu.Game.Screens.Select
             source.Colour = colour.GrayB;
             tags.Colour = colour.YellowLight;
 
-            stars.BarColour = colour.YellowLight;
+            stars.BarColour = colour.Yellow;
 
             ratingsBar.BackgroundColour = colour.Green;
             ratingsBar.BarColour = colour.YellowDark;
-
             ratingsGraph.Colour = colour.BlueDark;
         }
 
@@ -405,6 +480,64 @@ namespace osu.Game.Screens.Select
                 name.Colour = colour.GrayB;
                 bar.BackgroundColour = colour.Gray7;
                 valueText.Colour = colour.GrayB;
+            }
+        }
+
+        private class RetryAndFailBar : Container<DetailsBar>
+        {
+            private DetailsBar retryBar;
+            private DetailsBar failBar;
+
+            public float RetryLength
+            {
+                get
+                {
+                    return retryBar.Length;
+                }
+                set
+                {
+                    retryBar.Length = value + FailLength;
+                }
+            }
+
+            public float FailLength
+            {
+                get
+                {
+                    return failBar.Length;
+                }
+                set
+                {
+                    failBar.Length = value;
+                }
+            }
+
+            public RetryAndFailBar()
+            {
+                Children = new[]
+                {
+                    retryBar = new DetailsBar
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Direction = BarDirection.BottomToTop,
+                        Length = 0,
+                        BackgroundColour = new Color4(0,0,0,0),
+                    },
+                    failBar = new DetailsBar
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Direction = BarDirection.BottomToTop,
+                        Length = 0,
+                        BackgroundColour = new Color4(0,0,0,0),
+                    },
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colour)
+            {
+                retryBar.Colour = colour.Yellow;
+                failBar.Colour = colour.YellowDarker;
             }
         }
     }

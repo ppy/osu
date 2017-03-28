@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens.Testing;
 using osu.Game.Database;
 using osu.Game.Screens.Select;
@@ -20,9 +21,11 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            Add(new Details
+            Details details;
+            Add(details = new Details
             {
                 RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding(150),
                 Beatmap = new BeatmapInfo
                 {
                     Version = "VisualTest",
@@ -40,11 +43,11 @@ namespace osu.Desktop.VisualTests.Tests
                     },
                     StarDifficulty = 5.3f,
                 },
-                Ratings = new[]
-                {
-                    1,2,3,4,5,6,7,8,9,10
-                }
             });
+
+            details.Ratings = Enumerable.Range(1, 10);
+            details.Fails = Enumerable.Range(1, 100).Select(i => (int)(Math.Cos(i) * 100));
+            details.Retries = Enumerable.Range(1, 100).Select(i => (int)(Math.Sin(i) * 100));
         }
     }
 }
