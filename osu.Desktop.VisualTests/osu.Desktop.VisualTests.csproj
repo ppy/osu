@@ -185,6 +185,7 @@
     <Compile Include="Tests\TestCaseChatDisplay.cs" />
     <Compile Include="Tests\TestCaseDrawings.cs" />
     <Compile Include="Tests\TestCaseGamefield.cs" />
+    <Compile Include="Tests\TestCaseInGameOverlays.cs" />
     <Compile Include="Tests\TestCaseMusicController.cs" />
     <Compile Include="Tests\TestCaseNotificationManager.cs" />
     <Compile Include="Tests\TestCasePlayer.cs" />
@@ -202,7 +203,6 @@
     <Compile Include="VisualTestGame.cs" />
     <Compile Include="Platform\TestStorage.cs" />
     <Compile Include="Tests\TestCaseOptions.cs" />
-    <Compile Include="Tests\TestCasePauseOverlay.cs" />
     <Compile Include="Tests\TestCaseModSelectOverlay.cs" />
     <Compile Include="Tests\TestCaseDialogOverlay.cs" />
     <Compile Include="Tests\TestCaseBeatmapOptionsOverlay.cs" />
@@ -212,9 +212,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Beatmaps\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
