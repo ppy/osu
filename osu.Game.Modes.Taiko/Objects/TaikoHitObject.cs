@@ -20,6 +20,12 @@ namespace osu.Game.Modes.Taiko.Objects
         public double PreEmpt;
 
         /// <summary>
+        /// Whether this HitObject is a "strong" type.
+        /// Strong hit objects give more points for hitting the hit object with both keys.
+        /// </summary>
+        public bool IsStrong;
+
+        /// <summary>
         /// Whether this HitObject is in Kiai time.
         /// </summary>
         public bool Kiai { get; protected set; }

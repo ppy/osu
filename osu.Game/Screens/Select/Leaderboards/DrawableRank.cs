@@ -6,21 +6,21 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Modes;
 using osu.Framework.Extensions;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
     public class DrawableRank : Container
     {
-        private readonly Sprite sprite;
+        private readonly Sprite rankSprite;
 
         public ScoreRank Rank { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            sprite.Texture = textures.Get($@"Badges/ScoreRanks/{Rank.GetDescription()}");
+            rankSprite.Texture = textures.Get($@"Grades/{Rank.GetDescription()}");
         }
 
         public DrawableRank(ScoreRank rank)
@@ -29,10 +29,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             Children = new Drawable[]
             {
-                sprite = new Sprite
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
+                rankSprite = new Sprite { FillMode = FillMode.Fill },
             };
         }
     }

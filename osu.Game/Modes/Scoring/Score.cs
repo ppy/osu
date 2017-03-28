@@ -3,11 +3,12 @@
 
 using System;
 using Newtonsoft.Json;
-using osu.Game.Users;
 using osu.Game.Database;
 using osu.Game.Modes.Mods;
+using osu.Game.Users;
+using System.IO;
 
-namespace osu.Game.Modes
+namespace osu.Game.Modes.Scoring
 {
     public class Score
     {
@@ -42,6 +43,13 @@ namespace osu.Game.Modes
 
         [JsonProperty(@"date")]
         public DateTime Date;
+
+        /// <summary>
+        /// Creates a legacy replay which is read from a stream.
+        /// </summary>
+        /// <param name="reader">The stream reader.</param>
+        /// <returns>The replay.</returns>
+        public virtual Replay CreateLegacyReplayFrom(StreamReader reader) => new LegacyReplay(reader);
 
         //  [JsonProperty(@"count50")] 0,
         //[JsonProperty(@"count100")] 0,

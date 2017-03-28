@@ -3,6 +3,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Types;
 using osu.Game.Modes.Taiko.Objects;
@@ -43,12 +44,15 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             IHasRepeats repeatsData = original as IHasRepeats;
             IHasEndTime endTimeData = original as IHasEndTime;
 
+            bool strong = ((original.Sample?.Type ?? SampleType.None) & SampleType.Finish) > 0;
+
             if (distanceData != null)
             {
                 return new DrumRoll
                 {
                     StartTime = original.StartTime,
                     Sample = original.Sample,
+                    IsStrong = strong,
 
                     Distance = distanceData.Distance * (repeatsData?.RepeatCount ?? 1)
                 };
@@ -57,10 +61,11 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             if (endTimeData != null)
             {
                 // We compute the end time manually to add in the Bash convert factor
-                return new Bash
+                return new Swell
                 {
                     StartTime = original.StartTime,
                     Sample = original.Sample,
+                    IsStrong = strong,
 
                     EndTime = original.StartTime + endTimeData.Duration * bash_convert_factor 
                 };
@@ -70,6 +75,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             {
                 StartTime = original.StartTime,
                 Sample = original.Sample,
+                IsStrong = strong
             };
         }
     }

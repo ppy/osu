@@ -7,6 +7,8 @@ using osu.Game.Modes.Osu.Beatmaps;
 using osu.Game.Modes.Osu.Judgements;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Modes.Osu.Objects.Drawables;
+using osu.Game.Modes.Osu.Scoring;
+using osu.Game.Modes.Scoring;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;
 

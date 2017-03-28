@@ -4,6 +4,7 @@
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -22,12 +23,11 @@ namespace osu.Game.Screens.Select
 
         public PlaySongSelect()
         {
-            Add(modSelect = new ModSelectOverlay
+            FooterPanels.Add(modSelect = new ModSelectOverlay
             {
                 RelativeSizeAxes = Axes.X,
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.BottomCentre,
-                Margin = new MarginPadding { Bottom = 50 }
             });
 
             LeftContent.Add(beatmapDetails = new BeatmapDetailArea
@@ -64,6 +64,17 @@ namespace osu.Game.Screens.Select
         {
             player = null;
             base.OnResuming(last);
+        }
+
+        protected override bool OnExiting(Screen next)
+        {
+            if (modSelect.State == Visibility.Visible)
+            {
+                modSelect.Hide();
+                return true;
+            }
+
+            return base.OnExiting(next);
         }
 
         protected override void OnSelected()

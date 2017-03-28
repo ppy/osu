@@ -26,6 +26,7 @@ using osu.Framework.Graphics.Primitives;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Modes.Scoring;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
 
@@ -125,7 +126,7 @@ namespace osu.Game
 
             Beatmap.Value = BeatmapDatabase.GetWorkingBeatmap(s.Beatmap);
 
-            menu.Push(new PlayerLoader(new Player { ReplayInputHandler = s.Replay.GetInputHandler() }));
+            menu.Push(new PlayerLoader(new Player { ReplayInputHandler = s.Replay.CreateInputHandler() }));
         }
 
         protected override void LoadComplete()
