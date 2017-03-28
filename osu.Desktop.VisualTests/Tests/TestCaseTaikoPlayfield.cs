@@ -6,6 +6,7 @@ using osu.Framework.Screens.Testing;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
+using osu.Game.Modes.Taiko.Objects.Drawable;
 using osu.Game.Modes.Taiko.UI;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -22,6 +23,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddButton("Hit!", addHitJudgement);
             AddButton("Miss :(", addMissJudgement);
+            AddButton("Swell", addSwell);
 
             Add(playfield = new TaikoPlayfield
             {
@@ -58,6 +60,16 @@ namespace osu.Desktop.VisualTests.Tests
                     ComboAtHit = 0
                 }
             });
+        }
+
+        private void addSwell()
+        {
+            playfield.Add(new DrawableSwell(new Swell
+            {
+                StartTime = Time.Current + 1000,
+                EndTime = Time.Current + 5000,
+                PreEmpt = 1000
+            }));
         }
 
         private class DrawableTestHit : DrawableHitObject<TaikoHitObject, TaikoJudgement>
