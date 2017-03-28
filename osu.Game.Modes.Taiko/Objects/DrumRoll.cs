@@ -88,6 +88,7 @@ namespace osu.Game.Modes.Taiko.Objects
                     PreEmpt = PreEmpt,
                     TickTimeDistance = TickTimeDistance,
                     StartTime = t,
+                    IsStrong = IsStrong,
                     Sample = new HitSampleInfo
                     {
                         Type = SampleType.None,
