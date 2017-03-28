@@ -14,6 +14,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Game.Graphics;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play
 {
@@ -43,7 +44,7 @@ namespace osu.Game.Screens.Play
             set { description = value; }
         }
 
-        private readonly FillFlowContainer buttons;
+        private FillFlowContainer buttons;
 
         public int Retries
         {
@@ -83,7 +84,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private readonly FillFlowContainer retryCounterContainer;
+        private FillFlowContainer retryCounterContainer;
 
         public override bool HandleInput => State == Visibility.Visible;
 
@@ -123,11 +124,9 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        public FailOverlay()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            AlwaysReceiveInput = true;
-
-            RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
                 new Box
@@ -211,8 +210,19 @@ namespace osu.Game.Screens.Play
 
             Retries = 0;
 
-            AddButton(@"Retry", Color4.Yellow, OnRetry);
+            AddButtons(colours);
+        }
+
+        protected virtual void AddButtons(OsuColour colours)
+        {
+            AddButton(@"Retry", colours.YellowDark, OnRetry);
             AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), OnQuit);
+        }
+
+        public FailOverlay()
+        {
+            AlwaysReceiveInput = true;
+            RelativeSizeAxes = Axes.Both;            
         }
     }
 }
