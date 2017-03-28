@@ -194,13 +194,14 @@
     <Compile Include="Screens\Multiplayer\Lobby.cs" />
     <Compile Include="Screens\Multiplayer\Match.cs" />
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
+    <Compile Include="Screens\Play\FailOverlay.cs" />
     <Compile Include="Screens\Play\KeyConversionInputManager.cs" />
+    <Compile Include="Screens\Play\PauseOverlay.cs" />
     <Compile Include="Screens\Play\Pause\PauseButton.cs" />
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Modes\UI\StandardComboCounter.cs" />
-    <Compile Include="Screens\Play\StopOverlay.cs" />
     <Compile Include="Screens\Select\BeatmapCarousel.cs" />
     <Compile Include="Screens\Select\FilterCriteria.cs" />
     <Compile Include="Screens\Select\Filter\GroupMode.cs" />
