@@ -14,7 +14,6 @@ using OpenTK;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
 using osu.Framework.Input;
-using osu.Framework.Screens.Testing;
 using OpenTK.Input;
 
 namespace osu.Game.Screens.Menu
@@ -48,7 +47,6 @@ namespace osu.Game.Screens.Menu
                             OnEdit = delegate { Push(new Editor()); },
                             OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
-                            OnTest  = delegate { Push(new TestBrowser()); },
                             OnExit = delegate { Exit(); },
                         }
                     }

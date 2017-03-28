@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Mods;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Modes;
 
 namespace osu.Desktop.VisualTests.Tests
