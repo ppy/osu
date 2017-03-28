@@ -6,7 +6,6 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK;
 
