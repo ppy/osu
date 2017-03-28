@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -66,7 +65,7 @@ namespace osu.Game.Screens.Play
         private FailOverlay failOverlay;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuColour colours)
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
         {
             var beatmap = Beatmap.Beatmap;
 
