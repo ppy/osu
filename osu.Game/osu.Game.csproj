@@ -160,7 +160,7 @@
     <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
     <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
-    <Compile Include="Overlays\Options\OptionDropDown.cs" />
+    <Compile Include="Overlays\Options\OptionDropdown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropdown.cs" />
     <Compile Include="Overlays\Options\OptionsFooter.cs" />
@@ -322,7 +322,7 @@
     <Compile Include="Overlays\Options\OptionTextBox.cs" />
     <Compile Include="Overlays\Options\OptionSlider.cs" />
     <Compile Include="Configuration\ProgressBarType.cs" />
-    <Compile Include="Overlays\Options\OptionEnumDropDown.cs" />
+    <Compile Include="Overlays\Options\OptionEnumDropdown.cs" />
     <Compile Include="Configuration\RankingType.cs" />
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ReleaseStream.cs" />
