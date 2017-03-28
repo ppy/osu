@@ -9,20 +9,24 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
 {
-    class DetailsBar : Container
+    public class DetailsBar : Container
     {
         private Box background;
         private Box bar;
 
-        public float Value
+        private const int resizeDuration = 250;
+
+        private float length;
+        public float Length
         {
             get
             {
-                return bar.Width;
+                return length;
             }
             set
             {
-                bar.ResizeTo(new Vector2(value, 1), 200);
+                length = value;
+                updateBarLength();
             }
         }
 
@@ -50,6 +54,20 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        private BarDirection direction = BarDirection.LeftToRight;
+        public BarDirection Direction
+        {
+            get
+            {
+                return direction;
+            }
+            set
+            {
+                direction = value;
+                updateBarLength();
+            }
+        }
+
         public DetailsBar()
         {
             Children = new []
@@ -64,5 +82,42 @@ namespace osu.Game.Screens.Select
                 }
             };
         }
+
+        private void updateBarLength()
+        {
+            switch (direction)
+            {
+                case BarDirection.LeftToRight:
+                case BarDirection.RightToLeft:
+                    bar.ResizeTo(new Vector2(length, 1), resizeDuration);
+                    break;
+                case BarDirection.TopToBottom:
+                case BarDirection.BottomToTop:
+                    bar.ResizeTo(new Vector2(1, length), resizeDuration);
+                    break;
+            }
+
+            switch (direction)
+            {
+                case BarDirection.LeftToRight:
+                case BarDirection.TopToBottom:
+                    bar.Anchor = Anchor.TopLeft;
+                    bar.Origin = Anchor.TopLeft;
+                    break;
+                case BarDirection.RightToLeft:
+                case BarDirection.BottomToTop:
+                    bar.Anchor = Anchor.BottomRight;
+                    bar.Origin = Anchor.BottomRight;
+                    break;
+            }
+        }
+    }
+
+    public enum BarDirection
+    {
+        LeftToRight,
+        RightToLeft,
+        TopToBottom,
+        BottomToTop,
     }
 }
