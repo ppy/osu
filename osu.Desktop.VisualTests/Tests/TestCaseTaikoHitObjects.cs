@@ -38,7 +38,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(100, 100)
             });
 
-            Add(new CentreHitCircle(new AccentedCirclePiece()
+            Add(new CentreHitCircle(new StrongCirclePiece()
             {
                 KiaiMode = kiai
             })
@@ -54,7 +54,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(100, 300)
             });
 
-            Add(new RimHitCircle(new AccentedCirclePiece()
+            Add(new RimHitCircle(new StrongCirclePiece()
             {
                 KiaiMode = kiai
             })
@@ -70,7 +70,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(100, 500)
             });
 
-            Add(new SwellCircle(new AccentedCirclePiece()
+            Add(new SwellCircle(new StrongCirclePiece()
             {
                 KiaiMode = kiai
             })
@@ -87,7 +87,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(575, 100)
             });
 
-            Add(new DrumRollCircle(new AccentedCirclePiece()
+            Add(new DrumRollCircle(new StrongCirclePiece()
             {
                 KiaiMode = kiai
             })
