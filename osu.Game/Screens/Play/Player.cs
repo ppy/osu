@@ -62,8 +62,8 @@ namespace osu.Game.Screens.Play
         private SkipButton skipButton;
 
         private HudOverlay hudOverlay;
-        private PauseOverlay pauseOverlay;
-        private FailOverlay failOverlay;
+        private StopOverlay pauseOverlay;
+        private StopOverlay failOverlay;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuColour colours)
@@ -125,24 +125,28 @@ namespace osu.Game.Screens.Play
             hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
             hudOverlay.BindProcessor(scoreProcessor);
 
-            pauseOverlay = new PauseOverlay
+            pauseOverlay = new StopOverlay
             {
                 Depth = -1,
-                OnResume = delegate
+                OnEscPressed = delegate
                 {
                     Delay(400);
                     Schedule(Resume);
                 },
+                Title = @"paused",
+                Description = @"you're not going to do what i think you're going to do, are ya?",
             };
             pauseOverlay.AddButton(@"Continue", colours.Green, delegate { Delay(400); Schedule(Resume); });
             pauseOverlay.AddButton(@"Retry", colours.YellowDark, Restart);
             pauseOverlay.AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), Exit);
 
 
-            failOverlay = new FailOverlay
+            failOverlay = new StopOverlay
             {
                 Depth = -1,
-                OnQuit = Exit,
+                OnEscPressed = Exit,
+                Title = @"failed",
+                Description = @"you're dead, try again?",
             };
             failOverlay.AddButton(@"Retry", colours.YellowDark, Restart);
             failOverlay.AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), Exit);

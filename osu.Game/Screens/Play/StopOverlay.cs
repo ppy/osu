@@ -16,7 +16,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
-    public class PauseOverlay : OverlayContainer
+    public class StopOverlay : OverlayContainer
     {
         private const int transition_duration = 200;
         private const int button_height = 70;
@@ -24,10 +24,22 @@ namespace osu.Game.Screens.Play
 
         protected override bool HideOnEscape => false;
 
-        public Action OnResume;
+        public Action OnEscPressed;
 
-        protected OsuSpriteText Title;
-        protected OsuSpriteText Description;
+        private string title;
+        private string description;
+
+        public string Title
+        {
+            get { return title; }
+            set { title = value; }
+        }
+
+        public string Description
+        {
+            get { return description; }
+            set { description = value; }
+        }
 
         private readonly FillFlowContainer buttons;
 
@@ -86,16 +98,16 @@ namespace osu.Game.Screens.Play
             if (args.Key == Key.Escape)
             {
                 if (State == Visibility.Hidden) return false;
-                resume();
+                onEscPressed();
                 return true;
             }
 
             return base.OnKeyDown(state, args);
         }
 
-        private void resume()
+        private void onEscPressed()
         {
-            OnResume?.Invoke();
+            OnEscPressed?.Invoke();
             Hide();
         }
 
@@ -115,7 +127,7 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        public PauseOverlay()
+        public StopOverlay()
         {
             AlwaysReceiveInput = true;
 
@@ -148,9 +160,9 @@ namespace osu.Game.Screens.Play
                             Spacing = new Vector2(0, 20),
                             Children = new Drawable[]
                             {
-                                Title = new OsuSpriteText
+                                new OsuSpriteText
                                 {
-                                    Text = @"paused",
+                                    Text = Title,
                                     Font = @"Exo2.0-Medium",
                                     Spacing = new Vector2(5, 0),
                                     Origin = Anchor.TopCentre,
@@ -160,9 +172,9 @@ namespace osu.Game.Screens.Play
                                     Shadow = true,
                                     ShadowColour = new Color4(0, 0, 0, 0.25f)
                                 },
-                                Description = new OsuSpriteText
+                                new OsuSpriteText
                                 {
-                                    Text = @"you're not going to do what i think you're going to do, are ya?",
+                                    Text = Description,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Shadow = true,
