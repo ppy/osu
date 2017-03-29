@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace osu.Game.Screens.Select
@@ -405,7 +406,7 @@ namespace osu.Game.Screens.Select
                 {
                     difficultyValue = value;
                     bar.Length = value/maxValue;
-                    valueText.Text = value.ToString();
+                    valueText.Text = value.ToString(CultureInfo.InvariantCulture);
                 }
             }
 
