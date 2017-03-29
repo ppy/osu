@@ -13,6 +13,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
     {
         private readonly DrumRoll drumRoll;
 
+        private readonly DrumRollCirclePiece circle;
+
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
@@ -21,7 +23,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             RelativeSizeAxes = Axes.X;
             Width = (float)(drumRoll.Duration / drumRoll.PreEmpt);
 
-            Add(new DrumRollCirclePiece(CreateCirclePiece()));
+            Add(circle = new DrumRollCirclePiece(CreateCirclePiece()));
 
             foreach (var tick in drumRoll.Ticks)
             {
@@ -30,9 +32,17 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                     X = (float)((tick.StartTime - HitObject.StartTime) / drumRoll.Duration)
                 };
 
+                newTick.OnJudgement += onTickJudgement;
+
                 AddNested(newTick);
                 Add(newTick);
             }
+        }
+
+        private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)
+        {
+            int countHit = NestedHitObjects.Count(o => o.Judgement.Result == HitResult.Hit);
+            circle.Completion = (float)countHit / NestedHitObjects.Count();
         }
 
         protected override void LoadComplete()
