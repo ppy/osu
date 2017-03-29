@@ -13,7 +13,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace osu.Game.Screens.Select
 {
@@ -126,19 +125,20 @@ namespace osu.Game.Screens.Select
         private void calcRetryAndFailBarLength()
         {
             List<RetryAndFailBar> retryAndFailGraphBars = retryAndFailGraph.Children.ToList();
+            float maxValue = fails.Select((value, index) => value + retries[index]).Max();
             for (int i = 0; i < 100; i++)
                 if (retryAndFailGraphBars.Count > i)
                 {
-                    retryAndFailGraphBars[i].FailLength = (float)fails[i] / ((fails?.Max() ?? 0) + (retries?.Max() ?? 0));
-                    retryAndFailGraphBars[i].RetryLength = (float)retries[i] / ((fails?.Max() ?? 0) + (retries?.Max() ?? 0));
+                    retryAndFailGraphBars[i].FailLength = fails[i] / maxValue;
+                    retryAndFailGraphBars[i].RetryLength = retries[i] / maxValue;
                 }
                 else
                     retryAndFailGraph.Add(new RetryAndFailBar
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.01f,
-                        FailLength = (float)fails[i] / ((fails?.Max() ?? 0) + (retries?.Max() ?? 0)),
-                        RetryLength = (float)retries[i] / ((fails?.Max() ?? 0) + (retries?.Max() ?? 0)),
+                        FailLength = fails[i] / maxValue,
+                        RetryLength = retries[i] / maxValue,
                     });
         }
 
