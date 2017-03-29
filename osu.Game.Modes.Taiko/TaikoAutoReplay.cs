@@ -1,19 +1,19 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.Objects.Types;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Modes.Taiko
 {
     public class TaikoAutoReplay : LegacyTaikoReplay
     {
-        private readonly List<TaikoHitObject> hitObjects;
+        private readonly Beatmap<TaikoHitObject> beatmap;
 
-        public TaikoAutoReplay(List<TaikoHitObject> hitObjects)
+        public TaikoAutoReplay(Beatmap<TaikoHitObject> beatmap)
         {
-            this.hitObjects = hitObjects;
+            this.beatmap = beatmap;
 
             createAutoReplay();
         }
@@ -23,11 +23,11 @@ namespace osu.Game.Modes.Taiko
             bool hitButton = true;
 
             Frames.Add(new LegacyReplayFrame(-100000, 320, 240, LegacyButtonState.None));
-            Frames.Add(new LegacyReplayFrame(hitObjects[0].StartTime - 1000, 320, 240, LegacyButtonState.None));
+            Frames.Add(new LegacyReplayFrame(beatmap.HitObjects[0].StartTime - 1000, 320, 240, LegacyButtonState.None));
 
-            for (int i = 0; i < hitObjects.Count; i++)
+            for (int i = 0; i < beatmap.HitObjects.Count; i++)
             {
-                TaikoHitObject h = hitObjects[i];
+                TaikoHitObject h = beatmap.HitObjects[i];
 
                 LegacyButtonState button;
 
@@ -104,9 +104,9 @@ namespace osu.Game.Modes.Taiko
 
                 Frames.Add(new LegacyReplayFrame(endTime + 1, 0, 0, LegacyButtonState.None));
 
-                if (i < hitObjects.Count - 1)
+                if (i < beatmap.HitObjects.Count - 1)
                 {
-                    double waitTime = hitObjects[i + 1].StartTime - 1000;
+                    double waitTime = beatmap.HitObjects[i + 1].StartTime - 1000;
                     if (waitTime > endTime)
                         Frames.Add(new LegacyReplayFrame(waitTime, 0, 0, LegacyButtonState.None));
                 }
