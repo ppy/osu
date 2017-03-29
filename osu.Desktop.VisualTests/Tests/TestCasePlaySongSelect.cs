@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Platform;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Framework.MathUtils;
 using osu.Game.Database;
 using osu.Game.Modes;
