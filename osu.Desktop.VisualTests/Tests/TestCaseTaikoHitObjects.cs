@@ -103,7 +103,7 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    TextSize = SYMBOL_INNER_SIZE,
+                    TextSize = CirclePiece.SYMBOL_INNER_SIZE,
                     Icon = FontAwesome.fa_asterisk,
                     Shadow = false
                 });
