@@ -65,7 +65,7 @@ namespace osu.Game.Modes.Taiko
                         {
                             Mods = new Mod[]
                             {
-                                new ModAutoplay(),
+                                new TaikoModAutoplay(),
                                 new ModCinema(),
                             },
                         },

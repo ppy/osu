@@ -119,6 +119,15 @@ namespace osu.Game.Modes.Taiko.Scoring
         {
         }
 
+        public override Score CreateScore() => new TaikoScore
+        {
+            TotalScore = TotalScore,
+            Combo = Combo,
+            MaxCombo = HighestCombo,
+            Accuracy = Accuracy,
+            Health = Health,
+        };
+
         protected override void ComputeTargets(Beatmap<TaikoHitObject> beatmap)
         {
             double hpMultiplierNormal = 1 / (hp_hit_great * beatmap.HitObjects.FindAll(o => o is Hit).Count * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, 0.5, 0.75, 0.98));
