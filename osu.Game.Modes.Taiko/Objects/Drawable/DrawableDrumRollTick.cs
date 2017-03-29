@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {

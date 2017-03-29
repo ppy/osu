@@ -7,6 +7,7 @@ using osu.Game.Modes.Scoring;
 using osu.Game.Modes.Taiko.Beatmaps;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
+using osu.Game.Modes.Taiko.Objects.Drawable;
 using osu.Game.Modes.Taiko.Scoring;
 using osu.Game.Modes.UI;
 
@@ -27,6 +28,37 @@ namespace osu.Game.Modes.Taiko.UI
 
         protected override Playfield<TaikoHitObject, TaikoJudgement> CreatePlayfield() => new TaikoPlayfield();
 
-        protected override DrawableHitObject<TaikoHitObject, TaikoJudgement> GetVisualRepresentation(TaikoHitObject h) => null;
+        protected override DrawableHitObject<TaikoHitObject, TaikoJudgement> GetVisualRepresentation(TaikoHitObject h)
+        {
+            var hit = h as Hit;
+            if (hit != null)
+            {
+                switch (hit.Type)
+                {
+                    case HitType.Centre:
+                        if (h.IsStrong)
+                            return new DrawableStrongCentreHit(hit);
+                        return new DrawableCentreHit(hit);
+                    case HitType.Rim:
+                        if (h.IsStrong)
+                            return new DrawableStrongRimHit(hit);
+                        return new DrawableRimHit(hit);
+                }
+            }
+
+            var drumRoll = h as DrumRoll;
+            if (drumRoll != null)
+            {
+                if (h.IsStrong)
+                    return new DrawableStrongDrumRoll(drumRoll);
+                return new DrawableDrumRoll(drumRoll);
+            }
+
+            var swell = h as Swell;
+            if (swell != null)
+                return new DrawableSwell(swell);
+
+            return null;
+        }
     }
 }
