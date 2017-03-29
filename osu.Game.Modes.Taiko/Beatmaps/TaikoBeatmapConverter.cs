@@ -44,7 +44,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             IHasRepeats repeatsData = original as IHasRepeats;
             IHasEndTime endTimeData = original as IHasEndTime;
 
-            bool accented = ((original.Sample?.Type ?? SampleType.None) & SampleType.Finish) > 0;
+            bool strong = ((original.Sample?.Type ?? SampleType.None) & SampleType.Finish) > 0;
 
             if (distanceData != null)
             {
@@ -52,7 +52,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                 {
                     StartTime = original.StartTime,
                     Sample = original.Sample,
-                    Accented = accented,
+                    IsStrong = strong,
 
                     Distance = distanceData.Distance * (repeatsData?.RepeatCount ?? 1)
                 };
@@ -65,7 +65,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                 {
                     StartTime = original.StartTime,
                     Sample = original.Sample,
-                    Accented = accented,
+                    IsStrong = strong,
 
                     EndTime = original.StartTime + endTimeData.Duration * bash_convert_factor 
                 };
@@ -75,7 +75,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             {
                 StartTime = original.StartTime,
                 Sample = original.Sample,
-                Accented = accented
+                IsStrong = strong
             };
         }
     }
