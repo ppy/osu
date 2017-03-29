@@ -41,6 +41,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         private readonly CircularContainer targetRing;
         private readonly CircularContainer innerRing;
 
+        private readonly CirclePiece circlePiece;
+
         private bool hasStarted;
 
         public DrawableSwell(Swell swell)
@@ -107,7 +109,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                                 }
                             }
                         },
-                        new SwellCirclePiece(new CirclePiece())
+                        circlePiece = new CirclePiece
+                        {
+                            Children = new []
+                            {
+                                new SwellSymbolPiece()
+                            }
+                        }
                     }
                 }
             };
@@ -116,6 +124,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            circlePiece.AccentColour = colours.YellowDark;
             innerRing.Colour = colours.YellowDark;
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
         }
