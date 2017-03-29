@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -27,36 +28,52 @@ namespace osu.Desktop.VisualTests.Tests
                 Reset();
             });
 
-            Add(new CentreHitCirclePiece(new CirclePiece
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(100, 100)
+                Position = new Vector2(100, 100),
+                Width = 0,
+                AccentColour = Color4.DarkRed,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new CentreHitSymbolPiece()
+                }
             });
 
-            Add(new CentreHitCirclePiece(new StrongCirclePiece
+            Add(new StrongCirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(350, 100)
+                Position = new Vector2(350, 100),
+                Width = 0,
+                AccentColour = Color4.DarkRed,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new CentreHitSymbolPiece()
+                }
             });
 
-            Add(new RimHitCirclePiece(new CirclePiece
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(100, 300)
+                Position = new Vector2(100, 300),
+                Width = 0,
+                AccentColour = Color4.DarkBlue,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new RimHitSymbolPiece()
+                }
             });
 
-            Add(new RimHitCirclePiece(new StrongCirclePiece
+            Add(new StrongCirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(350, 300)
+                Position = new Vector2(350, 300),
+                Width = 0,
+                AccentColour = Color4.DarkBlue,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new RimHitSymbolPiece()
+                }
             });
 
             Add(new SwellCircle(new CirclePiece
