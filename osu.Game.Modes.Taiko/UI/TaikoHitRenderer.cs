@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Scoring;
 using osu.Game.Modes.Taiko.Beatmaps;
@@ -26,7 +27,11 @@ namespace osu.Game.Modes.Taiko.UI
 
         protected override IBeatmapProcessor<TaikoHitObject> CreateBeatmapProcessor() => new TaikoBeatmapProcessor();
 
-        protected override Playfield<TaikoHitObject, TaikoJudgement> CreatePlayfield() => new TaikoPlayfield();
+        protected override Playfield<TaikoHitObject, TaikoJudgement> CreatePlayfield() => new TaikoPlayfield
+        {
+            Anchor = Anchor.CentreLeft,
+            Origin = Anchor.CentreLeft
+        };
 
         protected override DrawableHitObject<TaikoHitObject, TaikoJudgement> GetVisualRepresentation(TaikoHitObject h)
         {
