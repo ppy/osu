@@ -149,7 +149,7 @@ namespace osu.Game.Modes.UI
         public event Action<TJudgement> OnJudgement;
 
         protected override Container<Drawable> Content => content;
-        protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
+        protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result != HitResult.None);
 
         /// <summary>
         /// The playfield.

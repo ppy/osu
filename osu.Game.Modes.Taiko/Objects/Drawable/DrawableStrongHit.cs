@@ -5,6 +5,7 @@ using OpenTK.Input;
 using System;
 using System.Linq;
 using osu.Framework.Input;
+using osu.Game.Modes.Objects.Drawables;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -27,7 +28,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         protected override void CheckJudgement(bool userTriggered)
         {
-            if (!Judgement.Result.HasValue)
+            if (Judgement.Result == HitResult.None)
             {
                 base.CheckJudgement(userTriggered);
                 return;
@@ -45,7 +46,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         protected override bool HandleKeyPress(Key key)
         {
             // Check if we've handled the first key
-            if (!Judgement.Result.HasValue)
+            if (Judgement.Result == HitResult.None)
             {
                 // First key hasn't been handled yet, attempt to handle it
                 bool handled = base.HandleKeyPress(key);

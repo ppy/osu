@@ -10,7 +10,7 @@ namespace osu.Game.Modes.Judgements
         /// <summary>
         /// Whether this judgement is the result of a hit or a miss.
         /// </summary>
-        public HitResult? Result;
+        public HitResult Result;
 
         /// <summary>
         /// The offset at which this judgement occurred.
