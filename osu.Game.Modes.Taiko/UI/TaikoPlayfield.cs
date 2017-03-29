@@ -53,7 +53,7 @@ namespace osu.Game.Modes.Taiko.UI
         private readonly Container<DrawableTaikoJudgement> judgementContainer;
 
         private readonly Container hitObjectContainer;
-        private Container topLevelHitContainer;
+        private readonly Container topLevelHitContainer;
         private readonly Container leftBackgroundContainer;
         private readonly Container rightBackgroundContainer;
         private readonly Box leftBackground;
