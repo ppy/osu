@@ -30,7 +30,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         protected override void LoadComplete()
         {
             LifetimeStart = HitObject.StartTime - HitObject.PreEmpt * 2;
-            LifetimeEnd = HitObject.StartTime + HitObject.PreEmpt;
 
             base.LoadComplete();
         }
