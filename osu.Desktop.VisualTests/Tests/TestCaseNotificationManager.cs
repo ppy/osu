@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Framework.MathUtils;
 using osu.Game.Overlays;
 using System.Linq;
