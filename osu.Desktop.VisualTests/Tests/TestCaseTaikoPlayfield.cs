@@ -1,6 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
 using osu.Game.Modes.Objects.Drawables;
@@ -24,10 +27,20 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton("Hit!", addHitJudgement);
             AddButton("Miss :(", addMissJudgement);
             AddButton("Swell", addSwell);
+            AddButton("Centre", () => addCentreHit(false));
+            AddButton("Strong Centre", () => addCentreHit(true));
+            AddButton("Rim", () => addRimHit(false));
+            AddButton("Strong Rim", () => addRimHit(true));
 
-            Add(playfield = new TaikoPlayfield
+            Add(new Container
             {
-                Y = 200
+                RelativeSizeAxes = Axes.X,
+                Y = 200,
+                Padding = new MarginPadding { Left = 200 },
+                Children = new[]
+                {
+                    playfield = new TaikoPlayfield()
+                }
             });
         }
 
@@ -70,6 +83,34 @@ namespace osu.Desktop.VisualTests.Tests
                 EndTime = Time.Current + 5000,
                 PreEmpt = 1000
             }));
+        }
+        
+        private void addCentreHit(bool strong)
+        {
+            Hit h = new Hit
+            {
+                StartTime = Time.Current + 1000,
+                PreEmpt = 1000
+            };
+
+            if (strong)
+                playfield.Add(new DrawableStrongCentreHit(h));
+            else
+                playfield.Add(new DrawableCentreHit(h));
+        }
+
+        private void addRimHit(bool strong)
+        {
+            Hit h = new Hit
+            {
+                StartTime = Time.Current + 1000,
+                PreEmpt = 1000
+            };
+
+            if (strong)
+                playfield.Add(new DrawableStrongRimHit(h));
+            else
+                playfield.Add(new DrawableRimHit(h));
         }
 
         private class DrawableTestHit : DrawableHitObject<TaikoHitObject, TaikoJudgement>
