@@ -4,6 +4,7 @@
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.Objects.Types;
 using osu.Game.Beatmaps;
+using System;
 
 namespace osu.Game.Modes.Taiko
 {
@@ -34,13 +35,16 @@ namespace osu.Game.Modes.Taiko
                 IHasEndTime endTimeData = h as IHasEndTime;
                 double endTime = endTimeData?.EndTime ?? h.StartTime;
 
-                Swell sp = h as Swell;
-                if (sp != null)
+                Swell swell = h as Swell;
+                DrumRoll drumRoll = h as DrumRoll;
+                Hit hit = h as Hit;
+
+                if (swell != null)
                 {
                     int d = 0;
                     int count = 0;
-                    int req = sp.RequiredHits;
-                    double hitRate = sp.Duration / req;
+                    int req = swell.RequiredHits;
+                    double hitRate = swell.Duration / req;
                     for (double j = h.StartTime; j < endTime; j += hitRate)
                     {
                         switch (d)
@@ -65,25 +69,21 @@ namespace osu.Game.Modes.Taiko
                             break;
                     }
                 }
-                else if (h is DrumRoll)
+                else if (drumRoll != null)
                 {
-                    DrumRoll d = h as DrumRoll;
+                    double delay = drumRoll.TickTimeDistance;
 
-                    double delay = d.TickTimeDistance;
+                    double time = drumRoll.StartTime;
 
-                    double time = d.StartTime;
-
-                    for (int j = 0; j < d.TotalTicks; j++)
+                    for (int j = 0; j < drumRoll.TotalTicks; j++)
                     {
                         Frames.Add(new LegacyReplayFrame((int)time, 0, 0, hitButton ? LegacyButtonState.Left1 : LegacyButtonState.Left2));
                         time += delay;
                         hitButton = !hitButton;
                     }
                 }
-                else
+                else if (hit != null)
                 {
-                    Hit hit = h as Hit;
-
                     if (hit.Type == HitType.Centre)
                     {
                         if (h.IsStrong)
@@ -101,6 +101,8 @@ namespace osu.Game.Modes.Taiko
 
                     Frames.Add(new LegacyReplayFrame(h.StartTime, 0, 0, button));
                 }
+                else
+                    throw new Exception("Unknown hit object type.");
 
                 Frames.Add(new LegacyReplayFrame(endTime + 1, 0, 0, LegacyButtonState.None));
 
@@ -113,9 +115,6 @@ namespace osu.Game.Modes.Taiko
 
                 hitButton = !hitButton;
             }
-
-            //Player.currentScore.Replay = InputManager.ReplayScore.Replay;
-            //Player.currentScore.PlayerName = "mekkadosu!";
         }
     }
 }
