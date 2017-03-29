@@ -35,6 +35,17 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             }
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // This is naive, however it's based on the reasoning that the hit target
+            // is further than mid point of the play field, so the time taken to scroll in should always
+            // be greater than the time taken to scroll out to the left of the screen.
+            // Thus, using PreEmpt here is enough for the drum roll to completely scroll out.
+            LifetimeEnd = drumRoll.EndTime + drumRoll.PreEmpt;
+        }
+
         protected override void CheckJudgement(bool userTriggered)
         {
             if (userTriggered)
