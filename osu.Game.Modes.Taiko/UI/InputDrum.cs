@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 
@@ -139,7 +138,7 @@ namespace osu.Game.Modes.Taiko.UI
                 {
                     target.FadeTo(Math.Min(target.Alpha + 0.4f, 1), 40, EasingTypes.OutQuint);
                     target.Delay(40);
-                    target.FadeOut(600, EasingTypes.OutQuint);
+                    target.FadeOut(1000, EasingTypes.OutQuint);
                 }
 
                 return false;
