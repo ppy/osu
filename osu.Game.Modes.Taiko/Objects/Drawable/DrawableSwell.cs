@@ -124,8 +124,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         {
             base.LoadComplete();
 
-            LifetimeEnd = double.MaxValue;
-
             targetRing.Delay(HitObject.StartTime - Time.Current).ScaleTo(target_ring_scale, 600, EasingTypes.OutQuint);
         }
 
