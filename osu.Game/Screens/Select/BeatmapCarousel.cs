@@ -203,6 +203,8 @@ namespace osu.Game.Screens.Select
 
                 if (selectedGroup == null || selectedGroup.State == BeatmapGroupState.Hidden)
                     SelectNext();
+                else
+                    selectGroup(selectedGroup);
             };
 
             filterTask?.Cancel();
