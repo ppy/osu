@@ -138,9 +138,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         {
             if (userTriggered)
             {
-                if (Time.Current < HitObject.StartTime)
-                    return;
-
                 userHits++;
 
                 innerRing.FadeTo(1);
@@ -209,6 +206,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         protected override bool HandleKeyPress(Key key)
         {
             if (Judgement.Result.HasValue)
+                return false;
+
+            // Don't handle keys before the swell starts
+            if (Time.Current < HitObject.StartTime)
                 return false;
 
             // Find the keyset which this key corresponds to
