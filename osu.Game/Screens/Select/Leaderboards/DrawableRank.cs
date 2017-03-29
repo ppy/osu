@@ -29,7 +29,12 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             Children = new Drawable[]
             {
-                rankSprite = new Sprite { FillMode = FillMode.Fill },
+                rankSprite = new Sprite
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    FillMode = FillMode.Fit
+                },
             };
         }
     }
