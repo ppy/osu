@@ -3,7 +3,7 @@
 
 using OpenTK;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;

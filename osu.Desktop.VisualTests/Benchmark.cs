@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game;
 
 namespace osu.Desktop.VisualTests
