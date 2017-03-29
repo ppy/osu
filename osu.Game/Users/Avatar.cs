@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Diagnostics;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,102 +11,31 @@ namespace osu.Game.Users
 {
     public class Avatar : Container
     {
-        public Drawable Sprite;
+        private readonly User user;
 
-        private long userId;
-        private OsuGameBase game;
-        private Texture guestTexture;
-
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGameBase game, TextureStore textures)
+        /// <summary>
+        /// An avatar for specified user.
+        /// </summary>
+        /// <param name="user">The user. A null value will get a placeholder avatar.</param>
+        public Avatar(User user = null)
         {
-            this.game = game;
-            guestTexture = textures.Get(@"Online/avatar-guest");
+            this.user = user;
         }
 
-        public long UserId
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
-            get { return userId; }
-            set
+            Texture texture = null;
+            if (user?.Id > 1) texture = textures.Get($@"https://a.ppy.sh/{user.Id}");
+            if (texture == null) texture = textures.Get(@"Online/avatar-guest");
+
+            Add(new Sprite
             {
-                if (userId == value)
-                    return;
-
-                userId = value;
-                invalidateSprite();
-            }
-        }
-
-        private Task loadTask;
-
-        private void invalidateSprite()
-        {
-            Sprite?.FadeOut(100);
-            Sprite?.Expire();
-            Sprite = null;
-        }
-
-        private void updateSprite()
-        {
-            if (loadTask != null || Sprite != null) return;
-
-            var newSprite = userId > 1 ? new OnlineSprite($@"https://a.ppy.sh/{userId}", guestTexture) : new Sprite { Texture = guestTexture };
-
-            newSprite.FillMode = FillMode.Fill;
-
-            loadTask = newSprite.LoadAsync(game, s =>
-            {
-                Sprite = s;
-                Add(Sprite);
-
-                Sprite.FadeInFromZero(200);
-                loadTask = null;
+                Texture = texture,
+                FillMode = FillMode.Fit,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
             });
-        }
-
-        private double timeVisible;
-
-        private bool shouldUpdate => Sprite != null || timeVisible > 500;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!shouldUpdate)
-            {
-                //Special optimisation to not start loading until we are within bounds of our closest ScrollContainer parent.
-                ScrollContainer scroll = null;
-                IContainer cursor = this;
-                while (scroll == null && (cursor = cursor.Parent) != null)
-                    scroll = cursor as ScrollContainer;
-
-                if (scroll?.ScreenSpaceDrawQuad.Intersects(ScreenSpaceDrawQuad) ?? true)
-                    timeVisible += Time.Elapsed;
-                else
-                    timeVisible = 0;
-            }
-
-            if (shouldUpdate)
-                updateSprite();
-        }
-
-        public class OnlineSprite : Sprite
-        {
-            private readonly string url;
-            private readonly Texture fallbackTexture;
-
-            public OnlineSprite(string url, Texture fallbackTexture = null)
-            {
-                Debug.Assert(url != null);
-                this.url = url;
-                this.fallbackTexture = fallbackTexture;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                Texture = textures.Get(url) ?? fallbackTexture;
-            }
         }
     }
 }

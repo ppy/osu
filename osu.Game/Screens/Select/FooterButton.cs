@@ -8,7 +8,6 @@ using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 
