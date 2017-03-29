@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.MathUtils;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;

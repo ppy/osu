@@ -12,7 +12,7 @@ namespace osu.Game.Modes.Taiko.Objects
         /// <summary>
         /// HitCircle radius.
         /// </summary>
-        public const float CIRCLE_RADIUS = 64;
+        public const float CIRCLE_RADIUS = 42f;
 
         /// <summary>
         /// The time to scroll in the HitObject.
