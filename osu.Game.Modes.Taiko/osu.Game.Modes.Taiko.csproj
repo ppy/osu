@@ -60,7 +60,6 @@
     <Compile Include="Objects\Drawable\DrawableStrongCentreHit.cs" />
     <Compile Include="Objects\Drawable\DrawableStrongHit.cs" />
     <Compile Include="Objects\Drawable\Pieces\RimHitCirclePiece.cs" />
-    <Compile Include="Objects\Drawable\Pieces\StrongCirclePiece.cs" />
     <Compile Include="Objects\Drawable\DrawableDrumRoll.cs" />
     <Compile Include="Objects\Drawable\DrawableDrumRollTick.cs" />
     <Compile Include="Objects\Drawable\DrawableSwell.cs" />
