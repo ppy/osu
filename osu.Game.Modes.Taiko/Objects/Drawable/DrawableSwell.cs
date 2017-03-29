@@ -14,6 +14,7 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 using System;
+using System.Linq;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -30,11 +31,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         private const float target_ring_scale = 5f;
         private const float inner_ring_alpha = 0.35f;
 
-        /// <summary>
-        /// The amount of times the user has hit this swell.
-        /// </summary>
-        private int userHits;
-
         private readonly Swell swell;
 
         private readonly Container bodyContainer;
@@ -42,6 +38,15 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         private readonly CircularContainer innerRing;
 
         private readonly CirclePiece circlePiece;
+
+        private readonly Key[] rimKeys = { Key.D, Key.K };
+        private readonly Key[] centreKeys = { Key.F, Key.J };
+        private Key[] lastKeySet;
+
+        /// <summary>
+        /// The amount of times the user has hit this swell.
+        /// </summary>
+        private int userHits;
 
         private bool hasStarted;
 
@@ -205,6 +210,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         {
             if (Judgement.Result.HasValue)
                 return false;
+
+            // Find the keyset which this key corresponds to
+            var keySet = rimKeys.Contains(key) ? rimKeys : centreKeys;
+
+            // Ensure alternating keysets
+            if (keySet == lastKeySet)
+                return false;
+            lastKeySet = keySet;
 
             UpdateJudgement(true);
 
