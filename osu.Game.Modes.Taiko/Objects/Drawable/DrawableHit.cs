@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -16,7 +16,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        protected abstract List<Key> HitKeys { get; }
+        protected abstract Key[] HitKeys { get; }
 
         protected override Container<Framework.Graphics.Drawable> Content => bodyContainer;
 
