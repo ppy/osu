@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using OpenTK;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Configuration;
 using osu.Framework.Configuration;
 
