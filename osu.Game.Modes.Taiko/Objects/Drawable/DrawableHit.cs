@@ -83,16 +83,17 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 case ArmedState.Idle:
                     break;
                 case ArmedState.Miss:
-                    bodyContainer.FadeOut(100);
+                    FadeOut(100);
+                    Expire();
                     break;
                 case ArmedState.Hit:
                     bodyContainer.ScaleTo(0.8f, 400, EasingTypes.OutQuad);
-                    bodyContainer.FadeOut(600, EasingTypes.OutQuint);
                     bodyContainer.MoveToY(-200, 250, EasingTypes.Out);
-
                     bodyContainer.Delay(250);
-
                     bodyContainer.MoveToY(0, 500, EasingTypes.In);
+
+                    FadeOut(600);
+                    Expire();
                     break;
             }
         }
