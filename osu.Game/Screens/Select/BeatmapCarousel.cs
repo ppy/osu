@@ -181,7 +181,8 @@ namespace osu.Game.Screens.Select
         {
             if (!IsLoaded) return;
 
-            criteria = newCriteria ?? criteria ?? new FilterCriteria();
+            if (newCriteria != null)
+                criteria = newCriteria;
 
             Action perform = delegate
             {
