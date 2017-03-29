@@ -44,8 +44,10 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             IHasRepeats repeatsData = original as IHasRepeats;
             IHasEndTime endTimeData = original as IHasEndTime;
 
-            // Old osu! used hit sounding to determine hits
-            bool strong = ((original.Sample?.Type ?? SampleType.None) & SampleType.Finish) > 0;
+            // Old osu! used hit sounding to determine various hit type information
+            SampleType sample = original.Sample?.Type ?? SampleType.None;
+
+            bool strong = (sample & SampleType.Finish) > 0;
 
             if (distanceData != null)
             {
@@ -78,7 +80,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             {
                 StartTime = original.StartTime,
                 Sample = original.Sample,
-                IsStrong = strong
+                IsStrong = strong,
                 Type = type
             };
         }

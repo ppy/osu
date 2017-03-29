@@ -34,7 +34,7 @@ namespace osu.Game.Modes.Taiko
                 IHasEndTime endTimeData = h as IHasEndTime;
                 double endTime = endTimeData?.EndTime ?? h.StartTime;
 
-                Bash sp = h as Bash;
+                Swell sp = h as Swell;
                 if (sp != null)
                 {
                     int d = 0;
@@ -86,14 +86,14 @@ namespace osu.Game.Modes.Taiko
 
                     if (hit.Type == HitType.Centre)
                     {
-                        if (h.Accented)
+                        if (h.IsStrong)
                             button = LegacyButtonState.Right1 | LegacyButtonState.Right2;
                         else
                             button = hitButton ? LegacyButtonState.Right1 : LegacyButtonState.Right2;
                     }
                     else
                     {
-                        if (h.Accented)
+                        if (h.IsStrong)
                             button = LegacyButtonState.Left1 | LegacyButtonState.Left2;
                         else
                             button = hitButton ? LegacyButtonState.Left1 : LegacyButtonState.Left2;
