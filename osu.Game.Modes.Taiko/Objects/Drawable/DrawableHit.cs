@@ -78,13 +78,15 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         protected override void UpdateState(ArmedState state)
         {
+            Delay(HitObject.StartTime - Time.Current + Judgement.TimeOffset, true);
+
             switch (State)
             {
                 case ArmedState.Idle:
+                    Delay(hit.HitWindowMiss);
                     break;
                 case ArmedState.Miss:
                     FadeOut(100);
-                    Expire();
                     break;
                 case ArmedState.Hit:
                     bodyContainer.ScaleTo(0.8f, 400, EasingTypes.OutQuad);
@@ -93,9 +95,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                     bodyContainer.MoveToY(0, 500, EasingTypes.In);
 
                     FadeOut(600);
-                    Expire();
                     break;
             }
+
+            Expire();
         }
     }
 }
