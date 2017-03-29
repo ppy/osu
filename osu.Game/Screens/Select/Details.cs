@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Select
                 beatmap = value;
                 description.Text = beatmap.Version;
                 source.Text = beatmap.Metadata.Source;
-                tags.Children = beatmap.Metadata.Tags.Split(' ').Select(text => new SpriteText
+                tags.Children = beatmap.Metadata.Tags?.Split(' ').Select(text => new SpriteText
                 {
                     Text = text,
                     TextSize = 14,
