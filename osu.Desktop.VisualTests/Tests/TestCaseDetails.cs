@@ -7,14 +7,11 @@ using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Screens.Select;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseDetails : TestCase
+    internal class TestCaseDetails : TestCase
     {
         private Details details;
 

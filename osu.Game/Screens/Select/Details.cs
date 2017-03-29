@@ -18,22 +18,22 @@ namespace osu.Game.Screens.Select
 {
     public class Details : Container
     {
-        private SpriteText description;
-        private SpriteText source;
-        private FillFlowContainer<SpriteText> tags;
+        private readonly SpriteText description;
+        private readonly SpriteText source;
+        private readonly FillFlowContainer<SpriteText> tags;
 
-        private DifficultyRow circleSize;
-        private DifficultyRow drainRate;
-        private DifficultyRow overallDifficulty;
-        private DifficultyRow approachRate;
-        private DifficultyRow stars;
+        private readonly DifficultyRow circleSize;
+        private readonly DifficultyRow drainRate;
+        private readonly DifficultyRow overallDifficulty;
+        private readonly DifficultyRow approachRate;
+        private readonly DifficultyRow stars;
 
-        private DetailsBar ratingsBar;
-        private SpriteText negativeRatings;
-        private SpriteText positiveRatings;
-        private FillFlowContainer<DetailsBar> ratingsGraph;
+        private readonly DetailsBar ratingsBar;
+        private readonly SpriteText negativeRatings;
+        private readonly SpriteText positiveRatings;
+        private readonly FillFlowContainer<DetailsBar> ratingsGraph;
 
-        private FillFlowContainer<RetryAndFailBar> retryAndFailGraph;
+        private readonly FillFlowContainer<RetryAndFailBar> retryAndFailGraph;
 
         private BeatmapInfo beatmap;
         public BeatmapInfo Beatmap
@@ -390,9 +390,9 @@ namespace osu.Game.Screens.Select
 
         private class DifficultyRow : Container
         {
-            private SpriteText name;
-            private DetailsBar bar;
-            private SpriteText valueText;
+            private readonly SpriteText name;
+            private readonly DetailsBar bar;
+            private readonly SpriteText valueText;
 
             private float difficultyValue;
             public float Value
@@ -485,8 +485,8 @@ namespace osu.Game.Screens.Select
 
         private class RetryAndFailBar : Container<DetailsBar>
         {
-            private DetailsBar retryBar;
-            private DetailsBar failBar;
+            private readonly DetailsBar retryBar;
+            private readonly DetailsBar failBar;
 
             public float RetryLength
             {

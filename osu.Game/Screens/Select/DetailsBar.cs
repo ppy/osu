@@ -6,14 +6,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Screens.Select
 {
     public class DetailsBar : Container
     {
-        private Box background;
-        private Box bar;
+        private readonly Box background;
+        private readonly Box bar;
 
         private const int resize_duration = 250;
 
