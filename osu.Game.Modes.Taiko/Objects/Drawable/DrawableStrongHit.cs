@@ -8,7 +8,7 @@ using osu.Framework.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
-    public abstract class DrawableAccentedHit : DrawableHit
+    public abstract class DrawableStrongHit : DrawableHit
     {
         /// <summary>
         /// The lenience for the second key press.
@@ -20,7 +20,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         private bool firstKeyHeld;
         private Key firstHitKey;
 
-        protected DrawableAccentedHit(Hit hit)
+        protected DrawableStrongHit(Hit hit)
             : base(hit)
         {
         }
@@ -71,7 +71,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             if (!HitKeys.Contains(key))
                 return false;
 
-            // Assume the intention was to hit the accented hit with both keys only if the first key is still being held down
+            // Assume the intention was to hit the strong hit with both keys only if the first key is still being held down
             return firstKeyHeld && UpdateJudgement(true);
         }
 
