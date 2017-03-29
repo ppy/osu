@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Input;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using System;
@@ -16,6 +18,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// </summary>
         protected abstract List<Key> HitKeys { get; }
 
+        protected override Container<Framework.Graphics.Drawable> Content => bodyContainer;
+
         private readonly Hit hit;
 
         /// <summary>
@@ -23,10 +27,18 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// </summary>
         private bool validKeyPressed;
 
+        private readonly Container bodyContainer;
+
         protected DrawableHit(Hit hit)
             : base(hit)
         {
             this.hit = hit;
+
+            AddInternal(bodyContainer = new Container
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+            });
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -62,6 +74,28 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             validKeyPressed = HitKeys.Contains(key);
 
             return UpdateJudgement(true);
+        }
+
+        protected override void UpdateState(ArmedState state)
+        {
+            switch (State)
+            {
+                case ArmedState.Idle:
+                    break;
+                case ArmedState.Miss:
+                    FadeOut(100);
+                    Expire();
+                    break;
+                case ArmedState.Hit:
+                    bodyContainer.ScaleTo(0.8f, 400, EasingTypes.OutQuad);
+                    bodyContainer.MoveToY(-200, 250, EasingTypes.Out);
+                    bodyContainer.Delay(250);
+                    bodyContainer.MoveToY(0, 500, EasingTypes.In);
+
+                    FadeOut(600);
+                    Expire();
+                    break;
+            }
         }
     }
 }
