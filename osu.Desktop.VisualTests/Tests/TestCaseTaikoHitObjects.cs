@@ -62,20 +62,16 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(350, 300)
             });
 
-            Add(new SwellCirclePiece(new CirclePiece
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(100, 500)
-            });
-
-            Add(new SwellCirclePiece(new StrongCirclePiece
-            {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(350, 500)
+                Position = new Vector2(100, 500),
+                Width = 0,
+                AccentColour = Color4.Orange,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new SwellSymbolPiece()
+                }
             });
 
             Add(new DrumRollCircle(new CirclePiece()
