@@ -58,6 +58,7 @@
     <Compile Include="Objects\Drawable\DrawableCentreHit.cs" />
     <Compile Include="Objects\Drawable\DrawableHit.cs" />
     <Compile Include="Objects\Drawable\DrawableStrongCentreHit.cs" />
+    <Compile Include="Objects\Drawable\DrawableStrongDrumRoll.cs" />
     <Compile Include="Objects\Drawable\DrawableStrongHit.cs" />
     <Compile Include="Objects\Drawable\Pieces\RimHitCirclePiece.cs" />
     <Compile Include="Objects\Drawable\DrawableDrumRoll.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="Objects\Drawable\DrawableSwell.cs" />
     <Compile Include="Objects\Drawable\DrawableTaikoHitObject.cs" />
     <Compile Include="Objects\Drawable\Pieces\SwellCirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\DrumRollCirclePiece.cs" />
     <Compile Include="Objects\Drawable\Pieces\StrongCirclePiece.cs" />
     <Compile Include="Objects\Drawable\Pieces\CirclePiece.cs" />
     <Compile Include="Objects\DrumRoll.cs" />
