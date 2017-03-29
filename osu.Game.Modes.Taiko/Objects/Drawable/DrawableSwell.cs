@@ -19,6 +19,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
     public class DrawableSwell : DrawableTaikoHitObject
     {
+        /// <summary>
+        /// Invoked when the swell has reached the hit target, i.e. when CurrentTime >= StartTime.
+        /// This is only ever invoked once.
+        /// </summary>
+        public event Action OnStart;
+
         private const float target_ring_thick_border = 4f;
         private const float target_ring_thin_border = 1f;
         private const float target_ring_scale = 5f;
@@ -34,6 +40,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
         private readonly CircularContainer innerRing;
+
+        private bool hasStarted;
 
         public DrawableSwell(Swell swell)
             : base(swell)
@@ -176,7 +184,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         protected override void UpdateScrollPosition(double time)
         {
-            base.UpdateScrollPosition(Math.Min(time, HitObject.StartTime));
+            // Make the swell stop at the hit target
+            double t = Math.Min(HitObject.StartTime, time);
+
+            if (t == HitObject.StartTime && !hasStarted)
+            {
+                OnStart?.Invoke();
+                hasStarted = true;
+            }
+
+            base.UpdateScrollPosition(t);
         }
 
         protected override bool HandleKeyPress(Key key)
