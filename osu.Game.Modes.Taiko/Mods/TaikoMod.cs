@@ -1,7 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps;
 using osu.Game.Modes.Mods;
+using osu.Game.Modes.Scoring;
+using osu.Game.Modes.Taiko.Objects;
 
 namespace osu.Game.Modes.Taiko.Mods
 {
@@ -60,5 +63,13 @@ namespace osu.Game.Modes.Taiko.Mods
     public class TaikoModPerfect : ModPerfect
     {
 
+    }
+
+    public class TaikoModAutoplay : ModAutoplay<TaikoHitObject>
+    {
+        protected override Score CreateReplayScore(Beatmap<TaikoHitObject> beatmap) => new Score
+        {
+            Replay = new TaikoAutoReplay(beatmap)
+        };
     }
 }
