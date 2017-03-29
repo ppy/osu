@@ -36,8 +36,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
             AddInternal(bodyContainer = new Container
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
             });
         }
 
