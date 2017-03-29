@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Screens.Select;
 using System;
