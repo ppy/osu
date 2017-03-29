@@ -91,7 +91,7 @@ namespace osu.Game.Online.Chat.Drawables
                         new OsuSpriteText
                         {
                             Font = @"Exo2.0-BoldItalic",
-                            Text = $@"{Message.User.Name}:",
+                            Text = $@"{Message.User.Username}:",
                             Colour = getUsernameColour(Message),
                             TextSize = text_size,
                             Origin = Anchor.TopRight,

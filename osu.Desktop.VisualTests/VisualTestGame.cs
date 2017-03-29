@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Platform;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game;
 using osu.Game.Screens.Backgrounds;
 
@@ -24,6 +24,11 @@ namespace osu.Desktop.VisualTests
         public override void SetHost(GameHost host)
         {
             base.SetHost(host);
+
+            host.UpdateThread.InactiveHz = host.UpdateThread.ActiveHz;
+            host.DrawThread.InactiveHz = host.DrawThread.ActiveHz;
+            host.InputThread.InactiveHz = host.InputThread.ActiveHz;
+
             host.Window.CursorState = CursorState.Hidden;
         }
     }
