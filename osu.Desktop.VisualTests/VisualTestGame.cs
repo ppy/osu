@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Platform;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game;
 using osu.Game.Screens.Backgrounds;
 
