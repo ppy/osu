@@ -62,7 +62,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(350, 300)
             });
 
-            Add(new SwellCircle(new CirclePiece()
+            Add(new SwellCirclePiece(new CirclePiece
             {
                 KiaiMode = kiai
             })
@@ -70,7 +70,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(100, 500)
             });
 
-            Add(new SwellCircle(new StrongCirclePiece()
+            Add(new SwellCirclePiece(new StrongCirclePiece
             {
                 KiaiMode = kiai
             })
@@ -95,28 +95,6 @@ namespace osu.Desktop.VisualTests.Tests
                 Width = 250,
                 Position = new Vector2(575, 300)
             });
-        }
-
-        private class SwellCircle : BaseCircle
-        {
-            public SwellCircle(CirclePiece piece)
-                : base(piece)
-            {
-                Piece.Add(new TextAwesome
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    TextSize = SYMBOL_INNER_SIZE,
-                    Icon = FontAwesome.fa_asterisk,
-                    Shadow = false
-                });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Piece.AccentColour = colours.YellowDark;
-            }
         }
 
         private class DrumRollCircle : BaseCircle
