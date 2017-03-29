@@ -120,13 +120,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            targetRing.Delay(HitObject.StartTime - Time.Current).ScaleTo(target_ring_scale, 600, EasingTypes.OutQuint);
-        }
-
         protected override void CheckJudgement(bool userTriggered)
         {
             if (userTriggered)
@@ -151,6 +144,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 if (Judgement.TimeOffset < 0)
                     return;
 
+                //TODO: THIS IS SHIT AND CAN'T EXIST POST-TAIKO WORLD CUP
                 if (userHits > swell.RequiredHits / 2)
                 {
                     Judgement.Result = HitResult.Hit;
@@ -163,21 +157,25 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         protected override void UpdateState(ArmedState state)
         {
+            const float preempt = 300;
+
+            Delay(HitObject.StartTime - Time.Current - preempt, true);
+
+            targetRing.ScaleTo(target_ring_scale, preempt, EasingTypes.Out);
+            Delay(preempt, true);
+
+            Delay(Judgement.TimeOffset + swell.Duration, true);
+
             switch (state)
             {
-                case ArmedState.Idle:
-                    break;
-                case ArmedState.Miss:
-                    FadeOut(100);
-                    Expire();
-                    break;
                 case ArmedState.Hit:
                     bodyContainer.ScaleTo(1.2f, 400, EasingTypes.OutQuad);
-
-                    FadeOut(600);
-                    Expire();
                     break;
             }
+
+            FadeOut(600);
+
+            Expire();
         }
 
         protected override void UpdateScrollPosition(double time)
