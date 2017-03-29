@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using osu.Framework.Input;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Taiko.Judgements;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -25,6 +26,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             : base(hit)
         {
         }
+
+        protected override TaikoJudgement CreateJudgement() => new TaikoStrongHitJudgement();
 
         protected override void CheckJudgement(bool userTriggered)
         {
