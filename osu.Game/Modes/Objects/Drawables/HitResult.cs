@@ -7,8 +7,19 @@ namespace osu.Game.Modes.Objects.Drawables
 {
     public enum HitResult
     {
+        /// <summary>
+        /// Indicates that the object has not been judged yet.
+        /// </summary>
+        [Description("")]
+        None,
+        /// <summary>
+        /// Indicates that the object has been judged as a miss.
+        /// </summary>
         [Description(@"Miss")]
         Miss,
+        /// <summary>
+        /// Indicates that the object has been judged as a hit.
+        /// </summary>
         [Description(@"Hit")]
         Hit,
     }
