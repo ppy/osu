@@ -16,12 +16,12 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseDetails : TestCase
     {
+        private Details details;
 
         public override void Reset()
         {
             base.Reset();
 
-            Details details;
             Add(details = new Details
             {
                 RelativeSizeAxes = Axes.Both,
@@ -48,6 +48,17 @@ namespace osu.Desktop.VisualTests.Tests
             details.Ratings = Enumerable.Range(1, 10);
             details.Fails = Enumerable.Range(1, 100).Select(i => (int)(Math.Cos(i) * 100));
             details.Retries = Enumerable.Range(1, 100).Select(i => (int)(Math.Sin(i) * 100));
+
+            AddButton("new retry/fail values", newRetryAndFailValues);
+        }
+
+        private int lastRange = 1;
+
+        private void newRetryAndFailValues()
+        {
+            lastRange += 100;
+            details.Fails = Enumerable.Range(lastRange, 100).Select(i => (int)(Math.Cos(i) * 100));
+            details.Retries = Enumerable.Range(lastRange, 100).Select(i => (int)(Math.Sin(i) * 100));
         }
     }
 }

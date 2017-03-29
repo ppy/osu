@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using System;
+using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Screens.Select
 {
@@ -17,6 +17,8 @@ namespace osu.Game.Screens.Select
 
         private const int resize_duration = 250;
 
+        private const EasingTypes easing = EasingTypes.InOutCubic;
+
         private float length;
         public float Length
         {
@@ -26,7 +28,7 @@ namespace osu.Game.Screens.Select
             }
             set
             {
-                length = value;
+                length = MathHelper.Clamp(value,0,1);
                 updateBarLength();
             }
         }
@@ -90,11 +92,11 @@ namespace osu.Game.Screens.Select
             {
                 case BarDirection.LeftToRight:
                 case BarDirection.RightToLeft:
-                    bar.ResizeTo(new Vector2(length, 1), resize_duration);
+                    bar.ResizeTo(new Vector2(length, 1), resize_duration, easing);
                     break;
                 case BarDirection.TopToBottom:
                 case BarDirection.BottomToTop:
-                    bar.ResizeTo(new Vector2(1, length), resize_duration);
+                    bar.ResizeTo(new Vector2(1, length), resize_duration, easing);
                     break;
             }
 
