@@ -8,14 +8,14 @@ using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    public class Bash : TaikoHitObject, IHasEndTime
+    public class Swell : TaikoHitObject, IHasEndTime
     {
         public double EndTime { get; set; }
 
         public double Duration => EndTime - StartTime;
 
         /// <summary>
-        /// The number of hits required to complete the bash successfully.
+        /// The number of hits required to complete the swell successfully.
         /// </summary>
         public int RequiredHits { get; protected set; }
 

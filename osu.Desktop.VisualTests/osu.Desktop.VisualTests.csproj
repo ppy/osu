@@ -150,6 +150,10 @@
       <Project>{65dc628f-a640-4111-ab35-3a5652bc1e17}</Project>
       <Name>osu.Framework.Desktop</Name>
     </ProjectReference>
+    <ProjectReference Include="..\osu-framework\osu.Framework.Testing\osu.Framework.Testing.csproj">
+      <Project>{007b2356-ab6f-4bd9-96d5-116fc2dce69a}</Project>
+      <Name>osu.Framework.Testing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
       <Project>{c76bf5b3-985e-4d39-95fe-97c9c879b83a}</Project>
       <Name>osu.Framework</Name>
@@ -194,6 +198,7 @@
     <Compile Include="Tests\TestCaseReplay.cs" />
     <Compile Include="Tests\TestCaseScoreCounter.cs" />
     <Compile Include="Tests\TestCaseTabControl.cs" />
+    <Compile Include="Tests\TestCaseTaikoHitObjects.cs" />
     <Compile Include="Tests\TestCaseTaikoPlayfield.cs" />
     <Compile Include="Tests\TestCaseTextAwesome.cs" />
     <Compile Include="Tests\TestCasePlaySongSelect.cs" />
@@ -211,9 +216,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Beatmaps\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

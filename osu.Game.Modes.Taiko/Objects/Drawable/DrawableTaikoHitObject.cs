@@ -1,14 +1,23 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
+using System.Collections.Generic;
+using osu.Framework.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
     public abstract class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject, TaikoJudgement>
     {
+        /// <summary>
+        /// A list of keys which this hit object will accept. These are the standard Taiko keys for now.
+        /// These should be moved to bindings later.
+        /// </summary>
+        private readonly List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
+
         protected DrawableTaikoHitObject(TaikoHitObject hitObject)
             : base(hitObject)
         {
@@ -41,6 +50,22 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         protected override void Update()
         {
             UpdateScrollPosition(Time.Current);
+        }
+
+        protected virtual bool HandleKeyPress(Key key) => false;
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            // Make sure we don't handle held-down keys
+            if (args.Repeat)
+                return false;
+
+            // Check if we've pressed a valid taiko key
+            if (!validKeys.Contains(args.Key))
+                return false;
+
+            // Handle it!
+            return HandleKeyPress(args.Key);
         }
     }
 }

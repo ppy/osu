@@ -14,7 +14,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays
 {
     public class MusicController : FocusedOverlayContainer
     {
-        private MusicControllerBackground backgroundSprite;
+        private Drawable currentBackground;
         private DragBar progress;
         private TextAwesome playButton;
         private SpriteText title, artist;
@@ -44,7 +43,6 @@ namespace osu.Game.Overlays
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
-        private Framework.Game game;
 
         private Container dragContainer;
 
@@ -78,10 +76,8 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, OsuConfigManager config, BeatmapDatabase beatmaps, OsuColour colours)
+        private void load(OsuGameBase game, OsuConfigManager config, BeatmapDatabase beatmaps, OsuColour colours)
         {
-            game = osuGame;
-
             unicodeString = config.GetUnicodeString;
 
             Children = new Drawable[]
@@ -212,15 +208,15 @@ namespace osu.Game.Overlays
             };
 
             this.beatmaps = beatmaps;
-            trackManager = osuGame.Audio.Track;
+            trackManager = game.Audio.Track;
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
             preferUnicode.ValueChanged += preferUnicode_changed;
 
-            beatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
+            beatmapSource = game.Beatmap ?? new Bindable<WorkingBeatmap>();
             playList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
 
-            backgroundSprite = new MusicControllerBackground();
-            dragContainer.Add(backgroundSprite);
+            currentBackground = new MusicControllerBackground();
+            dragContainer.Add(currentBackground);
         }
 
         protected override void LoadComplete()
@@ -351,29 +347,29 @@ namespace osu.Game.Overlays
                     }
                 });
 
-                MusicControllerBackground newBackground;
-
-                (newBackground = new MusicControllerBackground(beatmap)).LoadAsync(game, delegate
+                dragContainer.Add(new AsyncLoadContainer
                 {
-
-                    dragContainer.Add(newBackground);
-
-                    switch (direction)
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue,
+                    Children = new[] { new MusicControllerBackground(beatmap) },
+                    FinishedLoading = d =>
                     {
-                        case TransformDirection.Next:
-                            newBackground.Position = new Vector2(400, 0);
-                            newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                            backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
-                            break;
-                        case TransformDirection.Prev:
-                            newBackground.Position = new Vector2(-400, 0);
-                            newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                            backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
-                            break;
+                        switch (direction)
+                        {
+                            case TransformDirection.Next:
+                                d.Position = new Vector2(400, 0);
+                                d.MoveToX(0, 500, EasingTypes.OutCubic);
+                                currentBackground.MoveToX(-400, 500, EasingTypes.OutCubic);
+                                break;
+                            case TransformDirection.Prev:
+                                d.Position = new Vector2(-400, 0);
+                                d.MoveToX(0, 500, EasingTypes.OutCubic);
+                                currentBackground.MoveToX(400, 500, EasingTypes.OutCubic);
+                                break;
+                        }
+                        currentBackground.Expire();
+                        currentBackground = d;
                     }
-
-                    backgroundSprite.Expire();
-                    backgroundSprite = newBackground;
                 });
             };
         }
@@ -422,8 +418,8 @@ namespace osu.Game.Overlays
             {
                 this.beatmap = beatmap;
                 CacheDrawnFrameBuffer = true;
-                RelativeSizeAxes = Axes.Both;
                 Depth = float.MaxValue;
+                RelativeSizeAxes = Axes.Both;
 
                 Children = new Drawable[]
                 {
