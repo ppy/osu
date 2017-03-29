@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
