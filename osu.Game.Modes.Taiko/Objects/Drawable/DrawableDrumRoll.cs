@@ -1,8 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
+using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 using System.Linq;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
@@ -11,28 +13,47 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
     {
         private readonly DrumRoll drumRoll;
 
+        private readonly DrumRollCirclePiece circle;
+
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
             this.drumRoll = drumRoll;
 
-            int tickIndex = 0;
+            RelativeSizeAxes = Axes.X;
+            Width = (float)(drumRoll.Duration / drumRoll.PreEmpt);
+
+            Add(circle = new DrumRollCirclePiece(CreateCirclePiece()));
+
             foreach (var tick in drumRoll.Ticks)
             {
                 var newTick = new DrawableDrumRollTick(tick)
                 {
-                    Depth = tickIndex,
                     X = (float)((tick.StartTime - HitObject.StartTime) / drumRoll.Duration)
                 };
 
-                AddNested(newTick);
+                newTick.OnJudgement += onTickJudgement;
 
-                tickIndex++;
+                AddNested(newTick);
+                Add(newTick);
             }
         }
 
-        protected override void UpdateState(ArmedState state)
+        private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)
         {
+            int countHit = NestedHitObjects.Count(o => o.Judgement.Result == HitResult.Hit);
+            circle.Completion = (float)countHit / NestedHitObjects.Count();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // This is naive, however it's based on the reasoning that the hit target
+            // is further than mid point of the play field, so the time taken to scroll in should always
+            // be greater than the time taken to scroll out to the left of the screen.
+            // Thus, using PreEmpt here is enough for the drum roll to completely scroll out.
+            LifetimeEnd = drumRoll.EndTime + drumRoll.PreEmpt;
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -53,5 +74,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             else
                 Judgement.Result = HitResult.Miss;
         }
+
+        protected override void UpdateState(ArmedState state)
+        {
+        }
+
+        protected virtual CirclePiece CreateCirclePiece() => new CirclePiece();
     }
 }

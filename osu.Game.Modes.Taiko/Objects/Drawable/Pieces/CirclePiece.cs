@@ -36,9 +36,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                 accentColour = value;
 
                 innerBackground.Colour = AccentColour;
-
-                triangles.ColourLight = AccentColour;
-                triangles.ColourDark = AccentColour.Darken(0.1f);
+                triangles.Colour = AccentColour;
 
                 resetEdgeEffects();
             }
@@ -107,6 +105,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 RelativeSizeAxes = Axes.Both,
+                                ColourLight = Color4.White,
+                                ColourDark = Color4.White.Darken(0.1f)
                             }
                         }
                     },
