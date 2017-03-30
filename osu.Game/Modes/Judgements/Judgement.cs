@@ -20,7 +20,7 @@ namespace osu.Game.Modes.Judgements
         /// <summary>
         /// The combo after this judgement was processed.
         /// </summary>
-        public ulong? ComboAtHit;
+        public int ComboAtHit;
 
         /// <summary>
         /// The string representation for the result achieved.
