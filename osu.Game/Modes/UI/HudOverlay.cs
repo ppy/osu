@@ -24,10 +24,7 @@ namespace osu.Game.Modes.UI
         private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
 
-        public bool IsVisible
-        {
-            get { return showHud; }
-        }
+        public bool IsVisible => showHud;
 
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract ComboCounter CreateComboCounter();
