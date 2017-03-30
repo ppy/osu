@@ -1,7 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.MathUtils;
+using osu.Game.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
@@ -13,7 +17,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
     {
         private readonly DrumRoll drumRoll;
 
-        private readonly DrumRollCirclePiece circle;
+        private readonly CirclePiece circle;
+
+        private Color4 baseColour;
+        private Color4 finalColour;
 
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
@@ -23,7 +30,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             RelativeSizeAxes = Axes.X;
             Width = (float)(drumRoll.Duration / drumRoll.PreEmpt);
 
-            Add(circle = new DrumRollCirclePiece(CreateCirclePiece()));
+            Add(circle = CreateCirclePiece());
 
             foreach (var tick in drumRoll.Ticks)
             {
@@ -39,10 +46,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             }
         }
 
-        private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            int countHit = NestedHitObjects.Count(o => o.Judgement.Result == HitResult.Hit);
-            circle.Completion = (float)countHit / NestedHitObjects.Count();
+            circle.Background.Colour = baseColour = colours.YellowDark;
+            finalColour = colours.YellowDarker;
         }
 
         protected override void LoadComplete()
@@ -54,6 +62,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             // be greater than the time taken to scroll out to the left of the screen.
             // Thus, using PreEmpt here is enough for the drum roll to completely scroll out.
             LifetimeEnd = drumRoll.EndTime + drumRoll.PreEmpt;
+        }
+
+        private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)
+        {
+            int countHit = NestedHitObjects.Count(o => o.Judgement.Result == HitResult.Hit);
+            float completion = (float)countHit / NestedHitObjects.Count();
+
+            circle.AccentColour = Interpolation.ValueAt(completion, baseColour, finalColour, 0, 1);
         }
 
         protected override void CheckJudgement(bool userTriggered)

@@ -92,22 +92,20 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(350, 500)
             });
 
-            Add(new DrumRollCirclePiece(new CirclePiece
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
+                Position = new Vector2(575, 100),
                 Width = 0.25f,
-                Position = new Vector2(575, 100)
+                AccentColour = Color4.Orange,
+                KiaiMode = kiai,
             });
 
-            Add(new DrumRollCirclePiece(new StrongCirclePiece
+            Add(new StrongCirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
+                Position = new Vector2(575, 300),
                 Width = 0.25f,
-                Position = new Vector2(575, 300)
+                AccentColour = Color4.Orange,
+                KiaiMode = kiai
             });
         }
 
