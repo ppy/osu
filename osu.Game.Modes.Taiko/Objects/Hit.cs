@@ -9,11 +9,6 @@ namespace osu.Game.Modes.Taiko.Objects
     public class Hit : TaikoHitObject
     {
         /// <summary>
-        /// Whether this hit is a centre-hit or a rim-hit.
-        /// </summary>
-        public HitType Type;
-
-        /// <summary>
         /// The hit window that results in a "GREAT" hit.
         /// </summary>
         public double HitWindowGreat = 35;

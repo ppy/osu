@@ -84,7 +84,7 @@ namespace osu.Game.Modes.Taiko
                 }
                 else if (hit != null)
                 {
-                    if (hit.Type == HitType.Centre)
+                    if (hit is CentreHit)
                     {
                         if (h.IsStrong)
                             button = LegacyButtonState.Right1 | LegacyButtonState.Right2;
