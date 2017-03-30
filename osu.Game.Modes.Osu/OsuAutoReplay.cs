@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Osu.Objects;
@@ -10,6 +9,7 @@ using osu.Game.Modes.Osu.Objects.Drawables;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Osu
@@ -29,7 +29,7 @@ namespace osu.Game.Modes.Osu
             createAutoReplay();
         }
 
-        internal class LegacyReplayFrameComparer : IComparer<LegacyReplayFrame>
+        private class LegacyReplayFrameComparer : IComparer<LegacyReplayFrame>
         {
             public int Compare(LegacyReplayFrame f1, LegacyReplayFrame f2)
             {

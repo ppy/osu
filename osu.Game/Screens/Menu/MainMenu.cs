@@ -2,10 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Screens;
-using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
+using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
@@ -49,7 +47,6 @@ namespace osu.Game.Screens.Menu
                             OnEdit = delegate { Push(new Editor()); },
                             OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
-                            OnTest  = delegate { Push(new TestBrowser()); },
                             OnExit = delegate { Exit(); },
                         }
                     }

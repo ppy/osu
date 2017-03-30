@@ -160,7 +160,7 @@
     <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
     <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
-    <Compile Include="Overlays\Options\OptionDropDown.cs" />
+    <Compile Include="Overlays\Options\OptionDropdown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropdown.cs" />
     <Compile Include="Overlays\Options\OptionsFooter.cs" />
@@ -247,7 +247,6 @@
     <Compile Include="Online\Chat\Drawables\DrawableChannel.cs" />
     <Compile Include="Online\Chat\Drawables\ChatLine.cs" />
     <Compile Include="Online\Chat\Message.cs" />
-    <Compile Include="Online\User.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="OsuGameBase.cs" />
     <Compile Include="Overlays\ChatOverlay.cs" />
@@ -267,6 +266,7 @@
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
+    <Compile Include="Users\UpdateableAvatar.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
@@ -320,7 +320,7 @@
     <Compile Include="Overlays\Options\OptionTextBox.cs" />
     <Compile Include="Overlays\Options\OptionSlider.cs" />
     <Compile Include="Configuration\ProgressBarType.cs" />
-    <Compile Include="Overlays\Options\OptionEnumDropDown.cs" />
+    <Compile Include="Overlays\Options\OptionEnumDropdown.cs" />
     <Compile Include="Configuration\RankingType.cs" />
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ReleaseStream.cs" />

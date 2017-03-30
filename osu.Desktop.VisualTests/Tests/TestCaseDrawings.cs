@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Screens.Tournament;
 using osu.Game.Screens.Tournament.Teams;
 using osu.Game.Users;
