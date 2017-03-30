@@ -24,6 +24,8 @@ using System;
 using System.Linq;
 using osu.Game.Modes.Scoring;
 using OpenTK.Input;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Screens.Play
 {
@@ -66,7 +68,7 @@ namespace osu.Game.Screens.Play
         public ReplayInputHandler ReplayInputHandler;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, NotificationManager notificationManager)
         {
             var beatmap = Beatmap.Beatmap;
 
@@ -167,6 +169,14 @@ namespace osu.Game.Screens.Play
                 hudOverlay,
                 pauseOverlay
             };
+
+            if(!hudOverlay.IsVisible())
+            {
+                notificationManager.Post(new SimpleNotification
+                {
+                    Text = @"The score overlay is currently disabled. You can toogle this by pressing Shift + Tab."
+                });
+            }
         }
 
         private void initializeSkipButton()

@@ -24,6 +24,8 @@ namespace osu.Game.Modes.UI
         private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
 
+        private bool isVisible;
+
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract ComboCounter CreateComboCounter();
         protected abstract PercentageCounter CreateAccuracyCounter();
@@ -67,9 +69,15 @@ namespace osu.Game.Modes.UI
         private void hudVisibilityChanged(object sender, EventArgs e)
         {
             if (showHud)
+            {
+                isVisible = true;
                 Show();
+            }
             else
+            {
+                isVisible = false;
                 Hide();
+            }
         }
 
         public void ChangeVisibility()
@@ -90,6 +98,11 @@ namespace osu.Game.Modes.UI
         public void BindHitRenderer(HitRenderer hitRenderer)
         {
             hitRenderer.InputManager.Add(KeyCounter.GetReceptor());
+        }
+
+        public bool IsVisible()
+        {
+            return isVisible;
         }
     }
 }
