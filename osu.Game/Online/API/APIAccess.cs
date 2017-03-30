@@ -12,6 +12,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Online.API.Requests;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
@@ -118,7 +119,7 @@ namespace osu.Game.Online.API
                             //todo: this fails even on network-related issues. we should probably handle those differently.
                             //NotificationManager.ShowMessage("Login failed!");
                             log.Add(@"Login failed!");
-                            clearCredentials();
+                            Password = null;
                             continue;
                         }
 

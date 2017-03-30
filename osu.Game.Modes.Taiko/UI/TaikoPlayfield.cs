@@ -20,24 +20,15 @@ namespace osu.Game.Modes.Taiko.UI
     public class TaikoPlayfield : Playfield<TaikoHitObject, TaikoJudgement>
     {
         /// <summary>
-        /// The default play field height.
+        /// The play field height. This is relative to the size of hit objects
+        /// such that the playfield is just a bit larger than finishers.
         /// </summary>
-        public const float PLAYFIELD_BASE_HEIGHT = 242;
-
-        /// <summary>
-        /// The play field height scale.
-        /// </summary>
-        public const float PLAYFIELD_SCALE = 0.65f;
-
-        /// <summary>
-        /// The play field height after scaling.
-        /// </summary>
-        public static float PlayfieldHeight => PLAYFIELD_BASE_HEIGHT * PLAYFIELD_SCALE;
+        public const float PLAYFIELD_HEIGHT = TaikoHitObject.CIRCLE_RADIUS * 2 * 2;
 
         /// <summary>
         /// The offset from <see cref="left_area_size"/> which the center of the hit target lies at.
         /// </summary>
-        private const float hit_target_offset = 80;
+        private const float hit_target_offset = TaikoHitObject.CIRCLE_RADIUS * 1.5f + 40;
 
         /// <summary>
         /// The size of the left area of the playfield. This area contains the input drum.
@@ -60,7 +51,7 @@ namespace osu.Game.Modes.Taiko.UI
         public TaikoPlayfield()
         {
             RelativeSizeAxes = Axes.X;
-            Height = PlayfieldHeight;
+            Height = PLAYFIELD_HEIGHT;
 
             AddInternal(new Drawable[]
             {
@@ -101,7 +92,6 @@ namespace osu.Game.Modes.Taiko.UI
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
-                                    Scale = new Vector2(PLAYFIELD_SCALE),
                                     BlendingMode = BlendingMode.Additive
                                 },
                                 //barLineContainer = new Container<DrawableBarLine>
@@ -128,7 +118,7 @@ namespace osu.Game.Modes.Taiko.UI
                 },
                 leftBackgroundContainer = new Container
                 {
-                    Size = new Vector2(left_area_size, PlayfieldHeight),
+                    Size = new Vector2(left_area_size, PLAYFIELD_HEIGHT),
                     BorderThickness = 1,
                     Children = new Drawable[]
                     {
