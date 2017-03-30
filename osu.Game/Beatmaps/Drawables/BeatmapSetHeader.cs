@@ -36,7 +36,8 @@ namespace osu.Game.Beatmaps.Drawables
                 new DelayedLoadContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    TimeBeforeLoad = 100,
+                    TimeBeforeLoad = 300,
+                    FinishedLoading = d => d.FadeInFromZero(400, EasingTypes.Out),
                     Children = new[]
                     {
                         new PanelBackground(beatmap)
