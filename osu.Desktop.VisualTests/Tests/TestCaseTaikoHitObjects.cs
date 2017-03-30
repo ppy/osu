@@ -6,10 +6,8 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
-using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -30,39 +28,55 @@ namespace osu.Desktop.VisualTests.Tests
                 Reset();
             });
 
-            Add(new CentreHitCircle(new CirclePiece()
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(100, 100)
+                Position = new Vector2(100, 100),
+                Width = 0,
+                AccentColour = Color4.DarkRed,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new CentreHitSymbolPiece()
+                }
             });
 
-            Add(new CentreHitCircle(new StrongCirclePiece()
+            Add(new StrongCirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(350, 100)
+                Position = new Vector2(350, 100),
+                Width = 0,
+                AccentColour = Color4.DarkRed,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new CentreHitSymbolPiece()
+                }
             });
 
-            Add(new RimHitCircle(new CirclePiece()
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(100, 300)
+                Position = new Vector2(100, 300),
+                Width = 0,
+                AccentColour = Color4.DarkBlue,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new RimHitSymbolPiece()
+                }
             });
 
-            Add(new RimHitCircle(new StrongCirclePiece()
+            Add(new StrongCirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(350, 300)
+                Position = new Vector2(350, 300),
+                Width = 0,
+                AccentColour = Color4.DarkBlue,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new RimHitSymbolPiece()
+                }
             });
 
-            Add(new SwellCircle(new CirclePiece()
+            Add(new SwellCircle(new CirclePiece
             {
                 KiaiMode = kiai
             })
@@ -70,7 +84,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(100, 500)
             });
 
-            Add(new SwellCircle(new StrongCirclePiece()
+            Add(new SwellCircle(new StrongCirclePiece
             {
                 KiaiMode = kiai
             })
@@ -106,7 +120,7 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    TextSize = SYMBOL_INNER_SIZE,
+                    TextSize = CirclePiece.SYMBOL_INNER_SIZE,
                     Icon = FontAwesome.fa_asterisk,
                     Shadow = false
                 });
@@ -181,10 +195,6 @@ namespace osu.Desktop.VisualTests.Tests
 
         private abstract class BaseCircle : Container
         {
-            protected const float SYMBOL_SIZE = TaikoHitObject.CIRCLE_RADIUS * 2f * 0.45f;
-            protected const float SYMBOL_BORDER = 8;
-            protected const float SYMBOL_INNER_SIZE = SYMBOL_SIZE - 2 * SYMBOL_BORDER;
-
             protected readonly CirclePiece Piece;
 
             protected BaseCircle(CirclePiece piece)
