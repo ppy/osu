@@ -3,12 +3,7 @@
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    /// <summary>
-    /// Describes whether a hit is a centre-hit or a rim-hit.
-    /// </summary>
-    public enum HitType
+    public class CentreHit : Hit
     {
-        Centre,
-        Rim
     }
 }

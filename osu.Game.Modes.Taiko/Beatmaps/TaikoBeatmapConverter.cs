@@ -74,14 +74,23 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                 };
             }
 
-            HitType type = (sample & ~(SampleType.Finish | SampleType.Normal)) == 0 ? HitType.Centre : HitType.Rim;
+            bool isCentre = (sample & ~(SampleType.Finish | SampleType.Normal)) == 0;
 
-            return new Hit
+            if (isCentre)
+            {
+                return new CentreHit
+                {
+                    StartTime = original.StartTime,
+                    Sample = original.Sample,
+                    IsStrong = strong
+                };
+            }
+
+            return new RimHit
             {
                 StartTime = original.StartTime,
                 Sample = original.Sample,
                 IsStrong = strong,
-                Type = type
             };
         }
     }
