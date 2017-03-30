@@ -57,7 +57,6 @@ namespace osu.Game.Screens.Play
         private HitRenderer hitRenderer;
 
         private Bindable<int> dimLevel;
-        private Bindable<bool> showInterface;
         private Bindable<bool> mouseWheelDisabled;
 
         private HudOverlay hudOverlay;
@@ -79,8 +78,6 @@ namespace osu.Game.Screens.Play
             }
 
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
-            showInterface = config.GetBindable<bool>(OsuConfig.ShowInterface);
-            showInterface.ValueChanged += hudVisibilityChanged;
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
 
             try
@@ -170,8 +167,6 @@ namespace osu.Game.Screens.Play
                 hudOverlay,
                 pauseOverlay
             };
-
-            showInterface.TriggerChange();
         }
 
         private void initializeSkipButton()
@@ -355,20 +350,12 @@ namespace osu.Game.Screens.Play
                 switch (args.Key)
                 {
                     case Key.Tab:
-                        showInterface.Value = !showInterface.Value;
+                        hudOverlay.ChangeVisibility();
                         return true;
                 }
             }
 
             return base.OnKeyDown(state, args);
-        }
-
-        private void hudVisibilityChanged(object sender, EventArgs e)
-        {
-            if (showInterface.Value)
-                hudOverlay.Show();
-            else
-                hudOverlay.Hide();
         }
     }
 }
