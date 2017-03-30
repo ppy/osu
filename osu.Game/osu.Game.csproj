@@ -201,8 +201,9 @@
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Modes\UI\StandardComboCounter.cs" />
     <Compile Include="Screens\Select\BeatmapCarousel.cs" />
-    <Compile Include="Screens\Select\Details.cs" />
-    <Compile Include="Screens\Select\DetailsBar.cs" />
+    <Compile Include="Screens\Select\Details\BeatmapDetails.cs" />
+    <Compile Include="Screens\Select\Details\BeatmapDetailsBar.cs" />
+    <Compile Include="Screens\Select\Details\BeatmapDetailsGraph.cs" />
     <Compile Include="Screens\Select\FilterCriteria.cs" />
     <Compile Include="Screens\Select\Filter\GroupMode.cs" />
     <Compile Include="Screens\Select\Filter\SortMode.cs" />

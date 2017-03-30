@@ -15,9 +15,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace osu.Game.Screens.Select
+namespace osu.Game.Screens.Select.Details
 {
-    public class Details : Container
+    public class BeatmapDetails : Container
     {
         private readonly SpriteText description;
         private readonly SpriteText source;
@@ -29,12 +29,13 @@ namespace osu.Game.Screens.Select
         private readonly DifficultyRow approachRate;
         private readonly DifficultyRow stars;
 
-        private readonly DetailsBar ratingsBar;
+        private readonly BeatmapDetailsBar ratingsBar;
         private readonly SpriteText negativeRatings;
         private readonly SpriteText positiveRatings;
-        private readonly FillFlowContainer<DetailsBar> ratingsGraph;
+        private readonly BeatmapDetailsGraph ratingsGraph;
 
-        private readonly FillFlowContainer<RetryAndFailBar> retryAndFailGraph;
+        private readonly BeatmapDetailsGraph retryGraph;
+        private readonly BeatmapDetailsGraph failGraph;
 
         private BeatmapInfo beatmap;
         public BeatmapInfo Beatmap
@@ -79,19 +80,7 @@ namespace osu.Game.Screens.Select
                 positiveRatings.Text = ratings.GetRange(5, 5).Sum().ToString();
                 ratingsBar.Length = (float)ratings.GetRange(0, 5).Sum() / ratings.Sum();
 
-                List<DetailsBar> ratingsGraphBars = ratingsGraph.Children.ToList();
-                for (int i = 0; i < 10; i++)
-                    if(ratingsGraphBars.Count > i)
-                        ratingsGraphBars[i].Length = (float)ratings[i] / ratings.Max();
-                    else
-                        ratingsGraph.Add(new DetailsBar
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.1f,
-                            Length = (float)ratings[i] / ratings.Max(),
-                            Direction = BarDirection.BottomToTop,
-                            BackgroundColour = new Color4(0, 0, 0, 0),
-                        });
+                ratingsGraph.Values = ratings.Select(rating => (float)rating / ratings.Max());
             }
         }
 
@@ -105,7 +94,7 @@ namespace osu.Game.Screens.Select
             set
             {
                 retries = value.ToList();
-                calcRetryAndFailBarLength();
+                calcRetryAndFailGraph();
             }
         }
 
@@ -119,31 +108,18 @@ namespace osu.Game.Screens.Select
             set
             {
                 fails = value.ToList();
-                calcRetryAndFailBarLength();
+                calcRetryAndFailGraph();
             }
         }
 
-        private void calcRetryAndFailBarLength()
+        private void calcRetryAndFailGraph()
         {
-            List<RetryAndFailBar> retryAndFailGraphBars = retryAndFailGraph.Children.ToList();
-            float maxValue = fails.Select((value, index) => value + retries[index]).Max();
-            for (int i = 0; i < 100; i++)
-                if (retryAndFailGraphBars.Count > i)
-                {
-                    retryAndFailGraphBars[i].FailLength = fails[i] / maxValue;
-                    retryAndFailGraphBars[i].RetryLength = retries[i] / maxValue;
-                }
-                else
-                    retryAndFailGraph.Add(new RetryAndFailBar
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Width = 0.01f,
-                        FailLength = fails[i] / maxValue,
-                        RetryLength = retries[i] / maxValue,
-                    });
+            failGraph.Values = fails.Select(fail => (float)fail / fails.Max());
+            List<float> retryAndFails = retries.Select((retry, index) => (float)retry + fails[index]).ToList();
+            retryGraph.Values = retryAndFails.Select(value => value / retryAndFails.Max());
         }
 
-        public Details()
+        public BeatmapDetails()
         {
             Children = new Drawable[]
             {
@@ -211,7 +187,7 @@ namespace osu.Game.Screens.Select
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0,15),
                     Padding = new MarginPadding(10) { Top = 0 },
-                    Children = new []
+                    Children = new Drawable[]
                     {
                         new Container
                         {
@@ -297,7 +273,7 @@ namespace osu.Game.Screens.Select
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
                                         },
-                                        ratingsBar = new DetailsBar
+                                        ratingsBar = new BeatmapDetailsBar
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             Height = 5,
@@ -333,7 +309,7 @@ namespace osu.Game.Screens.Select
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
                                         },
-                                        ratingsGraph = new FillFlowContainer<DetailsBar>
+                                        ratingsGraph = new BeatmapDetailsGraph
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             Direction = FillDirection.Horizontal,
@@ -343,32 +319,27 @@ namespace osu.Game.Screens.Select
                                 },
                             },
                         },
-                    },
-                },
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Left = 10, Right = 10 },
-                    Children = new Drawable[]
-                    {
-						retryAndFailGraph = new FillFlowContainer<RetryAndFailBar>
-						{
-							RelativeSizeAxes = Axes.X,
-							Direction = FillDirection.Horizontal,
-							Height = 50,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                        },
                         new SpriteText
                         {
                             Text = "Points of Failure",
                             TextSize = 14,
                             Font = @"Exo2.0-Medium",
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                        },
+                        new Container<BeatmapDetailsGraph>
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Size = new Vector2(1/0.6f, 50),
+                            Children = new[]
+                            {
+                                retryGraph = new BeatmapDetailsGraph
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                failGraph = new BeatmapDetailsGraph
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                            },
                         },
                     },
                 },
@@ -387,12 +358,15 @@ namespace osu.Game.Screens.Select
             ratingsBar.BackgroundColour = colour.Green;
             ratingsBar.BarColour = colour.YellowDark;
             ratingsGraph.Colour = colour.BlueDark;
+
+            failGraph.Colour = colour.YellowDarker;
+            retryGraph.Colour = colour.Yellow;
         }
 
         private class DifficultyRow : Container
         {
             private readonly SpriteText name;
-            private readonly DetailsBar bar;
+            private readonly BeatmapDetailsBar bar;
             private readonly SpriteText valueText;
 
             private float difficultyValue;
@@ -457,7 +431,7 @@ namespace osu.Game.Screens.Select
                         TextSize = 14,
                         Font = @"Exo2.0-Medium",
                     },
-                    bar = new DetailsBar
+                    bar = new BeatmapDetailsBar
                     {
                         Origin = Anchor.CentreLeft,
                         Anchor = Anchor.CentreLeft,
@@ -484,10 +458,10 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private class RetryAndFailBar : Container<DetailsBar>
+        private class RetryAndFailBar : Container<BeatmapDetailsBar>
         {
-            private readonly DetailsBar retryBar;
-            private readonly DetailsBar failBar;
+            private readonly BeatmapDetailsBar retryBar;
+            private readonly BeatmapDetailsBar failBar;
 
             public float RetryLength
             {
@@ -517,14 +491,14 @@ namespace osu.Game.Screens.Select
             {
                 Children = new[]
                 {
-                    retryBar = new DetailsBar
+                    retryBar = new BeatmapDetailsBar
                     {
                         RelativeSizeAxes = Axes.Both,
                         Direction = BarDirection.BottomToTop,
                         Length = 0,
                         BackgroundColour = new Color4(0,0,0,0),
                     },
-                    failBar = new DetailsBar
+                    failBar = new BeatmapDetailsBar
                     {
                         RelativeSizeAxes = Axes.Both,
                         Direction = BarDirection.BottomToTop,

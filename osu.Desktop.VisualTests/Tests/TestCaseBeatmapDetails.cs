@@ -6,20 +6,23 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Details;
 using System;
 using System.Linq;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    internal class TestCaseDetails : TestCase
+    internal class TestCaseBeatmapDetails : TestCase
     {
-        private Details details;
+        public override string Description => "BeatmapDetails tab of BeatmapDetailArea";
+
+        private BeatmapDetails details;
 
         public override void Reset()
         {
             base.Reset();
 
-            Add(details = new Details
+            Add(details = new BeatmapDetails
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding(150),

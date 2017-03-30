@@ -7,9 +7,9 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 
-namespace osu.Game.Screens.Select
+namespace osu.Game.Screens.Select.Details
 {
-    public class DetailsBar : Container
+    public class BeatmapDetailsBar : Container
     {
         private readonly Box background;
         private readonly Box bar;
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public DetailsBar()
+        public BeatmapDetailsBar()
         {
             Children = new []
             {

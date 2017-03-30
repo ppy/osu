@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Screens.Select.Details;
 using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
@@ -17,7 +18,7 @@ namespace osu.Game.Screens.Select
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
-        public readonly Details Details;
+        public readonly BeatmapDetails Details;
         public readonly Leaderboard Leaderboard;
         private BeatmapDetailTab currentTab;
 
@@ -75,7 +76,7 @@ namespace osu.Game.Screens.Select
 
             Add(new Drawable[]
             {
-                Details = new Details
+                Details = new BeatmapDetails
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding(5),
