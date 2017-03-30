@@ -199,7 +199,7 @@ namespace osu.Game
             {
                 Depth = -3,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
-                OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
+                OnPlayModeChange = m => PlayMode.Value = m,
             }).LoadAsync(this, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
