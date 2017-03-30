@@ -24,12 +24,9 @@ namespace osu.Game.Modes.UI
         private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
 
-        private bool isVisible;
-
         public bool IsVisible
         {
-            set { isVisible = value; }
-            get { return isVisible; }
+            get { return showHud; }
         }
 
         protected abstract KeyCounterCollection CreateKeyCounter();
@@ -75,15 +72,9 @@ namespace osu.Game.Modes.UI
         private void hudVisibilityChanged(object sender, EventArgs e)
         {
             if (showHud)
-            {
-                IsVisible = true;
                 Show();
-            }
             else
-            {
-                IsVisible = false;
                 Hide();
-            }
         }
 
         public void ChangeVisibility()
