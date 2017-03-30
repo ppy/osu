@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                 },
                 new OsuCheckbox
                 {
-                    LabelText = "Enable In-game interface",
+                    LabelText = "Show score overlay",
                     Bindable = config.GetBindable<bool>(OsuConfig.ShowInterface)
                 },
                 new OsuCheckbox
