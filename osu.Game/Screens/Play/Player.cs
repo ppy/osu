@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Play
                 pauseOverlay
             };
 
-            if(!hudOverlay.IsVisible())
+            if(!hudOverlay.IsVisible)
             {
                 notificationManager.Post(new SimpleNotification
                 {

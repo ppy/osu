@@ -26,6 +26,12 @@ namespace osu.Game.Modes.UI
 
         private bool isVisible;
 
+        public bool IsVisible
+        {
+            set { isVisible = value; }
+            get { return isVisible; }
+        }
+
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract ComboCounter CreateComboCounter();
         protected abstract PercentageCounter CreateAccuracyCounter();
@@ -70,12 +76,12 @@ namespace osu.Game.Modes.UI
         {
             if (showHud)
             {
-                isVisible = true;
+                IsVisible = true;
                 Show();
             }
             else
             {
-                isVisible = false;
+                IsVisible = false;
                 Hide();
             }
         }
@@ -98,11 +104,6 @@ namespace osu.Game.Modes.UI
         public void BindHitRenderer(HitRenderer hitRenderer)
         {
             hitRenderer.InputManager.Add(KeyCounter.GetReceptor());
-        }
-
-        public bool IsVisible()
-        {
-            return isVisible;
         }
     }
 }
