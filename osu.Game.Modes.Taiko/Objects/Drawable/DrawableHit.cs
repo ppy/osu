@@ -2,11 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Input;
-using osu.Framework.Input;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -15,13 +16,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        protected abstract List<Key> HitKeys { get; }
+        protected abstract Key[] HitKeys { get; }
 
-        /// <summary>
-        /// A list of keys which this hit object will accept. These are the standard Taiko keys for now.
-        /// These should be moved to bindings later.
-        /// </summary>
-        private readonly List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
+        protected override Container<Framework.Graphics.Drawable> Content => bodyContainer;
 
         private readonly Hit hit;
 
@@ -30,10 +27,18 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// </summary>
         private bool validKeyPressed;
 
+        private readonly Container bodyContainer;
+
         protected DrawableHit(Hit hit)
             : base(hit)
         {
             this.hit = hit;
+
+            AddInternal(bodyContainer = new Container
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -61,7 +66,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 Judgement.Result = HitResult.Miss;
         }
 
-        protected virtual bool HandleKeyPress(Key key)
+        protected override bool HandleKeyPress(Key key)
         {
             if (Judgement.Result.HasValue)
                 return false;
@@ -71,18 +76,29 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             return UpdateJudgement(true);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override void UpdateState(ArmedState state)
         {
-            // Make sure we don't handle held-down keys
-            if (args.Repeat)
-                return false;
+            Delay(HitObject.StartTime - Time.Current + Judgement.TimeOffset, true);
 
-            // Check if we've pressed a valid taiko key
-            if (!validKeys.Contains(args.Key))
-                return false;
+            switch (State)
+            {
+                case ArmedState.Idle:
+                    Delay(hit.HitWindowMiss);
+                    break;
+                case ArmedState.Miss:
+                    FadeOut(100);
+                    break;
+                case ArmedState.Hit:
+                    bodyContainer.ScaleTo(0.8f, 400, EasingTypes.OutQuad);
+                    bodyContainer.MoveToY(-200, 250, EasingTypes.Out);
+                    bodyContainer.Delay(250);
+                    bodyContainer.MoveToY(0, 500, EasingTypes.In);
 
-            // Handle it!
-            return HandleKeyPress(args.Key);
+                    FadeOut(600);
+                    break;
+            }
+
+            Expire();
         }
     }
 }

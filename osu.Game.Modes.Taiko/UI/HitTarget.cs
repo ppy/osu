@@ -18,7 +18,7 @@ namespace osu.Game.Modes.Taiko.UI
         /// <summary>
         /// Diameter of normal hit object circles.
         /// </summary>
-        private const float normal_diameter = TaikoHitObject.CIRCLE_RADIUS * 2 * TaikoPlayfield.PLAYFIELD_SCALE;
+        private const float normal_diameter = TaikoHitObject.CIRCLE_RADIUS * 2;
         
         /// <summary>
         /// Diameter of finisher hit object circles.
@@ -47,7 +47,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Y = border_offset,
-                    Size = new Vector2(border_thickness, (TaikoPlayfield.PlayfieldHeight - finisher_diameter) / 2f - border_offset),
+                    Size = new Vector2(border_thickness, (TaikoPlayfield.PLAYFIELD_HEIGHT - finisher_diameter) / 2f - border_offset),
                     Alpha = 0.1f
                 },
                 new CircularContainer
@@ -96,7 +96,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Y = -border_offset,
-                    Size = new Vector2(border_thickness, (TaikoPlayfield.PlayfieldHeight - finisher_diameter) / 2f - border_offset),
+                    Size = new Vector2(border_thickness, (TaikoPlayfield.PLAYFIELD_HEIGHT - finisher_diameter) / 2f - border_offset),
                     Alpha = 0.1f
                 },
             };

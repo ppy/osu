@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Modes;
 using OpenTK;
 using OpenTK.Graphics;
@@ -66,14 +65,13 @@ namespace osu.Game.Overlays.Toolbar
 
             foreach (PlayMode m in Ruleset.PlayModes)
             {
-                var localMode = m;
                 modeButtons.Add(new ToolbarModeButton
                 {
                     Mode = m,
                     Action = delegate
                     {
-                        SetGameMode(localMode);
-                        OnPlayModeChange?.Invoke(localMode);
+                        SetGameMode(m);
+                        OnPlayModeChange?.Invoke(m);
                     }
                 });
             }

@@ -14,7 +14,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -277,7 +276,7 @@ namespace osu.Game.Screens.Select
             initialAddSetsTask.Cancel();
         }
 
-        private void playMode_ValueChanged(object sender, EventArgs e) => carousel.Filter();
+        private void playMode_ValueChanged(object sender, EventArgs e) => Beatmap.PreferredPlayMode = playMode;
 
         private void changeBackground(WorkingBeatmap beatmap)
         {
