@@ -21,7 +21,7 @@ namespace osu.Game.Modes.Taiko.UI
     {
         public InputDrum()
         {
-            Size = new Vector2(TaikoPlayfield.PlayfieldHeight);
+            Size = new Vector2(TaikoPlayfield.PLAYFIELD_HEIGHT);
 
             const float middle_split = 10;
 
