@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Play
 
         public ReplayInputHandler ReplayInputHandler;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, NotificationManager notificationManager)
         {
             var beatmap = Beatmap.Beatmap;
@@ -172,7 +172,7 @@ namespace osu.Game.Screens.Play
 
             if(!hudOverlay.IsVisible)
             {
-                notificationManager.Post(new SimpleNotification
+                notificationManager?.Post(new SimpleNotification
                 {
                     Text = @"The score overlay is currently disabled. You can toogle this by pressing Shift + Tab."
                 });
