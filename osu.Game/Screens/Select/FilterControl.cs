@@ -175,6 +175,7 @@ namespace osu.Game.Screens.Select
 
             if (osu != null)
                 playMode.BindTo(osu.PlayMode);
+            playMode.ValueChanged += (s, e) => FilterChanged?.Invoke(CreateCriteria());
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
