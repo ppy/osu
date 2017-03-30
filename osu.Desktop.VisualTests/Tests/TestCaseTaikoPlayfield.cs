@@ -55,7 +55,6 @@ namespace osu.Desktop.VisualTests.Tests
                     Result = HitResult.Hit,
                     TaikoResult = hitResult,
                     TimeOffset = 0,
-                    ComboAtHit = 1,
                     SecondHit = RNG.Next(10) == 0
                 }
             });
@@ -68,8 +67,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Judgement = new TaikoJudgement
                 {
                     Result = HitResult.Miss,
-                    TimeOffset = 0,
-                    ComboAtHit = 0
+                    TimeOffset = 0
                 }
             });
         }
