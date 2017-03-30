@@ -110,7 +110,7 @@ namespace osu.Game.Modes.Scoring
         /// <summary>
         /// All judgements held by this ScoreProcessor.
         /// </summary>
-        protected readonly List<TJudgement> Judgements = new List<TJudgement>();
+        protected readonly HashSet<TJudgement> Judgements = new HashSet<TJudgement>();
 
         public override bool HasFailed => Health.Value == Health.MinValue;
 
@@ -120,8 +120,6 @@ namespace osu.Game.Modes.Scoring
 
         protected ScoreProcessor(HitRenderer<TObject, TJudgement> hitRenderer)
         {
-            Judgements.Capacity = hitRenderer.Beatmap.HitObjects.Count;
-
             hitRenderer.OnJudgement += AddJudgement;
 
             ComputeTargets(hitRenderer.Beatmap);
