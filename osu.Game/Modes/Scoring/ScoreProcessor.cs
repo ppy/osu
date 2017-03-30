@@ -152,6 +152,8 @@ namespace osu.Game.Modes.Scoring
 
         protected override void Reset()
         {
+            base.Reset();
+
             Judgements.Clear();
         }
 
