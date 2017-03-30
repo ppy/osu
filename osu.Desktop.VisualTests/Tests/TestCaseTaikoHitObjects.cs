@@ -133,66 +133,6 @@ namespace osu.Desktop.VisualTests.Tests
             }
         }
 
-        private class CentreHitCircle : BaseCircle
-        {
-            public CentreHitCircle(CirclePiece piece)
-                : base(piece)
-            {
-                Piece.Add(new CircularContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(SYMBOL_INNER_SIZE),
-                    Masking = true,
-                    Children = new[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        }
-                    }
-                });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Piece.AccentColour = colours.PinkDarker;
-            }
-        }
-
-        private class RimHitCircle : BaseCircle
-        {
-            public RimHitCircle(CirclePiece piece)
-                : base(piece)
-            {
-                Piece.Add(new CircularContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(SYMBOL_SIZE),
-                    BorderThickness = SYMBOL_BORDER,
-                    BorderColour = Color4.White,
-                    Masking = true,
-                    Children = new[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            AlwaysPresent = true
-                        }
-                    }
-                });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Piece.AccentColour = colours.BlueDarker;
-            }
-        }
-
         private abstract class BaseCircle : Container
         {
             protected readonly CirclePiece Piece;
