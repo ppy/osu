@@ -181,7 +181,8 @@ namespace osu.Game.Screens.Select
         {
             if (!IsLoaded) return;
 
-            criteria = newCriteria ?? criteria ?? new FilterCriteria();
+            if (newCriteria != null)
+                criteria = newCriteria;
 
             Action perform = delegate
             {
@@ -202,6 +203,8 @@ namespace osu.Game.Screens.Select
 
                 if (selectedGroup == null || selectedGroup.State == BeatmapGroupState.Hidden)
                     SelectNext();
+                else
+                    selectGroup(selectedGroup);
             };
 
             filterTask?.Cancel();
