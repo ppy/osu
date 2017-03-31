@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Select.Details
                 positiveRatings.Text = ratings.GetRange(5, 5).Sum().ToString();
                 ratingsBar.Length = (float)ratings.GetRange(0, 5).Sum() / ratings.Sum();
 
-                ratingsGraph.Values = ratings.Select(rating => (float)rating / ratings.Max());
+                ratingsGraph.Values = ratings.Select(rating => (float)rating);
             }
         }
 
@@ -114,9 +114,9 @@ namespace osu.Game.Screens.Select.Details
 
         private void calcRetryAndFailGraph()
         {
-            failGraph.Values = fails.Select(fail => (float)fail / fails.Max());
-            List<float> retryAndFails = retries.Select((retry, index) => (float)retry + fails[index]).ToList();
-            retryGraph.Values = retryAndFails.Select(value => value / retryAndFails.Max());
+            failGraph.Values = fails.Select(fail => (float)fail);
+            retryGraph.Values = retries.Select((retry, index) => (float)retry + fails[index]);
+            
         }
 
         public BeatmapDetails()
