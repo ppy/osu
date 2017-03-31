@@ -8,8 +8,12 @@ namespace osu.Desktop.VisualTests
 {
     public class AutomatedVisualTestGame : OsuGameBase
     {
-        public AutomatedVisualTestGame()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
+            // Have to construct this here, rather than in the constructor, because
+            // we depend on some dependencies to be loaded within OsuGameBase.load().
             Add(new TestRunner(new TestBrowser()));
         }
     }
