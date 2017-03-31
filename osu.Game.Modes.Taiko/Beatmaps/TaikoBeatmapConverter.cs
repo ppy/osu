@@ -44,7 +44,10 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             IHasRepeats repeatsData = original as IHasRepeats;
             IHasEndTime endTimeData = original as IHasEndTime;
 
-            bool strong = ((original.Sample?.Type ?? SampleType.None) & SampleType.Finish) > 0;
+            // Old osu! used hit sounding to determine various hit type information
+            SampleType sample = original.Sample?.Type ?? SampleType.None;
+
+            bool strong = (sample & SampleType.Finish) > 0;
 
             if (distanceData != null)
             {
@@ -71,11 +74,23 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                 };
             }
 
-            return new Hit
+            bool isCentre = (sample & ~(SampleType.Finish | SampleType.Normal)) == 0;
+
+            if (isCentre)
+            {
+                return new CentreHit
+                {
+                    StartTime = original.StartTime,
+                    Sample = original.Sample,
+                    IsStrong = strong
+                };
+            }
+
+            return new RimHit
             {
                 StartTime = original.StartTime,
                 Sample = original.Sample,
-                IsStrong = strong
+                IsStrong = strong,
             };
         }
     }
