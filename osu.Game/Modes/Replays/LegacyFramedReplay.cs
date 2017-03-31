@@ -10,9 +10,9 @@ namespace osu.Game.Modes.Replays
     /// <summary>
     /// Reads a replay from a legacy replay file (.osr v1)
     /// </summary>
-    public class LegacyReplay : FramedReplay
+    public class LegacyFramedReplay : FramedReplay
     {
-        public LegacyReplay(StreamReader reader)
+        public LegacyFramedReplay(StreamReader reader)
         {
             float lastTime = 0;
 
