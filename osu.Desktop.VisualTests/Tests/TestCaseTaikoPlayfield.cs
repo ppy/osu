@@ -81,7 +81,7 @@ namespace osu.Desktop.VisualTests.Tests
             var d = new DrumRoll
             {
                 StartTime = Time.Current + 1000,
-                Distance = 2000,
+                Distance = 20000,
                 PreEmpt = 1000,
             };
 
