@@ -72,6 +72,10 @@ namespace osu.Game.Modes.UI
 
         protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
 
+        /// <summary>
+        /// Sets a replay to be used, overriding local input.
+        /// </summary>
+        /// <param name="replay">The replay, null for local input.</param>
         public void SetReplay(Replay replay) => InputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
     }
 
