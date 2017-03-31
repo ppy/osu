@@ -153,6 +153,7 @@
     <None Include="..\osu.licenseheader">
       <Link>osu.licenseheader</Link>
     </None>
+    <None Include="OpenTK.dll.config" />
     <None Include="osu!.res" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
