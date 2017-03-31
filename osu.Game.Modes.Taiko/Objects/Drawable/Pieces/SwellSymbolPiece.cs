@@ -15,6 +15,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+            UseFullGlyphHeight = true;
             TextSize = CirclePiece.SYMBOL_INNER_SIZE;
             Icon = FontAwesome.fa_asterisk;
             Shadow = false;
