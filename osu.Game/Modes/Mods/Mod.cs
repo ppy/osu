@@ -157,7 +157,7 @@ namespace osu.Game.Modes.Mods
 
         public void Apply(HitRenderer<T> hitRenderer)
         {
-            hitRenderer.InputManager.ReplayInputHandler = CreateReplayScore(hitRenderer.Beatmap)?.Replay?.CreateInputHandler();
+            hitRenderer.SetReplay(CreateReplayScore(hitRenderer.Beatmap)?.Replay);
         }
     }
 

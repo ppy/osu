@@ -15,7 +15,7 @@ using osu.Game.Modes.Replays;
 
 namespace osu.Game.Modes.Osu
 {
-    public class OsuAutoReplay : FramedReplay
+    public class OsuAutoReplay : Replay
     {
         private static readonly Vector2 spinner_centre = new Vector2(256, 192);
 
