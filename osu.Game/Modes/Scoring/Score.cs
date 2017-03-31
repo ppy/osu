@@ -7,6 +7,7 @@ using osu.Game.Database;
 using osu.Game.Modes.Mods;
 using osu.Game.Users;
 using System.IO;
+using osu.Game.Modes.Replays;
 
 namespace osu.Game.Modes.Scoring
 {
