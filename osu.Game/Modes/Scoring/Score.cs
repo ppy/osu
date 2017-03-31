@@ -50,7 +50,7 @@ namespace osu.Game.Modes.Scoring
         /// </summary>
         /// <param name="reader">The stream reader.</param>
         /// <returns>The replay.</returns>
-        public virtual Replay CreateLegacyReplayFrom(StreamReader reader) => new LegacyReplay(reader);
+        public virtual Replay CreateLegacyReplayFrom(StreamReader reader) => new LegacyFramedReplay(reader);
 
         //  [JsonProperty(@"count50")] 0,
         //[JsonProperty(@"count100")] 0,
