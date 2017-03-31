@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Modes.Taiko.Objects.Drawable;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -42,7 +43,7 @@ namespace osu.Game.Modes.Taiko.UI
         private readonly Container<DrawableTaikoJudgement> judgementContainer;
 
         private readonly Container hitObjectContainer;
-        //private Container topLevelHitContainer;
+        private readonly Container topLevelHitContainer;
         private readonly Container leftBackgroundContainer;
         private readonly Container rightBackgroundContainer;
         private readonly Box leftBackground;
@@ -143,10 +144,10 @@ namespace osu.Game.Modes.Taiko.UI
                         },
                     }
                 },
-                //topLevelHitContainer = new Container
-                //{
-                //    RelativeSizeAxes = Axes.Both,
-                //}
+                topLevelHitContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }
             });
         }
 
@@ -165,6 +166,11 @@ namespace osu.Game.Modes.Taiko.UI
             h.Depth = (float)h.HitObject.StartTime;
 
             base.Add(h);
+
+            // Swells should be moved at the very top of the playfield when they reach the hit target
+            var swell = h as DrawableSwell;
+            if (swell != null)
+                swell.OnStart += () => topLevelHitContainer.Add(swell.CreateProxy());
         }
 
         public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> judgedObject)
