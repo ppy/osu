@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using System.Collections.Generic;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input;
@@ -17,18 +20,20 @@ namespace osu.Game.Modes.Replays
     /// </summary>
     public class FramedReplayInputHandler : ReplayInputHandler
     {
-        private readonly List<ReplayFrame> replayContent;
+        private readonly Replay replay;
 
-        public ReplayFrame CurrentFrame => !hasFrames ? null : replayContent[currentFrameIndex];
-        public ReplayFrame NextFrame => !hasFrames ? null : replayContent[nextFrameIndex];
+        protected List<ReplayFrame> Frames => replay.Frames;
+
+        public ReplayFrame CurrentFrame => !hasFrames ? null : Frames[currentFrameIndex];
+        public ReplayFrame NextFrame => !hasFrames ? null : Frames[nextFrameIndex];
 
         private int currentFrameIndex;
 
-        private int nextFrameIndex => MathHelper.Clamp(currentFrameIndex + (currentDirection > 0 ? 1 : -1), 0, replayContent.Count - 1);
+        private int nextFrameIndex => MathHelper.Clamp(currentFrameIndex + (currentDirection > 0 ? 1 : -1), 0, Frames.Count - 1);
 
-        public FramedReplayInputHandler(List<ReplayFrame> replayContent)
+        public FramedReplayInputHandler(Replay replay)
         {
-            this.replayContent = replayContent;
+            this.replay = replay;
         }
 
         private bool advanceFrame()
@@ -75,7 +80,7 @@ namespace osu.Game.Modes.Replays
             };
         }
 
-        public bool AtLastFrame => currentFrameIndex == replayContent.Count - 1;
+        public bool AtLastFrame => currentFrameIndex == Frames.Count - 1;
         public bool AtFirstFrame => currentFrameIndex == 0;
 
         public Vector2 Size => new Vector2(512, 384);
@@ -91,7 +96,7 @@ namespace osu.Game.Modes.Replays
         /// </summary>
         public bool FrameAccuratePlayback = true;
 
-        private bool hasFrames => replayContent.Count > 0;
+        private bool hasFrames => Frames.Count > 0;
 
         private bool inImportantSection =>
             FrameAccuratePlayback &&
