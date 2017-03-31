@@ -34,6 +34,9 @@ namespace osu.Game.Modes.Osu
         {
             public int Compare(ReplayFrame f1, ReplayFrame f2)
             {
+                if (f1 == null) throw new NullReferenceException($@"{nameof(f1)} cannot be null");
+                if (f2 == null) throw new NullReferenceException($@"{nameof(f2)} cannot be null");
+
                 return f1.Time.CompareTo(f2.Time);
             }
         }
