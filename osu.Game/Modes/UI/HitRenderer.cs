@@ -72,7 +72,7 @@ namespace osu.Game.Modes.UI
 
         protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
 
-        public void SetReplay(Replay replay) => InputManager.ReplayInputHandler = CreateReplayInputHandler(replay);
+        public void SetReplay(Replay replay) => InputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
     }
 
     /// <summary>
