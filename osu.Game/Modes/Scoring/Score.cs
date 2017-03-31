@@ -2,11 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Database;
 using osu.Game.Modes.Mods;
 using osu.Game.Users;
 using System.IO;
+using osu.Game.Modes.Replays;
 
 namespace osu.Game.Modes.Scoring
 {
@@ -45,11 +47,34 @@ namespace osu.Game.Modes.Scoring
         public DateTime Date;
 
         /// <summary>
-        /// Creates a legacy replay which is read from a stream.
+        /// Creates a replay which is read from a stream.
         /// </summary>
         /// <param name="reader">The stream reader.</param>
         /// <returns>The replay.</returns>
-        public virtual Replay CreateLegacyReplayFrom(StreamReader reader) => new LegacyReplay(reader);
+        public virtual Replay CreateReplay(StreamReader reader)
+        {
+            var frames = new List<ReplayFrame>();
+
+            float lastTime = 0;
+
+            foreach (var l in reader.ReadToEnd().Split(','))
+            {
+                var split = l.Split('|');
+
+                if (split.Length < 4 || float.Parse(split[0]) < 0) continue;
+
+                lastTime += float.Parse(split[0]);
+
+                frames.Add(new ReplayFrame(
+                    lastTime,
+                    float.Parse(split[1]),
+                    384 - float.Parse(split[2]),
+                    (ReplayButtonState)int.Parse(split[3])
+                    ));
+            }
+
+            return new Replay { Frames = frames };
+        }
 
         //  [JsonProperty(@"count50")] 0,
         //[JsonProperty(@"count100")] 0,
