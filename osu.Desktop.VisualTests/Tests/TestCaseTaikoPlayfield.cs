@@ -26,6 +26,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddButton("Hit!", addHitJudgement);
             AddButton("Miss :(", addMissJudgement);
+            AddButton("Swell", addSwell);
             AddButton("Centre", () => addCentreHit(false));
             AddButton("Strong Centre", () => addCentreHit(true));
             AddButton("Rim", () => addRimHit(false));
@@ -55,7 +56,6 @@ namespace osu.Desktop.VisualTests.Tests
                     Result = HitResult.Hit,
                     TaikoResult = hitResult,
                     TimeOffset = 0,
-                    ComboAtHit = 1,
                     SecondHit = RNG.Next(10) == 0
                 }
             });
@@ -68,10 +68,19 @@ namespace osu.Desktop.VisualTests.Tests
                 Judgement = new TaikoJudgement
                 {
                     Result = HitResult.Miss,
-                    TimeOffset = 0,
-                    ComboAtHit = 0
+                    TimeOffset = 0
                 }
             });
+        }
+
+        private void addSwell()
+        {
+            playfield.Add(new DrawableSwell(new Swell
+            {
+                StartTime = Time.Current + 1000,
+                EndTime = Time.Current + 5000,
+                PreEmpt = 1000
+            }));
         }
 
         private void addCentreHit(bool strong)

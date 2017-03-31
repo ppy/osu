@@ -15,7 +15,6 @@ using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Input.Handlers;
 using osu.Game.Modes;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Backgrounds;
@@ -37,7 +36,7 @@ namespace osu.Game.Screens.Play
 
         internal override bool HasLocalCursorDisplayed => !hasReplayLoaded && !IsPaused;
 
-        private bool hasReplayLoaded => hitRenderer.InputManager.ReplayInputHandler != null;
+        private bool hasReplayLoaded => HitRenderer.InputManager.ReplayInputHandler != null;
 
         public BeatmapInfo BeatmapInfo;
 
@@ -56,7 +55,7 @@ namespace osu.Game.Screens.Play
         private Ruleset ruleset;
 
         private ScoreProcessor scoreProcessor;
-        private HitRenderer hitRenderer;
+        protected HitRenderer HitRenderer;
 
         private Bindable<int> dimLevel;
         private Bindable<bool> mouseWheelDisabled;
@@ -119,9 +118,9 @@ namespace osu.Game.Screens.Play
             });
 
             ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
-            hitRenderer = ruleset.CreateHitRendererWith(Beatmap);
+            HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
 
-            scoreProcessor = hitRenderer.CreateScoreProcessor();
+            scoreProcessor = HitRenderer.CreateScoreProcessor();
 
             hudOverlay = new StandardHudOverlay();
             hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
@@ -140,13 +139,10 @@ namespace osu.Game.Screens.Play
             };
 
 
-            if (ReplayInputHandler != null)
-                hitRenderer.InputManager.ReplayInputHandler = ReplayInputHandler;
-
-            hudOverlay.BindHitRenderer(hitRenderer);
+            hudOverlay.BindHitRenderer(HitRenderer);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
-            hitRenderer.OnAllJudged += onCompletion;
+            HitRenderer.OnAllJudged += onCompletion;
 
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
@@ -159,7 +155,7 @@ namespace osu.Game.Screens.Play
                     Clock = interpolatedSourceClock,
                     Children = new Drawable[]
                     {
-                        hitRenderer,
+                        HitRenderer,
                         skipButton = new SkipButton
                         {
                             Alpha = 0
