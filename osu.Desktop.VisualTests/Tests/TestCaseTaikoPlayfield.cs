@@ -28,6 +28,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddButton("Miss :(", addMissJudgement);
             AddButton("DrumRoll", () => addDrumRoll(false));
             AddButton("Strong DrumRoll", () => addDrumRoll(true));
+            AddButton("Swell", addSwell);
             AddButton("Centre", () => addCentreHit(false));
             AddButton("Strong Centre", () => addCentreHit(true));
             AddButton("Rim", () => addRimHit(false));
@@ -86,6 +87,16 @@ namespace osu.Desktop.VisualTests.Tests
             };
 
             playfield.Add(strong ? new DrawableStrongDrumRoll(d) : new DrawableDrumRoll(d));
+        }
+
+        private void addSwell()
+        {
+            playfield.Add(new DrawableSwell(new Swell
+            {
+                StartTime = Time.Current + 1000,
+                EndTime = Time.Current + 5000,
+                PreEmpt = 1000
+            }));
         }
 
         private void addCentreHit(bool strong)
