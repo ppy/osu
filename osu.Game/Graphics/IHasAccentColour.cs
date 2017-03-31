@@ -12,12 +12,12 @@ namespace osu.Game.Graphics
     /// The accent colour is used to colorize various objects inside a drawable
     /// without colorizing the drawable itself.
     /// </summary>
-    public interface IAccented : IDrawable
+    public interface IHasAccentColour : IDrawable
     {
         Color4 AccentColour { get; set; }
     }
 
-    public static class AccentedExtensions
+    public static class AccentedColourExtensions
     {
         /// <summary>
         /// Tweens the accent colour of a drawable to another colour.
@@ -28,7 +28,7 @@ namespace osu.Game.Graphics
         /// <param name="duration">The tween duration.</param>
         /// <param name="easing">The tween easing.</param>
         public static void FadeAccent<TDrawable>(this TDrawable drawable, Color4 newColour, double duration = 0, EasingTypes easing = EasingTypes.None)
-            where TDrawable : Drawable, IAccented
+            where TDrawable : Drawable, IHasAccentColour
         {
             drawable.TransformTo(drawable.AccentColour, newColour, duration, easing, new TransformAccent());
         }
