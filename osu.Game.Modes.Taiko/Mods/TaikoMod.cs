@@ -5,6 +5,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Modes.Mods;
 using osu.Game.Modes.Scoring;
 using osu.Game.Modes.Taiko.Objects;
+using osu.Game.Modes.Taiko.Replays;
 using osu.Game.Users;
 
 namespace osu.Game.Modes.Taiko.Mods
