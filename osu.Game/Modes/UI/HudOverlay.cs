@@ -22,6 +22,9 @@ namespace osu.Game.Modes.UI
         public readonly HealthDisplay HealthDisplay;
 
         private Bindable<bool> showKeyCounter;
+        private Bindable<bool> showHud;
+
+        public bool IsVisible => showHud;
 
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract ComboCounter CreateComboCounter();
@@ -47,16 +50,33 @@ namespace osu.Game.Modes.UI
         private void load(OsuConfigManager config)
         {
             showKeyCounter = config.GetBindable<bool>(OsuConfig.KeyOverlay);
-            showKeyCounter.ValueChanged += visibilityChanged;
+            showKeyCounter.ValueChanged += keyCounterVisibilityChanged;
             showKeyCounter.TriggerChange();
+
+            showHud = config.GetBindable<bool>(OsuConfig.ShowInterface);
+            showHud.ValueChanged += hudVisibilityChanged;
+            showHud.TriggerChange();
         }
 
-        private void visibilityChanged(object sender, EventArgs e)
+        private void keyCounterVisibilityChanged(object sender, EventArgs e)
         {
             if (showKeyCounter)
                 KeyCounter.Show();
             else
                 KeyCounter.Hide();
+        }
+
+        private void hudVisibilityChanged(object sender, EventArgs e)
+        {
+            if (showHud)
+                Show();
+            else
+                Hide();
+        }
+
+        public void ChangeVisibility()
+        {
+            showHud.Value = !showHud.Value;
         }
 
         public void BindProcessor(ScoreProcessor processor)

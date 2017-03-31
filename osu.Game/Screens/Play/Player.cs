@@ -22,6 +22,9 @@ using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
 using osu.Game.Modes.Scoring;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -59,8 +62,8 @@ namespace osu.Game.Screens.Play
         private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
+        [BackgroundDependencyLoader(true)]
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, NotificationManager notificationManager)
         {
             var beatmap = Beatmap.Beatmap;
 
@@ -158,6 +161,14 @@ namespace osu.Game.Screens.Play
                 hudOverlay,
                 pauseOverlay
             };
+
+            if (!hudOverlay.IsVisible)
+            {
+                notificationManager?.Post(new SimpleNotification
+                {
+                    Text = @"The score overlay is currently disabled. You can toogle this by pressing Shift + Tab."
+                });
+            }
         }
 
         private void initializeSkipButton()
@@ -333,5 +344,22 @@ namespace osu.Game.Screens.Play
         private Bindable<bool> mouseWheelDisabled;
 
         protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !IsPaused;
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat) return false;
+
+            if (state.Keyboard.ShiftPressed)
+            {
+                switch (args.Key)
+                {
+                    case Key.Tab:
+                        hudOverlay.ChangeVisibility();
+                        return true;
+                }
+            }
+
+            return base.OnKeyDown(state, args);
+        }
     }
 }
