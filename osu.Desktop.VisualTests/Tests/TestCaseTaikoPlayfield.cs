@@ -26,6 +26,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddButton("Hit!", addHitJudgement);
             AddButton("Miss :(", addMissJudgement);
+            AddButton("Swell", addSwell);
             AddButton("Centre", () => addCentreHit(false));
             AddButton("Strong Centre", () => addCentreHit(true));
             AddButton("Rim", () => addRimHit(false));
@@ -72,6 +73,16 @@ namespace osu.Desktop.VisualTests.Tests
                     ComboAtHit = 0
                 }
             });
+        }
+
+        private void addSwell()
+        {
+            playfield.Add(new DrawableSwell(new Swell
+            {
+                StartTime = Time.Current + 1000,
+                EndTime = Time.Current + 5000,
+                PreEmpt = 1000
+            }));
         }
 
         private void addCentreHit(bool strong)
