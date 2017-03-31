@@ -66,6 +66,7 @@
     <Compile Include="Objects\Drawable\Pieces\RimHitSymbolPiece.cs" />
     <Compile Include="Objects\Drawable\Pieces\StrongCirclePiece.cs" />
     <Compile Include="Objects\Drawable\Pieces\CirclePiece.cs" />
+    <Compile Include="Objects\Drawable\Pieces\SwellSymbolPiece.cs" />
     <Compile Include="Objects\DrumRoll.cs" />
     <Compile Include="Objects\DrumRollTick.cs" />
     <Compile Include="Objects\Hit.cs" />
