@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -15,12 +16,21 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
     public class DrawableDrumRoll : DrawableTaikoHitObject
     {
+        /// <summary>
+        /// Number of consecutive hits required to reach the dark/final accent colour.
+        /// </summary>
+        private const int consecutive_hits_for_dark_accent = 5;
+
         private readonly DrumRoll drumRoll;
 
         private readonly CirclePiece circle;
 
-        private Color4 baseColour;
-        private Color4 finalColour;
+        private Color4 accentDarkColour;
+
+        /// <summary>
+        /// Number of consecutive tick hits.
+        /// </summary>
+        private int consecutiveHits;
 
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
@@ -49,8 +59,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            circle.Background.Colour = baseColour = colours.YellowDark;
-            finalColour = colours.YellowDarker;
+            circle.AccentColour = AccentColour = colours.YellowDark;
+            accentDarkColour = colours.YellowDarker;
         }
 
         protected override void LoadComplete()
@@ -66,10 +76,15 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)
         {
-            int countHit = NestedHitObjects.Count(o => o.Judgement.Result == HitResult.Hit);
-            float completion = (float)countHit / NestedHitObjects.Count();
+            if (obj.Judgement.Result == HitResult.Hit)
+                consecutiveHits++;
+            else
+                consecutiveHits--;
 
-            circle.AccentColour = Interpolation.ValueAt(completion, baseColour, finalColour, 0, 1);
+            consecutiveHits = MathHelper.Clamp(consecutiveHits, 0, consecutive_hits_for_dark_accent);
+
+            Color4 newAccent = Interpolation.ValueAt((float)consecutiveHits / consecutive_hits_for_dark_accent, AccentColour, accentDarkColour, 0, 1);
+            circle.FadeAccent(newAccent, 100);
         }
 
         protected override void CheckJudgement(bool userTriggered)
