@@ -213,7 +213,7 @@ namespace osu.Game.Modes.UI
 
         protected class TransformComboRoll : Transform<int>
         {
-            protected override int CurrentValue
+            public override int CurrentValue
             {
                 get
                 {
