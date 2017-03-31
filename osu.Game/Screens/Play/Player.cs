@@ -22,6 +22,9 @@ using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
 using osu.Game.Modes.Scoring;
+using OpenTK.Input;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Screens.Play
 {
@@ -53,14 +56,18 @@ namespace osu.Game.Screens.Play
 
         private ScoreProcessor scoreProcessor;
         protected HitRenderer HitRenderer;
+
         private Bindable<int> dimLevel;
-        private SkipButton skipButton;
+        private Bindable<bool> mouseWheelDisabled;
 
         private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
+        private SkipButton skipButton;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
+        public ReplayInputHandler ReplayInputHandler;
+
+        [BackgroundDependencyLoader(true)]
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, NotificationManager notificationManager)
         {
             var beatmap = Beatmap.Beatmap;
 
@@ -158,6 +165,14 @@ namespace osu.Game.Screens.Play
                 hudOverlay,
                 pauseOverlay
             };
+
+            if(!hudOverlay.IsVisible)
+            {
+                notificationManager?.Post(new SimpleNotification
+                {
+                    Text = @"The score overlay is currently disabled. You can toogle this by pressing Shift + Tab."
+                });
+            }
         }
 
         private void initializeSkipButton()
@@ -330,8 +345,23 @@ namespace osu.Game.Screens.Play
             Background?.FadeTo((100f - dimLevel) / 100, 800);
         }
 
-        private Bindable<bool> mouseWheelDisabled;
-
         protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !IsPaused;
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat) return false;
+
+            if (state.Keyboard.ShiftPressed)
+            {
+                switch (args.Key)
+                {
+                    case Key.Tab:
+                        hudOverlay.ChangeVisibility();
+                        return true;
+                }
+            }
+
+            return base.OnKeyDown(state, args);
+        }
     }
 }
