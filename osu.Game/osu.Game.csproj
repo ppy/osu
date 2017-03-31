@@ -82,7 +82,9 @@
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\Cursor\GameplayCursor.cs" />
+    <Compile Include="Graphics\IHasAccentColour.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
+    <Compile Include="Graphics\Transforms\TransformAccent.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
     <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
     <Compile Include="Graphics\UserInterface\Nub.cs" />
@@ -96,8 +98,10 @@
     <Compile Include="IO\Legacy\SerializationReader.cs" />
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
+    <Compile Include="Modes\Replays\Replay.cs" />
     <Compile Include="Modes\Judgements\DrawableJudgement.cs" />
-    <Compile Include="Modes\LegacyReplay.cs" />
+    <Compile Include="Modes\Judgements\IPartialJudgement.cs" />
+    <Compile Include="Modes\Replays\FramedReplayInputHandler.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
     <Compile Include="Modes\Objects\Drawables\ArmedState.cs" />
@@ -123,7 +127,8 @@
     <Compile Include="Modes\Objects\Types\IHasPosition.cs" />
     <Compile Include="Modes\Objects\Types\IHasHold.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacyHitObjectType.cs" />
-    <Compile Include="Modes\Replay.cs" />
+    <Compile Include="Modes\Replays\ReplayButtonState.cs" />
+    <Compile Include="Modes\Replays\ReplayFrame.cs" />
     <Compile Include="Modes\Scoring\Score.cs" />
     <Compile Include="Modes\Scoring\ScoreProcessor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />
@@ -198,6 +203,7 @@
     <Compile Include="Screens\Play\KeyConversionInputManager.cs" />
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
+    <Compile Include="Screens\Play\ReplayPlayer.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Modes\UI\StandardComboCounter.cs" />
     <Compile Include="Screens\Select\BeatmapCarousel.cs" />

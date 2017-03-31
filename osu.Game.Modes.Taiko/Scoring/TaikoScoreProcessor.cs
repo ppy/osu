@@ -96,9 +96,9 @@ namespace osu.Game.Modes.Taiko.Scoring
 
         /// <summary>
         /// The multiple of the original score added to the combo portion of the score
-        /// for correctly hitting an accented hit object with both keys.
+        /// for correctly hitting a strong hit object with both keys.
         /// </summary>
-        private double accentedHitScale;
+        private double strongHitScale;
 
         private double hpIncreaseTick;
         private double hpIncreaseGreat;
@@ -128,12 +128,12 @@ namespace osu.Game.Modes.Taiko.Scoring
             hpIncreaseGood = hpMultiplierNormal * hp_hit_good;
             hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
 
-            var accentedHits = beatmap.HitObjects.FindAll(o => o is Hit && o.IsStrong);
+            var strongHits = beatmap.HitObjects.FindAll(o => o is Hit && o.IsStrong);
 
             // This is a linear function that awards:
-            // 10 times bonus points for hitting an accented hit object with both keys with 30 accented hit objects in the map
-            // 3 times bonus points for hitting an accented hit object with both keys with 120 accented hit objects in the map
-            accentedHitScale = -7d / 90d * MathHelper.Clamp(accentedHits.Count, 30, 120) + 111d / 9d;
+            // 10 times bonus points for hitting a strong hit object with both keys with 30 strong hit objects in the map
+            // 3 times bonus points for hitting a strong hit object with both keys with 120 strong hit objects in the map
+            strongHitScale = -7d / 90d * MathHelper.Clamp(strongHits.Count, 30, 120) + 111d / 9d;
 
             foreach (var obj in beatmap.HitObjects)
             {
@@ -179,7 +179,7 @@ namespace osu.Game.Modes.Taiko.Scoring
             maxComboPortion = comboPortion;
         }
 
-        protected override void OnNewJugement(TaikoJudgement judgement)
+        protected override void OnNewJudgement(TaikoJudgement judgement)
         {
             bool isTick = judgement is TaikoDrumRollTickJudgement;
 
@@ -187,29 +187,12 @@ namespace osu.Game.Modes.Taiko.Scoring
             if (!isTick)
                 totalHits++;
 
+            // Apply combo changes, must be done before the hit score is added
+            if (!isTick && judgement.Result == HitResult.Hit)
+                Combo.Value++;
+
             // Apply score changes
-            if (judgement.Result == HitResult.Hit)
-            {
-                double baseValue = judgement.ResultValueForScore;
-
-                // Add bonus points for hitting an accented hit object with the second key
-                if (judgement.SecondHit)
-                    baseValue += baseValue * accentedHitScale;
-
-                // Add score to portions
-                if (isTick)
-                    bonusScore += baseValue;
-                else
-                {
-                    Combo.Value++;
-
-                    // A relevance factor that needs to be applied to make higher combos more relevant
-                    // Value is capped at 400 combo
-                    double comboRelevance = Math.Min(Math.Log(400, combo_base), Math.Max(0.5, Math.Log(Combo.Value, combo_base)));
-
-                    comboPortion += baseValue * comboRelevance;
-                }
-            }
+            addHitScore(judgement);
 
             // Apply HP changes
             switch (judgement.Result)
@@ -235,7 +218,43 @@ namespace osu.Game.Modes.Taiko.Scoring
                     break;
             }
 
-            // Compute the new score + accuracy
+            calculateScore();
+        }
+
+        protected override void OnJudgementChanged(TaikoJudgement judgement)
+        {
+            // Apply score changes
+            addHitScore(judgement);
+
+            calculateScore();
+        }
+
+        private void addHitScore(TaikoJudgement judgement)
+        {
+            if (judgement.Result != HitResult.Hit)
+                return;
+
+            double baseValue = judgement.ResultValueForScore;
+
+            // Add increased score for hitting a strong hit object with the second key
+            if (judgement.SecondHit)
+                baseValue *= strongHitScale;
+
+            // Add score to portions
+            if (judgement is TaikoDrumRollTickJudgement)
+                bonusScore += baseValue;
+            else
+            {
+                // A relevance factor that needs to be applied to make higher combos more relevant
+                // Value is capped at 400 combo
+                double comboRelevance = Math.Min(Math.Log(400, combo_base), Math.Max(0.5, Math.Log(Combo.Value, combo_base)));
+
+                comboPortion += baseValue * comboRelevance;
+            }
+        }
+
+        private void calculateScore()
+        {
             int scoreForAccuracy = 0;
             int maxScoreForAccuracy = 0;
 
