@@ -110,7 +110,7 @@ namespace osu.Game.Modes.Scoring
         /// <summary>
         /// All judgements held by this ScoreProcessor.
         /// </summary>
-        protected readonly HashSet<TJudgement> Judgements = new HashSet<TJudgement>();
+        protected readonly List<TJudgement> Judgements = new List<TJudgement>();
 
         public override bool HasFailed => Health.Value == Health.MinValue;
 
@@ -139,9 +139,13 @@ namespace osu.Game.Modes.Scoring
         /// <param name="judgement">The judgement to add.</param>
         protected void AddJudgement(TJudgement judgement)
         {
-            if (Judgements.Add(judgement))
+            bool exists = Judgements.Contains(judgement);
+
+            if (!exists)
             {
+                Judgements.Add(judgement);
                 OnNewJudgement(judgement);
+
                 judgement.ComboAtHit = Combo.Value;
             }
             else
