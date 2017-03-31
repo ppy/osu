@@ -95,8 +95,8 @@ namespace osu.Game.Modes.Objects.Drawables
         {
             IPartialJudgement partial = Judgement as IPartialJudgement;
 
-            // Never re-process non-partial hits, or partial judgements that were previously judged as misses
-            if (Judgement.Result != HitResult.None && (partial == null || Judgement.Result == HitResult.Miss))
+            // Never re-process non-partial hits
+            if (Judgement.Result != HitResult.None && partial == null)
                 return false;
 
             // Update the judgement state
