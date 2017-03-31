@@ -4,7 +4,6 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
@@ -76,20 +75,16 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            Add(new SwellCircle(new CirclePiece
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(100, 500)
-            });
-
-            Add(new SwellCircle(new StrongCirclePiece
-            {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(350, 500)
+                Position = new Vector2(100, 500),
+                Width = 0,
+                AccentColour = Color4.Orange,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new SwellSymbolPiece()
+                }
             });
 
             Add(new DrumRollCircle(new CirclePiece
@@ -109,28 +104,6 @@ namespace osu.Desktop.VisualTests.Tests
                 Width = 250,
                 Position = new Vector2(575, 300)
             });
-        }
-
-        private class SwellCircle : BaseCircle
-        {
-            public SwellCircle(CirclePiece piece)
-                : base(piece)
-            {
-                Piece.Add(new TextAwesome
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    TextSize = CirclePiece.SYMBOL_INNER_SIZE,
-                    Icon = FontAwesome.fa_asterisk,
-                    Shadow = false
-                });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Piece.AccentColour = colours.YellowDark;
-            }
         }
 
         private class DrumRollCircle : BaseCircle
