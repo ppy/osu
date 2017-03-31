@@ -10,7 +10,7 @@ namespace osu.Game.Modes.Judgements
         /// <summary>
         /// Whether this judgement is the result of a hit or a miss.
         /// </summary>
-        public HitResult? Result;
+        public HitResult Result;
 
         /// <summary>
         /// The offset at which this judgement occurred.
@@ -20,7 +20,7 @@ namespace osu.Game.Modes.Judgements
         /// <summary>
         /// The combo after this judgement was processed.
         /// </summary>
-        public ulong? ComboAtHit;
+        public int ComboAtHit;
 
         /// <summary>
         /// The string representation for the result achieved.

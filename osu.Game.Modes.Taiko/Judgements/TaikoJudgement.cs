@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Taiko.Judgements
         /// The result value for the combo portion of the score.
         /// </summary>
         public int ResultValueForScore => NumericResultForScore(TaikoResult);
-        
+
         /// <summary>
         /// The result value for the accuracy portion of the score.
         /// </summary>
@@ -32,7 +32,7 @@ namespace osu.Game.Modes.Taiko.Judgements
         /// The maximum result value for the combo portion of the score.
         /// </summary>
         public int MaxResultValueForScore => NumericResultForScore(MAX_HIT_RESULT);
-        
+
         /// <summary>
         /// The maximum result value for the accuracy portion of the score.
         /// </summary>
@@ -45,7 +45,7 @@ namespace osu.Game.Modes.Taiko.Judgements
         /// <summary>
         /// Whether this Judgement has a secondary hit in the case of finishers.
         /// </summary>
-        public bool SecondHit;
+        public virtual bool SecondHit { get; set; }
 
         /// <summary>
         /// Computes the numeric result value for the combo portion of the score.
