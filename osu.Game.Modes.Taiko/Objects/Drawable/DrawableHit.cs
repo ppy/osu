@@ -68,7 +68,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         protected override bool HandleKeyPress(Key key)
         {
-            if (Judgement.Result.HasValue)
+            if (Judgement.Result != HitResult.None)
                 return false;
 
             validKeyPressed = HitKeys.Contains(key);

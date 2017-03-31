@@ -19,7 +19,7 @@ namespace osu.Game.Modes.Catch.Scoring
         {
         }
 
-        protected override void OnNewJugement(CatchJudgement judgement)
+        protected override void OnNewJudgement(CatchJudgement judgement)
         {
         }
     }
