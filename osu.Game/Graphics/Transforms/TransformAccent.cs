@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.Transforms
         {
             base.Apply(d);
 
-            var accented = d as IAccented;
+            var accented = d as IHasAccentColour;
             if (accented != null)
                 accented.AccentColour = CurrentValue;
         }
