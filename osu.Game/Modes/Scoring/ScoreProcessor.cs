@@ -120,6 +120,8 @@ namespace osu.Game.Modes.Scoring
 
         protected ScoreProcessor(HitRenderer<TObject, TJudgement> hitRenderer)
         {
+            Judgements.Capacity = hitRenderer.Beatmap.HitObjects.Count;
+
             hitRenderer.OnJudgement += AddJudgement;
 
             ComputeTargets(hitRenderer.Beatmap);
