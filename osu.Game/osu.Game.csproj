@@ -96,8 +96,9 @@
     <Compile Include="IO\Legacy\SerializationReader.cs" />
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
+    <Compile Include="Modes\Replays\FramedReplay.cs" />
     <Compile Include="Modes\Judgements\DrawableJudgement.cs" />
-    <Compile Include="Modes\LegacyReplay.cs" />
+    <Compile Include="Modes\Replays\LegacyFramedReplay.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
     <Compile Include="Modes\Objects\Drawables\ArmedState.cs" />
@@ -123,7 +124,9 @@
     <Compile Include="Modes\Objects\Types\IHasPosition.cs" />
     <Compile Include="Modes\Objects\Types\IHasHold.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacyHitObjectType.cs" />
-    <Compile Include="Modes\Replay.cs" />
+    <Compile Include="Modes\Replays\Replay.cs" />
+    <Compile Include="Modes\Replays\ReplayButtonState.cs" />
+    <Compile Include="Modes\Replays\ReplayFrame.cs" />
     <Compile Include="Modes\Scoring\Score.cs" />
     <Compile Include="Modes\Scoring\ScoreProcessor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />

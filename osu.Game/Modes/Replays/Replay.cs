@@ -3,7 +3,7 @@
 
 using osu.Game.Input.Handlers;
 
-namespace osu.Game.Modes
+namespace osu.Game.Modes.Replays
 {
     public abstract class Replay
     {

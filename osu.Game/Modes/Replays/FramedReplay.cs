@@ -3,67 +3,39 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Input.Handlers;
-using osu.Game.IO.Legacy;
 using OpenTK;
 using OpenTK.Input;
 using KeyboardState = osu.Framework.Input.KeyboardState;
 using MouseState = osu.Framework.Input.MouseState;
 
-namespace osu.Game.Modes
+namespace osu.Game.Modes.Replays
 {
-    public class LegacyReplay : Replay
+    public abstract class FramedReplay : Replay
     {
-        protected List<LegacyReplayFrame> Frames = new List<LegacyReplayFrame>();
+        protected List<ReplayFrame> Frames = new List<ReplayFrame>();
 
-        protected LegacyReplay()
-        {
-
-        }
-
-        public LegacyReplay(StreamReader reader)
-        {
-            float lastTime = 0;
-
-            foreach (var l in reader.ReadToEnd().Split(','))
-            {
-                var split = l.Split('|');
-
-                if (split.Length < 4 || float.Parse(split[0]) < 0) continue;
-
-                lastTime += float.Parse(split[0]);
-
-                Frames.Add(new LegacyReplayFrame(
-                    lastTime,
-                    float.Parse(split[1]),
-                    384 - float.Parse(split[2]),
-                    (LegacyButtonState)int.Parse(split[3])
-                    ));
-            }
-        }
-
-        public override ReplayInputHandler CreateInputHandler() => new LegacyReplayInputHandler(Frames);
+        public override ReplayInputHandler CreateInputHandler() => new FramedReplayInputHandler(Frames);
 
         /// <summary>
         /// The ReplayHandler will take a replay and handle the propagation of updates to the input stack.
         /// It handles logic of any frames which *must* be executed.
         /// </summary>
-        protected class LegacyReplayInputHandler : ReplayInputHandler
+        public class FramedReplayInputHandler : ReplayInputHandler
         {
-            private readonly List<LegacyReplayFrame> replayContent;
+            private readonly List<ReplayFrame> replayContent;
 
-            public LegacyReplayFrame CurrentFrame => !hasFrames ? null : replayContent[currentFrameIndex];
-            public LegacyReplayFrame NextFrame => !hasFrames ? null : replayContent[nextFrameIndex];
+            public ReplayFrame CurrentFrame => !hasFrames ? null : replayContent[currentFrameIndex];
+            public ReplayFrame NextFrame => !hasFrames ? null : replayContent[nextFrameIndex];
 
             private int currentFrameIndex;
 
             private int nextFrameIndex => MathHelper.Clamp(currentFrameIndex + (currentDirection > 0 ? 1 : -1), 0, replayContent.Count - 1);
 
-            public LegacyReplayInputHandler(List<LegacyReplayFrame> replayContent)
+            public FramedReplayInputHandler(List<ReplayFrame> replayContent)
             {
                 this.replayContent = replayContent;
             }
@@ -133,7 +105,7 @@ namespace osu.Game.Modes
             private bool inImportantSection =>
                 FrameAccuratePlayback &&
                 //a button is in a pressed state
-                (currentDirection > 0 ? CurrentFrame : NextFrame)?.ButtonState > LegacyButtonState.None &&
+                ((currentDirection > 0 ? CurrentFrame : NextFrame)?.IsImportant ?? false) &&
                 //the next frame is within an allowable time span
                 Math.Abs(currentTime - NextFrame?.Time ?? 0) <= sixty_frame_time * 1.2;
 
@@ -178,90 +150,6 @@ namespace osu.Game.Modes
                 {
                     Keys = keys;
                 }
-            }
-        }
-
-        [Flags]
-        protected enum LegacyButtonState
-        {
-            None = 0,
-            Left1 = 1,
-            Right1 = 2,
-            Left2 = 4,
-            Right2 = 8,
-            Smoke = 16
-        }
-
-        protected class LegacyReplayFrame
-        {
-            public Vector2 Position => new Vector2(MouseX, MouseY);
-
-            public float MouseX;
-            public float MouseY;
-            public bool MouseLeft;
-            public bool MouseRight;
-            public bool MouseLeft1;
-            public bool MouseRight1;
-            public bool MouseLeft2;
-            public bool MouseRight2;
-            public LegacyButtonState ButtonState;
-            public double Time;
-
-            public LegacyReplayFrame(double time, float posX, float posY, LegacyButtonState buttonState)
-            {
-                MouseX = posX;
-                MouseY = posY;
-                ButtonState = buttonState;
-                SetButtonStates(buttonState);
-                Time = time;
-            }
-
-            public void SetButtonStates(LegacyButtonState buttonState)
-            {
-                ButtonState = buttonState;
-                MouseLeft = (buttonState & (LegacyButtonState.Left1 | LegacyButtonState.Left2)) > 0;
-                MouseLeft1 = (buttonState & LegacyButtonState.Left1) > 0;
-                MouseLeft2 = (buttonState & LegacyButtonState.Left2) > 0;
-                MouseRight = (buttonState & (LegacyButtonState.Right1 | LegacyButtonState.Right2)) > 0;
-                MouseRight1 = (buttonState & LegacyButtonState.Right1) > 0;
-                MouseRight2 = (buttonState & LegacyButtonState.Right2) > 0;
-            }
-
-            public LegacyReplayFrame(Stream s) : this(new SerializationReader(s))
-            {
-            }
-
-            public LegacyReplayFrame(SerializationReader sr)
-            {
-                ButtonState = (LegacyButtonState)sr.ReadByte();
-                SetButtonStates(ButtonState);
-
-                byte bt = sr.ReadByte();
-                if (bt > 0)//Handle Pre-Taiko compatible replays.
-                    SetButtonStates(LegacyButtonState.Right1);
-
-                MouseX = sr.ReadSingle();
-                MouseY = sr.ReadSingle();
-                Time = sr.ReadInt32();
-            }
-
-            public void ReadFromStream(SerializationReader sr)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void WriteToStream(SerializationWriter sw)
-            {
-                sw.Write((byte)ButtonState);
-                sw.Write((byte)0);
-                sw.Write(MouseX);
-                sw.Write(MouseY);
-                sw.Write(Time);
-            }
-
-            public override string ToString()
-            {
-                return $"{Time}\t({MouseX},{MouseY})\t{MouseLeft}\t{MouseRight}\t{MouseLeft1}\t{MouseRight1}\t{MouseLeft2}\t{MouseRight2}\t{ButtonState}";
             }
         }
     }
