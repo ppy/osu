@@ -36,7 +36,7 @@ namespace osu.Game.Modes.UI
 
         protected class TransformComboResult : Transform<ulong>
         {
-            protected override ulong CurrentValue
+            public override ulong CurrentValue
             {
                 get
                 {

@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected class TransformAccuracy : Transform<double>
         {
-            protected override double CurrentValue
+            public override double CurrentValue
             {
                 get
                 {
