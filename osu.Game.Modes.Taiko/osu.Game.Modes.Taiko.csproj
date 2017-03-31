@@ -52,7 +52,6 @@
     <Compile Include="Judgements\TaikoDrumRollTickJudgement.cs" />
     <Compile Include="Judgements\TaikoJudgement.cs" />
     <Compile Include="Judgements\TaikoHitResult.cs" />
-    <Compile Include="LegacyTaikoReplay.cs" />
     <Compile Include="Objects\CentreHit.cs" />
     <Compile Include="Objects\Drawable\DrawableRimHit.cs" />
     <Compile Include="Objects\Drawable\DrawableStrongRimHit.cs" />
@@ -74,12 +73,12 @@
     <Compile Include="Objects\Hit.cs" />
     <Compile Include="Objects\RimHit.cs" />
     <Compile Include="Objects\Swell.cs" />
-    <Compile Include="TaikoAutoReplay.cs" />
+    <Compile Include="Replays\TaikoFramedReplayInputHandler.cs" />
+    <Compile Include="Replays\TaikoAutoReplay.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scoring\TaikoScoreProcessor.cs" />
-    <Compile Include="TaikoScore.cs" />
     <Compile Include="UI\HitTarget.cs" />
     <Compile Include="UI\InputDrum.cs" />
     <Compile Include="UI\DrawableTaikoJudgement.cs" />
