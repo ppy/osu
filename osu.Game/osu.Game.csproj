@@ -98,6 +98,7 @@
     <Compile Include="IPC\ScoreIPCChannel.cs" />
     <Compile Include="Modes\Replays\FramedReplay.cs" />
     <Compile Include="Modes\Judgements\DrawableJudgement.cs" />
+    <Compile Include="Modes\Replays\FramedReplayInputHandler.cs" />
     <Compile Include="Modes\Replays\LegacyFramedReplay.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
