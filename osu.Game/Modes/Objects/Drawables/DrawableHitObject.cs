@@ -93,16 +93,26 @@ namespace osu.Game.Modes.Objects.Drawables
         /// <returns>Whether a hit was processed.</returns>
         protected bool UpdateJudgement(bool userTriggered)
         {
-            if (Judgement.Result != null)
+            IPartialJudgement partial = Judgement as IPartialJudgement;
+
+            // Never re-process non-partial hits
+            if (Judgement.Result != HitResult.None && partial == null)
                 return false;
 
+            // Update the judgement state
             double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-
             Judgement.TimeOffset = Time.Current - endTime;
 
+            // Update the judgement state
+            bool hadResult = Judgement.Result != HitResult.None;
             CheckJudgement(userTriggered);
 
-            if (Judgement.Result == null)
+            // Don't process judgements with no result
+            if (Judgement.Result == HitResult.None)
+                return false;
+
+            // Don't process judgements that previously had results but the results were unchanged
+            if (hadResult && partial?.Changed != true)
                 return false;
 
             switch (Judgement.Result)
@@ -116,6 +126,9 @@ namespace osu.Game.Modes.Objects.Drawables
             }
 
             OnJudgement?.Invoke(this);
+
+            if (partial != null)
+                partial.Changed = false;
 
             return true;
         }
