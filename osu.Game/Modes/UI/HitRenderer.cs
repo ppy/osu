@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Game.Modes.Replays;
 using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Modes.UI
@@ -68,6 +69,14 @@ namespace osu.Game.Modes.UI
         /// </summary>
         /// <returns>The input manager.</returns>
         protected virtual KeyConversionInputManager CreateKeyConversionInputManager() => new KeyConversionInputManager();
+
+        protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
+
+        /// <summary>
+        /// Sets a replay to be used, overriding local input.
+        /// </summary>
+        /// <param name="replay">The replay, null for local input.</param>
+        public void SetReplay(Replay replay) => InputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
     }
 
     /// <summary>
