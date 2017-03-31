@@ -29,19 +29,24 @@ namespace osu.Game.Modes.Taiko
             {
             }
 
-            public override List<InputState> GetPendingStates() => new List<InputState>
+            public override List<InputState> GetPendingStates()
             {
-                new InputState
+                var keys = new List<Key>();
+
+                if (CurrentFrame?.MouseRight1 == true)
+                    keys.Add(Key.F);
+                if (CurrentFrame?.MouseRight2 == true)
+                    keys.Add(Key.J);
+                if (CurrentFrame?.MouseLeft1 == true)
+                    keys.Add(Key.D);
+                if (CurrentFrame?.MouseLeft2 == true)
+                    keys.Add(Key.K);
+
+                return new List<InputState>
                 {
-                    Keyboard = new ReplayKeyboardState(new List<Key>(new[]
-                    {
-                        CurrentFrame?.MouseRight1 == true ? Key.F : Key.Unknown,
-                        CurrentFrame?.MouseRight2 == true ? Key.J : Key.Unknown,
-                        CurrentFrame?.MouseLeft1 == true ? Key.D : Key.Unknown,
-                        CurrentFrame?.MouseLeft2 == true ? Key.K : Key.Unknown
-                    }))
-                }
-            };
+                    new InputState { Keyboard = new ReplayKeyboardState(keys) }
+                };
+            }
         }
     }
 }
