@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -19,9 +20,9 @@ namespace osu.Game.Screens.Select.Details
 {
     public class BeatmapDetails : Container
     {
-        private readonly SpriteText description;
-        private readonly SpriteText source;
-        private readonly FillFlowContainer<SpriteText> tags;
+        private readonly OsuSpriteText description;
+        private readonly OsuSpriteText source;
+        private readonly FillFlowContainer<OsuSpriteText> tags;
 
         private readonly DifficultyRow circleSize;
         private readonly DifficultyRow drainRate;
@@ -30,8 +31,8 @@ namespace osu.Game.Screens.Select.Details
         private readonly DifficultyRow stars;
 
         private readonly BeatmapDetailsBar ratingsBar;
-        private readonly SpriteText negativeRatings;
-        private readonly SpriteText positiveRatings;
+        private readonly OsuSpriteText negativeRatings;
+        private readonly OsuSpriteText positiveRatings;
         private readonly BeatmapDetailsGraph ratingsGraph;
 
         private readonly BeatmapDetailsGraph retryGraph;
@@ -51,10 +52,9 @@ namespace osu.Game.Screens.Select.Details
                 beatmap = value;
                 description.Text = beatmap.Version;
                 source.Text = beatmap.Metadata.Source;
-                tags.Children = beatmap.Metadata.Tags?.Split(' ').Select(text => new SpriteText
+                tags.Children = beatmap.Metadata.Tags?.Split(' ').Select(text => new OsuSpriteText
                 {
                     Text = text,
-                    TextSize = 14,
                     Font = "Exo2.0-Medium",
                 });
 
@@ -140,39 +140,34 @@ namespace osu.Game.Screens.Select.Details
                     Padding = new MarginPadding(10) { Top = 25 },
                     Children = new Drawable[]
                     {
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = "Description",
-                            TextSize = 14,
                             Font = @"Exo2.0-Bold",
                         },
-                        description = new SpriteText
+                        description = new OsuSpriteText
                         {
-                            TextSize = 14,
                             Font = @"Exo2.0-Medium",
                             Direction = FillDirection.Full,
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = "Source",
-                            TextSize = 14,
                             Font = @"Exo2.0-Bold",
                             Margin = new MarginPadding { Top = 20 },
                         },
-                        source = new SpriteText
+                        source = new OsuSpriteText
                         {
-                            TextSize = 14,
                             Font = @"Exo2.0-Medium",
                             Direction = FillDirection.Full,
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = "Tags",
-                            TextSize = 14,
                             Font = @"Exo2.0-Bold",
                             Margin = new MarginPadding { Top = 20 },
                         },
-                        tags = new FillFlowContainer<SpriteText>
+                        tags = new FillFlowContainer<OsuSpriteText>
                         {
                             RelativeSizeAxes = Axes.X,
                             Spacing = new Vector2(3,0),
@@ -265,10 +260,9 @@ namespace osu.Game.Screens.Select.Details
                                     Padding = new MarginPadding(15) { Top = 25, Bottom = 0 },
                                     Children = new Drawable[]
                                     {
-                                        new SpriteText
+                                        new OsuSpriteText
                                         {
                                             Text = "User Rating",
-                                            TextSize = 14,
                                             Font = @"Exo2.0-Medium",
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
@@ -285,15 +279,13 @@ namespace osu.Game.Screens.Select.Details
                                             AutoSizeAxes = Axes.Y,
                                             Children = new[]
                                             {
-                                                negativeRatings = new SpriteText
+                                                negativeRatings = new OsuSpriteText
                                                 {
-                                                    TextSize = 14,
                                                     Font = @"Exo2.0-Medium",
                                                     Text = "0",
                                                 },
-                                                positiveRatings = new SpriteText
+                                                positiveRatings = new OsuSpriteText
                                                 {
-                                                    TextSize = 14,
                                                     Font = @"Exo2.0-Medium",
                                                     Text = "0",
                                                     Anchor = Anchor.TopRight,
@@ -301,7 +293,7 @@ namespace osu.Game.Screens.Select.Details
                                                 },
                                             },
                                         },
-                                        new SpriteText
+                                        new OsuSpriteText
                                         {
                                             Text = "Rating Spread",
                                             TextSize = 14,
@@ -319,10 +311,9 @@ namespace osu.Game.Screens.Select.Details
                                 },
                             },
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = "Points of Failure",
-                            TextSize = 14,
                             Font = @"Exo2.0-Medium",
                         },
                         new Container<BeatmapDetailsGraph>
@@ -365,9 +356,9 @@ namespace osu.Game.Screens.Select.Details
 
         private class DifficultyRow : Container
         {
-            private readonly SpriteText name;
+            private readonly OsuSpriteText name;
             private readonly BeatmapDetailsBar bar;
-            private readonly SpriteText valueText;
+            private readonly OsuSpriteText valueText;
 
             private float difficultyValue;
             public float Value
@@ -426,9 +417,8 @@ namespace osu.Game.Screens.Select.Details
             {
                 Children = new Drawable[]
                 {
-                    name = new SpriteText
+                    name = new OsuSpriteText
                     {
-                        TextSize = 14,
                         Font = @"Exo2.0-Medium",
                     },
                     bar = new BeatmapDetailsBar
@@ -439,11 +429,10 @@ namespace osu.Game.Screens.Select.Details
                         Size = new Vector2(1, 0.35f),
                         Padding = new MarginPadding { Left = 100, Right = 25 },
                     },
-                    valueText = new SpriteText
+                    valueText = new OsuSpriteText
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        TextSize = 14,
                         Font = @"Exo2.0-Medium",
                     },
                 };
