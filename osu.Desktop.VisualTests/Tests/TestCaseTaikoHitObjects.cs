@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -22,7 +23,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddToggleStep("Kiai", b =>
             {
                 kiai = !kiai;
-                Reset();
+                updateKiaiState();
             });
 
             Add(new CirclePiece
@@ -100,6 +101,12 @@ namespace osu.Desktop.VisualTests.Tests
                 AccentColour = Color4.Orange,
                 KiaiMode = kiai
             });
+        }
+
+        private void updateKiaiState()
+        {
+            foreach (var c in Children.OfType<CirclePiece>())
+                c.KiaiMode = kiai;
         }
 
         private abstract class BaseCircle : Container
