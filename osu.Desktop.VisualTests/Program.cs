@@ -27,7 +27,7 @@ namespace osu.Desktop.VisualTests
                 Ruleset.Register(new CatchRuleset());
 
                 if (benchmark)
-                    host.Run(new Benchmark());
+                    host.Run(new AutomatedVisualTestGame());
                 else
                     host.Run(new VisualTestGame());
             }

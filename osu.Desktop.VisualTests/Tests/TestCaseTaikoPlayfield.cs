@@ -24,21 +24,20 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            AddButton("Hit!", addHitJudgement);
-            AddButton("Miss :(", addMissJudgement);
-            AddButton("DrumRoll", () => addDrumRoll(false));
-            AddButton("Strong DrumRoll", () => addDrumRoll(true));
-            AddButton("Swell", addSwell);
-            AddButton("Centre", () => addCentreHit(false));
-            AddButton("Strong Centre", () => addCentreHit(true));
-            AddButton("Rim", () => addRimHit(false));
-            AddButton("Strong Rim", () => addRimHit(true));
+            AddStep("Hit!", addHitJudgement);
+            AddStep("Miss :(", addMissJudgement);
+            AddStep("DrumRoll", () => addDrumRoll(false));
+            AddStep("Strong DrumRoll", () => addDrumRoll(true));
+            AddStep("Swell", addSwell);
+            AddStep("Centre", () => addCentreHit(false));
+            AddStep("Strong Centre", () => addCentreHit(true));
+            AddStep("Rim", () => addRimHit(false));
+            AddStep("Strong Rim", () => addRimHit(true));
 
             Add(new Container
             {
                 RelativeSizeAxes = Axes.X,
                 Y = 200,
-                Padding = new MarginPadding { Left = 200 },
                 Children = new[]
                 {
                     playfield = new TaikoPlayfield()
