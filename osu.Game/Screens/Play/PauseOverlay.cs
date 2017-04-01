@@ -35,8 +35,8 @@ namespace osu.Game.Screens.Play
 
         public PauseOverlay()
         {
-            title = @"paused";
-            description = @"you're not going to do what i think you're going to do, are ya?";
+            Title = @"paused";
+            Description = @"you're not going to do what i think you're going to do, are ya?";
         }
     }
 }

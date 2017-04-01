@@ -27,8 +27,8 @@ namespace osu.Game.Screens.Play
         public Action OnRetry;
         public Action OnQuit;
 
-        protected string title;
-        protected string description;
+        protected string Title;
+        protected string Description;
 
         private FillFlowContainer buttons;
 
@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Play
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = title,
+                                    Text = Title,
                                     Font = @"Exo2.0-Medium",
                                     Spacing = new Vector2(5, 0),
                                     Origin = Anchor.TopCentre,
@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Play
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = description,
+                                    Text = Description,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Shadow = true,
