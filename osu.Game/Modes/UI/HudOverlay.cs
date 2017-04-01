@@ -10,6 +10,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
 using System;
 using osu.Game.Modes.Scoring;
+using osu.Framework.Input;
+using OpenTK.Input;
 
 namespace osu.Game.Modes.UI
 {
@@ -35,6 +37,7 @@ namespace osu.Game.Modes.UI
         protected HudOverlay()
         {
             RelativeSizeAxes = Axes.Both;
+            AlwaysPresent = true;
 
             Children = new Drawable[]
             {
@@ -74,11 +77,6 @@ namespace osu.Game.Modes.UI
                 Hide();
         }
 
-        public void ChangeVisibility()
-        {
-            showHud.Value = !showHud.Value;
-        }
-
         public void BindProcessor(ScoreProcessor processor)
         {
             //bind processor bindables to combocounter, score display etc.
@@ -92,6 +90,23 @@ namespace osu.Game.Modes.UI
         public void BindHitRenderer(HitRenderer hitRenderer)
         {
             hitRenderer.InputManager.Add(KeyCounter.GetReceptor());
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat) return false;
+
+            if (state.Keyboard.ShiftPressed)
+            {
+                switch (args.Key)
+                {
+                    case Key.Tab:
+                        showHud.Value = !showHud.Value;
+                        return true;
+                }
+            }
+
+            return base.OnKeyDown(state, args);
         }
     }
 }
