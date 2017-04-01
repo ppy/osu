@@ -39,7 +39,7 @@ namespace osu.Game.Modes.Taiko.UI
         protected override Container<Drawable> Content => hitObjectContainer;
 
         private readonly Container<HitExplosion> hitExplosionContainer;
-        private Container<DrawableBarLine> barLineContainer;
+        private readonly Container<DrawableBarLine> barLineContainer;
         private readonly Container<DrawableTaikoJudgement> judgementContainer;
 
         private readonly Container hitObjectContainer;
