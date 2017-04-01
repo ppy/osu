@@ -28,5 +28,11 @@ namespace osu.Game.Screens.Play
             AddButton(@"Retry", colours.YellowDark, OnRetry);
             AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), OnQuit);
         }
+
+        public FailOverlay()
+        {
+            title = @"failed";
+            description = @"you're dead, try again?";
+        }
     }
 }
