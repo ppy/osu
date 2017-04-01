@@ -38,21 +38,21 @@ namespace osu.Desktop.VisualTests.Tests
             Add(pauseOverlay);
             Add(failOverlay);
 
-            AddToggleStep(@"Pause", delegate {
+            AddStep(@"Pause", delegate {
                 if(failOverlay.State == Visibility.Visible)
                 {
                     failOverlay.Hide();
                 }
                 pauseOverlay.Show();
             });
-            AddToggleStep("Fail", delegate {
+            AddStep("Fail", delegate {
                 if (pauseOverlay.State == Visibility.Visible)
                 {
                     pauseOverlay.Hide();
                 }
                 failOverlay.Show();
             });
-            AddToggleStep("Add Retry", delegate
+            AddStep("Add Retry", delegate
             {
                 retryCount++;
                 pauseOverlay.Retries = retryCount;
