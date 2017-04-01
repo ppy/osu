@@ -42,7 +42,7 @@ namespace osu.Game.Beatmaps
         protected abstract Track GetTrack();
         
         private Beatmap beatmap;
-        private object beatmapLock = new object();
+        private readonly object beatmapLock = new object();
         public Beatmap Beatmap
         {
             get
@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
             }
         }
         
-        private object backgroundLock = new object();
+        private readonly object backgroundLock = new object();
         private Texture background;
         public Texture Background
         {
@@ -68,7 +68,7 @@ namespace osu.Game.Beatmaps
         }
 
         private Track track;
-        private object trackLock = new object();
+        private readonly object trackLock = new object();
         public Track Track
         {
             get

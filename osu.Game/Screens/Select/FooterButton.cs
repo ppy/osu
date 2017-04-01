@@ -8,7 +8,6 @@ using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 
@@ -51,9 +50,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private SpriteText spriteText;
-        private Box box;
-        private Box light;
+        private readonly SpriteText spriteText;
+        private readonly Box box;
+        private readonly Box light;
 
         public FooterButton()
         {

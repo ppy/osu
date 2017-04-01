@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
@@ -30,10 +29,11 @@ namespace osu.Game.Overlays.Mods
 
         private Color4 lowMultiplierColour, highMultiplierColour;
 
-        private OsuSpriteText rankedLabel, multiplierLabel;
-        private FillFlowContainer rankedMultiplerContainer;
+        private readonly OsuSpriteText rankedLabel;
+        private readonly OsuSpriteText multiplierLabel;
+        private readonly FillFlowContainer rankedMultiplerContainer;
 
-        private FillFlowContainer<ModSection> modSectionsContainer;
+        private readonly FillFlowContainer<ModSection> modSectionsContainer;
 
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 

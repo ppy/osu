@@ -9,7 +9,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
@@ -135,7 +134,7 @@ namespace osu.Game.Overlays.Notifications
 
         private class ClearAllButton : ClickableContainer
         {
-            private OsuSpriteText text;
+            private readonly OsuSpriteText text;
 
             public ClearAllButton()
             {

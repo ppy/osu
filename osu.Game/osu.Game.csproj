@@ -82,7 +82,9 @@
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\Cursor\GameplayCursor.cs" />
+    <Compile Include="Graphics\IHasAccentColour.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
+    <Compile Include="Graphics\Transforms\TransformAccent.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
     <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
     <Compile Include="Graphics\UserInterface\Nub.cs" />
@@ -96,7 +98,10 @@
     <Compile Include="IO\Legacy\SerializationReader.cs" />
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
-    <Compile Include="Modes\LegacyReplay.cs" />
+    <Compile Include="Modes\Replays\Replay.cs" />
+    <Compile Include="Modes\Judgements\DrawableJudgement.cs" />
+    <Compile Include="Modes\Judgements\IPartialJudgement.cs" />
+    <Compile Include="Modes\Replays\FramedReplayInputHandler.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
     <Compile Include="Modes\Objects\Drawables\ArmedState.cs" />
@@ -112,7 +117,7 @@
     <Compile Include="Modes\Objects\SliderCurve.cs" />
     <Compile Include="Modes\Objects\Types\CurveType.cs" />
     <Compile Include="Modes\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
-    <Compile Include="Modes\Judgements\JudgementInfo.cs" />
+    <Compile Include="Modes\Judgements\Judgement.cs" />
     <Compile Include="Modes\Objects\HitObjectParser.cs" />
     <Compile Include="Modes\Objects\Types\IHasCombo.cs" />
     <Compile Include="Modes\Objects\Types\IHasEndTime.cs" />
@@ -122,9 +127,10 @@
     <Compile Include="Modes\Objects\Types\IHasPosition.cs" />
     <Compile Include="Modes\Objects\Types\IHasHold.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacyHitObjectType.cs" />
-    <Compile Include="Modes\Replay.cs" />
-    <Compile Include="Modes\Score.cs" />
-    <Compile Include="Modes\ScoreProcessor.cs" />
+    <Compile Include="Modes\Replays\ReplayButtonState.cs" />
+    <Compile Include="Modes\Replays\ReplayFrame.cs" />
+    <Compile Include="Modes\Scoring\Score.cs" />
+    <Compile Include="Modes\Scoring\ScoreProcessor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />
     <Compile Include="Modes\UI\HudOverlay.cs" />
     <Compile Include="Modes\UI\StandardHealthDisplay.cs" />
@@ -159,7 +165,7 @@
     <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
     <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
-    <Compile Include="Overlays\Options\OptionDropDown.cs" />
+    <Compile Include="Overlays\Options\OptionDropdown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropdown.cs" />
     <Compile Include="Overlays\Options\OptionsFooter.cs" />
@@ -197,6 +203,7 @@
     <Compile Include="Screens\Play\KeyConversionInputManager.cs" />
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
+    <Compile Include="Screens\Play\ReplayPlayer.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Modes\UI\StandardComboCounter.cs" />
     <Compile Include="Screens\Select\BeatmapCarousel.cs" />
@@ -246,7 +253,6 @@
     <Compile Include="Online\Chat\Drawables\DrawableChannel.cs" />
     <Compile Include="Online\Chat\Drawables\ChatLine.cs" />
     <Compile Include="Online\Chat\Message.cs" />
-    <Compile Include="Online\User.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="OsuGameBase.cs" />
     <Compile Include="Overlays\ChatOverlay.cs" />
@@ -266,6 +272,7 @@
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
+    <Compile Include="Users\UpdateableAvatar.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
@@ -319,7 +326,7 @@
     <Compile Include="Overlays\Options\OptionTextBox.cs" />
     <Compile Include="Overlays\Options\OptionSlider.cs" />
     <Compile Include="Configuration\ProgressBarType.cs" />
-    <Compile Include="Overlays\Options\OptionEnumDropDown.cs" />
+    <Compile Include="Overlays\Options\OptionEnumDropdown.cs" />
     <Compile Include="Configuration\RankingType.cs" />
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ReleaseStream.cs" />
@@ -358,10 +365,13 @@
     <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
     <Compile Include="Users\Country.cs" />
     <Compile Include="Users\Team.cs" />
-    <Compile Include="Modes\ScoreRank.cs" />
+    <Compile Include="Modes\Scoring\ScoreRank.cs" />
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
+    <Compile Include="Screens\Select\BeatmapDetailArea.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabControlCheckBox.cs" />
+    <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

@@ -7,14 +7,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Modes.Mods;
 using osu.Game.Users;
 using osu.Framework;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -30,14 +29,16 @@ namespace osu.Game.Screens.Select.Leaderboards
         private const float background_alpha = 0.25f;
         private const float rank_width = 30;
 
-        private Box background;
-        private Container content, avatar;
-        private DrawableRank scoreRank;
-        private OsuSpriteText nameLabel;
-        private GlowingSpriteText scoreLabel;
-        private ScoreComponentLabel maxCombo, accuracy;
-        private Container flagBadgeContainer;
-        private FillFlowContainer<ScoreModIcon> modsContainer;
+        private readonly Box background;
+        private readonly Container content;
+        private readonly Container avatar;
+        private readonly DrawableRank scoreRank;
+        private readonly OsuSpriteText nameLabel;
+        private readonly GlowingSpriteText scoreLabel;
+        private readonly ScoreComponentLabel maxCombo;
+        private readonly ScoreComponentLabel accuracy;
+        private readonly Container flagBadgeContainer;
+        private readonly FillFlowContainer<ScoreModIcon> modsContainer;
 
         private Visibility state;
         public Visibility State
@@ -140,18 +141,26 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Padding = new MarginPadding(edge_margin),
                             Children = new Drawable[]
                             {
-                                avatar = new Avatar
+                                avatar = new DelayedLoadContainer
                                 {
+                                    TimeBeforeLoad = 500,
+                                    FinishedLoading = d => d.FadeInFromZero(200),
                                     Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),
-                                    CornerRadius = corner_radius,
-                                    Masking = true,
-                                    EdgeEffect = new EdgeEffect
+                                    Children = new Drawable[]
                                     {
-                                        Type = EdgeEffectType.Shadow,
-                                        Radius = 1,
-                                        Colour = Color4.Black.Opacity(0.2f),
-                                    },
-                                    UserId = Score.User?.Id ?? Score.UserID,
+                                        new Avatar(Score.User ?? new User { Id = Score.UserID })
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            CornerRadius = corner_radius,
+                                            Masking = true,
+                                            EdgeEffect = new EdgeEffect
+                                            {
+                                                Type = EdgeEffectType.Shadow,
+                                                Radius = 1,
+                                                Colour = Color4.Black.Opacity(0.2f),
+                                            },
+                                        },
+                                    }
                                 },
                                 new Container
                                 {

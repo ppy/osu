@@ -34,8 +34,8 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        private SpriteText textDrawable;
-        private TextAwesome iconDrawable;
+        private readonly SpriteText textDrawable;
+        private readonly TextAwesome iconDrawable;
 
         protected Box IconBackgound;
 

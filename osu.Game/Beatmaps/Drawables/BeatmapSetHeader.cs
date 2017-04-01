@@ -20,11 +20,12 @@ namespace osu.Game.Beatmaps.Drawables
     public class BeatmapSetHeader : Panel
     {
         public Action<BeatmapSetHeader> GainedSelection;
-        private SpriteText title, artist;
+        private readonly SpriteText title;
+        private readonly SpriteText artist;
         private OsuConfigManager config;
         private Bindable<bool> preferUnicode;
-        private WorkingBeatmap beatmap;
-        private FillFlowContainer difficultyIcons;
+        private readonly WorkingBeatmap beatmap;
+        private readonly FillFlowContainer difficultyIcons;
 
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
@@ -32,12 +33,26 @@ namespace osu.Game.Beatmaps.Drawables
 
             Children = new Drawable[]
             {
+                new DelayedLoadContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    TimeBeforeLoad = 300,
+                    FinishedLoading = d => d.FadeInFromZero(400, EasingTypes.Out),
+                    Children = new[]
+                    {
+                        new PanelBackground(beatmap)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Depth = 1,
+                        }
+                    }
+                },
                 new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
                     Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         title = new OsuSpriteText
                         {
@@ -70,23 +85,13 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, OsuGameBase game)
+        private void load(OsuConfigManager config)
         {
             this.config = config;
 
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
             preferUnicode.ValueChanged += preferUnicode_changed;
             preferUnicode_changed(preferUnicode, null);
-
-            new PanelBackground(beatmap)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Depth = 1,
-            }.LoadAsync(game, b =>
-            {
-                Add(b);
-                b.FadeInFromZero(200);
-            });
         }
 
         private void preferUnicode_changed(object sender, EventArgs e)

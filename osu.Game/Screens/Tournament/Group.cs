@@ -23,9 +23,9 @@ namespace osu.Game.Screens.Tournament
 
         public int TeamsCount { get; private set; }
 
-        private FlowContainer<GroupTeam> teams;
+        private readonly FlowContainer<GroupTeam> teams;
 
-        private List<GroupTeam> allTeams = new List<GroupTeam>();
+        private readonly List<GroupTeam> allTeams = new List<GroupTeam>();
 
         public Group(string name)
         {
@@ -122,10 +122,10 @@ namespace osu.Game.Screens.Tournament
 
         private class GroupTeam : Container
         {
-            public Country Team;
+            public readonly Country Team;
 
-            private FillFlowContainer innerContainer;
-            private Sprite flagSprite;
+            private readonly FillFlowContainer innerContainer;
+            private readonly Sprite flagSprite;
 
             public GroupTeam(Country team)
             {

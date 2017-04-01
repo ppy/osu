@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Modes;
@@ -23,8 +22,8 @@ namespace osu.Game.Overlays.Toolbar
         public Action OnHome;
         public Action<PlayMode> OnPlayModeChange;
 
-        private ToolbarModeSelector modeSelector;
-        private ToolbarUserArea userArea;
+        private readonly ToolbarModeSelector modeSelector;
+        private readonly ToolbarUserArea userArea;
 
         protected override bool HideOnEscape => false;
 
@@ -90,8 +89,8 @@ namespace osu.Game.Overlays.Toolbar
 
         public class ToolbarBackground : Container
         {
-            private Box solidBackground;
-            private Box gradientBackground;
+            private readonly Box solidBackground;
+            private readonly Box gradientBackground;
 
             public ToolbarBackground()
             {

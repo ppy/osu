@@ -7,7 +7,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Judgements;
@@ -18,7 +17,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 {
     public class DrawableSliderTick : DrawableOsuHitObject
     {
-        private SliderTick sliderTick;
+        private readonly SliderTick sliderTick;
 
         public double FadeInTime;
         public double FadeOutTime;
@@ -27,7 +26,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
 
         public override bool RemoveWhenNotAlive => false;
 
-        protected override OsuJudgementInfo CreateJudgementInfo() => new OsuJudgementInfo { MaxScore = OsuScoreResult.SliderTick };
+        protected override OsuJudgement CreateJudgement() => new OsuJudgement { MaxScore = OsuScoreResult.SliderTick };
 
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
@@ -48,7 +47,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = sliderTick.ComboColour,
+                    Colour = AccentColour,
                     Alpha = 0.3f,
                 }
             };

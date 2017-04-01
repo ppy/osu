@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Allocation;
@@ -8,10 +9,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
-using System.Collections.Generic;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -22,7 +21,9 @@ namespace osu.Game.Modes.Taiko.UI
     {
         public InputDrum()
         {
-            Size = new Vector2(TaikoPlayfield.PlayfieldHeight);
+            Size = new Vector2(TaikoPlayfield.PLAYFIELD_HEIGHT);
+
+            const float middle_split = 10;
 
             Children = new Drawable[]
             {
@@ -32,7 +33,9 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
                     RelativeSizeAxes = Axes.Both,
-                    Keys = new List<Key>(new[] { Key.F, Key.D })
+                    X = -middle_split / 2,
+                    RimKey = Key.D,
+                    CentreKey = Key.F
                 },
                 new TaikoHalfDrum(true)
                 {
@@ -40,8 +43,10 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.Both,
+                    X = middle_split / 2,
                     Position = new Vector2(-1f, 0),
-                    Keys = new List<Key>(new[] { Key.J, Key.K })
+                    RimKey = Key.K,
+                    CentreKey = Key.J
                 }
             };
         }
@@ -52,17 +57,19 @@ namespace osu.Game.Modes.Taiko.UI
         private class TaikoHalfDrum : Container
         {
             /// <summary>
-            /// A list of keys which this half-drum accepts.
-            /// <para>
-            /// [0] => Inner key, [1] => Outer key
-            /// </para>
+            /// The key to be used for the rim of the half-drum.
             /// </summary>
-            public List<Key> Keys = new List<Key>();
+            public Key RimKey;
+            
+            /// <summary>
+            /// The key to be used for the centre of the half-drum.
+            /// </summary>
+            public Key CentreKey;
 
-            private Sprite outer;
-            private Sprite outerHit;
-            private Sprite inner;
-            private Sprite innerHit;
+            private readonly Sprite rim;
+            private readonly Sprite rimHit;
+            private readonly Sprite centre;
+            private readonly Sprite centreHit;
 
             public TaikoHalfDrum(bool flipped)
             {
@@ -70,28 +77,28 @@ namespace osu.Game.Modes.Taiko.UI
 
                 Children = new Drawable[]
                 {
-                    outer = new Sprite
+                    rim = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both
                     },
-                    outerHit = new Sprite
+                    rimHit = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                        BlendingMode = BlendingMode.Additive
+                        BlendingMode = BlendingMode.Additive,
                     },
-                    inner = new Sprite
+                    centre = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.7f)
                     },
-                    innerHit = new Sprite
+                    centreHit = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
@@ -106,13 +113,13 @@ namespace osu.Game.Modes.Taiko.UI
             [BackgroundDependencyLoader]
             private void load(TextureStore textures, OsuColour colours)
             {
-                outer.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer");
-                outerHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer-hit");
-                inner.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
-                innerHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner-hit");
+                rim.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer");
+                rimHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer-hit");
+                centre.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
+                centreHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner-hit");
 
-                outerHit.Colour = colours.Blue;
-                innerHit.Colour = colours.Pink;
+                rimHit.Colour = colours.Blue;
+                centreHit.Colour = colours.Pink;
             }
 
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -120,16 +127,18 @@ namespace osu.Game.Modes.Taiko.UI
                 if (args.Repeat)
                     return false;
 
-                if (args.Key == Keys[0])
-                {
-                    innerHit.FadeIn();
-                    innerHit.FadeOut(500, EasingTypes.OutQuint);
-                }
+                Drawable target = null;
 
-                if (args.Key == Keys[1])
+                if (args.Key == CentreKey)
+                    target = centreHit;
+                else if (args.Key == RimKey)
+                    target = rimHit;
+
+                if (target != null)
                 {
-                    outerHit.FadeIn();
-                    outerHit.FadeOut(500, EasingTypes.OutQuint);
+                    target.FadeTo(Math.Min(target.Alpha + 0.4f, 1), 40, EasingTypes.OutQuint);
+                    target.Delay(40);
+                    target.FadeOut(1000, EasingTypes.OutQuint);
                 }
 
                 return false;

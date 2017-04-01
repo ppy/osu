@@ -18,7 +18,7 @@ namespace osu.Game.Modes.Taiko.UI
         /// <summary>
         /// Diameter of normal hit object circles.
         /// </summary>
-        private const float normal_diameter = TaikoHitObject.CIRCLE_RADIUS * 2 * TaikoPlayfield.PLAYFIELD_SCALE;
+        private const float normal_diameter = TaikoHitObject.CIRCLE_RADIUS * 2;
         
         /// <summary>
         /// Diameter of finisher hit object circles.
@@ -29,6 +29,11 @@ namespace osu.Game.Modes.Taiko.UI
         /// The 1px inner border of the taiko playfield.
         /// </summary>
         private const float border_offset = 1;
+
+        /// <summary>
+        /// Thickness of all drawn line pieces.
+        /// </summary>
+        private const float border_thickness = 2.5f;
 
         public HitTarget()
         {
@@ -42,7 +47,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Y = border_offset,
-                    Size = new Vector2(3, (TaikoPlayfield.PlayfieldHeight - finisher_diameter) / 2f - border_offset),
+                    Size = new Vector2(border_thickness, (TaikoPlayfield.PLAYFIELD_HEIGHT - finisher_diameter) / 2f - border_offset),
                     Alpha = 0.1f
                 },
                 new CircularContainer
@@ -53,7 +58,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Size = new Vector2(finisher_diameter),
                     Masking = true,
                     BorderColour = Color4.White,
-                    BorderThickness = 2,
+                    BorderThickness = border_thickness,
                     Alpha = 0.1f,
                     Children = new[]
                     {
@@ -73,7 +78,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Size = new Vector2(normal_diameter),
                     Masking = true,
                     BorderColour = Color4.White,
-                    BorderThickness = 2,
+                    BorderThickness = border_thickness,
                     Alpha = 0.5f,
                     Children = new[]
                     {
@@ -91,7 +96,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Y = -border_offset,
-                    Size = new Vector2(3, (TaikoPlayfield.PlayfieldHeight - finisher_diameter) / 2f - border_offset),
+                    Size = new Vector2(border_thickness, (TaikoPlayfield.PLAYFIELD_HEIGHT - finisher_diameter) / 2f - border_offset),
                     Alpha = 0.1f
                 },
             };
