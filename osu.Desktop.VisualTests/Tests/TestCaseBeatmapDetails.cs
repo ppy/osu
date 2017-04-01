@@ -44,10 +44,8 @@ namespace osu.Desktop.VisualTests.Tests
                 },
             });
 
-            details.Ratings = Enumerable.Range(1, 10);
-            newRetryAndFailValues();
-
-            AddButton("new retry/fail values", newRetryAndFailValues);
+            AddStep("new retry/fail values", newRetryAndFailValues);
+            AddStep("new ratings", newRatings);
         }
 
         private int lastRange = 1;
@@ -57,6 +55,11 @@ namespace osu.Desktop.VisualTests.Tests
             details.Fails = Enumerable.Range(lastRange, 100).Select(i => (int)(Math.Cos(i) * 100));
             details.Retries = Enumerable.Range(lastRange, 100).Select(i => (int)(Math.Sin(i) * 100));
             lastRange += 100;
+        }
+
+        private void newRatings()
+        {
+            details.Ratings = Enumerable.Range(1, 10);
         }
     }
 }
