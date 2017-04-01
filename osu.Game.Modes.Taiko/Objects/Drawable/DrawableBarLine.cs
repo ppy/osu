@@ -14,12 +14,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
     public class DrawableBarLine : Container
     {
         /// <summary>
-        /// The line.
+        /// The visual line tracker.
         /// </summary>
         protected Box Tracker;
 
         /// <summary>
-        /// The 
+        /// The bar line.
         /// </summary>
         protected readonly BarLine BarLine;
 
@@ -61,12 +61,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             FadeOut(100 * BarLine.PreEmpt / 1000);
         }
 
-        private void moveToTimeOffset(double time) => MoveToX((float)((BarLine.StartTime - time) / BarLine.PreEmpt));
+        private void updateScrollPosition(double time) => MoveToX((float)((BarLine.StartTime - time) / BarLine.PreEmpt));
 
         protected override void Update()
         {
             base.Update();
-            moveToTimeOffset(Time.Current);
+
+            updateScrollPosition(Time.Current);
         }
     }
 }

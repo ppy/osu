@@ -6,7 +6,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
-using osu.Framework.Timing;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
@@ -20,11 +19,6 @@ namespace osu.Desktop.VisualTests.Tests
         public override string Description => "Taiko playfield";
 
         private TaikoPlayfield playfield;
-
-        public TestCaseTaikoPlayfield()
-        {
-            Clock = new FramedClock();
-        }
 
         public override void Reset()
         {
