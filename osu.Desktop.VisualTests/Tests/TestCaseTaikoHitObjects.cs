@@ -21,7 +21,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            AddToggle("Kiai", b =>
+            AddToggleStep("Kiai", b =>
             {
                 kiai = !kiai;
                 Reset();

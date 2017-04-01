@@ -13,10 +13,10 @@ using osu.Game.Modes.Taiko;
 namespace osu.Desktop.Tests
 {
     [TestFixture]
-    public class BenchmarkTest
+    public class VisualTests
     {
         [Test]
-        public void TestBenchmark()
+        public void TestVisualTests()
         {
             using (var host = new HeadlessGameHost())
             {
@@ -25,7 +25,7 @@ namespace osu.Desktop.Tests
                 Ruleset.Register(new ManiaRuleset());
                 Ruleset.Register(new CatchRuleset());
 
-                host.Run(new Benchmark());
+                host.Run(new AutomatedVisualTestGame());
             }
         }
     }
