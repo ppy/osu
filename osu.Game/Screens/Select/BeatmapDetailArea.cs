@@ -124,7 +124,6 @@ namespace osu.Game.Screens.Select
             if (api == null || beatmap?.BeatmapInfo == null) return;
             
             Details.Beatmap = beatmap.Beatmap.BeatmapInfo;
-            
         }
     }
 }
