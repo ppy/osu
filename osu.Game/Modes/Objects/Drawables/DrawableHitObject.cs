@@ -11,11 +11,12 @@ using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Judgements;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Game.Modes.Objects.Types;
+using OpenTK.Graphics;
 
 namespace osu.Game.Modes.Objects.Drawables
 {
     public abstract class DrawableHitObject<TJudgement> : Container, IStateful<ArmedState>
-        where TJudgement : JudgementInfo
+        where TJudgement : Judgement
     {
         public override bool HandleInput => Interactive;
 
@@ -23,7 +24,7 @@ namespace osu.Game.Modes.Objects.Drawables
 
         public TJudgement Judgement;
 
-        protected abstract TJudgement CreateJudgementInfo();
+        protected abstract TJudgement CreateJudgement();
 
         protected abstract void UpdateState(ArmedState state);
 
@@ -61,7 +62,7 @@ namespace osu.Game.Modes.Objects.Drawables
 
             //we may be setting a custom judgement in test cases or what not.
             if (Judgement == null)
-                Judgement = CreateJudgementInfo();
+                Judgement = CreateJudgement();
 
             //force application of the state that was set before we loaded.
             UpdateState(State);
@@ -70,11 +71,16 @@ namespace osu.Game.Modes.Objects.Drawables
 
     public abstract class DrawableHitObject<TObject, TJudgement> : DrawableHitObject<TJudgement>
         where TObject : HitObject
-        where TJudgement : JudgementInfo
+        where TJudgement : Judgement
     {
         public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
 
         public TObject HitObject;
+
+        /// <summary>
+        /// The colour used for various elements of this DrawableHitObject.
+        /// </summary>
+        public Color4 AccentColour { get; protected set; }
 
         protected DrawableHitObject(TObject hitObject)
         {
@@ -87,16 +93,26 @@ namespace osu.Game.Modes.Objects.Drawables
         /// <returns>Whether a hit was processed.</returns>
         protected bool UpdateJudgement(bool userTriggered)
         {
-            if (Judgement.Result != null)
+            IPartialJudgement partial = Judgement as IPartialJudgement;
+
+            // Never re-process non-partial hits
+            if (Judgement.Result != HitResult.None && partial == null)
                 return false;
 
+            // Update the judgement state
             double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-
             Judgement.TimeOffset = Time.Current - endTime;
 
+            // Update the judgement state
+            bool hadResult = Judgement.Result != HitResult.None;
             CheckJudgement(userTriggered);
 
-            if (Judgement.Result == null)
+            // Don't process judgements with no result
+            if (Judgement.Result == HitResult.None)
+                return false;
+
+            // Don't process judgements that previously had results but the results were unchanged
+            if (hadResult && partial?.Changed != true)
                 return false;
 
             switch (Judgement.Result)
@@ -110,6 +126,9 @@ namespace osu.Game.Modes.Objects.Drawables
             }
 
             OnJudgement?.Invoke(this);
+
+            if (partial != null)
+                partial.Changed = false;
 
             return true;
         }

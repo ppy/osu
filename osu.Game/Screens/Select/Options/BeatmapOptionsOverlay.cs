@@ -11,7 +11,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select.Options
@@ -24,8 +23,8 @@ namespace osu.Game.Screens.Select.Options
 
         private const float height = 100;
 
-        private Box holder;
-        private FillFlowContainer<BeatmapOptionsButton> buttonsContainer;
+        private readonly Box holder;
+        private readonly FillFlowContainer<BeatmapOptionsButton> buttonsContainer;
 
         protected override void PopIn()
         {

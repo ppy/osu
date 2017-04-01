@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Tournament
 
         private readonly List<Country> availableTeams = new List<Country>();
 
-        private Container tracker;
+        private readonly Container tracker;
 
         private float speed;
         private int expiredCount;
@@ -298,9 +298,7 @@ namespace osu.Game.Screens.Tournament
         private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None)
         {
             DelayReset();
-
-            UpdateTransformsOfType(typeof(TransformScrollSpeed));
-            TransformFloatTo(speed, value, duration, easing, new TransformScrollSpeed());
+            TransformTo(speed, value, duration, easing, new TransformScrollSpeed());
         }
 
         private enum ScrollState
@@ -328,8 +326,8 @@ namespace osu.Game.Screens.Tournament
 
             public Country Team;
 
-            private Sprite flagSprite;
-            private Box outline;
+            private readonly Sprite flagSprite;
+            private readonly Box outline;
 
             private bool selected;
             public bool Selected

@@ -4,7 +4,6 @@
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
@@ -18,7 +17,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public override bool RemoveWhenNotAlive => false;
 
-        private Container nestedContainer;
+        private readonly Container nestedContainer;
 
         protected override Container<Drawable> Content => nestedContainer;
 

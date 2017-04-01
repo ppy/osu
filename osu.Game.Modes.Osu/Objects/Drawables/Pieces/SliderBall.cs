@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK.Graphics;
 
@@ -12,10 +11,26 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
 {
     public class SliderBall : CircularContainer, ISliderProgress
     {
-        private readonly Slider slider;
-        private Box follow;
-
         private const float width = 128;
+
+        private Color4 accentColour = Color4.Black;
+        /// <summary>
+        /// The colour that is used for the slider ball.
+        /// </summary>
+        public Color4 AccentColour
+        {
+            get { return accentColour; }
+            set
+            {
+                accentColour = value;
+                if (ball != null)
+                    ball.Colour = value;
+            }
+        }
+
+        private readonly Slider slider;
+        private readonly Box follow;
+        private readonly Box ball;
 
         public SliderBall(Slider slider)
         {
@@ -49,9 +64,9 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Pieces
                     Alpha = 1,
                     Children = new[]
                     {
-                        new Box
+                        ball = new Box
                         {
-                            Colour = slider.ComboColour,
+                            Colour = AccentColour,
                             Alpha = 0.4f,
                             Width = width,
                             Height = width,

@@ -4,7 +4,6 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Database;
 using System;
 using System.Collections.Generic;
@@ -60,18 +59,18 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private List<float> yPositions = new List<float>();
+        private readonly List<float> yPositions = new List<float>();
 
         /// <summary>
         /// Required for now unfortunately.
         /// </summary>
         private BeatmapDatabase database;
 
-        private Container<Panel> scrollableContent;
+        private readonly Container<Panel> scrollableContent;
 
-        private List<BeatmapGroup> groups = new List<BeatmapGroup>();
+        private readonly List<BeatmapGroup> groups = new List<BeatmapGroup>();
 
-        private List<Panel> panels = new List<Panel>();
+        private readonly List<Panel> panels = new List<Panel>();
 
         private BeatmapGroup selectedGroup;
 
@@ -182,7 +181,8 @@ namespace osu.Game.Screens.Select
         {
             if (!IsLoaded) return;
 
-            criteria = newCriteria ?? criteria ?? new FilterCriteria();
+            if (newCriteria != null)
+                criteria = newCriteria;
 
             Action perform = delegate
             {
@@ -203,6 +203,8 @@ namespace osu.Game.Screens.Select
 
                 if (selectedGroup == null || selectedGroup.State == BeatmapGroupState.Hidden)
                     SelectNext();
+                else
+                    selectGroup(selectedGroup);
             };
 
             filterTask?.Cancel();

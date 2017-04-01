@@ -14,7 +14,6 @@ using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Timing;
 using osu.Game.Modes;
 using osu.Game.Overlays.Toolbar;
@@ -26,6 +25,7 @@ using osu.Framework.Graphics.Primitives;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Modes.Scoring;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
 
@@ -60,7 +60,7 @@ namespace osu.Game
 
         public Bindable<PlayMode> PlayMode;
 
-        private string[] args;
+        private readonly string[] args;
 
         private OptionsOverlay options;
 
@@ -125,7 +125,7 @@ namespace osu.Game
 
             Beatmap.Value = BeatmapDatabase.GetWorkingBeatmap(s.Beatmap);
 
-            menu.Push(new PlayerLoader(new Player { ReplayInputHandler = s.Replay.GetInputHandler() }));
+            menu.Push(new PlayerLoader(new ReplayPlayer(s.Replay)));
         }
 
         protected override void LoadComplete()
@@ -199,7 +199,7 @@ namespace osu.Game
             {
                 Depth = -3,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
-                OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
+                OnPlayModeChange = m => PlayMode.Value = m,
             }).LoadAsync(this, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };

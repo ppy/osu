@@ -7,7 +7,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using OpenTK.Graphics;
@@ -16,7 +15,7 @@ namespace osu.Game.Screens.Menu
 {
     public class Intro : OsuScreen
     {
-        private OsuLogo logo;
+        private readonly OsuLogo logo;
 
         /// <summary>
         /// Whether we have loaded the menu previously.
@@ -113,12 +112,12 @@ namespace osu.Game.Screens.Menu
             //we also handle the exit transition.
             seeya.Play();
 
-            double fadeOutTime = 2000;
+            const double fade_out_time = 2000;
 
-            Scheduler.AddDelayed(Exit, fadeOutTime);
+            Scheduler.AddDelayed(Exit, fade_out_time);
 
             //don't want to fade out completely else we will stop running updates and shit will hit the fan.
-            Game.FadeTo(0.01f, fadeOutTime);
+            Game.FadeTo(0.01f, fade_out_time);
 
             base.OnResuming(last);
         }

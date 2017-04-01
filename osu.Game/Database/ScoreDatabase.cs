@@ -8,6 +8,7 @@ using osu.Framework.Platform;
 using osu.Game.IO.Legacy;
 using osu.Game.IPC;
 using osu.Game.Modes;
+using osu.Game.Modes.Scoring;
 using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Database
@@ -100,7 +101,7 @@ namespace osu.Game.Database
 
                     using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
                     using (var reader = new StreamReader(lzma))
-                        score.Replay = new LegacyReplay(reader);
+                        score.Replay = score.CreateReplay(reader);
                 }
             }
             

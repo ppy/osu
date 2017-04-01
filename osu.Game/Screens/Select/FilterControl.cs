@@ -24,9 +24,9 @@ namespace osu.Game.Screens.Select
     {
         public Action<FilterCriteria> FilterChanged;
 
-        private OsuTabControl<SortMode> sortTabs;
+        private readonly OsuTabControl<SortMode> sortTabs;
 
-        private TabControl<GroupMode> groupTabs;
+        private readonly TabControl<GroupMode> groupTabs;
 
         private SortMode sort = SortMode.Title;
         public SortMode Sort
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select
 
         public Action Exit;
 
-        private SearchTextBox searchTextBox;
+        private readonly SearchTextBox searchTextBox;
 
         protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || groupTabs.Contains(screenSpacePos) || sortTabs.Contains(screenSpacePos);
 
@@ -175,6 +175,7 @@ namespace osu.Game.Screens.Select
 
             if (osu != null)
                 playMode.BindTo(osu.PlayMode);
+            playMode.ValueChanged += (s, e) => FilterChanged?.Invoke(CreateCriteria());
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;

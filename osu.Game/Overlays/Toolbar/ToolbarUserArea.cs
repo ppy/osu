@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Toolbar
     internal class ToolbarUserArea : Container
     {
         public LoginOverlay LoginOverlay;
-        private ToolbarUserButton button;
+        private readonly ToolbarUserButton button;
 
         public override RectangleF BoundingBox => button.BoundingBox;
 

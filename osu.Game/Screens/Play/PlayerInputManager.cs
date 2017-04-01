@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerInputManager : PassThroughInputManager
     {
-        private ManualClock clock = new ManualClock();
+        private readonly ManualClock clock = new ManualClock();
         private IFrameBasedClock parentClock;
 
         private ReplayInputHandler replayInputHandler;

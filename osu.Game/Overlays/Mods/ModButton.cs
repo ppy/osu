@@ -10,7 +10,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Modes.Mods;
@@ -23,8 +22,8 @@ namespace osu.Game.Overlays.Mods
     public class ModButton : FillFlowContainer
     {
         private ModIcon foregroundIcon { get; set; }
-        private SpriteText text;
-        private Container<ModIcon> iconsContainer;
+        private readonly SpriteText text;
+        private readonly Container<ModIcon> iconsContainer;
         private SampleChannel sampleOn, sampleOff;
 
         public Action<Mod> Action; // Passed the selected mod or null if none

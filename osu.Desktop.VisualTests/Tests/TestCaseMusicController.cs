@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Overlays;
@@ -30,7 +30,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Anchor = Anchor.Centre
             };
             Add(mc);
-            AddToggle(@"Show", state => mc.State = state ? Visibility.Visible : Visibility.Hidden);
+            AddToggleStep(@"Show", state => mc.State = state ? Visibility.Visible : Visibility.Hidden);
         }
     }
 }

@@ -1,16 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Framework.Graphics;
 using OpenTK.Input;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -38,19 +38,30 @@ namespace osu.Desktop.VisualTests.Tests
             };
             BindableInt bindable = new BindableInt { MinValue = 0, MaxValue = 200, Default = 50 };
             bindable.ValueChanged += delegate { kc.FadeTime = bindable.Value; };
-            AddButton("Add Random", () =>
+            AddStep("Add Random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
                 kc.Add(new KeyCounterKeyboard(key));
             });
-            ButtonsContainer.Add(new SpriteText { Text = "FadeTime" });
-            ButtonsContainer.Add(new TestSliderBar<int>
+
+            Add(new Container
             {
-                Width = 150,
-                Height = 10,
-                SelectionColor = Color4.Orange,
-                Bindable = bindable
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                AutoSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new SpriteText { Text = "FadeTime" },
+                    new TestSliderBar<int>
+                    {
+                        Width = 150,
+                        Height = 10,
+                        SelectionColor = Color4.Orange,
+                        Bindable = bindable
+                    }
+                }
             });
+
             Add(kc);
         }
         private class TestSliderBar<T> : SliderBar<T> where T : struct
