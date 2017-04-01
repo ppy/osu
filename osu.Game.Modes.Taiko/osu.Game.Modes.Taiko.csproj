@@ -53,6 +53,7 @@
     <Compile Include="Judgements\TaikoStrongHitJudgement.cs" />
     <Compile Include="Judgements\TaikoJudgement.cs" />
     <Compile Include="Judgements\TaikoHitResult.cs" />
+    <Compile Include="Objects\CentreHit.cs" />
     <Compile Include="Objects\Drawable\DrawableRimHit.cs" />
     <Compile Include="Objects\Drawable\DrawableStrongRimHit.cs" />
     <Compile Include="Objects\Drawable\DrawableCentreHit.cs" />
@@ -71,7 +72,10 @@
     <Compile Include="Objects\DrumRoll.cs" />
     <Compile Include="Objects\DrumRollTick.cs" />
     <Compile Include="Objects\Hit.cs" />
+    <Compile Include="Objects\RimHit.cs" />
     <Compile Include="Objects\Swell.cs" />
+    <Compile Include="Replays\TaikoFramedReplayInputHandler.cs" />
+    <Compile Include="Replays\TaikoAutoReplay.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
