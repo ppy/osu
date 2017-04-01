@@ -35,9 +35,9 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep("Swell", addSwell);
             AddStep("Centre", () => addCentreHit(false));
             AddStep("Strong Centre", () => addCentreHit(true));
-            AddButton("Add bar line", addBarLine);
             AddStep("Rim", () => addRimHit(false));
             AddStep("Strong Rim", () => addRimHit(true));
+            AddStep("Add bar line", addBarLine);
 
             Add(new Container
             {
