@@ -30,13 +30,13 @@ namespace osu.Desktop.VisualTests.Tests
                 Origin = Anchor.TopRight,
             });
 
-            AddToggle(@"show", state => manager.State = state ? Visibility.Visible : Visibility.Hidden);
+            AddToggleStep(@"show", state => manager.State = state ? Visibility.Visible : Visibility.Hidden);
 
-            AddButton(@"simple #1", sendNotification1);
-            AddButton(@"simple #2", sendNotification2);
-            AddButton(@"progress #1", sendProgress1);
-            AddButton(@"progress #2", sendProgress2);
-            AddButton(@"barrage", () => sendBarrage());
+            AddStep(@"simple #1", sendNotification1);
+            AddStep(@"simple #2", sendNotification2);
+            AddStep(@"progress #1", sendProgress1);
+            AddStep(@"progress #2", sendProgress2);
+            AddStep(@"barrage", () => sendBarrage());
         }
 
         private void sendBarrage(int remaining = 100)
