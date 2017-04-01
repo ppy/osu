@@ -57,7 +57,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     Sample = original.Sample,
                     IsStrong = strong,
 
-                    Distance = distanceData.Distance * (repeatsData?.RepeatCount ?? 1)
+                    Distance = distanceData.Distance * (repeatsData?.RepeatCount ?? 1) * legacy_velocity_scale
                 };
             }
 
