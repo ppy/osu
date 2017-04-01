@@ -14,31 +14,22 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Modes.Taiko.Objects.Drawable;
 
 namespace osu.Game.Modes.Taiko.UI
 {
     public class TaikoPlayfield : Playfield<TaikoHitObject, TaikoJudgement>
     {
         /// <summary>
-        /// The default play field height.
+        /// The play field height. This is relative to the size of hit objects
+        /// such that the playfield is just a bit larger than finishers.
         /// </summary>
-        public const float PLAYFIELD_BASE_HEIGHT = 242;
-
-        /// <summary>
-        /// The play field height scale.
-        /// This also uniformly scales the notes to match the new playfield height.
-        /// </summary>
-        public const float PLAYFIELD_SCALE = 0.65f;
-
-        /// <summary>
-        /// The play field height after scaling.
-        /// </summary>
-        public static float PlayfieldHeight => PLAYFIELD_BASE_HEIGHT * PLAYFIELD_SCALE;
+        public const float PLAYFIELD_HEIGHT = TaikoHitObject.CIRCLE_RADIUS * 2 * 2;
 
         /// <summary>
         /// The offset from <see cref="left_area_size"/> which the center of the hit target lies at.
         /// </summary>
-        private const float hit_target_offset = 80;
+        private const float hit_target_offset = TaikoHitObject.CIRCLE_RADIUS * 1.5f + 40;
 
         /// <summary>
         /// The size of the left area of the playfield. This area contains the input drum.
@@ -52,7 +43,7 @@ namespace osu.Game.Modes.Taiko.UI
         private readonly Container<DrawableTaikoJudgement> judgementContainer;
 
         private readonly Container hitObjectContainer;
-        //private Container topLevelHitContainer;
+        private readonly Container topLevelHitContainer;
         private readonly Container leftBackgroundContainer;
         private readonly Container rightBackgroundContainer;
         private readonly Box leftBackground;
@@ -61,7 +52,7 @@ namespace osu.Game.Modes.Taiko.UI
         public TaikoPlayfield()
         {
             RelativeSizeAxes = Axes.X;
-            Height = PlayfieldHeight;
+            Height = PLAYFIELD_HEIGHT;
 
             AddInternal(new Drawable[]
             {
@@ -102,7 +93,6 @@ namespace osu.Game.Modes.Taiko.UI
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
-                                    Scale = new Vector2(PLAYFIELD_SCALE),
                                     BlendingMode = BlendingMode.Additive
                                 },
                                 //barLineContainer = new Container<DrawableBarLine>
@@ -129,7 +119,7 @@ namespace osu.Game.Modes.Taiko.UI
                 },
                 leftBackgroundContainer = new Container
                 {
-                    Size = new Vector2(left_area_size, PlayfieldHeight),
+                    Size = new Vector2(left_area_size, PLAYFIELD_HEIGHT),
                     BorderThickness = 1,
                     Children = new Drawable[]
                     {
@@ -154,10 +144,10 @@ namespace osu.Game.Modes.Taiko.UI
                         },
                     }
                 },
-                //topLevelHitContainer = new Container
-                //{
-                //    RelativeSizeAxes = Axes.Both,
-                //}
+                topLevelHitContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }
             });
         }
 
@@ -174,9 +164,13 @@ namespace osu.Game.Modes.Taiko.UI
         public override void Add(DrawableHitObject<TaikoHitObject, TaikoJudgement> h)
         {
             h.Depth = (float)h.HitObject.StartTime;
-            h.Scale = new Vector2(PLAYFIELD_SCALE);
 
             base.Add(h);
+
+            // Swells should be moved at the very top of the playfield when they reach the hit target
+            var swell = h as DrawableSwell;
+            if (swell != null)
+                swell.OnStart += () => topLevelHitContainer.Add(swell.CreateProxy());
         }
 
         public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> judgedObject)

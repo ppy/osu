@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Drawables;
@@ -93,19 +93,28 @@ namespace osu.Desktop.VisualTests.Tests
 
             playbackSpeed.TriggerChange();
 
-            AddButton(@"circles", () => load(HitObjectType.Circle));
-            AddButton(@"slider", () => load(HitObjectType.Slider));
-            AddButton(@"spinner", () => load(HitObjectType.Spinner));
+            AddStep(@"circles", () => load(HitObjectType.Circle));
+            AddStep(@"slider", () => load(HitObjectType.Slider));
+            AddStep(@"spinner", () => load(HitObjectType.Spinner));
 
-            AddToggle(@"auto", state => { auto = state; load(mode); });
+            AddToggleStep(@"auto", state => { auto = state; load(mode); });
 
-            ButtonsContainer.Add(new SpriteText { Text = "Playback Speed" });
-            ButtonsContainer.Add(new BasicSliderBar<double>
+            Add(new Container
             {
-                Width = 150,
-                Height = 10,
-                SelectionColor = Color4.Orange,
-                Bindable = playbackSpeed
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                AutoSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new SpriteText { Text = "Playback Speed" },
+                    new BasicSliderBar<double>
+                    {
+                        Width = 150,
+                        Height = 10,
+                        SelectionColor = Color4.Orange,
+                        Bindable = playbackSpeed
+                    }
+                }
             });
 
             framedClock.ProcessFrame();
