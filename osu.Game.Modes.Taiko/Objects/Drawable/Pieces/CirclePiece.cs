@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Backgrounds;
 using OpenTK.Graphics;
 using System;
+using osu.Game.Graphics;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
 {
@@ -18,7 +19,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
     /// a rounded (_[-Width-]_) figure such that a regular "circle" is the result of a parent with Width = 0.
     /// </para>
     /// </summary>
-    public class CirclePiece : Container
+    public class CirclePiece : Container, IHasAccentColour
     {
         public const float SYMBOL_SIZE = TaikoHitObject.CIRCLE_RADIUS * 2f * 0.45f;
         public const float SYMBOL_BORDER = 8;

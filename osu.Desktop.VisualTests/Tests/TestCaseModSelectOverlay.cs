@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Mods;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Modes;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -25,11 +25,11 @@ namespace osu.Desktop.VisualTests.Tests
                 Anchor = Anchor.BottomCentre,
             });
 
-            AddButton("Toggle", modSelect.ToggleVisibility);
-            AddButton("osu!", () => modSelect.PlayMode.Value = PlayMode.Osu);
-            AddButton("osu!taiko", () => modSelect.PlayMode.Value = PlayMode.Taiko);
-            AddButton("osu!catch", () => modSelect.PlayMode.Value = PlayMode.Catch);
-            AddButton("osu!mania", () => modSelect.PlayMode.Value = PlayMode.Mania);
+            AddStep("Toggle", modSelect.ToggleVisibility);
+            AddStep("osu!", () => modSelect.PlayMode.Value = PlayMode.Osu);
+            AddStep("osu!taiko", () => modSelect.PlayMode.Value = PlayMode.Taiko);
+            AddStep("osu!catch", () => modSelect.PlayMode.Value = PlayMode.Catch);
+            AddStep("osu!mania", () => modSelect.PlayMode.Value = PlayMode.Mania);
         }
     }
 }

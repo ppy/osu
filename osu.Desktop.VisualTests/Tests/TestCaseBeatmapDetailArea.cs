@@ -3,7 +3,7 @@
 
 using OpenTK;
 using osu.Framework.Graphics;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Screens.Select;
 
 namespace osu.Desktop.VisualTests.Tests

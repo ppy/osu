@@ -4,12 +4,9 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
-using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -24,61 +21,73 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            AddToggle("Kiai", b =>
+            AddToggleStep("Kiai", b =>
             {
                 kiai = !kiai;
                 Reset();
             });
 
-            Add(new CentreHitCircle(new CirclePiece()
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(100, 100)
+                Position = new Vector2(100, 100),
+                Width = 0,
+                AccentColour = Color4.DarkRed,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new CentreHitSymbolPiece()
+                }
             });
 
-            Add(new CentreHitCircle(new StrongCirclePiece()
+            Add(new StrongCirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(350, 100)
+                Position = new Vector2(350, 100),
+                Width = 0,
+                AccentColour = Color4.DarkRed,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new CentreHitSymbolPiece()
+                }
             });
 
-            Add(new RimHitCircle(new CirclePiece()
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(100, 300)
+                Position = new Vector2(100, 300),
+                Width = 0,
+                AccentColour = Color4.DarkBlue,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new RimHitSymbolPiece()
+                }
             });
 
-            Add(new RimHitCircle(new StrongCirclePiece()
+            Add(new StrongCirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(350, 300)
+                Position = new Vector2(350, 300),
+                Width = 0,
+                AccentColour = Color4.DarkBlue,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new RimHitSymbolPiece()
+                }
             });
 
-            Add(new SwellCircle(new CirclePiece()
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(100, 500)
+                Position = new Vector2(100, 500),
+                Width = 0,
+                AccentColour = Color4.Orange,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new SwellSymbolPiece()
+                }
             });
 
-            Add(new SwellCircle(new StrongCirclePiece()
-            {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(350, 500)
-            });
-
-            Add(new DrumRollCircle(new CirclePiece()
+            Add(new DrumRollCircle(new CirclePiece
             {
                 KiaiMode = kiai
             })
@@ -87,7 +96,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(575, 100)
             });
 
-            Add(new DrumRollCircle(new StrongCirclePiece()
+            Add(new DrumRollCircle(new StrongCirclePiece
             {
                 KiaiMode = kiai
             })
@@ -95,28 +104,6 @@ namespace osu.Desktop.VisualTests.Tests
                 Width = 250,
                 Position = new Vector2(575, 300)
             });
-        }
-
-        private class SwellCircle : BaseCircle
-        {
-            public SwellCircle(CirclePiece piece)
-                : base(piece)
-            {
-                Piece.Add(new TextAwesome
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    TextSize = SYMBOL_INNER_SIZE,
-                    Icon = FontAwesome.fa_asterisk,
-                    Shadow = false
-                });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Piece.AccentColour = colours.YellowDark;
-            }
         }
 
         private class DrumRollCircle : BaseCircle
@@ -133,72 +120,8 @@ namespace osu.Desktop.VisualTests.Tests
             }
         }
 
-        private class CentreHitCircle : BaseCircle
-        {
-            public CentreHitCircle(CirclePiece piece)
-                : base(piece)
-            {
-                Piece.Add(new CircularContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(SYMBOL_INNER_SIZE),
-                    Masking = true,
-                    Children = new[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        }
-                    }
-                });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Piece.AccentColour = colours.PinkDarker;
-            }
-        }
-
-        private class RimHitCircle : BaseCircle
-        {
-            public RimHitCircle(CirclePiece piece)
-                : base(piece)
-            {
-                Piece.Add(new CircularContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(SYMBOL_SIZE),
-                    BorderThickness = SYMBOL_BORDER,
-                    BorderColour = Color4.White,
-                    Masking = true,
-                    Children = new[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            AlwaysPresent = true
-                        }
-                    }
-                });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Piece.AccentColour = colours.BlueDarker;
-            }
-        }
-
         private abstract class BaseCircle : Container
         {
-            protected const float SYMBOL_SIZE = TaikoHitObject.CIRCLE_RADIUS * 2f * 0.45f;
-            protected const float SYMBOL_BORDER = 8;
-            protected const float SYMBOL_INNER_SIZE = SYMBOL_SIZE - 2 * SYMBOL_BORDER;
-
             protected readonly CirclePiece Piece;
 
             protected BaseCircle(CirclePiece piece)

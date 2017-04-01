@@ -150,6 +150,10 @@
       <Project>{65dc628f-a640-4111-ab35-3a5652bc1e17}</Project>
       <Name>osu.Framework.Desktop</Name>
     </ProjectReference>
+    <ProjectReference Include="..\osu-framework\osu.Framework.Testing\osu.Framework.Testing.csproj">
+      <Project>{007b2356-ab6f-4bd9-96d5-116fc2dce69a}</Project>
+      <Name>osu.Framework.Testing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
       <Project>{c76bf5b3-985e-4d39-95fe-97c9c879b83a}</Project>
       <Name>osu.Framework</Name>
@@ -180,7 +184,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Benchmark.cs" />
+    <Compile Include="AutomatedVisualTestGame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Tests\TestCaseChatDisplay.cs" />
     <Compile Include="Tests\TestCaseDrawings.cs" />

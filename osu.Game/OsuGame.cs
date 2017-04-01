@@ -14,7 +14,6 @@ using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Timing;
 using osu.Game.Modes;
 using osu.Game.Overlays.Toolbar;
@@ -126,7 +125,7 @@ namespace osu.Game
 
             Beatmap.Value = BeatmapDatabase.GetWorkingBeatmap(s.Beatmap);
 
-            menu.Push(new PlayerLoader(new Player { ReplayInputHandler = s.Replay.CreateInputHandler() }));
+            menu.Push(new PlayerLoader(new ReplayPlayer(s.Replay)));
         }
 
         protected override void LoadComplete()
@@ -200,7 +199,7 @@ namespace osu.Game
             {
                 Depth = -3,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
-                OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
+                OnPlayModeChange = m => PlayMode.Value = m,
             }).LoadAsync(this, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };

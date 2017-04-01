@@ -3,7 +3,7 @@
 
 using OpenTK;
 using osu.Framework.Graphics;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Modes.Mods;
 using osu.Game.Modes.Osu.Mods;
 using osu.Game.Modes.Scoring;
@@ -218,7 +218,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Size = new Vector2(550f, 450f),
             });
 
-            AddButton(@"New Scores", newScores);
+            AddStep(@"New Scores", newScores);
             newScores();
         }
     }

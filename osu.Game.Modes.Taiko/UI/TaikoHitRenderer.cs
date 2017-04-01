@@ -3,10 +3,12 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Replays;
 using osu.Game.Modes.Scoring;
 using osu.Game.Modes.Taiko.Beatmaps;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
+using osu.Game.Modes.Taiko.Replays;
 using osu.Game.Modes.Taiko.Scoring;
 using osu.Game.Modes.UI;
 
@@ -28,5 +30,7 @@ namespace osu.Game.Modes.Taiko.UI
         protected override Playfield<TaikoHitObject, TaikoJudgement> CreatePlayfield() => new TaikoPlayfield();
 
         protected override DrawableHitObject<TaikoHitObject, TaikoJudgement> GetVisualRepresentation(TaikoHitObject h) => null;
+
+        protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
     }
 }

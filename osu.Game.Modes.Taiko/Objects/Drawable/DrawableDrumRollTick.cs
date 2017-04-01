@@ -47,7 +47,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         protected override bool HandleKeyPress(Key key)
         {
-            return !Judgement.Result.HasValue && UpdateJudgement(true);
+            return Judgement.Result == HitResult.None && UpdateJudgement(true);
         }
     }
 }

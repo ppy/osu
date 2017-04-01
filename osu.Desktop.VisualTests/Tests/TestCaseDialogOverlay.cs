@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
@@ -20,7 +20,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(overlay = new DialogOverlay());
 
-            AddButton("dialog #1", () => overlay.Push(new PopupDialog
+            AddStep("dialog #1", () => overlay.Push(new PopupDialog
             {
                 Icon = FontAwesome.fa_trash_o,
                 HeaderText = @"Confirm deletion of",
@@ -40,7 +40,7 @@ namespace osu.Desktop.VisualTests.Tests
                 },
             }));
 
-            AddButton("dialog #2", () => overlay.Push(new PopupDialog
+            AddStep("dialog #2", () => overlay.Push(new PopupDialog
             {
                 Icon = FontAwesome.fa_gear,
                 HeaderText = @"What do you want to do with",

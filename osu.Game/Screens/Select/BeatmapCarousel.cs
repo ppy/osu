@@ -4,7 +4,6 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Database;
 using System;
 using System.Collections.Generic;
@@ -182,7 +181,8 @@ namespace osu.Game.Screens.Select
         {
             if (!IsLoaded) return;
 
-            criteria = newCriteria ?? criteria ?? new FilterCriteria();
+            if (newCriteria != null)
+                criteria = newCriteria;
 
             Action perform = delegate
             {
@@ -203,6 +203,8 @@ namespace osu.Game.Screens.Select
 
                 if (selectedGroup == null || selectedGroup.State == BeatmapGroupState.Hidden)
                     SelectNext();
+                else
+                    selectGroup(selectedGroup);
             };
 
             filterTask?.Cancel();

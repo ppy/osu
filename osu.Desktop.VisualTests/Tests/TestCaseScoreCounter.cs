@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Modes.UI;
 
@@ -68,7 +68,7 @@ namespace osu.Desktop.VisualTests.Tests
             };
             Add(starsLabel);
 
-            AddButton(@"Reset all", delegate
+            AddStep(@"Reset all", delegate
             {
                 score.Current.Value = 0;
                 comboCounter.Current.Value = 0;
@@ -78,7 +78,7 @@ namespace osu.Desktop.VisualTests.Tests
                 starsLabel.Text = stars.Count.ToString("0.00");
             });
 
-            AddButton(@"Hit! :D", delegate
+            AddStep(@"Hit! :D", delegate
             {
                 score.Current.Value += 300 + (ulong)(300.0 * (comboCounter.Current > 0 ? comboCounter.Current - 1 : 0) / 25.0);
                 comboCounter.Increment();
@@ -86,20 +86,20 @@ namespace osu.Desktop.VisualTests.Tests
                 accuracyCounter.SetFraction(numerator, denominator);
             });
 
-            AddButton(@"miss...", delegate
+            AddStep(@"miss...", delegate
             {
                 comboCounter.Current.Value = 0;
                 denominator++;
                 accuracyCounter.SetFraction(numerator, denominator);
             });
 
-            AddButton(@"Alter stars", delegate
+            AddStep(@"Alter stars", delegate
             {
                 stars.Count = RNG.NextSingle() * (stars.StarCount + 1);
                 starsLabel.Text = stars.Count.ToString("0.00");
             });
 
-            AddButton(@"Stop counters", delegate
+            AddStep(@"Stop counters", delegate
             {
                 score.StopRolling();
                 comboCounter.StopRolling();

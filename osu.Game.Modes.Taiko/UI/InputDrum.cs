@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 
@@ -22,7 +21,7 @@ namespace osu.Game.Modes.Taiko.UI
     {
         public InputDrum()
         {
-            Size = new Vector2(TaikoPlayfield.PlayfieldHeight);
+            Size = new Vector2(TaikoPlayfield.PLAYFIELD_HEIGHT);
 
             const float middle_split = 10;
 
