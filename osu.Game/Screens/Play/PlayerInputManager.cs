@@ -1,57 +1,71 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Input;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Input;
-using osu.Framework.Platform;
-using osu.Game.Configuration;
-using System.Linq;
+using osu.Framework.Timing;
+using osu.Game.Input.Handlers;
 
 namespace osu.Game.Screens.Play
 {
-    class PlayerInputManager : UserInputManager
+    public class PlayerInputManager : PassThroughInputManager
     {
-        public PlayerInputManager(GameHost host)
-            : base(host)
+        private readonly ManualClock clock = new ManualClock();
+        private IFrameBasedClock parentClock;
+
+        private ReplayInputHandler replayInputHandler;
+        public ReplayInputHandler ReplayInputHandler
         {
-        }
-
-        bool leftViaKeyboard;
-        bool rightViaKeyboard;
-        Bindable<bool> mouseDisabled;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            mouseDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableButtons)
-                ?? new Bindable<bool>(false);
-        }
-
-        protected override void TransformState(InputState state)
-        {
-            base.TransformState(state);
-
-            if (state.Keyboard != null)
+            get { return replayInputHandler; }
+            set
             {
-                leftViaKeyboard = state.Keyboard.Keys.Contains(Key.Z);
-                rightViaKeyboard = state.Keyboard.Keys.Contains(Key.X);
+                if (replayInputHandler != null) RemoveHandler(replayInputHandler);
+
+                replayInputHandler = value;
+                UseParentState = replayInputHandler == null;
+
+                if (replayInputHandler != null)
+                    AddHandler(replayInputHandler);
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            parentClock = Clock;
+            Clock = new FramedClock(clock);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (parentClock == null) return;
+
+            clock.Rate = parentClock.Rate;
+            clock.IsRunning = parentClock.IsRunning;
+
+            //if a replayHandler is not attached, we should just pass-through.
+            if (UseParentState || replayInputHandler == null)
+            {
+                clock.CurrentTime = parentClock.CurrentTime;
+                base.Update();
+                return;
             }
 
-            var mouse = (Framework.Input.MouseState)state.Mouse;
-            if (state.Mouse != null)
+            while (true)
             {
-                if (mouseDisabled.Value)
-                {
-                    mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = false;
-                    mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = false;
-                }
+                double? newTime = replayInputHandler.SetFrameFromTime(parentClock.CurrentTime);
 
-                if (leftViaKeyboard)
-                    mouse.ButtonStates.Find(s => s.Button == MouseButton.Left).State = true;
-                if (rightViaKeyboard)
-                    mouse.ButtonStates.Find(s => s.Button == MouseButton.Right).State = true;
+                if (newTime == null)
+                    //we shouldn't execute for this time value
+                    break;
+
+                if (clock.CurrentTime == parentClock.CurrentTime)
+                    break;
+
+                clock.CurrentTime = newTime.Value;
+                base.Update();
             }
         }
     }

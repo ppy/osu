@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
             Children = new Drawable[]
             {
                 // TODO: this needs to be a custom dropdown at some point
-                new OptionEnumDropDown<FrameSync>
+                new OptionEnumDropdown<FrameSync>
                 {
                     LabelText = "Frame limiter",
                     Bindable = config.GetBindable<FrameSync>(FrameworkConfig.FrameSync)

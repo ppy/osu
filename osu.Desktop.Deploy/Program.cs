@@ -1,5 +1,5 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.GitHubusercontent.com/ppy/osu-framework/master/LICENCE
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
@@ -40,7 +40,7 @@ namespace osu.Desktop.Deploy
         /// <summary>
         /// How many previous build deltas we want to keep when publishing.
         /// </summary>
-        const int keep_delta_count = 3;
+        private const int keep_delta_count = 3;
 
         private static string codeSigningCmd => string.IsNullOrEmpty(codeSigningPassword) ? "" : $"-n \"/a /f {codeSigningCertPath} /p {codeSigningPassword} /t http://timestamp.comodoca.com/authenticode\"";
 
@@ -53,7 +53,7 @@ namespace osu.Desktop.Deploy
         private static string nupkgFilename(string ver) => $"{PackageName}.{ver}.nupkg";
         private static string nupkgDistroFilename(string ver) => $"{PackageName}-{ver}-full.nupkg";
 
-        private static Stopwatch sw = new Stopwatch();
+        private static readonly Stopwatch sw = new Stopwatch();
 
         private static string codeSigningPassword;
 
@@ -172,10 +172,10 @@ namespace osu.Desktop.Deploy
             }
 
             //remove excess deltas
-            var deltas = releaseLines.Where(l => l.Filename.Contains("-delta"));
-            if (deltas.Count() > keep_delta_count)
+            var deltas = releaseLines.Where(l => l.Filename.Contains("-delta")).ToArray();
+            if (deltas.Length > keep_delta_count)
             {
-                foreach (var l in deltas.Take(deltas.Count() - keep_delta_count))
+                foreach (var l in deltas.Take(deltas.Length - keep_delta_count))
                 {
                     write($"- Removing old delta {l.Filename}", ConsoleColor.Yellow);
                     File.Delete(Path.Combine(ReleasesFolder, l.Filename));
@@ -198,7 +198,7 @@ namespace osu.Desktop.Deploy
             write($"- Creating release {version}...", ConsoleColor.Yellow);
             var req = new JsonWebRequest<GitHubRelease>($"{GitHubApiEndpoint}")
             {
-                Method = HttpMethod.POST
+                Method = HttpMethod.POST,
             };
             req.AddRaw(JsonConvert.SerializeObject(new GitHubRelease
             {
@@ -215,6 +215,7 @@ namespace osu.Desktop.Deploy
                 var upload = new WebRequest(assetUploadUrl, Path.GetFileName(a))
                 {
                     Method = HttpMethod.POST,
+                    Timeout = 240000,
                     ContentType = "application/octet-stream",
                 };
 
@@ -261,7 +262,7 @@ namespace osu.Desktop.Deploy
 
             if (!File.Exists(Path.Combine(ReleasesFolder, nupkgDistroFilename(lastRelease.Name))))
             {
-                write("Last verion's package not found locally.", ConsoleColor.Red);
+                write("Last version's package not found locally.", ConsoleColor.Red);
                 requireDownload = true;
             }
             else
@@ -282,6 +283,8 @@ namespace osu.Desktop.Deploy
 
             foreach (var a in assets)
             {
+                if (a.Name.EndsWith(".exe")) continue;
+
                 write($"- Downloading {a.Name}...", ConsoleColor.Yellow);
                 new FileWebRequest(Path.Combine(ReleasesFolder, a.Name), $"{GitHubApiEndpoint}/assets/{a.Id}").AuthenticatedBlockingPerform();
             }
@@ -337,12 +340,17 @@ namespace osu.Desktop.Deploy
                 WorkingDirectory = solutionPath,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 UseShellExecute = false,
                 WindowStyle = ProcessWindowStyle.Hidden
             };
 
             Process p = Process.Start(psi);
+            if (p == null) return false;
+
             string output = p.StandardOutput.ReadToEnd();
+            output += p.StandardError.ReadToEnd();
+
             if (p.ExitCode == 0) return true;
 
             write(output);

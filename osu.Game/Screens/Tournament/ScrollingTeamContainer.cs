@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,20 +13,20 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
-using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Tournament
 {
     public class ScrollingTeamContainer : Container
     {
         public event Action OnScrollStarted;
-        public event Action<Team> OnSelected;
+        public event Action<Country> OnSelected;
 
-        private readonly List<Team> availableTeams = new List<Team>();
+        private readonly List<Country> availableTeams = new List<Country>();
 
-        private Container tracker;
+        private readonly Container tracker;
 
         private float speed;
         private int expiredCount;
@@ -109,7 +110,11 @@ namespace osu.Game.Screens.Tournament
                         break;
                     case ScrollState.Stopped:
                         // Find closest to center
+                        if (!Children.Any())
+                            break;
+
                         Drawable closest = null;
+
                         foreach (var c in Children)
                         {
                             if (!(c is ScrollingTeam))
@@ -121,12 +126,14 @@ namespace osu.Game.Screens.Tournament
                                 continue;
                             }
 
-                            float offset = Math.Abs(c.Position.X + c.DrawWidth / 2f - DrawWidth / 2f);
+                            float o = Math.Abs(c.Position.X + c.DrawWidth / 2f - DrawWidth / 2f);
                             float lastOffset = Math.Abs(closest.Position.X + closest.DrawWidth / 2f - DrawWidth / 2f);
 
-                            if (offset < lastOffset)
+                            if (o < lastOffset)
                                 closest = c;
                         }
+
+                        Trace.Assert(closest != null, "closest != null");
 
                         offset += DrawWidth / 2f - (closest.Position.X + closest.DrawWidth / 2f);
 
@@ -151,7 +158,7 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        public void AddTeam(Team team)
+        public void AddTeam(Country team)
         {
             if (availableTeams.Contains(team))
                 return;
@@ -162,12 +169,12 @@ namespace osu.Game.Screens.Tournament
             scrollState = ScrollState.Idle;
         }
 
-        public void AddTeams(IEnumerable<Team> teams)
+        public void AddTeams(IEnumerable<Country> teams)
         {
             if (teams == null)
                 return;
 
-            foreach (Team t in teams)
+            foreach (Country t in teams)
                 AddTeam(t);
         }
 
@@ -178,7 +185,7 @@ namespace osu.Game.Screens.Tournament
             scrollState = ScrollState.Idle;
         }
 
-        public void RemoveTeam(Team team)
+        public void RemoveTeam(Country team)
         {
             availableTeams.Remove(team);
 
@@ -263,9 +270,9 @@ namespace osu.Game.Screens.Tournament
 
         private void addFlags()
         {
-            for (int i = 0; i < availableTeams.Count; i++)
+            foreach (Country t in availableTeams)
             {
-                Add(new ScrollingTeam(availableTeams[i])
+                Add(new ScrollingTeam(t)
                 {
                     X = leftPos + DrawWidth
                 });
@@ -291,12 +298,10 @@ namespace osu.Game.Screens.Tournament
         private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None)
         {
             DelayReset();
-
-            UpdateTransformsOfType(typeof(TransformScrollSpeed));
-            TransformFloatTo(speed, value, duration, easing, new TransformScrollSpeed());
+            TransformTo(speed, value, duration, easing, new TransformScrollSpeed());
         }
 
-        enum ScrollState
+        private enum ScrollState
         {
             None,
             Idle,
@@ -310,7 +315,7 @@ namespace osu.Game.Screens.Tournament
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as ScrollingTeamContainer).speed = CurrentValue;
+                ((ScrollingTeamContainer)d).speed = CurrentValue;
             }
         }
 
@@ -319,10 +324,10 @@ namespace osu.Game.Screens.Tournament
             public const float WIDTH = 58;
             public const float HEIGHT = 41;
 
-            public Team Team;
+            public Country Team;
 
-            private Sprite flagSprite;
-            private Box outline;
+            private readonly Sprite flagSprite;
+            private readonly Box outline;
 
             private bool selected;
             public bool Selected
@@ -339,7 +344,7 @@ namespace osu.Game.Screens.Tournament
                 }
             }
 
-            public ScrollingTeam(Team team)
+            public ScrollingTeam(Country team)
             {
                 Team = team;
 

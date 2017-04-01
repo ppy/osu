@@ -2,12 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Logging;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCasePauseOverlay : TestCase
+    internal class TestCasePauseOverlay : TestCase
     {
         public override string Description => @"Tests the pause overlay";
 
@@ -25,8 +25,8 @@ namespace osu.Desktop.VisualTests.Tests
                 OnRetry = () => Logger.Log(@"Retry"),
                 OnQuit = () => Logger.Log(@"Quit")
             });
-            AddButton("Pause", pauseOverlay.Show);
-            AddButton("Add Retry", delegate
+            AddStep("Pause", pauseOverlay.Show);
+            AddStep("Add Retry", delegate
             {
                 retryCount++;
                 pauseOverlay.Retries = retryCount;

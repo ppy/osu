@@ -7,7 +7,6 @@ using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Backgrounds;
@@ -19,15 +18,14 @@ namespace osu.Game.Screens
 {
     public class ScreenWhiteBox : OsuScreen
     {
-        private BackButton popButton;
+        private readonly BackButton popButton;
 
-        const int transition_time = 1000;
+        private const double transition_time = 1000;
 
         protected virtual IEnumerable<Type> PossibleChildren => null;
 
-        private FillFlowContainer childModeButtons;
-        private Container textContainer;
-        private Box box;
+        private readonly Container textContainer;
+        private readonly Box box;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg2");
 
@@ -56,7 +54,7 @@ namespace osu.Game.Screens
 
         protected override bool OnExiting(Screen next)
         {
-            textContainer.MoveTo(new Vector2((DrawSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2(DrawSize.X / 16, 0), transition_time, EasingTypes.OutExpo);
             Content.FadeOut(transition_time, EasingTypes.OutExpo);
 
             return base.OnExiting(next);
@@ -80,6 +78,8 @@ namespace osu.Game.Screens
 
         public ScreenWhiteBox()
         {
+            FillFlowContainer childModeButtons;
+
             Children = new Drawable[]
             {
                 box = new Box

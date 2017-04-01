@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -27,10 +26,12 @@ namespace osu.Game.Overlays.Dialog
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);
         private readonly Vector2 buttonsEnterSpacing = new Vector2(0f, 50f);
 
-        private Container content, ring;
-        private FillFlowContainer<PopupDialogButton> buttonsContainer;
-        private TextAwesome iconText;
-        private SpriteText header, body;
+        private readonly Container content;
+        private readonly Container ring;
+        private readonly FillFlowContainer<PopupDialogButton> buttonsContainer;
+        private readonly TextAwesome iconText;
+        private readonly SpriteText header;
+        private readonly SpriteText body;
 
         public FontAwesome Icon
         {
@@ -193,6 +194,7 @@ namespace osu.Game.Overlays.Dialog
                                         {
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.Centre,
+                                            Masking = true,
                                             BorderColour = Color4.White,
                                             BorderThickness = 5f,
                                             Children = new Drawable[]

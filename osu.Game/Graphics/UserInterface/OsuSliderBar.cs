@@ -8,7 +8,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 
@@ -19,8 +18,9 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sample;
         private double lastSampleTime;
 
-        private Nub nub;
-        private Box leftBox, rightBox;
+        private readonly Nub nub;
+        private readonly Box leftBox;
+        private readonly Box rightBox;
 
         public OsuSliderBar()
         {
@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
                 nub = new Nub
                 {
                     Origin = Anchor.TopCentre,
-                    State = CheckBoxState.Unchecked,
+                    State = CheckboxState.Unchecked,
                     Expanded = true,
                 }
             };
@@ -94,13 +94,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            nub.State = CheckBoxState.Checked;
+            nub.State = CheckboxState.Checked;
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            nub.State = CheckBoxState.Unchecked;
+            nub.State = CheckboxState.Unchecked;
             return base.OnMouseUp(state, args);
         }
 

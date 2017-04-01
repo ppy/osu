@@ -3,15 +3,16 @@
 
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Platform;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Framework.MathUtils;
 using osu.Game.Database;
 using osu.Game.Modes;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCasePlaySongSelect : TestCase
+    internal class TestCasePlaySongSelect : TestCase
     {
         private BeatmapDatabase db, oldDb;
         private TestStorage storage;
@@ -22,12 +23,10 @@ namespace osu.Desktop.VisualTests.Tests
         public override void Reset()
         {
             base.Reset();
-            oldDb = Dependencies.Get<BeatmapDatabase>();
             if (db == null)
             {
                 storage = new TestStorage(@"TestCasePlaySongSelect");
                 db = new BeatmapDatabase(storage);
-                Dependencies.Cache(db, true);
 
                 var sets = new List<BeatmapSetInfo>();
 
@@ -39,19 +38,16 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(songSelect = new PlaySongSelect());
 
-            AddButton(@"Sort by Artist", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Artist; });
-            AddButton(@"Sort by Title", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Title; });
-            AddButton(@"Sort by Author", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Author; });
-            AddButton(@"Sort by Difficulty", delegate { songSelect.Filter.Sort = FilterControl.SortMode.Difficulty; });
+            AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
+            AddStep(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });
+            AddStep(@"Sort by Author", delegate { songSelect.FilterControl.Sort = SortMode.Author; });
+            AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
         }
 
         protected override void Dispose(bool isDisposing)
         {
             if (oldDb != null)
-            {
-                Dependencies.Cache(oldDb, true);
                 db = null;
-            }
 
             base.Dispose(isDisposing);
         }
@@ -79,7 +75,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Mode = PlayMode.Osu,
                         Path = "normal.osu",
                         Version = "Normal",
-                        BaseDifficulty = new BaseDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 3.5f,
                         }
@@ -90,7 +86,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Mode = PlayMode.Osu,
                         Path = "hard.osu",
                         Version = "Hard",
-                        BaseDifficulty = new BaseDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 5,
                         }
@@ -101,7 +97,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Mode = PlayMode.Osu,
                         Path = "insane.osu",
                         Version = "Insane",
-                        BaseDifficulty = new BaseDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 7,
                         }

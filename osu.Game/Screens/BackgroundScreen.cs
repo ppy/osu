@@ -6,7 +6,6 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK;
 
@@ -19,8 +18,8 @@ namespace osu.Game.Screens
             return other?.GetType() == GetType();
         }
 
-        const float transition_length = 500;
-        const float x_movement_amount = 50;
+        private const float transition_length = 500;
+        private const float x_movement_amount = 50;
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
@@ -28,7 +27,7 @@ namespace osu.Game.Screens
             return false;
         }
 
-        Framework.Game game;
+        private Framework.Game game;
 
         [BackgroundDependencyLoader]
         private void load(Framework.Game game)
@@ -58,7 +57,7 @@ namespace osu.Game.Screens
         protected override void Update()
         {
             base.Update();
-            Content.Scale = new Vector2(1 + (x_movement_amount / DrawSize.X) * 2);
+            Content.Scale = new Vector2(1 + x_movement_amount / DrawSize.X * 2);
         }
 
         protected override void OnEntering(Screen last)

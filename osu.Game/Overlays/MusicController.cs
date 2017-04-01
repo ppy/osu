@@ -3,39 +3,36 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Music;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays
 {
     public class MusicController : FocusedOverlayContainer
     {
-        private MusicControllerBackground backgroundSprite;
+        private Drawable currentBackground;
         private DragBar progress;
-        private TextAwesome playButton, listButton;
+        private TextAwesome playButton;
         private SpriteText title, artist;
 
         private List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
@@ -46,7 +43,6 @@ namespace osu.Game.Overlays
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
-        private Framework.Game game;
 
         public BeatmapDatabase Beatmaps => playlistController.Beatmaps;
         public List<BeatmapSetInfo> PlayList => playlistController.PlayList;
@@ -60,10 +56,12 @@ namespace osu.Game.Overlays
 
         protected override bool OnDrag(InputState state)
         {
+            Trace.Assert(state.Mouse.PositionMouseDown != null, "state.Mouse.PositionMouseDown != null");
+
             Vector2 change = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
 
             // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-            change *= (float)Math.Pow(change.Length, 0.7f) / change.Length;
+            change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
 
             dragContainer.MoveTo(change);
             return base.OnDrag(state);
@@ -77,23 +75,20 @@ namespace osu.Game.Overlays
 
         public MusicController()
         {
-            Width = 400;
-            Height = 590;
+            AutoSizeAxes = Axes.Both;
             Margin = new MarginPadding(10);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame, OsuConfigManager config, OsuColour colours)
         {
-            game = osuGame;
-
             unicodeString = config.GetUnicodeString;
 
             Children = new Drawable[]
             {
                 dragContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Children = new[]
@@ -202,7 +197,7 @@ namespace osu.Game.Overlays
                                     Action = () => { playlistController.ToggleVisibility(); },
                                     Children = new Drawable[]
                                     {
-                                        listButton = new TextAwesome
+                                        new TextAwesome
                                         {
                                             TextSize = 15,
                                             Icon = FontAwesome.fa_bars,
@@ -218,7 +213,7 @@ namespace osu.Game.Overlays
                                     Height = 10,
                                     Colour = colours.Yellow,
                                     SeekRequested = seek
-                                }
+                                },
                             }
                         },
                         playlistController = new PlaylistController
@@ -236,7 +231,8 @@ namespace osu.Game.Overlays
             beatmapSource = new Bindable<WorkingBeatmap>();
             beatmapSource.BindTo(playlistController.BeatmapSource);
 
-            playerContainer.Add(backgroundSprite = new MusicControllerBackground());
+            currentBackground = new MusicControllerBackground();
+            playerContainer.Add(currentBackground);
         }
 
         protected override void LoadComplete()
@@ -263,9 +259,11 @@ namespace osu.Game.Overlays
 
                 if (current.Track.HasCompleted && !current.Track.Looping) next();
             }
+            else
+                playButton.Icon = FontAwesome.fa_play_circle_o;
         }
 
-        void preferUnicode_changed(object sender, EventArgs e)
+        private void preferUnicode_changed(object sender, EventArgs e)
         {
             updateDisplay(current, TransformDirection.None);
         }
@@ -346,7 +344,7 @@ namespace osu.Game.Overlays
             updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
-        Action pendingBeatmapSwitch;
+        private Action pendingBeatmapSwitch;
 
         private void updateDisplay(WorkingBeatmap beatmap, TransformDirection direction)
         {
@@ -357,36 +355,41 @@ namespace osu.Game.Overlays
                 Task.Run(() =>
                 {
                     if (beatmap?.Beatmap == null)
-                        //todo: we may need to display some default text here (currently in the constructor).
-                        return;
-
-                    BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
-                    title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
-                    artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
+                    {
+                        title.Text = @"Nothing to play";
+                        artist.Text = @"Nothing to play";
+                    }
+                    else
+                    {
+                        BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
+                        title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
+                        artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
+                    }
                 });
 
-                MusicControllerBackground newBackground;
-
-                (newBackground = new MusicControllerBackground(beatmap)).LoadAsync(game, delegate
+                playerContainer.Add(new AsyncLoadContainer
                 {
-                    playerContainer.Add(newBackground);
-
-                    switch (direction)
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue,
+                    Children = new[] { new MusicControllerBackground(beatmap) },
+                    FinishedLoading = d =>
                     {
-                        case TransformDirection.Next:
-                            newBackground.Position = new Vector2(400, 0);
-                            newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                            backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
-                            break;
-                        case TransformDirection.Prev:
-                            newBackground.Position = new Vector2(-400, 0);
-                            newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                            backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
-                            break;
+                        switch (direction)
+                        {
+                            case TransformDirection.Next:
+                                d.Position = new Vector2(400, 0);
+                                d.MoveToX(0, 500, EasingTypes.OutCubic);
+                                currentBackground.MoveToX(-400, 500, EasingTypes.OutCubic);
+                                break;
+                            case TransformDirection.Prev:
+                                d.Position = new Vector2(-400, 0);
+                                d.MoveToX(0, 500, EasingTypes.OutCubic);
+                                currentBackground.MoveToX(400, 500, EasingTypes.OutCubic);
+                                break;
+                        }
+                        currentBackground.Expire();
+                        currentBackground = d;
                     }
-
-                    backgroundSprite.Expire();
-                    backgroundSprite = newBackground;
                 });
             };
         }
@@ -433,15 +436,15 @@ namespace osu.Game.Overlays
 
         private class MusicControllerBackground : BufferedContainer
         {
-            private Sprite sprite;
-            private WorkingBeatmap beatmap;
+            private readonly Sprite sprite;
+            private readonly WorkingBeatmap beatmap;
 
             public MusicControllerBackground(WorkingBeatmap beatmap = null)
             {
                 this.beatmap = beatmap;
                 CacheDrawnFrameBuffer = true;
-                RelativeSizeAxes = Axes.Both;
                 Depth = float.MaxValue;
+                RelativeSizeAxes = Axes.Both;
 
                 Children = new Drawable[]
                 {

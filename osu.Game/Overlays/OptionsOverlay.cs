@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Overlays.Options;
 using System;
 using osu.Game.Graphics;
@@ -100,7 +99,8 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.X,
                                     Direction = FillDirection.Vertical,
                                     Children = sections,
-                                }
+                                },
+                                new OptionsFooter()
                             }
                         }
                     }
@@ -146,11 +146,8 @@ namespace osu.Game.Overlays
 
                 var previous = sidebarButtons.SingleOrDefault(sb => sb.Selected);
                 var next = sidebarButtons.SingleOrDefault(sb => sb.Section == bestCandidate);
-                if (next != null)
-                {
-                    previous.Selected = false;
-                    next.Selected = true;
-                }
+                if (previous != null) previous.Selected = false;
+                if (next != null) next.Selected = true;
             }
         }
 

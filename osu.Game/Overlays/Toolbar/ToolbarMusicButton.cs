@@ -7,7 +7,7 @@ using osu.Game.Overlays.Music;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    class ToolbarMusicButton : ToolbarOverlayToggleButton
+    internal class ToolbarMusicButton : ToolbarOverlayToggleButton
     {
         public ToolbarMusicButton()
         {

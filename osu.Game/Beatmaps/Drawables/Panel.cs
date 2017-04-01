@@ -4,7 +4,6 @@
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
@@ -12,13 +11,13 @@ using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class Panel : Container, IStateful<PanelSelectedState>
+    public class Panel : Container, IStateful<PanelSelectedState>
     {
         public const float MAX_HEIGHT = 80;
 
         public override bool RemoveWhenNotAlive => false;
 
-        private Container nestedContainer;
+        private readonly Container nestedContainer;
 
         protected override Container<Drawable> Content => nestedContainer;
 
@@ -51,6 +50,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected virtual void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
         {
+            if (!IsLoaded) return;
+
             switch (state)
             {
                 case PanelSelectedState.Hidden:
@@ -115,7 +116,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
     }
 
-    enum PanelSelectedState
+    public enum PanelSelectedState
     {
         Hidden,
         NotSelected,

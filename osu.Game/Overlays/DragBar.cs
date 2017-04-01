@@ -11,7 +11,7 @@ namespace osu.Game.Overlays
 {
     public class DragBar : Container
     {
-        private Box fill;
+        private readonly Box fill;
 
         public Action<float> SeekRequested;
         private bool isDragging;
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                fill = new Box()
+                fill = new Box
                 {
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,

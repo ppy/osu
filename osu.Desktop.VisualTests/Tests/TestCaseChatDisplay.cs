@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 using osu.Game.Overlays;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseChatDisplay : TestCase
+    internal class TestCaseChatDisplay : TestCase
     {
         private ScheduledDelegate messageRequest;
 
@@ -18,7 +18,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            Add(new ChatOverlay()
+            Add(new ChatOverlay
             {
                 State = Visibility.Visible
             });

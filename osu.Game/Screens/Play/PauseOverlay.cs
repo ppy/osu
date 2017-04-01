@@ -7,7 +7,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -50,7 +49,7 @@ namespace osu.Game.Screens.Play
                         },
                         new OsuSpriteText
                         {
-                            Text = String.Format("{0:n0}", value),
+                            Text = $"{value:n0}",
                             Font = @"Exo2.0-Bold",
                             Shadow = true,
                             ShadowColour = new Color4(0, 0, 0, 0.25f),
@@ -58,7 +57,7 @@ namespace osu.Game.Screens.Play
                         },
                         new OsuSpriteText
                         {
-                            Text = $" time{((value == 1) ? "" : "s")} in this session",
+                            Text = $" time{(value == 1 ? "" : "s")} in this session",
                             Shadow = true,
                             ShadowColour = new Color4(0, 0, 0, 0.25f),
                             TextSize = 18
@@ -70,7 +69,6 @@ namespace osu.Game.Screens.Play
 
         private FillFlowContainer retryCounterContainer;
 
-        public override bool Contains(Vector2 screenSpacePos) => true;
         public override bool HandleInput => State == Visibility.Visible;
 
         protected override void PopIn() => FadeIn(transition_duration, EasingTypes.In);
@@ -78,6 +76,8 @@ namespace osu.Game.Screens.Play
 
         // Don't let mouse down events through the overlay or people can click circles while paused.
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+
+        protected override bool OnMouseMove(InputState state) => true;
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
@@ -217,6 +217,7 @@ namespace osu.Game.Screens.Play
 
         public PauseOverlay()
         {
+            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
         }
     }

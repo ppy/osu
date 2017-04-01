@@ -1,39 +1,40 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Framework.Screens.Testing;
-using osu.Framework.Graphics;
-using osu.Framework.Timing;
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Configuration;
-using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Modes.Osu.Objects;
-using osu.Game.Modes.Osu.Objects.Drawables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using OpenTK.Graphics;
+using osu.Framework.Testing;
+using osu.Framework.Timing;
+using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Osu.Judgements;
+using osu.Game.Modes.Osu.Objects;
+using osu.Game.Modes.Osu.Objects.Drawables;
+using System.Collections.Generic;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseHitObjects : TestCase
+    internal class TestCaseHitObjects : TestCase
     {
-        private StopwatchClock rateAdjustClock;
-        private FramedClock framedClock;
+        private readonly FramedClock framedClock;
 
-        bool auto = false;
+        private bool auto;
 
         public TestCaseHitObjects()
         {
-            rateAdjustClock = new StopwatchClock(true);
+            var rateAdjustClock = new StopwatchClock(true);
             framedClock = new FramedClock(rateAdjustClock);
             playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
         }
 
-        HitObjectType mode = HitObjectType.Slider;
+        private HitObjectType mode = HitObjectType.Slider;
 
-        BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
+        private readonly BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
         private Container playfieldContainer;
         private Container approachContainer;
 
@@ -61,12 +62,15 @@ namespace osu.Desktop.VisualTests.Tests
                     add(new DrawableSlider(new Slider
                     {
                         StartTime = framedClock.CurrentTime + 600,
-                        ControlPoints = new List<Vector2>()
+                        CurveObject = new CurvedHitObject
                         {
-                            new Vector2(-200, 0),
-                            new Vector2(400, 0),
+                            ControlPoints = new List<Vector2>
+                            {
+                                new Vector2(-200, 0),
+                                new Vector2(400, 0),
+                            },
+                            Distance = 400
                         },
-                        Length = 400,
                         Position = new Vector2(-200, 0),
                         Velocity = 1,
                         TickDistance = 100,
@@ -76,7 +80,7 @@ namespace osu.Desktop.VisualTests.Tests
                     add(new DrawableSpinner(new Spinner
                     {
                         StartTime = framedClock.CurrentTime + 600,
-                        Length = 1000,
+                        EndTime = framedClock.CurrentTime + 1600,
                         Position = new Vector2(0, 0),
                     }));
                     break;
@@ -89,19 +93,28 @@ namespace osu.Desktop.VisualTests.Tests
 
             playbackSpeed.TriggerChange();
 
-            AddButton(@"circles", () => load(HitObjectType.Circle));
-            AddButton(@"slider", () => load(HitObjectType.Slider));
-            AddButton(@"spinner", () => load(HitObjectType.Spinner));
+            AddStep(@"circles", () => load(HitObjectType.Circle));
+            AddStep(@"slider", () => load(HitObjectType.Slider));
+            AddStep(@"spinner", () => load(HitObjectType.Spinner));
 
-            AddToggle(@"auto", (state) => { auto = state; load(mode); });
+            AddToggleStep(@"auto", state => { auto = state; load(mode); });
 
-            ButtonsContainer.Add(new SpriteText { Text = "Playback Speed" });
-            ButtonsContainer.Add(new BasicSliderBar<double>
+            Add(new Container
             {
-                Width = 150,
-                Height = 10,
-                SelectionColor = Color4.Orange,
-                Bindable = playbackSpeed
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                AutoSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new SpriteText { Text = "Playback Speed" },
+                    new BasicSliderBar<double>
+                    {
+                        Width = 150,
+                        Height = 10,
+                        SelectionColor = Color4.Orange,
+                        Bindable = playbackSpeed
+                    }
+                }
             });
 
             framedClock.ProcessFrame();
@@ -122,8 +135,9 @@ namespace osu.Desktop.VisualTests.Tests
             load(mode);
         }
 
-        int depth;
-        void add(DrawableHitObject h)
+        private int depth;
+
+        private void add(DrawableOsuHitObject h)
         {
             h.Anchor = Anchor.Centre;
             h.Depth = depth++;
@@ -131,13 +145,20 @@ namespace osu.Desktop.VisualTests.Tests
             if (auto)
             {
                 h.State = ArmedState.Hit;
-                h.Judgement = new OsuJudgementInfo { Result = HitResult.Hit };
+                h.Judgement = new OsuJudgement { Result = HitResult.Hit };
             }
 
             playfieldContainer.Add(h);
             var proxyable = h as IDrawableHitObjectWithProxiedApproach;
             if (proxyable != null)
                 approachContainer.Add(proxyable.ProxiedLayer.CreateProxy());
+        }
+
+        private enum HitObjectType
+        {
+            Circle,
+            Slider,
+            Spinner
         }
     }
 }

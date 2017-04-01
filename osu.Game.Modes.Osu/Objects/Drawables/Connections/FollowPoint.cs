@@ -7,7 +7,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
 {
@@ -17,7 +16,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
         public double EndTime;
         public Vector2 EndPosition;
 
-        const float width = 8;
+        private const float width = 8;
 
         public FollowPoint()
         {

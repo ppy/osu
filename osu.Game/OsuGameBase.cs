@@ -1,11 +1,13 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Diagnostics;
+using System.Reflection;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -25,6 +27,8 @@ namespace osu.Game
 
         protected BeatmapDatabase BeatmapDatabase;
 
+        protected ScoreDatabase ScoreDatabase;
+
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
         public APIAccess API;
@@ -33,9 +37,43 @@ namespace osu.Game
 
         private RatioAdjust ratioContainer;
 
-        public CursorContainer Cursor;
+        protected MenuCursor Cursor;
 
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+        protected AssemblyName AssemblyName => Assembly.GetEntryAssembly()?.GetName() ?? new AssemblyName { Version = new Version() };
+
+        public bool IsDeployedBuild => AssemblyName.Version.Major > 0;
+
+        public bool IsDebug
+        {
+            get
+            {
+                // ReSharper disable once RedundantAssignment
+                bool isDebug = false;
+                // Debug.Assert conditions are only evaluated in debug mode
+                Debug.Assert(isDebug = true);
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                return isDebug;
+            }
+        }
+
+        public string Version
+        {
+            get
+            {
+                if (!IsDeployedBuild)
+                    return @"local " + (IsDebug ? @"debug" : @"release");
+
+                var assembly = AssemblyName;
+                return $@"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}";
+            }
+        }
+
+        public OsuGameBase()
+        {
+            Name = @"osu!lazer";
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -43,6 +81,7 @@ namespace osu.Game
             Dependencies.Cache(this);
             Dependencies.Cache(LocalConfig);
             Dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, Host));
+            Dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, Host, BeatmapDatabase));
             Dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
@@ -97,7 +136,7 @@ namespace osu.Game
             {
                 Children = new[]
                 {
-                    Cursor = new OsuCursorContainer { Depth = float.MinValue }
+                    Cursor = new MenuCursor { Depth = float.MinValue }
                 }
             });
         }

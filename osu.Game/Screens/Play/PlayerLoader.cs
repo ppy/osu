@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -21,7 +20,7 @@ namespace osu.Game.Screens.Play
     public class PlayerLoader : OsuScreen
     {
         private readonly Player player;
-        private OsuLogo logo;
+        private readonly OsuLogo logo;
         private BeatmapMetadataDisplay info;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
@@ -95,9 +94,9 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(next);
         }
 
-        class BeatmapMetadataDisplay : Container
+        private class BeatmapMetadataDisplay : Container
         {
-            class MetadataLine : Container
+            private class MetadataLine : Container
             {
                 public MetadataLine(string left, string right)
                 {
@@ -131,7 +130,7 @@ namespace osu.Game.Screens.Play
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    new FillFlowContainer()
+                    new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
                         Origin = Anchor.TopCentre,
@@ -167,7 +166,7 @@ namespace osu.Game.Screens.Play
                                 {
                                     new Sprite
                                     {
-                                        Texture = beatmap.Background,
+                                        Texture = beatmap?.Background,
                                         Origin = Anchor.Centre,
                                         Anchor = Anchor.Centre,
                                         FillMode = FillMode.Fill,
@@ -176,7 +175,7 @@ namespace osu.Game.Screens.Play
                             },
                             new OsuSpriteText
                             {
-                                Text = beatmap.BeatmapInfo?.Version,
+                                Text = beatmap?.BeatmapInfo?.Version,
                                 TextSize = 26,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,

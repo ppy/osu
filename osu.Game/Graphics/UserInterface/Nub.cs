@@ -8,19 +8,18 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class Nub : CircularContainer, IStateful<CheckBoxState>
+    public class Nub : CircularContainer, IStateful<CheckboxState>
     {
         public const float COLLAPSED_SIZE = 20;
         public const float EXPANDED_SIZE = 40;
 
-        private Box fill;
+        private readonly Box fill;
 
-        const float border_width = 3;
+        private const float border_width = 3;
         private Color4 glowingColour, idleColour;
 
         public Nub()
@@ -29,6 +28,8 @@ namespace osu.Game.Graphics.UserInterface
 
             BorderColour = Color4.White;
             BorderThickness = border_width;
+
+            Masking = true;
 
             Children = new[]
             {
@@ -83,9 +84,9 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private CheckBoxState state;
+        private CheckboxState state;
 
-        public CheckBoxState State
+        public CheckboxState State
         {
             get
             {
@@ -97,10 +98,10 @@ namespace osu.Game.Graphics.UserInterface
 
                 switch (state)
                 {
-                    case CheckBoxState.Checked:
+                    case CheckboxState.Checked:
                         fill.FadeIn(200, EasingTypes.OutQuint);
                         break;
-                    case CheckBoxState.Unchecked:
+                    case CheckboxState.Unchecked:
                         fill.FadeTo(0.01f, 200, EasingTypes.OutQuint); //todo: remove once we figure why containers aren't drawing at all times
                         break;
                 }

@@ -1,19 +1,22 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Tournament
 {
     public class GroupContainer : Container
     {
-        private List<Group> groups = new List<Group>();
+        private readonly List<Group> groups = new List<Group>();
 
-        private int maxTeams;
+        private readonly int maxTeams;
         private int currentGroup;
 
         public GroupContainer(int numGroups, int teamsPerGroup)
@@ -61,7 +64,7 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        public void AddTeam(Team team)
+        public void AddTeam(Country team)
         {
             if (groups[currentGroup].TeamsCount == maxTeams)
                 return;

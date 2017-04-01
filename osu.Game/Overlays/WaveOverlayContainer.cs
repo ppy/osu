@@ -7,7 +7,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using System;
 
 namespace osu.Game.Overlays
@@ -20,9 +19,12 @@ namespace osu.Game.Overlays
         private const EasingTypes easing_show = EasingTypes.OutSine;
         private const EasingTypes easing_hide = EasingTypes.InSine;
 
-        private Wave firstWave, secondWave, thirdWave, fourthWave;
+        private readonly Wave firstWave;
+        private readonly Wave secondWave;
+        private readonly Wave thirdWave;
+        private readonly Wave fourthWave;
 
-        private Container<Wave> wavesContainer;
+        private readonly Container<Wave> wavesContainer;
 
         private readonly Container contentContainer;
 
@@ -134,19 +136,23 @@ namespace osu.Game.Overlays
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Visible;
 
-            contentContainer.FadeIn(APPEAR_DURATION, EasingTypes.OutQuint);
+            FadeIn(100, EasingTypes.OutQuint);
             contentContainer.MoveToY(0, APPEAR_DURATION, EasingTypes.OutQuint);
+
+            FadeIn(100, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            contentContainer.FadeOut(DISAPPEAR_DURATION, EasingTypes.In);
+            FadeOut(DISAPPEAR_DURATION, EasingTypes.InQuint);
             contentContainer.MoveToY(DrawHeight * 2f, DISAPPEAR_DURATION, EasingTypes.In);
 
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Hidden;
+
+            FadeOut(DISAPPEAR_DURATION, EasingTypes.InQuint);
         }
 
         protected override void UpdateAfterChildren()

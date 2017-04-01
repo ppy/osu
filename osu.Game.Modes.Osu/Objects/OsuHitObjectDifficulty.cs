@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace osu.Game.Modes.Osu.Objects
 {
-    class OsuHitObjectDifficulty
+    internal class OsuHitObjectDifficulty
     {
         /// <summary>
         /// Factor by how much speed / aim strain decays per second.
@@ -47,11 +47,11 @@ namespace osu.Game.Modes.Osu.Objects
 
         internal int MaxCombo = 1;
 
-        private float scalingFactor;
+        private readonly float scalingFactor;
         private float lazySliderLength;
 
-        private Vector2 startPosition;
-        private Vector2 endPosition;
+        private readonly Vector2 startPosition;
+        private readonly Vector2 endPosition;
 
         internal OsuHitObjectDifficulty(OsuHitObject baseHitObject)
         {
@@ -63,7 +63,7 @@ namespace osu.Game.Modes.Osu.Objects
                 MaxCombo += slider.Ticks.Count();
 
             // We will scale everything by this factor, so we can assume a uniform CircleSize among beatmaps.
-            scalingFactor = (52.0f / circleRadius);
+            scalingFactor = 52.0f / circleRadius;
             if (circleRadius < 30)
             {
                 float smallCircleBonus = Math.Min(30.0f - circleRadius, 5.0f) / 50.0f;
@@ -130,7 +130,7 @@ namespace osu.Game.Modes.Osu.Objects
                     else if (distance > almost_diameter)
                         return 1.2 + 0.4 * (distance - almost_diameter) / (stream_spacing_threshold - almost_diameter);
                     else if (distance > almost_diameter / 2)
-                        return 0.95 + 0.25 * (distance - (almost_diameter / 2)) / (almost_diameter / 2);
+                        return 0.95 + 0.25 * (distance - almost_diameter / 2) / (almost_diameter / 2);
                     else
                         return 0.95;
 
@@ -148,11 +148,11 @@ namespace osu.Game.Modes.Osu.Objects
             double timeElapsed = (BaseHitObject.StartTime - previousHitObject.BaseHitObject.StartTime) / timeRate;
             double decay = Math.Pow(DECAY_BASE[(int)type], timeElapsed / 1000);
 
-            if (BaseHitObject.Type == HitObjectType.Spinner)
+            if (BaseHitObject is Spinner)
             {
                 // Do nothing for spinners
             }
-            else if (BaseHitObject.Type == HitObjectType.Slider)
+            else if (BaseHitObject is Slider)
             {
                 switch (type)
                 {
@@ -180,7 +180,7 @@ namespace osu.Game.Modes.Osu.Objects
                         break;
                 }
             }
-            else if (BaseHitObject.Type == HitObjectType.Circle)
+            else if (BaseHitObject is HitCircle)
             {
                 addition = spacingWeight(DistanceTo(previousHitObject), type) * spacing_weight_scaling[(int)type];
             }

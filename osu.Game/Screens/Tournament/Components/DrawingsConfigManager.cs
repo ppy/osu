@@ -8,7 +8,7 @@ namespace osu.Game.Screens.Tournament.Components
 {
     public class DrawingsConfigManager : ConfigManager<DrawingsConfig>
     {
-        public override string Filename => @"drawings.ini";
+        protected override string Filename => @"drawings.ini";
 
         protected override void InitialiseDefaults()
         {

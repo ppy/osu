@@ -4,7 +4,6 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using System;
 
@@ -32,7 +31,7 @@ namespace osu.Game.Graphics.UserInterface
         private float minStarAlpha => 0.5f;
 
         private const float star_size = 20;
-        private float star_spacing = 4;
+        private const float star_spacing = 4;
 
         private float count;
 
@@ -123,7 +122,7 @@ namespace osu.Game.Graphics.UserInterface
             if (value <= i)
                 return minStarScale;
 
-            return i + 1 <= value ? 1.0f : Interpolation.ValueAt(value, minStarScale, 1.0f, i, i + 1);
+            return i + 1 <= value ? 1.0f : (float)Interpolation.ValueAt(value, minStarScale, 1.0f, i, i + 1);
         }
 
         private void transformCount(float newValue)
@@ -145,9 +144,9 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        class Star : Container
+        private class Star : Container
         {
-            public TextAwesome Icon;
+            public readonly TextAwesome Icon;
             public Star()
             {
                 Size = new Vector2(star_size);

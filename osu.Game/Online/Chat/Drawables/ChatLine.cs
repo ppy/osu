@@ -59,8 +59,8 @@ namespace osu.Game.Online.Chat.Drawables
             return username_colours[message.UserId % username_colours.Length];
         }
 
-        const float padding = 200;
-        const float text_size = 20;
+        private const float padding = 200;
+        private const float text_size = 20;
 
         public ChatLine(Message message)
         {
@@ -91,7 +91,7 @@ namespace osu.Game.Online.Chat.Drawables
                         new OsuSpriteText
                         {
                             Font = @"Exo2.0-BoldItalic",
-                            Text = $@"{Message.User.Name}:",
+                            Text = $@"{Message.User.Username}:",
                             Colour = getUsernameColour(Message),
                             TextSize = text_size,
                             Origin = Anchor.TopRight,

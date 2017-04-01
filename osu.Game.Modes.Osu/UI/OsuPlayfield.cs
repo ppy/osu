@@ -10,14 +10,16 @@ using osu.Game.Modes.Osu.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Connections;
 using osu.Game.Modes.UI;
 using System.Linq;
+using osu.Game.Graphics.Cursor;
+using osu.Game.Modes.Osu.Judgements;
 
 namespace osu.Game.Modes.Osu.UI
 {
-    public class OsuPlayfield : Playfield
+    public class OsuPlayfield : Playfield<OsuHitObject, OsuJudgement>
     {
-        private Container approachCircles;
-        private Container judgementLayer;
-        private ConnectionRenderer<OsuHitObject> connectionLayer;
+        private readonly Container approachCircles;
+        private readonly Container judgementLayer;
+        private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
         public override Vector2 Size
         {
@@ -30,7 +32,7 @@ namespace osu.Game.Modes.Osu.UI
             }
         }
 
-        public OsuPlayfield()
+        public OsuPlayfield() : base(512)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -53,20 +55,23 @@ namespace osu.Game.Modes.Osu.UI
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = -1,
-                }
+                },
             });
         }
 
-        public override void Add(DrawableHitObject h)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            AddInternal(new GameplayCursor());
+        }
+
+        public override void Add(DrawableHitObject<OsuHitObject, OsuJudgement> h)
         {
             h.Depth = (float)h.HitObject.StartTime;
+
             IDrawableHitObjectWithProxiedApproach c = h as IDrawableHitObjectWithProxiedApproach;
             if (c != null)
-            {
                 approachCircles.Add(c.ProxiedLayer.CreateProxy());
-            }
-
-            h.OnJudgement += judgement;
 
             base.Add(h);
         }
@@ -74,13 +79,17 @@ namespace osu.Game.Modes.Osu.UI
         public override void PostProcess()
         {
             connectionLayer.HitObjects = HitObjects.Children
-                .Select(d => (OsuHitObject)d.HitObject)
+                .Select(d => d.HitObject)
                 .OrderBy(h => h.StartTime);
         }
 
-        private void judgement(DrawableHitObject h, JudgementInfo j)
+        public override void OnJudgement(DrawableHitObject<OsuHitObject, OsuJudgement> judgedObject)
         {
-            HitExplosion explosion = new HitExplosion((OsuJudgementInfo)j, (OsuHitObject)h.HitObject);
+            DrawableOsuJudgement explosion = new DrawableOsuJudgement(judgedObject.Judgement)
+            {
+                Origin = Anchor.Centre,
+                Position = judgedObject.HitObject.StackedEndPosition + judgedObject.Judgement.PositionOffset
+            };
 
             judgementLayer.Add(explosion);
         }

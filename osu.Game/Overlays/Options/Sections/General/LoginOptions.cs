@@ -11,12 +11,14 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using OpenTK;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Options.Sections.General
 {
     public class LoginOptions : OptionsSubsection, IOnlineComponent
     {
         private bool bounding = true;
+        private LoginForm form;
 
         protected override string Header => "Account";
 
@@ -40,12 +42,14 @@ namespace osu.Game.Overlays.Options.Sections.General
 
         public void APIStateChanged(APIAccess api, APIState state)
         {
+            form = null;
+
             switch (state)
             {
                 case APIState.Offline:
                     Children = new Drawable[]
                     {
-                        new LoginForm()
+                        form = new LoginForm()
                     };
                     break;
                 case APIState.Failing:
@@ -82,9 +86,17 @@ namespace osu.Game.Overlays.Options.Sections.General
                     };
                     break;
             }
+
+            form?.TriggerFocus();
         }
 
-        class LoginForm : FillFlowContainer
+        protected override bool OnFocus(InputState state)
+        {
+            form?.TriggerFocus();
+            return base.OnFocus(state);
+        }
+
+        private class LoginForm : FillFlowContainer
         {
             private TextBox username;
             private TextBox password;
@@ -118,7 +130,7 @@ namespace osu.Game.Overlays.Options.Sections.General
                         PlaceholderText = "Password",
                         RelativeSizeAxes = Axes.X,
                         TabbableContentContainer = this,
-                        OnCommit = (TextBox sender, bool newText) => performLogin()
+                        OnCommit = (sender, newText) => performLogin()
                     },
                     new OsuCheckbox
                     {
@@ -143,6 +155,19 @@ namespace osu.Game.Overlays.Options.Sections.General
                         //Action = registerLink
                     }
                 };
+            }
+
+            protected override bool OnFocus(InputState state)
+            {
+                Schedule(() =>
+                {
+                    if (string.IsNullOrEmpty(username.Text))
+                        username.TriggerFocus();
+                    else
+                        password.TriggerFocus();
+                });
+
+                return base.OnFocus(state);
             }
         }
     }

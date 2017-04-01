@@ -17,14 +17,15 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class BeatmapSetHeader : Panel
+    public class BeatmapSetHeader : Panel
     {
         public Action<BeatmapSetHeader> GainedSelection;
-        private SpriteText title, artist;
+        private readonly SpriteText title;
+        private readonly SpriteText artist;
         private OsuConfigManager config;
         private Bindable<bool> preferUnicode;
-        private WorkingBeatmap beatmap;
-        private FillFlowContainer difficultyIcons;
+        private readonly WorkingBeatmap beatmap;
+        private readonly FillFlowContainer difficultyIcons;
 
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
@@ -32,16 +33,26 @@ namespace osu.Game.Beatmaps.Drawables
 
             Children = new Drawable[]
             {
-                new PanelBackground(beatmap)
+                new DelayedLoadContainer
                 {
                     RelativeSizeAxes = Axes.Both,
+                    TimeBeforeLoad = 300,
+                    FinishedLoading = d => d.FadeInFromZero(400, EasingTypes.Out),
+                    Children = new[]
+                    {
+                        new PanelBackground(beatmap)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Depth = 1,
+                        }
+                    }
                 },
                 new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
                     Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         title = new OsuSpriteText
                         {
@@ -96,18 +107,20 @@ namespace osu.Game.Beatmaps.Drawables
             base.Dispose(isDisposing);
         }
 
-        class PanelBackground : BufferedContainer
+        private class PanelBackground : BufferedContainer
         {
-            private readonly WorkingBeatmap working;
-
             public PanelBackground(WorkingBeatmap working)
             {
-                this.working = working;
-
                 CacheDrawnFrameBuffer = true;
 
-                Children = new[]
+                Children = new Drawable[]
                 {
+                    new BeatmapBackgroundSprite(working)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        FillMode = FillMode.Fill,
+                    },
                     new FillFlowContainer
                     {
                         Depth = -1,
@@ -150,21 +163,6 @@ namespace osu.Game.Beatmaps.Drawables
                         }
                     },
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuGameBase game)
-            {
-                new BeatmapBackgroundSprite(working)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    FillMode = FillMode.Fill,
-                }.LoadAsync(game, (bg) =>
-                {
-                    Add(bg);
-                    ForceRedraw();
-                });
             }
         }
 

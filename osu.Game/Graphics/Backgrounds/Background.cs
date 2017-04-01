@@ -14,7 +14,7 @@ namespace osu.Game.Graphics.Backgrounds
     {
         public Sprite Sprite;
 
-        string textureName;
+        private readonly string textureName;
 
         public Background(string textureName = @"")
         {

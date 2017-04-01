@@ -5,7 +5,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Overlays.Dialog;
 using OpenTK.Graphics;
 
@@ -13,7 +12,7 @@ namespace osu.Game.Overlays
 {
     public class DialogOverlay : FocusedOverlayContainer
     {
-        private Container dialogContainer;
+        private readonly Container dialogContainer;
         private PopupDialog currentDialog;
 
         public void Push(PopupDialog dialog)

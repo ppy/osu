@@ -9,26 +9,24 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistItem : ClickableContainer, IStateful<DropDownMenuItemState>
+    public class PlaylistItem : ClickableContainer, IStateful<PlaylistItemState>
     {
         private SpriteText artist, title;
-        private DropDownMenuItemState _state;
+        private PlaylistItemState _state;
         private Func<string, string, string> unicodeString;
         private Bindable<bool> preferUnicode;
 
         public BeatmapSetInfo BeatmapSetInfo { get; }
 
-        public DropDownMenuItemState State
+        public PlaylistItemState State
         {
             get { return _state; }
 
@@ -37,10 +35,10 @@ namespace osu.Game.Overlays.Music
                 _state = value;
                 switch (value)
                 {
-                    case DropDownMenuItemState.Selected:
+                    case PlaylistItemState.Selected:
                         selected();
                         break;
-                    case DropDownMenuItemState.NotSelected:
+                    case PlaylistItemState.NotSelected:
                         deselected();
                         break;
                 }
@@ -60,40 +58,11 @@ namespace osu.Game.Overlays.Music
             Action = () => OnSelected?.Invoke(BeatmapSetInfo);
 
             AutoSizeAxes = Axes.Both;
-            ////Children = new[]
-            ////{
-            ////    new FlowContainer<SpriteText>
-            ////    {
-            ////        Direction = FlowDirections.Horizontal,
-            ////        Spacing = new Vector2(10, 0),
-            ////        AutoSizeAxes = Axes.Both,
-            ////        Children = new[]
-            ////        {
-            ////            title = new SpriteText
-            ////            {
-            ////                Font = @"Exo2.0-Regular",
-            ////                TextSize = 14,
-            ////                Colour = Color4.White
-            ////            },
-            ////            artist = new SpriteText
-            ////            {
-            ////                Font = @"Exo2.0-Bold",
-            ////                TextSize = 12,
-            ////                Colour = OsuColour.FromHex("999")
-            ////            }
-            ////        }
-            ////    }
-            ////};
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
             Children = new[]
             {
-                new FlowContainer<SpriteText>
+                new FillFlowContainer<SpriteText>
                 {
-                    Direction = FlowDirections.Horizontal,
+                    Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(10, 0),
                     AutoSizeAxes = Axes.Both,
                     Children = new[]
@@ -113,7 +82,11 @@ namespace osu.Game.Overlays.Music
                     }
                 }
             };
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
             unicodeString = config.GetUnicodeString;
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
             preferUnicode.ValueChanged += preferUnicode_changed;

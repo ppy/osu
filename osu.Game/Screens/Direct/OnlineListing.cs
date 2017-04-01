@@ -3,7 +3,7 @@
 
 namespace osu.Game.Screens.Direct
 {
-    class OnlineListing : ScreenWhiteBox
+    internal class OnlineListing : ScreenWhiteBox
     {
     }
 }

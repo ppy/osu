@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class TwoLayerButton : ClickableContainer
     {
-        private TextAwesome icon;
+        private readonly TextAwesome icon;
 
         public Box IconLayer;
         public Box TextLayer;
@@ -29,11 +29,11 @@ namespace osu.Game.Graphics.UserInterface
         public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
         public SampleChannel ActivationSound;
-        private SpriteText text;
+        private readonly SpriteText text;
 
         public Color4 HoverColour;
-        private Container c1;
-        private Container c2;
+        private readonly Container c1;
+        private readonly Container c2;
 
         public Color4 BackgroundColour
         {
@@ -98,6 +98,7 @@ namespace osu.Game.Graphics.UserInterface
                         icon = new TextAwesome
                         {
                             Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             TextSize = 25,
                         },
                     }
@@ -157,7 +158,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public override bool Contains(Vector2 screenSpacePos) => IconLayer.Contains(screenSpacePos) || TextLayer.Contains(screenSpacePos);
+        protected override bool InternalContains(Vector2 screenSpacePos) => IconLayer.Contains(screenSpacePos) || TextLayer.Contains(screenSpacePos);
 
         protected override bool OnHover(InputState state)
         {
@@ -170,7 +171,7 @@ namespace osu.Game.Graphics.UserInterface
 
             IconLayer.FadeColour(HoverColour, transform_time, EasingTypes.OutElastic);
 
-            double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
+            const double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
             double startTime = Time.Current + offset;
 
             // basic pulse
@@ -199,7 +200,7 @@ namespace osu.Game.Graphics.UserInterface
             int duration = 0; //(int)(Game.Audio.BeatLength);
             if (duration == 0) duration = pulse_length * 2;
 
-            double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
+            const double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
             double startTime = Time.Current + offset;
 
             // slow pulse

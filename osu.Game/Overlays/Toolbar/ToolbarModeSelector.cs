@@ -8,19 +8,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Modes;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    class ToolbarModeSelector : Container
+    internal class ToolbarModeSelector : Container
     {
-        const float padding = 10;
+        private const float padding = 10;
 
-        private FillFlowContainer modeButtons;
-        private Drawable modeButtonLine;
+        private readonly FillFlowContainer modeButtons;
+        private readonly Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
         public Action<PlayMode> OnPlayModeChange;
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             RelativeSizeAxes = Axes.Y;
 
-            Children = new Drawable[]
+            Children = new[]
             {
                 new OpaqueBackground(),
                 modeButtons = new FillFlowContainer
@@ -64,19 +63,15 @@ namespace osu.Game.Overlays.Toolbar
                 }
             };
 
-            int amountButtons = 0;
-            foreach (PlayMode m in Enum.GetValues(typeof(PlayMode)))
+            foreach (PlayMode m in Ruleset.PlayModes)
             {
-                ++amountButtons;
-
-                var localMode = m;
                 modeButtons.Add(new ToolbarModeButton
                 {
                     Mode = m,
                     Action = delegate
                     {
-                        SetGameMode(localMode);
-                        OnPlayModeChange?.Invoke(localMode);
+                        SetGameMode(m);
+                        OnPlayModeChange?.Invoke(m);
                     }
                 });
             }

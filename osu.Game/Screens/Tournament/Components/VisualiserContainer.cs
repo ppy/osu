@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace osu.Game.Screens.Tournament.Components
 {
-    class VisualiserContainer : Container
+    internal class VisualiserContainer : Container
     {
         /// <summary>
         /// Number of lines in the visualiser.
@@ -30,13 +30,13 @@ namespace osu.Game.Screens.Tournament.Components
             }
         }
 
-        private List<VisualiserLine> allLines = new List<VisualiserLine>();
+        private readonly List<VisualiserLine> allLines = new List<VisualiserLine>();
 
         private float offset;
 
         private void addLine()
         {
-            VisualiserLine newLine = new VisualiserLine()
+            VisualiserLine newLine = new VisualiserLine
             {
                 RelativeSizeAxes = Axes.Both,
 
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Tournament.Components
             allLines.Remove(allLines.First());
         }
 
-        class VisualiserLine : Container
+        private class VisualiserLine : Container
         {
             /// <summary>
             /// Time offset.
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Tournament.Components
 
             private Texture texture;
 
-            private int expiredCount = 0;
+            private int expiredCount;
 
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Tournament.Components
 
             private void addLine()
             {
-                Add(new Sprite()
+                Add(new Sprite
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
