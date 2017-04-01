@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -20,7 +20,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            Add(pauseOverlay = new PauseOverlay
+            pauseOverlay = new PauseOverlay
             {
                 Depth = -1,
                 OnResume = () => Logger.Log(@"Resume"),
@@ -28,31 +28,35 @@ namespace osu.Desktop.VisualTests.Tests
                 OnQuit = () => Logger.Log(@"Quit"),
                 Title = @"paused",
                 Description = @"you're not going to do what i think you're going to do, are ya?",
-            });
-            Add(failOverlay = new FailOverlay
+            };
+
+            failOverlay = new FailOverlay
             {
                 Depth = -1,
                 OnRetry = () => Logger.Log(@"Retry"),
                 OnQuit = () => Logger.Log(@"Quit"),
                 Title = @"failed",
                 Description = @"you're dead, try again?",
-            });
+            };
 
-            AddButton("Pause", delegate {
+            Add(pauseOverlay);
+            Add(failOverlay);
+
+            AddToggleStep(@"Pause", delegate {
                 if(failOverlay.State == Visibility.Visible)
                 {
                     failOverlay.Hide();
                 }
                 pauseOverlay.Show();
             });
-            AddButton("Fail", delegate {
+            AddToggleStep("Fail", delegate {
                 if (pauseOverlay.State == Visibility.Visible)
                 {
                     pauseOverlay.Hide();
                 }
                 failOverlay.Show();
             });
-            AddButton("Add Retry", delegate
+            AddToggleStep("Add Retry", delegate
             {
                 retryCount++;
                 pauseOverlay.Retries = retryCount;
