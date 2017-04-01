@@ -10,7 +10,7 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseInGameOverlays : TestCase
     {
-        public override string Description => @"Tests the pause and fail overlays";
+        public override string Description => @"Tests pause and fail overlays";
 
         private PauseOverlay pauseOverlay;
         private FailOverlay failOverlay;

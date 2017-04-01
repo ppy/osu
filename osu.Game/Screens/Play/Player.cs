@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Play
 
         internal override bool ShowOverlays => false;
 
-        internal override bool HasLocalCursorDisplayed => !hasReplayLoaded && !IsPaused && !IsFailed;
+        internal override bool HasLocalCursorDisplayed => !hasReplayLoaded && !IsPaused && !HasFailed;
 
         private bool hasReplayLoaded => HitRenderer.InputManager.ReplayInputHandler != null;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
 
         public bool IsPaused { get; private set; }
 
-        public bool IsFailed { get; private set; }
+        public bool HasFailed { get; private set; }
 
         public int RestartCount;
 
@@ -274,7 +274,7 @@ namespace osu.Game.Screens.Play
 
             Delay(500);
 
-            IsFailed = true;
+            HasFailed = true;
             failOverlay.Retries = RestartCount;
             failOverlay.Show();
         }
