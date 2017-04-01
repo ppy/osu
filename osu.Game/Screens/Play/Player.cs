@@ -24,7 +24,6 @@ using System.Linq;
 using osu.Game.Modes.Scoring;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -344,22 +343,5 @@ namespace osu.Game.Screens.Play
         private Bindable<bool> mouseWheelDisabled;
 
         protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !IsPaused;
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (args.Repeat) return false;
-
-            if (state.Keyboard.ShiftPressed)
-            {
-                switch (args.Key)
-                {
-                    case Key.Tab:
-                        hudOverlay.ChangeVisibility();
-                        return true;
-                }
-            }
-
-            return base.OnKeyDown(state, args);
-        }
     }
 }
