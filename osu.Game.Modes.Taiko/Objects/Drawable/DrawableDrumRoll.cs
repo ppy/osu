@@ -17,9 +17,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
     public class DrawableDrumRoll : DrawableTaikoHitObject
     {
         /// <summary>
-        /// Number of consecutive hits required to reach the dark/final accent colour.
+        /// Number of rolling hits required to reach the dark/final accent colour.
         /// </summary>
-        private const int consecutive_hits_for_dark_accent = 5;
+        private const int rolling_hits_for_dark_accent = 5;
 
         private readonly DrumRoll drumRoll;
 
@@ -28,9 +28,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         private Color4 accentDarkColour;
 
         /// <summary>
-        /// Number of consecutive tick hits.
+        /// Rolling number of tick hits. This increases for hits and increases for misses.
         /// </summary>
-        private int consecutiveHits;
+        private int rollingHits;
 
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
@@ -77,13 +77,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)
         {
             if (obj.Judgement.Result == HitResult.Hit)
-                consecutiveHits++;
+                rollingHits++;
             else
-                consecutiveHits--;
+                rollingHits--;
 
-            consecutiveHits = MathHelper.Clamp(consecutiveHits, 0, consecutive_hits_for_dark_accent);
+            rollingHits = MathHelper.Clamp(rollingHits, 0, rolling_hits_for_dark_accent);
 
-            Color4 newAccent = Interpolation.ValueAt((float)consecutiveHits / consecutive_hits_for_dark_accent, AccentColour, accentDarkColour, 0, 1);
+            Color4 newAccent = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_dark_accent, AccentColour, accentDarkColour, 0, 1);
             circle.FadeAccent(newAccent, 100);
         }
 
