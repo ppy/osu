@@ -32,6 +32,7 @@ namespace osu.Game.Overlays
         private DragBar progress;
         private TextAwesome playButton;
         private SpriteText title, artist;
+        private RollingContainer titleContainer, artistContainer;
 
         private List<BeatmapSetInfo> playList;
         private readonly List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
@@ -97,25 +98,43 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        title = new OsuSpriteText
+                        titleContainer = new RollingContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.TopCentre,
                             Position = new Vector2(0, 40),
-                            TextSize = 25,
-                            Colour = Color4.White,
-                            Text = @"Nothing to play",
-                            Font = @"Exo2.0-MediumItalic"
+                            Children = new Drawable[]
+                            {
+                                title = new OsuSpriteText
+                                {
+                                    Origin = Anchor.BottomCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    TextSize = 25,
+                                    Colour = Color4.White,
+                                    Text = @"Nothing to play",
+                                    Font = @"Exo2.0-MediumItalic"
+                                }
+                            }
                         },
-                        artist = new OsuSpriteText
+                        artistContainer = new RollingContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Position = new Vector2(0, 45),
-                            TextSize = 15,
-                            Colour = Color4.White,
-                            Text = @"Nothing to play",
-                            Font = @"Exo2.0-BoldItalic"
+                            Children = new Drawable[]
+                            {
+                                artist = new OsuSpriteText
+                                {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    TextSize = 15,
+                                    Colour = Color4.White,
+                                    Text = @"Nothing to play",
+                                    Font = @"Exo2.0-BoldItalic"
+                                },
+                            }
                         },
                         new ClickableContainer
                         {
@@ -443,6 +462,45 @@ namespace osu.Game.Overlays
             private void load(TextureStore textures)
             {
                 sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
+            }
+        }
+
+        private class RollingContainer : Container
+        {
+            private Bindable<float> size;
+
+            public RollingContainer()
+            {
+                size = new Bindable<float>(Size.X);                
+            }
+
+            protected override void LoadComplete()
+            {
+                size.ValueChanged += rolling;
+                base.LoadComplete();
+            }
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                size = new Bindable<float>(Size.X);
+            }
+
+            private void rolling(object sender = null, EventArgs e = null)
+            {
+                if (Size.X > 400)
+                {
+                    MoveToX(-(Size.X / 2 + 200), 1000);
+                    Hide();
+                    MoveToX(Size.X / 2 + 200);
+                    Show();
+                    Loop();
+                }
+                else
+                {
+                    MoveToX(0);
+                }
             }
         }
     }
