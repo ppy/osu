@@ -218,7 +218,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Size = new Vector2(550f, 450f),
             });
 
-            AddButton(@"New Scores", newScores);
+            AddStep(@"New Scores", newScores);
             newScores();
         }
     }

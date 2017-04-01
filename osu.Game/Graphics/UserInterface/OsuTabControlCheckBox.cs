@@ -16,15 +16,15 @@ using osu.Game.Graphics.Sprites;
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
-    /// A checkbox styled to be placed in line with an <see cref="OsuTabControl{T}"/>
+    /// A Checkbox styled to be placed in line with an <see cref="OsuTabControl{T}"/>
     /// </summary>
-    public class OsuTabControlCheckBox : CheckBox
+    public class OsuTabControlCheckbox : Checkbox
     {
         private readonly Box box;
         private readonly SpriteText text;
         private readonly TextAwesome icon;
 
-        public event EventHandler<CheckBoxState> Action;
+        public event EventHandler<CheckboxState> Action;
 
         private Color4? accentColour;
         public Color4 AccentColour
@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 accentColour = value;
 
-                if (State != CheckBoxState.Checked)
+                if (State != CheckboxState.Checked)
                 {
                     text.Colour = AccentColour;
                     icon.Colour = AccentColour;
@@ -84,7 +84,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(InputState state)
         {
-            if (State == CheckBoxState.Unchecked)
+            if (State == CheckboxState.Unchecked)
                 fadeOut();
 
             base.OnHoverLost(state);
@@ -97,7 +97,7 @@ namespace osu.Game.Graphics.UserInterface
                 AccentColour = colours.Blue;
         }
 
-        public OsuTabControlCheckBox()
+        public OsuTabControlCheckbox()
         {
             AutoSizeAxes = Axes.Both;
 
