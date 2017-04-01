@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
                 nub = new Nub
                 {
                     Origin = Anchor.TopCentre,
-                    State = CheckBoxState.Unchecked,
+                    State = CheckboxState.Unchecked,
                     Expanded = true,
                 }
             };
@@ -94,13 +94,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            nub.State = CheckBoxState.Checked;
+            nub.State = CheckboxState.Checked;
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            nub.State = CheckBoxState.Unchecked;
+            nub.State = CheckboxState.Unchecked;
             return base.OnMouseUp(state, args);
         }
 

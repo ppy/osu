@@ -24,13 +24,13 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            AddButton("Hit!", addHitJudgement);
-            AddButton("Miss :(", addMissJudgement);
-            AddButton("Swell", addSwell);
-            AddButton("Centre", () => addCentreHit(false));
-            AddButton("Strong Centre", () => addCentreHit(true));
-            AddButton("Rim", () => addRimHit(false));
-            AddButton("Strong Rim", () => addRimHit(true));
+            AddStep("Hit!", addHitJudgement);
+            AddStep("Miss :(", addMissJudgement);
+            AddStep("Swell", addSwell);
+            AddStep("Centre", () => addCentreHit(false));
+            AddStep("Strong Centre", () => addCentreHit(true));
+            AddStep("Rim", () => addRimHit(false));
+            AddStep("Strong Rim", () => addRimHit(true));
 
             Add(new Container
             {
