@@ -28,7 +28,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         private Color4 accentDarkColour;
 
         /// <summary>
-        /// Rolling number of tick hits. This increases for hits and increases for misses.
+        /// Rolling number of tick hits. This increases for hits and decreases for misses.
         /// </summary>
         private int rollingHits;
 
