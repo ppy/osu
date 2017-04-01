@@ -20,7 +20,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(overlay = new DialogOverlay());
 
-            AddButton("dialog #1", () => overlay.Push(new PopupDialog
+            AddStep("dialog #1", () => overlay.Push(new PopupDialog
             {
                 Icon = FontAwesome.fa_trash_o,
                 HeaderText = @"Confirm deletion of",
@@ -40,7 +40,7 @@ namespace osu.Desktop.VisualTests.Tests
                 },
             }));
 
-            AddButton("dialog #2", () => overlay.Push(new PopupDialog
+            AddStep("dialog #2", () => overlay.Push(new PopupDialog
             {
                 Icon = FontAwesome.fa_gear,
                 HeaderText = @"What do you want to do with",

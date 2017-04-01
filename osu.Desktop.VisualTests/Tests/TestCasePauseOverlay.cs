@@ -25,8 +25,8 @@ namespace osu.Desktop.VisualTests.Tests
                 OnRetry = () => Logger.Log(@"Retry"),
                 OnQuit = () => Logger.Log(@"Quit")
             });
-            AddButton("Pause", pauseOverlay.Show);
-            AddButton("Add Retry", delegate
+            AddStep("Pause", pauseOverlay.Show);
+            AddStep("Add Retry", delegate
             {
                 retryCount++;
                 pauseOverlay.Retries = retryCount;
