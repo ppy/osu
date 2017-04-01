@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
 using osu.Game.Modes.Objects.Drawables;
