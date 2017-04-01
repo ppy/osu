@@ -26,8 +26,6 @@ namespace osu.Desktop.VisualTests.Tests
                 OnResume = () => Logger.Log(@"Resume"),
                 OnRetry = () => Logger.Log(@"Retry"),
                 OnQuit = () => Logger.Log(@"Quit"),
-                Title = @"paused",
-                Description = @"you're not going to do what i think you're going to do, are ya?",
             };
 
             failOverlay = new FailOverlay
@@ -35,8 +33,6 @@ namespace osu.Desktop.VisualTests.Tests
                 Depth = -1,
                 OnRetry = () => Logger.Log(@"Retry"),
                 OnQuit = () => Logger.Log(@"Quit"),
-                Title = @"failed",
-                Description = @"you're dead, try again?",
             };
 
             Add(pauseOverlay);

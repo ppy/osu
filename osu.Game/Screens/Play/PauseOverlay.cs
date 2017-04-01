@@ -32,6 +32,12 @@ namespace osu.Game.Screens.Play
             AddButton(@"Retry", colours.YellowDark, OnRetry);
             AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), OnQuit);
         }
+
+        public PauseOverlay()
+        {
+            title = @"paused";
+            description = @"you're not going to do what i think you're going to do, are ya?";
+        }
     }
 }
         

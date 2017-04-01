@@ -27,20 +27,8 @@ namespace osu.Game.Screens.Play
         public Action OnRetry;
         public Action OnQuit;
 
-        private string title;
-        private string description;
-
-        public string Title
-        {
-            get { return title; }
-            set { title = value; }
-        }
-
-        public string Description
-        {
-            get { return description; }
-            set { description = value; }
-        }
+        protected string title;
+        protected string description;
 
         private FillFlowContainer buttons;
 
@@ -143,7 +131,7 @@ namespace osu.Game.Screens.Play
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = Title,
+                                    Text = title,
                                     Font = @"Exo2.0-Medium",
                                     Spacing = new Vector2(5, 0),
                                     Origin = Anchor.TopCentre,
@@ -155,7 +143,7 @@ namespace osu.Game.Screens.Play
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = Description,
+                                    Text = description,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Shadow = true,

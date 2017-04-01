@@ -131,8 +131,6 @@ namespace osu.Game.Screens.Play
                 },
                 OnRetry = Restart,
                 OnQuit = Exit,
-                Title = @"paused",
-                Description = @"you're not going to do what i think you're going to do, are ya?",
             };
 
             failOverlay = new FailOverlay
@@ -140,8 +138,6 @@ namespace osu.Game.Screens.Play
                 Depth = -1,
                 OnRetry = Restart,
                 OnQuit = Exit,
-                Title = @"failed",
-                Description = @"you're dead, try again?",
             };
 
 
