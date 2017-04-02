@@ -9,8 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
-using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
@@ -22,8 +20,14 @@ namespace osu.Game.Graphics.UserInterface
         private readonly OsuSpriteText text;
 
         public string TooltipText {
-            get => text.Text;
-            set => text.Text = value;
+            get
+            {
+                return text.Text;
+            }
+            set
+            {
+                text.Text = value;
+            }
         }
 
         public Vector2 TooltipOffset = new Vector2();
