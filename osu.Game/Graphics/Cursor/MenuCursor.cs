@@ -71,17 +71,14 @@ namespace osu.Game.Graphics.Cursor
 
         private void searchTooltip(Tooltip tooltip, Vector2 mousePosition, IContainerEnumerable<Drawable> children)
         {
-            IEnumerable<Drawable> next = children.Children.Where(drawable => drawable.Contains(mousePosition) && !(drawable is CursorContainer));
+            IEnumerable<Drawable> next = children.InternalChildren.Where(drawable => drawable.Contains(mousePosition) && !(drawable is CursorContainer));
 
             foreach (Drawable drawable in next)
             {
                 string tooltipText = (drawable as IHasTooltip)?.Tooltip ?? "";
                 if (tooltipText != "") tooltip.TooltipText = tooltipText;
-
-                var childScreen = (drawable as Screen)?.ChildScreen;
-                if (childScreen != null)
-                    searchTooltip(tooltip, mousePosition, childScreen);
-                else if (drawable is IContainer)
+                
+                if (drawable is IContainer)
                     searchTooltip(tooltip, mousePosition, drawable as IContainerEnumerable<Drawable>);
             }
         }
