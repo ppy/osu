@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Threading;
 using System.Linq;
-using osu.Framework.Screens;
 using System.Collections.Generic;
 
 namespace osu.Game.Graphics.Cursor
