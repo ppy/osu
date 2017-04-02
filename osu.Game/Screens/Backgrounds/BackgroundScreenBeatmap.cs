@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Backgrounds
                 {
                     var newBackground = beatmap == null ? new Background(@"Backgrounds/bg1") : new BeatmapBackground(beatmap);
 
-                    newBackground.LoadAsync(Game, delegate
+                    LoadComponentAsync(newBackground, delegate
                     {
                         float newDepth = 0;
                         if (background != null)
