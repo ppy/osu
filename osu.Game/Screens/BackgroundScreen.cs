@@ -27,21 +27,13 @@ namespace osu.Game.Screens
             return false;
         }
 
-        private Framework.Game game;
-
-        [BackgroundDependencyLoader]
-        private void load(Framework.Game game)
-        {
-            this.game = game;
-        }
-
         public override bool Push(Screen screen)
         {
             // When trying to push a non-loaded GameMode, load it asynchronously and re-invoke Push
             // once it's done.
             if (screen.LoadState == LoadState.NotLoaded)
             {
-                screen.LoadAsync(game, d => Push((BackgroundScreen)d));
+                LoadComponentAsync(screen, d => Push((BackgroundScreen)d));
                 return true;
             }
 
