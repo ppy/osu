@@ -3,7 +3,6 @@
 
 using System;
 using System.Threading;
-using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
