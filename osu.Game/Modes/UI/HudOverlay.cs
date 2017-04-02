@@ -12,6 +12,8 @@ using System;
 using osu.Game.Modes.Scoring;
 using osu.Framework.Input;
 using OpenTK.Input;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Modes.UI
 {
@@ -25,8 +27,6 @@ namespace osu.Game.Modes.UI
 
         private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
-
-        public bool IsVisible => showHud;
 
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract ComboCounter CreateComboCounter();
@@ -49,8 +49,8 @@ namespace osu.Game.Modes.UI
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config, NotificationManager notificationManager)
         {
             showKeyCounter = config.GetBindable<bool>(OsuConfig.KeyOverlay);
             showKeyCounter.ValueChanged += keyCounterVisibilityChanged;
@@ -59,6 +59,14 @@ namespace osu.Game.Modes.UI
             showHud = config.GetBindable<bool>(OsuConfig.ShowInterface);
             showHud.ValueChanged += hudVisibilityChanged;
             showHud.TriggerChange();
+
+            if (!showHud)
+            {
+                notificationManager?.Post(new SimpleNotification
+                {
+                    Text = @"The score overlay is currently disabled. You can toogle this by pressing Shift + Tab."
+                });
+            }
         }
 
         private void keyCounterVisibilityChanged(object sender, EventArgs e)
