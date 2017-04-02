@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Padding = new MarginPadding(edge_margin),
                             Children = new Drawable[]
                             {
-                                avatar = new DelayedLoadContainer(
+                                avatar = new DelayedLoadWrapper(
                                     new Avatar(Score.User ?? new User { Id = Score.UserID })
                                     {
                                         RelativeSizeAxes = Axes.Both,
