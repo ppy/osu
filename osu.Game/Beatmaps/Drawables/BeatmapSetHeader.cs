@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             Children = new Drawable[]
             {
-                new DelayedLoadContainer(
+                new DelayedLoadWrapper(
                     new PanelBackground(beatmap)
                     {
                         RelativeSizeAxes = Axes.Both,

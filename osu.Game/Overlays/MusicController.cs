@@ -347,7 +347,7 @@ namespace osu.Game.Overlays
                     }
                 });
 
-                dragContainer.Add(new AsyncLoadContainer(new MusicControllerBackground(beatmap)
+                dragContainer.Add(new AsyncLoadWrapper(new MusicControllerBackground(beatmap)
                 {
                     OnLoadComplete = d =>
                     {

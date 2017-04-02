@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Select
 
             AlwaysPresent = true;
 
-            Add(beatmapInfoContainer = new AsyncLoadContainer(
+            Add(beatmapInfoContainer = new AsyncLoadWrapper(
                 new BufferedContainer
                 {
                     OnLoadComplete = d =>
