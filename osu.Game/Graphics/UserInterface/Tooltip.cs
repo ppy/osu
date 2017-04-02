@@ -15,7 +15,6 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class Tooltip : Container
     {
-        private readonly Container actualTooltip;
         private readonly Box tooltipBackground;
         private readonly OsuSpriteText text;
 
@@ -38,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
             AlwaysReceiveInput = true;
             Children = new[]
             {
-                actualTooltip = new Container
+                new Container
                 {
                     AutoSizeAxes = Axes.Both,
                     CornerRadius = 5,
@@ -67,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour, OsuGameBase game)
+        private void load(OsuColour colour)
         {
             tooltipBackground.Colour = colour.Gray3;
         }
