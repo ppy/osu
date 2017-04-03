@@ -46,6 +46,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                     Circle = CreateCirclePiece()
                 }
             });
+
+            Circle.KiaiMode = HitObject.Kiai;
         }
 
         protected override void CheckJudgement(bool userTriggered)
