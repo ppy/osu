@@ -14,10 +14,8 @@ using osu.Game.Modes.Taiko.Beatmaps;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
 using osu.Game.Modes.Taiko.Objects.Drawable;
-using osu.Game.Modes.Taiko.Replays;
 using osu.Game.Modes.Taiko.Scoring;
 using osu.Game.Modes.UI;
-using osu.Game.Modes.Replays;
 using osu.Game.Modes.Taiko.Replays;
 
 namespace osu.Game.Modes.Taiko.UI
@@ -48,7 +46,7 @@ namespace osu.Game.Modes.Taiko.UI
 
             var timingPoints = Beatmap.TimingInfo.ControlPoints.FindAll(cp => cp.TimingChange);
 
-            if (timingPoints == null || timingPoints.Count == 0)
+            if (timingPoints.Count == 0)
                 return;
 
             int currentIndex = 0;
