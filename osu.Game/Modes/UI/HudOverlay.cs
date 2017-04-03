@@ -30,6 +30,8 @@ namespace osu.Game.Modes.UI
 
         private readonly Container hud;
 
+        private static bool has_shown_notification_once = false;
+
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract ComboCounter CreateComboCounter();
         protected abstract PercentageCounter CreateAccuracyCounter();
@@ -66,8 +68,10 @@ namespace osu.Game.Modes.UI
             showHud.ValueChanged += hudVisibilityChanged;
             showHud.TriggerChange();
 
-            if (!showHud)
+            if (!showHud && !has_shown_notification_once)
             {
+                has_shown_notification_once = true;
+
                 notificationManager?.Post(new SimpleNotification
                 {
                     Text = @"The score overlay is currently disabled. You can toogle this by pressing Shift + Tab."
