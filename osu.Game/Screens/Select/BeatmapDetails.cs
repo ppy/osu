@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Select
                 tags.Children = beatmap.Metadata.Tags?.Split(' ').Select(text => new OsuSpriteText
                 {
                     Text = text,
-                    Font = "Exo2.0-Medium",
+                    Font = "Exo2.0-Regular",
                 });
 
                 circleSize.Value = beatmap.Difficulty.CircleSize;
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Select
                         },
                         description = new OsuSpriteText
                         {
-                            Font = @"Exo2.0-Medium",
+                            Font = @"Exo2.0-Regular",
                             Direction = FillDirection.Full,
                         },
                         new OsuSpriteText
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Select
                         },
                         source = new OsuSpriteText
                         {
-                            Font = @"Exo2.0-Medium",
+                            Font = @"Exo2.0-Regular",
                             Direction = FillDirection.Full,
                         },
                         new OsuSpriteText
@@ -282,12 +282,12 @@ namespace osu.Game.Screens.Select
                                             {
                                                 negativeRatings = new OsuSpriteText
                                                 {
-                                                    Font = @"Exo2.0-Medium",
+                                                    Font = @"Exo2.0-Regular",
                                                     Text = "0",
                                                 },
                                                 positiveRatings = new OsuSpriteText
                                                 {
-                                                    Font = @"Exo2.0-Medium",
+                                                    Font = @"Exo2.0-Regular",
                                                     Text = "0",
                                                     Anchor = Anchor.TopRight,
                                                     Origin = Anchor.TopRight,
@@ -298,7 +298,7 @@ namespace osu.Game.Screens.Select
                                         {
                                             Text = "Rating Spread",
                                             TextSize = 14,
-                                            Font = @"Exo2.0-Medium",
+                                            Font = @"Exo2.0-Regular",
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
                                         },
@@ -315,7 +315,7 @@ namespace osu.Game.Screens.Select
                         new OsuSpriteText
                         {
                             Text = "Points of Failure",
-                            Font = @"Exo2.0-Medium",
+                            Font = @"Exo2.0-Regular",
                         },
                         new Container<BarGraph>
                         {
@@ -420,7 +420,7 @@ namespace osu.Game.Screens.Select
                 {
                     name = new OsuSpriteText
                     {
-                        Font = @"Exo2.0-Medium",
+                        Font = @"Exo2.0-Regular",
                     },
                     bar = new Bar
                     {
@@ -434,7 +434,7 @@ namespace osu.Game.Screens.Select
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Font = @"Exo2.0-Medium",
+                        Font = @"Exo2.0-Regular",
                     },
                 };
             }
