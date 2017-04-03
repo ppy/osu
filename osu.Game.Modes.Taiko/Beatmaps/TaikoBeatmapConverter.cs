@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Types;
@@ -53,20 +52,33 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             {
                 int repeats = repeatsData?.RepeatCount ?? 1;
 
-                double speedAdjustedBeatLength = beatmap.TimingInfo.BeatLengthAt(obj.StartTime) * beatmap.TimingInfo.SpeedMultiplierAt(obj.StartTime);
+                double speedAdjustment = beatmap.TimingInfo.SpeedMultiplierAt(obj.StartTime);
+                double speedAdjustedBeatLength = beatmap.TimingInfo.BeatLengthAt(obj.StartTime) * speedAdjustment;
+                
+                // The true distance, accounting for any repeats. This ends up being the drum roll distance later
                 double distance = distanceData.Distance * repeats * legacy_velocity_scale;
 
+                // The velocity of the taiko hit object - calculated as the velocity of a drum roll
                 double taikoVelocity = base_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength * legacy_velocity_scale;
+                // The duration of the taiko hit object
                 double taikoDuration = distance / taikoVelocity;
 
+                // For some reason, old osu! always uses speedAdjustment to determine the taiko velocity, but
+                // only uses it to determine osu! velocity if beatmap version < 8. Let's account for that here.
+                if (beatmap.BeatmapInfo.BeatmapVersion >= 8)
+                    speedAdjustedBeatLength /= speedAdjustment;
+
+                // The velocity of the osu! hit object - calculated as the velocity of a slider
                 double osuVelocity = base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength * legacy_velocity_scale;
+                // The duration of the osu! hit object
                 double osuDuration = distance / osuVelocity;
 
-                double skipPeriod = Math.Min(speedAdjustedBeatLength / beatmap.BeatmapInfo.Difficulty.SliderTickRate, taikoDuration / repeats);
+                // If the drum roll is to be split into hit circles, assume the ticks are 1/8 spaced within the duration of one beat
+                double tickSpacing = Math.Min(speedAdjustedBeatLength / beatmap.BeatmapInfo.Difficulty.SliderTickRate, taikoDuration / repeats) / 8;
 
-                if (skipPeriod > 0 && osuDuration < 2 * speedAdjustedBeatLength)
+                if (tickSpacing > 0 && osuDuration < 2 * speedAdjustedBeatLength)
                 {
-                    for (double j = obj.StartTime; j <= distanceData.EndTime + skipPeriod / 8; j += skipPeriod)
+                    for (double j = obj.StartTime; j <= distanceData.EndTime + tickSpacing; j += tickSpacing)
                     {
                         // Todo: This should generate different type of hits (including strongs)
                         // depending on hitobject sound additions (not implemented fully yet)
@@ -86,7 +98,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         StartTime = obj.StartTime,
                         Sample = obj.Sample,
                         IsStrong = strong,
-                        Distance = distanceData.Distance * (repeatsData?.RepeatCount ?? 1) * legacy_velocity_scale,
+                        Distance = distance,
                         TickRate = beatmap.BeatmapInfo.Difficulty.SliderTickRate == 3 ? 3 : 4,
                         VelocityMultiplier = legacy_velocity_scale
                     };
