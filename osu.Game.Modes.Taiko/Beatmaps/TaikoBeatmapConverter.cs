@@ -19,6 +19,11 @@ namespace osu.Game.Modes.Taiko.Beatmaps
         private const float legacy_velocity_scale = 1.4f;
         private const float bash_convert_factor = 1.65f;
 
+        /// <summary>
+        /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
+        /// </summary>
+        private const float base_distance = 100;
+
         public Beatmap<TaikoHitObject> Convert(Beatmap original)
         {
             if (original is LegacyBeatmap)
@@ -48,7 +53,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 
             if (distanceData != null)
             {
-                double sv = beatmap.TimingInfo.SliderVelocityAt(obj.StartTime) * beatmap.BeatmapInfo.Difficulty.SliderMultiplier;
+                double sv = base_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier * beatmap.TimingInfo.BeatLengthAt(obj.StartTime) / 1000;
 
                 double l = distanceData.Distance * legacy_velocity_scale;
                 double v = sv * legacy_velocity_scale;
