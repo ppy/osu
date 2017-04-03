@@ -13,6 +13,11 @@ namespace osu.Game.Modes.Taiko.Objects
 {
     public class DrumRoll : TaikoHitObject, IHasDistance
     {
+        /// <summary>
+        /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
+        /// </summary>
+        private const float base_distance = 100;
+
         public double EndTime => StartTime + Distance / Velocity;
 
         public double Duration => EndTime - StartTime;
@@ -59,7 +64,7 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.ApplyDefaults(timing, difficulty);
 
-            Velocity = timing.SliderVelocityAt(StartTime) * difficulty.SliderMultiplier / 1000;
+            Velocity = base_distance * difficulty.SliderMultiplier * difficulty.SliderTickRate * timing.BeatLengthAt(StartTime) * timing.SpeedMultiplierAt(StartTime);
             TickTimeDistance = timing.BeatLengthAt(StartTime);
 
             //TODO: move this to legacy conversion code to allow for direct division without special case.
