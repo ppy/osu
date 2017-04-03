@@ -31,6 +31,17 @@ namespace osu.Game.Beatmaps.Formats
             // TODO: Not sure how far back to go, or differences between versions
         }
 
+        private readonly int beatmapVersion;
+
+        public OsuLegacyDecoder()
+        {
+        }
+
+        public OsuLegacyDecoder(string header)
+        {
+            beatmapVersion = int.Parse(header.Substring(17));
+        }
+
         private enum Section
         {
             None,
@@ -246,32 +257,36 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected override Beatmap ParseFile(TextReader stream)
+        protected override Beatmap ParseFile(StreamReader stream)
         {
             return new LegacyBeatmap(base.ParseFile(stream));
         }
 
-        public override Beatmap Decode(TextReader stream)
+        public override Beatmap Decode(StreamReader stream)
         {
             return new LegacyBeatmap(base.Decode(stream));
         }
 
-        protected override void ParseFile(TextReader stream, Beatmap beatmap)
+        protected override void ParseFile(StreamReader stream, Beatmap beatmap)
         {
+            beatmap.BeatmapInfo.BeatmapVersion = beatmapVersion;
+
             HitObjectParser parser = null;
 
+            Section section = Section.None;
             bool hasCustomColours = false;
 
-            var section = Section.None;
-            while (true)
+            string line;
+            while ((line = stream.ReadLine()) != null)
             {
-                var line = stream.ReadLine();
-                if (line == null)
-                    break;
                 if (string.IsNullOrEmpty(line))
                     continue;
+
                 if (line.StartsWith(@"osu file format v"))
+                {
+                    beatmap.BeatmapInfo.BeatmapVersion = int.Parse(line.Substring(17));
                     continue;
+                }
 
                 if (line.StartsWith(@"[") && line.EndsWith(@"]"))
                 {
