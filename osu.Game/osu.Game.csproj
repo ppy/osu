@@ -206,9 +206,8 @@
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Modes\UI\StandardComboCounter.cs" />
     <Compile Include="Screens\Select\BeatmapCarousel.cs" />
-    <Compile Include="Screens\Select\Details\BeatmapDetails.cs" />
-    <Compile Include="Screens\Select\Details\BeatmapDetailsBar.cs" />
-    <Compile Include="Screens\Select\Details\BeatmapDetailsGraph.cs" />
+    <Compile Include="Screens\Select\BeatmapDetails.cs" />
+    <Compile Include="Graphics\UserInterface\BarGraph.cs" />
     <Compile Include="Screens\Select\FilterCriteria.cs" />
     <Compile Include="Screens\Select\Filter\GroupMode.cs" />
     <Compile Include="Screens\Select\Filter\SortMode.cs" />
@@ -391,7 +390,9 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Screens\Select\Details\" />
+  </ItemGroup>
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />

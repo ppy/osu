@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Screens.Select.Details;
 using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select

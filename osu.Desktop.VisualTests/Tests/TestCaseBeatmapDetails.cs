@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Testing;
 using osu.Game.Database;
-using osu.Game.Screens.Select.Details;
+using osu.Game.Screens.Select;
 using System;
 using System.Linq;
 

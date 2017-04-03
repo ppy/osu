@@ -1,15 +1,48 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace osu.Game.Screens.Select.Details
+namespace osu.Game.Graphics.UserInterface
 {
-    public class BeatmapDetailsBar : Container
+    public class BarGraph : FillFlowContainer<Bar>
+    {
+
+        public IEnumerable<float> Values
+        {
+            set
+            {
+                List<float> values = value.ToList();
+                List<Bar> graphBars = Children.ToList();
+                for (int i = 0; i < values.Count; i++)
+                    if (graphBars.Count > i)
+                    {
+                        graphBars[i].Length = values[i] / values.Max();
+                        graphBars[i].Width = 1.0f / values.Count;
+                    }
+                    else
+                        Add(new Bar
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 1.0f / values.Count,
+                            Length = values[i] / values.Max(),
+                            Direction = BarDirection.BottomToTop,
+                            BackgroundColour = new Color4(0, 0, 0, 0),
+                        });
+
+            }
+        }
+
+    }
+
+    public class Bar : Container
     {
         private readonly Box background;
         private readonly Box bar;
@@ -27,7 +60,7 @@ namespace osu.Game.Screens.Select.Details
             }
             set
             {
-                length = MathHelper.Clamp(value,0,1);
+                length = MathHelper.Clamp(value, 0, 1);
                 updateBarLength();
             }
         }
@@ -70,9 +103,9 @@ namespace osu.Game.Screens.Select.Details
             }
         }
 
-        public BeatmapDetailsBar()
+        public Bar()
         {
-            Children = new []
+            Children = new[]
             {
                 background = new Box
                 {
