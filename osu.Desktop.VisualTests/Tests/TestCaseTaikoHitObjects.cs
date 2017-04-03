@@ -1,12 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Graphics;
 using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -24,7 +23,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddToggleStep("Kiai", b =>
             {
                 kiai = !kiai;
-                Reset();
+                updateKiaiState();
             });
 
             Add(new CirclePiece
@@ -87,37 +86,27 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            Add(new DrumRollCircle(new CirclePiece
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Width = 250,
-                Position = new Vector2(575, 100)
+                Position = new Vector2(575, 100),
+                Width = 0.25f,
+                AccentColour = Color4.Orange,
+                KiaiMode = kiai,
             });
 
-            Add(new DrumRollCircle(new StrongCirclePiece
+            Add(new StrongCirclePiece
             {
+                Position = new Vector2(575, 300),
+                Width = 0.25f,
+                AccentColour = Color4.Orange,
                 KiaiMode = kiai
-            })
-            {
-                Width = 250,
-                Position = new Vector2(575, 300)
             });
         }
 
-        private class DrumRollCircle : BaseCircle
+        private void updateKiaiState()
         {
-            public DrumRollCircle(CirclePiece piece)
-                : base(piece)
-            {
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Piece.AccentColour = colours.YellowDark;
-            }
+            foreach (var c in Children.OfType<CirclePiece>())
+                c.KiaiMode = kiai;
         }
 
         private abstract class BaseCircle : Container
