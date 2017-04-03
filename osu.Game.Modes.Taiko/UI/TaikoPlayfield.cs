@@ -23,7 +23,7 @@ namespace osu.Game.Modes.Taiko.UI
     {
         /// <summary>
         /// The play field height. This is relative to the size of hit objects
-        /// such that the playfield is just a bit larger than finishers.
+        /// such that the playfield is just a bit larger than strong hits.
         /// </summary>
         public const float PLAYFIELD_HEIGHT = TaikoHitObject.CIRCLE_RADIUS * 2 * 2;
 
