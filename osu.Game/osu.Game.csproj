@@ -143,7 +143,6 @@
     <Compile Include="Overlays\LoginOverlay.cs" />
     <Compile Include="Overlays\MusicController.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
-    <Compile Include="Beatmaps\Formats\ConstructableBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\WorkingBeatmap.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />

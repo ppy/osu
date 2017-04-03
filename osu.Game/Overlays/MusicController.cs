@@ -1,5 +1,5 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
@@ -367,12 +367,9 @@ namespace osu.Game.Overlays
                     }
                 });
 
-                playerContainer.Add(new AsyncLoadContainer
+                playerContainer.Add(new AsyncLoadWrapper(new MusicControllerBackground(beatmap)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue,
-                    Children = new[] { new MusicControllerBackground(beatmap) },
-                    FinishedLoading = d =>
+                    OnLoadComplete = d =>
                     {
                         switch (direction)
                         {
@@ -390,6 +387,9 @@ namespace osu.Game.Overlays
                         currentBackground.Expire();
                         currentBackground = d;
                     }
+                })
+                {
+                    Depth = float.MaxValue,
                 });
             };
         }

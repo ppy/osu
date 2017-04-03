@@ -88,9 +88,9 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame game, OsuColour colours)
+        private void load(OsuColour colours)
         {
-            (intro = new Intro()).LoadAsync(game);
+            LoadComponentAsync(intro = new Intro());
 
             iconColour = colours.Yellow;
         }
