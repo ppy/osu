@@ -14,6 +14,11 @@ namespace osu.Game.Modes.Osu.Objects
 {
     public class Slider : OsuHitObject, IHasCurve
     {
+        /// <summary>
+        /// Scoring distance with a speed-adjusted beat length of 1 second.
+        /// </summary>
+        private const float base_scoring_distance = 100;
+
         public IHasCurve CurveObject { get; set; }
 
         public SliderCurve Curve => CurveObject.Curve;
@@ -51,13 +56,10 @@ namespace osu.Game.Modes.Osu.Objects
         {
             base.ApplyDefaults(timing, difficulty);
 
-            ControlPoint overridePoint;
-            ControlPoint timingPoint = timing.TimingPointAt(StartTime, out overridePoint);
-            var velocityAdjustment = overridePoint?.VelocityAdjustment ?? 1;
-            var baseVelocity = 100 * difficulty.SliderMultiplier / velocityAdjustment;
+            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier / timing.SpeedMultiplierAt(StartTime);
 
-            Velocity = baseVelocity / timingPoint.BeatLength;
-            TickDistance = baseVelocity / difficulty.SliderTickRate;
+            Velocity = scoringDistance / timing.BeatLengthAt(StartTime);
+            TickDistance = scoringDistance / difficulty.SliderTickRate;
         }
 
         public IEnumerable<SliderTick> Ticks
