@@ -15,6 +15,12 @@ namespace osu.Game.Modes.Taiko.Objects
         public double Duration => EndTime - StartTime;
 
         /// <summary>
+        /// The multiplier for cases in which the number of required hits by a Swell is not
+        /// dependent on solely the overall difficulty and the duration of the swell.
+        /// </summary>
+        public double HitMultiplier { get; set; } = 1;
+
+        /// <summary>
         /// The number of hits required to complete the swell successfully.
         /// </summary>
         public int RequiredHits { get; protected set; } = 10;
@@ -24,7 +30,7 @@ namespace osu.Game.Modes.Taiko.Objects
             base.ApplyDefaults(timing, difficulty);
 
             double spinnerRotationRatio = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
-            RequiredHits = (int)Math.Max(1, Duration / 1000f * spinnerRotationRatio);
+            RequiredHits = (int)Math.Max(1, Duration / 1000f * spinnerRotationRatio * HitMultiplier);
         }
     }
 }
