@@ -12,24 +12,20 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
     {
         protected override Key[] HitKeys { get; } = { Key.F, Key.J };
 
-        private readonly CirclePiece circlePiece;
-
         public DrawableStrongCentreHit(Hit hit)
             : base(hit)
         {
-            Add(circlePiece = new StrongCirclePiece
-            {
-                Children = new []
-                {
-                    new CentreHitSymbolPiece()
-                }
-            });
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            circlePiece.AccentColour = colours.PinkDarker;
+            Circle.AccentColour = colours.PinkDarker;
         }
+
+        protected override CirclePiece CreateCirclePiece() => new StrongCirclePiece
+        {
+            Children = new[] { new CentreHitSymbolPiece() }
+        };
     }
 }

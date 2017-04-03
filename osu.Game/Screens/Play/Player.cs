@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play
         {
             var beatmap = Beatmap.Beatmap;
 
-            if (beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
+            if (beatmap.BeatmapInfo?.Mode > PlayMode.Taiko)
             {
                 //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
                 Exit();
@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Play
 
             var newPlayer = new Player();
 
-            newPlayer.LoadAsync(Game, delegate
+            LoadComponentAsync(newPlayer, delegate
             {
                 newPlayer.RestartCount = RestartCount + 1;
                 ValidForResume = false;

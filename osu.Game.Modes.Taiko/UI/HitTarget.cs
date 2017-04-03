@@ -21,9 +21,9 @@ namespace osu.Game.Modes.Taiko.UI
         private const float normal_diameter = TaikoHitObject.CIRCLE_RADIUS * 2;
         
         /// <summary>
-        /// Diameter of finisher hit object circles.
+        /// Diameter of strong hit object circles.
         /// </summary>
-        private const float finisher_diameter = normal_diameter * 1.5f;
+        private const float strong_hit_diameter = normal_diameter * 1.5f;
 
         /// <summary>
         /// The 1px inner border of the taiko playfield.
@@ -47,15 +47,15 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Y = border_offset,
-                    Size = new Vector2(border_thickness, (TaikoPlayfield.PLAYFIELD_HEIGHT - finisher_diameter) / 2f - border_offset),
+                    Size = new Vector2(border_thickness, (TaikoPlayfield.PLAYFIELD_HEIGHT - strong_hit_diameter) / 2f - border_offset),
                     Alpha = 0.1f
                 },
                 new CircularContainer
                 {
-                    Name = "Finisher Ring",
+                    Name = "Strong Hit Ring",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(finisher_diameter),
+                    Size = new Vector2(strong_hit_diameter),
                     Masking = true,
                     BorderColour = Color4.White,
                     BorderThickness = border_thickness,
@@ -72,7 +72,7 @@ namespace osu.Game.Modes.Taiko.UI
                 },
                 new CircularContainer
                 {
-                    Name = "Normal Ring",
+                    Name = "Normal Hit Ring",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(normal_diameter),
@@ -96,7 +96,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Y = -border_offset,
-                    Size = new Vector2(border_thickness, (TaikoPlayfield.PLAYFIELD_HEIGHT - finisher_diameter) / 2f - border_offset),
+                    Size = new Vector2(border_thickness, (TaikoPlayfield.PLAYFIELD_HEIGHT - strong_hit_diameter) / 2f - border_offset),
                     Alpha = 0.1f
                 },
             };
