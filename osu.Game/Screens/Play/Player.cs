@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Play
 
             var newPlayer = new Player();
 
-            newPlayer.LoadAsync(Game, delegate
+            LoadComponentAsync(newPlayer, delegate
             {
                 newPlayer.RestartCount = RestartCount + 1;
                 ValidForResume = false;
