@@ -18,6 +18,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
     {
         private const float legacy_velocity_scale = 1.4f;
         private const float bash_convert_factor = 1.65f;
+        private const float base_scoring_distance = 100;
 
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
@@ -26,7 +27,6 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 
         public Beatmap<TaikoHitObject> Convert(Beatmap original)
         {
-
             return new Beatmap<TaikoHitObject>(original)
             {
                 HitObjects = original.HitObjects.SelectMany(h => convertHitObject(h, original)).ToList()
@@ -51,17 +51,20 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 
             if (distanceData != null)
             {
-                double sv = base_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier * beatmap.TimingInfo.BeatLengthAt(obj.StartTime) / 1000;
-
-                double l = distanceData.Distance * legacy_velocity_scale;
-                double v = sv * legacy_velocity_scale;
-                double bl = beatmap.TimingInfo.BeatLengthAt(obj.StartTime);
-
                 int repeats = repeatsData?.RepeatCount ?? 1;
 
-                double skipPeriod = Math.Min(bl / beatmap.BeatmapInfo.Difficulty.SliderTickRate, distanceData.Duration / repeats);
+                double speedAdjustedBeatLength = beatmap.TimingInfo.BeatLengthAt(obj.StartTime) * beatmap.TimingInfo.SpeedMultiplierAt(obj.StartTime);
+                double distance = distanceData.Distance * repeats * legacy_velocity_scale;
 
-                if (skipPeriod > 0 && l / v * 1000 < 2 * bl)
+                double taikoVelocity = base_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength * legacy_velocity_scale;
+                double taikoDuration = distance / taikoVelocity;
+
+                double osuVelocity = base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength * legacy_velocity_scale;
+                double osuDuration = distance / osuVelocity;
+
+                double skipPeriod = Math.Min(speedAdjustedBeatLength / beatmap.BeatmapInfo.Difficulty.SliderTickRate, taikoDuration / repeats);
+
+                if (skipPeriod > 0 && osuDuration < 2 * speedAdjustedBeatLength)
                 {
                     for (double j = obj.StartTime; j <= distanceData.EndTime + skipPeriod / 8; j += skipPeriod)
                     {
