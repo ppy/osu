@@ -33,10 +33,9 @@ namespace osu.Game.Modes.Taiko.Objects
         public double Velocity { get; protected set; } = 5;
 
         /// <summary>
-        /// The distance between ticks of this drumroll.
-        /// <para>Half of this value is the hit window of the ticks.</para>
+        /// Numer of ticks per beat length.
         /// </summary>
-        public double TickTimeDistance { get; protected set; } = 100;
+        public int TickRate = 1;
 
         /// <summary>
         /// Number of drum roll ticks required for a "Good" hit.
@@ -60,18 +59,18 @@ namespace osu.Game.Modes.Taiko.Objects
 
         private List<DrumRollTick> ticks;
 
+        /// <summary>
+        /// The length (in milliseconds) between ticks of this drumroll.
+        /// <para>Half of this value is the hit window of the ticks.</para>
+        /// </summary>
+        private double tickSpacing = 100;
+
         public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaults(timing, difficulty);
 
             Velocity = base_distance * difficulty.SliderMultiplier * difficulty.SliderTickRate * timing.BeatLengthAt(StartTime) * timing.SpeedMultiplierAt(StartTime);
-            TickTimeDistance = timing.BeatLengthAt(StartTime);
-
-            //TODO: move this to legacy conversion code to allow for direct division without special case.
-            if (difficulty.SliderTickRate == 3)
-                TickTimeDistance /= 3;
-            else
-                TickTimeDistance /= 4;
+            tickSpacing = timing.BeatLengthAt(StartTime) / TickRate;
 
             RequiredGoodHits = TotalTicks * Math.Min(0.15, 0.05 + 0.10 / 6 * difficulty.OverallDifficulty);
             RequiredGreatHits = TotalTicks * Math.Min(0.30, 0.10 + 0.20 / 6 * difficulty.OverallDifficulty);
@@ -81,17 +80,17 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             var ret = new List<DrumRollTick>();
 
-            if (TickTimeDistance == 0)
+            if (tickSpacing == 0)
                 return ret;
 
             bool first = true;
-            for (double t = StartTime; t < EndTime + (int)TickTimeDistance; t += TickTimeDistance)
+            for (double t = StartTime; t < EndTime + (int)tickSpacing; t += tickSpacing)
             {
                 ret.Add(new DrumRollTick
                 {
                     FirstTick = first,
                     PreEmpt = PreEmpt,
-                    TickTimeDistance = TickTimeDistance,
+                    TickSpacing = tickSpacing,
                     StartTime = t,
                     IsStrong = IsStrong,
                     Sample = new HitSampleInfo

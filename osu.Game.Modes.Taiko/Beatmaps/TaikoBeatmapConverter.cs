@@ -84,7 +84,8 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         StartTime = obj.StartTime,
                         Sample = obj.Sample,
                         IsStrong = strong,
-                        Distance = distanceData.Distance * (repeatsData?.RepeatCount ?? 1) * legacy_velocity_scale
+                        Distance = distanceData.Distance * (repeatsData?.RepeatCount ?? 1) * legacy_velocity_scale,
+                        TickRate = beatmap.BeatmapInfo.Difficulty.SliderTickRate == 3 ? 3 : 4
                     };
                 }
             }
