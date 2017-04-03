@@ -81,10 +81,10 @@ namespace osu.Game.Screens.Select
         {
             if (player != null) return;
 
-            (player = new PlayerLoader(new Player
+            LoadComponentAsync(player = new PlayerLoader(new Player
             {
                 Beatmap = Beatmap, //eagerly set this so it's present before push.
-            })).LoadAsync(Game, l => Push(player));
+            }), l => Push(player));
         }
     }
 }
