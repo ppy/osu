@@ -19,6 +19,9 @@ namespace osu.Game.Modes.UI
 {
     public abstract class HudOverlay : Container
     {
+        private const int duration = 100;
+
+        private readonly Container hud;
         public readonly KeyCounterCollection KeyCounter;
         public readonly ComboCounter ComboCounter;
         public readonly ScoreCounter ScoreCounter;
@@ -27,8 +30,6 @@ namespace osu.Game.Modes.UI
 
         private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
-
-        private readonly Container hud;
 
         private static bool has_shown_notification_once = false;
 
@@ -90,9 +91,9 @@ namespace osu.Game.Modes.UI
         private void hudVisibilityChanged(object sender, EventArgs e)
         {
             if (showHud)
-                hud.Show();
+                hud.FadeIn(duration);
             else
-                hud.Hide();
+                hud.FadeOut(duration);
         }
 
         public void BindProcessor(ScoreProcessor processor)
