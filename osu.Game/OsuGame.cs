@@ -41,6 +41,8 @@ namespace osu.Game
 
         private NotificationManager notificationManager;
 
+        private NotificationOverlay notificationOverlay;
+
         private DialogOverlay dialogOverlay;
 
         private Intro intro
@@ -158,11 +160,12 @@ namespace osu.Game
             });
 
             //overlay elements
-            LoadComponentAsync(chat = new ChatOverlay { Depth = 0 }, overlayContent.Add);
-            LoadComponentAsync(options = new OptionsOverlay { Depth = -1 }, overlayContent.Add);
+            LoadComponentAsync(notificationOverlay = new NotificationOverlay { Depth = 0 }, overlayContent.Add);
+            LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, overlayContent.Add);
+            LoadComponentAsync(options = new OptionsOverlay { Depth = -2 }, overlayContent.Add);
             LoadComponentAsync(musicController = new MusicController
             {
-                Depth = -2,
+                Depth = -3,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -170,14 +173,14 @@ namespace osu.Game
 
             LoadComponentAsync(notificationManager = new NotificationManager
             {
-                Depth = -2,
+                Depth = -3,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);
 
             LoadComponentAsync(dialogOverlay = new DialogOverlay
             {
-                Depth = -4,
+                Depth = -5,
             }, overlayContent.Add);
 
             Logger.NewEntry += entry =>
@@ -193,11 +196,12 @@ namespace osu.Game
             Dependencies.Cache(options);
             Dependencies.Cache(musicController);
             Dependencies.Cache(notificationManager);
+            Dependencies.Cache(notificationOverlay);
             Dependencies.Cache(dialogOverlay);
 
             LoadComponentAsync(Toolbar = new Toolbar
             {
-                Depth = -3,
+                Depth = -4,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
                 OnPlayModeChange = m => PlayMode.Value = m,
             }, t =>

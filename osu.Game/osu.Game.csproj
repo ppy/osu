@@ -158,6 +158,7 @@
     <Compile Include="Beatmaps\Timing\SampleChange.cs" />
     <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
+    <Compile Include="Overlays\NotificationOverlay.cs" />
     <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
     <Compile Include="Overlays\Notifications\Notification.cs" />
     <Compile Include="Overlays\NotificationManager.cs" />

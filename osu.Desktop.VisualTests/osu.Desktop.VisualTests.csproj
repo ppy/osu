@@ -191,6 +191,7 @@
     <Compile Include="Tests\TestCaseGamefield.cs" />
     <Compile Include="Tests\TestCaseMusicController.cs" />
     <Compile Include="Tests\TestCaseNotificationManager.cs" />
+    <Compile Include="Tests\TestCaseNotificationOverlay.cs" />
     <Compile Include="Tests\TestCasePlayer.cs" />
     <Compile Include="Tests\TestCaseHitObjects.cs" />
     <Compile Include="Tests\TestCaseKeyCounter.cs" />
