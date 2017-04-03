@@ -1,9 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using osu.Game.Beatmaps.Timing;
-using osu.Game.Database;
 using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Taiko.Objects
@@ -17,14 +14,6 @@ namespace osu.Game.Modes.Taiko.Objects
         /// <summary>
         /// The number of hits required to complete the swell successfully.
         /// </summary>
-        public int RequiredHits { get; protected set; } = 10;
-
-        public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
-        {
-            base.ApplyDefaults(timing, difficulty);
-
-            double spinnerRotationRatio = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
-            RequiredHits = (int)Math.Max(1, Duration / 1000f * spinnerRotationRatio);
-        }
+        public int RequiredHits = 10;
     }
 }
