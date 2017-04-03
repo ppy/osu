@@ -14,6 +14,7 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 using System;
+using System.Linq;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -25,23 +26,30 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// </summary>
         public event Action OnStart;
 
-        private const float target_ring_thick_border = 4f;
+        private const float target_ring_thick_border = 1.4f;
         private const float target_ring_thin_border = 1f;
         private const float target_ring_scale = 5f;
-        private const float inner_ring_alpha = 0.35f;
+        private const float inner_ring_alpha = 0.65f;
+
+        private readonly Swell swell;
+
+        private readonly Container bodyContainer;
+        private readonly CircularContainer targetRing;
+        private readonly CircularContainer expandingRing;
+
+        private readonly CirclePiece circlePiece;
+
+        private readonly Key[] rimKeys = { Key.D, Key.K };
+        private readonly Key[] centreKeys = { Key.F, Key.J };
+        private Key[] lastKeySet;
 
         /// <summary>
         /// The amount of times the user has hit this swell.
         /// </summary>
         private int userHits;
 
-        private readonly Swell swell;
-
-        private readonly Container bodyContainer;
-        private readonly CircularContainer targetRing;
-        private readonly CircularContainer innerRing;
-
         private bool hasStarted;
+        private readonly SwellSymbolPiece symbol;
 
         public DrawableSwell(Swell swell)
             : base(swell)
@@ -54,12 +62,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 {
                     Children = new Framework.Graphics.Drawable[]
                     {
-                        innerRing = new CircularContainer
+                        expandingRing = new CircularContainer
                         {
-                            Name = "Inner ring",
+                            Name = "Expanding ring",
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            Alpha = 0,
                             Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
+                            BlendingMode = BlendingMode.Additive,
                             Masking = true,
                             Children = new []
                             {
@@ -78,6 +88,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                             Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
                             Masking = true,
                             BorderThickness = target_ring_thick_border,
+                            BlendingMode = BlendingMode.Additive,
                             Children = new Framework.Graphics.Drawable[]
                             {
                                 new Box
@@ -107,7 +118,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                                 }
                             }
                         },
-                        new SwellCirclePiece(new CirclePiece())
+                        circlePiece = new CirclePiece
+                        {
+                            Children = new []
+                            {
+                                symbol = new SwellSymbolPiece()
+                            }
+                        }
                     }
                 }
             };
@@ -116,29 +133,27 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            innerRing.Colour = colours.YellowDark;
+            circlePiece.AccentColour = colours.YellowDark;
+            expandingRing.Colour = colours.YellowLight;
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            targetRing.Delay(HitObject.StartTime - Time.Current).ScaleTo(target_ring_scale, 600, EasingTypes.OutQuint);
         }
 
         protected override void CheckJudgement(bool userTriggered)
         {
             if (userTriggered)
             {
-                if (Time.Current < HitObject.StartTime)
-                    return;
-
                 userHits++;
 
-                innerRing.FadeTo(1);
-                innerRing.FadeTo(inner_ring_alpha, 500, EasingTypes.OutQuint);
-                innerRing.ScaleTo(1f + (target_ring_scale - 1) * userHits / swell.RequiredHits, 1200, EasingTypes.OutElastic);
+                var completion = (float)userHits / swell.RequiredHits;
+
+                expandingRing.FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50);
+                expandingRing.Delay(50);
+                expandingRing.FadeTo(completion / 8, 2000, EasingTypes.OutQuint);
+                expandingRing.DelayReset();
+
+                symbol.RotateTo((float)(completion * swell.Duration / 8), 4000, EasingTypes.OutQuint);
+
+                expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, EasingTypes.OutQuint);
 
                 if (userHits == swell.RequiredHits)
                 {
@@ -151,6 +166,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 if (Judgement.TimeOffset < 0)
                     return;
 
+                //TODO: THIS IS SHIT AND CAN'T EXIST POST-TAIKO WORLD CUP
                 if (userHits > swell.RequiredHits / 2)
                 {
                     Judgement.Result = HitResult.Hit;
@@ -163,21 +179,28 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         protected override void UpdateState(ArmedState state)
         {
+            const float preempt = 100;
+
+            Delay(HitObject.StartTime - Time.Current - preempt, true);
+
+            targetRing.ScaleTo(target_ring_scale, preempt * 4, EasingTypes.OutQuint);
+
+            Delay(preempt, true);
+
+            Delay(Judgement.TimeOffset + swell.Duration, true);
+
+            const float out_transition_time = 300;
+
             switch (state)
             {
-                case ArmedState.Idle:
-                    break;
-                case ArmedState.Miss:
-                    FadeOut(100);
-                    Expire();
-                    break;
                 case ArmedState.Hit:
-                    bodyContainer.ScaleTo(1.2f, 400, EasingTypes.OutQuad);
-
-                    FadeOut(600);
-                    Expire();
+                    bodyContainer.ScaleTo(1.4f, out_transition_time);
                     break;
             }
+
+            FadeOut(out_transition_time, EasingTypes.Out);
+
+            Expire();
         }
 
         protected override void UpdateScrollPosition(double time)
@@ -196,8 +219,20 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         protected override bool HandleKeyPress(Key key)
         {
-            if (Judgement.Result.HasValue)
+            if (Judgement.Result != HitResult.None)
                 return false;
+
+            // Don't handle keys before the swell starts
+            if (Time.Current < HitObject.StartTime)
+                return false;
+
+            // Find the keyset which this key corresponds to
+            var keySet = rimKeys.Contains(key) ? rimKeys : centreKeys;
+
+            // Ensure alternating keysets
+            if (keySet == lastKeySet)
+                return false;
+            lastKeySet = keySet;
 
             UpdateJudgement(true);
 

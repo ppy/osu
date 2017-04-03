@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(OsuGame game)
         {
-            background.LoadAsync(game);
+            LoadComponentAsync(background);
 
             buttons.OnSettings = game.ToggleOptions;
 
@@ -67,10 +67,7 @@ namespace osu.Game.Screens.Menu
         private void preloadSongSelect()
         {
             if (songSelect == null)
-            {
-                songSelect = new PlaySongSelect();
-                songSelect.LoadAsync(Game);
-            }
+                LoadComponentAsync(songSelect = new PlaySongSelect());
         }
 
         private Screen consumeSongSelect()

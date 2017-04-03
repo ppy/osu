@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
@@ -16,7 +16,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        protected abstract List<Key> HitKeys { get; }
+        protected abstract Key[] HitKeys { get; }
 
         protected override Container<Framework.Graphics.Drawable> Content => bodyContainer;
 
@@ -36,8 +36,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
             AddInternal(bodyContainer = new Container
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
             });
         }
 
@@ -68,7 +68,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         protected override bool HandleKeyPress(Key key)
         {
-            if (Judgement.Result.HasValue)
+            if (Judgement.Result != HitResult.None)
                 return false;
 
             validKeyPressed = HitKeys.Contains(key);
@@ -78,13 +78,15 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         protected override void UpdateState(ArmedState state)
         {
+            Delay(HitObject.StartTime - Time.Current + Judgement.TimeOffset, true);
+
             switch (State)
             {
                 case ArmedState.Idle:
+                    Delay(hit.HitWindowMiss);
                     break;
                 case ArmedState.Miss:
                     FadeOut(100);
-                    Expire();
                     break;
                 case ArmedState.Hit:
                     bodyContainer.ScaleTo(0.8f, 400, EasingTypes.OutQuad);
@@ -93,9 +95,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                     bodyContainer.MoveToY(0, 500, EasingTypes.In);
 
                     FadeOut(600);
-                    Expire();
                     break;
             }
+
+            Expire();
         }
     }
 }

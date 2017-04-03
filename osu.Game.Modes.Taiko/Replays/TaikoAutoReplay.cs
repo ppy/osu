@@ -1,13 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Modes.Taiko.Objects;
-using osu.Game.Modes.Objects.Types;
+using System;
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Objects.Types;
+using osu.Game.Modes.Taiko.Objects;
+using osu.Game.Modes.Replays;
 
-namespace osu.Game.Modes.Taiko
+namespace osu.Game.Modes.Taiko.Replays
 {
-    public class TaikoAutoReplay : LegacyTaikoReplay
+    public class TaikoAutoReplay : Replay
     {
         private readonly Beatmap<TaikoHitObject> beatmap;
 
@@ -22,100 +24,98 @@ namespace osu.Game.Modes.Taiko
         {
             bool hitButton = true;
 
-            Frames.Add(new LegacyReplayFrame(-100000, 320, 240, LegacyButtonState.None));
-            Frames.Add(new LegacyReplayFrame(beatmap.HitObjects[0].StartTime - 1000, 320, 240, LegacyButtonState.None));
+            Frames.Add(new ReplayFrame(-100000, 320, 240, ReplayButtonState.None));
+            Frames.Add(new ReplayFrame(beatmap.HitObjects[0].StartTime - 1000, 320, 240, ReplayButtonState.None));
 
             for (int i = 0; i < beatmap.HitObjects.Count; i++)
             {
                 TaikoHitObject h = beatmap.HitObjects[i];
 
-                LegacyButtonState button;
+                ReplayButtonState button;
 
                 IHasEndTime endTimeData = h as IHasEndTime;
                 double endTime = endTimeData?.EndTime ?? h.StartTime;
 
-                Swell sp = h as Swell;
-                if (sp != null)
+                Swell swell = h as Swell;
+                DrumRoll drumRoll = h as DrumRoll;
+                Hit hit = h as Hit;
+
+                if (swell != null)
                 {
                     int d = 0;
                     int count = 0;
-                    int req = sp.RequiredHits;
-                    double hitRate = sp.Duration / req;
+                    int req = swell.RequiredHits;
+                    double hitRate = swell.Duration / req;
                     for (double j = h.StartTime; j < endTime; j += hitRate)
                     {
                         switch (d)
                         {
                             default:
-                                button = LegacyButtonState.Left1;
+                                button = ReplayButtonState.Left1;
                                 break;
                             case 1:
-                                button = LegacyButtonState.Right1;
+                                button = ReplayButtonState.Right1;
                                 break;
                             case 2:
-                                button = LegacyButtonState.Left2;
+                                button = ReplayButtonState.Left2;
                                 break;
                             case 3:
-                                button = LegacyButtonState.Right2;
+                                button = ReplayButtonState.Right2;
                                 break;
                         }
 
-                        Frames.Add(new LegacyReplayFrame(j, 0, 0, button));
+                        Frames.Add(new ReplayFrame(j, 0, 0, button));
                         d = (d + 1) % 4;
                         if (++count > req)
                             break;
                     }
                 }
-                else if (h is DrumRoll)
+                else if (drumRoll != null)
                 {
-                    DrumRoll d = h as DrumRoll;
+                    double delay = drumRoll.TickTimeDistance;
 
-                    double delay = d.TickTimeDistance;
+                    double time = drumRoll.StartTime;
 
-                    double time = d.StartTime;
-
-                    for (int j = 0; j < d.TotalTicks; j++)
+                    for (int j = 0; j < drumRoll.TotalTicks; j++)
                     {
-                        Frames.Add(new LegacyReplayFrame((int)time, 0, 0, hitButton ? LegacyButtonState.Left1 : LegacyButtonState.Left2));
+                        Frames.Add(new ReplayFrame((int)time, 0, 0, hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2));
                         time += delay;
                         hitButton = !hitButton;
                     }
                 }
-                else
+                else if (hit != null)
                 {
-                    Hit hit = h as Hit;
-
-                    if (hit.Type == HitType.Centre)
+                    if (hit is CentreHit)
                     {
                         if (h.IsStrong)
-                            button = LegacyButtonState.Right1 | LegacyButtonState.Right2;
+                            button = ReplayButtonState.Right1 | ReplayButtonState.Right2;
                         else
-                            button = hitButton ? LegacyButtonState.Right1 : LegacyButtonState.Right2;
+                            button = hitButton ? ReplayButtonState.Right1 : ReplayButtonState.Right2;
                     }
                     else
                     {
                         if (h.IsStrong)
-                            button = LegacyButtonState.Left1 | LegacyButtonState.Left2;
+                            button = ReplayButtonState.Left1 | ReplayButtonState.Left2;
                         else
-                            button = hitButton ? LegacyButtonState.Left1 : LegacyButtonState.Left2;
+                            button = hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2;
                     }
 
-                    Frames.Add(new LegacyReplayFrame(h.StartTime, 0, 0, button));
+                    Frames.Add(new ReplayFrame(h.StartTime, 0, 0, button));
                 }
+                else
+                    throw new Exception("Unknown hit object type.");
 
-                Frames.Add(new LegacyReplayFrame(endTime + 1, 0, 0, LegacyButtonState.None));
+                Frames.Add(new ReplayFrame(endTime + 1, 0, 0, ReplayButtonState.None));
 
                 if (i < beatmap.HitObjects.Count - 1)
                 {
                     double waitTime = beatmap.HitObjects[i + 1].StartTime - 1000;
                     if (waitTime > endTime)
-                        Frames.Add(new LegacyReplayFrame(waitTime, 0, 0, LegacyButtonState.None));
+                        Frames.Add(new ReplayFrame(waitTime, 0, 0, ReplayButtonState.None));
                 }
 
                 hitButton = !hitButton;
             }
-
-            //Player.currentScore.Replay = InputManager.ReplayScore.Replay;
-            //Player.currentScore.PlayerName = "mekkadosu!";
         }
     }
 }

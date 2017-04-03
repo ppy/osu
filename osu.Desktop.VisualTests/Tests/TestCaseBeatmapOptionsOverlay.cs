@@ -26,7 +26,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(overlay);
 
-            AddButton(@"Toggle", overlay.ToggleVisibility);
+            AddStep(@"Toggle", overlay.ToggleVisibility);
         }
     }
 }
