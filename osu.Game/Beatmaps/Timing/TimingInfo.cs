@@ -46,32 +46,6 @@ namespace osu.Game.Beatmaps.Timing
         }
 
         /// <summary>
-        /// Finds the beat velocity at a time.
-        /// </summary>
-        /// <param name="time">The time to find the velocity at.</param>
-        /// <returns>The velocity.</returns>
-        public double BeatVelocityAt(double time)
-        {
-            ControlPoint overridePoint;
-            ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
-
-            return overridePoint?.VelocityAdjustment ?? timingPoint?.VelocityAdjustment ?? 1;
-        }
-
-        /// <summary>
-        /// Finds the beat length at a time.
-        /// </summary>
-        /// <param name="time">The time to find the beat length at.</param>
-        /// <returns>The beat length in positional length units.</returns>
-        public double BeatDistanceAt(double time)
-        {
-            ControlPoint overridePoint;
-            ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
-
-            return (timingPoint?.BeatLength ?? 1) * (overridePoint?.VelocityAdjustment ?? timingPoint?.VelocityAdjustment ?? 1);
-        }
-
-        /// <summary>
         /// Finds the timing point at a time.
         /// </summary>
         /// <param name="time">The time to find the timing point at.</param>
