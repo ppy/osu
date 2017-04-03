@@ -15,6 +15,8 @@ namespace osu.Game.Database
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
 
+        public int BeatmapVersion;
+
         public int? OnlineBeatmapID { get; set; }
 
         public int? OnlineBeatmapSetID { get; set; }
