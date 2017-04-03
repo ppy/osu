@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
+using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 using System;
 using System.Linq;
 
@@ -20,14 +21,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
         protected override Container<Framework.Graphics.Drawable> Content => bodyContainer;
 
+        protected readonly CirclePiece Circle;
+
         private readonly Hit hit;
+
+        private readonly Container bodyContainer;
 
         /// <summary>
         /// Whether the last key pressed is a valid hit key.
         /// </summary>
         private bool validKeyPressed;
-
-        private readonly Container bodyContainer;
 
         protected DrawableHit(Hit hit)
             : base(hit)
@@ -38,7 +41,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Children = new[]
+                {
+                    Circle = CreateCirclePiece()
+                }
             });
+
+            Circle.KiaiMode = HitObject.Kiai;
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -100,5 +109,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
             Expire();
         }
+
+        protected abstract CirclePiece CreateCirclePiece();
     }
 }

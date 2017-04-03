@@ -7,8 +7,10 @@ using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Types;
 using osu.Game.Modes.Taiko.Objects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Database;
 
 namespace osu.Game.Modes.Taiko.Beatmaps
 {
@@ -24,74 +26,100 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 
             return new Beatmap<TaikoHitObject>(original)
             {
-                HitObjects = convertHitObjects(original.HitObjects)
+                HitObjects = original.HitObjects.SelectMany(h => convertHitObject(h, original)).ToList()
             };
         }
 
-        private List<TaikoHitObject> convertHitObjects(List<HitObject> hitObjects)
-        {
-            return hitObjects.Select(convertHitObject).ToList();
-        }
-
-        private TaikoHitObject convertHitObject(HitObject original)
+        private IEnumerable<TaikoHitObject> convertHitObject(HitObject obj, Beatmap beatmap)
         {
             // Check if this HitObject is already a TaikoHitObject, and return it if so
-            TaikoHitObject originalTaiko = original as TaikoHitObject;
+            var originalTaiko = obj as TaikoHitObject;
             if (originalTaiko != null)
-                return originalTaiko;
+                yield return originalTaiko;
 
-            IHasDistance distanceData = original as IHasDistance;
-            IHasRepeats repeatsData = original as IHasRepeats;
-            IHasEndTime endTimeData = original as IHasEndTime;
+            var distanceData = obj as IHasDistance;
+            var repeatsData = obj as IHasRepeats;
+            var endTimeData = obj as IHasEndTime;
 
             // Old osu! used hit sounding to determine various hit type information
-            SampleType sample = original.Sample?.Type ?? SampleType.None;
+            SampleType sample = obj.Sample?.Type ?? SampleType.None;
 
             bool strong = (sample & SampleType.Finish) > 0;
 
             if (distanceData != null)
             {
-                return new DrumRoll
+                double sv = beatmap.TimingInfo.SliderVelocityAt(obj.StartTime) * beatmap.BeatmapInfo.Difficulty.SliderMultiplier;
+
+                double l = distanceData.Distance * legacy_velocity_scale;
+                double v = sv * legacy_velocity_scale;
+                double bl = beatmap.TimingInfo.BeatLengthAt(obj.StartTime);
+
+                int repeats = repeatsData?.RepeatCount ?? 1;
+
+                double skipPeriod = Math.Min(bl / beatmap.BeatmapInfo.Difficulty.SliderTickRate, distanceData.Duration / repeats);
+
+                if (skipPeriod > 0 && l / v * 1000 < 2 * bl)
                 {
-                    StartTime = original.StartTime,
-                    Sample = original.Sample,
+                    for (double j = obj.StartTime; j <= distanceData.EndTime + skipPeriod / 8; j += skipPeriod)
+                    {
+                        // Todo: This should generate different type of hits (including strongs)
+                        // depending on hitobject sound additions (not implemented fully yet)
+                        yield return new CentreHit
+                        {
+                            StartTime = obj.StartTime,
+                            Sample = obj.Sample,
+                            IsStrong = strong
+                        };
+                    }
+                }
+                else
+                {
+                    yield return new DrumRoll
+                    {
+                        StartTime = obj.StartTime,
+                        Sample = obj.Sample,
+                        IsStrong = strong,
+                        Distance = distanceData.Distance * (repeatsData?.RepeatCount ?? 1) * legacy_velocity_scale
+                    };
+                }
+            }
+            else if (endTimeData != null)
+            {
+                double hitMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.OverallDifficulty, 3, 5, 7.5) * bash_convert_factor;
+
+                yield return new Swell
+                {
+                    StartTime = obj.StartTime,
+                    Sample = obj.Sample,
                     IsStrong = strong,
 
-                    Distance = distanceData.Distance * (repeatsData?.RepeatCount ?? 1)
+                    EndTime = endTimeData.EndTime,
+                    RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier)
                 };
             }
-
-            if (endTimeData != null)
+            else
             {
-                // We compute the end time manually to add in the Bash convert factor
-                return new Swell
+                bool isCentre = (sample & ~(SampleType.Finish | SampleType.Normal)) == 0;
+
+                if (isCentre)
                 {
-                    StartTime = original.StartTime,
-                    Sample = original.Sample,
-                    IsStrong = strong,
-
-                    EndTime = original.StartTime + endTimeData.Duration * bash_convert_factor 
-                };
-            }
-
-            bool isCentre = (sample & ~(SampleType.Finish | SampleType.Normal)) == 0;
-
-            if (isCentre)
-            {
-                return new CentreHit
+                    yield return new CentreHit
+                    {
+                        StartTime = obj.StartTime,
+                        Sample = obj.Sample,
+                        IsStrong = strong
+                    };
+                }
+                else
                 {
-                    StartTime = original.StartTime,
-                    Sample = original.Sample,
-                    IsStrong = strong
-                };
+                    yield return new RimHit
+                    {
+                        StartTime = obj.StartTime,
+                        Sample = obj.Sample,
+                        IsStrong = strong,
+                    };
+                }
             }
-
-            return new RimHit
-            {
-                StartTime = original.StartTime,
-                Sample = original.Sample,
-                IsStrong = strong,
-            };
         }
     }
 }
