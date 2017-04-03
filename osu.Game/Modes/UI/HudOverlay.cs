@@ -28,6 +28,8 @@ namespace osu.Game.Modes.UI
         private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
 
+        private readonly Container hud;
+
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract ComboCounter CreateComboCounter();
         protected abstract PercentageCounter CreateAccuracyCounter();
@@ -39,14 +41,19 @@ namespace osu.Game.Modes.UI
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
 
-            Children = new Drawable[]
+            Add(hud = new Container
             {
-                KeyCounter = CreateKeyCounter(),
-                ComboCounter = CreateComboCounter(),
-                ScoreCounter = CreateScoreCounter(),
-                AccuracyCounter = CreateAccuracyCounter(),
-                HealthDisplay = CreateHealthDisplay(),
-            };
+                RelativeSizeAxes = Axes.Both,
+
+                Children = new Drawable[]
+                {
+                    KeyCounter = CreateKeyCounter(),
+                    ComboCounter = CreateComboCounter(),
+                    ScoreCounter = CreateScoreCounter(),
+                    AccuracyCounter = CreateAccuracyCounter(),
+                    HealthDisplay = CreateHealthDisplay(),
+                }
+            });
         }
 
         [BackgroundDependencyLoader(true)]
@@ -80,9 +87,9 @@ namespace osu.Game.Modes.UI
         private void hudVisibilityChanged(object sender, EventArgs e)
         {
             if (showHud)
-                Show();
+                hud.Show();
             else
-                Hide();
+                hud.Hide();
         }
 
         public void BindProcessor(ScoreProcessor processor)
