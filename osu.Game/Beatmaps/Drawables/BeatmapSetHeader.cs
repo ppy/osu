@@ -22,8 +22,9 @@ namespace osu.Game.Beatmaps.Drawables
         public Action<BeatmapSetHeader> GainedSelection;
         private readonly SpriteText title;
         private readonly SpriteText artist;
-        private OsuConfigManager config;
+
         private Bindable<bool> preferUnicode;
+
         private readonly WorkingBeatmap beatmap;
         private readonly FillFlowContainer difficultyIcons;
 
@@ -83,24 +84,13 @@ namespace osu.Game.Beatmaps.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            this.config = config;
-
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
-            preferUnicode.ValueChanged += preferUnicode_changed;
-            preferUnicode_changed(preferUnicode, null);
-        }
-
-        private void preferUnicode_changed(object sender, EventArgs e)
-        {
-            title.Text = config.GetUnicodeString(beatmap.BeatmapSetInfo.Metadata.Title, beatmap.BeatmapSetInfo.Metadata.TitleUnicode);
-            artist.Text = config.GetUnicodeString(beatmap.BeatmapSetInfo.Metadata.Artist, beatmap.BeatmapSetInfo.Metadata.ArtistUnicode);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            if (preferUnicode != null)
-                preferUnicode.ValueChanged -= preferUnicode_changed;
-            base.Dispose(isDisposing);
+            preferUnicode.ValueChanged += unicode =>
+            {
+                title.Text =  unicode ? beatmap.BeatmapSetInfo.Metadata.TitleUnicode : beatmap.BeatmapSetInfo.Metadata.Title;
+                artist.Text = unicode ? beatmap.BeatmapSetInfo.Metadata.ArtistUnicode : beatmap.BeatmapSetInfo.Metadata.Artist;
+            };
+            preferUnicode.TriggerChange();
         }
 
         private class PanelBackground : BufferedContainer

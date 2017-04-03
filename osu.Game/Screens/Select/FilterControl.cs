@@ -151,8 +151,8 @@ namespace osu.Game.Screens.Select
 
             groupTabs.PinItem(GroupMode.All);
             groupTabs.PinItem(GroupMode.RecentlyPlayed);
-            groupTabs.ItemChanged += (sender, value) => Group = value;
-            sortTabs.ItemChanged += (sender, value) => Sort = value;
+            groupTabs.SelectedItem.ValueChanged += val => Group = val;
+            sortTabs.SelectedItem.ValueChanged += val => Sort = val;
         }
 
         public void Deactivate()
@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Select
 
             if (osu != null)
                 playMode.BindTo(osu.PlayMode);
-            playMode.ValueChanged += (s, e) => FilterChanged?.Invoke(CreateCriteria());
+            playMode.ValueChanged += val => FilterChanged?.Invoke(CreateCriteria());
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;

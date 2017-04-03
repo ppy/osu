@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select
                 },
             };
 
-            tabs.SelectedItem.ValueChanged += (sender, e) => invokeOnFilter();
+            tabs.SelectedItem.ValueChanged += item => invokeOnFilter();
             modsCheckbox.Action += (sender, e) => invokeOnFilter();
 
             tabs.SelectedItem.Value = BeatmapDetailTab.Global;
