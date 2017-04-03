@@ -31,7 +31,7 @@ namespace osu.Game.Modes.UI
         private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
 
-        private static bool has_shown_notification_once = false;
+        private static bool hasShownNotificationOnce;
 
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract ComboCounter CreateComboCounter();
@@ -69,9 +69,9 @@ namespace osu.Game.Modes.UI
             showHud.ValueChanged += hudVisibilityChanged;
             showHud.TriggerChange();
 
-            if (!showHud && !has_shown_notification_once)
+            if (!showHud && !hasShownNotificationOnce)
             {
-                has_shown_notification_once = true;
+                hasShownNotificationOnce = true;
 
                 notificationManager?.Post(new SimpleNotification
                 {
