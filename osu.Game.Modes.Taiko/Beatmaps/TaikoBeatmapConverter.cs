@@ -87,14 +87,13 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             {
                 double hitMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.OverallDifficulty, 3, 5, 7.5) * bash_convert_factor;
 
-                // We compute the end time manually to add in the Bash convert factor
                 yield return new Swell
                 {
                     StartTime = obj.StartTime,
                     Sample = obj.Sample,
                     IsStrong = strong,
 
-                    EndTime = obj.StartTime + endTimeData.Duration,
+                    EndTime = endTimeData.EndTime,
                     RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier)
                 };
             }
