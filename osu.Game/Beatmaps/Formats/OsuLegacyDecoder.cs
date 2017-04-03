@@ -273,10 +273,10 @@ namespace osu.Game.Beatmaps.Formats
 
             HitObjectParser parser = null;
 
+            Section section = Section.None;
             bool hasCustomColours = false;
 
-            Section section = Section.None;
-            string line = null;
+            string line;
             while ((line = stream.ReadLine()) != null)
             {
                 if (string.IsNullOrEmpty(line))
