@@ -20,9 +20,9 @@ namespace osu.Game.Screens
         private void load(OsuGame game)
         {
             if (game.IsDeployedBuild)
-                new Disclaimer().LoadAsync(game, d => Push((Screen)d));
+                LoadComponentAsync(new Disclaimer(), d => Push((Screen)d));
             else
-                new Intro().LoadAsync(game, d => Push((Screen)d));
+                LoadComponentAsync(new Intro(), d => Push((Screen)d));
         }
     }
 }
