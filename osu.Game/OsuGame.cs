@@ -26,7 +26,6 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Modes.Scoring;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Overlays.Music;
 using System.Linq;
 using osu.Game.Screens.Play;
 

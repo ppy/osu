@@ -35,14 +35,13 @@ namespace osu.Game.Overlays
         private TextAwesome playButton;
         private SpriteText title, artist;
 
-        private List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
+        private readonly List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
         private int playHistoryIndex = -1;
 
         private TrackManager trackManager;
         private Bindable<WorkingBeatmap> beatmapSource;
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap current;
-        private BeatmapDatabase beatmaps;
 
         public BeatmapDatabase Beatmaps => playlistController.Beatmaps;
         public List<BeatmapSetInfo> PlayList => playlistController.PlayList;
@@ -319,12 +318,11 @@ namespace osu.Game.Overlays
                     var minAvailableIndex = 0;
                     if (availableIndexes.Contains(PlayListIndex))
                         minAvailableIndex = availableIndexes.IndexOf(PlayListIndex);
-                    var playlistFiltered = availableIndexes.Count != playListCount;
                     var j = availableIndexes[RNG.Next(minAvailableIndex, availableIndexes.Count)];
 
                     nextToPlay = PlayListIndex == availableIndexes.Last()
-                        ? nextToPlay = PlayList[availableIndexes.First()].Beatmaps[0]
-                        : nextToPlay = PlayList[MathHelper.Clamp(minAvailableIndex, j, availableIndexes.Last())].Beatmaps[0];
+                        ? PlayList[availableIndexes.First()].Beatmaps[0]
+                        : PlayList[MathHelper.Clamp(minAvailableIndex, j, availableIndexes.Last())].Beatmaps[0];
                 } while (nextToPlay.AudioEquals(current?.BeatmapInfo));
 
                 play(nextToPlay, true);

@@ -31,8 +31,8 @@ namespace osu.Game.Overlays.Music
 
         public Bindable<WorkingBeatmap> BeatmapSource { get; private set; }
 
-        private Playlist playlistView;
-        private SearchTextBox searchTextBox;
+        private readonly Playlist playlistView;
+        private readonly SearchTextBox searchTextBox;
         private ScheduledDelegate lastScheduledSearch;
 
         private bool handleInput;

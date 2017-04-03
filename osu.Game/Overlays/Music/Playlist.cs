@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Music
 {
     public class Playlist : Container
     {
-        private FlowContainer<PlaylistItem> playlistFlow;
+        private readonly FlowContainer<PlaylistItem> playlistFlow;
         private List<BeatmapSetInfo> items;
         private BeatmapSetInfo selectedItem;
 

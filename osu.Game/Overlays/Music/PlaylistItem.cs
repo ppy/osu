@@ -19,7 +19,8 @@ namespace osu.Game.Overlays.Music
 {
     public class PlaylistItem : ClickableContainer, IStateful<PlaylistItemState>
     {
-        private SpriteText artist, title;
+        private readonly SpriteText artist;
+        private readonly SpriteText title;
         private PlaylistItemState _state;
         private Func<string, string, string> unicodeString;
         private Bindable<bool> preferUnicode;
