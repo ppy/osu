@@ -58,8 +58,6 @@ namespace osu.Game.Modes.UI
 
         public void BindProcessor(ScoreProcessor processor)
         {
-            //bind processor bindables to combocounter, score display etc.
-            //TODO: these should be bindable binds, not events!
             ScoreCounter?.Current.BindTo(processor.TotalScore);
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
             ComboCounter?.Current.BindTo(processor.Combo);
