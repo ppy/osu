@@ -10,6 +10,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
     public class DrawableMajorBarLine : DrawableBarLine
     {
+        /// <summary>
+        /// The vertical offset of the triangles from the line tracker.
+        /// </summary>
+        private const float triangle_offfset = 10f;
+
+        /// <summary>
+        /// The size of the triangles.
+        /// </summary>
+        private const float triangle_size = 20f;
+
         public DrawableMajorBarLine(BarLine barLine)
             : base(barLine)
         {
@@ -17,33 +27,25 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-
                 RelativeSizeAxes = Axes.Both,
-
                 Children = new[]
                 {
                     new EquilateralTriangle
                     {
                         Name = "Top",
-
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-
-                        Position = new Vector2(0, -10),
-                        Size = new Vector2(-20),
-
+                        Position = new Vector2(0, -triangle_offfset),
+                        Size = new Vector2(-triangle_size),
                         EdgeSmoothness = new Vector2(1),
                     },
                     new EquilateralTriangle
                     {
                         Name = "Bottom",
-
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.TopCentre,
-
-                        Position = new Vector2(0, 10),
-                        Size = new Vector2(20),
-
+                        Position = new Vector2(0, triangle_offfset),
+                        Size = new Vector2(triangle_size),
                         EdgeSmoothness = new Vector2(1),
                     }
                 }

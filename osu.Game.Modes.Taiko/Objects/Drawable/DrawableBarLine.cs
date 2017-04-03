@@ -14,6 +14,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
     public class DrawableBarLine : Container
     {
         /// <summary>
+        /// The width of the line tracker.
+        /// </summary>
+        private const float tracker_width = 2f;
+
+        /// <summary>
+        /// Fade out time calibrated to a pre-empt of 1000ms.
+        /// </summary>
+        private const float base_fadeout_time = 100f;
+
+        /// <summary>
         /// The visual line tracker.
         /// </summary>
         protected Box Tracker;
@@ -33,7 +43,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             RelativePositionAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
 
-            Width = 2f;
+            Width = tracker_width;
 
             Children = new[]
             {
@@ -41,9 +51,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-
                     RelativeSizeAxes = Axes.Both,
-
                     EdgeSmoothness = new Vector2(0.5f, 0),
                     Alpha = 0.75f
                 }
@@ -58,7 +66,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             LifetimeEnd = BarLine.StartTime + BarLine.PreEmpt;
 
             Delay(BarLine.StartTime - Time.Current);
-            FadeOut(100 * BarLine.PreEmpt / 1000);
+            FadeOut(base_fadeout_time * BarLine.PreEmpt / 1000);
         }
 
         private void updateScrollPosition(double time) => MoveToX((float)((BarLine.StartTime - time) / BarLine.PreEmpt));
