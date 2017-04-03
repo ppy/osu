@@ -73,6 +73,16 @@ namespace osu.Desktop.VisualTests.Tests
             });
         }
 
+        private void addSwell()
+        {
+            playfield.Add(new DrawableSwell(new Swell
+            {
+                StartTime = Time.Current + 1000,
+                EndTime = Time.Current + 5000,
+                PreEmpt = 1000
+            }));
+        }
+        
         private void addDrumRoll(bool strong)
         {
             var d = new DrumRoll
@@ -83,16 +93,6 @@ namespace osu.Desktop.VisualTests.Tests
             };
 
             playfield.Add(strong ? new DrawableStrongDrumRoll(d) : new DrawableDrumRoll(d));
-        }
-
-        private void addSwell()
-        {
-            playfield.Add(new DrawableSwell(new Swell
-            {
-                StartTime = Time.Current + 1000,
-                EndTime = Time.Current + 5000,
-                PreEmpt = 1000
-            }));
         }
 
         private void addCentreHit(bool strong)
