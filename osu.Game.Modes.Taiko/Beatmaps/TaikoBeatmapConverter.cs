@@ -72,7 +72,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         // depending on hitobject sound additions (not implemented fully yet)
                         yield return new CentreHit
                         {
-                            StartTime = obj.StartTime,
+                            StartTime = j,
                             Sample = obj.Sample,
                             IsStrong = strong,
                             VelocityMultiplier = legacy_velocity_scale
