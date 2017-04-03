@@ -20,6 +20,11 @@ namespace osu.Game.Modes.Taiko.Objects
         private const double base_scroll_time = 6000;
 
         /// <summary>
+        /// The velocity multiplier applied to this hit object.
+        /// </summary>
+        public float VelocityMultiplier = 1;
+
+        /// <summary>
         /// The time to scroll in the HitObject.
         /// </summary>
         public double PreEmpt;
@@ -39,7 +44,7 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.ApplyDefaults(timing, difficulty);
 
-            PreEmpt = base_scroll_time / difficulty.SliderMultiplier * timing.BeatLengthAt(StartTime) * timing.SpeedMultiplierAt(StartTime) / 1000;
+            PreEmpt = base_scroll_time / difficulty.SliderMultiplier * timing.BeatLengthAt(StartTime) * timing.SpeedMultiplierAt(StartTime) / VelocityMultiplier / 1000;
 
             ControlPoint overridePoint;
             Kiai = timing.TimingPointAt(StartTime, out overridePoint).KiaiMode;

@@ -11,14 +11,14 @@ namespace osu.Game.Modes.Taiko.Objects
         public bool FirstTick;
 
         /// <summary>
-        /// The distance between this tick and the next in milliseconds.
+        /// The length (in milliseconds) between this tick and the next.
         /// <para>Half of this value is the hit window of the tick.</para>
         /// </summary>
-        public double TickTimeDistance;
+        public double TickSpacing;
 
         /// <summary>
         /// The time allowed to hit this tick.
         /// </summary>
-        public double HitWindow => TickTimeDistance / 2;
+        public double HitWindow => TickSpacing / 2;
     }
 }
