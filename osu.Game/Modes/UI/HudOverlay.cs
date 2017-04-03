@@ -39,7 +39,6 @@ namespace osu.Game.Modes.UI
         protected HudOverlay()
         {
             RelativeSizeAxes = Axes.Both;
-            AlwaysPresent = true;
 
             Add(hud = new Container
             {
