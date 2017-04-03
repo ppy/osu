@@ -4,7 +4,6 @@
 using System.IO;
 using System.Linq;
 using osu.Game.Beatmaps.IO;
-using osu.Game.Beatmaps;
 
 namespace osu.Desktop.Beatmaps.IO
 {
@@ -38,6 +37,5 @@ namespace osu.Desktop.Beatmaps.IO
         {
             // no-op
         }
-
     }
 }
