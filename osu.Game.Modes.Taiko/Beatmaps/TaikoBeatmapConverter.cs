@@ -15,14 +15,27 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 {
     internal class TaikoBeatmapConverter : IBeatmapConverter<TaikoHitObject>
     {
-        private const float legacy_velocity_scale = 1.4f;
-        private const float bash_convert_factor = 1.65f;
-        private const float base_scoring_distance = 100;
+        /// <summary>
+        /// osu! is generally slower than taiko, so a factor is added to increase
+        /// speed. This must be used everywhere slider length or beat length is used.
+        /// </summary>
+        private const float legacy_velocity_multiplier = 1.4f;
+
+        /// <summary>
+        /// Because swells are easier in taiko than spinners are in osu!,
+        /// legacy taiko multiplies a factor when converting the number of required hits.
+        /// </summary>
+        private const float swell_hit_multiplier = 1.65f;
+
+        /// <summary>
+        /// Base osu! slider scoring distance.
+        /// </summary>
+        private const float osu_base_scoring_distance = 100;
 
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
         /// </summary>
-        private const float base_distance = 100;
+        private const float taiko_base_distance = 100;
 
         public Beatmap<TaikoHitObject> Convert(Beatmap original)
         {
@@ -56,10 +69,10 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                 double speedAdjustedBeatLength = beatmap.TimingInfo.BeatLengthAt(obj.StartTime) * speedAdjustment;
                 
                 // The true distance, accounting for any repeats. This ends up being the drum roll distance later
-                double distance = distanceData.Distance * repeats * legacy_velocity_scale;
+                double distance = distanceData.Distance * repeats * legacy_velocity_multiplier;
 
                 // The velocity of the taiko hit object - calculated as the velocity of a drum roll
-                double taikoVelocity = base_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength * legacy_velocity_scale;
+                double taikoVelocity = taiko_base_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength * legacy_velocity_multiplier;
                 // The duration of the taiko hit object
                 double taikoDuration = distance / taikoVelocity;
 
@@ -69,7 +82,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     speedAdjustedBeatLength /= speedAdjustment;
 
                 // The velocity of the osu! hit object - calculated as the velocity of a slider
-                double osuVelocity = base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength * legacy_velocity_scale;
+                double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength * legacy_velocity_multiplier;
                 // The duration of the osu! hit object
                 double osuDuration = distance / osuVelocity;
 
@@ -87,7 +100,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                             StartTime = j,
                             Sample = obj.Sample,
                             IsStrong = strong,
-                            VelocityMultiplier = legacy_velocity_scale
+                            VelocityMultiplier = legacy_velocity_multiplier
                         };
                     }
                 }
@@ -100,13 +113,13 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         IsStrong = strong,
                         Distance = distance,
                         TickRate = beatmap.BeatmapInfo.Difficulty.SliderTickRate == 3 ? 3 : 4,
-                        VelocityMultiplier = legacy_velocity_scale
+                        VelocityMultiplier = legacy_velocity_multiplier
                     };
                 }
             }
             else if (endTimeData != null)
             {
-                double hitMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.OverallDifficulty, 3, 5, 7.5) * bash_convert_factor;
+                double hitMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.OverallDifficulty, 3, 5, 7.5) * swell_hit_multiplier;
 
                 yield return new Swell
                 {
@@ -115,7 +128,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     IsStrong = strong,
                     EndTime = endTimeData.EndTime,
                     RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier),
-                    VelocityMultiplier = legacy_velocity_scale
+                    VelocityMultiplier = legacy_velocity_multiplier
                 };
             }
             else
@@ -129,7 +142,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         StartTime = obj.StartTime,
                         Sample = obj.Sample,
                         IsStrong = strong,
-                        VelocityMultiplier = legacy_velocity_scale
+                        VelocityMultiplier = legacy_velocity_multiplier
                     };
                 }
                 else
@@ -139,7 +152,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         StartTime = obj.StartTime,
                         Sample = obj.Sample,
                         IsStrong = strong,
-                        VelocityMultiplier = legacy_velocity_scale
+                        VelocityMultiplier = legacy_velocity_multiplier
                     };
                 }
             }
