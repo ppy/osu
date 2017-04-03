@@ -46,7 +46,7 @@ namespace osu.Game.Modes.Taiko.UI
             }
 
             var rimHit = h as RimHit;
-            if (centreHit != null)
+            if (rimHit != null)
             {
                 if (h.IsStrong)
                     return new DrawableStrongRimHit(rimHit);
