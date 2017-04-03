@@ -128,6 +128,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                     }
                 }
             };
+
+            circlePiece.KiaiMode = HitObject.Kiai;
         }
 
         [BackgroundDependencyLoader]
