@@ -10,6 +10,7 @@ using osu.Game.Modes.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Database;
 
 namespace osu.Game.Modes.Taiko.Beatmaps
 {
@@ -84,6 +85,8 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             }
             else if (endTimeData != null)
             {
+                double hitMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.OverallDifficulty, 3, 5, 7.5) * bash_convert_factor;
+
                 // We compute the end time manually to add in the Bash convert factor
                 yield return new Swell
                 {
@@ -92,7 +95,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     IsStrong = strong,
 
                     EndTime = obj.StartTime + endTimeData.Duration,
-                    HitMultiplier = bash_convert_factor
+                    RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier)
                 };
             }
             else
