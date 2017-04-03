@@ -30,13 +30,13 @@ namespace osu.Game.Modes.Taiko.Objects
         /// <summary>
         /// Velocity of the drum roll in positional length units per millisecond.
         /// </summary>
-        public double Velocity { get; protected set; }
+        public double Velocity { get; protected set; } = 5;
 
         /// <summary>
         /// The distance between ticks of this drumroll.
         /// <para>Half of this value is the hit window of the ticks.</para>
         /// </summary>
-        public double TickTimeDistance { get; protected set; }
+        public double TickTimeDistance { get; protected set; } = 100;
 
         /// <summary>
         /// Number of drum roll ticks required for a "Good" hit.
@@ -93,6 +93,7 @@ namespace osu.Game.Modes.Taiko.Objects
                     PreEmpt = PreEmpt,
                     TickTimeDistance = TickTimeDistance,
                     StartTime = t,
+                    IsStrong = IsStrong,
                     Sample = new HitSampleInfo
                     {
                         Type = SampleType.None,

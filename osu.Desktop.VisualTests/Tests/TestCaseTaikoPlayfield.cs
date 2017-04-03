@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
 using osu.Game.Modes.Objects.Drawables;
@@ -26,6 +25,8 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddStep("Hit!", addHitJudgement);
             AddStep("Miss :(", addMissJudgement);
+            AddStep("DrumRoll", () => addDrumRoll(false));
+            AddStep("Strong DrumRoll", () => addDrumRoll(true));
             AddStep("Swell", addSwell);
             AddStep("Centre", () => addCentreHit(false));
             AddStep("Strong Centre", () => addCentreHit(true));
@@ -38,7 +39,6 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 RelativeSizeAxes = Axes.X,
                 Y = 200,
-                Padding = new MarginPadding { Left = 200 },
                 Children = new[]
                 {
                     playfield = new TaikoPlayfield()
@@ -94,6 +94,18 @@ namespace osu.Desktop.VisualTests.Tests
                 EndTime = Time.Current + 5000,
                 PreEmpt = 1000
             }));
+        }
+        
+        private void addDrumRoll(bool strong)
+        {
+            var d = new DrumRoll
+            {
+                StartTime = Time.Current + 1000,
+                Distance = 20000,
+                PreEmpt = 1000,
+            };
+
+            playfield.Add(strong ? new DrawableStrongDrumRoll(d) : new DrawableDrumRoll(d));
         }
 
         private void addCentreHit(bool strong)

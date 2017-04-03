@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Modes.Taiko.Objects.Drawable;
+using System.Linq;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Modes.Taiko.UI
     {
         /// <summary>
         /// The play field height. This is relative to the size of hit objects
-        /// such that the playfield is just a bit larger than finishers.
+        /// such that the playfield is just a bit larger than strong hits.
         /// </summary>
         public const float PLAYFIELD_HEIGHT = TaikoHitObject.CIRCLE_RADIUS * 2 * 2;
 
@@ -181,9 +182,7 @@ namespace osu.Game.Modes.Taiko.UI
         public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> judgedObject)
         {
             bool wasHit = judgedObject.Judgement.Result == HitResult.Hit;
-
-            if (wasHit)
-                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement));
+            bool secondHit = judgedObject.Judgement.SecondHit;
 
             judgementContainer.Add(new DrawableTaikoJudgement(judgedObject.Judgement)
             {
@@ -192,6 +191,22 @@ namespace osu.Game.Modes.Taiko.UI
                 RelativePositionAxes = Axes.X,
                 X = wasHit ? judgedObject.Position.X : 0,
             });
+
+            if (!wasHit)
+                return;
+
+            if (!secondHit)
+            {
+                if (judgedObject.X >= -0.05f && !(judgedObject is DrawableSwell))
+                {
+                    // If we're far enough away from the left stage, we should bring outselves in front of it
+                    topLevelHitContainer.Add(judgedObject.CreateProxy());
+                }
+
+                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement));
+            }
+            else
+                hitExplosionContainer.Children.FirstOrDefault(e => e.Judgement == judgedObject.Judgement)?.VisualiseSecondHit();
         }
     }
 }
