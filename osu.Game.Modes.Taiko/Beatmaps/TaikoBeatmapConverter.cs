@@ -70,7 +70,8 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     Sample = original.Sample,
                     IsStrong = strong,
 
-                    EndTime = original.StartTime + endTimeData.Duration * bash_convert_factor 
+                    EndTime = original.StartTime + endTimeData.Duration,
+                    HitMultiplier = bash_convert_factor
                 };
             }
 
