@@ -15,6 +15,11 @@ namespace osu.Game.Modes.Taiko.Objects
         public const float CIRCLE_RADIUS = 42f;
 
         /// <summary>
+        /// Time (in milliseconds) to scroll in the hit object with a speed-adjusted beat length of 1 second.
+        /// </summary>
+        private const double base_scroll_time = 6000;
+
+        /// <summary>
         /// The time to scroll in the HitObject.
         /// </summary>
         public double PreEmpt;
@@ -34,7 +39,7 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.ApplyDefaults(timing, difficulty);
 
-            PreEmpt = 600 / (timing.SliderVelocityAt(StartTime) * difficulty.SliderMultiplier) * 1000;
+            PreEmpt = base_scroll_time / difficulty.SliderMultiplier * timing.BeatLengthAt(StartTime) * timing.SpeedMultiplierAt(StartTime) / 1000;
 
             ControlPoint overridePoint;
             Kiai = timing.TimingPointAt(StartTime, out overridePoint).KiaiMode;

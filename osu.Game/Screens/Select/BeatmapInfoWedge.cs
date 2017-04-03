@@ -103,111 +103,109 @@ namespace osu.Game.Screens.Select
                 labels.AddRange(Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
             }
 
-            Add(beatmapInfoContainer = new AsyncLoadContainer
-            {
-                FinishedLoading = d =>
-                {
-                    FadeIn(250);
+            AlwaysPresent = true;
 
-                    lastContainer?.FadeOut(250);
-                    lastContainer?.Expire();
-                },
-                Depth = newDepth,
-                RelativeSizeAxes = Axes.Both,
-                Children = new[]
+            Add(beatmapInfoContainer = new AsyncLoadWrapper(
+                new BufferedContainer
                 {
-                    new BufferedContainer
+                    OnLoadComplete = d =>
                     {
-                        PixelSnapping = true,
-                        CacheDrawnFrameBuffer = true,
-                        Shear = -Shear,
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        FadeIn(250);
+
+                        lastContainer?.FadeOut(250);
+                        lastContainer?.Expire();
+                    },
+                    PixelSnapping = true,
+                    CacheDrawnFrameBuffer = true,
+                    Shear = -Shear,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        // We will create the white-to-black gradient by modulating transparency and having
+                        // a black backdrop. This results in an sRGB-space gradient and not linear space,
+                        // transitioning from white to black more perceptually uniformly.
+                        new Box
                         {
-                            // We will create the white-to-black gradient by modulating transparency and having
-                            // a black backdrop. This results in an sRGB-space gradient and not linear space,
-                            // transitioning from white to black more perceptually uniformly.
-                            new Box
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                        },
+                        // We use a container, such that we can set the colour gradient to go across the
+                        // vertices of the masked container instead of the vertices of the (larger) sprite.
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            ColourInfo = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
+                            Children = new[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Black,
-                            },
-                            // We use a container, such that we can set the colour gradient to go across the
-                            // vertices of the masked container instead of the vertices of the (larger) sprite.
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                ColourInfo = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
-                                Children = new[]
+                                // Zoomed-in and cropped beatmap background
+                                new BeatmapBackgroundSprite(beatmap)
                                 {
-                                    // Zoomed-in and cropped beatmap background
-                                    new BeatmapBackgroundSprite(beatmap)
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        FillMode = FillMode.Fill,
-                                    },
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    FillMode = FillMode.Fill,
                                 },
                             },
-                            // Text for beatmap info
-                            new FillFlowContainer
+                        },
+                        // Text for beatmap info
+                        new FillFlowContainer
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Direction = FillDirection.Vertical,
+                            Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
+                            AutoSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                Direction = FillDirection.Vertical,
-                                Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
-                                AutoSizeAxes = Axes.Both,
-                                Children = new Drawable[]
+                                new OsuSpriteText
                                 {
-                                    new OsuSpriteText
+                                    Font = @"Exo2.0-MediumItalic",
+                                    Text = metadata.Artist + " -- " + metadata.Title,
+                                    TextSize = 28,
+                                    Shadow = true,
+                                },
+                                new OsuSpriteText
+                                {
+                                    Font = @"Exo2.0-MediumItalic",
+                                    Text = beatmapInfo.Version,
+                                    TextSize = 17,
+                                    Shadow = true,
+                                },
+                                new FillFlowContainer
+                                {
+                                    Margin = new MarginPadding { Top = 10 },
+                                    Direction = FillDirection.Horizontal,
+                                    AutoSizeAxes = Axes.Both,
+                                    Children = new[]
                                     {
-                                        Font = @"Exo2.0-MediumItalic",
-                                        Text = metadata.Artist + " -- " + metadata.Title,
-                                        TextSize = 28,
-                                        Shadow = true,
-                                    },
-                                    new OsuSpriteText
-                                    {
-                                        Font = @"Exo2.0-MediumItalic",
-                                        Text = beatmapInfo.Version,
-                                        TextSize = 17,
-                                        Shadow = true,
-                                    },
-                                    new FillFlowContainer
-                                    {
-                                        Margin = new MarginPadding { Top = 10 },
-                                        Direction = FillDirection.Horizontal,
-                                        AutoSizeAxes = Axes.Both,
-                                        Children = new[]
+                                        new OsuSpriteText
                                         {
-                                            new OsuSpriteText
-                                            {
-                                                Font = @"Exo2.0-Medium",
-                                                Text = "mapped by ",
-                                                TextSize = 15,
-                                                Shadow = true,
-                                            },
-                                            new OsuSpriteText
-                                            {
-                                                Font = @"Exo2.0-Bold",
-                                                Text = metadata.Author,
-                                                TextSize = 15,
-                                                Shadow = true,
-                                            },
-                                        }
-                                    },
-                                    new FillFlowContainer
-                                    {
-                                        Margin = new MarginPadding { Top = 20 },
-                                        Spacing = new Vector2(40, 0),
-                                        AutoSizeAxes = Axes.Both,
-                                        Children = labels
-                                    },
-                                }
-                            },
-                        }
+                                            Font = @"Exo2.0-Medium",
+                                            Text = "mapped by ",
+                                            TextSize = 15,
+                                            Shadow = true,
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Font = @"Exo2.0-Bold",
+                                            Text = metadata.Author,
+                                            TextSize = 15,
+                                            Shadow = true,
+                                        },
+                                    }
+                                },
+                                new FillFlowContainer
+                                {
+                                    Margin = new MarginPadding { Top = 20 },
+                                    Spacing = new Vector2(40, 0),
+                                    AutoSizeAxes = Axes.Both,
+                                    Children = labels
+                                },
+                            }
+                        },
                     }
-                }
+                })
+            {
+                Depth = newDepth,
             });
         }
 
