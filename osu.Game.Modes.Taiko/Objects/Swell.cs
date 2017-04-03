@@ -15,7 +15,7 @@ namespace osu.Game.Modes.Taiko.Objects
         public double Duration => EndTime - StartTime;
 
         /// <summary>
-        /// The multiplier for cases in which the number of required hits by a Swell is not
+        /// The multiplier for cases in which the number of required hits by a swell is not
         /// dependent on solely the overall difficulty and the duration of the swell.
         /// </summary>
         public double HitMultiplier { get; set; } = 1;

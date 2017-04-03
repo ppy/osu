@@ -19,9 +19,9 @@ namespace osu.Game.Modes.Taiko.UI
     internal class HitExplosion : CircularContainer
     {
         /// <summary>
-        /// The size of a hit explosion if a hit object has been hit with the second key.
+        /// The size multiplier of a hit explosion if a hit object has been hit with the second key.
         /// </summary>
-        private const float secondhit_scale = 1.5f;
+        private const float secondhit_size_multiplier = 1.5f;
 
         /// <summary>
         /// The judgement this hit explosion visualises.
@@ -85,7 +85,7 @@ namespace osu.Game.Modes.Taiko.UI
         /// </summary>
         public void VisualiseSecondHit()
         {
-            ResizeTo(Size * secondhit_scale, 50);
+            ResizeTo(Size * secondhit_size_multiplier, 50);
         }
     }
 }
