@@ -72,14 +72,9 @@ namespace osu.Game.Modes.Taiko.Replays
                 }
                 else if (drumRoll != null)
                 {
-                    double delay = drumRoll.TickTimeDistance;
-
-                    double time = drumRoll.StartTime;
-
-                    for (int j = 0; j < drumRoll.TotalTicks; j++)
+                    foreach (var tick in drumRoll.Ticks)
                     {
-                        Frames.Add(new ReplayFrame((int)time, 0, 0, hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2));
-                        time += delay;
+                        Frames.Add(new ReplayFrame(tick.StartTime, 0, 0, hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2));
                         hitButton = !hitButton;
                     }
                 }
