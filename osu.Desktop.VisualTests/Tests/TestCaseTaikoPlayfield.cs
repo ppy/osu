@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
 using osu.Game.Modes.Objects.Drawables;
@@ -24,21 +23,20 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            AddButton("Hit!", addHitJudgement);
-            AddButton("Miss :(", addMissJudgement);
-            AddButton("DrumRoll", () => addDrumRoll(false));
-            AddButton("Strong DrumRoll", () => addDrumRoll(true));
-            AddButton("Swell", addSwell);
-            AddButton("Centre", () => addCentreHit(false));
-            AddButton("Strong Centre", () => addCentreHit(true));
-            AddButton("Rim", () => addRimHit(false));
-            AddButton("Strong Rim", () => addRimHit(true));
+            AddStep("Hit!", addHitJudgement);
+            AddStep("Miss :(", addMissJudgement);
+            AddStep("DrumRoll", () => addDrumRoll(false));
+            AddStep("Strong DrumRoll", () => addDrumRoll(true));
+            AddStep("Swell", addSwell);
+            AddStep("Centre", () => addCentreHit(false));
+            AddStep("Strong Centre", () => addCentreHit(true));
+            AddStep("Rim", () => addRimHit(false));
+            AddStep("Strong Rim", () => addRimHit(true));
 
             Add(new Container
             {
                 RelativeSizeAxes = Axes.X,
                 Y = 200,
-                Padding = new MarginPadding { Left = 200 },
                 Children = new[]
                 {
                     playfield = new TaikoPlayfield()
@@ -58,7 +56,6 @@ namespace osu.Desktop.VisualTests.Tests
                     Result = HitResult.Hit,
                     TaikoResult = hitResult,
                     TimeOffset = 0,
-                    ComboAtHit = 1,
                     SecondHit = RNG.Next(10) == 0
                 }
             });
@@ -71,8 +68,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Judgement = new TaikoJudgement
                 {
                     Result = HitResult.Miss,
-                    TimeOffset = 0,
-                    ComboAtHit = 0
+                    TimeOffset = 0
                 }
             });
         }
@@ -92,13 +88,13 @@ namespace osu.Desktop.VisualTests.Tests
             var d = new DrumRoll
             {
                 StartTime = Time.Current + 1000,
-                Distance = 2000,
+                Distance = 20000,
                 PreEmpt = 1000,
             };
 
             playfield.Add(strong ? new DrawableStrongDrumRoll(d) : new DrawableDrumRoll(d));
         }
-        
+
         private void addCentreHit(bool strong)
         {
             Hit h = new Hit

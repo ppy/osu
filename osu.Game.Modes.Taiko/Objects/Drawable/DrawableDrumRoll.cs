@@ -1,7 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
+using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.MathUtils;
+using osu.Game.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
@@ -11,9 +16,21 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 {
     public class DrawableDrumRoll : DrawableTaikoHitObject
     {
+        /// <summary>
+        /// Number of rolling hits required to reach the dark/final accent colour.
+        /// </summary>
+        private const int rolling_hits_for_dark_accent = 5;
+
         private readonly DrumRoll drumRoll;
 
-        private readonly DrumRollCirclePiece circle;
+        private readonly CirclePiece circle;
+
+        private Color4 accentDarkColour;
+
+        /// <summary>
+        /// Rolling number of tick hits. This increases for hits and decreases for misses.
+        /// </summary>
+        private int rollingHits;
 
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
@@ -23,7 +40,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             RelativeSizeAxes = Axes.X;
             Width = (float)(drumRoll.Duration / drumRoll.PreEmpt);
 
-            Add(circle = new DrumRollCirclePiece(CreateCirclePiece()));
+            Add(circle = CreateCirclePiece());
 
             foreach (var tick in drumRoll.Ticks)
             {
@@ -39,10 +56,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             }
         }
 
-        private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            int countHit = NestedHitObjects.Count(o => o.Judgement.Result == HitResult.Hit);
-            circle.Completion = (float)countHit / NestedHitObjects.Count();
+            circle.AccentColour = AccentColour = colours.YellowDark;
+            accentDarkColour = colours.YellowDarker;
         }
 
         protected override void LoadComplete()
@@ -54,6 +72,19 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             // be greater than the time taken to scroll out to the left of the screen.
             // Thus, using PreEmpt here is enough for the drum roll to completely scroll out.
             LifetimeEnd = drumRoll.EndTime + drumRoll.PreEmpt;
+        }
+
+        private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)
+        {
+            if (obj.Judgement.Result == HitResult.Hit)
+                rollingHits++;
+            else
+                rollingHits--;
+
+            rollingHits = MathHelper.Clamp(rollingHits, 0, rolling_hits_for_dark_accent);
+
+            Color4 newAccent = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_dark_accent, AccentColour, accentDarkColour, 0, 1);
+            circle.FadeAccent(newAccent, 100);
         }
 
         protected override void CheckJudgement(bool userTriggered)

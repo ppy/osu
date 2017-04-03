@@ -1,12 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
+using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Graphics;
 using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -21,99 +20,93 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            AddToggle("Kiai", b =>
+            AddToggleStep("Kiai", b =>
             {
                 kiai = !kiai;
-                Reset();
+                updateKiaiState();
             });
 
-            Add(new CentreHitCirclePiece(new CirclePiece
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(100, 100)
+                Position = new Vector2(100, 100),
+                Width = 0,
+                AccentColour = Color4.DarkRed,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new CentreHitSymbolPiece()
+                }
             });
 
-            Add(new CentreHitCirclePiece(new StrongCirclePiece
+            Add(new StrongCirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(350, 100)
+                Position = new Vector2(350, 100),
+                Width = 0,
+                AccentColour = Color4.DarkRed,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new CentreHitSymbolPiece()
+                }
             });
 
-            Add(new RimHitCirclePiece(new CirclePiece
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(100, 300)
+                Position = new Vector2(100, 300),
+                Width = 0,
+                AccentColour = Color4.DarkBlue,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new RimHitSymbolPiece()
+                }
             });
 
-            Add(new RimHitCirclePiece(new StrongCirclePiece
+            Add(new StrongCirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(350, 300)
+                Position = new Vector2(350, 300),
+                Width = 0,
+                AccentColour = Color4.DarkBlue,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new RimHitSymbolPiece()
+                }
             });
 
-            Add(new SwellCirclePiece(new CirclePiece
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(100, 500)
+                Position = new Vector2(100, 500),
+                Width = 0,
+                AccentColour = Color4.Orange,
+                KiaiMode = kiai,
+                Children = new[]
+                {
+                    new SwellSymbolPiece()
+                }
             });
 
-            Add(new SwellCirclePiece(new StrongCirclePiece
+            Add(new CirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Position = new Vector2(350, 500)
-            });
-
-            Add(new DrumRollCirclePiece(new CirclePiece
-            {
-                KiaiMode = kiai
-            })
-            {
+                Position = new Vector2(575, 100),
                 Width = 0.25f,
-                Position = new Vector2(575, 100)
+                AccentColour = Color4.Orange,
+                KiaiMode = kiai,
             });
 
-            Add(new DrumRollCirclePiece(new StrongCirclePiece
+            Add(new StrongCirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
+                Position = new Vector2(575, 300),
                 Width = 0.25f,
-                Position = new Vector2(575, 300)
+                AccentColour = Color4.Orange,
+                KiaiMode = kiai
             });
         }
 
-        private class SwellCircle : BaseCircle
+        private void updateKiaiState()
         {
-            public SwellCircle(CirclePiece piece)
-                : base(piece)
-            {
-                Piece.Add(new TextAwesome
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    TextSize = CirclePiece.SYMBOL_INNER_SIZE,
-                    Icon = FontAwesome.fa_asterisk,
-                    Shadow = false
-                });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Piece.AccentColour = colours.YellowDark;
-            }
+            foreach (var c in Children.OfType<CirclePiece>())
+                c.KiaiMode = kiai;
         }
 
         private abstract class BaseCircle : Container

@@ -65,14 +65,13 @@ namespace osu.Game.Overlays.Toolbar
 
             foreach (PlayMode m in Ruleset.PlayModes)
             {
-                var localMode = m;
                 modeButtons.Add(new ToolbarModeButton
                 {
                     Mode = m,
                     Action = delegate
                     {
-                        SetGameMode(localMode);
-                        OnPlayModeChange?.Invoke(localMode);
+                        SetGameMode(m);
+                        OnPlayModeChange?.Invoke(m);
                     }
                 });
             }

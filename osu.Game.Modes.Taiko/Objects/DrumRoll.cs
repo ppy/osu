@@ -31,7 +31,7 @@ namespace osu.Game.Modes.Taiko.Objects
         /// The distance between ticks of this drumroll.
         /// <para>Half of this value is the hit window of the ticks.</para>
         /// </summary>
-        public double TickTimeDistance { get; protected set; } = 200;
+        public double TickTimeDistance { get; protected set; } = 100;
 
         /// <summary>
         /// Number of drum roll ticks required for a "Good" hit.
