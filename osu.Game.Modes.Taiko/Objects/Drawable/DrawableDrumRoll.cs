@@ -41,6 +41,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             Width = (float)(drumRoll.Duration / drumRoll.PreEmpt);
 
             Add(circle = CreateCirclePiece());
+            circle.KiaiMode = HitObject.Kiai;
 
             foreach (var tick in drumRoll.Ticks)
             {
