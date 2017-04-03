@@ -26,8 +26,6 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 
         public Beatmap<TaikoHitObject> Convert(Beatmap original)
         {
-            if (original is LegacyBeatmap)
-                original.TimingInfo.ControlPoints.ForEach(c => c.VelocityAdjustment /= legacy_velocity_scale);
 
             return new Beatmap<TaikoHitObject>(original)
             {
@@ -73,7 +71,8 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         {
                             StartTime = obj.StartTime,
                             Sample = obj.Sample,
-                            IsStrong = strong
+                            IsStrong = strong,
+                            VelocityMultiplier = legacy_velocity_scale
                         };
                     }
                 }
@@ -85,7 +84,8 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         Sample = obj.Sample,
                         IsStrong = strong,
                         Distance = distanceData.Distance * (repeatsData?.RepeatCount ?? 1) * legacy_velocity_scale,
-                        TickRate = beatmap.BeatmapInfo.Difficulty.SliderTickRate == 3 ? 3 : 4
+                        TickRate = beatmap.BeatmapInfo.Difficulty.SliderTickRate == 3 ? 3 : 4,
+                        VelocityMultiplier = legacy_velocity_scale
                     };
                 }
             }
@@ -98,9 +98,9 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     StartTime = obj.StartTime,
                     Sample = obj.Sample,
                     IsStrong = strong,
-
                     EndTime = endTimeData.EndTime,
-                    RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier)
+                    RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier),
+                    VelocityMultiplier = legacy_velocity_scale
                 };
             }
             else
@@ -113,7 +113,8 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     {
                         StartTime = obj.StartTime,
                         Sample = obj.Sample,
-                        IsStrong = strong
+                        IsStrong = strong,
+                        VelocityMultiplier = legacy_velocity_scale
                     };
                 }
                 else
@@ -123,6 +124,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         StartTime = obj.StartTime,
                         Sample = obj.Sample,
                         IsStrong = strong,
+                        VelocityMultiplier = legacy_velocity_scale
                     };
                 }
             }

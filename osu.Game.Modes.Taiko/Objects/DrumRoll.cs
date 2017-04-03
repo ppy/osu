@@ -69,7 +69,7 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.ApplyDefaults(timing, difficulty);
 
-            Velocity = base_distance * difficulty.SliderMultiplier * difficulty.SliderTickRate * timing.BeatLengthAt(StartTime) * timing.SpeedMultiplierAt(StartTime);
+            Velocity = base_distance * difficulty.SliderMultiplier * VelocityMultiplier / timing.BeatLengthAt(StartTime);
             tickSpacing = timing.BeatLengthAt(StartTime) / TickRate;
 
             RequiredGoodHits = TotalTicks * Math.Min(0.15, 0.05 + 0.10 / 6 * difficulty.OverallDifficulty);
