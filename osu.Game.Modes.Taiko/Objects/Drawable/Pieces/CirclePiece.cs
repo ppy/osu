@@ -36,10 +36,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
             {
                 accentColour = value;
 
-                innerBackground.Colour = AccentColour;
-
-                triangles.ColourLight = AccentColour;
-                triangles.ColourDark = AccentColour.Darken(0.1f);
+                background.Colour = AccentColour;
 
                 resetEdgeEffects();
             }
@@ -69,10 +66,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
         protected override Container<Framework.Graphics.Drawable> Content => SymbolContainer;
         protected readonly Container SymbolContainer;
 
+        private readonly Container background;
         private readonly Container innerLayer;
-        private readonly Container innerCircleContainer;
-        private readonly Box innerBackground;
-        private readonly Triangles triangles;
 
         public CirclePiece()
         {
@@ -88,26 +83,28 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                 RelativeSizeAxes = Axes.Y,
                 Children = new Framework.Graphics.Drawable[]
                 {
-                    innerCircleContainer = new CircularContainer
+                    background = new CircularContainer
                     {
-                        Name = "Inner Circle",
+                        Name = "Background",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
                         Children = new Framework.Graphics.Drawable[]
                         {
-                            innerBackground = new Box
+                            new Box
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            triangles = new Triangles
+                            new Triangles
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 RelativeSizeAxes = Axes.Both,
+                                ColourLight = Color4.White,
+                                ColourDark = Color4.White.Darken(0.1f)
                             }
                         }
                     },
@@ -150,7 +147,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
 
         private void resetEdgeEffects()
         {
-            innerCircleContainer.EdgeEffect = new EdgeEffect
+            background.EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Glow,
                 Colour = AccentColour,
