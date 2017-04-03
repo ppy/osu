@@ -29,7 +29,7 @@ namespace osu.Desktop
         {
             base.LoadComplete();
 
-            versionManager.LoadAsync(this);
+            LoadComponentAsync(versionManager);
             ScreenChanged += s =>
             {
                 if (!versionManager.IsAlive && s is Intro)

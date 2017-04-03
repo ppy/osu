@@ -347,12 +347,9 @@ namespace osu.Game.Overlays
                     }
                 });
 
-                dragContainer.Add(new AsyncLoadContainer
+                dragContainer.Add(new AsyncLoadWrapper(new MusicControllerBackground(beatmap)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue,
-                    Children = new[] { new MusicControllerBackground(beatmap) },
-                    FinishedLoading = d =>
+                    OnLoadComplete = d =>
                     {
                         switch (direction)
                         {
@@ -370,6 +367,9 @@ namespace osu.Game.Overlays
                         currentBackground.Expire();
                         currentBackground = d;
                     }
+                })
+                {
+                    Depth = float.MaxValue,
                 });
             };
         }
