@@ -20,7 +20,7 @@ namespace osu.Game.Modes.Taiko.Objects
 
         public void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
         {
-            PreEmpt = 600 / (timing.SliderVelocityAt(StartTime) * difficulty.SliderMultiplier) * 1000;
+            PreEmpt = TaikoHitObject.BASE_SCROLL_TIME / difficulty.SliderMultiplier * timing.BeatLengthAt(StartTime) * timing.SpeedMultiplierAt(StartTime) / 1000;
         }
     }
 }
