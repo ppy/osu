@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
-using System;
 using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Modes.UI
@@ -47,16 +46,14 @@ namespace osu.Game.Modes.UI
         private void load(OsuConfigManager config)
         {
             showKeyCounter = config.GetBindable<bool>(OsuConfig.KeyOverlay);
-            showKeyCounter.ValueChanged += visibilityChanged;
+            showKeyCounter.ValueChanged += visibility =>
+            {
+                if (visibility)
+                    KeyCounter.Show();
+                else
+                    KeyCounter.Hide();
+            };
             showKeyCounter.TriggerChange();
-        }
-
-        private void visibilityChanged(object sender, EventArgs e)
-        {
-            if (showKeyCounter)
-                KeyCounter.Show();
-            else
-                KeyCounter.Hide();
         }
 
         public void BindProcessor(ScoreProcessor processor)

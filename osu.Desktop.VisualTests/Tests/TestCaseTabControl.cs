@@ -36,9 +36,9 @@ namespace osu.Desktop.VisualTests.Tests
             filter.PinItem(GroupMode.All);
             filter.PinItem(GroupMode.RecentlyPlayed);
 
-            filter.SelectedItem.ValueChanged += (sender, args) =>
+            filter.SelectedItem.ValueChanged += newFilter =>
             {
-                text.Text = "Currently Selected: " + filter.SelectedItem.ToString();
+                text.Text = "Currently Selected: " + newFilter.ToString();
             };
         }
     }
