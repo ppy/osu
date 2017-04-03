@@ -20,11 +20,11 @@ namespace osu.Game.Beatmaps.Timing
         }
 
         /// <summary>
-        /// Finds the BPM multiplier at a time.
+        /// Finds the speed multiplier at a time.
         /// </summary>
-        /// <param name="time">The time to find the BPM multiplier at.</param>
-        /// <returns>The BPM multiplier.</returns>
-        public double BPMMultiplierAt(double time)
+        /// <param name="time">The time to find the speed multiplier at.</param>
+        /// <returns>The speed multiplier.</returns>
+        public double SpeedMultiplierAt(double time)
         {
             ControlPoint overridePoint;
             ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
@@ -33,10 +33,10 @@ namespace osu.Game.Beatmaps.Timing
         }
 
         /// <summary>
-        /// Finds the beat length at a time.
+        /// Finds the beat length at a time. This is expressed in milliseconds.
         /// </summary>
         /// <param name="time">The time to find the beat length at.</param>
-        /// <returns>The beat length in milliseconds.</returns>
+        /// <returns>The beat length.</returns>
         public double BeatLengthAt(double time)
         {
             ControlPoint overridePoint;
