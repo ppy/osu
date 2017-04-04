@@ -58,6 +58,5 @@ namespace osu.Desktop.VisualTests.Tests
         }
 
         private void newRatings() => details.Ratings = Enumerable.Range(1, 10);
-        
     }
 }

@@ -40,6 +40,7 @@ namespace osu.Game.Screens.Select
         private readonly BarGraph failGraph;
 
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
             get
@@ -63,11 +64,12 @@ namespace osu.Game.Screens.Select
                 drainRate.Value = beatmap.Difficulty.DrainRate;
                 overallDifficulty.Value = beatmap.Difficulty.OverallDifficulty;
                 approachRate.Value = beatmap.Difficulty.ApproachRate;
-                stars.Value = (float) beatmap.StarDifficulty;
+                stars.Value = (float)beatmap.StarDifficulty;
             }
         }
 
         private List<int> ratings;
+
         public IEnumerable<int> Ratings
         {
             get
@@ -85,7 +87,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private List<int> retries = Enumerable.Repeat(0,100).ToList();
+        private List<int> retries = Enumerable.Repeat(0, 100).ToList();
+
         public IEnumerable<int> Retries
         {
             get
@@ -99,7 +102,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private List<int> fails = Enumerable.Repeat(0,100).ToList();
+        private List<int> fails = Enumerable.Repeat(0, 100).ToList();
+
         public IEnumerable<int> Fails
         {
             get
@@ -117,7 +121,6 @@ namespace osu.Game.Screens.Select
         {
             failGraph.Values = fails.Select(fail => (float)fail);
             retryGraph.Values = retries.Select((retry, index) => (float)retry + fails[index]);
-            
         }
 
         public BeatmapDetails()
@@ -361,6 +364,7 @@ namespace osu.Game.Screens.Select
             private readonly OsuSpriteText valueText;
 
             private float difficultyValue;
+
             public float Value
             {
                 get
@@ -370,12 +374,13 @@ namespace osu.Game.Screens.Select
                 set
                 {
                     difficultyValue = value;
-                    bar.Length = value/maxValue;
+                    bar.Length = value / maxValue;
                     valueText.Text = value.ToString(CultureInfo.InvariantCulture);
                 }
             }
 
             private float maxValue = 10;
+
             public float MaxValue
             {
                 get
@@ -385,7 +390,7 @@ namespace osu.Game.Screens.Select
                 set
                 {
                     maxValue = value;
-                    bar.Length = Value/value;
+                    bar.Length = Value / value;
                 }
             }
 

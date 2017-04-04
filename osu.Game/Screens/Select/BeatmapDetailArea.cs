@@ -24,6 +24,7 @@ namespace osu.Game.Screens.Select
         private APIAccess api;
 
         private WorkingBeatmap beatmap;
+
         public WorkingBeatmap Beatmap
         {
             get
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.Select
             {
                 beatmap = value;
                 if (IsLoaded)
-                    if(currentTab == BeatmapDetailTab.Details)
+                    if (currentTab == BeatmapDetailTab.Details)
                         Schedule(updateDetails);
                     else
                         Schedule(updateScores);
@@ -48,7 +49,7 @@ namespace osu.Game.Screens.Select
                 new BeatmapDetailAreaTabControl
                 {
                     RelativeSizeAxes = Axes.X,
-                    OnFilter = (tab, mods) => 
+                    OnFilter = (tab, mods) =>
                     {
                         switch (tab)
                         {
@@ -57,6 +58,7 @@ namespace osu.Game.Screens.Select
                                 Leaderboard.Hide();
                                 updateDetails();
                                 break;
+
                             default:
                                 Details.Hide();
                                 Leaderboard.Show();
@@ -100,6 +102,7 @@ namespace osu.Game.Screens.Select
         }
 
         private GetScoresRequest getScoresRequest;
+
         private void updateScores()
         {
             if (!IsLoaded) return;
@@ -114,14 +117,12 @@ namespace osu.Game.Screens.Select
             api.Queue(getScoresRequest);
         }
 
-
-
         private void updateDetails()
         {
             if (!IsLoaded) return;
 
             if (api == null || beatmap?.BeatmapInfo == null) return;
-            
+
             Details.Beatmap = beatmap.Beatmap.BeatmapInfo;
         }
     }

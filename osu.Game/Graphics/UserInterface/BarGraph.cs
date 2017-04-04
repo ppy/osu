@@ -30,7 +30,6 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-
         public IEnumerable<float> Values
         {
             set
@@ -52,7 +51,6 @@ namespace osu.Game.Graphics.UserInterface
                             Direction = Direction,
                             BackgroundColour = new Color4(0, 0, 0, 0),
                         });
-
             }
         }
     }
@@ -141,6 +139,7 @@ namespace osu.Game.Graphics.UserInterface
                 case BarDirection.RightToLeft:
                     bar.ResizeTo(new Vector2(length, 1), resize_duration, easing);
                     break;
+
                 case BarDirection.TopToBottom:
                 case BarDirection.BottomToTop:
                     bar.ResizeTo(new Vector2(1, length), resize_duration, easing);
@@ -154,6 +153,7 @@ namespace osu.Game.Graphics.UserInterface
                     bar.Anchor = Anchor.TopLeft;
                     bar.Origin = Anchor.TopLeft;
                     break;
+
                 case BarDirection.RightToLeft:
                 case BarDirection.BottomToTop:
                     bar.Anchor = Anchor.BottomRight;
