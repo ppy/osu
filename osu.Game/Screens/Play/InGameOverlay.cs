@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Play
 
         }
 
-        public InGameOverlay()
+        protected InGameOverlay()
         {
             AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
