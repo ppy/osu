@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps.Formats
         }
 
         private SampleSet defaultSampleSet;
-        private int defaultSampleVolume;
+        private int defaultSampleVolume = 100;
         private bool samplesMatchPlaybackRate;
 
         private readonly int beatmapVersion;
@@ -309,7 +309,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             beatmap.BeatmapInfo.BeatmapVersion = beatmapVersion;
 
-            HitObjectParser parser = null;
+            HitObjectParser parser = new LegacyHitObjectParser();
 
             Section section = Section.None;
             bool hasCustomColours = false;
@@ -343,7 +343,6 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     case Section.General:
                         handleGeneral(beatmap, key, val);
-                        parser = new LegacyHitObjectParser();
                         break;
                     case Section.Editor:
                         handleEditor(beatmap, key, val);
