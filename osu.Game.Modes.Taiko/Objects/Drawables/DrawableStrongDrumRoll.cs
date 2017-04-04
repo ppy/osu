@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Modes.Taiko.Judgements;
-using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawable
+namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableStrongDrumRoll : DrawableDrumRoll
     {

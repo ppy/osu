@@ -3,16 +3,16 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using OpenTK.Input;
-using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawable
+namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public class DrawableStrongRimHit : DrawableStrongHit
+    public class DrawableStrongCentreHit : DrawableStrongHit
     {
-        protected override Key[] HitKeys { get; } = { Key.D, Key.K };
+        protected override Key[] HitKeys { get; } = { Key.F, Key.J };
 
-        public DrawableStrongRimHit(Hit hit)
+        public DrawableStrongCentreHit(Hit hit)
             : base(hit)
         {
         }
@@ -20,12 +20,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Circle.AccentColour = colours.BlueDarker;
+            Circle.AccentColour = colours.PinkDarker;
         }
 
         protected override CirclePiece CreateCirclePiece() => new StrongCirclePiece
         {
-            Children = new[] { new RimHitSymbolPiece() }
+            Children = new[] { new CentreHitSymbolPiece() }
         };
     }
 }
