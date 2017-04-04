@@ -20,7 +20,7 @@ namespace osu.Game.Modes.UI
     {
         private const int duration = 100;
 
-        private readonly Container hud;
+        private readonly Container content;
         public readonly KeyCounterCollection KeyCounter;
         public readonly ComboCounter ComboCounter;
         public readonly ScoreCounter ScoreCounter;
@@ -42,7 +42,7 @@ namespace osu.Game.Modes.UI
         {
             RelativeSizeAxes = Axes.Both;
 
-            Add(hud = new Container
+            Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
 
@@ -61,17 +61,23 @@ namespace osu.Game.Modes.UI
         private void load(OsuConfigManager config, NotificationManager notificationManager)
         {
             showKeyCounter = config.GetBindable<bool>(OsuConfig.KeyOverlay);
-            showKeyCounter.ValueChanged += visibility =>
+            showKeyCounter.ValueChanged += keyCounterVisibility =>
             {
-                if (visibility)
-                    KeyCounter.Show();
+                if (keyCounterVisibility)
+                    KeyCounter.FadeIn(duration);
                 else
-                    KeyCounter.Hide();
+                    KeyCounter.FadeOut(duration);
             };
             showKeyCounter.TriggerChange();
 
             showHud = config.GetBindable<bool>(OsuConfig.ShowInterface);
-            showHud.ValueChanged += hudVisibilityChanged;
+            showHud.ValueChanged += hudVisibility =>
+            {
+                if (hudVisibility)
+                    content.FadeIn(duration);
+                else
+                    content.FadeOut(duration);
+            };
             showHud.TriggerChange();
 
             if (!showHud && !hasShownNotificationOnce)
@@ -83,14 +89,6 @@ namespace osu.Game.Modes.UI
                     Text = @"The score overlay is currently disabled. You can toogle this by pressing Shift + Tab."
                 });
             }
-        }
-
-        private void hudVisibilityChanged(object sender, EventArgs e)
-        {
-            if (showHud)
-                hud.FadeIn(duration);
-            else
-                hud.FadeOut(duration);
         }
 
         public void BindProcessor(ScoreProcessor processor)
