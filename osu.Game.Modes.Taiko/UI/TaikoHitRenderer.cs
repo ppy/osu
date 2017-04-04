@@ -41,7 +41,6 @@ namespace osu.Game.Modes.Taiko.UI
                 return;
 
             TaikoHitObject lastObject = Beatmap.HitObjects[Beatmap.HitObjects.Count - 1];
-            // ReSharper disable once SuspiciousTypeConversion.Global (will be fixed with hitobjects)
             double lastHitTime = 1 + (lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime;
 
             var timingPoints = Beatmap.TimingInfo.ControlPoints.FindAll(cp => cp.TimingChange);
