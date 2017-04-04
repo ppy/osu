@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace osu.Desktop.VisualTests.Tests
