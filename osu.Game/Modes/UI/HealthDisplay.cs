@@ -16,7 +16,7 @@ namespace osu.Game.Modes.UI
 
         protected HealthDisplay()
         {
-            Current.ValueChanged += (s, e) => SetHealth((float)Current);
+            Current.ValueChanged += newValue => SetHealth((float)newValue);
         }
 
         protected abstract void SetHealth(float value);
