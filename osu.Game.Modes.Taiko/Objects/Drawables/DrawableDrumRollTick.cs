@@ -1,17 +1,17 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Input;
-using osu.Game.Modes.Taiko.Judgements;
 using System;
-using osu.Game.Modes.Objects.Drawables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Modes.Objects.Drawables;
+using osu.Game.Modes.Taiko.Judgements;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Graphics.Sprites;
+using OpenTK.Input;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawable
+namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableDrumRollTick : DrawableTaikoHitObject
     {
