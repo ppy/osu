@@ -190,6 +190,7 @@
     <Compile Include="Tests\TestCaseBeatmapDetails.cs" />
     <Compile Include="Tests\TestCaseDrawings.cs" />
     <Compile Include="Tests\TestCaseGamefield.cs" />
+    <Compile Include="Tests\TestCaseGraphAndBar.cs" />
     <Compile Include="Tests\TestCaseMusicController.cs" />
     <Compile Include="Tests\TestCaseNotificationManager.cs" />
     <Compile Include="Tests\TestCasePlayer.cs" />
