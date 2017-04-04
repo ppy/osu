@@ -3,7 +3,7 @@
 
 using OpenTK;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
+namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 {
     /// <summary>
     /// A type of circle piece which is drawn at a higher scale to represent a "strong" piece.
