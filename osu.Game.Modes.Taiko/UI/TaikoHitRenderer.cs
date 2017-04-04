@@ -13,7 +13,7 @@ using osu.Game.Modes.Scoring;
 using osu.Game.Modes.Taiko.Beatmaps;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
-using osu.Game.Modes.Taiko.Objects.Drawable;
+using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.Scoring;
 using osu.Game.Modes.UI;
 using osu.Game.Modes.Taiko.Replays;
