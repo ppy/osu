@@ -8,7 +8,7 @@ using osu.Framework.Testing;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
-using osu.Game.Modes.Taiko.Objects.Drawable;
+using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.UI;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -18,6 +18,8 @@ namespace osu.Desktop.VisualTests.Tests
         public override string Description => "Taiko playfield";
 
         private TaikoPlayfield playfield;
+
+        protected override double TimePerAction => 500;
 
         public override void Reset()
         {
@@ -32,6 +34,8 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep("Strong Centre", () => addCentreHit(true));
             AddStep("Rim", () => addRimHit(false));
             AddStep("Strong Rim", () => addRimHit(true));
+            AddStep("Add bar line", () => addBarLine(false));
+            AddStep("Add major bar line", () => addBarLine(true));
 
             Add(new Container
             {
@@ -73,12 +77,23 @@ namespace osu.Desktop.VisualTests.Tests
             });
         }
 
+        private void addBarLine(bool major)
+        {
+            BarLine bl = new BarLine
+            {
+                StartTime = Time.Current + 1000,
+                PreEmpt = 1000
+            };
+
+            playfield.AddBarLine(major ? new DrawableMajorBarLine(bl) : new DrawableBarLine(bl));
+        }
+
         private void addSwell()
         {
             playfield.Add(new DrawableSwell(new Swell
             {
                 StartTime = Time.Current + 1000,
-                EndTime = Time.Current + 5000,
+                EndTime = Time.Current + 1000,
                 PreEmpt = 1000
             }));
         }
@@ -88,7 +103,7 @@ namespace osu.Desktop.VisualTests.Tests
             var d = new DrumRoll
             {
                 StartTime = Time.Current + 1000,
-                Distance = 20000,
+                Distance = 1000,
                 PreEmpt = 1000,
             };
 
