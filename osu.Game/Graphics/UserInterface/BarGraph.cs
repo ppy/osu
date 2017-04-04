@@ -24,9 +24,12 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 direction = value;
+                base.Direction = (direction & BarDirection.Horizontal) > 0 ? FillDirection.Vertical : FillDirection.Horizontal;
                 foreach (var bar in Children)
+                {
+                    bar.Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / Children.Count()) : new Vector2(1.0f / Children.Count(), 1);
                     bar.Direction = direction;
-                base.Direction = direction == BarDirection.LeftToRight || direction == BarDirection.RightToLeft ? FillDirection.Vertical : FillDirection.Horizontal;
+                }
             }
         }
 
@@ -40,13 +43,13 @@ namespace osu.Game.Graphics.UserInterface
                     if (graphBars.Count > i)
                     {
                         graphBars[i].Length = values[i] / values.Max();
-                        graphBars[i].Width = 1.0f / values.Count;
+                        graphBars[i].Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / values.Count) : new Vector2(1.0f / values.Count, 1);
                     }
                     else
                         Add(new Bar
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Width = 1.0f / values.Count,
+                            Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / values.Count) : new Vector2(1.0f / values.Count, 1),
                             Length = values[i] / values.Max(),
                             Direction = Direction,
                             BackgroundColour = new Color4(0, 0, 0, 0),
@@ -165,9 +168,12 @@ namespace osu.Game.Graphics.UserInterface
 
     public enum BarDirection
     {
-        LeftToRight,
-        RightToLeft,
-        TopToBottom,
-        BottomToTop,
+        LeftToRight = 1 << 0,
+        RightToLeft = 1 << 1,
+        TopToBottom = 1 << 2,
+        BottomToTop = 1 << 3,
+
+        Vertical = TopToBottom | BottomToTop,
+        Horizontal = LeftToRight | RightToLeft,
     }
 }
