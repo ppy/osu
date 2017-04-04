@@ -187,10 +187,6 @@ namespace osu.Game.Configuration
 #pragma warning restore CS0612 // Type or member is obsolete
         }
 
-        //todo: make a UnicodeString class/struct rather than requiring this helper method.
-        public string GetUnicodeString(string nonunicode, string unicode)
-            => Get<bool>(OsuConfig.ShowUnicode) ? unicode ?? nonunicode : nonunicode ?? unicode;
-
         public OsuConfigManager(Storage storage) : base(storage)
         {
         }

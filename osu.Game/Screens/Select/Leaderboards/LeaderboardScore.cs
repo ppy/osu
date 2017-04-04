@@ -157,6 +157,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     })
                                 {
                                     TimeBeforeLoad = 500,
+                                    RelativeSizeAxes = Axes.None,
                                     Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),
                                 },
                                 new Container
