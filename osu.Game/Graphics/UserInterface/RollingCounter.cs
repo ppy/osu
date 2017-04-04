@@ -98,13 +98,10 @@ namespace osu.Game.Graphics.UserInterface
 
             DisplayedCount = Current;
 
-            Current.ValueChanged += currentChanged;
-        }
-
-        private void currentChanged(object sender, EventArgs e)
-        {
-            if (IsLoaded)
-                TransformCount(displayedCount, Current);
+            Current.ValueChanged += newValue =>
+            {
+                if (IsLoaded) TransformCount(displayedCount, newValue);
+            };
         }
 
         protected override void LoadComplete()

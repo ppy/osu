@@ -22,8 +22,6 @@ namespace osu.Desktop.VisualTests.Tests
 
             int numerator = 0, denominator = 0;
 
-            bool maniaHold = false;
-
             ScoreCounter score = new ScoreCounter(7)
             {
                 Origin = Anchor.TopRight,

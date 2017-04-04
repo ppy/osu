@@ -3,33 +3,29 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using OpenTK.Input;
-using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawable
+namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableRimHit : DrawableHit
     {
         protected override Key[] HitKeys { get; } = { Key.D, Key.K };
 
-        private readonly CirclePiece circlePiece;
-
         public DrawableRimHit(Hit hit)
             : base(hit)
         {
-            Add(circlePiece = new CirclePiece
-            {
-                Children = new[]
-                {
-                    new RimHitSymbolPiece()
-                }
-            });
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            circlePiece.AccentColour = colours.BlueDarker;
+            Circle.AccentColour = colours.BlueDarker;
         }
+
+        protected override CirclePiece CreateCirclePiece() => new CirclePiece
+        {
+            Children = new[] { new RimHitSymbolPiece() }
+        };
     }
 }

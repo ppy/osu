@@ -1,9 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -12,11 +11,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
-using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
-using System;
-using System.Linq;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawable
+namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public class DrawableSwell : DrawableTaikoHitObject
     {
@@ -56,11 +56,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         {
             this.swell = swell;
 
-            Children = new Framework.Graphics.Drawable[]
+            Children = new Drawable[]
             {
                 bodyContainer = new Container
                 {
-                    Children = new Framework.Graphics.Drawable[]
+                    Children = new Drawable[]
                     {
                         expandingRing = new CircularContainer
                         {
@@ -89,7 +89,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                             Masking = true,
                             BorderThickness = target_ring_thick_border,
                             BlendingMode = BlendingMode.Additive,
-                            Children = new Framework.Graphics.Drawable[]
+                            Children = new Drawable[]
                             {
                                 new Box
                                 {
@@ -128,6 +128,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
                     }
                 }
             };
+
+            circlePiece.KiaiMode = HitObject.Kiai;
         }
 
         [BackgroundDependencyLoader]

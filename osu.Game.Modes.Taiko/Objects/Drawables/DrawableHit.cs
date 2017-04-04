@@ -1,15 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Input;
+using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
-using System;
-using System.Linq;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
+using OpenTK.Input;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawable
+namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
     public abstract class DrawableHit : DrawableTaikoHitObject
     {
@@ -18,16 +19,18 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         /// </summary>
         protected abstract Key[] HitKeys { get; }
 
-        protected override Container<Framework.Graphics.Drawable> Content => bodyContainer;
+        protected override Container<Drawable> Content => bodyContainer;
+
+        protected readonly CirclePiece Circle;
 
         private readonly Hit hit;
+
+        private readonly Container bodyContainer;
 
         /// <summary>
         /// Whether the last key pressed is a valid hit key.
         /// </summary>
         private bool validKeyPressed;
-
-        private readonly Container bodyContainer;
 
         protected DrawableHit(Hit hit)
             : base(hit)
@@ -38,7 +41,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Children = new[]
+                {
+                    Circle = CreateCirclePiece()
+                }
             });
+
+            Circle.KiaiMode = HitObject.Kiai;
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -100,5 +109,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
 
             Expire();
         }
+
+        protected abstract CirclePiece CreateCirclePiece();
     }
 }

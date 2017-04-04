@@ -78,8 +78,6 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, OsuConfigManager config, BeatmapDatabase beatmaps, OsuColour colours)
         {
-            unicodeString = config.GetUnicodeString;
-
             Children = new Drawable[]
             {
                 dragContainer = new Container
@@ -210,7 +208,7 @@ namespace osu.Game.Overlays
             this.beatmaps = beatmaps;
             trackManager = game.Audio.Track;
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
-            preferUnicode.ValueChanged += preferUnicode_changed;
+            preferUnicode.ValueChanged += unicode => updateDisplay(current, TransformDirection.None);
 
             beatmapSource = game.Beatmap ?? new Bindable<WorkingBeatmap>();
             playList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
@@ -222,7 +220,8 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             beatmapSource.ValueChanged += workingChanged;
-            workingChanged();
+            beatmapSource.TriggerChange();
+
             base.LoadComplete();
         }
 
@@ -247,17 +246,12 @@ namespace osu.Game.Overlays
                 playButton.Icon = FontAwesome.fa_play_circle_o;
         }
 
-        private void preferUnicode_changed(object sender, EventArgs e)
+        private void workingChanged(WorkingBeatmap beatmap)
         {
-            updateDisplay(current, TransformDirection.None);
-        }
-
-        private void workingChanged(object sender = null, EventArgs e = null)
-        {
-            progress.IsEnabled = beatmapSource.Value != null;
-            if (beatmapSource.Value == current) return;
-            bool audioEquals = current?.BeatmapInfo?.AudioEquals(beatmapSource?.Value?.BeatmapInfo) ?? false;
-            current = beatmapSource.Value;
+            progress.IsEnabled = beatmap != null;
+            if (beatmap == current) return;
+            bool audioEquals = current?.BeatmapInfo?.AudioEquals(beatmap?.BeatmapInfo) ?? false;
+            current = beatmap;
             updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Next);
             appendToHistory(current?.BeatmapInfo);
         }
@@ -342,17 +336,14 @@ namespace osu.Game.Overlays
                     else
                     {
                         BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
-                        title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
-                        artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
+                        title.Text = preferUnicode ? metadata.TitleUnicode : metadata.Title;
+                        artist.Text = preferUnicode ? metadata.ArtistUnicode : metadata.Artist;
                     }
                 });
 
-                dragContainer.Add(new AsyncLoadContainer
+                dragContainer.Add(new AsyncLoadWrapper(new MusicControllerBackground(beatmap)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue,
-                    Children = new[] { new MusicControllerBackground(beatmap) },
-                    FinishedLoading = d =>
+                    OnLoadComplete = d =>
                     {
                         switch (direction)
                         {
@@ -370,23 +361,17 @@ namespace osu.Game.Overlays
                         currentBackground.Expire();
                         currentBackground = d;
                     }
+                })
+                {
+                    Depth = float.MaxValue,
                 });
             };
         }
-
-        private Func<string, string, string> unicodeString;
 
         private void seek(float position)
         {
             current?.Track?.Seek(current.Track.Length * position);
             current?.Track?.Start();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            if (preferUnicode != null)
-                preferUnicode.ValueChanged -= preferUnicode_changed;
-            base.Dispose(isDisposing);
         }
 
         private const float transition_length = 800;

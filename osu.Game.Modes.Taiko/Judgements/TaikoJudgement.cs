@@ -43,7 +43,7 @@ namespace osu.Game.Modes.Taiko.Judgements
         public override string MaxResultString => MAX_HIT_RESULT.GetDescription();
 
         /// <summary>
-        /// Whether this Judgement has a secondary hit in the case of finishers.
+        /// Whether this Judgement has a secondary hit in the case of strong hits.
         /// </summary>
         public virtual bool SecondHit { get; set; }
 
