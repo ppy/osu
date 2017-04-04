@@ -44,7 +44,7 @@ namespace osu.Desktop.VisualTests.Tests
                 },
             });
 
-            AddStep("new retry/fail values", newRetryAndFailValues);
+            AddRepeatStep("new retry/fail values", newRetryAndFailValues, 10);
             AddStep("new ratings", newRatings);
         }
 
@@ -57,9 +57,7 @@ namespace osu.Desktop.VisualTests.Tests
             lastRange += 100;
         }
 
-        private void newRatings()
-        {
-            details.Ratings = Enumerable.Range(1, 10);
-        }
+        private void newRatings() => details.Ratings = Enumerable.Range(1, 10);
+        
     }
 }
