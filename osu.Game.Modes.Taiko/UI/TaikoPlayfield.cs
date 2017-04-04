@@ -14,8 +14,8 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Primitives;
-using osu.Game.Modes.Taiko.Objects.Drawable;
 using System.Linq;
+using osu.Game.Modes.Taiko.Objects.Drawables;
 
 namespace osu.Game.Modes.Taiko.UI
 {
