@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
@@ -35,6 +36,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         }
 
         protected override TaikoJudgement CreateJudgement() => new TaikoJudgement();
+
+        protected virtual CirclePiece CreateCirclePiece() => new CirclePiece();
 
         /// <summary>
         /// Sets the scroll position of the DrawableHitObject relative to the offset between

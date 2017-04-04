@@ -110,7 +110,5 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         protected override void UpdateState(ArmedState state)
         {
         }
-
-        protected virtual CirclePiece CreateCirclePiece() => new CirclePiece();
     }
 }

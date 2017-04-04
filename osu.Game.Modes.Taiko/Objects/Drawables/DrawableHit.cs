@@ -109,7 +109,5 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             Expire();
         }
-
-        protected abstract CirclePiece CreateCirclePiece();
     }
 }
