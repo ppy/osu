@@ -34,12 +34,14 @@ namespace osu.Game.Database
                     using (var stream = new StreamReader(reader.GetStream(BeatmapInfo.Path)))
                     {
                         decoder = BeatmapDecoder.GetDecoder(stream);
-                        beatmap = decoder?.Decode(stream);
+                        beatmap = decoder.Decode(stream);
                     }
 
-                    if (WithStoryboard && beatmap != null && BeatmapSetInfo.StoryboardFile != null)
-                        using (var stream = new StreamReader(reader.GetStream(BeatmapSetInfo.StoryboardFile)))
-                            decoder.Decode(stream, beatmap);
+                    if (beatmap == null || !WithStoryboard || BeatmapSetInfo.StoryboardFile == null)
+                        return beatmap;
+
+                    using (var stream = new StreamReader(reader.GetStream(BeatmapSetInfo.StoryboardFile)))
+                        decoder.Decode(stream, beatmap);
                 }
 
                 return beatmap;

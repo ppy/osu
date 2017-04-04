@@ -21,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override Dropdown<T> CreateDropdown() => new OsuTabDropdown();
 
-        protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem { Value = value };
+        protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem(value);
 
         protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || Dropdown.Contains(screenSpacePos);
 
@@ -75,16 +75,6 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            public new T Value
-            {
-                get { return base.Value; }
-                set
-                {
-                    base.Value = value;
-                    text.Text = (value as Enum)?.GetDescription();
-                }
-            }
-
             public override bool Active
             {
                 get { return base.Active; }
@@ -134,30 +124,31 @@ namespace osu.Game.Graphics.UserInterface
                     AccentColour = colours.Blue;
             }
 
-            public OsuTabItem()
+            public OsuTabItem(T value) : base(value)
             {
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
 
                 Children = new Drawable[]
                 {
-                text = new OsuSpriteText
-                {
-                    Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    TextSize = 14,
-                    Font = @"Exo2.0-Bold", // Font should only turn bold when active?
-                },
-                box = new Box
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1,
-                    Alpha = 0,
-                    Colour = Color4.White,
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                }
+                    text = new OsuSpriteText
+                    {
+                        Margin = new MarginPadding { Top = 5, Bottom = 5 },
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomLeft,
+                        Text = (value as Enum)?.GetDescription(),
+                        TextSize = 14,
+                        Font = @"Exo2.0-Bold", // Font should only turn bold when active?
+                    },
+                    box = new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 1,
+                        Alpha = 0,
+                        Colour = Color4.White,
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomLeft,
+                    }
                 };
             }
         }

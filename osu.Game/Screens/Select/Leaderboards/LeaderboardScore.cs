@@ -141,26 +141,24 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Padding = new MarginPadding(edge_margin),
                             Children = new Drawable[]
                             {
-                                avatar = new DelayedLoadContainer
+                                avatar = new DelayedLoadWrapper(
+                                    new Avatar(Score.User ?? new User { Id = Score.UserID })
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        CornerRadius = corner_radius,
+                                        Masking = true,
+                                        OnLoadComplete = d => d.FadeInFromZero(200),
+                                        EdgeEffect = new EdgeEffect
+                                        {
+                                            Type = EdgeEffectType.Shadow,
+                                            Radius = 1,
+                                            Colour = Color4.Black.Opacity(0.2f),
+                                        },
+                                    })
                                 {
                                     TimeBeforeLoad = 500,
-                                    FinishedLoading = d => d.FadeInFromZero(200),
+                                    RelativeSizeAxes = Axes.None,
                                     Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),
-                                    Children = new Drawable[]
-                                    {
-                                        new Avatar(Score.User ?? new User { Id = Score.UserID })
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            CornerRadius = corner_radius,
-                                            Masking = true,
-                                            EdgeEffect = new EdgeEffect
-                                            {
-                                                Type = EdgeEffectType.Shadow,
-                                                Radius = 1,
-                                                Colour = Color4.Black.Opacity(0.2f),
-                                            },
-                                        },
-                                    }
                                 },
                                 new Container
                                 {
