@@ -12,6 +12,10 @@ using osu.Framework.Input;
 using osu.Game.Configuration;
 using System;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Graphics.UserInterface;
+using osu.Framework.Threading;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -19,10 +23,34 @@ namespace osu.Game.Graphics.Cursor
     {
         protected override Drawable CreateCursor() => new Cursor();
 
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase game)
+        {
+            this.game = game;
+        }
+
         private bool dragging;
+
+        private ScheduledDelegate show;
+        private OsuGameBase game;
 
         protected override bool OnMouseMove(InputState state)
         {
+            if (state.Mouse.Position != state.Mouse.LastPosition)
+            {
+                Tooltip tooltip = ((Cursor)ActiveCursor).Tooltip;
+                show?.Cancel();
+                tooltip.Hide();
+                Delay(250);
+                show = Schedule(delegate
+                {
+                    tooltip.TooltipText = "";
+                    searchTooltip(tooltip, ToScreenSpace(state.Mouse.Position), game);
+                    if (tooltip.TooltipText != "")
+                        tooltip.Show();
+                });
+            }
+
             if (dragging)
             {
                 Vector2 offset = state.Mouse.Position - state.Mouse.PositionMouseDown ?? state.Mouse.Delta;
@@ -38,6 +66,20 @@ namespace osu.Game.Graphics.Cursor
             }
 
             return base.OnMouseMove(state);
+        }
+
+        private void searchTooltip(Tooltip tooltip, Vector2 mousePosition, IContainerEnumerable<Drawable> children)
+        {
+            IEnumerable<Drawable> next = children.InternalChildren.Where(drawable => drawable.Contains(mousePosition) && !(drawable is CursorContainer));
+
+            foreach (Drawable drawable in next)
+            {
+                string tooltipText = (drawable as IHasTooltip)?.Tooltip ?? "";
+                if (tooltipText != "") tooltip.TooltipText = tooltipText;
+                
+                if (drawable is IContainer)
+                    searchTooltip(tooltip, mousePosition, drawable as IContainerEnumerable<Drawable>);
+            }
         }
 
         protected override bool OnDragStart(InputState state)
@@ -94,6 +136,7 @@ namespace osu.Game.Graphics.Cursor
         public class Cursor : Container
         {
             private Container cursorContainer;
+            public Tooltip Tooltip;
             private Bindable<double> cursorScale;
 
             public Sprite AdditiveLayer;
@@ -127,7 +170,11 @@ namespace osu.Game.Graphics.Cursor
                                 Texture = textures.Get(@"Cursor/menu-cursor-additive"),
                             },
                         }
-                    }
+                    },
+                    Tooltip = new Tooltip
+                    {
+                        Alpha = 0,
+                    },
                 };
 
                 cursorScale = config.GetBindable<double>(OsuConfig.MenuCursorSize);
@@ -138,6 +185,7 @@ namespace osu.Game.Graphics.Cursor
             private void scaleChanged(object sender, EventArgs e)
             {
                 cursorContainer.Scale = new Vector2((float)cursorScale);
+                Tooltip.Y = cursorContainer.Height * (float)cursorScale;
             }
         }
     }
