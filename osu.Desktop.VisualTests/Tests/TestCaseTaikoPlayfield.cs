@@ -19,6 +19,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         private TaikoPlayfield playfield;
 
+        protected override double TimePerAction => 500;
+
         public override void Reset()
         {
             base.Reset();
@@ -91,7 +93,7 @@ namespace osu.Desktop.VisualTests.Tests
             playfield.Add(new DrawableSwell(new Swell
             {
                 StartTime = Time.Current + 1000,
-                EndTime = Time.Current + 5000,
+                EndTime = Time.Current + 1000,
                 PreEmpt = 1000
             }));
         }
@@ -101,7 +103,7 @@ namespace osu.Desktop.VisualTests.Tests
             var d = new DrumRoll
             {
                 StartTime = Time.Current + 1000,
-                Distance = 20000,
+                Distance = 1000,
                 PreEmpt = 1000,
             };
 
