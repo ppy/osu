@@ -15,6 +15,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         public DrawableCentreHit(Hit hit)
             : base(hit)
         {
+            Circle.Add(new CentreHitSymbolPiece());
         }
 
         [BackgroundDependencyLoader]
@@ -22,10 +23,5 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
             Circle.AccentColour = colours.PinkDarker;
         }
-
-        protected override CirclePiece CreateCirclePiece() => new CirclePiece
-        {
-            Children = new[] { new CentreHitSymbolPiece() }
-        };
     }
 }
