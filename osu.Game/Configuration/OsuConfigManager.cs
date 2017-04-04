@@ -35,8 +35,8 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.MenuParallax, true);
 
-            Set(OsuConfig.KeyOverlay, false);
             Set(OsuConfig.ShowInterface, true);
+            Set(OsuConfig.KeyOverlay, false);
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
