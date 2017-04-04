@@ -16,7 +16,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play
 {
-    public class InGameOverlay : OverlayContainer
+    public abstract class InGameOverlay : OverlayContainer
     {
         private const int transition_duration = 200;
         private const int button_height = 70;
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseMove(InputState state) => true;
 
-        public void AddButton(string text, Color4 colour, Action action)
+        protected void AddButton(string text, Color4 colour, Action action)
         {
             buttons.Add(new PauseButton
             {
