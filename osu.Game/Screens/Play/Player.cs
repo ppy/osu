@@ -275,7 +275,8 @@ namespace osu.Game.Screens.Play
             Background?.FadeTo((100f - dimLevel) / 100, 1500, EasingTypes.OutQuint);
 
             Content.Alpha = 0;
-            dimLevel.ValueChanged += dimChanged;
+
+            dimLevel.ValueChanged += newDim => Background?.FadeTo((100f - newDim) / 100, 800);
 
             Content.ScaleTo(0.7f);
 
@@ -318,16 +319,9 @@ namespace osu.Game.Screens.Play
             {
                 FadeOut(250);
                 Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
-
-                dimLevel.ValueChanged -= dimChanged;
                 Background?.FadeTo(1f, 200);
                 return base.OnExiting(next);
             }
-        }
-
-        private void dimChanged(object sender, EventArgs e)
-        {
-            Background?.FadeTo((100f - dimLevel) / 100, 800);
         }
 
         private Bindable<bool> mouseWheelDisabled;
