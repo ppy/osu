@@ -1,16 +1,16 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using OpenTK.Graphics;
-using System;
-using osu.Game.Graphics;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
+namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 {
     /// <summary>
     /// A circle piece which is used uniformly through osu!taiko to visualise hitobjects.
@@ -63,7 +63,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
             set { throw new InvalidOperationException($"{nameof(CirclePiece)} must always use CentreLeft origin."); }
         }
 
-        protected override Container<Framework.Graphics.Drawable> Content => SymbolContainer;
+        protected override Container<Drawable> Content => SymbolContainer;
         protected readonly Container SymbolContainer;
 
         private readonly Container background;
@@ -81,7 +81,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Y,
-                Children = new Framework.Graphics.Drawable[]
+                Children = new Drawable[]
                 {
                     background = new CircularContainer
                     {
@@ -90,7 +90,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable.Pieces
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
-                        Children = new Framework.Graphics.Drawable[]
+                        Children = new Drawable[]
                         {
                             new Box
                             {
