@@ -31,6 +31,10 @@ namespace osu.Game.Beatmaps.Formats
             // TODO: Not sure how far back to go, or differences between versions
         }
 
+        private SampleSet defaultSampleSet;
+        private int defaultSampleVolume;
+        private bool samplesMatchPlaybackRate;
+
         private readonly int beatmapVersion;
 
         public OsuLegacyDecoder()
@@ -73,7 +77,13 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.Countdown = int.Parse(val) == 1;
                     break;
                 case @"SampleSet":
-                    beatmap.BeatmapInfo.SampleSet = (SampleSet)Enum.Parse(typeof(SampleSet), val);
+                    defaultSampleSet = (SampleSet)Enum.Parse(typeof(SampleSet), val);
+                    break;
+                case @"SampleVolume":
+                    defaultSampleVolume = int.Parse(val);
+                    break;
+                case "SamplesMatchPlaybackRate":
+                    samplesMatchPlaybackRate = val[0] == '1';
                     break;
                 case @"StackLeniency":
                     beatmap.BeatmapInfo.StackLeniency = float.Parse(val, NumberFormatInfo.InvariantInfo);
@@ -203,28 +213,56 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleTimingPoints(Beatmap beatmap, string val)
         {
-            ControlPoint cp = null;
-
             string[] split = val.Split(',');
 
-            if (split.Length > 2)
+            double time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo);
+            double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
+
+            TimeSignatures timeSignature = TimeSignatures.SimpleQuadruple;
+            if (split.Length >= 3)
+                timeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)int.Parse(split[2]);
+
+            SampleSet sampleSet = defaultSampleSet;
+            if (split.Length >= 4)
+                sampleSet = (SampleSet)int.Parse(split[3]);
+
+            SampleBank sampleBank = SampleBank.Default;
+            if (split.Length >= 5)
+                sampleBank = (SampleBank)int.Parse(split[4]);
+
+            int sampleVolume = defaultSampleVolume;
+            if (split.Length >= 6)
+                sampleVolume = int.Parse(split[5]);
+
+            bool timingChange = true;
+            if (split.Length >= 7)
+                timingChange = split[6][0] == '1';
+
+            bool kiaiMode = false;
+            bool omitFirstBarSignature = false;
+            if (split.Length >= 8)
             {
-                int effectFlags = split.Length > 7 ? Convert.ToInt32(split[7], NumberFormatInfo.InvariantInfo) : 0;
-                double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
-                cp = new ControlPoint
-                {
-                    Time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo),
-                    BeatLength = beatLength > 0 ? beatLength : 0,
-                    VelocityAdjustment = beatLength < 0 ? -beatLength / 100.0 : 1,
-                    TimingChange = split.Length <= 6 || split[6][0] == '1',
-                    KiaiMode = (effectFlags & 1) > 0,
-                    OmitFirstBarLine = (effectFlags & 8) > 0,
-                    TimeSignature = (TimeSignatures)int.Parse(split[2])
-                };
+                int effectFlags = int.Parse(split[7]);
+                kiaiMode = (effectFlags & 1) > 0;
+                omitFirstBarSignature = (effectFlags & 8) > 0;
             }
 
-            if (cp != null)
-                beatmap.TimingInfo.ControlPoints.Add(cp);
+            beatmap.TimingInfo.ControlPoints.Add(new ControlPoint
+            {
+                Time = time,
+                BeatLength = beatLength,
+                VelocityAdjustment = beatLength < 0 ? -beatLength / 100.0 : 1,
+                TimingChange = timingChange,
+                TimeSignature = timeSignature,
+                Sample = new SampleInfo
+                {
+                    Bank = sampleBank,
+                    Set = sampleSet,
+                    Volume = sampleVolume
+                },
+                KiaiMode = kiaiMode,
+                OmitFirstBarLine = omitFirstBarSignature
+            });
         }
 
         private void handleColours(Beatmap beatmap, string key, string val, ref bool hasCustomColours)

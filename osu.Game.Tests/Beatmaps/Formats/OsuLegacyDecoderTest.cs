@@ -55,7 +55,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var beatmapInfo = decoder.Decode(new StreamReader(stream)).BeatmapInfo;
                 Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
                 Assert.AreEqual(false, beatmapInfo.Countdown);
-                Assert.AreEqual(SampleSet.Soft, beatmapInfo.SampleSet);
                 Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
                 Assert.AreEqual(false, beatmapInfo.SpecialStyle);
                 Assert.AreEqual(PlayMode.Osu, beatmapInfo.Mode);
