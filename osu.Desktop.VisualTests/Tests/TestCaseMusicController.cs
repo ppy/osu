@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Overlays.Music;
 
 namespace osu.Desktop.VisualTests.Tests
 {

@@ -20,13 +20,13 @@ using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using OpenTK;
-using System.Linq;
 using osu.Framework.Graphics.Primitives;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Modes.Scoring;
 using osu.Game.Overlays.Notifications;
+using System.Linq;
 using osu.Game.Screens.Play;
 
 namespace osu.Game
