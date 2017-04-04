@@ -276,7 +276,11 @@ namespace osu.Game.Screens.Select
             initialAddSetsTask.Cancel();
         }
 
-        private void playMode_ValueChanged(object sender, EventArgs e) => Beatmap.PreferredPlayMode = playMode;
+        private void playMode_ValueChanged(object sender, EventArgs e)
+        {
+            if(Beatmap!= null)
+                Beatmap.PreferredPlayMode = playMode;
+        }
 
         private void changeBackground(WorkingBeatmap beatmap)
         {
