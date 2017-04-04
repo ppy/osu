@@ -14,6 +14,22 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class BarGraph : FillFlowContainer<Bar>
     {
+        private BarDirection direction = BarDirection.BottomToTop;
+        public new BarDirection Direction
+        {
+            get
+            {
+                return direction;
+            }
+            set
+            {
+                direction = value;
+                foreach (var bar in Children)
+                    bar.Direction = direction;
+                base.Direction = direction == BarDirection.LeftToRight || direction == BarDirection.RightToLeft ? FillDirection.Vertical : FillDirection.Horizontal;
+            }
+        }
+
 
         public IEnumerable<float> Values
         {
@@ -33,13 +49,12 @@ namespace osu.Game.Graphics.UserInterface
                             RelativeSizeAxes = Axes.Both,
                             Width = 1.0f / values.Count,
                             Length = values[i] / values.Max(),
-                            Direction = BarDirection.BottomToTop,
+                            Direction = Direction,
                             BackgroundColour = new Color4(0, 0, 0, 0),
                         });
 
             }
         }
-
     }
 
     public class Bar : Container

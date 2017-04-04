@@ -305,7 +305,6 @@ namespace osu.Game.Screens.Select
                                         ratingsGraph = new BarGraph
                                         {
                                             RelativeSizeAxes = Axes.X,
-                                            Direction = FillDirection.Horizontal,
                                             Height = 50,
                                         },
                                     },
