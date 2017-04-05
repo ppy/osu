@@ -56,15 +56,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     Alpha = 0.75f
                 }
             };
+
+            LifetimeStart = BarLine.StartTime - BarLine.ScrollTime * 2;
+            LifetimeEnd = BarLine.StartTime + BarLine.ScrollTime;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            LifetimeStart = BarLine.StartTime - BarLine.ScrollTime * 2;
-            LifetimeEnd = BarLine.StartTime + BarLine.ScrollTime;
-
             Delay(BarLine.StartTime - Time.Current);
             FadeOut(base_fadeout_time * BarLine.ScrollTime / 1000);
         }
