@@ -6,8 +6,8 @@ using System.Linq;
 using osu.Framework.Input;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
-using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using OpenTK.Input;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
@@ -28,9 +28,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
         }
 
-        protected override TaikoJudgement CreateJudgement() => new TaikoStrongHitJudgement();
+        protected override TaikoPiece CreateMainPiece() => new CirclePiece(true);
 
-        protected override CirclePiece CreateCirclePiece() => new StrongCirclePiece();
+        protected override TaikoJudgement CreateJudgement() => new TaikoStrongHitJudgement();
 
         protected override void CheckJudgement(bool userTriggered)
         {

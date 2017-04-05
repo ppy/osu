@@ -108,11 +108,12 @@ namespace osu.Desktop.VisualTests.Tests
             var d = new DrumRoll
             {
                 StartTime = Time.Current + 1000,
+                IsStrong = strong,
                 Distance = 1000,
                 PreEmpt = 1000,
             };
 
-            playfield.Add(strong ? new DrawableStrongDrumRoll(d) : new DrawableDrumRoll(d));
+            playfield.Add(new DrawableDrumRoll(d));
         }
 
         private void addCentreHit(bool strong)

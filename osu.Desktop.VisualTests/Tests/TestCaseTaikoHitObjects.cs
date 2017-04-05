@@ -37,7 +37,7 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            Add(new StrongCirclePiece
+            Add(new CirclePiece(true)
             {
                 Position = new Vector2(350, 100),
                 AccentColour = Color4.DarkRed,
@@ -59,7 +59,7 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            Add(new StrongCirclePiece
+            Add(new CirclePiece(true)
             {
                 Position = new Vector2(350, 300),
                 AccentColour = Color4.DarkBlue,
@@ -89,7 +89,7 @@ namespace osu.Desktop.VisualTests.Tests
                 KiaiMode = kiai,
             });
 
-            Add(new StrongCirclePiece
+            Add(new CirclePiece(true)
             {
                 Position = new Vector2(575, 300),
                 Width = 0.25f,

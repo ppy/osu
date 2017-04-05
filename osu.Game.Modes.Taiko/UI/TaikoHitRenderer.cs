@@ -133,8 +133,6 @@ namespace osu.Game.Modes.Taiko.UI
             var drumRoll = h as DrumRoll;
             if (drumRoll != null)
             {
-                if (h.IsStrong)
-                    return new DrawableStrongDrumRoll(drumRoll);
                 return new DrawableDrumRoll(drumRoll);
             }
 

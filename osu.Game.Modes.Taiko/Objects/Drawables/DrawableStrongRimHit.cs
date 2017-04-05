@@ -15,13 +15,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         public DrawableStrongRimHit(Hit hit)
             : base(hit)
         {
-            Circle.Add(new RimHitSymbolPiece());
+            MainPiece.Add(new RimHitSymbolPiece());
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Circle.AccentColour = colours.BlueDarker;
+            MainPiece.AccentColour = colours.BlueDarker;
         }
     }
 }

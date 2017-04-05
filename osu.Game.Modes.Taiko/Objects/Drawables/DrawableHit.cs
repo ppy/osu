@@ -4,28 +4,18 @@
 using System;
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
-using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public abstract class DrawableHit : DrawableTaikoHitObject
+    public abstract class DrawableHit : DrawableTaikoHitObject<Hit>
     {
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
         protected abstract Key[] HitKeys { get; }
-
-        protected override Container<Drawable> Content => bodyContainer;
-
-        protected readonly CirclePiece Circle;
-
-        private readonly Hit hit;
-
-        private readonly Container bodyContainer;
 
         /// <summary>
         /// Whether the last key pressed is a valid hit key.
@@ -35,41 +25,28 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         protected DrawableHit(Hit hit)
             : base(hit)
         {
-            this.hit = hit;
-
-            AddInternal(bodyContainer = new Container
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Children = new[]
-                {
-                    Circle = CreateCirclePiece()
-                }
-            });
-
-            Circle.KiaiMode = HitObject.Kiai;
         }
 
         protected override void CheckJudgement(bool userTriggered)
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > hit.HitWindowGood)
+                if (Judgement.TimeOffset > HitObject.HitWindowGood)
                     Judgement.Result = HitResult.Miss;
                 return;
             }
 
             double hitOffset = Math.Abs(Judgement.TimeOffset);
 
-            if (hitOffset > hit.HitWindowMiss)
+            if (hitOffset > HitObject.HitWindowMiss)
                 return;
 
             if (!validKeyPressed)
                 Judgement.Result = HitResult.Miss;
-            else if (hitOffset < hit.HitWindowGood)
+            else if (hitOffset < HitObject.HitWindowGood)
             {
                 Judgement.Result = HitResult.Hit;
-                Judgement.TaikoResult = hitOffset < hit.HitWindowGreat ? TaikoHitResult.Great : TaikoHitResult.Good;
+                Judgement.TaikoResult = hitOffset < HitObject.HitWindowGreat ? TaikoHitResult.Great : TaikoHitResult.Good;
             }
             else
                 Judgement.Result = HitResult.Miss;
@@ -92,16 +69,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             switch (State)
             {
                 case ArmedState.Idle:
-                    Delay(hit.HitWindowMiss);
+                    Delay(HitObject.HitWindowMiss);
                     break;
                 case ArmedState.Miss:
                     FadeOut(100);
                     break;
                 case ArmedState.Hit:
-                    bodyContainer.ScaleTo(0.8f, 400, EasingTypes.OutQuad);
-                    bodyContainer.MoveToY(-200, 250, EasingTypes.Out);
-                    bodyContainer.Delay(250);
-                    bodyContainer.MoveToY(0, 500, EasingTypes.In);
+                    Content.ScaleTo(0.8f, 400, EasingTypes.OutQuad);
+                    Content.MoveToY(-200, 250, EasingTypes.Out);
+                    Content.Delay(250);
+                    Content.MoveToY(0, 500, EasingTypes.In);
 
                     FadeOut(600);
                     break;
