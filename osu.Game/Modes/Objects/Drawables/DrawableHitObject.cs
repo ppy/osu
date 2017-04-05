@@ -59,8 +59,9 @@ namespace osu.Game.Modes.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            foreach (var sample in HitObject.SampleBank.Sets)
-                samples.Add(audio.Sample.Get($@"Gameplay/{sample.Type}-hit{HitObject.SampleBank.Name}"));
+            foreach (var bank in HitObject.SampleBanks)
+            foreach (var sample in bank.Samples)
+                samples.Add(audio.Sample.Get($@"Gameplay/{sample.Type}-hit{bank.Name}"));
         }
 
         private ArmedState state;

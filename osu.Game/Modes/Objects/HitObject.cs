@@ -4,6 +4,7 @@
 using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
+using System.Collections.Generic;
 
 namespace osu.Game.Modes.Objects
 {
@@ -21,15 +22,29 @@ namespace osu.Game.Modes.Objects
         public double StartTime { get; set; }
 
         /// <summary>
-        /// The sample bank to be played when this hit object is hit.
+        /// The sample banks to be played when this hit object is hit.
         /// </summary>
-        public SampleBank SampleBank { get; set; }
+        public List<SampleBank> SampleBanks = new List<SampleBank>();
 
         /// <summary>
         /// Applies default values to this HitObject.
         /// </summary>
         /// <param name="difficulty">The difficulty settings to use.</param>
         /// <param name="timing">The timing settings to use.</param>
-        public virtual void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty) { }
+        public virtual void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
+        {
+            foreach (var bank in SampleBanks)
+            {
+                if (!string.IsNullOrEmpty(bank.Name))
+                    continue;
+
+                // If the bank is not assigned a name, assign it from the relevant timing point
+                ControlPoint overridePoint;
+                ControlPoint timingPoint = timing.TimingPointAt(StartTime, out overridePoint);
+
+                bank.Name = (overridePoint ?? timingPoint)?.SampleBank.Name ?? string.Empty;
+                bank.Volume = (overridePoint ?? timingPoint)?.SampleBank.Volume ?? 0;
+            }
+        }
     }
 }

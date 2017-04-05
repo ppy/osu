@@ -11,6 +11,7 @@ using osu.Game.Modes;
 using osu.Game.Tests.Resources;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Objects.Legacy;
+using System.Linq;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -136,12 +137,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsNotNull(slider);
                 Assert.AreEqual(new Vector2(192, 168), slider.Position);
                 Assert.AreEqual(956, slider.StartTime);
-                Assert.AreEqual(SampleType.None, slider.SampleBank.Type);
+                Assert.IsTrue(slider.SampleBanks.Any(b => b.Name == "none"));
                 var hit = beatmap.HitObjects[1] as LegacyHit;
                 Assert.IsNotNull(hit);
                 Assert.AreEqual(new Vector2(304, 56), hit.Position);
                 Assert.AreEqual(1285, hit.StartTime);
-                Assert.AreEqual(SampleType.Clap, hit.SampleBank.Type);
+                Assert.IsTrue(hit.SampleBanks.Any(b => b.Name == "clap"));
             }
         }
     }

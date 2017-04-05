@@ -95,7 +95,7 @@ namespace osu.Game.Modes.Osu.Objects
                             StackHeight = StackHeight,
                             Scale = Scale,
                             ComboColour = ComboColour,
-                            SampleBank = SampleBank
+                            SampleBanks = SampleBanks
                         };
                     }
                 }
