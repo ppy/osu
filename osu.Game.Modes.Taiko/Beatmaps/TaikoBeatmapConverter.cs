@@ -112,7 +112,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         StartTime = obj.StartTime,
                         Sample = obj.Sample,
                         IsStrong = strong,
-                        Distance = distance,
+                        Duration = taikoDuration,
                         TickRate = beatmap.BeatmapInfo.Difficulty.SliderTickRate == 3 ? 3 : 4,
                     };
                 }
@@ -126,7 +126,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     StartTime = obj.StartTime,
                     Sample = obj.Sample,
                     IsStrong = strong,
-                    EndTime = endTimeData.EndTime,
+                    Duration = endTimeData.Duration,
                     RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier),
                 };
             }

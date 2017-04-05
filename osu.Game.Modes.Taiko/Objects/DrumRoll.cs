@@ -11,21 +11,16 @@ using osu.Game.Database;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    public class DrumRoll : TaikoHitObject, IHasDistance
+    public class DrumRoll : TaikoHitObject, IHasEndTime
     {
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
         /// </summary>
         private const float base_distance = 100;
 
-        public double EndTime => StartTime + Distance / Velocity;
+        public double EndTime => StartTime + Duration;
 
-        public double Duration => EndTime - StartTime;
-
-        /// <summary>
-        /// Raw length of the drum roll in positional length units.
-        /// </summary>
-        public double Distance { get; set; }
+        public double Duration { get; set; }
 
         /// <summary>
         /// Velocity of the drum roll in positional length units per millisecond.
