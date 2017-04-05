@@ -90,7 +90,7 @@ namespace osu.Desktop.VisualTests.Tests
                 PreEmpt = 1000
             };
 
-            playfield.AddBarLine(major ? new DrawableMajorBarLine(bl) : new DrawableBarLine(bl));
+            playfield.AddBarLine(major ? new DrawableBarLineMajor(bl) : new DrawableBarLine(bl));
         }
 
         private void addSwell()
@@ -125,7 +125,7 @@ namespace osu.Desktop.VisualTests.Tests
             };
 
             if (strong)
-                playfield.Add(new DrawableStrongCentreHit(h));
+                playfield.Add(new DrawableCentreHitStrong(h));
             else
                 playfield.Add(new DrawableCentreHit(h));
         }
@@ -139,7 +139,7 @@ namespace osu.Desktop.VisualTests.Tests
             };
 
             if (strong)
-                playfield.Add(new DrawableStrongRimHit(h));
+                playfield.Add(new DrawableRimHitStrong(h));
             else
                 playfield.Add(new DrawableRimHit(h));
         }

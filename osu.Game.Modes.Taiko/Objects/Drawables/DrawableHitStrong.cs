@@ -11,7 +11,7 @@ using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public abstract class DrawableStrongHit : DrawableHit
+    public abstract class DrawableHitStrong : DrawableHit
     {
         /// <summary>
         /// The lenience for the second key press.
@@ -23,7 +23,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         private bool firstKeyHeld;
         private Key firstHitKey;
 
-        protected DrawableStrongHit(Hit hit)
+        protected DrawableHitStrong(Hit hit)
             : base(hit)
         {
         }
