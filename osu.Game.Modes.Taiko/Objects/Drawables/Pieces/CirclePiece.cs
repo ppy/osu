@@ -26,7 +26,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         /// <summary>
         /// The amount to scale up the base circle to show it as a "strong" piece.
         /// </summary>
-        protected const float STRONG_SCALE = 1.5f;
+        private const float strong_scale = 1.5f;
 
         /// <summary>
         /// The colour of the inner circle and outer glows.
@@ -125,11 +125,19 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
             if (isStrong)
             {
-                Size *= STRONG_SCALE;
+                Size *= strong_scale;
 
                 //default for symbols etc.
-                Content.Scale *= STRONG_SCALE;
+                Content.Scale *= strong_scale;
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            //we want to allow for width of content to remain mapped to the area inside us, regardless of the scale applied above.
+            Content.Width = 1 / Content.Scale.X;
         }
 
         private void resetEdgeEffects()
