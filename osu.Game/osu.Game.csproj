@@ -76,6 +76,9 @@
     <Compile Include="Beatmaps\IBeatmapCoverter.cs" />
     <Compile Include="Beatmaps\IBeatmapProcessor.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
+    <Compile Include="Beatmaps\Samples\SampleBank.cs" />
+    <Compile Include="Beatmaps\Samples\Sample.cs" />
+    <Compile Include="Beatmaps\Samples\SampleType.cs" />
     <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
     <Compile Include="Beatmaps\Timing\TimingInfo.cs" />
     <Compile Include="Database\ScoreDatabase.cs" />
@@ -148,11 +151,6 @@
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Modes\Objects\Drawables\DrawableHitObject.cs" />
     <Compile Include="Modes\Objects\HitObject.cs" />
-    <Compile Include="Beatmaps\Samples\HitSampleInfo.cs" />
-    <Compile Include="Beatmaps\Samples\SampleBank.cs" />
-    <Compile Include="Beatmaps\Samples\SampleInfo.cs" />
-    <Compile Include="Beatmaps\Samples\SampleSet.cs" />
-    <Compile Include="Beatmaps\Samples\SampleType.cs" />
     <Compile Include="Beatmaps\Timing\ControlPoint.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />

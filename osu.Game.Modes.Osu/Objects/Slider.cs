@@ -95,11 +95,7 @@ namespace osu.Game.Modes.Osu.Objects
                             StackHeight = StackHeight,
                             Scale = Scale,
                             ComboColour = ComboColour,
-                            Sample = new HitSampleInfo
-                            {
-                                Type = SampleType.None,
-                                Set = SampleSet.Soft,
-                            },
+                            SampleBank = SampleBank
                         };
                     }
                 }

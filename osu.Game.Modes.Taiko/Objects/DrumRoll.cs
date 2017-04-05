@@ -95,11 +95,7 @@ namespace osu.Game.Modes.Taiko.Objects
                     TickSpacing = tickSpacing,
                     StartTime = t,
                     IsStrong = IsStrong,
-                    Sample = new HitSampleInfo
-                    {
-                        Type = SampleType.None,
-                        Set = SampleSet.Soft
-                    }
+                    SampleBank = SampleBank
                 });
 
                 first = false;

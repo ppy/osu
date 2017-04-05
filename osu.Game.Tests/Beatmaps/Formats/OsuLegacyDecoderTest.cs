@@ -136,12 +136,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsNotNull(slider);
                 Assert.AreEqual(new Vector2(192, 168), slider.Position);
                 Assert.AreEqual(956, slider.StartTime);
-                Assert.AreEqual(SampleType.None, slider.Sample.Type);
+                Assert.AreEqual(SampleType.None, slider.SampleBank.Type);
                 var hit = beatmap.HitObjects[1] as LegacyHit;
                 Assert.IsNotNull(hit);
                 Assert.AreEqual(new Vector2(304, 56), hit.Position);
                 Assert.AreEqual(1285, hit.StartTime);
-                Assert.AreEqual(SampleType.Clap, hit.Sample.Type);
+                Assert.AreEqual(SampleType.Clap, hit.SampleBank.Type);
             }
         }
     }

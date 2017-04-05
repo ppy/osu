@@ -31,7 +31,7 @@ namespace osu.Game.Beatmaps.Formats
             // TODO: Not sure how far back to go, or differences between versions
         }
 
-        private SampleSet defaultSampleSet;
+        private Sample defaultSampleSet;
         private int defaultSampleVolume = 100;
         private bool samplesMatchPlaybackRate;
 
@@ -77,7 +77,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.Countdown = int.Parse(val) == 1;
                     break;
                 case @"SampleSet":
-                    defaultSampleSet = (SampleSet)Enum.Parse(typeof(SampleSet), val);
+                    defaultSampleSet = (Sample)Enum.Parse(typeof(Sample), val);
                     break;
                 case @"SampleVolume":
                     defaultSampleVolume = int.Parse(val);
@@ -222,9 +222,9 @@ namespace osu.Game.Beatmaps.Formats
             if (split.Length >= 3)
                 timeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)int.Parse(split[2]);
 
-            SampleSet sampleSet = defaultSampleSet;
+            Sample sampleSet = defaultSampleSet;
             if (split.Length >= 4)
-                sampleSet = (SampleSet)int.Parse(split[3]);
+                sampleSet = (Sample)int.Parse(split[3]);
 
             SampleBank sampleBank = SampleBank.Default;
             if (split.Length >= 5)
