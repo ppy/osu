@@ -26,7 +26,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         /// <summary>
         /// The amount to scale up the base circle to show it as a "strong" piece.
         /// </summary>
-        private const float strong_scale = 1.5f;
+        protected const float STRONG_SCALE = 1.5f;
 
         /// <summary>
         /// The colour of the inner circle and outer glows.
@@ -117,7 +117,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Name = "Symbol",
+                    Name = "Content",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 }
@@ -125,10 +125,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
             if (isStrong)
             {
-                Size *= strong_scale;
+                Size *= STRONG_SCALE;
 
-                //for symbols etc.
-                Content.Scale *= strong_scale;
+                //default for symbols etc.
+                Content.Scale *= STRONG_SCALE;
             }
         }
 
