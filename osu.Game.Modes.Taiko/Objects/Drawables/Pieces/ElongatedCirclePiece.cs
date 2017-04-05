@@ -21,18 +21,21 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
         public ElongatedCirclePiece(bool isStrong = false) : base(isStrong)
         {
+            if (isStrong)
+            {
+                //undo the strong scale provided in CirclePiece.
+                Content.Scale /= STRONG_SCALE;
+            }
         }
 
         protected override void Update()
         {
             base.Update();
 
-            var contentPadding = DrawHeight / 2 * Content.Scale.X;
-
             Content.Padding = new MarginPadding
             {
-                Left = contentPadding,
-                Right = contentPadding,
+                Left = DrawHeight / 2,
+                Right = DrawHeight / 2,
             };
 
             Width = (PlayfieldLengthReference?.Invoke() ?? 0) * Length + DrawHeight;
