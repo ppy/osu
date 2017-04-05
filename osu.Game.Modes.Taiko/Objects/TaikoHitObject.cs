@@ -25,7 +25,7 @@ namespace osu.Game.Modes.Taiko.Objects
         public float VelocityMultiplier = 1;
 
         /// <summary>
-        /// The time to scroll in the HitObject.
+        /// The time from the initial right (off-screen) spawn position to the centre of the hit target.
         /// </summary>
         public double PreEmpt;
 

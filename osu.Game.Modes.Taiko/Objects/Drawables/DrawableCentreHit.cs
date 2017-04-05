@@ -15,13 +15,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         public DrawableCentreHit(Hit hit)
             : base(hit)
         {
-            Circle.Add(new CentreHitSymbolPiece());
+            MainPiece.Add(new CentreHitSymbolPiece());
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Circle.AccentColour = colours.PinkDarker;
+            MainPiece.AccentColour = colours.PinkDarker;
         }
     }
 }
