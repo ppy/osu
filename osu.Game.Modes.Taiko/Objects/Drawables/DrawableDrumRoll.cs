@@ -48,7 +48,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece(HitObject.IsStrong)
         {
-            Length = (float)(HitObject.Duration / HitObject.PreEmpt),
+            Length = (float)(HitObject.Duration / HitObject.ScrollTime),
             PlayfieldLengthReference = () => Parent.DrawSize.X
         };
 
@@ -67,7 +67,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             // is further than mid point of the play field, so the time taken to scroll in should always
             // be greater than the time taken to scroll out to the left of the screen.
             // Thus, using PreEmpt here is enough for the drum roll to completely scroll out.
-            LifetimeEnd = HitObject.EndTime + HitObject.PreEmpt;
+            LifetimeEnd = HitObject.EndTime + HitObject.ScrollTime;
         }
 
         private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)

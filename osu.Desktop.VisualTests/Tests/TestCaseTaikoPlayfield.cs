@@ -87,7 +87,7 @@ namespace osu.Desktop.VisualTests.Tests
             BarLine bl = new BarLine
             {
                 StartTime = Time.Current + 1000,
-                PreEmpt = 1000
+                ScrollTime = 1000
             };
 
             playfield.AddBarLine(major ? new DrawableBarLineMajor(bl) : new DrawableBarLine(bl));
@@ -99,7 +99,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 StartTime = Time.Current + 1000,
                 EndTime = Time.Current + 1000,
-                PreEmpt = 1000
+                ScrollTime = 1000
             }));
         }
         
@@ -110,7 +110,7 @@ namespace osu.Desktop.VisualTests.Tests
                 StartTime = Time.Current + 1000,
                 IsStrong = strong,
                 Distance = 1000,
-                PreEmpt = 1000,
+                ScrollTime = 1000,
             };
 
             playfield.Add(new DrawableDrumRoll(d));
@@ -121,7 +121,7 @@ namespace osu.Desktop.VisualTests.Tests
             Hit h = new Hit
             {
                 StartTime = Time.Current + 1000,
-                PreEmpt = 1000
+                ScrollTime = 1000
             };
 
             if (strong)
@@ -135,7 +135,7 @@ namespace osu.Desktop.VisualTests.Tests
             Hit h = new Hit
             {
                 StartTime = Time.Current + 1000,
-                PreEmpt = 1000
+                ScrollTime = 1000
             };
 
             if (strong)

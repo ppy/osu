@@ -58,7 +58,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
         protected override void LoadComplete()
         {
-            LifetimeStart = HitObject.StartTime - HitObject.PreEmpt * 2;
+            LifetimeStart = HitObject.StartTime - HitObject.ScrollTime * 2;
             base.LoadComplete();
         }
 
@@ -71,7 +71,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         /// a time value and the HitObject's StartTime.
         /// </summary>
         /// <param name="time"></param>
-        protected virtual void UpdateScrollPosition(double time) => MoveToX((float)((HitObject.StartTime - time) / HitObject.PreEmpt));
+        protected virtual void UpdateScrollPosition(double time) => MoveToX((float)((HitObject.StartTime - time) / HitObject.ScrollTime));
 
         protected override void Update()
         {
