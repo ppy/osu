@@ -29,7 +29,6 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new CirclePiece
             {
                 Position = new Vector2(100, 100),
-                Width = 0,
                 AccentColour = Color4.DarkRed,
                 KiaiMode = kiai,
                 Children = new[]
@@ -41,7 +40,6 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new StrongCirclePiece
             {
                 Position = new Vector2(350, 100),
-                Width = 0,
                 AccentColour = Color4.DarkRed,
                 KiaiMode = kiai,
                 Children = new[]
@@ -53,7 +51,6 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new CirclePiece
             {
                 Position = new Vector2(100, 300),
-                Width = 0,
                 AccentColour = Color4.DarkBlue,
                 KiaiMode = kiai,
                 Children = new[]
@@ -65,7 +62,6 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new StrongCirclePiece
             {
                 Position = new Vector2(350, 300),
-                Width = 0,
                 AccentColour = Color4.DarkBlue,
                 KiaiMode = kiai,
                 Children = new[]
@@ -77,7 +73,6 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new CirclePiece
             {
                 Position = new Vector2(100, 500),
-                Width = 0,
                 AccentColour = Color4.Orange,
                 KiaiMode = kiai,
                 Children = new[]
