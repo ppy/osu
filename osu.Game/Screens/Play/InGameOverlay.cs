@@ -27,8 +27,8 @@ namespace osu.Game.Screens.Play
         public Action OnRetry;
         public Action OnQuit;
 
-        protected string Title;
-        protected string Description;
+        public abstract string Header { get; }
+        public abstract string Description { get; }
 
         private FillFlowContainer buttons;
 
@@ -82,6 +82,8 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseMove(InputState state) => true;
 
+        protected abstract void AddButtons(OsuColour colours);
+
         protected void AddButton(string text, Color4 colour, Action action)
         {
             buttons.Add(new PauseButton
@@ -131,7 +133,7 @@ namespace osu.Game.Screens.Play
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = Title,
+                                    Text = Header,
                                     Font = @"Exo2.0-Medium",
                                     Spacing = new Vector2(5, 0),
                                     Origin = Anchor.TopCentre,
@@ -185,11 +187,6 @@ namespace osu.Game.Screens.Play
             Retries = 0;
 
             AddButtons(colours);
-        }
-
-        protected virtual void AddButtons(OsuColour colours)
-        {
-
         }
 
         protected InGameOverlay()
