@@ -75,12 +75,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     FadeOut(100);
                     break;
                 case ArmedState.Hit:
-                    Content.ScaleTo(0.8f, 400, EasingTypes.OutQuad);
-                    Content.MoveToY(-200, 250, EasingTypes.Out);
-                    Content.Delay(250);
-                    Content.MoveToY(0, 500, EasingTypes.In);
-
                     FadeOut(600);
+
+                    const float gravity_time = 300;
+                    const float gravity_travel_height = 200;
+
+                    Content.ScaleTo(0.8f, gravity_time * 2, EasingTypes.OutQuad);
+
+                    MoveToY(-gravity_travel_height, gravity_time, EasingTypes.Out);
+                    Delay(gravity_time, true);
+                    MoveToY(gravity_travel_height * 2, gravity_time * 2, EasingTypes.In);
                     break;
             }
 
