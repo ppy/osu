@@ -20,7 +20,11 @@ namespace osu.Desktop.VisualTests.Tests
 
         private TaikoPlayfield playfield;
 
-        protected override double TimePerAction => 500;
+        protected override double TimePerAction => default_duration * 2;
+
+        private const double default_duration = 300;
+
+        private const float scroll_time = 1000;
 
         public override void Reset()
         {
@@ -30,7 +34,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep("Miss :(", addMissJudgement);
             AddStep("DrumRoll", () => addDrumRoll(false));
             AddStep("Strong DrumRoll", () => addDrumRoll(true));
-            AddStep("Swell", addSwell);
+            AddStep("Swell", () => addSwell());
             AddStep("Centre", () => addCentreHit(false));
             AddStep("Strong Centre", () => addCentreHit(true));
             AddStep("Rim", () => addRimHit(false));
@@ -82,35 +86,38 @@ namespace osu.Desktop.VisualTests.Tests
             });
         }
 
-        private void addBarLine(bool major)
+        private void addBarLine(bool major, double delay = scroll_time)
         {
             BarLine bl = new BarLine
             {
-                StartTime = Time.Current + 1000,
-                ScrollTime = 1000
+                StartTime = playfield.Time.Current + delay,
+                ScrollTime = scroll_time
             };
 
             playfield.AddBarLine(major ? new DrawableBarLineMajor(bl) : new DrawableBarLine(bl));
         }
 
-        private void addSwell()
+        private void addSwell(double duration = default_duration)
         {
             playfield.Add(new DrawableSwell(new Swell
             {
-                StartTime = Time.Current + 1000,
-                EndTime = Time.Current + 1000,
-                ScrollTime = 1000
+                StartTime = playfield.Time.Current + scroll_time,
+                Duration = duration,
+                ScrollTime = scroll_time
             }));
         }
         
-        private void addDrumRoll(bool strong)
+        private void addDrumRoll(bool strong, double duration = default_duration)
         {
+            addBarLine(true);
+            addBarLine(true, scroll_time + duration);
+
             var d = new DrumRoll
             {
-                StartTime = Time.Current + 1000,
+                StartTime = playfield.Time.Current + scroll_time,
                 IsStrong = strong,
-                Distance = 1000,
-                ScrollTime = 1000,
+                Duration = duration,
+                ScrollTime = scroll_time,
             };
 
             playfield.Add(new DrawableDrumRoll(d));
@@ -120,8 +127,8 @@ namespace osu.Desktop.VisualTests.Tests
         {
             Hit h = new Hit
             {
-                StartTime = Time.Current + 1000,
-                ScrollTime = 1000
+                StartTime = playfield.Time.Current + scroll_time,
+                ScrollTime = scroll_time
             };
 
             if (strong)
@@ -134,8 +141,8 @@ namespace osu.Desktop.VisualTests.Tests
         {
             Hit h = new Hit
             {
-                StartTime = Time.Current + 1000,
-                ScrollTime = 1000
+                StartTime = playfield.Time.Current + scroll_time,
+                ScrollTime = scroll_time
             };
 
             if (strong)
