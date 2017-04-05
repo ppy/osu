@@ -71,7 +71,7 @@ namespace osu.Game.Modes.Taiko.Objects
 
             double speedAdjutedBeatLength = timing.SpeedMultiplierAt(StartTime) * timing.BeatLengthAt(StartTime);
 
-            Velocity = base_distance * difficulty.SliderMultiplier / speedAdjutedBeatLength * VelocityMultiplier;
+            Velocity = base_distance * difficulty.SliderMultiplier / speedAdjutedBeatLength;
             tickSpacing = timing.BeatLengthAt(StartTime) / TickRate;
 
             RequiredGoodHits = TotalTicks * Math.Min(0.15, 0.05 + 0.10 / 6 * difficulty.OverallDifficulty);
@@ -91,7 +91,7 @@ namespace osu.Game.Modes.Taiko.Objects
                 ret.Add(new DrumRollTick
                 {
                     FirstTick = first,
-                    PreEmpt = PreEmpt,
+                    ScrollTime = ScrollTime,
                     TickSpacing = tickSpacing,
                     StartTime = t,
                     IsStrong = IsStrong,
