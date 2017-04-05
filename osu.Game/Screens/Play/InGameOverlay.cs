@@ -82,8 +82,6 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseMove(InputState state) => true;
 
-        protected abstract void AddButtons(OsuColour colours);
-
         protected void AddButton(string text, Color4 colour, Action action)
         {
             buttons.Add(new PauseButton
@@ -185,8 +183,6 @@ namespace osu.Game.Screens.Play
             };
 
             Retries = 0;
-
-            AddButtons(colours);
         }
 
         protected InGameOverlay()
