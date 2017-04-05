@@ -60,7 +60,7 @@ namespace osu.Game.Modes.Objects.Drawables
         private void load(AudioManager audio)
         {
             foreach (var sample in HitObject.SampleBank.Sets)
-                samples.Add(audio.Sample.Get($@"Gameplay/{sample.Type.ToString().ToLower()}-hit{HitObject.SampleBank.Name.ToLower()}"));
+                samples.Add(audio.Sample.Get($@"Gameplay/{sample.Type}-hit{HitObject.SampleBank.Name}"));
         }
 
         private ArmedState state;

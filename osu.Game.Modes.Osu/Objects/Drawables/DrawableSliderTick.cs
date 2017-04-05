@@ -58,7 +58,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sample = audio.Sample.Get($@"Gameplay/{HitObject.SampleBank.Name.ToLower()}-slidertick");
+            sample = audio.Sample.Get($@"Gameplay/{HitObject.SampleBank.Name}-slidertick");
         }
 
         protected override void PlaySamples()
