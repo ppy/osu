@@ -9,6 +9,7 @@ using osu.Game.Modes.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 
@@ -42,7 +43,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
         {
             return new Beatmap<TaikoHitObject>(original)
             {
-                TimingInfo = new LegacyTimingInfo(original.TimingInfo),
+                TimingInfo = original is LegacyBeatmap ? new LegacyTimingInfo(original.TimingInfo) : original.TimingInfo,
                 HitObjects = original.HitObjects.SelectMany(h => convertHitObject(h, original)).ToList()
             };
         }
