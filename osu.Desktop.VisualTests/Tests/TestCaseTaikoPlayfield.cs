@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
@@ -37,8 +38,12 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep("Add bar line", () => addBarLine(false));
             AddStep("Add major bar line", () => addBarLine(true));
 
+
+            var rateAdjustClock = new StopwatchClock(true) { Rate = 1 };
+
             Add(new Container
             {
+                Clock = new FramedClock(rateAdjustClock),
                 RelativeSizeAxes = Axes.X,
                 Y = 200,
                 Children = new[]
