@@ -54,12 +54,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             });
 
             MainPiece.KiaiMode = HitObject.Kiai;
-        }
 
-        protected override void LoadComplete()
-        {
             LifetimeStart = HitObject.StartTime - HitObject.ScrollTime * 2;
-            base.LoadComplete();
         }
 
         protected override TaikoJudgement CreateJudgement() => new TaikoJudgement();
