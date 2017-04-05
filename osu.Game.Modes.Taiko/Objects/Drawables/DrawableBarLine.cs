@@ -62,14 +62,14 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
             base.LoadComplete();
 
-            LifetimeStart = BarLine.StartTime - BarLine.PreEmpt * 2;
-            LifetimeEnd = BarLine.StartTime + BarLine.PreEmpt;
+            LifetimeStart = BarLine.StartTime - BarLine.ScrollTime * 2;
+            LifetimeEnd = BarLine.StartTime + BarLine.ScrollTime;
 
             Delay(BarLine.StartTime - Time.Current);
-            FadeOut(base_fadeout_time * BarLine.PreEmpt / 1000);
+            FadeOut(base_fadeout_time * BarLine.ScrollTime / 1000);
         }
 
-        private void updateScrollPosition(double time) => MoveToX((float)((BarLine.StartTime - time) / BarLine.PreEmpt));
+        private void updateScrollPosition(double time) => MoveToX((float)((BarLine.StartTime - time) / BarLine.ScrollTime));
 
         protected override void Update()
         {
