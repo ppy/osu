@@ -23,11 +23,6 @@ namespace osu.Game.Modes.Taiko.Objects
         public double Duration { get; set; }
 
         /// <summary>
-        /// Velocity of the drum roll in positional length units per millisecond.
-        /// </summary>
-        public double Velocity { get; protected set; } = 5;
-
-        /// <summary>
         /// Numer of ticks per beat length.
         /// </summary>
         public int TickRate = 1;
@@ -64,9 +59,6 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.ApplyDefaults(timing, difficulty);
 
-            double speedAdjutedBeatLength = timing.SpeedMultiplierAt(StartTime) * timing.BeatLengthAt(StartTime);
-
-            Velocity = base_distance * difficulty.SliderMultiplier / speedAdjutedBeatLength;
             tickSpacing = timing.BeatLengthAt(StartTime) / TickRate;
 
             RequiredGoodHits = TotalTicks * Math.Min(0.15, 0.05 + 0.10 / 6 * difficulty.OverallDifficulty);
