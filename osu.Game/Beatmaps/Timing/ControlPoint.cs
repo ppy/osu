@@ -14,9 +14,11 @@ namespace osu.Game.Beatmaps.Timing
         public TimeSignatures TimeSignature;
         public double Time;
         public double BeatLength;
-        public double VelocityAdjustment;
+        public double SpeedMultiplier;
         public bool TimingChange;
         public bool KiaiMode;
         public bool OmitFirstBarLine;
+
+        public ControlPoint Clone() => (ControlPoint)MemberwiseClone();
     }
 }

@@ -9,6 +9,7 @@ using osu.Game.Modes.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 
 namespace osu.Game.Modes.Taiko.Beatmaps
@@ -41,6 +42,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
         {
             return new Beatmap<TaikoHitObject>(original)
             {
+                TimingInfo = new LegacyTimingInfo(original.TimingInfo),
                 HitObjects = original.HitObjects.SelectMany(h => convertHitObject(h, original)).ToList()
             };
         }
@@ -100,7 +102,6 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                             StartTime = j,
                             Sample = obj.Sample,
                             IsStrong = strong,
-                            VelocityMultiplier = legacy_velocity_multiplier
                         };
                     }
                 }
@@ -113,7 +114,6 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         IsStrong = strong,
                         Distance = distance,
                         TickRate = beatmap.BeatmapInfo.Difficulty.SliderTickRate == 3 ? 3 : 4,
-                        VelocityMultiplier = legacy_velocity_multiplier
                     };
                 }
             }
@@ -128,7 +128,6 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     IsStrong = strong,
                     EndTime = endTimeData.EndTime,
                     RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier),
-                    VelocityMultiplier = legacy_velocity_multiplier
                 };
             }
             else
@@ -142,7 +141,6 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         StartTime = obj.StartTime,
                         Sample = obj.Sample,
                         IsStrong = strong,
-                        VelocityMultiplier = legacy_velocity_multiplier
                     };
                 }
                 else
@@ -152,8 +150,23 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         StartTime = obj.StartTime,
                         Sample = obj.Sample,
                         IsStrong = strong,
-                        VelocityMultiplier = legacy_velocity_multiplier
                     };
+                }
+            }
+        }
+
+        private class LegacyTimingInfo : TimingInfo
+        {
+            public LegacyTimingInfo(TimingInfo original)
+            {
+                if (original is LegacyTimingInfo)
+                    ControlPoints.AddRange(original.ControlPoints);
+                else
+                {
+                    ControlPoints.AddRange(original.ControlPoints.Select(c => c.Clone()));
+
+                    foreach (var c in ControlPoints)
+                        c.SpeedMultiplier *= legacy_velocity_multiplier;
                 }
             }
         }

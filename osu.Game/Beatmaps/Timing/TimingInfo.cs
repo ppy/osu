@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Timing
             ControlPoint overridePoint;
             ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
 
-            return overridePoint?.VelocityAdjustment ?? timingPoint?.VelocityAdjustment ?? 1;
+            return overridePoint?.SpeedMultiplier ?? timingPoint?.SpeedMultiplier ?? 1;
         }
 
         /// <summary>
