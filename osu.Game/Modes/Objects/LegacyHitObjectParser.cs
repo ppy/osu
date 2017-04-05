@@ -105,11 +105,6 @@ namespace osu.Game.Modes.Objects
                 throw new InvalidOperationException($@"Unknown hit object type {type}");
 
             result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
-            result.SampleBank = new HitSampleInfo
-            {
-                Type = (SampleType)int.Parse(split[4]),
-                Set = Sample.Soft,
-            };
 
             // TODO: "addition" field
 

@@ -31,7 +31,7 @@ namespace osu.Game.Beatmaps.Formats
             // TODO: Not sure how far back to go, or differences between versions
         }
 
-        private Sample defaultSampleSet;
+        private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
         private bool samplesMatchPlaybackRate;
 
@@ -77,7 +77,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.Countdown = int.Parse(val) == 1;
                     break;
                 case @"SampleSet":
-                    defaultSampleSet = (Sample)Enum.Parse(typeof(Sample), val);
+                    defaultSampleBank = (LegacySampleBank)Enum.Parse(typeof(LegacySampleBank), val);
                     break;
                 case @"SampleVolume":
                     defaultSampleVolume = int.Parse(val);
@@ -222,13 +222,13 @@ namespace osu.Game.Beatmaps.Formats
             if (split.Length >= 3)
                 timeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)int.Parse(split[2]);
 
-            Sample sampleSet = defaultSampleSet;
+            LegacySampleBank sampleSet = defaultSampleBank;
             if (split.Length >= 4)
-                sampleSet = (Sample)int.Parse(split[3]);
+                sampleSet = (LegacySampleBank)int.Parse(split[3]);
 
-            SampleBank sampleBank = SampleBank.Default;
-            if (split.Length >= 5)
-                sampleBank = (SampleBank)int.Parse(split[4]);
+            //SampleBank sampleBank = SampleBank.Default;
+            //if (split.Length >= 5)
+            //    sampleBank = (SampleBank)int.Parse(split[4]);
 
             int sampleVolume = defaultSampleVolume;
             if (split.Length >= 6)
@@ -254,10 +254,9 @@ namespace osu.Game.Beatmaps.Formats
                 VelocityAdjustment = beatLength < 0 ? -beatLength / 100.0 : 1,
                 TimingChange = timingChange,
                 TimeSignature = timeSignature,
-                Sample = new SampleInfo
+                SampleBank = new SampleBank
                 {
-                    Bank = sampleBank,
-                    Set = sampleSet,
+                    Name = sampleSet.ToString().ToLower(),
                     Volume = sampleVolume
                 },
                 KiaiMode = kiaiMode,
@@ -371,6 +370,14 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                 }
             }
+        }
+
+        private enum LegacySampleBank
+        {
+            None = 0,
+            Normal = 1,
+            Soft = 2,
+            Drum = 3
         }
     }
 }
