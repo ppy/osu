@@ -71,7 +71,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         /// a time value and the HitObject's StartTime.
         /// </summary>
         /// <param name="time"></param>
-        protected virtual void UpdateScrollPosition(double time) => MoveToX((float)((HitObject.StartTime - time) / HitObject.ScrollTime));
+        protected virtual void UpdateScrollPosition(double time) => X = (float)((HitObject.StartTime - time) / HitObject.ScrollTime);
 
         protected override void Update()
         {
