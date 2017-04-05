@@ -34,7 +34,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             {
                 var newTick = new DrawableDrumRollTick(tick)
                 {
-                    X = (float)((tick.StartTime - HitObject.StartTime) / drumRoll.Duration)
+                    X = (float)((tick.StartTime - HitObject.StartTime) / HitObject.Duration)
                 };
 
                 newTick.OnJudgement += onTickJudgement;
