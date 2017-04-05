@@ -21,9 +21,9 @@ namespace osu.Game.Modes.Objects
         public double StartTime { get; set; }
 
         /// <summary>
-        /// The sample to be played when this HitObject is hit.
+        /// The sample bank to be played when this hit object is hit.
         /// </summary>
-        public HitSampleInfo Sample { get; set; }
+        public SampleBank SampleBank { get; set; }
 
         /// <summary>
         /// Applies default values to this HitObject.
