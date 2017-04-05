@@ -14,6 +14,9 @@ namespace osu.Game.Screens.Play
     {
         public Action OnResume;
 
+        public override string Header => "paused";
+        public override string Description => "you're not going to do what i think you're going to do, are ya?";
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Key == Key.Escape)
@@ -31,12 +34,6 @@ namespace osu.Game.Screens.Play
             AddButton(@"Continue", colours.Green, OnResume);
             AddButton(@"Retry", colours.YellowDark, OnRetry);
             AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), OnQuit);
-        }
-
-        public PauseOverlay()
-        {
-            Title = @"paused";
-            Description = @"you're not going to do what i think you're going to do, are ya?";
         }
     }
 }

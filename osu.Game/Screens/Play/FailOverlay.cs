@@ -11,6 +11,9 @@ namespace osu.Game.Screens.Play
 {
     public class FailOverlay : InGameOverlay
     {
+
+        public override string Header => "failed";
+        public override string Description => "you're dead, try again?";
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Key == Key.Escape)
@@ -27,12 +30,6 @@ namespace osu.Game.Screens.Play
         {
             AddButton(@"Retry", colours.YellowDark, OnRetry);
             AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), OnQuit);
-        }
-
-        public FailOverlay()
-        {
-            Title = @"failed";
-            Description = @"you're dead, try again?";
         }
     }
 }
