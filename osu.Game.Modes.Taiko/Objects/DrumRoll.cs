@@ -86,7 +86,7 @@ namespace osu.Game.Modes.Taiko.Objects
                 return ret;
 
             bool first = true;
-            for (double t = StartTime; t < EndTime + (int)tickSpacing; t += tickSpacing)
+            for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
             {
                 ret.Add(new DrumRollTick
                 {
