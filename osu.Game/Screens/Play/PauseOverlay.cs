@@ -7,6 +7,7 @@ using osu.Game.Graphics;
 using OpenTK.Input;
 using osu.Framework.Graphics.Containers;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play
 {
@@ -29,7 +30,8 @@ namespace osu.Game.Screens.Play
             return base.OnKeyDown(state, args);
         }
 
-        protected override void AddButtons(OsuColour colours)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
             AddButton(@"Continue", colours.Green, OnResume);
             AddButton(@"Retry", colours.YellowDark, OnRetry);

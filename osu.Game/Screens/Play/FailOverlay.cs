@@ -6,6 +6,7 @@ using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Game.Graphics;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play
 {
@@ -26,7 +27,8 @@ namespace osu.Game.Screens.Play
             return base.OnKeyDown(state, args);
         }
 
-        protected override void AddButtons(OsuColour colours)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
             AddButton(@"Retry", colours.YellowDark, OnRetry);
             AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), OnQuit);
