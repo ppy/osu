@@ -8,11 +8,11 @@ using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public class DrawableStrongRimHit : DrawableStrongHit
+    public class DrawableRimHitStrong : DrawableHitStrong
     {
         protected override Key[] HitKeys { get; } = { Key.D, Key.K };
 
-        public DrawableStrongRimHit(Hit hit)
+        public DrawableRimHitStrong(Hit hit)
             : base(hit)
         {
             MainPiece.Add(new RimHitSymbolPiece());
