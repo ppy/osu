@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps.Samples
         /// <summary>
         /// The list of samples that are to be played to be played from this bank.
         /// </summary>
-        public List<Sample> Sets;
+        public List<Sample> Samples;
 
         /// <summary>
         /// In conversion from osu-stable, this is equivalent to SampleSet (_not_ CustomSampleSet).

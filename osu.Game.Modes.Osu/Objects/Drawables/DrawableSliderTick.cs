@@ -12,6 +12,7 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Judgements;
 using OpenTK;
 using OpenTK.Graphics;
+using System.Collections.Generic;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -27,6 +28,8 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         public override bool RemoveWhenNotAlive => false;
 
         protected override OsuJudgement CreateJudgement() => new OsuJudgement { MaxScore = OsuScoreResult.SliderTick };
+
+        private List<SampleChannel> samples = new List<SampleChannel>();
 
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
@@ -53,19 +56,17 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             };
         }
 
-        private SampleChannel sample;
-
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sample = audio.Sample.Get($@"Gameplay/{HitObject.SampleBank.Name}-slidertick");
+            foreach (var bank in HitObject.SampleBanks)
+                samples.Add(audio.Sample.Get($@"Gameplay/{bank.Name}-slidertick"));
         }
 
         protected override void PlaySamples()
         {
-            sample?.Play();
+            samples.ForEach(s => s?.Play());
         }
-
 
         protected override void CheckJudgement(bool userTriggered)
         {

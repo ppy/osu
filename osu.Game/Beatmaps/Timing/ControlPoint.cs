@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps.Timing
             TimingChange = true,
         };
 
-        public SampleInfo Sample;
+        public SampleBank SampleBank;
         public TimeSignatures TimeSignature;
         public double Time;
         public double BeatLength;

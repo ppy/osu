@@ -95,7 +95,7 @@ namespace osu.Game.Modes.Taiko.Objects
                     TickSpacing = tickSpacing,
                     StartTime = t,
                     IsStrong = IsStrong,
-                    SampleBank = SampleBank
+                    SampleBanks = SampleBanks
                 });
 
                 first = false;
