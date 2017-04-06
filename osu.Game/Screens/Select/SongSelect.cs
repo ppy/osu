@@ -167,12 +167,11 @@ namespace osu.Game.Screens.Select
                 BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
             }
 
-            if (osu != null)
-                playMode.BindTo(osu.PlayMode);
-            playMode.ValueChanged += val => Beatmap.PreferredPlayMode = val;
-
             if (database == null)
                 database = beatmaps;
+
+            playMode.ValueChanged += val => { if (Beatmap != null) Beatmap.PreferredPlayMode = val; };
+            if (osu != null) playMode.BindTo(osu.PlayMode);
 
             database.BeatmapSetAdded += onBeatmapSetAdded;
             database.BeatmapSetRemoved += onBeatmapSetRemoved;
