@@ -104,7 +104,7 @@ namespace osu.Game.Database
                         score.Replay = score.CreateReplay(reader);
                 }
             }
-            
+
             return score;
         }
     }
