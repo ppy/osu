@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
+using osu.Game.Audio;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
@@ -82,11 +82,12 @@ namespace osu.Game.Modes.Taiko.Objects
                     TickSpacing = tickSpacing,
                     StartTime = t,
                     IsStrong = IsStrong,
-                    Sample = new HitSampleInfo
+                    Samples = Samples.Select(s => new SampleInfo
                     {
-                        Type = SampleType.None,
-                        Set = SampleSet.Soft
-                    }
+                        Bank = s.Bank,
+                        Name = @"slidertick",
+                        Volume = s.Volume
+                    }).ToList()
                 });
 
                 first = false;

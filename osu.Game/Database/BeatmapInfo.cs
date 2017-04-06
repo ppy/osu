@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
@@ -47,7 +46,6 @@ namespace osu.Game.Database
         // General
         public int AudioLeadIn { get; set; }
         public bool Countdown { get; set; }
-        public SampleSet SampleSet { get; set; }
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
         public PlayMode Mode { get; set; }
