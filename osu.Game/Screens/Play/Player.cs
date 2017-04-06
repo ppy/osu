@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -31,13 +30,13 @@ namespace osu.Game.Screens.Play
 
         internal override bool ShowOverlays => false;
 
-        internal override bool HasLocalCursorDisplayed => !hasReplayLoaded && !IsPaused;
-
-        private bool hasReplayLoaded => HitRenderer.InputManager.ReplayInputHandler != null;
+        internal override bool HasLocalCursorDisplayed => !IsPaused && !HasFailed && HitRenderer.ProvidingUserCursor;
 
         public BeatmapInfo BeatmapInfo;
 
         public bool IsPaused { get; private set; }
+
+        public bool HasFailed { get; private set; }
 
         public int RestartCount;
 
@@ -58,6 +57,7 @@ namespace osu.Game.Screens.Play
 
         private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
+        private FailOverlay failOverlay;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
@@ -118,20 +118,6 @@ namespace osu.Game.Screens.Play
             hudOverlay = new StandardHudOverlay();
             hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
             hudOverlay.BindProcessor(scoreProcessor);
-
-            pauseOverlay = new PauseOverlay
-            {
-                Depth = -1,
-                OnResume = delegate
-                {
-                    Delay(400);
-                    Schedule(Resume);
-                },
-                OnRetry = Restart,
-                OnQuit = Exit
-            };
-
-
             hudOverlay.BindHitRenderer(HitRenderer);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
@@ -156,7 +142,21 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 hudOverlay,
-                pauseOverlay
+                pauseOverlay = new PauseOverlay
+                {
+                    OnResume = delegate
+                    {
+                        Delay(400);
+                        Schedule(Resume);
+                    },
+                    OnRetry = Restart,
+                    OnQuit = Exit,
+                },
+                failOverlay = new FailOverlay
+                {
+                    OnRetry = Restart,
+                    OnQuit = Exit,
+                }
             };
         }
 
@@ -256,15 +256,13 @@ namespace osu.Game.Screens.Play
 
         private void onFail()
         {
-            Content.FadeColour(Color4.Red, 500);
             sourceClock.Stop();
 
             Delay(500);
-            Schedule(delegate
-            {
-                ValidForResume = false;
-                Push(new FailDialog());
-            });
+
+            HasFailed = true;
+            failOverlay.Retries = RestartCount;
+            failOverlay.Show();
         }
 
         protected override void OnEntering(Screen last)
@@ -275,7 +273,8 @@ namespace osu.Game.Screens.Play
             Background?.FadeTo((100f - dimLevel) / 100, 1500, EasingTypes.OutQuint);
 
             Content.Alpha = 0;
-            dimLevel.ValueChanged += dimChanged;
+
+            dimLevel.ValueChanged += newDim => Background?.FadeTo((100f - newDim) / 100, 800);
 
             Content.ScaleTo(0.7f);
 
@@ -304,7 +303,7 @@ namespace osu.Game.Screens.Play
         {
             if (pauseOverlay == null) return false;
 
-            if (hasReplayLoaded)
+            if (HitRenderer.HasReplayLoaded)
                 return false;
 
             if (pauseOverlay.State != Visibility.Visible && !canPause) return true;
@@ -318,16 +317,9 @@ namespace osu.Game.Screens.Play
             {
                 FadeOut(250);
                 Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
-
-                dimLevel.ValueChanged -= dimChanged;
                 Background?.FadeTo(1f, 200);
                 return base.OnExiting(next);
             }
-        }
-
-        private void dimChanged(object sender, EventArgs e)
-        {
-            Background?.FadeTo((100f - dimLevel) / 100, 800);
         }
 
         private Bindable<bool> mouseWheelDisabled;
