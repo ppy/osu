@@ -8,7 +8,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    internal class TestCaseInGameOverlays : TestCase
+    internal class TestCaseMenuOverlays : TestCase
     {
         public override string Description => @"Tests pause and fail overlays";
 
@@ -20,23 +20,19 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            pauseOverlay = new PauseOverlay
+            retryCount = 0;
+
+            Add(pauseOverlay = new PauseOverlay
             {
-                Depth = -1,
                 OnResume = () => Logger.Log(@"Resume"),
                 OnRetry = () => Logger.Log(@"Retry"),
                 OnQuit = () => Logger.Log(@"Quit"),
-            };
-
-            failOverlay = new FailOverlay
+            });
+            Add(failOverlay = new FailOverlay
             {
-                Depth = -1,
                 OnRetry = () => Logger.Log(@"Retry"),
                 OnQuit = () => Logger.Log(@"Quit"),
-            };
-
-            Add(pauseOverlay);
-            Add(failOverlay);
+            });
 
             AddStep(@"Pause", delegate {
                 if(failOverlay.State == Visibility.Visible)
@@ -58,8 +54,6 @@ namespace osu.Desktop.VisualTests.Tests
                 pauseOverlay.Retries = retryCount;
                 failOverlay.Retries = retryCount;
             });
-
-            retryCount = 0;
         }
     }
 }
