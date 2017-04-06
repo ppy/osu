@@ -45,7 +45,7 @@ namespace osu.Game.Modes.Objects
                 if (!string.IsNullOrEmpty(sample.Bank))
                     continue;
 
-                sample.Bank = (overridePoint ?? timingPoint)?.SampleBank ?? string.Empty;
+                sample.Bank = (overridePoint ?? timingPoint)?.SampleBank ?? @"normal";
             }
         }
     }
