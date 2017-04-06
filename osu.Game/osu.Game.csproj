@@ -71,7 +71,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\BeatmapSampleStore.cs" />
     <Compile Include="Audio\SampleInfo.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />

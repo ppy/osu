@@ -32,7 +32,6 @@ namespace osu.Game.Beatmaps.Formats
 
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
-        private bool samplesMatchPlaybackRate;
 
         private readonly int beatmapVersion;
 
@@ -80,9 +79,6 @@ namespace osu.Game.Beatmaps.Formats
                     break;
                 case @"SampleVolume":
                     defaultSampleVolume = int.Parse(val);
-                    break;
-                case "SamplesMatchPlaybackRate":
-                    samplesMatchPlaybackRate = val[0] == '1';
                     break;
                 case @"StackLeniency":
                     beatmap.BeatmapInfo.StackLeniency = float.Parse(val, NumberFormatInfo.InvariantInfo);
@@ -247,8 +243,8 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             string stringSampleSet = sampleSet.ToString().ToLower();
-            if (stringSampleSet == "none")
-                stringSampleSet = "normal";
+            if (stringSampleSet == @"none")
+                stringSampleSet = @"normal";
 
             beatmap.TimingInfo.ControlPoints.Add(new ControlPoint
             {
