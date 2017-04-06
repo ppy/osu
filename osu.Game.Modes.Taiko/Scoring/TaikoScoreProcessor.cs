@@ -187,20 +187,6 @@ namespace osu.Game.Modes.Taiko.Scoring
             if (!isTick)
                 totalHits++;
 
-            // Apply combo changes, must be done before the hit score is added
-            if (!isTick)
-            {
-                switch (judgement.Result)
-                {
-                    case HitResult.Miss:
-                        Combo.Value = 0;
-                        break;
-                    case HitResult.Hit:
-                        Combo.Value++;
-                        break;
-                }
-            }
-
             // Apply score changes
             addHitScore(judgement);
 
