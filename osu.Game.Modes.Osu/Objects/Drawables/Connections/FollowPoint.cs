@@ -32,7 +32,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables.Connections
                 Colour = Color4.White.Opacity(0.2f),
                 Radius = 4,
             };
-            
+
             Children = new Drawable[]
             {
                 new Box

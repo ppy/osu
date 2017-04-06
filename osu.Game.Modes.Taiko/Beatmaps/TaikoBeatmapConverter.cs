@@ -72,7 +72,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 
                 double speedAdjustment = beatmap.TimingInfo.SpeedMultiplierAt(obj.StartTime);
                 double speedAdjustedBeatLength = beatmap.TimingInfo.BeatLengthAt(obj.StartTime) * speedAdjustment;
-                
+
                 // The true distance, accounting for any repeats. This ends up being the drum roll distance later
                 double distance = distanceData.Distance * repeats * legacy_velocity_multiplier;
 
