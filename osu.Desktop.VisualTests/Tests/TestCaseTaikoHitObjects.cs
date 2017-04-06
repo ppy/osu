@@ -29,7 +29,6 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new CirclePiece
             {
                 Position = new Vector2(100, 100),
-                Width = 0,
                 AccentColour = Color4.DarkRed,
                 KiaiMode = kiai,
                 Children = new[]
@@ -38,10 +37,9 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            Add(new StrongCirclePiece
+            Add(new CirclePiece(true)
             {
                 Position = new Vector2(350, 100),
-                Width = 0,
                 AccentColour = Color4.DarkRed,
                 KiaiMode = kiai,
                 Children = new[]
@@ -53,7 +51,6 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new CirclePiece
             {
                 Position = new Vector2(100, 300),
-                Width = 0,
                 AccentColour = Color4.DarkBlue,
                 KiaiMode = kiai,
                 Children = new[]
@@ -62,10 +59,9 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            Add(new StrongCirclePiece
+            Add(new CirclePiece(true)
             {
                 Position = new Vector2(350, 300),
-                Width = 0,
                 AccentColour = Color4.DarkBlue,
                 KiaiMode = kiai,
                 Children = new[]
@@ -77,7 +73,6 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new CirclePiece
             {
                 Position = new Vector2(100, 500),
-                Width = 0,
                 AccentColour = Color4.Orange,
                 KiaiMode = kiai,
                 Children = new[]
@@ -86,20 +81,22 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            Add(new CirclePiece
+            Add(new ElongatedCirclePiece
             {
                 Position = new Vector2(575, 100),
-                Width = 0.25f,
                 AccentColour = Color4.Orange,
                 KiaiMode = kiai,
+                Length = 0.10f,
+                PlayfieldLengthReference = () => DrawSize.X
             });
 
-            Add(new StrongCirclePiece
+            Add(new ElongatedCirclePiece(true)
             {
                 Position = new Vector2(575, 300),
-                Width = 0.25f,
                 AccentColour = Color4.Orange,
-                KiaiMode = kiai
+                KiaiMode = kiai,
+                Length = 0.10f,
+                PlayfieldLengthReference = () => DrawSize.X
             });
         }
 

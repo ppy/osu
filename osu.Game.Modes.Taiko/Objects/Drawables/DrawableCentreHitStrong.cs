@@ -8,24 +8,20 @@ using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public class DrawableStrongCentreHit : DrawableStrongHit
+    public class DrawableCentreHitStrong : DrawableHitStrong
     {
         protected override Key[] HitKeys { get; } = { Key.F, Key.J };
 
-        public DrawableStrongCentreHit(Hit hit)
+        public DrawableCentreHitStrong(Hit hit)
             : base(hit)
         {
+            MainPiece.Add(new CentreHitSymbolPiece());
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Circle.AccentColour = colours.PinkDarker;
+            MainPiece.AccentColour = colours.PinkDarker;
         }
-
-        protected override CirclePiece CreateCirclePiece() => new StrongCirclePiece
-        {
-            Children = new[] { new CentreHitSymbolPiece() }
-        };
     }
 }
