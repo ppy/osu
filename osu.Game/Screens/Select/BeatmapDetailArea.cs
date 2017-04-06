@@ -81,6 +81,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding(5),
+                    Alpha = 0,
                 },
                 Leaderboard = new Leaderboard
                 {
