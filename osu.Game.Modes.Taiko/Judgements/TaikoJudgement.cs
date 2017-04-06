@@ -3,6 +3,7 @@
 
 using osu.Game.Modes.Judgements;
 using osu.Framework.Extensions;
+using osu.Game.Modes.Objects.Drawables;
 
 namespace osu.Game.Modes.Taiko.Judgements
 {
@@ -21,12 +22,12 @@ namespace osu.Game.Modes.Taiko.Judgements
         /// <summary>
         /// The result value for the combo portion of the score.
         /// </summary>
-        public int ResultValueForScore => NumericResultForScore(TaikoResult);
+        public int ResultValueForScore => Result == HitResult.Miss ? 0 : NumericResultForScore(TaikoResult);
 
         /// <summary>
         /// The result value for the accuracy portion of the score.
         /// </summary>
-        public int ResultValueForAccuracy => NumericResultForAccuracy(TaikoResult);
+        public int ResultValueForAccuracy => Result == HitResult.Miss ? 0 : NumericResultForAccuracy(TaikoResult);
 
         /// <summary>
         /// The maximum result value for the combo portion of the score.

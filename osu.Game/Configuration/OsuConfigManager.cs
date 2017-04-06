@@ -35,6 +35,7 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.MenuParallax, true);
 
+            Set(OsuConfig.ShowInterface, true);
             Set(OsuConfig.KeyOverlay, false);
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
@@ -89,7 +90,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.LastVersionPermissionsFailed, string.Empty).Disabled = true;
             Set(OsuConfig.LoadSubmittedThread, true).Disabled = true;
             Set(OsuConfig.LobbyPlayMode, -1).Disabled = true;
-            Set(OsuConfig.ShowInterface, true).Disabled = true;
             Set(OsuConfig.ShowInterfaceDuringRelax, false).Disabled = true;
             Set(OsuConfig.LobbyShowExistingOnly, false).Disabled = true;
             Set(OsuConfig.LobbyShowFriendsOnly, false).Disabled = true;

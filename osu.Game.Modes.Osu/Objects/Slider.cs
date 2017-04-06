@@ -2,13 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes.Objects.Types;
 using System;
 using System.Collections.Generic;
 using osu.Game.Modes.Objects;
 using osu.Game.Database;
+using System.Linq;
+using osu.Game.Audio;
 
 namespace osu.Game.Modes.Osu.Objects
 {
@@ -95,11 +96,12 @@ namespace osu.Game.Modes.Osu.Objects
                             StackHeight = StackHeight,
                             Scale = Scale,
                             ComboColour = ComboColour,
-                            Sample = new HitSampleInfo
+                            Samples = Samples.Select(s => new SampleInfo
                             {
-                                Type = SampleType.None,
-                                Set = SampleSet.Soft,
-                            },
+                                Bank = s.Bank,
+                                Name = @"slidertick",
+                                Volume = s.Volume
+                            }).ToList()
                         };
                     }
                 }
