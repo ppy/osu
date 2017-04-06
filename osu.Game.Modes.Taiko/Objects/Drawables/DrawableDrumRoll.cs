@@ -3,27 +3,22 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
-using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public class DrawableDrumRoll : DrawableTaikoHitObject
+    public class DrawableDrumRoll : DrawableTaikoHitObject<DrumRoll>
     {
         /// <summary>
         /// Number of rolling hits required to reach the dark/final accent colour.
         /// </summary>
         private const int rolling_hits_for_dark_accent = 5;
-
-        private readonly DrumRoll drumRoll;
-
-        private readonly CirclePiece circle;
 
         private Color4 accentDarkColour;
 
@@ -35,32 +30,32 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
-            this.drumRoll = drumRoll;
-
-            RelativeSizeAxes = Axes.X;
-            Width = (float)(drumRoll.Duration / drumRoll.PreEmpt);
-
-            Add(circle = CreateCirclePiece());
-            circle.KiaiMode = HitObject.Kiai;
-
             foreach (var tick in drumRoll.Ticks)
             {
                 var newTick = new DrawableDrumRollTick(tick)
                 {
-                    X = (float)((tick.StartTime - HitObject.StartTime) / drumRoll.Duration)
+                    X = (float)((tick.StartTime - HitObject.StartTime) / HitObject.Duration)
                 };
 
                 newTick.OnJudgement += onTickJudgement;
 
                 AddNested(newTick);
-                Add(newTick);
+                MainPiece.Add(newTick);
             }
         }
+
+        protected override TaikoJudgement CreateJudgement() => new TaikoJudgement { SecondHit = HitObject.IsStrong };
+
+        protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece(HitObject.IsStrong)
+        {
+            Length = (float)(HitObject.Duration / HitObject.ScrollTime),
+            PlayfieldLengthReference = () => Parent.DrawSize.X
+        };
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            circle.AccentColour = AccentColour = colours.YellowDark;
+            MainPiece.AccentColour = AccentColour = colours.YellowDark;
             accentDarkColour = colours.YellowDarker;
         }
 
@@ -72,7 +67,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             // is further than mid point of the play field, so the time taken to scroll in should always
             // be greater than the time taken to scroll out to the left of the screen.
             // Thus, using PreEmpt here is enough for the drum roll to completely scroll out.
-            LifetimeEnd = drumRoll.EndTime + drumRoll.PreEmpt;
+            LifetimeEnd = HitObject.EndTime + HitObject.ScrollTime;
         }
 
         private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)
@@ -85,7 +80,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             rollingHits = MathHelper.Clamp(rollingHits, 0, rolling_hits_for_dark_accent);
 
             Color4 newAccent = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_dark_accent, AccentColour, accentDarkColour, 0, 1);
-            circle.FadeAccent(newAccent, 100);
+            MainPiece.FadeAccent(newAccent, 100);
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -98,10 +93,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             int countHit = NestedHitObjects.Count(o => o.Judgement.Result == HitResult.Hit);
 
-            if (countHit > drumRoll.RequiredGoodHits)
+            if (countHit > HitObject.RequiredGoodHits)
             {
                 Judgement.Result = HitResult.Hit;
-                Judgement.TaikoResult = countHit >= drumRoll.RequiredGreatHits ? TaikoHitResult.Great : TaikoHitResult.Good;
+                Judgement.TaikoResult = countHit >= HitObject.RequiredGreatHits ? TaikoHitResult.Great : TaikoHitResult.Good;
             }
             else
                 Judgement.Result = HitResult.Miss;
@@ -110,7 +105,5 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         protected override void UpdateState(ArmedState state)
         {
         }
-
-        protected virtual CirclePiece CreateCirclePiece() => new CirclePiece();
     }
 }

@@ -18,7 +18,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public class DrawableSwell : DrawableTaikoHitObject
+    public class DrawableSwell : DrawableTaikoHitObject<Swell>
     {
         /// <summary>
         /// Invoked when the swell has reached the hit target, i.e. when CurrentTime >= StartTime.
@@ -30,8 +30,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         private const float target_ring_thin_border = 1f;
         private const float target_ring_scale = 5f;
         private const float inner_ring_alpha = 0.65f;
-
-        private readonly Swell swell;
 
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
@@ -54,12 +52,11 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         public DrawableSwell(Swell swell)
             : base(swell)
         {
-            this.swell = swell;
-
             Children = new Drawable[]
             {
                 bodyContainer = new Container
                 {
+                    AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
                         expandingRing = new CircularContainer
@@ -120,6 +117,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                         },
                         circlePiece = new CirclePiece
                         {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             Children = new []
                             {
                                 symbol = new SwellSymbolPiece()
@@ -146,18 +145,18 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             {
                 userHits++;
 
-                var completion = (float)userHits / swell.RequiredHits;
+                var completion = (float)userHits / HitObject.RequiredHits;
 
                 expandingRing.FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50);
                 expandingRing.Delay(50);
                 expandingRing.FadeTo(completion / 8, 2000, EasingTypes.OutQuint);
                 expandingRing.DelayReset();
 
-                symbol.RotateTo((float)(completion * swell.Duration / 8), 4000, EasingTypes.OutQuint);
+                symbol.RotateTo((float)(completion * HitObject.Duration / 8), 4000, EasingTypes.OutQuint);
 
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, EasingTypes.OutQuint);
 
-                if (userHits == swell.RequiredHits)
+                if (userHits == HitObject.RequiredHits)
                 {
                     Judgement.Result = HitResult.Hit;
                     Judgement.TaikoResult = TaikoHitResult.Great;
@@ -169,7 +168,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     return;
 
                 //TODO: THIS IS SHIT AND CAN'T EXIST POST-TAIKO WORLD CUP
-                if (userHits > swell.RequiredHits / 2)
+                if (userHits > HitObject.RequiredHits / 2)
                 {
                     Judgement.Result = HitResult.Hit;
                     Judgement.TaikoResult = TaikoHitResult.Good;
@@ -189,7 +188,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             Delay(preempt, true);
 
-            Delay(Judgement.TimeOffset + swell.Duration, true);
+            Delay(Judgement.TimeOffset + HitObject.Duration, true);
 
             const float out_transition_time = 300;
 

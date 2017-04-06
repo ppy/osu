@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
 using osu.Game.Modes.Taiko.Objects;
@@ -19,7 +20,11 @@ namespace osu.Desktop.VisualTests.Tests
 
         private TaikoPlayfield playfield;
 
-        protected override double TimePerAction => 500;
+        protected override double TimePerAction => default_duration * 2;
+
+        private const double default_duration = 300;
+
+        private const float scroll_time = 1000;
 
         public override void Reset()
         {
@@ -29,7 +34,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep("Miss :(", addMissJudgement);
             AddStep("DrumRoll", () => addDrumRoll(false));
             AddStep("Strong DrumRoll", () => addDrumRoll(true));
-            AddStep("Swell", addSwell);
+            AddStep("Swell", () => addSwell());
             AddStep("Centre", () => addCentreHit(false));
             AddStep("Strong Centre", () => addCentreHit(true));
             AddStep("Rim", () => addRimHit(false));
@@ -37,8 +42,12 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep("Add bar line", () => addBarLine(false));
             AddStep("Add major bar line", () => addBarLine(true));
 
+
+            var rateAdjustClock = new StopwatchClock(true) { Rate = 1 };
+
             Add(new Container
             {
+                Clock = new FramedClock(rateAdjustClock),
                 RelativeSizeAxes = Axes.X,
                 Y = 200,
                 Children = new[]
@@ -77,49 +86,53 @@ namespace osu.Desktop.VisualTests.Tests
             });
         }
 
-        private void addBarLine(bool major)
+        private void addBarLine(bool major, double delay = scroll_time)
         {
             BarLine bl = new BarLine
             {
-                StartTime = Time.Current + 1000,
-                PreEmpt = 1000
+                StartTime = playfield.Time.Current + delay,
+                ScrollTime = scroll_time
             };
 
-            playfield.AddBarLine(major ? new DrawableMajorBarLine(bl) : new DrawableBarLine(bl));
+            playfield.AddBarLine(major ? new DrawableBarLineMajor(bl) : new DrawableBarLine(bl));
         }
 
-        private void addSwell()
+        private void addSwell(double duration = default_duration)
         {
             playfield.Add(new DrawableSwell(new Swell
             {
-                StartTime = Time.Current + 1000,
-                EndTime = Time.Current + 1000,
-                PreEmpt = 1000
+                StartTime = playfield.Time.Current + scroll_time,
+                Duration = duration,
+                ScrollTime = scroll_time
             }));
         }
         
-        private void addDrumRoll(bool strong)
+        private void addDrumRoll(bool strong, double duration = default_duration)
         {
+            addBarLine(true);
+            addBarLine(true, scroll_time + duration);
+
             var d = new DrumRoll
             {
-                StartTime = Time.Current + 1000,
-                Distance = 1000,
-                PreEmpt = 1000,
+                StartTime = playfield.Time.Current + scroll_time,
+                IsStrong = strong,
+                Duration = duration,
+                ScrollTime = scroll_time,
             };
 
-            playfield.Add(strong ? new DrawableStrongDrumRoll(d) : new DrawableDrumRoll(d));
+            playfield.Add(new DrawableDrumRoll(d));
         }
 
         private void addCentreHit(bool strong)
         {
             Hit h = new Hit
             {
-                StartTime = Time.Current + 1000,
-                PreEmpt = 1000
+                StartTime = playfield.Time.Current + scroll_time,
+                ScrollTime = scroll_time
             };
 
             if (strong)
-                playfield.Add(new DrawableStrongCentreHit(h));
+                playfield.Add(new DrawableCentreHitStrong(h));
             else
                 playfield.Add(new DrawableCentreHit(h));
         }
@@ -128,12 +141,12 @@ namespace osu.Desktop.VisualTests.Tests
         {
             Hit h = new Hit
             {
-                StartTime = Time.Current + 1000,
-                PreEmpt = 1000
+                StartTime = playfield.Time.Current + scroll_time,
+                ScrollTime = scroll_time
             };
 
             if (strong)
-                playfield.Add(new DrawableStrongRimHit(h));
+                playfield.Add(new DrawableRimHitStrong(h));
             else
                 playfield.Add(new DrawableRimHit(h));
         }
