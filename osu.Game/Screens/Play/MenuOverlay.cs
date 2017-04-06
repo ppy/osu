@@ -16,7 +16,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class InGameOverlay : OverlayContainer
+    public abstract class MenuOverlay : OverlayContainer
     {
         private const int transition_duration = 200;
         private const int button_height = 70;
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Play
             Retries = 0;
         }
 
-        protected InGameOverlay()
+        protected MenuOverlay()
         {
             AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;

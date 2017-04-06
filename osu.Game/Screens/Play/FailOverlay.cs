@@ -10,7 +10,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play
 {
-    public class FailOverlay : InGameOverlay
+    public class FailOverlay : MenuOverlay
     {
 
         public override string Header => "failed";
