@@ -61,7 +61,7 @@ namespace osu.Game.Modes.Objects.Drawables
         {
             foreach (var bank in HitObject.SampleBanks)
             foreach (var sample in bank.Samples)
-                samples.Add(audio.Sample.Get($@"Gameplay/{sample.Type}-hit{bank.Name}"));
+                samples.Add(audio.Sample.Get($@"Gameplay/{bank.Name}-hit{sample.Type.ToString().ToLower()}"));
         }
 
         private ArmedState state;

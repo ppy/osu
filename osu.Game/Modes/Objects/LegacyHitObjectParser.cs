@@ -2,12 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects.Types;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using osu.Game.Modes.Objects.Legacy;
+using osu.Game.Beatmaps.Samples;
+using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Modes.Objects
 {
@@ -20,6 +21,9 @@ namespace osu.Game.Modes.Objects
             bool combo = type.HasFlag(LegacyHitObjectType.NewCombo);
             type &= ~LegacyHitObjectType.NewCombo;
 
+            var normalSampleBank = new SampleBank();
+            var addSampleBank = new SampleBank();
+
             HitObject result;
 
             if ((type & LegacyHitObjectType.Circle) > 0)
@@ -29,6 +33,9 @@ namespace osu.Game.Modes.Objects
                     Position = new Vector2(int.Parse(split[0]), int.Parse(split[1])),
                     NewCombo = combo
                 };
+
+                if (split.Length > 5)
+                    readCustomSampleBanks(split[5], ref normalSampleBank, ref addSampleBank);
             }
             else if ((type & LegacyHitObjectType.Slider) > 0)
             {
@@ -84,6 +91,9 @@ namespace osu.Game.Modes.Objects
                     Position = new Vector2(int.Parse(split[0]), int.Parse(split[1])),
                     NewCombo = combo
                 };
+
+                if (split.Length > 10)
+                    readCustomSampleBanks(split[10], ref normalSampleBank, ref addSampleBank);
             }
             else if ((type & LegacyHitObjectType.Spinner) > 0)
             {
@@ -91,6 +101,9 @@ namespace osu.Game.Modes.Objects
                 {
                     EndTime = Convert.ToDouble(split[5], CultureInfo.InvariantCulture)
                 };
+
+                if (split.Length > 6)
+                    readCustomSampleBanks(split[6], ref normalSampleBank, ref addSampleBank);
             }
             else if ((type & LegacyHitObjectType.Hold) > 0)
             {
@@ -106,9 +119,57 @@ namespace osu.Game.Modes.Objects
 
             result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
 
-            // TODO: "addition" field
+            var soundType = (LegacySoundType)int.Parse(split[4]);
+
+            normalSampleBank.Samples.Add(new Sample { Type = SampleType.Normal });
+            if ((soundType & LegacySoundType.Finish) > 0)
+                addSampleBank.Samples.Add(new Sample { Type = SampleType.Finish });
+            if ((soundType & LegacySoundType.Whistle) > 0)
+                addSampleBank.Samples.Add(new Sample { Type = SampleType.Whistle });
+            if ((soundType & LegacySoundType.Clap) > 0)
+                addSampleBank.Samples.Add(new Sample { Type = SampleType.Clap });
+
+            result.SampleBanks.Add(normalSampleBank);
+            result.SampleBanks.Add(addSampleBank);
 
             return result;
+        }
+
+        private void readCustomSampleBanks(string str, ref SampleBank normalSampleBank, ref SampleBank addSampleBank)
+        {
+            if (string.IsNullOrEmpty(str))
+                return;
+
+            string[] split = str.Split(':');
+
+            var sb = (OsuLegacyDecoder.LegacySampleBank)Convert.ToInt32(split[0]);
+            var addsb = (OsuLegacyDecoder.LegacySampleBank)Convert.ToInt32(split[1]);
+
+            int volume = split.Length > 3 ? int.Parse(split[3]) : 0;
+
+            //string sampleFile = split2.Length > 4 ? split2[4] : string.Empty;
+
+            normalSampleBank = new SampleBank
+            {
+                Name = sb.ToString().ToLower(),
+                Volume = volume
+            };
+
+            addSampleBank = new SampleBank
+            {
+                Name = addsb.ToString().ToLower(),
+                Volume = volume
+            };
+        }
+
+        [Flags]
+        private enum LegacySoundType
+        {
+            None = 0,
+            Normal = 1,
+            Whistle = 2,
+            Finish = 4,
+            Clap = 8
         }
     }
 }

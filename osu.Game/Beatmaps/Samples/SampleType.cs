@@ -5,7 +5,6 @@ namespace osu.Game.Beatmaps.Samples
 {
     public enum SampleType
     {
-        None,
         Normal,
         Whistle,
         Finish,
