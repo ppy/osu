@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using Newtonsoft.Json;
 using osu.Game.Beatmaps.Samples;
+using osu.Game.IO.Serialization;
 using osu.Game.Modes;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
@@ -10,7 +12,7 @@ using System.Linq;
 
 namespace osu.Game.Database
 {
-    public class BeatmapInfo : IEquatable<BeatmapInfo>
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable
     {
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
@@ -57,17 +59,13 @@ namespace osu.Game.Database
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
         public string StoredBookmarks { get; internal set; }
+
         [Ignore]
+        [JsonIgnore]
         public int[] Bookmarks
         {
-            get
-            {
-                return StoredBookmarks.Split(',').Select(int.Parse).ToArray();
-            }
-            set
-            {
-                StoredBookmarks = string.Join(",", value);
-            }
+            get { return StoredBookmarks.Split(',').Select(int.Parse).ToArray(); }
+            set { StoredBookmarks = string.Join(",", value); }
         }
 
         public double DistanceSpacing { get; set; }
@@ -86,7 +84,7 @@ namespace osu.Game.Database
         }
 
         public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-            BeatmapSet.Path == other.BeatmapSet.Path &&
-            (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
+                                                      BeatmapSet.Path == other.BeatmapSet.Path &&
+                                                      (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
     }
 }
