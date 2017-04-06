@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using Newtonsoft.Json;
-using osu.Game.Beatmaps.Samples;
 using osu.Game.IO.Serialization;
 using osu.Game.Modes;
 using SQLite.Net.Attributes;
