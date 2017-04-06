@@ -21,6 +21,8 @@ namespace osu.Game.Modes.Osu.UI
         private readonly Container judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
+        public override bool ProvidingUserCursor => true;
+
         public override Vector2 Size
         {
             get
