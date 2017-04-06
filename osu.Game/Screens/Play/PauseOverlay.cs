@@ -11,7 +11,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play
 {
-    public class PauseOverlay : InGameOverlay
+    public class PauseOverlay : MenuOverlay
     {
         public Action OnResume;
 
