@@ -173,9 +173,9 @@ namespace osu.Game.Screens.Select
         {
             sortTabs.AccentColour = colours.GreenLight;
 
-            if (osu != null)
-                playMode.BindTo(osu.PlayMode);
+            if (osu != null) playMode.BindTo(osu.PlayMode);
             playMode.ValueChanged += val => FilterChanged?.Invoke(CreateCriteria());
+            playMode.TriggerChange();
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
