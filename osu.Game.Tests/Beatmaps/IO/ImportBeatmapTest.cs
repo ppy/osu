@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 ensureLoaded(osu);
 
                 Assert.IsTrue(File.Exists(temp));
-                
+
                 File.Delete(temp);
 
                 Assert.IsFalse(File.Exists(temp));

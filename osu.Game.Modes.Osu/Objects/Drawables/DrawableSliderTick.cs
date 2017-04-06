@@ -57,7 +57,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 Judgement.Score = Tracking ? OsuScoreResult.SliderTick : OsuScoreResult.Miss;
             }
         }
-        
+
         protected override void UpdatePreemptState()
         {
             var animIn = Math.Min(150, sliderTick.StartTime - FadeInTime);
