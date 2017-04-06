@@ -79,7 +79,7 @@ namespace osu.Game.Modes.Taiko.UI
 
                     barLine.ApplyDefaults(Beatmap.TimingInfo, Beatmap.BeatmapInfo.Difficulty);
 
-                    taikoPlayfield.AddBarLine(isMajor ? new DrawableMajorBarLine(barLine) : new DrawableBarLine(barLine));
+                    taikoPlayfield.AddBarLine(isMajor ? new DrawableBarLineMajor(barLine) : new DrawableBarLine(barLine));
 
                     currentBeat++;
                 }
@@ -118,7 +118,7 @@ namespace osu.Game.Modes.Taiko.UI
             if (centreHit != null)
             {
                 if (h.IsStrong)
-                    return new DrawableStrongCentreHit(centreHit);
+                    return new DrawableCentreHitStrong(centreHit);
                 return new DrawableCentreHit(centreHit);
             }
 
@@ -126,15 +126,13 @@ namespace osu.Game.Modes.Taiko.UI
             if (rimHit != null)
             {
                 if (h.IsStrong)
-                    return new DrawableStrongRimHit(rimHit);
+                    return new DrawableRimHitStrong(rimHit);
                 return new DrawableRimHit(rimHit);
             }
 
             var drumRoll = h as DrumRoll;
             if (drumRoll != null)
             {
-                if (h.IsStrong)
-                    return new DrawableStrongDrumRoll(drumRoll);
                 return new DrawableDrumRoll(drumRoll);
             }
 

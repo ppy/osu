@@ -8,7 +8,7 @@ using OpenTK;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public class DrawableMajorBarLine : DrawableBarLine
+    public class DrawableBarLineMajor : DrawableBarLine
     {
         /// <summary>
         /// The vertical offset of the triangles from the line tracker.
@@ -20,7 +20,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         /// </summary>
         private const float triangle_size = 20f;
 
-        public DrawableMajorBarLine(BarLine barLine)
+        public DrawableBarLineMajor(BarLine barLine)
             : base(barLine)
         {
             Add(new Container
