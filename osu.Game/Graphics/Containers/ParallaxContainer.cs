@@ -8,6 +8,7 @@ using OpenTK;
 using osu.Framework.Allocation;
 using osu.Game.Configuration;
 using osu.Framework.Configuration;
+using osu.Framework.Platform;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -56,7 +57,7 @@ namespace osu.Game.Graphics.Containers
         {
             base.Update();
 
-            if (parallaxEnabled) 
+            if (parallaxEnabled && GameHost.Instance.IsActive) 
             { 
                 Vector2 offset = input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2;
                 content.MoveTo(offset * ParallaxAmount, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
