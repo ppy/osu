@@ -106,7 +106,7 @@ namespace osu.Desktop.VisualTests.Tests
                 ScrollTime = scroll_time
             }));
         }
-        
+
         private void addDrumRoll(bool strong, double duration = default_duration)
         {
             addBarLine(true);

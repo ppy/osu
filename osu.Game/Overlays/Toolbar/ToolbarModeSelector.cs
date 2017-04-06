@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Toolbar
         private ToolbarModeButton activeButton;
 
         public Action<PlayMode> OnPlayModeChange;
-        
+
         public ToolbarModeSelector()
         {
             RelativeSizeAxes = Axes.Y;

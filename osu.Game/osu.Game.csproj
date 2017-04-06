@@ -74,7 +74,7 @@
     <Compile Include="Audio\SampleInfo.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
-    <Compile Include="Beatmaps\IBeatmapCoverter.cs" />
+    <Compile Include="Beatmaps\IBeatmapConverter.cs" />
     <Compile Include="Beatmaps\IBeatmapProcessor.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
     <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
@@ -180,7 +180,7 @@
     <Compile Include="Screens\Backgrounds\BackgroundScreenEmpty.cs" />
     <Compile Include="Screens\Charts\ChartInfo.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
-    <Compile Include="Screens\GameScreenWhiteBox.cs" />
+    <Compile Include="Screens\ScreenWhiteBox.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
     <Compile Include="Screens\Menu\Disclaimer.cs" />
@@ -208,7 +208,7 @@
     <Compile Include="Screens\Select\Filter\GroupMode.cs" />
     <Compile Include="Screens\Select\Filter\SortMode.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
-    <Compile Include="Screens\OsuGameScreen.cs" />
+    <Compile Include="Screens\OsuScreen.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Screens\Play\Player.cs" />
@@ -282,7 +282,7 @@
     <Compile Include="Database\BeatmapSetInfo.cs" />
     <Compile Include="Database\BeatmapMetadata.cs" />
     <Compile Include="Database\BeatmapInfo.cs" />
-    <Compile Include="Database\BaseDifficulty.cs" />
+    <Compile Include="Database\BeatmapDifficulty.cs" />
     <Compile Include="Database\DatabaseWorkingBeatmap.cs" />
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />
     <Compile Include="Overlays\Options\Sections\MaintenanceSection.cs" />
@@ -346,7 +346,7 @@
     <Compile Include="Overlays\Dialog\PopupDialog.cs" />
     <Compile Include="Graphics\UserInterface\DialogButton.cs" />
     <Compile Include="Overlays\Dialog\PopupDialogButton.cs" />
-    <Compile Include="Overlays\Dialog\PopupDialogOKButton.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialogOkButton.cs" />
     <Compile Include="Overlays\Dialog\PopupDialogCancelButton.cs" />
     <Compile Include="Screens\Select\BeatmapDeleteDialog.cs" />
     <Compile Include="Overlays\DialogOverlay.cs" />
@@ -363,7 +363,7 @@
     <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
     <Compile Include="Screens\Select\BeatmapDetailArea.cs" />
-    <Compile Include="Graphics\UserInterface\OsuTabControlCheckBox.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabControlCheckbox.cs" />
     <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
   </ItemGroup>
   <ItemGroup>

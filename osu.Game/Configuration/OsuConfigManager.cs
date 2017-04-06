@@ -13,7 +13,7 @@ namespace osu.Game.Configuration
         protected override void InitialiseDefaults()
         {
 #pragma warning disable CS0612 // Type or member is obsolete
-            
+
             Set(OsuConfig.Username, string.Empty);
             Set(OsuConfig.Token, string.Empty);
 
