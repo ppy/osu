@@ -2,16 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Types;
 using osu.Game.Modes.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps.Legacy;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
+using osu.Game.IO.Serialization;
+using osu.Game.Audio;
 
 namespace osu.Game.Modes.Taiko.Beatmaps
 {
@@ -41,9 +40,12 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 
         public Beatmap<TaikoHitObject> Convert(Beatmap original)
         {
+            BeatmapInfo info = original.BeatmapInfo.DeepClone<BeatmapInfo>();
+            info.Difficulty.SliderMultiplier *= legacy_velocity_multiplier;
+
             return new Beatmap<TaikoHitObject>(original)
             {
-                TimingInfo = original is LegacyBeatmap ? new LegacyTimingInfo(original.TimingInfo) : original.TimingInfo,
+                BeatmapInfo = info,
                 HitObjects = original.HitObjects.SelectMany(h => convertHitObject(h, original)).ToList()
             };
         }
@@ -60,9 +62,9 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             var endTimeData = obj as IHasEndTime;
 
             // Old osu! used hit sounding to determine various hit type information
-            SampleType sample = obj.Sample?.Type ?? SampleType.None;
+            List<SampleInfo> samples = obj.Samples;
 
-            bool strong = (sample & SampleType.Finish) > 0;
+            bool strong = samples.Any(s => s.Name == SampleInfo.HIT_FINISH);
 
             if (distanceData != null)
             {
@@ -70,12 +72,12 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 
                 double speedAdjustment = beatmap.TimingInfo.SpeedMultiplierAt(obj.StartTime);
                 double speedAdjustedBeatLength = beatmap.TimingInfo.BeatLengthAt(obj.StartTime) * speedAdjustment;
-                
+
                 // The true distance, accounting for any repeats. This ends up being the drum roll distance later
                 double distance = distanceData.Distance * repeats * legacy_velocity_multiplier;
 
                 // The velocity of the taiko hit object - calculated as the velocity of a drum roll
-                double taikoVelocity = taiko_base_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength * legacy_velocity_multiplier;
+                double taikoVelocity = taiko_base_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier * legacy_velocity_multiplier / speedAdjustedBeatLength;
                 // The duration of the taiko hit object
                 double taikoDuration = distance / taikoVelocity;
 
@@ -85,7 +87,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     speedAdjustedBeatLength /= speedAdjustment;
 
                 // The velocity of the osu! hit object - calculated as the velocity of a slider
-                double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength * legacy_velocity_multiplier;
+                double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier * legacy_velocity_multiplier / speedAdjustedBeatLength;
                 // The duration of the osu! hit object
                 double osuDuration = distance / osuVelocity;
 
@@ -101,7 +103,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         yield return new CentreHit
                         {
                             StartTime = j,
-                            Sample = obj.Sample,
+                            Samples = obj.Samples,
                             IsStrong = strong,
                         };
                     }
@@ -111,7 +113,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     yield return new DrumRoll
                     {
                         StartTime = obj.StartTime,
-                        Sample = obj.Sample,
+                        Samples = obj.Samples,
                         IsStrong = strong,
                         Duration = taikoDuration,
                         TickRate = beatmap.BeatmapInfo.Difficulty.SliderTickRate == 3 ? 3 : 4,
@@ -125,7 +127,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                 yield return new Swell
                 {
                     StartTime = obj.StartTime,
-                    Sample = obj.Sample,
+                    Samples = obj.Samples,
                     IsStrong = strong,
                     Duration = endTimeData.Duration,
                     RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier),
@@ -133,41 +135,25 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             }
             else
             {
-                bool isCentre = (sample & ~(SampleType.Finish | SampleType.Normal)) == 0;
+                bool isRim = samples.Any(s => s.Name == SampleInfo.HIT_CLAP || s.Name == SampleInfo.HIT_WHISTLE);
 
-                if (isCentre)
-                {
-                    yield return new CentreHit
-                    {
-                        StartTime = obj.StartTime,
-                        Sample = obj.Sample,
-                        IsStrong = strong,
-                    };
-                }
-                else
+                if (isRim)
                 {
                     yield return new RimHit
                     {
                         StartTime = obj.StartTime,
-                        Sample = obj.Sample,
+                        Samples = obj.Samples,
                         IsStrong = strong,
                     };
                 }
-            }
-        }
-
-        private class LegacyTimingInfo : TimingInfo
-        {
-            public LegacyTimingInfo(TimingInfo original)
-            {
-                if (original is LegacyTimingInfo)
-                    ControlPoints.AddRange(original.ControlPoints);
                 else
                 {
-                    ControlPoints.AddRange(original.ControlPoints.Select(c => c.Clone()));
-
-                    foreach (var c in ControlPoints)
-                        c.SpeedMultiplier *= legacy_velocity_multiplier;
+                    yield return new CentreHit
+                    {
+                        StartTime = obj.StartTime,
+                        Samples = obj.Samples,
+                        IsStrong = strong,
+                    };
                 }
             }
         }

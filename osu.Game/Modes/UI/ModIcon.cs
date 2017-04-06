@@ -26,7 +26,7 @@ namespace osu.Game.Modes.UI
                 reapplySize();
             }
         }
-        
+
         public new Color4 Colour
         {
             get
@@ -38,7 +38,7 @@ namespace osu.Game.Modes.UI
                 background.Colour = value;
             }
         }
-        
+
         public FontAwesome Icon
         {
             get
