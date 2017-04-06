@@ -35,7 +35,7 @@ namespace osu.Game.Modes.Objects
         {
             foreach (var bank in SampleBanks)
             {
-                if (!string.IsNullOrEmpty(bank.Name))
+                if (!string.IsNullOrEmpty(bank.Name) && bank.Name != @"none")
                     continue;
 
                 // If the bank is not assigned a name, assign it from the relevant timing point

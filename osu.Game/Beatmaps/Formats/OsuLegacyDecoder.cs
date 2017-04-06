@@ -372,7 +372,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private enum LegacySampleBank
+        internal enum LegacySampleBank
         {
             None = 0,
             Normal = 1,
