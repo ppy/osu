@@ -86,7 +86,7 @@ namespace osu.Game.Modes.UI
 
                 notificationManager?.Post(new SimpleNotification
                 {
-                    Text = @"The score overlay is currently disabled. You can toogle this by pressing Shift + Tab."
+                    Text = @"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab."
                 });
             }
         }
