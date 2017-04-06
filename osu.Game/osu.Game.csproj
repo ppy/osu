@@ -71,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\SampleInfo.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\IBeatmapCoverter.cs" />
@@ -148,14 +149,7 @@
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Modes\Objects\Drawables\DrawableHitObject.cs" />
     <Compile Include="Modes\Objects\HitObject.cs" />
-    <Compile Include="Beatmaps\Samples\HitSampleInfo.cs" />
-    <Compile Include="Beatmaps\Samples\SampleBank.cs" />
-    <Compile Include="Beatmaps\Samples\SampleInfo.cs" />
-    <Compile Include="Beatmaps\Samples\SampleSet.cs" />
-    <Compile Include="Beatmaps\Samples\SampleType.cs" />
     <Compile Include="Beatmaps\Timing\ControlPoint.cs" />
-    <Compile Include="Beatmaps\Timing\SampleChange.cs" />
-    <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
     <Compile Include="Overlays\Notifications\Notification.cs" />
