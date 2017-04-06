@@ -43,7 +43,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
                 return new Slider
                 {
                     StartTime = original.StartTime,
-                    SampleBanks = original.SampleBanks,
+                    Samples = original.Samples,
                     CurveObject = curveData,
                     Position = positionData?.Position ?? Vector2.Zero,
                     NewCombo = comboData?.NewCombo ?? false
@@ -55,7 +55,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
                 return new Spinner
                 {
                     StartTime = original.StartTime,
-                    SampleBanks = original.SampleBanks,
+                    Samples = original.Samples,
                     Position = new Vector2(512, 384) / 2,
                     EndTime = endTimeData.EndTime
                 };
@@ -64,7 +64,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
             return new HitCircle
             {
                 StartTime = original.StartTime,
-                SampleBanks = original.SampleBanks,
+                Samples = original.Samples,
                 Position = positionData?.Position ?? Vector2.Zero,
                 NewCombo = comboData?.NewCombo ?? false
             };

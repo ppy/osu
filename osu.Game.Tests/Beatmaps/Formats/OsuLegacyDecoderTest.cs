@@ -6,7 +6,6 @@ using NUnit.Framework;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes;
 using osu.Game.Tests.Resources;
 using osu.Game.Modes.Osu;
@@ -137,12 +136,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsNotNull(slider);
                 Assert.AreEqual(new Vector2(192, 168), slider.Position);
                 Assert.AreEqual(956, slider.StartTime);
-                Assert.IsTrue(slider.SampleBanks.Any(b => b.Name == "none"));
+                Assert.IsTrue(slider.Samples.Any(s => s.Name == @"normal"));
                 var hit = beatmap.HitObjects[1] as LegacyHit;
                 Assert.IsNotNull(hit);
                 Assert.AreEqual(new Vector2(304, 56), hit.Position);
                 Assert.AreEqual(1285, hit.StartTime);
-                Assert.IsTrue(hit.SampleBanks.Any(b => b.Name == "clap"));
+                Assert.IsTrue(hit.Samples.Any(s => s.Name == @"clap"));
             }
         }
     }

@@ -7,11 +7,11 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Judgements;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Game.Modes.Objects.Types;
 using OpenTK.Graphics;
+using osu.Game.Audio;
 
 namespace osu.Game.Modes.Objects.Drawables
 {
@@ -50,6 +50,7 @@ namespace osu.Game.Modes.Objects.Drawables
         public TObject HitObject;
 
         private readonly List<SampleChannel> samples = new List<SampleChannel>();
+        private AudioManager audio;
 
         protected DrawableHitObject(TObject hitObject)
         {
@@ -59,9 +60,10 @@ namespace osu.Game.Modes.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            foreach (var bank in HitObject.SampleBanks)
-            foreach (var sample in bank.Samples)
-                samples.Add(audio.Sample.Get($@"Gameplay/{bank.Name}-hit{sample.Type.ToString().ToLower()}"));
+            this.audio = audio;
+
+            foreach (var sample in HitObject.Samples)
+                samples.Add(GetSample(sample));
         }
 
         private ArmedState state;
@@ -155,9 +157,21 @@ namespace osu.Game.Modes.Objects.Drawables
             UpdateJudgement(false);
         }
 
+        protected SampleChannel GetSample(SampleInfo sampleInfo)
+        {
+            SampleChannel ret = audio.Sample.Get($@"Gameplay/{sampleInfo.Bank}-{sampleInfo.Name}");
+            ret.Volume.Value = sampleInfo.Volume;
+
+            return ret;
+        }
+
         protected virtual void PlaySamples()
         {
-            samples.ForEach(s => s?.Play());
+            samples.ForEach(s =>
+            {
+
+                s?.Play();
+            });
         }
 
         private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;

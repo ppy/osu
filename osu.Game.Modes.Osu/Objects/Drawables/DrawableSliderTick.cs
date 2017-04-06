@@ -2,17 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Judgements;
 using OpenTK;
 using OpenTK.Graphics;
-using System.Collections.Generic;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -28,8 +23,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
         public override bool RemoveWhenNotAlive => false;
 
         protected override OsuJudgement CreateJudgement() => new OsuJudgement { MaxScore = OsuScoreResult.SliderTick };
-
-        private List<SampleChannel> samples = new List<SampleChannel>();
 
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
@@ -54,18 +47,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Alpha = 0.3f,
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            foreach (var bank in HitObject.SampleBanks)
-                samples.Add(audio.Sample.Get($@"Gameplay/{bank.Name}-slidertick"));
-        }
-
-        protected override void PlaySamples()
-        {
-            samples.ForEach(s => s?.Play());
         }
 
         protected override void CheckJudgement(bool userTriggered)

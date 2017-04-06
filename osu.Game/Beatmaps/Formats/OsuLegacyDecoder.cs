@@ -6,7 +6,6 @@ using System.Globalization;
 using System.IO;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Events;
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Modes;
 using osu.Game.Modes.Objects;
@@ -247,6 +246,10 @@ namespace osu.Game.Beatmaps.Formats
                 omitFirstBarSignature = (effectFlags & 8) > 0;
             }
 
+            string stringSampleSet = sampleSet.ToString().ToLower();
+            if (stringSampleSet == "none")
+                stringSampleSet = "normal";
+
             beatmap.TimingInfo.ControlPoints.Add(new ControlPoint
             {
                 Time = time,
@@ -254,11 +257,8 @@ namespace osu.Game.Beatmaps.Formats
                 VelocityAdjustment = beatLength < 0 ? -beatLength / 100.0 : 1,
                 TimingChange = timingChange,
                 TimeSignature = timeSignature,
-                SampleBank = new SampleBank
-                {
-                    Name = sampleSet.ToString().ToLower(),
-                    Volume = sampleVolume
-                },
+                SampleBank = stringSampleSet,
+                SampleVolume = sampleVolume,
                 KiaiMode = kiaiMode,
                 OmitFirstBarLine = omitFirstBarSignature
             });

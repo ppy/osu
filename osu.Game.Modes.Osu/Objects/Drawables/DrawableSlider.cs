@@ -67,7 +67,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     ComboIndex = s.ComboIndex,
                     Scale = s.Scale,
                     ComboColour = s.ComboColour,
-                    SampleBanks = s.SampleBanks,
+                    Samples = s.Samples,
                 }),
             };
 
