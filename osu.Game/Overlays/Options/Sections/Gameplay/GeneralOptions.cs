@@ -40,6 +40,11 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                 },
                 new OsuCheckbox
                 {
+                    LabelText = "Show score overlay",
+                    Bindable = config.GetBindable<bool>(OsuConfig.ShowInterface)
+                },
+                new OsuCheckbox
+                {
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuConfig.KeyOverlay)
                 },
