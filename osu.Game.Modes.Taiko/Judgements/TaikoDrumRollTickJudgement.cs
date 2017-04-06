@@ -15,6 +15,8 @@ namespace osu.Game.Modes.Taiko.Judgements
         /// </summary>
         public override string MaxResultString => string.Empty;
 
+        public override bool AffectsCombo => false;
+
         protected override int NumericResultForScore(TaikoHitResult result)
         {
             switch (result)

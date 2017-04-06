@@ -98,6 +98,7 @@
     <Compile Include="IO\Legacy\ILegacySerializable.cs" />
     <Compile Include="IO\Legacy\SerializationReader.cs" />
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
+    <Compile Include="IO\Serialization\IJsonSerializable.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
     <Compile Include="Modes\Replays\Replay.cs" />
     <Compile Include="Modes\Judgements\DrawableJudgement.cs" />
