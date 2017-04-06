@@ -71,14 +71,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\BeatmapSampleStore.cs" />
+    <Compile Include="Audio\SampleInfo.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\IBeatmapCoverter.cs" />
     <Compile Include="Beatmaps\IBeatmapProcessor.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
-    <Compile Include="Beatmaps\Samples\SampleBank.cs" />
-    <Compile Include="Beatmaps\Samples\Sample.cs" />
-    <Compile Include="Beatmaps\Samples\SampleType.cs" />
     <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
     <Compile Include="Beatmaps\Timing\TimingInfo.cs" />
     <Compile Include="Database\ScoreDatabase.cs" />

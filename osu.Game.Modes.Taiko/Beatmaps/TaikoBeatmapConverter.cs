@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Types;
 using osu.Game.Modes.Taiko.Objects;
@@ -10,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Database;
+using osu.Game.Audio;
 
 namespace osu.Game.Modes.Taiko.Beatmaps
 {
@@ -57,9 +57,9 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             var endTimeData = obj as IHasEndTime;
 
             // Old osu! used hit sounding to determine various hit type information
-            List<SampleBank> sampleBanks = obj.SampleBanks;
+            List<SampleInfo> samples = obj.Samples;
 
-            bool strong = sampleBanks.Any(b => b.Samples.Any(s => s.Type == SampleType.Finish));
+            bool strong = samples.Any(s => s.Name == @"hitfinish");
 
             if (distanceData != null)
             {
@@ -98,7 +98,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         yield return new CentreHit
                         {
                             StartTime = j,
-                            SampleBanks = obj.SampleBanks,
+                            Samples = obj.Samples,
                             IsStrong = strong,
                             VelocityMultiplier = legacy_velocity_multiplier
                         };
@@ -109,7 +109,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     yield return new DrumRoll
                     {
                         StartTime = obj.StartTime,
-                        SampleBanks = obj.SampleBanks,
+                        Samples = obj.Samples,
                         IsStrong = strong,
                         Distance = distance,
                         TickRate = beatmap.BeatmapInfo.Difficulty.SliderTickRate == 3 ? 3 : 4,
@@ -124,7 +124,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                 yield return new Swell
                 {
                     StartTime = obj.StartTime,
-                    SampleBanks = obj.SampleBanks,
+                    Samples = obj.Samples,
                     IsStrong = strong,
                     EndTime = endTimeData.EndTime,
                     RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier),
@@ -133,24 +133,24 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             }
             else
             {
-                bool isCentre = sampleBanks.Any(b => b.Samples.Any(s => s.Type == SampleType.Normal));
+                bool isRim = samples.Any(s => s.Name == @"hitclap" || s.Name == @"hitwhistle");
 
-                if (isCentre)
+                if (isRim)
                 {
-                    yield return new CentreHit
+                    yield return new RimHit
                     {
                         StartTime = obj.StartTime,
-                        SampleBanks = obj.SampleBanks,
+                        Samples = obj.Samples,
                         IsStrong = strong,
                         VelocityMultiplier = legacy_velocity_multiplier
                     };
                 }
                 else
                 {
-                    yield return new RimHit
+                    yield return new CentreHit
                     {
                         StartTime = obj.StartTime,
-                        SampleBanks = obj.SampleBanks,
+                        Samples = obj.Samples,
                         IsStrong = strong,
                         VelocityMultiplier = legacy_velocity_multiplier
                     };
