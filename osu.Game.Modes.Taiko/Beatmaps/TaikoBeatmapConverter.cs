@@ -9,9 +9,8 @@ using osu.Game.Modes.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps.Legacy;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
+using osu.Game.IO.Serialization;
 
 namespace osu.Game.Modes.Taiko.Beatmaps
 {
@@ -41,9 +40,12 @@ namespace osu.Game.Modes.Taiko.Beatmaps
 
         public Beatmap<TaikoHitObject> Convert(Beatmap original)
         {
+            BeatmapInfo info = original.BeatmapInfo.DeepClone<BeatmapInfo>();
+            info.Difficulty.SliderMultiplier *= legacy_velocity_multiplier;
+
             return new Beatmap<TaikoHitObject>(original)
             {
-                TimingInfo = original is LegacyBeatmap ? new LegacyTimingInfo(original.TimingInfo) : original.TimingInfo,
+                BeatmapInfo = info,
                 HitObjects = original.HitObjects.SelectMany(h => convertHitObject(h, original)).ToList()
             };
         }
@@ -75,7 +77,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                 double distance = distanceData.Distance * repeats * legacy_velocity_multiplier;
 
                 // The velocity of the taiko hit object - calculated as the velocity of a drum roll
-                double taikoVelocity = taiko_base_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength * legacy_velocity_multiplier;
+                double taikoVelocity = taiko_base_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier * legacy_velocity_multiplier / speedAdjustedBeatLength;
                 // The duration of the taiko hit object
                 double taikoDuration = distance / taikoVelocity;
 
@@ -85,7 +87,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                     speedAdjustedBeatLength /= speedAdjustment;
 
                 // The velocity of the osu! hit object - calculated as the velocity of a slider
-                double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength * legacy_velocity_multiplier;
+                double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier * legacy_velocity_multiplier / speedAdjustedBeatLength;
                 // The duration of the osu! hit object
                 double osuDuration = distance / osuVelocity;
 
@@ -152,22 +154,6 @@ namespace osu.Game.Modes.Taiko.Beatmaps
                         Sample = obj.Sample,
                         IsStrong = strong,
                     };
-                }
-            }
-        }
-
-        private class LegacyTimingInfo : TimingInfo
-        {
-            public LegacyTimingInfo(TimingInfo original)
-            {
-                if (original is LegacyTimingInfo)
-                    ControlPoints.AddRange(original.ControlPoints);
-                else
-                {
-                    ControlPoints.AddRange(original.ControlPoints.Select(c => c.Clone()));
-
-                    foreach (var c in ControlPoints)
-                        c.SpeedMultiplier *= legacy_velocity_multiplier;
                 }
             }
         }
