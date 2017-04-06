@@ -17,10 +17,7 @@ namespace osu.Game.Modes.Judgements
         /// </summary>
         public double TimeOffset;
 
-        /// <summary>
-        /// The combo after this judgement was processed.
-        /// </summary>
-        public int ComboAtHit;
+        public virtual bool AffectsCombo => true;
 
         /// <summary>
         /// The string representation for the result achieved.
