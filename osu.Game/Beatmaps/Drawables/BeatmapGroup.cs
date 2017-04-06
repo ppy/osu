@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps.Drawables
                 GainedSelection = headerGainedSelection,
                 RelativeSizeAxes = Axes.X,
             };
-            
+
             BeatmapSet.Beatmaps = BeatmapSet.Beatmaps.OrderBy(b => b.StarDifficulty).ToList();
             BeatmapPanels = BeatmapSet.Beatmaps.Select(b => new BeatmapPanel(b)
             {

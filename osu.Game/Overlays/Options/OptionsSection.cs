@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Options
                 },
             });
         }
-        
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
