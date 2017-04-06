@@ -15,7 +15,7 @@ using osu.Game.Audio;
 
 namespace osu.Game.Modes.Objects.Drawables
 {
-    public abstract class DrawableHitObject<TJudgement> : Container
+    public abstract class DrawableHitObject<TJudgement> : Container, IStateful<ArmedState>
         where TJudgement : Judgement
     {
         public override bool HandleInput => Interactive;
@@ -24,47 +24,9 @@ namespace osu.Game.Modes.Objects.Drawables
 
         public TJudgement Judgement;
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // We may be setting a custom judgement in test cases or what not
-            if (Judgement == null)
-                Judgement = CreateJudgement();
-        }
-
         protected abstract TJudgement CreateJudgement();
-    }
 
-    public abstract class DrawableHitObject<TObject, TJudgement> : DrawableHitObject<TJudgement>, IStateful<ArmedState>
-        where TObject : HitObject
-        where TJudgement : Judgement
-    {
-        public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
-
-        /// <summary>
-        /// The colour used for various elements of this DrawableHitObject.
-        /// </summary>
-        public Color4 AccentColour { get; protected set; }
-
-        public TObject HitObject;
-
-        private readonly List<SampleChannel> samples = new List<SampleChannel>();
-        private AudioManager audio;
-
-        protected DrawableHitObject(TObject hitObject)
-        {
-            HitObject = hitObject;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            this.audio = audio;
-
-            foreach (var sample in HitObject.Samples)
-                samples.Add(GetSample(sample));
-        }
+        protected abstract void UpdateState(ArmedState state);
 
         private ArmedState state;
         public ArmedState State
@@ -87,12 +49,42 @@ namespace osu.Game.Modes.Objects.Drawables
             }
         }
 
+        protected List<SampleChannel> Samples = new List<SampleChannel>();
+
+        protected void PlaySamples()
+        {
+            Samples.ForEach(s => s?.Play());
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            // Force application of the state that was set before we loaded
+            //we may be setting a custom judgement in test cases or what not.
+            if (Judgement == null)
+                Judgement = CreateJudgement();
+
+            //force application of the state that was set before we loaded.
             UpdateState(State);
+        }
+    }
+
+    public abstract class DrawableHitObject<TObject, TJudgement> : DrawableHitObject<TJudgement>
+        where TObject : HitObject
+        where TJudgement : Judgement
+    {
+        public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
+
+        public TObject HitObject;
+
+        /// <summary>
+        /// The colour used for various elements of this DrawableHitObject.
+        /// </summary>
+        public Color4 AccentColour { get; protected set; }
+
+        protected DrawableHitObject(TObject hitObject)
+        {
+            HitObject = hitObject;
         }
 
         /// <summary>
@@ -157,17 +149,19 @@ namespace osu.Game.Modes.Objects.Drawables
             UpdateJudgement(false);
         }
 
-        protected SampleChannel GetSample(SampleInfo sampleInfo)
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
         {
-            SampleChannel ret = audio.Sample.Get($@"Gameplay/{sampleInfo.Bank}-{sampleInfo.Name}");
-            ret.Volume.Value = sampleInfo.Volume;
+            foreach (SampleInfo sample in HitObject.Samples)
+            {
+                SampleChannel channel = audio.Sample.Get($@"Gameplay/{sample.Bank}-{sample.Name}");
 
-            return ret;
-        }
+                if (channel == null)
+                    continue;
 
-        protected void PlaySamples()
-        {
-            samples.ForEach(s => s?.Play());
+                channel.Volume.Value = sample.Volume;
+                Samples.Add(channel);
+            }
         }
 
         private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;
@@ -182,7 +176,5 @@ namespace osu.Game.Modes.Objects.Drawables
             h.OnJudgement += d => OnJudgement?.Invoke(d);
             nestedHitObjects.Add(h);
         }
-
-        protected abstract void UpdateState(ArmedState state);
     }
 }
