@@ -3,79 +3,37 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
-using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public class DrawableDrumRollTick : DrawableTaikoHitObject
+    public class DrawableDrumRollTick : DrawableTaikoHitObject<DrumRollTick>
     {
-        /// <summary>
-        /// The size of a tick.
-        /// </summary>
-        private const float tick_size = TaikoHitObject.CIRCLE_RADIUS / 2;
-        
-        /// <summary>
-        /// Any tick that is not the first for a drumroll is not filled, but is instead displayed
-        /// as a hollow circle. This is what controls the border width of that circle.
-        /// </summary>
-        private const float tick_border_width = tick_size / 4;
-
-        private readonly DrumRollTick tick;
-
-        private readonly CircularContainer bodyContainer;
-
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
         {
-            this.tick = tick;
-
-            Anchor = Anchor.CentreLeft;
-            Origin = Anchor.Centre;
-
-            RelativePositionAxes = Axes.X;
-            Size = new Vector2(tick_size);
-
-            Children = new[]
-            {
-                bodyContainer = new CircularContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    BorderThickness = tick_border_width,
-                    BorderColour = Color4.White,
-                    Children = new[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = tick.FirstTick ? 1 : 0,
-                            AlwaysPresent = true
-                        }
-                    }
-                }
-            };
         }
 
-        protected override TaikoJudgement CreateJudgement() => new TaikoDrumRollTickJudgement { SecondHit = tick.IsStrong };
+        protected override TaikoPiece CreateMainPiece() => new TickPiece
+        {
+            Filled = HitObject.FirstTick
+        };
+
+        protected override TaikoJudgement CreateJudgement() => new TaikoDrumRollTickJudgement { SecondHit = HitObject.IsStrong };
 
         protected override void CheckJudgement(bool userTriggered)
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > tick.HitWindow)
+                if (Judgement.TimeOffset > HitObject.HitWindow)
                     Judgement.Result = HitResult.Miss;
                 return;
             }
 
-            if (Math.Abs(Judgement.TimeOffset) < tick.HitWindow)
+            if (Math.Abs(Judgement.TimeOffset) < HitObject.HitWindow)
             {
                 Judgement.Result = HitResult.Hit;
                 Judgement.TaikoResult = TaikoHitResult.Great;
@@ -87,7 +45,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Hit:
-                    bodyContainer.ScaleTo(0, 100, EasingTypes.OutQuint);
+                    Content.ScaleTo(0, 100, EasingTypes.OutQuint);
                     break;
             }
         }
