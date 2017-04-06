@@ -165,13 +165,9 @@ namespace osu.Game.Modes.Objects.Drawables
             return ret;
         }
 
-        protected virtual void PlaySamples()
+        protected void PlaySamples()
         {
-            samples.ForEach(s =>
-            {
-
-                s?.Play();
-            });
+            samples.ForEach(s => s?.Play());
         }
 
         private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;
