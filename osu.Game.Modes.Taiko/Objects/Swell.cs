@@ -7,9 +7,9 @@ namespace osu.Game.Modes.Taiko.Objects
 {
     public class Swell : TaikoHitObject, IHasEndTime
     {
-        public double EndTime { get; set; }
+        public double EndTime => StartTime + Duration;
 
-        public double Duration => EndTime - StartTime;
+        public double Duration { get; set; }
 
         /// <summary>
         /// The number of hits required to complete the swell successfully.

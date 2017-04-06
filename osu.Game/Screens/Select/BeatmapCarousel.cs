@@ -179,10 +179,10 @@ namespace osu.Game.Screens.Select
 
         public void Filter(FilterCriteria newCriteria = null, bool debounce = true)
         {
-            if (!IsLoaded) return;
-
             if (newCriteria != null)
                 criteria = newCriteria;
+
+            if (!IsLoaded) return;
 
             Action perform = delegate
             {

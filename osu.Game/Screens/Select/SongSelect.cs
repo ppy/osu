@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Linq;
 using System.Threading;
 using OpenTK;
@@ -168,12 +167,11 @@ namespace osu.Game.Screens.Select
                 BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
             }
 
-            if (osu != null)
-                playMode.BindTo(osu.PlayMode);
-            playMode.ValueChanged += playMode_ValueChanged;
-
             if (database == null)
                 database = beatmaps;
+
+            playMode.ValueChanged += val => { if (Beatmap != null) Beatmap.PreferredPlayMode = val; };
+            if (osu != null) playMode.BindTo(osu.PlayMode);
 
             database.BeatmapSetAdded += onBeatmapSetAdded;
             database.BeatmapSetRemoved += onBeatmapSetRemoved;
@@ -275,8 +273,6 @@ namespace osu.Game.Screens.Select
 
             initialAddSetsTask.Cancel();
         }
-
-        private void playMode_ValueChanged(object sender, EventArgs e) => Beatmap.PreferredPlayMode = playMode;
 
         private void changeBackground(WorkingBeatmap beatmap)
         {
