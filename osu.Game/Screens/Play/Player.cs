@@ -118,7 +118,6 @@ namespace osu.Game.Screens.Play
             hudOverlay = new StandardHudOverlay();
             hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
             hudOverlay.BindProcessor(scoreProcessor);
-
             hudOverlay.BindHitRenderer(HitRenderer);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
@@ -145,7 +144,6 @@ namespace osu.Game.Screens.Play
                 hudOverlay,
                 pauseOverlay = new PauseOverlay
                 {
-                    Depth = -1,
                     OnResume = delegate
                     {
                         Delay(400);
@@ -156,7 +154,6 @@ namespace osu.Game.Screens.Play
                 },
                 failOverlay = new FailOverlay
                 {
-                    Depth = -1,
                     OnRetry = Restart,
                     OnQuit = Exit,
                 }
