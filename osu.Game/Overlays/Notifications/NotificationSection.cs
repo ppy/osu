@@ -155,7 +155,7 @@ namespace osu.Game.Overlays.Notifications
 
         public void MarkAllRead()
         {
-            notifications.Children.ForEach(n => n.Read = true);
+            notifications?.Children.ForEach(n => n.Read = true);
         }
     }
 }

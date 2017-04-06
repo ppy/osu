@@ -60,8 +60,8 @@ namespace osu.Game.Graphics.Backgrounds
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            for (int i = 0; i < aimTriangleCount; i++)
-                addTriangle(true);
+
+            addTriangles(true);
         }
 
         private int aimTriangleCount => (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
@@ -83,8 +83,8 @@ namespace osu.Game.Graphics.Backgrounds
                     t.Expire();
             }
 
-            while (CreateNewTriangles && Children.Count() < aimTriangleCount)
-                addTriangle(false);
+            if (CreateNewTriangles)
+                addTriangles(false);
         }
 
         protected virtual Triangle CreateTriangle()
@@ -113,12 +113,16 @@ namespace osu.Game.Graphics.Backgrounds
 
         protected virtual Color4 GetTriangleShade() => Interpolation.ValueAt(RNG.NextSingle(), ColourDark, ColourLight, 0, 1);
 
-        private void addTriangle(bool randomY)
+        private void addTriangles(bool randomY)
         {
-            var sprite = CreateTriangle();
-            float triangleHeight = sprite.DrawHeight / DrawHeight;
-            sprite.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() * (1 + triangleHeight) - triangleHeight : 1);
-            Add(sprite);
+            int addCount = aimTriangleCount - Children.Count();
+            for (int i = 0; i < addCount; i++)
+            {
+                var sprite = CreateTriangle();
+                float triangleHeight = sprite.DrawHeight / DrawHeight;
+                sprite.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() * (1 + triangleHeight) - triangleHeight : 1);
+                Add(sprite);
+            }
         }
     }
 }

@@ -11,26 +11,16 @@ using osu.Game.Audio;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
-    public class DrumRoll : TaikoHitObject, IHasDistance
+    public class DrumRoll : TaikoHitObject, IHasEndTime
     {
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
         /// </summary>
         private const float base_distance = 100;
 
-        public double EndTime => StartTime + Distance / Velocity;
+        public double EndTime => StartTime + Duration;
 
-        public double Duration => EndTime - StartTime;
-
-        /// <summary>
-        /// Raw length of the drum roll in positional length units.
-        /// </summary>
-        public double Distance { get; set; }
-
-        /// <summary>
-        /// Velocity of the drum roll in positional length units per millisecond.
-        /// </summary>
-        public double Velocity { get; protected set; } = 5;
+        public double Duration { get; set; }
 
         /// <summary>
         /// Numer of ticks per beat length.
@@ -69,9 +59,6 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.ApplyDefaults(timing, difficulty);
 
-            double speedAdjutedBeatLength = timing.SpeedMultiplierAt(StartTime) * timing.BeatLengthAt(StartTime);
-
-            Velocity = base_distance * difficulty.SliderMultiplier / speedAdjutedBeatLength * VelocityMultiplier;
             tickSpacing = timing.BeatLengthAt(StartTime) / TickRate;
 
             RequiredGoodHits = TotalTicks * Math.Min(0.15, 0.05 + 0.10 / 6 * difficulty.OverallDifficulty);
@@ -86,12 +73,12 @@ namespace osu.Game.Modes.Taiko.Objects
                 return ret;
 
             bool first = true;
-            for (double t = StartTime; t < EndTime + (int)tickSpacing; t += tickSpacing)
+            for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
             {
                 ret.Add(new DrumRollTick
                 {
                     FirstTick = first,
-                    PreEmpt = PreEmpt,
+                    ScrollTime = ScrollTime,
                     TickSpacing = tickSpacing,
                     StartTime = t,
                     IsStrong = IsStrong,

@@ -1,16 +1,17 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Input;
 using System;
 using System.Linq;
 using osu.Framework.Input;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
+using OpenTK.Input;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 
-namespace osu.Game.Modes.Taiko.Objects.Drawable
+namespace osu.Game.Modes.Taiko.Objects.Drawables
 {
-    public abstract class DrawableStrongHit : DrawableHit
+    public abstract class DrawableHitStrong : DrawableHit
     {
         /// <summary>
         /// The lenience for the second key press.
@@ -22,10 +23,12 @@ namespace osu.Game.Modes.Taiko.Objects.Drawable
         private bool firstKeyHeld;
         private Key firstHitKey;
 
-        protected DrawableStrongHit(Hit hit)
+        protected DrawableHitStrong(Hit hit)
             : base(hit)
         {
         }
+
+        protected override TaikoPiece CreateMainPiece() => new CirclePiece(true);
 
         protected override TaikoJudgement CreateJudgement() => new TaikoStrongHitJudgement();
 

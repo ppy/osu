@@ -29,10 +29,10 @@ namespace osu.Game.Overlays.Options
 
         public BindableNumber<T> Bindable
         {
-            get { return slider.Bindable; }
+            get { return slider.Value; }
             set
             {
-                slider.Bindable = value;
+                slider.Value = value;
                 if (value?.Disabled ?? true)
                     Alpha = 0.3f;
             }

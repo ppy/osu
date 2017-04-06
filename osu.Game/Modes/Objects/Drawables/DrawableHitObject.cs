@@ -56,13 +56,17 @@ namespace osu.Game.Modes.Objects.Drawables
             Samples.ForEach(s => s?.Play());
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-
             //we may be setting a custom judgement in test cases or what not.
             if (Judgement == null)
                 Judgement = CreateJudgement();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             //force application of the state that was set before we loaded.
             UpdateState(State);
