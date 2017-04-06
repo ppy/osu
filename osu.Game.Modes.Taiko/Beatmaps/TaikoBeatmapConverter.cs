@@ -59,7 +59,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             // Old osu! used hit sounding to determine various hit type information
             List<SampleInfo> samples = obj.Samples;
 
-            bool strong = samples.Any(s => s.Name == @"hitfinish");
+            bool strong = samples.Any(s => s.Name == SampleInfo.HIT_FINISH);
 
             if (distanceData != null)
             {
@@ -133,7 +133,7 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             }
             else
             {
-                bool isRim = samples.Any(s => s.Name == @"hitclap" || s.Name == @"hitwhistle");
+                bool isRim = samples.Any(s => s.Name == SampleInfo.HIT_CLAP || s.Name == SampleInfo.HIT_WHISTLE);
 
                 if (isRim)
                 {

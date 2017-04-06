@@ -129,7 +129,7 @@ namespace osu.Game.Modes.Objects
             result.Samples.Add(new SampleInfo
             {
                 Bank = normalSampleBank,
-                Name = "hitnormal",
+                Name = SampleInfo.HIT_NORMAL,
                 Volume = sampleVolume
             });
 
@@ -138,7 +138,7 @@ namespace osu.Game.Modes.Objects
                 result.Samples.Add(new SampleInfo
                 {
                     Bank = addSampleBank,
-                    Name = "hitfinish",
+                    Name = SampleInfo.HIT_FINISH,
                     Volume = sampleVolume
                 });
             }
@@ -148,7 +148,7 @@ namespace osu.Game.Modes.Objects
                 result.Samples.Add(new SampleInfo
                 {
                     Bank = addSampleBank,
-                    Name = "hitwhistle",
+                    Name = SampleInfo.HIT_WHISTLE,
                     Volume = sampleVolume
                 });
             }
@@ -158,7 +158,7 @@ namespace osu.Game.Modes.Objects
                 result.Samples.Add(new SampleInfo
                 {
                     Bank = addSampleBank,
-                    Name = "hitclap",
+                    Name = SampleInfo.HIT_CLAP,
                     Volume = sampleVolume
                 });
             }
