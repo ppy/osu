@@ -9,12 +9,12 @@ namespace osu.Game.Database
     {
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
-        public float DrainRate { get; set; }
-        public float CircleSize { get; set; }
-        public float OverallDifficulty { get; set; }
-        public float ApproachRate { get; set; }
-        public float SliderMultiplier { get; set; }
-        public float SliderTickRate { get; set; }
+        public float DrainRate { get; set; } = 5;
+        public float CircleSize { get; set; } = 5;
+        public float OverallDifficulty { get; set; } = 5;
+        public float ApproachRate { get; set; } = 5;
+        public float SliderMultiplier { get; set; } = 1;
+        public float SliderTickRate { get; set; } = 1;
 
         /// <summary>
         /// Maps a difficulty value [0, 10] to a two-piece linear range of values.

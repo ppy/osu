@@ -14,7 +14,7 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCasePlaySongSelect : TestCase
     {
-        private BeatmapDatabase db, oldDb;
+        private BeatmapDatabase db;
         private TestStorage storage;
         private PlaySongSelect songSelect;
 
@@ -44,13 +44,13 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            if (oldDb != null)
-                db = null;
+        //protected override void Dispose(bool isDisposing)
+        //{
+        //    if (oldDb != null)
+        //        db = null;
 
-            base.Dispose(isDisposing);
-        }
+        //    base.Dispose(isDisposing);
+        //}
 
         private BeatmapSetInfo createTestBeatmapSet(int i)
         {

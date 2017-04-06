@@ -10,8 +10,8 @@ namespace osu.Game.Beatmaps.Timing
     {
         public readonly List<ControlPoint> ControlPoints = new List<ControlPoint>();
 
-        public double BPMMaximum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderBy(c => c.BeatLength).FirstOrDefault() ?? ControlPoint.Default).BeatLength;
-        public double BPMMinimum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? ControlPoint.Default).BeatLength;
+        public double BPMMaximum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderBy(c => c.BeatLength).FirstOrDefault() ?? new ControlPoint()).BeatLength;
+        public double BPMMinimum => 60000 / (ControlPoints?.Where(c => c.BeatLength != 0).OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? new ControlPoint()).BeatLength;
         public double BPMMode => BPMAt(ControlPoints.Where(c => c.BeatLength != 0).GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).First().First().Time);
 
         public double BPMAt(double time)
@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Timing
             ControlPoint overridePoint;
             ControlPoint timingPoint = TimingPointAt(time, out overridePoint);
 
-            return overridePoint?.VelocityAdjustment ?? timingPoint?.VelocityAdjustment ?? 1;
+            return overridePoint?.SpeedMultiplier ?? timingPoint?.SpeedMultiplier ?? 1;
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace osu.Game.Beatmaps.Timing
                 else break;
             }
 
-            return timingPoint ?? ControlPoint.Default;
+            return timingPoint ?? new ControlPoint();
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
@@ -40,11 +39,6 @@ namespace osu.Game.Screens
             }
         }
 
-        private void beatmap_ValueChanged(object sender, EventArgs e)
-        {
-            OnBeatmapChanged(beatmap.Value);
-        }
-
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGameBase game)
         {
@@ -57,7 +51,7 @@ namespace osu.Game.Screens
                     beatmap.Value = localMap;
             }
 
-            beatmap.ValueChanged += beatmap_ValueChanged;
+            beatmap.ValueChanged += OnBeatmapChanged;
         }
 
         protected virtual void OnBeatmapChanged(WorkingBeatmap beatmap)

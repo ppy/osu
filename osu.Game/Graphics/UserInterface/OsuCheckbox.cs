@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -86,9 +85,9 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        private void bindableValueChanged(object sender, EventArgs e)
+        private void bindableValueChanged(bool isChecked)
         {
-            State = bindable.Value ? CheckboxState.Checked : CheckboxState.Unchecked;
+            State = isChecked ? CheckboxState.Checked : CheckboxState.Unchecked;
         }
 
         protected override void Dispose(bool isDisposing)
