@@ -19,7 +19,7 @@ namespace osu.Game.Modes.Taiko.UI
         /// Diameter of normal hit object circles.
         /// </summary>
         private const float normal_diameter = TaikoHitObject.CIRCLE_RADIUS * 2;
-        
+
         /// <summary>
         /// Diameter of strong hit object circles.
         /// </summary>
