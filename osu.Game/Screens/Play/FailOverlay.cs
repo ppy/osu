@@ -30,8 +30,8 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AddButton(@"Retry", colours.YellowDark, OnRetry);
-            AddButton(@"Quit to Main Menu", new Color4(170, 27, 39, 255), OnQuit);
+            AddButton("Retry", colours.YellowDark, OnRetry);
+            AddButton("Quit", new Color4(170, 27, 39, 255), OnQuit);
         }
     }
 }
