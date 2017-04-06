@@ -71,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\SampleInfo.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\IBeatmapCoverter.cs" />
@@ -149,14 +150,7 @@
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Modes\Objects\Drawables\DrawableHitObject.cs" />
     <Compile Include="Modes\Objects\HitObject.cs" />
-    <Compile Include="Beatmaps\Samples\HitSampleInfo.cs" />
-    <Compile Include="Beatmaps\Samples\SampleBank.cs" />
-    <Compile Include="Beatmaps\Samples\SampleInfo.cs" />
-    <Compile Include="Beatmaps\Samples\SampleSet.cs" />
-    <Compile Include="Beatmaps\Samples\SampleType.cs" />
     <Compile Include="Beatmaps\Timing\ControlPoint.cs" />
-    <Compile Include="Beatmaps\Timing\SampleChange.cs" />
-    <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
     <Compile Include="Overlays\Notifications\Notification.cs" />
@@ -199,8 +193,11 @@
     <Compile Include="Screens\Multiplayer\Lobby.cs" />
     <Compile Include="Screens\Multiplayer\Match.cs" />
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
-    <Compile Include="Screens\Play\FailDialog.cs" />
+    <Compile Include="Screens\Play\FailOverlay.cs" />
+    <Compile Include="Screens\Play\MenuOverlay.cs" />
     <Compile Include="Screens\Play\KeyConversionInputManager.cs" />
+    <Compile Include="Screens\Play\PauseOverlay.cs" />
+    <Compile Include="Screens\Play\Pause\PauseButton.cs" />
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\ReplayPlayer.cs" />
@@ -337,12 +334,8 @@
     <Compile Include="Screens\Select\SearchTextBox.cs" />
     <Compile Include="Screens\Select\FooterButton.cs" />
     <Compile Include="Screens\Select\Footer.cs" />
-    <Compile Include="Screens\Play\PauseOverlay.cs" />
     <Compile Include="Screens\Play\Pause\PauseProgressBar.cs" />
     <Compile Include="Screens\Play\Pause\PauseProgressGraph.cs" />
-    <Compile Include="Screens\Play\Pause\ResumeButton.cs" />
-    <Compile Include="Screens\Play\Pause\RetryButton.cs" />
-    <Compile Include="Screens\Play\Pause\QuitButton.cs" />
     <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
     <Compile Include="Modes\Mods\Mod.cs" />
     <Compile Include="Overlays\Mods\ModButton.cs" />

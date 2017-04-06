@@ -49,7 +49,6 @@ namespace osu.Game.Database
         // General
         public int AudioLeadIn { get; set; }
         public bool Countdown { get; set; }
-        public SampleSet SampleSet { get; set; }
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
         public PlayMode Mode { get; set; }
