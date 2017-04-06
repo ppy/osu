@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Modes.Judgements;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
+using osu.Game.Modes.Objects.Drawables;
 
 namespace osu.Game.Modes.Scoring
 {
@@ -145,10 +146,21 @@ namespace osu.Game.Modes.Scoring
 
             if (!exists)
             {
+                if (judgement.AffectsCombo)
+                {
+                    switch (judgement.Result)
+                    {
+                        case HitResult.Miss:
+                            Combo.Value = 0;
+                            break;
+                        case HitResult.Hit:
+                            Combo.Value++;
+                            break;
+                    }
+                }
+
                 Judgements.Add(judgement);
                 OnNewJudgement(judgement);
-
-                judgement.ComboAtHit = Combo.Value;
             }
             else
                 OnJudgementChanged(judgement);

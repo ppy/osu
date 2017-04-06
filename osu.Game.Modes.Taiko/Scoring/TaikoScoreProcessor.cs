@@ -187,10 +187,6 @@ namespace osu.Game.Modes.Taiko.Scoring
             if (!isTick)
                 totalHits++;
 
-            // Apply combo changes, must be done before the hit score is added
-            if (!isTick && judgement.Result == HitResult.Hit)
-                Combo.Value++;
-
             // Apply score changes
             addHitScore(judgement);
 
@@ -261,7 +257,7 @@ namespace osu.Game.Modes.Taiko.Scoring
             foreach (var j in Judgements)
             {
                 scoreForAccuracy += j.ResultValueForAccuracy;
-                maxScoreForAccuracy = j.MaxResultValueForAccuracy;
+                maxScoreForAccuracy += j.MaxResultValueForAccuracy;
             }
 
             Accuracy.Value = (double)scoreForAccuracy / maxScoreForAccuracy;

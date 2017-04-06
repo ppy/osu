@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Options
         }
 
         private ScheduledDelegate expandEvent;
-        
+
         protected override bool OnHover(InputState state)
         {
             expandEvent = Scheduler.AddDelayed(() =>
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Options
             }, 750);
             return true;
         }
-        
+
         protected override void OnHoverLost(InputState state)
         {
             expandEvent?.Cancel();

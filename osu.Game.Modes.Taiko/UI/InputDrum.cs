@@ -60,7 +60,7 @@ namespace osu.Game.Modes.Taiko.UI
             /// The key to be used for the rim of the half-drum.
             /// </summary>
             public Key RimKey;
-            
+
             /// <summary>
             /// The key to be used for the centre of the half-drum.
             /// </summary>

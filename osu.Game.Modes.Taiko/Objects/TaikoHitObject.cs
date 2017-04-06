@@ -39,7 +39,7 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.ApplyDefaults(timing, difficulty);
 
-            ScrollTime = scroll_time * (timing.BeatLengthAt(StartTime) / 1000) / (difficulty.SliderMultiplier * timing.SpeedMultiplierAt(StartTime));
+            ScrollTime = scroll_time * (timing.BeatLengthAt(StartTime) * timing.SpeedMultiplierAt(StartTime) / 1000) / difficulty.SliderMultiplier;
 
             ControlPoint overridePoint;
             Kiai = timing.TimingPointAt(StartTime, out overridePoint).KiaiMode;

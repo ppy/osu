@@ -2,12 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Judgements;
 using OpenTK;
@@ -53,22 +49,6 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             };
         }
 
-        private SampleChannel sample;
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            string sampleSet = (HitObject.Sample?.Set ?? SampleSet.Normal).ToString().ToLower();
-
-            sample = audio.Sample.Get($@"Gameplay/{sampleSet}-slidertick");
-        }
-
-        protected override void PlaySample()
-        {
-            sample?.Play();
-        }
-
-
         protected override void CheckJudgement(bool userTriggered)
         {
             if (Judgement.TimeOffset >= 0)
@@ -77,7 +57,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                 Judgement.Score = Tracking ? OsuScoreResult.SliderTick : OsuScoreResult.Miss;
             }
         }
-        
+
         protected override void UpdatePreemptState()
         {
             var animIn = Math.Min(150, sliderTick.StartTime - FadeInTime);
