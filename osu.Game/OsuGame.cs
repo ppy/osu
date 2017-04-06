@@ -314,7 +314,7 @@ namespace osu.Game
             if (intro?.ChildScreen != null)
                 intro.ChildScreen.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
 
-            Cursor.State = currentScreen == null || currentScreen.HasLocalCursorDisplayed ? Visibility.Hidden : Visibility.Visible;
+            Cursor.State = currentScreen?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
         }
 
         private void screenAdded(Screen newScreen)
