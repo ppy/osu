@@ -358,7 +358,7 @@ namespace osu.Game.Beatmaps.Formats
                         handleColours(beatmap, key, val, ref hasCustomColours);
                         break;
                     case Section.HitObjects:
-                        var obj = parser?.Parse(val);
+                        var obj = parser.Parse(val);
 
                         if (obj != null)
                             beatmap.HitObjects.Add(obj);
