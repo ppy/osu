@@ -261,7 +261,7 @@ namespace osu.Game.Modes.Taiko.Scoring
             foreach (var j in Judgements)
             {
                 scoreForAccuracy += j.ResultValueForAccuracy;
-                maxScoreForAccuracy = j.MaxResultValueForAccuracy;
+                maxScoreForAccuracy += j.MaxResultValueForAccuracy;
             }
 
             Accuracy.Value = (double)scoreForAccuracy / maxScoreForAccuracy;
