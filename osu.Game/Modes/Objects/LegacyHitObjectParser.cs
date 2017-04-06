@@ -22,8 +22,8 @@ namespace osu.Game.Modes.Objects
             type &= ~LegacyHitObjectType.NewCombo;
 
             int sampleVolume = 0;
-            string normalSampleBank = string.Empty;
-            string addSampleBank = string.Empty;
+            string normalSampleBank = null;
+            string addSampleBank = null;
 
             HitObject result;
 
@@ -181,10 +181,10 @@ namespace osu.Game.Modes.Objects
 
             string stringBank = bank.ToString().ToLower();
             if (stringBank == @"none")
-                stringBank = string.Empty;
+                stringBank = null;
             string stringAddBank = addbank.ToString().ToLower();
             if (stringAddBank == @"none")
-                stringAddBank = string.Empty;
+                stringAddBank = null;
 
             normalSampleBank = stringBank;
             addSampleBank = stringAddBank;
