@@ -250,7 +250,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 Time = time,
                 BeatLength = beatLength,
-                VelocityAdjustment = beatLength < 0 ? -beatLength / 100.0 : 1,
+                SpeedMultiplier = beatLength < 0 ? -beatLength / 100.0 : 1,
                 TimingChange = timingChange,
                 TimeSignature = timeSignature,
                 SampleBank = stringSampleSet,
