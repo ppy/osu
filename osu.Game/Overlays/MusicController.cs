@@ -119,7 +119,8 @@ namespace osu.Game.Overlays
                             Text = @"Nothing to play",
                             Font = @"Exo2.0-BoldItalic"
                         },
-                        new Container {
+                        new Container
+                        {
                             Padding = new MarginPadding { Bottom = progress_height },
                             Height = bottom_black_area_height,
                             RelativeSizeAxes = Axes.X,
