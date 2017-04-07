@@ -45,7 +45,9 @@ namespace osu.Desktop.VisualTests.Tests
             });
 
             AddRepeatStep("new retry/fail values", newRetryAndFailValues, 10);
-            AddStep("new ratings", newRatings);
+            AddStep("new ratings", () => details.Ratings = Enumerable.Range(1, 10));
+            AddStep("remove retries and fails", () => details.Retries = null );
+            AddStep("remove ratings", () => details.Ratings = null);
         }
 
         private int lastRange = 1;
@@ -56,7 +58,5 @@ namespace osu.Desktop.VisualTests.Tests
             details.Retries = Enumerable.Range(lastRange, 100).Select(i => (int)(Math.Sin(i) * 100));
             lastRange += 100;
         }
-
-        private void newRatings() => details.Ratings = Enumerable.Range(1, 10);
     }
 }
