@@ -19,7 +19,6 @@ namespace osu.Game.Screens.Select
 
         public readonly BeatmapDetails Details;
         public readonly Leaderboard Leaderboard;
-        private BeatmapDetailTab currentTab;
 
         private APIAccess api;
 
@@ -60,8 +59,6 @@ namespace osu.Game.Screens.Select
                                 updateScores();
                                 break;
                         }
-                        currentTab = tab;
-                        updateDetails();
                     },
                 },
                 content = new Container
