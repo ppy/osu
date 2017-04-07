@@ -31,7 +31,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.MouseDisableWheel, false);
 
             Set(OsuConfig.SnakingInSliders, true);
-            Set(OsuConfig.SnakingOutSliders, false);
+            Set(OsuConfig.SnakingOutSliders, true);
 
             Set(OsuConfig.MenuParallax, true);
 
