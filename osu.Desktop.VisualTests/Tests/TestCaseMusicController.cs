@@ -30,7 +30,9 @@ namespace osu.Desktop.VisualTests.Tests
                 Anchor = Anchor.Centre
             };
             Add(mc);
-            AddToggleStep(@"Show", state => mc.State = state ? Visibility.Visible : Visibility.Hidden);
+
+            AddToggleStep(@"toggle visibility", state => mc.State = state ? Visibility.Visible : Visibility.Hidden);
+            AddStep(@"show", () => mc.State = Visibility.Visible);
         }
     }
 }
