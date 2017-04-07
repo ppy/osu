@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Play
             }
 
             float step = values.Length / (float)ColumnCount;
-            for (float i = 0; i < values.Length; i += step) 
+            for (float i = 0; i < values.Length; i += step)
             {
                 newValues.Add(values[(int)i]);
             }

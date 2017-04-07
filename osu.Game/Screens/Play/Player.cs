@@ -121,8 +121,6 @@ namespace osu.Game.Screens.Play
             hudOverlay.BindHitRenderer(HitRenderer);
                     hudOverlay.Progress.Hide();
 
-            hudOverlay.Progress.Length = Beatmap?.Track?.Length ?? 0;
-
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
 
@@ -167,7 +165,7 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            hudOverlay.Progress.CurrentTime = Beatmap.Track.CurrentTime;
+            hudOverlay.Progress.Progress = Beatmap.Track.CurrentTime / Beatmap.Track.Length;
         }
 
         private void initializeSkipButton()
