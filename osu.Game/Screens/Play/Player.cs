@@ -20,6 +20,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
+using osu.Framework.Threading;
 using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Screens.Play
@@ -237,14 +238,16 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        private ScheduledDelegate onCompletionEvent;
+
         private void onCompletion()
         {
             // Only show the completion screen if the player hasn't failed
-            if (scoreProcessor.HasFailed)
+            if (scoreProcessor.HasFailed || onCompletionEvent != null)
                 return;
 
             Delay(1000);
-            Schedule(delegate
+            onCompletionEvent = Schedule(delegate
             {
                 ValidForResume = false;
                 Push(new Results
