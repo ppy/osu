@@ -46,6 +46,8 @@ namespace osu.Game.Overlays
 
         private Container dragContainer;
 
+        private const float progress_height = 10;
+
         private const float bottom_black_area_height = 50;
 
         public MusicController()
@@ -117,53 +119,62 @@ namespace osu.Game.Overlays
                             Text = @"Nothing to play",
                             Font = @"Exo2.0-BoldItalic"
                         },
-                        new FillFlowContainer<Button>
-                        {
-                            AutoSizeAxes = Axes.X,
+                        new Container {
+                            Padding = new MarginPadding { Bottom = progress_height },
                             Height = bottom_black_area_height,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(5),
+                            RelativeSizeAxes = Axes.X,
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.BottomCentre,
-                            Children = new[]
+                            Children = new Drawable[]
                             {
-                                new Button
+                                new FillFlowContainer<Button>
                                 {
-                                    Action = prev,
-                                    Icon = FontAwesome.fa_step_backward,
-                                },
-                                playButton = new Button
-                                {
-                                    //Scale = new Vector2(1.4f),
-                                    Action = () =>
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(5),
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    Children = new[]
                                     {
-                                        if (current?.Track == null) return;
-                                        if (current.Track.IsRunning)
-                                            current.Track.Stop();
-                                        else
-                                            current.Track.Start();
-                                    },
-                                    Icon = FontAwesome.fa_play_circle_o,
+                                        new Button
+                                        {
+                                            Action = prev,
+                                            Icon = FontAwesome.fa_step_backward,
+                                        },
+                                        playButton = new Button
+                                        {
+                                            //Scale = new Vector2(1.3f),
+                                            Action = () =>
+                                            {
+                                                if (current?.Track == null) return;
+                                                if (current.Track.IsRunning)
+                                                    current.Track.Stop();
+                                                else
+                                                    current.Track.Start();
+                                            },
+                                            Icon = FontAwesome.fa_play_circle_o,
+                                        },
+                                        new Button
+                                        {
+                                            Action = next,
+                                            Icon = FontAwesome.fa_step_forward,
+                                        },
+                                    }
                                 },
                                 new Button
                                 {
-                                    Action = next,
-                                    Icon = FontAwesome.fa_step_forward,
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.CentreRight,
+                                    Position = new Vector2(-bottom_black_area_height / 2, 0),
+                                    Icon = FontAwesome.fa_bars,
                                 },
                             }
-                        },
-                        new Button
-                        {
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.BottomRight,
-                            Position = new Vector2(-bottom_black_area_height / 2),
-                            Icon = FontAwesome.fa_bars,
                         },
                         progress = new DragBar
                         {
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.BottomCentre,
-                            Height = 10,
+                            Height = progress_height,
                             Colour = colours.Yellow,
                             SeekRequested = seek
                         }
