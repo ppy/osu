@@ -21,9 +21,9 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapDetails : Container
     {
-        private readonly OsuSpriteText description;
-        private readonly OsuSpriteText source;
-        private readonly FillFlowContainer<OsuSpriteText> tags;
+        private readonly MetadataSegment description;
+        private readonly MetadataSegment source;
+        private readonly MetadataSegment tags;
 
         private readonly DifficultyRow circleSize;
         private readonly DifficultyRow drainRate;
@@ -52,13 +52,10 @@ namespace osu.Game.Screens.Select
             {
                 if (beatmap == value) return;
                 beatmap = value;
-                description.Text = beatmap.Version;
-                source.Text = beatmap.Metadata.Source;
-                tags.Children = beatmap.Metadata.Tags?.Split(' ').Select(text => new OsuSpriteText
-                {
-                    Text = text,
-                    Font = "Exo2.0-Regular",
-                });
+
+                description.ContentText = beatmap.Version;
+                source.ContentText = beatmap.Metadata.Source;
+                tags.ContentText = beatmap.Metadata.Tags;
 
                 circleSize.Value = beatmap.Difficulty.CircleSize;
                 drainRate.Value = beatmap.Difficulty.DrainRate;
@@ -87,8 +84,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private List<int> retries = Enumerable.Repeat(0, 100).ToList();
-
+        private List<int> retries;
         public IEnumerable<int> Retries
         {
             get
@@ -102,8 +98,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private List<int> fails = Enumerable.Repeat(0, 100).ToList();
-
+        private List<int> fails;
         public IEnumerable<int> Fails
         {
             get
@@ -120,7 +115,7 @@ namespace osu.Game.Screens.Select
         private void calcRetryAndFailGraph()
         {
             failGraph.Values = fails.Select(fail => (float)fail);
-            retryGraph.Values = retries.Select((retry, index) => (float)retry + fails[index]);
+            retryGraph.Values = retries?.Select((retry, index) => (float)retry + fails?[index] ?? 0) ?? new List<float>();
         }
 
         public BeatmapDetails()
@@ -133,7 +128,7 @@ namespace osu.Game.Screens.Select
                     Colour = Color4.Black,
                     Alpha = 0.5f,
                 },
-                new FillFlowContainer()
+                new FillFlowContainer<MetadataSegment>()
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -141,41 +136,29 @@ namespace osu.Game.Screens.Select
                     AutoSizeAxes = Axes.Y,
                     Width = 0.4f,
                     Direction = FillDirection.Vertical,
+                    LayoutDuration = 1,
+                    LayoutEasing = EasingTypes.OutQuint,
                     Padding = new MarginPadding(10) { Top = 25 },
-                    Children = new Drawable[]
+                    Children = new []
                     {
-                        new OsuSpriteText
+                        description = new MetadataSegment
                         {
-                            Text = "Description",
-                            Font = @"Exo2.0-Bold",
-                        },
-                        description = new OsuSpriteText
-                        {
-                            Font = @"Exo2.0-Regular",
-                            Direction = FillDirection.Full,
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = "Source",
-                            Font = @"Exo2.0-Bold",
-                            Margin = new MarginPadding { Top = 20 },
-                        },
-                        source = new OsuSpriteText
-                        {
-                            Font = @"Exo2.0-Regular",
-                            Direction = FillDirection.Full,
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = "Tags",
-                            Font = @"Exo2.0-Bold",
-                            Margin = new MarginPadding { Top = 20 },
-                        },
-                        tags = new FillFlowContainer<OsuSpriteText>
-                        {
+                            HeaderText = "Description",
                             RelativeSizeAxes = Axes.X,
-                            Spacing = new Vector2(3,0),
+                            AutoSizeAxes = Axes.Y,
                         },
+                        source = new MetadataSegment
+                        {
+                            HeaderText = "Source",
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        },
+                        tags = new MetadataSegment
+                        {
+                            HeaderText = "Tags",
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        }
                     },
                 },
                 new FillFlowContainer
@@ -343,9 +326,9 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
-            description.Colour = colour.GrayB;
-            source.Colour = colour.GrayB;
-            tags.Colour = colour.YellowLight;
+            description.ContentColour = colour.GrayB;
+            source.ContentColour = colour.GrayB;
+            tags.ContentColour = colour.YellowLight;
 
             stars.BarColour = colour.Yellow;
 
@@ -449,6 +432,66 @@ namespace osu.Game.Screens.Select
                 name.Colour = colour.GrayB;
                 bar.BackgroundColour = colour.Gray7;
                 valueText.Colour = colour.GrayB;
+            }
+        }
+
+        private class MetadataSegment : Container
+        {
+            private readonly OsuSpriteText header;
+            private readonly FillFlowContainer<OsuSpriteText> content;
+
+            private const int fade_time = 250;
+
+            public string HeaderText
+            {
+                set
+                {
+                    header.Text = value;
+                }
+            }
+
+            public string ContentText
+            {
+                set
+                {
+                    if (value == "")
+                        FadeOut(fade_time);
+                    else
+                    {
+                        FadeIn(fade_time);
+                        content.Children = value.Split(' ').Select(text => new OsuSpriteText
+                        {
+                            Text = text + " ",
+                            Font = "Exo2.0-Regular",
+                        });
+                    }
+                }
+            }
+
+            public SRGBColour ContentColour
+            {
+                set
+                {
+                    content.Colour = value;
+                }
+            }
+
+            public MetadataSegment()
+            {
+                Children = new Drawable[]
+                {
+                    header = new OsuSpriteText
+                    {
+                        Font = @"Exo2.0-Bold",
+                    },
+                    content = new FillFlowContainer<OsuSpriteText>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Full,
+                        Margin = new MarginPadding { Top = header.TextSize }
+                    }
+                };
             }
         }
     }
