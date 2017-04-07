@@ -56,7 +56,6 @@ namespace osu.Game.Screens.Select
                             case BeatmapDetailTab.Details:
                                 Details.Show();
                                 Leaderboard.Hide();
-                                updateDetails();
                                 break;
 
                             default:
@@ -66,6 +65,7 @@ namespace osu.Game.Screens.Select
                                 break;
                         }
                         currentTab = tab;
+                        updateDetails();
                     },
                 },
                 content = new Container
