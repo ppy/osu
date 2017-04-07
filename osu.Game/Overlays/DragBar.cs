@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 
 namespace osu.Game.Overlays
@@ -48,7 +49,7 @@ namespace osu.Game.Overlays
         {
             if (isDragging || !IsEnabled) return;
 
-            fill.Width = position;
+            updatePosition(position);
         }
 
         private void seek(InputState state)
@@ -56,7 +57,12 @@ namespace osu.Game.Overlays
             if (!IsEnabled) return;
             float seekLocation = state.Mouse.Position.X / DrawWidth;
             SeekRequested?.Invoke(seekLocation);
-            fill.Width = seekLocation;
+            updatePosition(seekLocation);
+        }
+
+        private void updatePosition(float position)
+        {
+            fill.TransformTo(fill.Width, position, 100, EasingTypes.OutQuint, new TransformWidth());
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -77,6 +83,15 @@ namespace osu.Game.Overlays
         {
             isDragging = false;
             return true;
+        }
+
+        private class TransformWidth : TransformFloat
+        {
+            public override void Apply(Drawable d)
+            {
+                base.Apply(d);
+                d.Width = CurrentValue;
+            }
         }
     }
 }
