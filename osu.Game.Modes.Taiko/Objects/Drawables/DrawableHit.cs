@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Taiko.Judgements;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 using OpenTK.Input;
 
 namespace osu.Game.Modes.Taiko.Objects.Drawables
@@ -66,6 +67,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         {
             Delay(HitObject.StartTime - Time.Current + Judgement.TimeOffset, true);
 
+            var circlePiece = MainPiece as CirclePiece;
+
+            circlePiece?.FlashBox.Flush();
+
             switch (State)
             {
                 case ArmedState.Idle:
@@ -76,6 +81,16 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                     break;
                 case ArmedState.Hit:
                     FadeOut(600);
+
+                    var flash = circlePiece?.FlashBox;
+                    if (flash != null)
+                    {
+                        flash.FadeTo(0.9f);
+                        flash.FadeOut(300);
+                    }
+
+
+                    FadeOut(800);
 
                     const float gravity_time = 300;
                     const float gravity_travel_height = 200;
