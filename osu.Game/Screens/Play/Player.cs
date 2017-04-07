@@ -292,6 +292,10 @@ namespace osu.Game.Screens.Play
                 sourceClock.Start();
                 initializeSkipButton();
             });
+
+            //keep in mind this is using the interpolatedSourceClock so won't be run as early as we may expect.
+            HitRenderer.Alpha = 0;
+            HitRenderer.FadeIn(750, EasingTypes.OutQuint);
         }
 
         protected override void OnSuspending(Screen next)
