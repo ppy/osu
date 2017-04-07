@@ -14,7 +14,6 @@ namespace osu.Game.Overlays
     public class DragBar : Container
     {
         protected readonly Container FillContainer;
-        protected readonly Box Fill;
 
         public Action<float> SeekRequested;
 
@@ -46,7 +45,7 @@ namespace osu.Game.Overlays
                     Width = 0,
                     Children = new Drawable[]
                     {
-                        Fill = new Box
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both
                         }
@@ -73,7 +72,7 @@ namespace osu.Game.Overlays
         private void updatePosition(float position)
         {
             position = MathHelper.Clamp(position, 0, 1);
-            fill.TransformTo(fill.Width, position, 200, EasingTypes.OutQuint, new TransformSeek());
+            FillContainer.TransformTo(FillContainer.Width, position, 200, EasingTypes.OutQuint, new TransformSeek());
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)

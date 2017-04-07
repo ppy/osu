@@ -14,7 +14,9 @@ namespace osu.Game.Screens.Play
     public class SongProgress : OverlayContainer
     {
         private const int progress_height = 5;
-        private readonly Vector2 handleSize = new Vector2(14, 25);
+
+        private static readonly Vector2 handle_size = new Vector2(14, 25);
+
         private const float transition_duration = 200;
 
         private readonly SongProgressBar bar;
@@ -22,24 +24,13 @@ namespace osu.Game.Screens.Play
 
         public Action<double> OnSeek;
 
-        private double currentTime;
-        public double CurrentTime
+        private double progress;
+        public double Progress
         {
-            get { return currentTime; }
+            get { return progress; }
             set
             {
-                currentTime = value;
-                updateProgress();
-            }
-        }
-
-        private double length;
-        public double Length
-        {
-            get { return length; }
-            set
-            {
-                length = value;
+                progress = value;
                 updateProgress();
             }
         }
@@ -59,7 +50,7 @@ namespace osu.Game.Screens.Play
         public SongProgress()
         {
             RelativeSizeAxes = Axes.X;
-            Height = progress_height + SongProgressGraph.Column.HEIGHT + handleSize.Y;
+            Height = progress_height + SongProgressGraph.Column.HEIGHT + handle_size.Y;
 
             Children = new Drawable[]
             {
@@ -71,13 +62,13 @@ namespace osu.Game.Screens.Play
                     Height = SongProgressGraph.Column.HEIGHT,
                     Margin = new MarginPadding { Bottom = progress_height },
                 },
-                bar = new SongProgressBar(progress_height, SongProgressGraph.Column.HEIGHT, handleSize)
+                bar = new SongProgressBar(progress_height, SongProgressGraph.Column.HEIGHT, handle_size)
                 {
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     SeekRequested = delegate (float position)
                     {
-                        OnSeek?.Invoke(Length * position);
+                        OnSeek?.Invoke(position);
                     },
                 },
             };
@@ -85,9 +76,8 @@ namespace osu.Game.Screens.Play
 
         private void updateProgress()
         {
-            float currentProgress = (float)(CurrentTime / Length);
-            bar.UpdatePosition(currentProgress);
-            graph.Progress = (int)(graph.ColumnCount * currentProgress);
+            bar.UpdatePosition((float)progress);
+            graph.Progress = (int)(graph.ColumnCount * progress);
         }
 
         protected override void PopIn()
@@ -104,6 +94,13 @@ namespace osu.Game.Screens.Play
             bar.IsEnabled = false;
             bar.FadeOut(transition_duration, EasingTypes.In);
             MoveTo(new Vector2(0f, progress_height), transition_duration, EasingTypes.In);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            updateProgress();
         }
     }
 }

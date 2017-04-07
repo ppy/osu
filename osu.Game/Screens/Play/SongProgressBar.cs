@@ -14,8 +14,8 @@ namespace osu.Game.Screens.Play
     {
         public Color4 FillColour
         {
-            get { return Fill.Colour; }
-            set { Fill.Colour = value; }
+            get { return FillContainer.Colour; }
+            set { FillContainer.Colour = value; }
         }
 
         public SongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
