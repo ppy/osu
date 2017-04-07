@@ -7,11 +7,11 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes.Judgements;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Game.Modes.Objects.Types;
 using OpenTK.Graphics;
+using osu.Game.Audio;
 
 namespace osu.Game.Modes.Objects.Drawables
 {
@@ -45,24 +45,28 @@ namespace osu.Game.Modes.Objects.Drawables
                 UpdateState(state);
 
                 if (State == ArmedState.Hit)
-                    PlaySample();
+                    PlaySamples();
             }
         }
 
-        protected SampleChannel Sample;
+        protected List<SampleChannel> Samples = new List<SampleChannel>();
 
-        protected virtual void PlaySample()
+        protected void PlaySamples()
         {
-            Sample?.Play();
+            Samples.ForEach(s => s?.Play());
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            //we may be setting a custom judgement in test cases or what not.
+            if (Judgement == null)
+                Judgement = CreateJudgement();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            //we may be setting a custom judgement in test cases or what not.
-            if (Judgement == null)
-                Judgement = CreateJudgement();
 
             //force application of the state that was set before we loaded.
             UpdateState(State);
@@ -93,16 +97,26 @@ namespace osu.Game.Modes.Objects.Drawables
         /// <returns>Whether a hit was processed.</returns>
         protected bool UpdateJudgement(bool userTriggered)
         {
-            if (Judgement.Result != null)
+            IPartialJudgement partial = Judgement as IPartialJudgement;
+
+            // Never re-process non-partial hits
+            if (Judgement.Result != HitResult.None && partial == null)
                 return false;
 
+            // Update the judgement state
             double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-
             Judgement.TimeOffset = Time.Current - endTime;
 
+            // Update the judgement state
+            bool hadResult = Judgement.Result != HitResult.None;
             CheckJudgement(userTriggered);
 
-            if (Judgement.Result == null)
+            // Don't process judgements with no result
+            if (Judgement.Result == HitResult.None)
+                return false;
+
+            // Don't process judgements that previously had results but the results were unchanged
+            if (hadResult && partial?.Changed != true)
                 return false;
 
             switch (Judgement.Result)
@@ -116,6 +130,9 @@ namespace osu.Game.Modes.Objects.Drawables
             }
 
             OnJudgement?.Invoke(this);
+
+            if (partial != null)
+                partial.Changed = false;
 
             return true;
         }
@@ -139,13 +156,16 @@ namespace osu.Game.Modes.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            SampleType type = HitObject.Sample?.Type ?? SampleType.None;
-            if (type == SampleType.None)
-                type = SampleType.Normal;
+            foreach (SampleInfo sample in HitObject.Samples)
+            {
+                SampleChannel channel = audio.Sample.Get($@"Gameplay/{sample.Bank}-{sample.Name}");
 
-            SampleSet sampleSet = HitObject.Sample?.Set ?? SampleSet.Normal;
+                if (channel == null)
+                    continue;
 
-            Sample = audio.Sample.Get($@"Gameplay/{sampleSet.ToString().ToLower()}-hit{type.ToString().ToLower()}");
+                channel.Volume.Value = sample.Volume;
+                Samples.Add(channel);
+            }
         }
 
         private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;

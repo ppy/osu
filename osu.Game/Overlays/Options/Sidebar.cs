@@ -6,7 +6,6 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Game.Overlays.Toolbar;
@@ -48,7 +47,7 @@ namespace osu.Game.Overlays.Options
         }
 
         private ScheduledDelegate expandEvent;
-        
+
         protected override bool OnHover(InputState state)
         {
             expandEvent = Scheduler.AddDelayed(() =>
@@ -58,7 +57,7 @@ namespace osu.Game.Overlays.Options
             }, 750);
             return true;
         }
-        
+
         protected override void OnHoverLost(InputState state)
         {
             expandEvent?.Cancel();

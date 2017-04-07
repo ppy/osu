@@ -109,7 +109,7 @@ namespace osu.Game.Modes.Objects
 
             // "toFlatten" contains all the curves which are not yet approximated well enough.
             // We use a stack to emulate recursion without the risk of running into a stack overflow.
-            // (More specifically, we iteratively and adaptively refine our curve with a 
+            // (More specifically, we iteratively and adaptively refine our curve with a
             // <a href="https://en.wikipedia.org/wiki/Depth-first_search">Depth-first search</a>
             // over the tree resulting from the subdivisions we make.)
             toFlatten.Push(controlPoints.ToArray());

@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Overlays.Options;
 using System;
 using osu.Game.Graphics;
@@ -26,7 +25,7 @@ namespace osu.Game.Overlays
         public const float SIDEBAR_WIDTH = Sidebar.DEFAULT_WIDTH;
 
         private const float width = 400;
-        
+
         private const float sidebar_padding = 10;
 
         private ScrollContainer scrollContainer;
@@ -119,7 +118,7 @@ namespace osu.Game.Overlays
                     ).ToArray()
                 }
             };
-        
+
             scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
         }
 

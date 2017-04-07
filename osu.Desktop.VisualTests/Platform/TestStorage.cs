@@ -15,7 +15,7 @@ namespace osu.Desktop.VisualTests.Platform
         public TestStorage(string baseName) : base(baseName)
         {
         }
-        
+
         public override SQLiteConnection GetDatabase(string name)
         {
             ISQLitePlatform platform;

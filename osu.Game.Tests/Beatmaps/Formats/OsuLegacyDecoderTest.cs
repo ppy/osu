@@ -6,11 +6,12 @@ using NUnit.Framework;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Beatmaps.Samples;
 using osu.Game.Modes;
 using osu.Game.Tests.Resources;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Objects.Legacy;
+using System.Linq;
+using osu.Game.Audio;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -55,7 +56,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var beatmapInfo = decoder.Decode(new StreamReader(stream)).BeatmapInfo;
                 Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
                 Assert.AreEqual(false, beatmapInfo.Countdown);
-                Assert.AreEqual(SampleSet.Soft, beatmapInfo.SampleSet);
                 Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
                 Assert.AreEqual(false, beatmapInfo.SpecialStyle);
                 Assert.AreEqual(PlayMode.Osu, beatmapInfo.Mode);
@@ -137,12 +137,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsNotNull(slider);
                 Assert.AreEqual(new Vector2(192, 168), slider.Position);
                 Assert.AreEqual(956, slider.StartTime);
-                Assert.AreEqual(SampleType.None, slider.Sample.Type);
+                Assert.IsTrue(slider.Samples.Any(s => s.Name == SampleInfo.HIT_NORMAL));
                 var hit = beatmap.HitObjects[1] as LegacyHit;
                 Assert.IsNotNull(hit);
                 Assert.AreEqual(new Vector2(304, 56), hit.Position);
                 Assert.AreEqual(1285, hit.StartTime);
-                Assert.AreEqual(SampleType.Clap, hit.Sample.Type);
+                Assert.IsTrue(hit.Samples.Any(s => s.Name == SampleInfo.HIT_CLAP));
             }
         }
     }

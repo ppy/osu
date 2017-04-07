@@ -14,7 +14,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays
 {
     public class MusicController : FocusedOverlayContainer
     {
-        private MusicControllerBackground backgroundSprite;
+        private Drawable currentBackground;
         private DragBar progress;
         private TextAwesome playButton;
         private SpriteText title, artist;
@@ -44,7 +43,6 @@ namespace osu.Game.Overlays
         private Bindable<bool> preferUnicode;
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
-        private Framework.Game game;
 
         private Container dragContainer;
 
@@ -78,12 +76,8 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, OsuConfigManager config, BeatmapDatabase beatmaps, OsuColour colours)
+        private void load(OsuGameBase game, OsuConfigManager config, BeatmapDatabase beatmaps, OsuColour colours)
         {
-            game = osuGame;
-
-            unicodeString = config.GetUnicodeString;
-
             Children = new Drawable[]
             {
                 dragContainer = new Container
@@ -212,21 +206,22 @@ namespace osu.Game.Overlays
             };
 
             this.beatmaps = beatmaps;
-            trackManager = osuGame.Audio.Track;
+            trackManager = game.Audio.Track;
             preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
-            preferUnicode.ValueChanged += preferUnicode_changed;
+            preferUnicode.ValueChanged += unicode => updateDisplay(current, TransformDirection.None);
 
-            beatmapSource = osuGame.Beatmap ?? new Bindable<WorkingBeatmap>();
+            beatmapSource = game.Beatmap ?? new Bindable<WorkingBeatmap>();
             playList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
 
-            backgroundSprite = new MusicControllerBackground();
-            dragContainer.Add(backgroundSprite);
+            currentBackground = new MusicControllerBackground();
+            dragContainer.Add(currentBackground);
         }
 
         protected override void LoadComplete()
         {
             beatmapSource.ValueChanged += workingChanged;
-            workingChanged();
+            beatmapSource.TriggerChange();
+
             base.LoadComplete();
         }
 
@@ -251,17 +246,12 @@ namespace osu.Game.Overlays
                 playButton.Icon = FontAwesome.fa_play_circle_o;
         }
 
-        private void preferUnicode_changed(object sender, EventArgs e)
+        private void workingChanged(WorkingBeatmap beatmap)
         {
-            updateDisplay(current, TransformDirection.None);
-        }
-
-        private void workingChanged(object sender = null, EventArgs e = null)
-        {
-            progress.IsEnabled = beatmapSource.Value != null;
-            if (beatmapSource.Value == current) return;
-            bool audioEquals = current?.BeatmapInfo?.AudioEquals(beatmapSource?.Value?.BeatmapInfo) ?? false;
-            current = beatmapSource.Value;
+            progress.IsEnabled = beatmap != null;
+            if (beatmap == current) return;
+            bool audioEquals = current?.BeatmapInfo?.AudioEquals(beatmap?.BeatmapInfo) ?? false;
+            current = beatmap;
             updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Next);
             appendToHistory(current?.BeatmapInfo);
         }
@@ -346,51 +336,42 @@ namespace osu.Game.Overlays
                     else
                     {
                         BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
-                        title.Text = unicodeString(metadata.Title, metadata.TitleUnicode);
-                        artist.Text = unicodeString(metadata.Artist, metadata.ArtistUnicode);
+                        title.Text = preferUnicode ? metadata.TitleUnicode : metadata.Title;
+                        artist.Text = preferUnicode ? metadata.ArtistUnicode : metadata.Artist;
                     }
                 });
 
-                MusicControllerBackground newBackground;
-
-                (newBackground = new MusicControllerBackground(beatmap)).LoadAsync(game, delegate
+                dragContainer.Add(new AsyncLoadWrapper(new MusicControllerBackground(beatmap)
                 {
-
-                    dragContainer.Add(newBackground);
-
-                    switch (direction)
+                    OnLoadComplete = d =>
                     {
-                        case TransformDirection.Next:
-                            newBackground.Position = new Vector2(400, 0);
-                            newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                            backgroundSprite.MoveToX(-400, 500, EasingTypes.OutCubic);
-                            break;
-                        case TransformDirection.Prev:
-                            newBackground.Position = new Vector2(-400, 0);
-                            newBackground.MoveToX(0, 500, EasingTypes.OutCubic);
-                            backgroundSprite.MoveToX(400, 500, EasingTypes.OutCubic);
-                            break;
+                        switch (direction)
+                        {
+                            case TransformDirection.Next:
+                                d.Position = new Vector2(400, 0);
+                                d.MoveToX(0, 500, EasingTypes.OutCubic);
+                                currentBackground.MoveToX(-400, 500, EasingTypes.OutCubic);
+                                break;
+                            case TransformDirection.Prev:
+                                d.Position = new Vector2(-400, 0);
+                                d.MoveToX(0, 500, EasingTypes.OutCubic);
+                                currentBackground.MoveToX(400, 500, EasingTypes.OutCubic);
+                                break;
+                        }
+                        currentBackground.Expire();
+                        currentBackground = d;
                     }
-
-                    backgroundSprite.Expire();
-                    backgroundSprite = newBackground;
+                })
+                {
+                    Depth = float.MaxValue,
                 });
             };
         }
-
-        private Func<string, string, string> unicodeString;
 
         private void seek(float position)
         {
             current?.Track?.Seek(current.Track.Length * position);
             current?.Track?.Start();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            if (preferUnicode != null)
-                preferUnicode.ValueChanged -= preferUnicode_changed;
-            base.Dispose(isDisposing);
         }
 
         private const float transition_length = 800;
@@ -422,8 +403,8 @@ namespace osu.Game.Overlays
             {
                 this.beatmap = beatmap;
                 CacheDrawnFrameBuffer = true;
-                RelativeSizeAxes = Axes.Both;
                 Depth = float.MaxValue;
+                RelativeSizeAxes = Axes.Both;
 
                 Children = new Drawable[]
                 {

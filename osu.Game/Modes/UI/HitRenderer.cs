@@ -14,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Game.Modes.Replays;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Modes.UI
 {
@@ -39,6 +41,16 @@ namespace osu.Game.Modes.UI
         /// The key conversion input manager for this HitRenderer.
         /// </summary>
         protected readonly KeyConversionInputManager KeyConversionInputManager;
+
+        /// <summary>
+        /// Whether we are currently providing the local user a gameplay cursor.
+        /// </summary>
+        public virtual bool ProvidingUserCursor => false;
+
+        /// <summary>
+        /// Whether we have a replay loaded currently.
+        /// </summary>
+        public bool HasReplayLoaded => InputManager.ReplayInputHandler != null;
 
         /// <summary>
         /// Whether all the HitObjects have been judged.
@@ -67,6 +79,14 @@ namespace osu.Game.Modes.UI
         /// </summary>
         /// <returns>The input manager.</returns>
         protected virtual KeyConversionInputManager CreateKeyConversionInputManager() => new KeyConversionInputManager();
+
+        protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
+
+        /// <summary>
+        /// Sets a replay to be used, overriding local input.
+        /// </summary>
+        /// <param name="replay">The replay, null for local input.</param>
+        public void SetReplay(Replay replay) => InputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
     }
 
     /// <summary>
@@ -147,8 +167,10 @@ namespace osu.Game.Modes.UI
     {
         public event Action<TJudgement> OnJudgement;
 
+        public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
+
         protected override Container<Drawable> Content => content;
-        protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result.HasValue);
+        protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result != HitResult.None);
 
         /// <summary>
         /// The playfield.

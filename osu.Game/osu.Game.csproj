@@ -71,9 +71,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\SampleInfo.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
-    <Compile Include="Beatmaps\IBeatmapCoverter.cs" />
+    <Compile Include="Beatmaps\IBeatmapConverter.cs" />
     <Compile Include="Beatmaps\IBeatmapProcessor.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
     <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
@@ -82,7 +83,9 @@
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\Cursor\GameplayCursor.cs" />
+    <Compile Include="Graphics\IHasAccentColour.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
+    <Compile Include="Graphics\Transforms\TransformAccent.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
     <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
     <Compile Include="Graphics\UserInterface\Nub.cs" />
@@ -95,9 +98,12 @@
     <Compile Include="IO\Legacy\ILegacySerializable.cs" />
     <Compile Include="IO\Legacy\SerializationReader.cs" />
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
+    <Compile Include="IO\Serialization\IJsonSerializable.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
+    <Compile Include="Modes\Replays\Replay.cs" />
     <Compile Include="Modes\Judgements\DrawableJudgement.cs" />
-    <Compile Include="Modes\LegacyReplay.cs" />
+    <Compile Include="Modes\Judgements\IPartialJudgement.cs" />
+    <Compile Include="Modes\Replays\FramedReplayInputHandler.cs" />
     <Compile Include="Modes\Mods\IApplicableMod.cs" />
     <Compile Include="Modes\Mods\ModType.cs" />
     <Compile Include="Modes\Objects\Drawables\ArmedState.cs" />
@@ -123,9 +129,10 @@
     <Compile Include="Modes\Objects\Types\IHasPosition.cs" />
     <Compile Include="Modes\Objects\Types\IHasHold.cs" />
     <Compile Include="Modes\Objects\Legacy\LegacyHitObjectType.cs" />
-    <Compile Include="Modes\Replay.cs" />
-    <Compile Include="Modes\Score.cs" />
-    <Compile Include="Modes\ScoreProcessor.cs" />
+    <Compile Include="Modes\Replays\ReplayButtonState.cs" />
+    <Compile Include="Modes\Replays\ReplayFrame.cs" />
+    <Compile Include="Modes\Scoring\Score.cs" />
+    <Compile Include="Modes\Scoring\ScoreProcessor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />
     <Compile Include="Modes\UI\HudOverlay.cs" />
     <Compile Include="Modes\UI\StandardHealthDisplay.cs" />
@@ -137,21 +144,13 @@
     <Compile Include="Overlays\LoginOverlay.cs" />
     <Compile Include="Overlays\MusicController.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
-    <Compile Include="Beatmaps\Formats\ConstructableBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\WorkingBeatmap.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Modes\Objects\Drawables\DrawableHitObject.cs" />
     <Compile Include="Modes\Objects\HitObject.cs" />
-    <Compile Include="Beatmaps\Samples\HitSampleInfo.cs" />
-    <Compile Include="Beatmaps\Samples\SampleBank.cs" />
-    <Compile Include="Beatmaps\Samples\SampleInfo.cs" />
-    <Compile Include="Beatmaps\Samples\SampleSet.cs" />
-    <Compile Include="Beatmaps\Samples\SampleType.cs" />
     <Compile Include="Beatmaps\Timing\ControlPoint.cs" />
-    <Compile Include="Beatmaps\Timing\SampleChange.cs" />
-    <Compile Include="Beatmaps\Timing\TimingChange.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
     <Compile Include="Overlays\Notifications\Notification.cs" />
@@ -160,7 +159,7 @@
     <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
     <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
-    <Compile Include="Overlays\Options\OptionDropDown.cs" />
+    <Compile Include="Overlays\Options\OptionDropdown.cs" />
     <Compile Include="Overlays\Options\OptionLabel.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropdown.cs" />
     <Compile Include="Overlays\Options\OptionsFooter.cs" />
@@ -181,7 +180,7 @@
     <Compile Include="Screens\Backgrounds\BackgroundScreenEmpty.cs" />
     <Compile Include="Screens\Charts\ChartInfo.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
-    <Compile Include="Screens\GameScreenWhiteBox.cs" />
+    <Compile Include="Screens\ScreenWhiteBox.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
     <Compile Include="Screens\Menu\Disclaimer.cs" />
@@ -194,10 +193,14 @@
     <Compile Include="Screens\Multiplayer\Lobby.cs" />
     <Compile Include="Screens\Multiplayer\Match.cs" />
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
-    <Compile Include="Screens\Play\FailDialog.cs" />
+    <Compile Include="Screens\Play\FailOverlay.cs" />
+    <Compile Include="Screens\Play\MenuOverlay.cs" />
     <Compile Include="Screens\Play\KeyConversionInputManager.cs" />
+    <Compile Include="Screens\Play\PauseOverlay.cs" />
+    <Compile Include="Screens\Play\Pause\PauseButton.cs" />
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
+    <Compile Include="Screens\Play\ReplayPlayer.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Modes\UI\StandardComboCounter.cs" />
     <Compile Include="Screens\Select\BeatmapCarousel.cs" />
@@ -205,7 +208,7 @@
     <Compile Include="Screens\Select\Filter\GroupMode.cs" />
     <Compile Include="Screens\Select\Filter\SortMode.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
-    <Compile Include="Screens\OsuGameScreen.cs" />
+    <Compile Include="Screens\OsuScreen.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Screens\Play\Player.cs" />
@@ -247,7 +250,6 @@
     <Compile Include="Online\Chat\Drawables\DrawableChannel.cs" />
     <Compile Include="Online\Chat\Drawables\ChatLine.cs" />
     <Compile Include="Online\Chat\Message.cs" />
-    <Compile Include="Online\User.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="OsuGameBase.cs" />
     <Compile Include="Overlays\ChatOverlay.cs" />
@@ -267,6 +269,7 @@
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
+    <Compile Include="Users\UpdateableAvatar.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
     <Compile Include="Database\BeatmapDatabase.cs" />
@@ -279,7 +282,7 @@
     <Compile Include="Database\BeatmapSetInfo.cs" />
     <Compile Include="Database\BeatmapMetadata.cs" />
     <Compile Include="Database\BeatmapInfo.cs" />
-    <Compile Include="Database\BaseDifficulty.cs" />
+    <Compile Include="Database\BeatmapDifficulty.cs" />
     <Compile Include="Database\DatabaseWorkingBeatmap.cs" />
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />
     <Compile Include="Overlays\Options\Sections\MaintenanceSection.cs" />
@@ -320,7 +323,7 @@
     <Compile Include="Overlays\Options\OptionTextBox.cs" />
     <Compile Include="Overlays\Options\OptionSlider.cs" />
     <Compile Include="Configuration\ProgressBarType.cs" />
-    <Compile Include="Overlays\Options\OptionEnumDropDown.cs" />
+    <Compile Include="Overlays\Options\OptionEnumDropdown.cs" />
     <Compile Include="Configuration\RankingType.cs" />
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ReleaseStream.cs" />
@@ -334,12 +337,8 @@
     <Compile Include="Screens\Play\SongProgress.cs" />
     <Compile Include="Screens\Play\SongProgressGraph.cs" />
     <Compile Include="Screens\Play\SongProgressBar.cs" />
-    <Compile Include="Screens\Play\PauseOverlay.cs" />
     <Compile Include="Screens\Play\Pause\PauseProgressBar.cs" />
     <Compile Include="Screens\Play\Pause\PauseProgressGraph.cs" />
-    <Compile Include="Screens\Play\Pause\ResumeButton.cs" />
-    <Compile Include="Screens\Play\Pause\RetryButton.cs" />
-    <Compile Include="Screens\Play\Pause\QuitButton.cs" />
     <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
     <Compile Include="Modes\Mods\Mod.cs" />
     <Compile Include="Overlays\Mods\ModButton.cs" />
@@ -350,7 +349,7 @@
     <Compile Include="Overlays\Dialog\PopupDialog.cs" />
     <Compile Include="Graphics\UserInterface\DialogButton.cs" />
     <Compile Include="Overlays\Dialog\PopupDialogButton.cs" />
-    <Compile Include="Overlays\Dialog\PopupDialogOKButton.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialogOkButton.cs" />
     <Compile Include="Overlays\Dialog\PopupDialogCancelButton.cs" />
     <Compile Include="Screens\Select\BeatmapDeleteDialog.cs" />
     <Compile Include="Overlays\DialogOverlay.cs" />
@@ -362,12 +361,12 @@
     <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
     <Compile Include="Users\Country.cs" />
     <Compile Include="Users\Team.cs" />
-    <Compile Include="Modes\ScoreRank.cs" />
+    <Compile Include="Modes\Scoring\ScoreRank.cs" />
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
     <Compile Include="Screens\Select\BeatmapDetailArea.cs" />
-    <Compile Include="Graphics\UserInterface\OsuTabControlCheckBox.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabControlCheckbox.cs" />
     <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
   </ItemGroup>
   <ItemGroup>

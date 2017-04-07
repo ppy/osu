@@ -17,14 +17,14 @@ namespace osu.Game.Screens.Select
     public class BeatmapDetailAreaTabControl : Container
     {
         public static readonly float HEIGHT = 24;
-        private readonly OsuTabControlCheckBox modsCheckbox;
+        private readonly OsuTabControlCheckbox modsCheckbox;
         private readonly OsuTabControl<BeatmapDetailTab> tabs;
 
         public Action<BeatmapDetailTab, bool> OnFilter; //passed the selected tab and if mods is checked
 
         private void invokeOnFilter()
         {
-            OnFilter?.Invoke(tabs.SelectedItem, modsCheckbox.State == CheckBoxState.Checked);
+            OnFilter?.Invoke(tabs.SelectedItem, modsCheckbox.State == CheckboxState.Checked);
         }
 
         [BackgroundDependencyLoader]
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
                 },
-                modsCheckbox = new OsuTabControlCheckBox
+                modsCheckbox = new OsuTabControlCheckbox
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -61,10 +61,10 @@ namespace osu.Game.Screens.Select
                 },
             };
 
-            tabs.ItemChanged += (sender, e) => invokeOnFilter();
+            tabs.SelectedItem.ValueChanged += item => invokeOnFilter();
             modsCheckbox.Action += (sender, e) => invokeOnFilter();
 
-            tabs.SelectedItem = BeatmapDetailTab.Global;
+            tabs.SelectedItem.Value = BeatmapDetailTab.Global;
         }
     }
 
