@@ -385,9 +385,7 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Screens\Select\Details\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />

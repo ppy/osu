@@ -31,6 +31,7 @@ namespace osu.Game.Screens.Select
         private readonly DifficultyRow approachRate;
         private readonly DifficultyRow stars;
 
+        private readonly Container ratingsContainer;
         private readonly Bar ratingsBar;
         private readonly OsuSpriteText negativeRatings;
         private readonly OsuSpriteText positiveRatings;
@@ -40,7 +41,6 @@ namespace osu.Game.Screens.Select
         private readonly BarGraph failGraph;
 
         private BeatmapInfo beatmap;
-
         public BeatmapInfo Beatmap
         {
             get
@@ -66,7 +66,6 @@ namespace osu.Game.Screens.Select
         }
 
         private List<int> ratings;
-
         public IEnumerable<int> Ratings
         {
             get
@@ -76,11 +75,17 @@ namespace osu.Game.Screens.Select
             set
             {
                 ratings = value.ToList();
-                negativeRatings.Text = ratings.GetRange(0, 5).Sum().ToString();
-                positiveRatings.Text = ratings.GetRange(5, 5).Sum().ToString();
-                ratingsBar.Length = (float)ratings.GetRange(0, 5).Sum() / ratings.Sum();
+                if(ratings.Count == 0)
+                    ratingsContainer.FadeOut(250);
+                else
+                {
+                    ratingsContainer.FadeIn(250);
+                    negativeRatings.Text = ratings.GetRange(0, 5).Sum().ToString();
+                    positiveRatings.Text = ratings.GetRange(5, 5).Sum().ToString();
+                    ratingsBar.Length = (float)ratings.GetRange(0, 5).Sum() / ratings.Sum();
 
-                ratingsGraph.Values = ratings.Select(rating => (float)rating);
+                    ratingsGraph.Values = ratings.Select(rating => (float)rating);
+                }
             }
         }
 
@@ -227,10 +232,12 @@ namespace osu.Game.Screens.Select
                                 },
                             },
                         },
-                        new Container
+                        ratingsContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Alpha = 0,
+                            AlwaysPresent = true,
                             Children = new Drawable[]
                             {
                                 new Box
