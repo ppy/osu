@@ -16,7 +16,8 @@ namespace osu.Game.Overlays
         private readonly Box fill;
 
         public Action<float> SeekRequested;
-        private bool isDragging;
+
+        public bool IsSeeking { get; private set; }
 
         private bool enabled = true;
         public bool IsEnabled
@@ -48,7 +49,7 @@ namespace osu.Game.Overlays
 
         public void UpdatePosition(float position)
         {
-            if (isDragging || !IsEnabled) return;
+            if (IsSeeking || !IsEnabled) return;
 
             updatePosition(position);
         }
@@ -64,7 +65,7 @@ namespace osu.Game.Overlays
         private void updatePosition(float position)
         {
             position = MathHelper.Clamp(position, 0, 1);
-            fill.TransformTo(fill.Width, position, 100, EasingTypes.OutQuint, new TransformWidth());
+            fill.TransformTo(fill.Width, position, 200, EasingTypes.OutQuint, new TransformSeek());
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -79,15 +80,15 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDragStart(InputState state) => isDragging = true;
+        protected override bool OnDragStart(InputState state) => IsSeeking = true;
 
         protected override bool OnDragEnd(InputState state)
         {
-            isDragging = false;
+            IsSeeking = false;
             return true;
         }
 
-        private class TransformWidth : TransformFloat
+        private class TransformSeek : TransformFloat
         {
             public override void Apply(Drawable d)
             {
