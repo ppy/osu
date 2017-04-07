@@ -30,7 +30,7 @@ namespace osu.Game.Overlays
     {
         private Drawable currentBackground;
         private DragBar progress;
-        private TextAwesome playButton;
+        private Button playButton;
         private SpriteText title, artist;
 
         private List<BeatmapSetInfo> playList;
@@ -45,6 +45,8 @@ namespace osu.Game.Overlays
         private BeatmapDatabase beatmaps;
 
         private Container dragContainer;
+
+        private const float bottom_black_area_height = 50;
 
         public MusicController()
         {
@@ -115,83 +117,46 @@ namespace osu.Game.Overlays
                             Text = @"Nothing to play",
                             Font = @"Exo2.0-BoldItalic"
                         },
-                        new ClickableContainer
+                        new FillFlowContainer<Button>
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.X,
+                            Height = bottom_black_area_height,
+                            Direction = FillDirection.Horizontal,
+                            Origin = Anchor.BottomCentre,
                             Anchor = Anchor.BottomCentre,
-                            Position = new Vector2(0, -30),
-                            Action = () =>
+                            Children = new[]
                             {
-                                if (current?.Track == null) return;
-                                if (current.Track.IsRunning)
-                                    current.Track.Stop();
-                                else
-                                    current.Track.Start();
-                            },
-                            Children = new Drawable[]
-                            {
-                                playButton = new TextAwesome
+                                new Button
                                 {
-                                    TextSize = 30,
-                                    Icon = FontAwesome.fa_play_circle_o,
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre
-                                }
-                            }
-                        },
-                        new ClickableContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.BottomCentre,
-                            Position = new Vector2(-30, -30),
-                            Action = prev,
-                            Children = new Drawable[]
-                            {
-                                new TextAwesome
-                                {
-                                    TextSize = 15,
+                                    Action = prev,
                                     Icon = FontAwesome.fa_step_backward,
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre
-                                }
-                            }
-                        },
-                        new ClickableContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.BottomCentre,
-                            Position = new Vector2(30, -30),
-                            Action = next,
-                            Children = new Drawable[]
-                            {
-                                new TextAwesome
+                                },
+                                playButton = new Button
                                 {
-                                    TextSize = 15,
+                                    Scale = new Vector2(1.4f),
+                                    Action = () =>
+                                    {
+                                        if (current?.Track == null) return;
+                                        if (current.Track.IsRunning)
+                                            current.Track.Stop();
+                                        else
+                                            current.Track.Start();
+                                    },
+                                    Icon = FontAwesome.fa_play_circle_o,
+                                },
+                                new Button
+                                {
+                                    Action = next,
                                     Icon = FontAwesome.fa_step_forward,
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre
-                                }
+                                },
                             }
                         },
-                        new ClickableContainer
+                        new Button
                         {
-                            AutoSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.BottomRight,
-                            Position = new Vector2(20, -30),
-                            Children = new Drawable[]
-                            {
-                                new TextAwesome
-                                {
-                                    TextSize = 15,
-                                    Icon = FontAwesome.fa_bars,
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre
-                                }
-                            }
+                            Position = new Vector2(-bottom_black_area_height / 2),
+                            Icon = FontAwesome.fa_bars,
                         },
                         progress = new DragBar
                         {
@@ -416,7 +381,7 @@ namespace osu.Game.Overlays
                     new Box
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 50,
+                        Height = bottom_black_area_height,
                         Origin = Anchor.BottomCentre,
                         Anchor = Anchor.BottomCentre,
                         Colour = Color4.Black.Opacity(0.5f)
@@ -428,6 +393,92 @@ namespace osu.Game.Overlays
             private void load(TextureStore textures)
             {
                 sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
+            }
+        }
+
+        private class Button : ClickableContainer
+        {
+            private readonly TextAwesome icon;
+            private readonly Box hover;
+            private readonly Container content;
+
+            public FontAwesome Icon
+            {
+                get { return icon.Icon; }
+                set { icon.Icon = value; }
+            }
+
+            private const float button_size = 30;
+
+            public Button()
+            {
+                AutoSizeAxes = Axes.Both;
+
+                Origin = Anchor.Centre;
+                Anchor = Anchor.Centre;
+
+                Children = new Drawable[]
+                {
+                    content = new Container
+                    {
+                        Size = new Vector2(button_size),
+                        CornerRadius = 5,
+                        Masking = true,
+
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        EdgeEffect = new EdgeEffect
+                        {
+                            Colour = Color4.Black.Opacity(0.04f),
+                            Type = EdgeEffectType.Shadow,
+                            Radius = 5,
+                        },
+                        Children = new Drawable[]
+                        {
+                            hover = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                            },
+                            icon = new TextAwesome
+                            {
+                                TextSize = 18,
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre
+                            }
+                        }
+                    }
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                hover.Colour = colours.Yellow.Opacity(0.6f);
+            }
+
+            protected override bool OnHover(InputState state)
+            {
+                hover.FadeIn(500, EasingTypes.OutQuint);
+                return base.OnHover(state);
+            }
+
+            protected override void OnHoverLost(InputState state)
+            {
+                hover.FadeOut(500, EasingTypes.OutQuint);
+                base.OnHoverLost(state);
+            }
+
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            {
+                content.ScaleTo(0.7f, 2000, EasingTypes.OutQuint);
+                return base.OnMouseDown(state, args);
+            }
+
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            {
+                content.ScaleTo(1, 1000, EasingTypes.OutElastic);
+                return base.OnMouseUp(state, args);
             }
         }
     }
