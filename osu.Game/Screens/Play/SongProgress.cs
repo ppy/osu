@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Transforms;
 using System;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
