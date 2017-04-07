@@ -37,6 +37,7 @@ namespace osu.Game.Screens.Select
         private readonly OsuSpriteText positiveRatings;
         private readonly BarGraph ratingsGraph;
 
+        private readonly FillFlowContainer retryAndFailContainer;
         private readonly BarGraph retryGraph;
         private readonly BarGraph failGraph;
 
@@ -119,8 +120,14 @@ namespace osu.Game.Screens.Select
 
         private void calcRetryAndFailGraph()
         {
-            failGraph.Values = fails.Select(fail => (float)fail);
-            retryGraph.Values = retries?.Select((retry, index) => (float)retry + fails?[index] ?? 0) ?? new List<float>();
+            if ((fails?.Count ?? 0) == 0 || (retries?.Count ?? 0) == 0)
+                retryAndFailContainer.FadeOut(250);
+            else
+            {
+                retryAndFailContainer.FadeIn(250);
+                failGraph.Values = fails.Select(fail => (float)fail);
+                retryGraph.Values = retries?.Select((retry, index) => (float)retry + fails[index]) ?? new List<float>();
+            }
         }
 
         public BeatmapDetails()
@@ -304,26 +311,35 @@ namespace osu.Game.Screens.Select
                                 },
                             },
                         },
-                        new OsuSpriteText
-                        {
-                            Text = "Points of Failure",
-                            Font = @"Exo2.0-Regular",
-                        },
-                        new Container<BarGraph>
+                        retryAndFailContainer = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Size = new Vector2(1/0.6f, 50),
-                            Children = new[]
+                            AutoSizeAxes = Axes.Y,
+                            Alpha = 0,
+                            Children = new Drawable[]
                             {
-                                retryGraph = new BarGraph
+                                new OsuSpriteText
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    Text = "Points of Failure",
+                                   Font = @"Exo2.0-Regular",
                                 },
-                                failGraph = new BarGraph
+                                new Container<BarGraph>
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    RelativeSizeAxes = Axes.X,
+                                    Size = new Vector2(1/0.6f, 50),
+                                    Children = new[]
+                                    {
+                                        retryGraph = new BarGraph
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        failGraph = new BarGraph
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                    },
                                 },
-                            },
+                            }
                         },
                     },
                 },
