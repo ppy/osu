@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -28,8 +28,8 @@ namespace osu.Desktop.VisualTests.Tests
                 OnSeek = time => progress.CurrentTime = time,
             });
 
-            AddButton("Toggle Bar", progress.ToggleVisibility);
-            AddButton("New Values", displayNewValues);
+            AddStep("Toggle Bar", progress.ToggleVisibility);
+            AddStep("New Values", displayNewValues);
 
             displayNewValues();
         }
