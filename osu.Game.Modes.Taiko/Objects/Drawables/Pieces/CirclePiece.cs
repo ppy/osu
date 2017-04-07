@@ -64,6 +64,8 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
         private readonly Container background;
 
+        public Box FlashBox;
+
         public CirclePiece(bool isStrong = false)
         {
             AddInternal(new Drawable[]
@@ -104,11 +106,13 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
                     Masking = true,
                     Children = new[]
                     {
-                        new Box
+                        FlashBox = new Box
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.White,
+                            BlendingMode = BlendingMode.Additive,
                             Alpha = 0,
                             AlwaysPresent = true
                         }
