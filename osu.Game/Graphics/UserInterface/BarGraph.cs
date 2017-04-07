@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             set
             {
-                List<float> values = value.ToList();
+                List<float> values = value?.ToList() ?? new List<float>();
                 List<Bar> graphBars = Children.ToList();
                 for (int i = 0; i < values.Count; i++)
                     if (graphBars.Count > i)

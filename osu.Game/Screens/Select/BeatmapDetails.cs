@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Select
             }
             set
             {
-                ratings = value.ToList();
+                ratings = value?.ToList() ?? new List<int>();
                 if(ratings.Count == 0)
                     ratingsContainer.FadeOut(250);
                 else
@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Select
             }
             set
             {
-                retries = value.ToList();
+                retries = value?.ToList() ?? new List<int>();
                 calcRetryAndFailGraph();
             }
         }
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Select
             }
             set
             {
-                fails = value.ToList();
+                fails = value?.ToList() ?? new List<int>();
                 calcRetryAndFailGraph();
             }
         }
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Select
             {
                 retryAndFailContainer.FadeIn(250);
                 failGraph.Values = fails.Select(fail => (float)fail);
-                retryGraph.Values = retries?.Select((retry, index) => (float)retry + fails[index]) ?? new List<float>();
+                retryGraph.Values = retries?.Select((retry, index) => (float)retry + fails[index]);
             }
         }
 
