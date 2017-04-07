@@ -39,7 +39,13 @@ namespace osu.Game.Overlays.Options.Sections.Audio
             if (deviceItems.All(kv => kv.Value != preferredDeviceName))
                 deviceItems.Add(new KeyValuePair<string, string>(preferredDeviceName, preferredDeviceName));
 
-            dropdown.Items = deviceItems;
+            // The option dropdown for audio device selection lists all audio
+            // device names. Dropdowns, however, may not have multiple identical
+            // keys. Thus, we remove duplicate audio device names from
+            // the dropdown. BASS does not give us a simple mechanism to select
+            // specific audio devices in such a case anyways.This functionality would
+            // require OS-specific and involved code.
+            dropdown.Items = deviceItems.Distinct().ToList();
         }
 
         private void onDeviceChanged(string name) => updateItems();
