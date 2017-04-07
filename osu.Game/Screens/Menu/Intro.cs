@@ -7,7 +7,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using OpenTK.Graphics;
@@ -77,7 +76,7 @@ namespace osu.Game.Screens.Menu
             {
                 bgm.Start();
 
-                (mainMenu = new MainMenu()).LoadAsync(Game);
+                LoadComponentAsync(mainMenu = new MainMenu());
 
                 Scheduler.AddDelayed(delegate
                 {

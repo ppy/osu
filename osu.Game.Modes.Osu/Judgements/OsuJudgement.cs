@@ -25,9 +25,9 @@ namespace osu.Game.Modes.Osu.Judgements
         /// </summary>
         public OsuScoreResult MaxScore = OsuScoreResult.Hit300;
 
-        public override string ScoreString => Score.GetDescription();
+        public override string ResultString => Score.GetDescription();
 
-        public override string MaxScoreString => MaxScore.GetDescription();
+        public override string MaxResultString => MaxScore.GetDescription();
 
         public int ScoreValue => scoreToInt(Score);
 

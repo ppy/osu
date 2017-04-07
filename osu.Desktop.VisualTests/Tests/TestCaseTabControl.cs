@@ -3,7 +3,7 @@
 
 using OpenTK;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Screens.Testing;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;
@@ -36,9 +36,9 @@ namespace osu.Desktop.VisualTests.Tests
             filter.PinItem(GroupMode.All);
             filter.PinItem(GroupMode.RecentlyPlayed);
 
-            filter.ItemChanged += (sender, mode) =>
+            filter.SelectedItem.ValueChanged += newFilter =>
             {
-                text.Text = "Currently Selected: " + mode.ToString();
+                text.Text = "Currently Selected: " + newFilter.ToString();
             };
         }
     }

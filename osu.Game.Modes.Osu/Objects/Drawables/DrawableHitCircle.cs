@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
@@ -39,7 +38,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     Colour = AccentColour,
                     Hit = () =>
                     {
-                        if (Judgement.Result.HasValue) return false;
+                        if (Judgement.Result != HitResult.None) return false;
 
                         Judgement.PositionOffset = Vector2.Zero; //todo: set to correct value
                         UpdateJudgement(true);

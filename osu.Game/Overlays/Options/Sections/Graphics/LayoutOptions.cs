@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
-using System;
 
 namespace osu.Game.Overlays.Options.Sections.Graphics
 {
@@ -52,9 +51,9 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
             letterboxing.TriggerChange();
         }
 
-        private void visibilityChanged(object sender, EventArgs e)
+        private void visibilityChanged(bool newVisibility)
         {
-            if (letterboxing)
+            if (newVisibility)
             {
                 letterboxPositionX.Show();
                 letterboxPositionY.Show();

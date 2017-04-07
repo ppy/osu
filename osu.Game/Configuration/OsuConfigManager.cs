@@ -13,7 +13,7 @@ namespace osu.Game.Configuration
         protected override void InitialiseDefaults()
         {
 #pragma warning disable CS0612 // Type or member is obsolete
-            
+
             Set(OsuConfig.Username, string.Empty);
             Set(OsuConfig.Token, string.Empty);
 
@@ -35,6 +35,7 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.MenuParallax, true);
 
+            Set(OsuConfig.ShowInterface, true);
             Set(OsuConfig.KeyOverlay, false);
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
@@ -89,7 +90,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.LastVersionPermissionsFailed, string.Empty).Disabled = true;
             Set(OsuConfig.LoadSubmittedThread, true).Disabled = true;
             Set(OsuConfig.LobbyPlayMode, -1).Disabled = true;
-            Set(OsuConfig.ShowInterface, true).Disabled = true;
             Set(OsuConfig.ShowInterfaceDuringRelax, false).Disabled = true;
             Set(OsuConfig.LobbyShowExistingOnly, false).Disabled = true;
             Set(OsuConfig.LobbyShowFriendsOnly, false).Disabled = true;
@@ -186,10 +186,6 @@ namespace osu.Game.Configuration
             };
 #pragma warning restore CS0612 // Type or member is obsolete
         }
-
-        //todo: make a UnicodeString class/struct rather than requiring this helper method.
-        public string GetUnicodeString(string nonunicode, string unicode)
-            => Get<bool>(OsuConfig.ShowUnicode) ? unicode ?? nonunicode : nonunicode ?? unicode;
 
         public OsuConfigManager(Storage storage) : base(storage)
         {

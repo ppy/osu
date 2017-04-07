@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Select
                 new BeatmapDetailAreaTabControl
                 {
                     RelativeSizeAxes = Axes.X,
-                    OnFilter = (tab, mods) => 
+                    OnFilter = (tab, mods) =>
                     {
                         switch (tab)
                         {

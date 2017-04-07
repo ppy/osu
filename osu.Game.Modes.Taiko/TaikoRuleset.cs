@@ -10,6 +10,8 @@ using osu.Game.Modes.Taiko.UI;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;
 using System.Collections.Generic;
+using osu.Game.Modes.Scoring;
+using osu.Game.Modes.Taiko.Scoring;
 
 namespace osu.Game.Modes.Taiko
 {
@@ -63,7 +65,7 @@ namespace osu.Game.Modes.Taiko
                         {
                             Mods = new Mod[]
                             {
-                                new ModAutoplay(),
+                                new TaikoModAutoplay(),
                                 new ModCinema(),
                             },
                         },

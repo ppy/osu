@@ -66,7 +66,7 @@ namespace osu.Game.Modes.Objects
             double dir = 1;
             double thetaRange = thetaEnd - thetaStart;
 
-            // Decide in which direction to draw the circle, depending on which side of 
+            // Decide in which direction to draw the circle, depending on which side of
             // AC B lies.
             Vector2 orthoAtoC = c - a;
             orthoAtoC = new Vector2(orthoAtoC.Y, -orthoAtoC.X);
