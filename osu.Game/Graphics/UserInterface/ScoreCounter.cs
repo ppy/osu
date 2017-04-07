@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using System;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -32,6 +33,12 @@ namespace osu.Game.Graphics.UserInterface
         {
             DisplayedCountSpriteText.FixedWidth = true;
             LeadingZeroes = leading;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            DisplayedCountSpriteText.Colour = colours.BlueLighter;
         }
 
         protected override double GetProportionalDuration(double currentValue, double newValue)

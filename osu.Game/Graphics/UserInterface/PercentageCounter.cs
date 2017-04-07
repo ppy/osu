@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using System;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -28,6 +29,12 @@ namespace osu.Game.Graphics.UserInterface
         {
             DisplayedCountSpriteText.FixedWidth = true;
             Current.Value = DisplayedCount = 1.0f;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            DisplayedCountSpriteText.Colour = colours.BlueLighter;
         }
 
         protected override string FormatCount(double count)
