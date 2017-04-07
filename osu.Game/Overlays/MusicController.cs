@@ -122,6 +122,7 @@ namespace osu.Game.Overlays
                             AutoSizeAxes = Axes.X,
                             Height = bottom_black_area_height,
                             Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(5),
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.BottomCentre,
                             Children = new[]
@@ -133,7 +134,7 @@ namespace osu.Game.Overlays
                                 },
                                 playButton = new Button
                                 {
-                                    Scale = new Vector2(1.4f),
+                                    //Scale = new Vector2(1.4f),
                                     Action = () =>
                                     {
                                         if (current?.Track == null) return;
@@ -471,7 +472,7 @@ namespace osu.Game.Overlays
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                content.ScaleTo(0.7f, 2000, EasingTypes.OutQuint);
+                content.ScaleTo(1, 2000, EasingTypes.OutQuint);
                 return base.OnMouseDown(state, args);
             }
 
