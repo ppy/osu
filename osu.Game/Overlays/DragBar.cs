@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
+using OpenTK;
 
 namespace osu.Game.Overlays
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Overlays
         public Action<float> SeekRequested;
         private bool isDragging;
 
-        private bool enabled;
+        private bool enabled = true;
         public bool IsEnabled
         {
             get { return enabled; }
@@ -62,6 +63,7 @@ namespace osu.Game.Overlays
 
         private void updatePosition(float position)
         {
+            position = MathHelper.Clamp(position, 0, 1);
             fill.TransformTo(fill.Width, position, 100, EasingTypes.OutQuint, new TransformWidth());
         }
 
