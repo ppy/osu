@@ -24,7 +24,6 @@ namespace osu.Game.Screens.Select
         private APIAccess api;
 
         private WorkingBeatmap beatmap;
-
         public WorkingBeatmap Beatmap
         {
             get
@@ -34,11 +33,8 @@ namespace osu.Game.Screens.Select
             set
             {
                 beatmap = value;
-                if (IsLoaded)
-                    if (currentTab == BeatmapDetailTab.Details)
-                        Schedule(updateDetails);
-                    else
-                        Schedule(updateScores);
+                Schedule(updateDetails);
+                Schedule(updateScores);
             }
         }
 
