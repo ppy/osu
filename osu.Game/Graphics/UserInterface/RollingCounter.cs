@@ -111,8 +111,6 @@ namespace osu.Game.Graphics.UserInterface
             Flush(false, TransformType);
 
             DisplayedCountSpriteText.Text = FormatCount(Current);
-            DisplayedCountSpriteText.Anchor = Anchor;
-            DisplayedCountSpriteText.Origin = Origin;
         }
 
         /// <summary>

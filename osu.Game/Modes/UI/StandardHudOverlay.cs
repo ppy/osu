@@ -11,19 +11,22 @@ namespace osu.Game.Modes.UI
 {
     public class StandardHudOverlay : HudOverlay
     {
-        protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter
+        protected override RollingCounter<double> CreateAccuracyCounter() => new PercentageCounter
         {
             Anchor = Anchor.TopCentre,
-            Origin = Anchor.TopCentre,
-            Position = new Vector2(0, 65),
+            Origin = Anchor.TopRight,
+            Position = new Vector2(0, 35),
             TextSize = 20,
-            Margin = new MarginPadding { Right = 5 },
+            Margin = new MarginPadding { Right = 140 },
         };
 
-        protected override ComboCounter CreateComboCounter() => new StandardComboCounter
+        protected override RollingCounter<int> CreateComboCounter() => new SimpleComboCounter
         {
-            Anchor = Anchor.BottomLeft,
-            Origin = Anchor.BottomLeft,
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopLeft,
+            Position = new Vector2(0, 35),
+            Margin = new MarginPadding { Left = 140 },
+            TextSize = 20,
         };
 
         protected override HealthDisplay CreateHealthDisplay() => new StandardHealthDisplay
@@ -49,7 +52,6 @@ namespace osu.Game.Modes.UI
             Origin = Anchor.TopCentre,
             TextSize = 40,
             Position = new Vector2(0, 30),
-            Margin = new MarginPadding { Right = 5 },
         };
     }
 }
