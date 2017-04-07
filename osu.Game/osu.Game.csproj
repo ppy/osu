@@ -87,6 +87,7 @@
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\Transforms\TransformAccent.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
+    <Compile Include="Graphics\UserInterface\Bar.cs" />
     <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
     <Compile Include="Graphics\UserInterface\Nub.cs" />
     <Compile Include="Graphics\UserInterface\OsuMenu.cs" />
