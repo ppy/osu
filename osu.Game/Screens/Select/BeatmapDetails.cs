@@ -483,7 +483,7 @@ namespace osu.Game.Screens.Select
                         FadeIn(fade_time);
                         content.Children = value.Split(' ').Select(text => new OsuSpriteText
                         {
-                            Text = text + " ",
+                            Text = text,
                             Font = "Exo2.0-Regular",
                         });
                     }
@@ -515,6 +515,7 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Full,
+                        Spacing = new Vector2(5,0),
                         Margin = new MarginPadding { Top = header.TextSize }
                     }
                 };
