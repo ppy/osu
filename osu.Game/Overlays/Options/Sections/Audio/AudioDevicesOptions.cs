@@ -43,8 +43,8 @@ namespace osu.Game.Overlays.Options.Sections.Audio
             // device names. Dropdowns, however, may not have multiple identical
             // keys. Thus, we remove duplicate audio device names from
             // the dropdown. BASS does not give us a simple mechanism to select
-            // specific audio devices in such a case anyways.This functionality would
-            // require OS-specific and involved code.
+            // specific audio devices in such a case anyways. Such
+            // functionality would require involved OS-specific code.
             dropdown.Items = deviceItems.Distinct().ToList();
         }
 
