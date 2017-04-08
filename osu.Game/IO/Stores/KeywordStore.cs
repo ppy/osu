@@ -45,7 +45,7 @@ namespace osu.Game.IO.Stores
 
         public Stream GetStream(string name)
         {
-            throw new NotImplementedException("We don't support a stream for now"); 
+            throw new NotImplementedException("We don't support a stream for now");
             //var stream = new StreamWriter(Stream.Null);
             //stream.Write(Get(name));
             //return stream.BaseStream;
