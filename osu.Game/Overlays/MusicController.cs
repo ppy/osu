@@ -48,7 +48,7 @@ namespace osu.Game.Overlays
 
         private const float progress_height = 10;
 
-        private const float bottom_black_area_height = 50;
+        private const float bottom_black_area_height = 55;
 
         public MusicController()
         {
@@ -144,7 +144,8 @@ namespace osu.Game.Overlays
                                         },
                                         playButton = new Button
                                         {
-                                            Scale = new Vector2(1.3f),
+                                            Scale = new Vector2(1.4f),
+                                            IconScale = new Vector2(1.4f),
                                             Action = () =>
                                             {
                                                 if (current?.Track == null) return;
@@ -422,6 +423,12 @@ namespace osu.Game.Overlays
             }
 
             private const float button_size = 30;
+
+            public Vector2 IconScale
+            {
+                get { return icon.Scale; }
+                set { icon.Scale = value; }
+            }
 
             public Button()
             {
