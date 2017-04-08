@@ -423,6 +423,7 @@ namespace osu.Game.Overlays
             }
 
             private const float button_size = 30;
+            private Color4 flashColour;
 
             public Vector2 IconScale
             {
@@ -475,6 +476,7 @@ namespace osu.Game.Overlays
             private void load(OsuColour colours)
             {
                 hover.Colour = colours.Yellow.Opacity(0.6f);
+                flashColour = colours.Yellow;
             }
 
             protected override bool OnHover(InputState state)
@@ -487,6 +489,12 @@ namespace osu.Game.Overlays
             {
                 hover.FadeOut(500, EasingTypes.OutQuint);
                 base.OnHoverLost(state);
+            }
+
+            protected override bool OnClick(InputState state)
+            {
+                hover.FlashColour(flashColour, 800, EasingTypes.OutQuint);
+                return base.OnClick(state);
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
