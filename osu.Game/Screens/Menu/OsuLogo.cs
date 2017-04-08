@@ -194,8 +194,6 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override bool OnDragStart(InputState state) => true;
-
         protected override bool OnClick(InputState state)
         {
             if (!Interactive) return false;
