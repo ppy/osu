@@ -144,7 +144,7 @@ namespace osu.Game.Overlays
                                         },
                                         playButton = new Button
                                         {
-                                            //Scale = new Vector2(1.3f),
+                                            Scale = new Vector2(1.3f),
                                             Action = () =>
                                             {
                                                 if (current?.Track == null) return;
@@ -484,7 +484,7 @@ namespace osu.Game.Overlays
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                content.ScaleTo(1, 2000, EasingTypes.OutQuint);
+                content.ScaleTo(0.75f, 2000, EasingTypes.OutQuint);
                 return base.OnMouseDown(state, args);
             }
 
