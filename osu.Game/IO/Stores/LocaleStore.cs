@@ -33,12 +33,16 @@ namespace osu.Game.IO.Stores
 
         public string Get(string name)
         {
-            if (!stores.TryGetValue(Locale, out KeywordStore store))
+            KeywordStore store;
+            if (!stores.TryGetValue(Locale, out store))
                 store = stores.Values.ToList()[0];
             return store.Get(name);
         }
 
-        public Stream GetStream(string name) => throw new NotImplementedException();
+        public Stream GetStream(string name)
+        {
+            throw new NotImplementedException();
+        }
 
         public void AddStore(string name, KeywordStore store)
         {
