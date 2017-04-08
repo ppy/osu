@@ -5,7 +5,6 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
@@ -349,11 +348,11 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
-            description.ContentColour = colour.GrayB;
-            source.ContentColour = colour.GrayB;
-            tags.ContentColour = colour.YellowLight;
+            description.AccentColour = colour.GrayB;
+            source.AccentColour = colour.GrayB;
+            tags.AccentColour = colour.YellowLight;
 
-            stars.BarColour = colour.Yellow;
+            stars.AccentColour = colour.Yellow;
 
             ratingsBar.BackgroundColour = colour.Green;
             ratingsBar.BarColour = colour.YellowDark;
@@ -363,7 +362,7 @@ namespace osu.Game.Screens.Select
             retryGraph.Colour = colour.Yellow;
         }
 
-        private class DifficultyRow : Container
+        private class DifficultyRow : Container, IHasAccentColour
         {
             private readonly OsuSpriteText name;
             private readonly Bar bar;
@@ -412,7 +411,7 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            public SRGBColour BarColour
+            public Color4 AccentColour
             {
                 get
                 {
@@ -458,7 +457,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private class MetadataSegment : Container
+        private class MetadataSegment : Container, IHasAccentColour
         {
             private readonly OsuSpriteText header;
             private readonly FillFlowContainer<OsuSpriteText> content;
@@ -491,8 +490,12 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            public SRGBColour ContentColour
+            public Color4 AccentColour
             {
+                get
+                {
+                    return content.Colour;
+                }
                 set
                 {
                     content.Colour = value;

@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using System;
@@ -33,11 +33,11 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public SRGBColour BackgroundColour
+        public Color4 BackgroundColour
         {
             get
             {
-                return background?.Colour ?? default(SRGBColour);
+                return background?.Colour ?? default(Color4);
             }
             set
             {
@@ -51,7 +51,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public SRGBColour BarColour
+        public Color4 BarColour
         {
             get
             {
