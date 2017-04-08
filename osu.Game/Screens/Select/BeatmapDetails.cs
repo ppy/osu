@@ -355,7 +355,7 @@ namespace osu.Game.Screens.Select
             stars.AccentColour = colour.Yellow;
 
             ratingsBar.BackgroundColour = colour.Green;
-            ratingsBar.BarColour = colour.YellowDark;
+            ratingsBar.AccentColour = colour.YellowDark;
             ratingsGraph.Colour = colour.BlueDark;
 
             failGraph.Colour = colour.YellowDarker;
@@ -415,11 +415,11 @@ namespace osu.Game.Screens.Select
             {
                 get
                 {
-                    return bar.BarColour;
+                    return bar.AccentColour;
                 }
                 set
                 {
-                    bar.BarColour = value;
+                    bar.AccentColour = value;
                 }
             }
 

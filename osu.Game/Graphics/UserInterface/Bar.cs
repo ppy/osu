@@ -10,7 +10,7 @@ using System;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class Bar : Container
+    public class Bar : Container, IHasAccentColour
     {
         private Box background;
         private readonly Box bar;
@@ -51,7 +51,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public Color4 BarColour
+        public Color4 AccentColour
         {
             get
             {
