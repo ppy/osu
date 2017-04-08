@@ -11,7 +11,7 @@ namespace osu.Game.IO.Stores
 {
     public class LocaleStore : IResourceStore<string>
     {
-        private Dictionary<string, KeywordStore> stores = new Dictionary<string, KeywordStore>();
+        private readonly Dictionary<string, KeywordStore> stores = new Dictionary<string, KeywordStore>();
 
         private string locale = "";
         public string Locale

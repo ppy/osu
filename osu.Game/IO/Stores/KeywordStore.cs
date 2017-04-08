@@ -10,8 +10,8 @@ namespace osu.Game.IO.Stores
 {
     public class KeywordStore : IResourceStore<string>
     {
-        private ResourceStore<byte[]> store;
-        private string filename;
+        private readonly ResourceStore<byte[]> store;
+        private readonly string filename;
         private Dictionary<string, string> dictionary;
 
         private bool loaded;
@@ -56,8 +56,12 @@ namespace osu.Game.IO.Stores
             dictionary = new Dictionary<string, string>();
             using (StreamReader reader = new StreamReader(store.GetStream(filename)))
             {
-                string[] data = reader.ReadLine().Split('=');
-                dictionary.Add(data[0], data[1]);
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] data = line.Split('=');
+                    dictionary.Add(data[0], data[1]);
+                }
             }
         }
     }
