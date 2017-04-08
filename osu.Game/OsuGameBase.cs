@@ -98,7 +98,6 @@ namespace osu.Game
                     LocaleStore.AddStore(locale, new KeywordStore(Resources, $@"Localization/{locale}.txt"));
                 }
             }
-            LocaleStore.Locale = LocalConfig.Get<string>(OsuConfig.Language);
             Dependencies.Cache(LocaleStore);
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
