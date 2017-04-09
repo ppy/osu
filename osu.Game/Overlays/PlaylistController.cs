@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -26,19 +25,19 @@ namespace osu.Game.Overlays
         private const float transition_duration = 800;
 
         private Box bg;
-        private FilterTextBox search;
-        private Playlist songList;
+        private FilterControl filter;
+        private Playlist list;
 
         public Action<BeatmapSetInfo> OnSelect
         {
-            get { return songList.OnSelect; }
-            set { songList.OnSelect = value; }
+            get { return list.OnSelect; }
+            set { list.OnSelect = value; }
         }
 
         public BeatmapSetInfo Current
         {
-            get { return songList.Current; }
-            set { songList.Current = value; }
+            get { return list.Current; }
+            set { list.Current = value; }
         }
 
         public PlaylistController()
@@ -62,37 +61,16 @@ namespace osu.Game.Overlays
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
-                        songList = new Playlist
+                        list = new Playlist
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 }, //todo: static sizes aren't good
                         },
-                        new Container
+                        filter = new FilterControl
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding(10),
-                            Children = new Drawable[]
-                            {
-                                new FillFlowContainer
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Spacing = new Vector2(0f, 10f),
-                                    Children = new Drawable[]
-                                    {
-                                        search = new FilterTextBox
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            Height = 40,
-                                        },
-                                        new CollectionsDropdown<PlaylistCollection>
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            Items = new[] { new KeyValuePair<string, PlaylistCollection>(@"All", PlaylistCollection.All) },
-                                        }
-                                    },
-                                },
-                            },
                         },
                     },
                 },
@@ -100,18 +78,19 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, BeatmapDatabase beatmaps)
         {
             bg.Colour = colours.Gray3;
+            list.Sets = beatmaps.GetAllWithChildren<BeatmapSetInfo>().ToArray();
         }
 
         protected override void PopIn()
         {
             base.PopIn();
 
-            search.HoldFocus = true;
+            filter.Search.HoldFocus = true;
 
-            songList.ScrollContainer.ScrollDraggerVisible = true;
+            list.ScrollContainer.ScrollDraggerVisible = true;
             ResizeTo(new Vector2(1f), transition_duration, EasingTypes.OutQuint);
         }
 
@@ -119,22 +98,146 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            search.HoldFocus = false;
-            search.TriggerFocusLost();
+            filter.Search.HoldFocus = false;
+            filter.Search.TriggerFocusLost();
 
-            songList.ScrollContainer.ScrollDraggerVisible = false;
+            list.ScrollContainer.ScrollDraggerVisible = false;
             ResizeTo(new Vector2(1f, 0f), transition_duration, EasingTypes.OutQuint);
+        }
+
+        private class FilterControl : Container
+        {
+            public readonly FilterTextBox Search;
+
+            public FilterControl()
+            {
+                Children = new Drawable[]
+                {
+                    new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(0f, 10f),
+                        Children = new Drawable[]
+                        {
+                            Search = new FilterTextBox
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 40,
+                            },
+                            new CollectionsDropdown<PlaylistCollection>
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Items = new[] { new KeyValuePair<string, PlaylistCollection>(@"All", PlaylistCollection.All) },
+                            }
+                        },
+                    },
+                };
+            }
+
+            public class FilterTextBox : SearchTextBox
+            {
+                protected override Color4 BackgroundUnfocused => OsuColour.FromHex(@"222222");
+                protected override Color4 BackgroundFocused => OsuColour.FromHex(@"222222");
+
+                public FilterTextBox()
+                {
+                    Masking = true;
+                    CornerRadius = 5;
+                }
+            }
+
+            private class CollectionsDropdown<T> : OsuDropdown<T>
+            {
+                protected override DropdownHeader CreateHeader() => new CollectionsHeader { AccentColour = AccentColour };
+                protected override Menu CreateMenu() => new CollectionsMenu();
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    AccentColour = colours.Gray6;
+                }
+
+                private class CollectionsHeader : OsuDropdownHeader
+                {
+                    [BackgroundDependencyLoader]
+                    private void load(OsuColour colours)
+                    {
+                        BackgroundColour = colours.Gray4;
+                    }
+
+                    public CollectionsHeader()
+                    {
+                        CornerRadius = 5;
+                        Height = 30;
+                        Icon.TextSize = 14;
+                        Icon.Margin = new MarginPadding(0);
+                        Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 10, Right = 10 };
+                        EdgeEffect = new EdgeEffect
+                        {
+                            Type = EdgeEffectType.Shadow,
+                            Colour = Color4.Black.Opacity(0.3f),
+                            Radius = 3,
+                            Offset = new Vector2(0f, 1f),
+                        };
+                    }
+                }
+
+                private class CollectionsMenu : OsuMenu
+                {
+                    [BackgroundDependencyLoader]
+                    private void load(OsuColour colours)
+                    {
+                        Background.Colour = colours.Gray4;
+                    }
+
+                    public CollectionsMenu()
+                    {
+                        CornerRadius = 5;
+                        EdgeEffect = new EdgeEffect
+                        {
+                            Type = EdgeEffectType.Shadow,
+                            Colour = Color4.Black.Opacity(0.3f),
+                            Radius = 3,
+                            Offset = new Vector2(0f, 1f),
+                        };
+                    }
+                }
+            }
         }
 
         private class Playlist : Container
         {
-            private FillFlowContainer<PlaylistItem> songs;
+            private FillFlowContainer<PlaylistItem> items;
+
+            private BeatmapSetInfo[] sets = { };
+            public BeatmapSetInfo[] Sets
+            {
+                get
+                {
+                    return sets;
+                }
+                set
+                {
+                    if (value == sets) return;
+                    sets = value;
+
+                    List<PlaylistItem> newItems = new List<PlaylistItem>();
+                    foreach (BeatmapSetInfo s in value)
+                    {
+                        newItems.Add(new PlaylistItem(s)
+                        {
+                            OnSelect = OnSelect,
+                        });
+                    }
+
+                    items.Children = newItems;
+                }
+            }
 
             // exposed so PlaylistController can hide the scroll dragger when hidden
             // because the scroller can be seen when scrolled to the bottom and PlaylistController is closed
             public readonly ScrollContainer ScrollContainer;
-
-            private BeatmapDatabase database;
 
             private Action<BeatmapSetInfo> onSelect;
             public Action<BeatmapSetInfo> OnSelect
@@ -144,7 +247,7 @@ namespace osu.Game.Overlays
                 {
                     onSelect = value;
 
-                    foreach (PlaylistItem s in songs.Children)
+                    foreach (PlaylistItem s in items.Children)
                         s.OnSelect = value;
                 }
             }
@@ -158,7 +261,7 @@ namespace osu.Game.Overlays
                     if (value == current) return;
                     current = value;
 
-                    foreach (PlaylistItem s in songs.Children)
+                    foreach (PlaylistItem s in items.Children)
                         s.Current = s.RepresentedSet.ID == value.ID;
                 }
             }
@@ -172,7 +275,7 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            songs = new FillFlowContainer<PlaylistItem>
+                            items = new FillFlowContainer<PlaylistItem>
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
@@ -180,20 +283,6 @@ namespace osu.Game.Overlays
                         },
                     },
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(BeatmapDatabase beatmaps)
-            {
-                database = beatmaps;
-
-                foreach (BeatmapSetInfo b in beatmaps.GetAllWithChildren<BeatmapSetInfo>())
-                {
-                    songs.Add(new PlaylistItem(b)
-                    {
-                        OnSelect = OnSelect,
-                    });
-                }
             }
 
             private class PlaylistItem : Container
@@ -290,76 +379,6 @@ namespace osu.Game.Overlays
                 {
                     OnSelect?.Invoke(RepresentedSet);
                     return true;
-                }
-            }
-        }
-
-        private class FilterTextBox : SearchTextBox
-        {
-            protected override Color4 BackgroundUnfocused => OsuColour.FromHex(@"222222");
-            protected override Color4 BackgroundFocused => OsuColour.FromHex(@"222222");
-
-            public FilterTextBox()
-            {
-                Masking = true;
-                CornerRadius = 5;
-            }
-        }
-
-        private class CollectionsDropdown<T> : OsuDropdown<T>
-        {
-            protected override DropdownHeader CreateHeader() => new CollectionsHeader { AccentColour = AccentColour };
-            protected override Menu CreateMenu() => new CollectionsMenu();
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Gray6;
-            }
-
-            private class CollectionsHeader : OsuDropdownHeader
-            {
-                [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
-                {
-                    BackgroundColour = colours.Gray4;
-                }
-
-                public CollectionsHeader()
-                {
-                    CornerRadius = 5;
-                    Height = 30;
-                    Icon.TextSize = 14;
-                    Icon.Margin = new MarginPadding(0);
-                    Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 10, Right = 10 };
-                    EdgeEffect = new EdgeEffect
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Black.Opacity(0.3f),
-                        Radius = 3,
-                        Offset = new Vector2(0f, 1f),
-                    };
-                }
-            }
-
-            private class CollectionsMenu : OsuMenu
-            {
-                [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
-                {
-                    Background.Colour = colours.Gray4;
-                }
-
-                public CollectionsMenu()
-                {
-                    CornerRadius = 5;
-                    EdgeEffect = new EdgeEffect
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Black.Opacity(0.3f),
-                        Radius = 3,
-                        Offset = new Vector2(0f, 1f),
-                    };
                 }
             }
         }
