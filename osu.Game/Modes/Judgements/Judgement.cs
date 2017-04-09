@@ -10,26 +10,23 @@ namespace osu.Game.Modes.Judgements
         /// <summary>
         /// Whether this judgement is the result of a hit or a miss.
         /// </summary>
-        public HitResult? Result;
+        public HitResult Result;
 
         /// <summary>
         /// The offset at which this judgement occurred.
         /// </summary>
         public double TimeOffset;
 
-        /// <summary>
-        /// The combo after this judgement was processed.
-        /// </summary>
-        public ulong? ComboAtHit;
+        public virtual bool AffectsCombo => true;
 
         /// <summary>
-        /// The string representation for the score achieved.
+        /// The string representation for the result achieved.
         /// </summary>
-        public abstract string ScoreString { get; }
+        public abstract string ResultString { get; }
 
         /// <summary>
-        /// The string representation for the max score achievable.
+        /// The string representation for the max result achievable.
         /// </summary>
-        public abstract string MaxScoreString { get; }
+        public abstract string MaxResultString { get; }
     }
 }

@@ -12,12 +12,23 @@ namespace osu.Game.Modes.Taiko.Objects
         /// <summary>
         /// HitCircle radius.
         /// </summary>
-        public const float CIRCLE_RADIUS = 64;
+        public const float CIRCLE_RADIUS = 42f;
 
         /// <summary>
-        /// The time to scroll in the HitObject.
+        /// The time taken from the initial (off-screen) spawn position to the centre of the hit target for a <see cref="ControlPoint.BeatLength"/> of 1000ms.
         /// </summary>
-        public double PreEmpt;
+        private const double scroll_time = 6000;
+
+        /// <summary>
+        /// Our adjusted <see cref="scroll_time"/> taking into consideration local <see cref="ControlPoint.BeatLength"/> and other speed multipliers.
+        /// </summary>
+        public double ScrollTime;
+
+        /// <summary>
+        /// Whether this HitObject is a "strong" type.
+        /// Strong hit objects give more points for hitting the hit object with both keys.
+        /// </summary>
+        public bool IsStrong;
 
         /// <summary>
         /// Whether this HitObject is in Kiai time.
@@ -28,7 +39,7 @@ namespace osu.Game.Modes.Taiko.Objects
         {
             base.ApplyDefaults(timing, difficulty);
 
-            PreEmpt = 600 / (timing.SliderVelocityAt(StartTime) * difficulty.SliderMultiplier) * 1000;
+            ScrollTime = scroll_time * (timing.BeatLengthAt(StartTime) * timing.SpeedMultiplierAt(StartTime) / 1000) / difficulty.SliderMultiplier;
 
             ControlPoint overridePoint;
             Kiai = timing.TimingPointAt(StartTime, out overridePoint).KiaiMode;

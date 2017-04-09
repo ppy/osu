@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -16,7 +15,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuCheckbox : CheckBox
+    public class OsuCheckbox : Checkbox
     {
         private Bindable<bool> bindable;
 
@@ -29,9 +28,9 @@ namespace osu.Game.Graphics.UserInterface
                 bindable = value;
                 if (bindable != null)
                 {
-                    bool state = State == CheckBoxState.Checked;
+                    bool state = State == CheckboxState.Checked;
                     if (state != bindable.Value)
-                        State = bindable.Value ? CheckBoxState.Checked : CheckBoxState.Unchecked;
+                        State = bindable.Value ? CheckboxState.Checked : CheckboxState.Unchecked;
                     bindable.ValueChanged += bindableValueChanged;
                 }
 
@@ -86,9 +85,9 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        private void bindableValueChanged(object sender, EventArgs e)
+        private void bindableValueChanged(bool isChecked)
         {
-            State = bindable.Value ? CheckBoxState.Checked : CheckBoxState.Unchecked;
+            State = isChecked ? CheckboxState.Checked : CheckboxState.Unchecked;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -122,7 +121,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnChecked()
         {
             sampleChecked?.Play();
-            nub.State = CheckBoxState.Checked;
+            nub.State = CheckboxState.Checked;
 
             if (bindable != null)
                 bindable.Value = true;
@@ -131,7 +130,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnUnchecked()
         {
             sampleUnchecked?.Play();
-            nub.State = CheckBoxState.Unchecked;
+            nub.State = CheckboxState.Unchecked;
 
             if (bindable != null)
                 bindable.Value = false;

@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -194,8 +193,6 @@ namespace osu.Game.Screens.Menu
             logoBounceContainer.ScaleTo(1f, 500, EasingTypes.OutElastic);
             return true;
         }
-
-        protected override bool OnDragStart(InputState state) => true;
 
         protected override bool OnClick(InputState state)
         {

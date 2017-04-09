@@ -6,6 +6,7 @@ using osu.Game.Graphics;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.UI;
 using System;
+using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Modes.Mods
 {
@@ -156,7 +157,7 @@ namespace osu.Game.Modes.Mods
 
         public void Apply(HitRenderer<T> hitRenderer)
         {
-            hitRenderer.InputManager.ReplayInputHandler = CreateReplayScore(hitRenderer.Beatmap)?.Replay?.GetInputHandler();
+            hitRenderer.SetReplay(CreateReplayScore(hitRenderer.Beatmap)?.Replay);
         }
     }
 

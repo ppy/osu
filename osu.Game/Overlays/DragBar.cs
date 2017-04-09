@@ -5,7 +5,9 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
+using OpenTK;
 
 namespace osu.Game.Overlays
 {
@@ -14,9 +16,10 @@ namespace osu.Game.Overlays
         private readonly Box fill;
 
         public Action<float> SeekRequested;
-        private bool isDragging;
 
-        private bool enabled;
+        public bool IsSeeking { get; private set; }
+
+        private bool enabled = true;
         public bool IsEnabled
         {
             get { return enabled; }
@@ -46,9 +49,9 @@ namespace osu.Game.Overlays
 
         public void UpdatePosition(float position)
         {
-            if (isDragging || !IsEnabled) return;
+            if (IsSeeking || !IsEnabled) return;
 
-            fill.Width = position;
+            updatePosition(position);
         }
 
         private void seek(InputState state)
@@ -56,7 +59,13 @@ namespace osu.Game.Overlays
             if (!IsEnabled) return;
             float seekLocation = state.Mouse.Position.X / DrawWidth;
             SeekRequested?.Invoke(seekLocation);
-            fill.Width = seekLocation;
+            updatePosition(seekLocation);
+        }
+
+        private void updatePosition(float position)
+        {
+            position = MathHelper.Clamp(position, 0, 1);
+            fill.TransformTo(fill.Width, position, 200, EasingTypes.OutQuint, new TransformSeek());
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -71,12 +80,21 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDragStart(InputState state) => isDragging = true;
+        protected override bool OnDragStart(InputState state) => IsSeeking = true;
 
         protected override bool OnDragEnd(InputState state)
         {
-            isDragging = false;
+            IsSeeking = false;
             return true;
+        }
+
+        private class TransformSeek : TransformFloat
+        {
+            public override void Apply(Drawable d)
+            {
+                base.Apply(d);
+                d.Width = CurrentValue;
+            }
         }
     }
 }

@@ -3,6 +3,7 @@
 
 using System;
 using Newtonsoft.Json;
+using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
