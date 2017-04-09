@@ -111,7 +111,7 @@ namespace osu.Game.Overlays
 
             search.HoldFocus = true;
 
-            songList.ScrollContainer.ScrollDraggerVisible = false;
+            songList.ScrollContainer.ScrollDraggerVisible = true;
             ResizeTo(new Vector2(1f), transition_duration, EasingTypes.OutQuint);
         }
 
