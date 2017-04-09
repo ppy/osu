@@ -20,7 +20,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Overlays
 {
-    public class PlaylistController : FocusedOverlayContainer
+    public class PlaylistController : OverlayContainer
     {
         private const float transition_duration = 800;
 
@@ -83,6 +83,8 @@ namespace osu.Game.Overlays
                     },
                 },
             };
+
+            filter.Search.Exit = Hide;
         }
 
         [BackgroundDependencyLoader]
@@ -94,9 +96,8 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
-
             filter.Search.HoldFocus = true;
+            filter.Search.TriggerFocus();
 
             list.ScrollContainer.ScrollDraggerVisible = true;
             ResizeTo(new Vector2(1f), transition_duration, EasingTypes.OutQuint);
@@ -104,8 +105,6 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            base.PopOut();
-
             filter.Search.HoldFocus = false;
             filter.Search.TriggerFocusLost();
 
