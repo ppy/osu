@@ -14,7 +14,6 @@ using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Timing;
 using osu.Game.Modes;
 using osu.Game.Overlays.Toolbar;
@@ -26,6 +25,7 @@ using osu.Framework.Graphics.Primitives;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Modes.Scoring;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
 
@@ -125,7 +125,7 @@ namespace osu.Game
 
             Beatmap.Value = BeatmapDatabase.GetWorkingBeatmap(s.Beatmap);
 
-            menu.Push(new PlayerLoader(new Player { ReplayInputHandler = s.Replay.GetInputHandler() }));
+            menu.Push(new PlayerLoader(new ReplayPlayer(s.Replay)));
         }
 
         protected override void LoadComplete()
@@ -150,7 +150,7 @@ namespace osu.Game
                 }
             });
 
-            (screenStack = new Loader()).LoadAsync(this, d =>
+            LoadComponentAsync(screenStack = new Loader(), d =>
             {
                 screenStack.ModePushed += screenAdded;
                 screenStack.Exited += screenRemoved;
@@ -158,27 +158,27 @@ namespace osu.Game
             });
 
             //overlay elements
-            (chat = new ChatOverlay { Depth = 0 }).LoadAsync(this, overlayContent.Add);
-            (options = new OptionsOverlay { Depth = -1 }).LoadAsync(this, overlayContent.Add);
-            (musicController = new MusicController
+            LoadComponentAsync(chat = new ChatOverlay { Depth = 0 }, overlayContent.Add);
+            LoadComponentAsync(options = new OptionsOverlay { Depth = -1 }, overlayContent.Add);
+            LoadComponentAsync(musicController = new MusicController
             {
                 Depth = -2,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }).LoadAsync(this, overlayContent.Add);
+            }, overlayContent.Add);
 
-            (notificationManager = new NotificationManager
+            LoadComponentAsync(notificationManager = new NotificationManager
             {
                 Depth = -2,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }).LoadAsync(this, overlayContent.Add);
+            }, overlayContent.Add);
 
-            (dialogOverlay = new DialogOverlay
+            LoadComponentAsync(dialogOverlay = new DialogOverlay
             {
                 Depth = -4,
-            }).LoadAsync(this, overlayContent.Add);
+            }, overlayContent.Add);
 
             Logger.NewEntry += entry =>
             {
@@ -195,12 +195,12 @@ namespace osu.Game
             Dependencies.Cache(notificationManager);
             Dependencies.Cache(dialogOverlay);
 
-            (Toolbar = new Toolbar
+            LoadComponentAsync(Toolbar = new Toolbar
             {
                 Depth = -3,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
-                OnPlayModeChange = delegate (PlayMode m) { PlayMode.Value = m; },
-            }).LoadAsync(this, t =>
+                OnPlayModeChange = m => PlayMode.Value = m,
+            }, t =>
             {
                 PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
                 PlayMode.TriggerChange();
@@ -314,7 +314,7 @@ namespace osu.Game
             if (intro?.ChildScreen != null)
                 intro.ChildScreen.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
 
-            Cursor.State = currentScreen == null || currentScreen.HasLocalCursorDisplayed ? Visibility.Hidden : Visibility.Visible;
+            Cursor.State = currentScreen?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
         }
 
         private void screenAdded(Screen newScreen)

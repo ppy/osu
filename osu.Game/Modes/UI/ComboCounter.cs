@@ -66,12 +66,7 @@ namespace osu.Game.Modes.UI
 
             TextSize = 80;
 
-            Current.ValueChanged += comboChanged;
-        }
-
-        private void comboChanged(object sender, System.EventArgs e)
-        {
-            updateCount(Current.Value == 0);
+            Current.ValueChanged += newValue => updateCount(newValue == 0);
         }
 
         protected override void LoadComplete()
@@ -213,7 +208,7 @@ namespace osu.Game.Modes.UI
 
         protected class TransformComboRoll : Transform<int>
         {
-            protected override int CurrentValue
+            public override int CurrentValue
             {
                 get
                 {

@@ -7,6 +7,8 @@ using osu.Game.Beatmaps.IO;
 using osu.Game.Modes;
 using osu.Game.Modes.Osu;
 using osu.Game.Tests.Resources;
+using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -53,7 +55,11 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
             {
                 var reader = new OszArchiveReader(osz);
-                var meta = reader.ReadMetadata();
+
+                BeatmapMetadata meta;
+                using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
+                    meta = BeatmapDecoder.GetDecoder(stream).Decode(stream).Metadata;
+
                 Assert.AreEqual(241526, meta.OnlineBeatmapSetID);
                 Assert.AreEqual("Soleily", meta.Artist);
                 Assert.AreEqual("Soleily", meta.ArtistUnicode);

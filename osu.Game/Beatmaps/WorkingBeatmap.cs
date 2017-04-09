@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps
         protected abstract Beatmap GetBeatmap();
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
-        
+
         private Beatmap beatmap;
         private readonly object beatmapLock = new object();
         public Beatmap Beatmap
@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps
                 }
             }
         }
-        
+
         private readonly object backgroundLock = new object();
         private Texture background;
         public Texture Background
@@ -87,7 +87,7 @@ namespace osu.Game.Beatmaps
             if (track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
                 other.track = track;
         }
-        
+
         public virtual void Dispose()
         {
             track?.Dispose();
