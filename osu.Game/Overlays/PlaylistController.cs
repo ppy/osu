@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -300,7 +301,7 @@ namespace osu.Game.Overlays
                 private Color4 current_colour;
 
                 private TextAwesome icon;
-                private OsuSpriteText title, artist;
+                private readonly IEnumerable<OsuSpriteText> title, artist;
 
                 public readonly int Index;
                 public readonly BeatmapSetInfo RepresentedSet;
@@ -315,8 +316,9 @@ namespace osu.Game.Overlays
                         if (value == current) return;
                         current = value;
 
-                        //todo: fading off screen doesn't work
-                        title.FadeColour(Current ? current_colour : Color4.White, fade_duration);
+                        //todo: fading when masked away is broken
+                        foreach (OsuSpriteText t in title)
+                            t.FadeColour(Current ? current_colour : Color4.White, fade_duration);
                     }
                 }
 
@@ -328,6 +330,14 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
                     Padding = new MarginPadding { Top = 3, Bottom = 3 };
+
+                    FillFlowContainer<OsuSpriteText> textContainer = new FillFlowContainer<OsuSpriteText>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Left = 20 },
+                        Spacing = new Vector2(5f, 0f),
+                    };
 
                     Children = new Drawable[]
                     {
@@ -341,37 +351,38 @@ namespace osu.Game.Overlays
                             Margin = new MarginPadding { Left = 5 },
                             Padding = new MarginPadding { Top = 2 },
                         },
-                        new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Left = 20 },
-                            Spacing = new Vector2(10f, 0f),
-                            Children = new Drawable[]
-                            {
-                                title = new OsuSpriteText
-                                {
-                                    TextSize = 16,
-                                    Font = @"Exo2.0-Regular",
-                                    Text = RepresentedSet.Metadata.Title,
-                                },
-                                artist = new OsuSpriteText
-                                {
-                                    TextSize = 14,
-                                    Font = @"Exo2.0-Bold",
-                                    Text = RepresentedSet.Metadata.Artist,
-                                    Padding = new MarginPadding { Top = 1 },
-                                },
-                            },
-                        },
+                        textContainer,
                     };
+
+                    textContainer.Add(title = splitText(RepresentedSet.Metadata.Title, 16, @"Exo2.0-Regular", new MarginPadding(0)));
+                    textContainer.Add(artist = splitText(RepresentedSet.Metadata.Artist, 14, @"Exo2.0-Bold", new MarginPadding { Top = 1 }));
+                }
+
+                private IEnumerable<OsuSpriteText> splitText(string text, int textSize, string font, MarginPadding padding)
+                {
+                    List<OsuSpriteText> sprites = new List<OsuSpriteText>();
+
+                    foreach (string w in text.Split(' '))
+                    {
+                        sprites.Add(new OsuSpriteText
+                        {
+                            TextSize = textSize,
+                            Font = font,
+                            Text = w,
+                            Padding = padding,
+                        });
+                    }
+
+                    return sprites;
                 }
 
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
+                    foreach (OsuSpriteText t in artist)
+                        t.Colour = colours.Gray9;
+                    
                     icon.Colour = colours.Gray5;
-                    artist.Colour = colours.Gray9;
                     current_colour = colours.Yellow;
                 }
 
