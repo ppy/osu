@@ -23,6 +23,7 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.Color4Extensions;
+using System.Linq;
 
 namespace osu.Game.Overlays
 {
@@ -39,9 +40,7 @@ namespace osu.Game.Overlays
         private Color4 activeColour;
 
         private List<BeatmapSetInfo> playList;
-        private readonly List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
-        private int playListIndex;
-        private int playHistoryIndex = -1;
+        private int playListIndex = -1;
 
         private TrackManager trackManager;
         private Bindable<WorkingBeatmap> beatmapSource;
@@ -63,6 +62,8 @@ namespace osu.Game.Overlays
 
             Margin = new MarginPadding(10);
         }
+
+        protected override bool InternalContains(Vector2 screenSpacePos) => playlist.State == Visibility.Visible ? dragContainer.Contains(screenSpacePos) : playerContainer.Contains(screenSpacePos);
 
         protected override bool OnDragStart(InputState state) => true;
 
@@ -104,12 +105,13 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = player_height + 10 },
                             //todo: this is the logic I expect, but maybe not others
-                            OnSelect = (set) =>
+                            OnSelect = (set, index) =>
                             {
                                 if (set.ID == (current?.BeatmapSetInfo?.ID ?? -1))
                                     current?.Track?.Seek(0);
 
-								play(set.Beatmaps[0], true);
+                                play(set.Beatmaps[0], true);
+                                playListIndex = index;
                             },
                         },
                         playerContainer = new Container
@@ -220,7 +222,6 @@ namespace osu.Game.Overlays
             preferUnicode.ValueChanged += unicode => updateDisplay(current, TransformDirection.None);
 
             beatmapSource = game.Beatmap ?? new Bindable<WorkingBeatmap>();
-            //playList = playlist;
 
             currentBackground = new MusicControllerBackground();
             playerContainer.Add(currentBackground);
@@ -231,6 +232,7 @@ namespace osu.Game.Overlays
         {
             beatmapSource.ValueChanged += workingChanged;
             beatmapSource.TriggerChange();
+            playList = playlist.List.ToList();
 
             base.LoadComplete();
         }
@@ -263,57 +265,32 @@ namespace osu.Game.Overlays
             bool audioEquals = current?.BeatmapInfo?.AudioEquals(beatmap?.BeatmapInfo) ?? false;
             current = beatmap;
             updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Next);
-            appendToHistory(current?.BeatmapInfo);
-        }
-
-        private void appendToHistory(BeatmapInfo beatmap)
-        {
-            if (beatmap == null) return;
-
-            if (playHistoryIndex >= 0)
-            {
-                if (beatmap.AudioEquals(playHistory[playHistoryIndex]))
-                    return;
-                if (playHistoryIndex < playHistory.Count - 1)
-                    playHistory.RemoveRange(playHistoryIndex + 1, playHistory.Count - playHistoryIndex - 1);
-            }
-            playHistory.Insert(++playHistoryIndex, beatmap);
         }
 
         private void prev()
         {
-            if (playHistoryIndex > 0)
-                play(playHistory[--playHistoryIndex], false);
+            if (playList.Count == 0) return;
+            if (current != null && playList.Count == 1) return;
+
+            int n = playListIndex - 1;
+            if (n < 0)
+                n = playList.Count - 1;
+
+            play(playList[n].Beatmaps[0], false);
+            playListIndex = n;
         }
 
         private void next()
         {
-            if (playHistoryIndex < playHistory.Count - 1)
-                play(playHistory[++playHistoryIndex], true);
-            else
-            {
-                if (playList.Count == 0) return;
-                if (current != null && playList.Count == 1) return;
-                //shuffle
-                BeatmapInfo nextToPlay;
-                do
-                {
-                    int j = RNG.Next(playListIndex, playList.Count);
-                    if (j != playListIndex)
-                    {
-                        BeatmapSetInfo temp = playList[playListIndex];
-                        playList[playListIndex] = playList[j];
-                        playList[j] = temp;
-                    }
+            if (playList.Count == 0) return;
+            if (current != null && playList.Count == 1) return;
 
-                    nextToPlay = playList[playListIndex++].Beatmaps[0];
-                    if (playListIndex == playList.Count) playListIndex = 0;
-                }
-                while (nextToPlay.AudioEquals(current?.BeatmapInfo));
+            int n = playListIndex + 1;
+            if (n >= playList.Count)
+				n = 0;
 
-                play(nextToPlay, true);
-                appendToHistory(nextToPlay);
-            }
+            play(playList[n].Beatmaps[0], true);
+            playListIndex = n;
         }
 
         private void play(BeatmapInfo info, bool isNext)

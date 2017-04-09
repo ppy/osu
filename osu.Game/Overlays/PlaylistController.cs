@@ -28,7 +28,15 @@ namespace osu.Game.Overlays
         private FilterControl filter;
         private Playlist list;
 
-        public Action<BeatmapSetInfo> OnSelect
+        public BeatmapSetInfo[] List
+        {
+            get
+            {
+                return list.Sets;
+            }
+        }
+
+        public Action<BeatmapSetInfo,int> OnSelect
         {
             get { return list.OnSelect; }
             set { list.OnSelect = value; }
@@ -223,11 +231,12 @@ namespace osu.Game.Overlays
                     sets = value;
 
                     List<PlaylistItem> newItems = new List<PlaylistItem>();
-                    foreach (BeatmapSetInfo s in value)
+
+                    for (int i = 0; i < value.Length; i++)
                     {
-                        newItems.Add(new PlaylistItem(s)
+                        newItems.Add(new PlaylistItem(value[i], i)
                         {
-                            OnSelect = OnSelect,
+                        	OnSelect = OnSelect,
                         });
                     }
 
@@ -239,8 +248,8 @@ namespace osu.Game.Overlays
             // because the scroller can be seen when scrolled to the bottom and PlaylistController is closed
             public readonly ScrollContainer ScrollContainer;
 
-            private Action<BeatmapSetInfo> onSelect;
-            public Action<BeatmapSetInfo> OnSelect
+            private Action<BeatmapSetInfo,int> onSelect;
+            public Action<BeatmapSetInfo,int> OnSelect
             {
                 get { return onSelect; }
                 set
@@ -293,8 +302,9 @@ namespace osu.Game.Overlays
                 private TextAwesome icon;
                 private OsuSpriteText title, artist;
 
+                public readonly int Index;
                 public readonly BeatmapSetInfo RepresentedSet;
-                public Action<BeatmapSetInfo> OnSelect;
+                public Action<BeatmapSetInfo,int> OnSelect;
 
                 private bool current;
                 public bool Current
@@ -309,8 +319,9 @@ namespace osu.Game.Overlays
                     }
                 }
 
-                public PlaylistItem(BeatmapSetInfo set)
+                public PlaylistItem(BeatmapSetInfo set, int index)
                 {
+                    Index = index;
                     RepresentedSet = set;
 
                     RelativeSizeAxes = Axes.X;
@@ -377,7 +388,7 @@ namespace osu.Game.Overlays
 
                 protected override bool OnClick(Framework.Input.InputState state)
                 {
-                    OnSelect?.Invoke(RepresentedSet);
+                    OnSelect?.Invoke(RepresentedSet, Index);
                     return true;
                 }
             }
