@@ -104,9 +104,15 @@ namespace osu.Game.Overlays
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = player_height + 10 },
+                            //todo: this is the logic I expect, but maybe not others
                             OnSelect = (set) =>
                             {
-                                if ((current?.BeatmapSetInfo?.ID ?? -1) != set.ID) play(set.Beatmaps[0], true);
+                                if (set.ID == (current?.BeatmapSetInfo?.ID ?? -1))
+                                {
+                                    current?.Track?.Seek(0);
+                                }
+                                    
+                                play(set.Beatmaps[0], true);
                             },
                         },
                         playerContainer = new Container
