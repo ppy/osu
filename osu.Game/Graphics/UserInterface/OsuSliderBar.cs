@@ -66,11 +66,15 @@ namespace osu.Game.Graphics.UserInterface
 
         private void playSample()
         {
-            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
-                return;
-            lastSampleTime = Clock.CurrentTime;
-            sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
-            sample.Play();
+            if (MathHelper.Clamp(
+                nub.DrawPosition.X - nub.DrawWidth / 2, 0, DrawWidth) > 0 & MathHelper.Clamp(
+                DrawWidth - nub.DrawPosition.X - nub.DrawWidth / 2, 0, DrawWidth) > 0) {
+                if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
+                    return;
+                lastSampleTime = Clock.CurrentTime;
+                sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
+                sample.Play();
+            }
         }
 
         protected override bool OnHover(InputState state)
