@@ -136,7 +136,7 @@ namespace osu.Game.Modes.Replays
             public ReplayMouseState(Vector2 position, IEnumerable<MouseButton> list)
             {
                 Position = position;
-                list.ForEach(b => PressedButtons.Add(b));
+                list.ForEach(b => SetPressed(b, true));
             }
         }
 
