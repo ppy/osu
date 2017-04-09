@@ -60,7 +60,6 @@ namespace osu.Game.Screens.Play
         private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
         private FailOverlay failOverlay;
-        private RetryOverlay retryOverlay;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
@@ -160,7 +159,7 @@ namespace osu.Game.Screens.Play
                     OnRetry = Restart,
                     OnQuit = Exit,
                 },
-                retryOverlay = new RetryOverlay
+                new RetryOverlay
                 {
                     Action = Restart,
                     OnKeyPressed = () => Content.FadeColour(Color4.Black, 500),
