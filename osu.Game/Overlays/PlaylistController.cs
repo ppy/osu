@@ -297,7 +297,7 @@ namespace osu.Game.Overlays
             private class PlaylistItem : Container
             {
                 private const float fade_duration = 100;
-                private Color4 current_colour;
+                private Color4 currentColour;
 
                 private TextAwesome icon;
                 private readonly IEnumerable<OsuSpriteText> title, artist;
@@ -315,9 +315,9 @@ namespace osu.Game.Overlays
                         if (value == current) return;
                         current = value;
 
-                        //todo: fading when masked away is broken
+                        Flush(true);
                         foreach (OsuSpriteText t in title)
-                            t.FadeColour(Current ? current_colour : Color4.White, fade_duration);
+                            t.FadeColour(Current ? currentColour : Color4.White, fade_duration);
                     }
                 }
 
@@ -382,7 +382,7 @@ namespace osu.Game.Overlays
                         t.Colour = colours.Gray9;
                     
                     icon.Colour = colours.Gray5;
-                    current_colour = colours.Yellow;
+                    currentColour = colours.Yellow;
                 }
 
                 protected override bool OnHover(Framework.Input.InputState state)
