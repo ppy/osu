@@ -72,7 +72,7 @@ namespace osu.Game.Overlays
                         list = new Playlist
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 }, //todo: static sizes aren't good
+                            Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },
                         },
                         filter = new FilterControl
                         {
@@ -85,6 +85,7 @@ namespace osu.Game.Overlays
             };
 
             filter.Search.Exit = Hide;
+            //todo: play the first displayed song on commit when searching is implemented
         }
 
         [BackgroundDependencyLoader]
@@ -314,6 +315,7 @@ namespace osu.Game.Overlays
                         if (value == current) return;
                         current = value;
 
+                        //todo: fading off screen doesn't work
                         title.FadeColour(Current ? current_colour : Color4.White, fade_duration);
                     }
                 }

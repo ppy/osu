@@ -110,8 +110,8 @@ namespace osu.Game.Overlays
                                 if (set.ID == (current?.BeatmapSetInfo?.ID ?? -1))
                                     current?.Track?.Seek(0);
 
-                                play(set.Beatmaps[0], true);
                                 playListIndex = index;
+                                play(set.Beatmaps[0], true);
                             },
                         },
                         playerContainer = new Container
@@ -177,7 +177,13 @@ namespace osu.Game.Overlays
                                                     IconScale = new Vector2(1.4f),
                                                     Action = () =>
                                                     {
-                                                        if (current?.Track == null) return;
+                                                        if (current?.Track == null)
+                                                        {
+                                                            if (playList.Count > 0)
+                                                                play(playList.First().Beatmaps[0], true);
+                                                            else
+                                                                return;
+                                                        }    
                                                         if (current.Track.IsRunning)
                                                             current.Track.Stop();
                                                         else
