@@ -220,7 +220,7 @@ namespace osu.Game.Overlays
             preferUnicode.ValueChanged += unicode => updateDisplay(current, TransformDirection.None);
 
             beatmapSource = game.Beatmap ?? new Bindable<WorkingBeatmap>();
-            playList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
+            //playList = playlist;
 
             currentBackground = new MusicControllerBackground();
             playerContainer.Add(currentBackground);
