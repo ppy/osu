@@ -28,15 +28,10 @@ namespace osu.Game.Overlays
 {
     public class MusicController : FocusedOverlayContainer
     {
-        private const float player_height = 130;
         private Drawable currentBackground;
         private DragBar progress;
         private Button playButton;
         private SpriteText title, artist;
-        private ClickableContainer playlistButton;
-        private PlaylistController playlist;
-        private Color4 activeColour;
-        private Container playerContainer;
 
         private List<BeatmapSetInfo> playList;
         private readonly List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
@@ -58,7 +53,7 @@ namespace osu.Game.Overlays
         public MusicController()
         {
             Width = 400;
-            Height = player_height + 510; //510 = playlist height
+            Height = 130;
 
             Margin = new MarginPadding(10);
         }
@@ -87,8 +82,6 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, OsuConfigManager config, BeatmapDatabase beatmaps, OsuColour colours)
         {
-            activeColour = colours.Yellow;
-
             Children = new Drawable[]
             {
                 dragContainer = new Container
@@ -199,9 +192,8 @@ namespace osu.Game.Overlays
             beatmapSource = game.Beatmap ?? new Bindable<WorkingBeatmap>();
             playList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
 
-            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? activeColour : Color4.White, transition_length, EasingTypes.OutQuint);
             currentBackground = new MusicControllerBackground();
-            playerContainer.Add(currentBackground);
+            dragContainer.Add(currentBackground);
         }
 
         protected override void LoadComplete()
@@ -325,11 +317,10 @@ namespace osu.Game.Overlays
                         BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
                         title.Text = preferUnicode ? metadata.TitleUnicode : metadata.Title;
                         artist.Text = preferUnicode ? metadata.ArtistUnicode : metadata.Artist;
-                        playlist.Current = beatmap.BeatmapSetInfo;
                     }
                 });
 
-                playerContainer.Add(new AsyncLoadWrapper(new MusicControllerBackground(beatmap)
+                dragContainer.Add(new AsyncLoadWrapper(new MusicControllerBackground(beatmap)
                 {
                     OnLoadComplete = d =>
                     {
@@ -353,6 +344,7 @@ namespace osu.Game.Overlays
                 {
                     Depth = float.MaxValue,
                 });
+            };
         }
 
         private void seek(float position)
