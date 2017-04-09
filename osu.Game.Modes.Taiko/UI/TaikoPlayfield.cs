@@ -25,7 +25,7 @@ namespace osu.Game.Modes.Taiko.UI
         /// The play field height. This is relative to the size of hit objects
         /// such that the playfield is just a bit larger than strong hits.
         /// </summary>
-        public const float PLAYFIELD_HEIGHT = TaikoHitObject.CIRCLE_RADIUS * 2 * 2;
+        public const float DEFAULT_PLAYFIELD_HEIGHT = TaikoHitObject.CIRCLE_RADIUS * 2 * 2;
 
         /// <summary>
         /// The offset from <see cref="left_area_size"/> which the center of the hit target lies at.
@@ -53,7 +53,7 @@ namespace osu.Game.Modes.Taiko.UI
         public TaikoPlayfield()
         {
             RelativeSizeAxes = Axes.X;
-            Height = PLAYFIELD_HEIGHT;
+            Height = DEFAULT_PLAYFIELD_HEIGHT;
 
             AddInternal(new Drawable[]
             {
@@ -93,7 +93,8 @@ namespace osu.Game.Modes.Taiko.UI
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,
-                                    Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
+                                    Size = new Vector2(DEFAULT_PLAYFIELD_HEIGHT),
+                                    FillMode = FillMode.Fit,
                                     BlendingMode = BlendingMode.Additive
                                 },
                                 barLineContainer = new Container<DrawableBarLine>
@@ -104,6 +105,7 @@ namespace osu.Game.Modes.Taiko.UI
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,
+                                    FillMode = FillMode.Fit
                                 },
                                 hitObjectContainer = new Container
                                 {
@@ -111,7 +113,8 @@ namespace osu.Game.Modes.Taiko.UI
                                 },
                                 judgementContainer = new Container<DrawableTaikoJudgement>
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(DEFAULT_PLAYFIELD_HEIGHT),
+                                    FillMode = FillMode.Fit,
                                     BlendingMode = BlendingMode.Additive
                                 },
                             },
@@ -120,7 +123,8 @@ namespace osu.Game.Modes.Taiko.UI
                 },
                 leftBackgroundContainer = new Container
                 {
-                    Size = new Vector2(left_area_size, PLAYFIELD_HEIGHT),
+                    RelativeSizeAxes = Axes.Y,
+                    Width = left_area_size,
                     BorderThickness = 1,
                     Children = new Drawable[]
                     {
@@ -134,6 +138,7 @@ namespace osu.Game.Modes.Taiko.UI
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.X,
                             Position = new Vector2(0.10f, 0),
+                            FillMode = FillMode.Fit,
                             Scale = new Vector2(0.9f)
                         },
                         new Box
@@ -164,6 +169,9 @@ namespace osu.Game.Modes.Taiko.UI
 
         public override void Add(DrawableHitObject<TaikoHitObject, TaikoJudgement> h)
         {
+            h.AutoSizeAxes = h.AutoSizeAxes & ~Axes.Y;
+            h.Height = DEFAULT_PLAYFIELD_HEIGHT;
+            h.FillMode = FillMode.Fit;
             h.Depth = (float)h.HitObject.StartTime;
 
             base.Add(h);

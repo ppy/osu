@@ -37,7 +37,7 @@ namespace osu.Game.Modes.Taiko.UI
 
         public HitTarget()
         {
-            RelativeSizeAxes = Axes.Y;
+            Size = new Vector2(TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT);
 
             Children = new Drawable[]
             {
@@ -47,7 +47,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Y = border_offset,
-                    Size = new Vector2(border_thickness, (TaikoPlayfield.PLAYFIELD_HEIGHT - strong_hit_diameter) / 2f - border_offset),
+                    Size = new Vector2(border_thickness, (TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT - strong_hit_diameter) / 2f - border_offset),
                     Alpha = 0.1f
                 },
                 new CircularContainer
@@ -96,7 +96,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Y = -border_offset,
-                    Size = new Vector2(border_thickness, (TaikoPlayfield.PLAYFIELD_HEIGHT - strong_hit_diameter) / 2f - border_offset),
+                    Size = new Vector2(border_thickness, (TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT - strong_hit_diameter) / 2f - border_offset),
                     Alpha = 0.1f
                 },
             };

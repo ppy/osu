@@ -61,17 +61,24 @@ namespace osu.Desktop.VisualTests.Tests
         {
             TaikoHitResult hitResult = RNG.Next(2) == 0 ? TaikoHitResult.Good : TaikoHitResult.Great;
 
-            playfield.OnJudgement(new DrawableTestHit(new Hit())
+            var h = new DrawableTestHit(new Hit())
             {
                 X = RNG.NextSingle(hitResult == TaikoHitResult.Good ? -0.1f : -0.05f, hitResult == TaikoHitResult.Good ? 0.1f : 0.05f),
                 Judgement = new TaikoJudgement
                 {
                     Result = HitResult.Hit,
                     TaikoResult = hitResult,
-                    TimeOffset = 0,
-                    SecondHit = RNG.Next(10) == 0
+                    TimeOffset = 0
                 }
-            });
+            };
+
+            playfield.OnJudgement(h);
+
+            if (RNG.Next(10) == 0)
+            {
+                h.Judgement.SecondHit = true;
+                playfield.OnJudgement(h);
+            }
         }
 
         private void addMissJudgement()
