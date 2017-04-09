@@ -32,6 +32,8 @@ namespace osu.Game.Modes
 
         public abstract HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap);
 
+        public virtual HudOverlay CreateHudOverlay() => null;
+
         public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap);
 
         public abstract ScoreProcessor CreateScoreProcessor();
