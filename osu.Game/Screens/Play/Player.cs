@@ -22,9 +22,6 @@ using System;
 using System.Linq;
 using osu.Framework.Threading;
 using osu.Game.Modes.Scoring;
-using OpenTK.Input;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Graphics.Sprites;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
@@ -63,16 +60,11 @@ namespace osu.Game.Screens.Play
         private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
         private FailOverlay failOverlay;
-        private Box retryOverlay;
-
-        private SampleChannel SampleClick;
+        private RetryOverlay retryOverlay;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
         {
-            AlwaysPresent = true;
-            SampleClick = audio.Sample.Get(@"Menu/menuback");
-
             var beatmap = Beatmap.Beatmap;
 
             if (beatmap.BeatmapInfo?.Mode > PlayMode.Taiko)
@@ -168,12 +160,11 @@ namespace osu.Game.Screens.Play
                     OnRetry = Restart,
                     OnQuit = Exit,
                 },
-                retryOverlay = new Box
+                retryOverlay = new RetryOverlay
                 {
-                    Alpha = 0,
-                    AlwaysPresent = true,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
+                    Action = Restart,
+                    OnKeyPressed = () => Content.FadeColour(Color4.Black, 500),
+                    OnKeyReleased = () => Content.FadeColour(Color4.White, 200),
                 }
             };
         }
@@ -348,41 +339,5 @@ namespace osu.Game.Screens.Play
         private Bindable<bool> mouseWheelDisabled;
 
         protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !IsPaused;
-
-        private bool isHolded;
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (args.Repeat) return false;
-
-            if (args.Key == Key.Tilde)
-            {
-                isHolded = true;
-
-                retryOverlay.FadeIn(500);
-
-                Delay(500).Schedule(() =>{
-                    if (isHolded)
-                    {
-                        SampleClick.Play();
-                        Restart();
-                    }
-                });
-                return true;
-            }
-
-            return base.OnKeyDown(state, args);
-        }
-
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
-        {
-            if (args.Key == Key.Tilde)
-            {
-                isHolded = false;
-                retryOverlay.FadeOut(200);
-                return true;
-            }
-
-            return base.OnKeyUp(state, args);
-        }
     }
 }
