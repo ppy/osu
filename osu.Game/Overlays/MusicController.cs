@@ -28,10 +28,15 @@ namespace osu.Game.Overlays
 {
     public class MusicController : FocusedOverlayContainer
     {
+        private const float player_height = 130;
+        private const float playlist_height = 510;  
         private Drawable currentBackground;
         private DragBar progress;
         private Button playButton;
         private SpriteText title, artist;
+        private ClickableContainer playlistButton;
+        private PlaylistController playlist;
+        private Color4 activeColour;
 
         private List<BeatmapSetInfo> playList;
         private readonly List<BeatmapInfo> playHistory = new List<BeatmapInfo>();
@@ -45,6 +50,7 @@ namespace osu.Game.Overlays
         private BeatmapDatabase beatmaps;
 
         private Container dragContainer;
+        private Container playerContainer;
 
         private const float progress_height = 10;
 
@@ -53,7 +59,7 @@ namespace osu.Game.Overlays
         public MusicController()
         {
             Width = 400;
-            Height = 130;
+            Height = player_height + playlist_height;
 
             Margin = new MarginPadding(10);
         }
@@ -82,104 +88,128 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, OsuConfigManager config, BeatmapDatabase beatmaps, OsuColour colours)
         {
+            activeColour = colours.Yellow;
+
             Children = new Drawable[]
             {
                 dragContainer = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Masking = true,
-                    CornerRadius = 5,
-                    EdgeEffect = new EdgeEffect
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Black.Opacity(40),
-                        Radius = 5,
-                    },
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        title = new OsuSpriteText
+                        playlist = new PlaylistController
                         {
-                            Origin = Anchor.BottomCentre,
-                            Anchor = Anchor.TopCentre,
-                            Position = new Vector2(0, 40),
-                            TextSize = 25,
-                            Colour = Color4.White,
-                            Text = @"Nothing to play",
-                            Font = @"Exo2.0-MediumItalic"
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Top = player_height + 10 },
+                            //todo: this is the logic I expect, but maybe not others
+                            OnSelect = (set) =>
+                            {
+                                if (set.ID == (current?.BeatmapSetInfo?.ID ?? -1))
+                                    current?.Track?.Seek(0);
+
+								play(set.Beatmaps[0], true);
+                            },
                         },
-                        artist = new OsuSpriteText
+                        playerContainer = new Container
                         {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Position = new Vector2(0, 45),
-                            TextSize = 15,
-                            Colour = Color4.White,
-                            Text = @"Nothing to play",
-                            Font = @"Exo2.0-BoldItalic"
-                        },
-                        new Container
-                        {
-                            Padding = new MarginPadding { Bottom = progress_height },
-                            Height = bottom_black_area_height,
                             RelativeSizeAxes = Axes.X,
-                            Origin = Anchor.BottomCentre,
-                            Anchor = Anchor.BottomCentre,
+                            Height = player_height,
+                            Masking = true,
+                            CornerRadius = 5,
+                            EdgeEffect = new EdgeEffect
+                            {
+                                Type = EdgeEffectType.Shadow,
+                                Colour = Color4.Black.Opacity(40),
+                                Radius = 5,
+                            },
                             Children = new Drawable[]
                             {
-                                new FillFlowContainer<Button>
+                                title = new OsuSpriteText
                                 {
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(5),
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre,
-                                    Children = new[]
+                                    Origin = Anchor.BottomCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Position = new Vector2(0, 40),
+                                    TextSize = 25,
+                                    Colour = Color4.White,
+                                    Text = @"Nothing to play",
+                                    Font = @"Exo2.0-MediumItalic"
+                                },
+                                artist = new OsuSpriteText
+                                {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Position = new Vector2(0, 45),
+                                    TextSize = 15,
+                                    Colour = Color4.White,
+                                    Text = @"Nothing to play",
+                                    Font = @"Exo2.0-BoldItalic"
+                                },
+                                new Container
+                                {
+                                    Padding = new MarginPadding { Bottom = progress_height },
+                                    Height = bottom_black_area_height,
+                                    RelativeSizeAxes = Axes.X,
+                                    Origin = Anchor.BottomCentre,
+                                    Anchor = Anchor.BottomCentre,
+                                    Children = new Drawable[]
                                     {
-                                        new Button
+                                        new FillFlowContainer<Button>
                                         {
-                                            Action = prev,
-                                            Icon = FontAwesome.fa_step_backward,
-                                        },
-                                        playButton = new Button
-                                        {
-                                            Scale = new Vector2(1.4f),
-                                            IconScale = new Vector2(1.4f),
-                                            Action = () =>
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(5),
+                                            Origin = Anchor.Centre,
+                                            Anchor = Anchor.Centre,
+                                            Children = new[]
                                             {
-                                                if (current?.Track == null) return;
-                                                if (current.Track.IsRunning)
-                                                    current.Track.Stop();
-                                                else
-                                                    current.Track.Start();
-                                            },
-                                            Icon = FontAwesome.fa_play_circle_o,
+                                                new Button
+                                                {
+                                                    Action = prev,
+                                                    Icon = FontAwesome.fa_step_backward,
+                                                },
+                                                playButton = new Button
+                                                {
+                                                    Scale = new Vector2(1.4f),
+                                                    IconScale = new Vector2(1.4f),
+                                                    Action = () =>
+                                                    {
+                                                        if (current?.Track == null) return;
+                                                        if (current.Track.IsRunning)
+                                                            current.Track.Stop();
+                                                        else
+                                                            current.Track.Start();
+                                                    },
+                                                    Icon = FontAwesome.fa_play_circle_o,
+                                                },
+                                                new Button
+                                                {
+                                                    Action = next,
+                                                    Icon = FontAwesome.fa_step_forward,
+                                                },
+                                            }
                                         },
-                                        new Button
+                                        playlistButton = new Button
                                         {
-                                            Action = next,
-                                            Icon = FontAwesome.fa_step_forward,
+                                            Origin = Anchor.Centre,
+                                            Anchor = Anchor.CentreRight,
+                                            Position = new Vector2(-bottom_black_area_height / 2, 0),
+                                            Icon = FontAwesome.fa_bars,
+                                            Action = () => playlist.ToggleVisibility(),
                                         },
                                     }
                                 },
-                                new Button
+                                progress = new DragBar
                                 {
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.CentreRight,
-                                    Position = new Vector2(-bottom_black_area_height / 2, 0),
-                                    Icon = FontAwesome.fa_bars,
-                                },
-                            }
+                                    Origin = Anchor.BottomCentre,
+                                    Anchor = Anchor.BottomCentre,
+                                    Height = progress_height,
+                                    Colour = colours.Yellow,
+                                    SeekRequested = seek
+                                }
+                            },
                         },
-                        progress = new DragBar
-                        {
-                            Origin = Anchor.BottomCentre,
-                            Anchor = Anchor.BottomCentre,
-                            Height = progress_height,
-                            Colour = colours.Yellow,
-                            SeekRequested = seek
-                        }
                     }
                 }
             };
@@ -193,7 +223,8 @@ namespace osu.Game.Overlays
             playList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
 
             currentBackground = new MusicControllerBackground();
-            dragContainer.Add(currentBackground);
+            playerContainer.Add(currentBackground);
+            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible? activeColour : Color4.White, transition_length, EasingTypes.OutQuint);
         }
 
         protected override void LoadComplete()
@@ -317,10 +348,11 @@ namespace osu.Game.Overlays
                         BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
                         title.Text = preferUnicode ? metadata.TitleUnicode : metadata.Title;
                         artist.Text = preferUnicode ? metadata.ArtistUnicode : metadata.Artist;
+                        playlist.Current = beatmap.BeatmapSetInfo;
                     }
                 });
 
-                dragContainer.Add(new AsyncLoadWrapper(new MusicControllerBackground(beatmap)
+                playerContainer.Add(new AsyncLoadWrapper(new MusicControllerBackground(beatmap)
                 {
                     OnLoadComplete = d =>
                     {
