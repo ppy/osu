@@ -49,7 +49,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece(HitObject.IsStrong)
         {
             Length = (float)(HitObject.Duration / HitObject.ScrollTime),
-            PlayfieldLengthReference = () => Parent.DrawSize.X
+            PlayfieldLengthReference = () => Parent.DrawSize.X / DrawScale.X
         };
 
         [BackgroundDependencyLoader]
