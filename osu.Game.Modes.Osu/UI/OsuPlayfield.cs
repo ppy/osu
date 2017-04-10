@@ -38,8 +38,6 @@ namespace osu.Game.Modes.Osu.UI
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            RelativeSizeAxes = Axes.Both;
-            Size = new Vector2(0.75f);
 
             Add(new Drawable[]
             {

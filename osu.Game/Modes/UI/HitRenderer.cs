@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Game.Modes.Replays;
 using osu.Game.Modes.Scoring;
+using OpenTK;
 
 namespace osu.Game.Modes.UI
 {
@@ -167,6 +168,11 @@ namespace osu.Game.Modes.UI
     {
         public event Action<TJudgement> OnJudgement;
 
+        /// <summary>
+        /// Whether to apply adjustments to the child <see cref="Playfield{TObject,TJudgement}"/> based on our own size.
+        /// </summary>
+        public bool AspectAdjust = true;
+
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
         protected override Container<Drawable> Content => content;
@@ -218,6 +224,19 @@ namespace osu.Game.Modes.UI
 
             Playfield.PostProcess();
         }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Playfield.Size = AspectAdjust ? GetPlayfieldAspectAdjust() : Vector2.One;
+        }
+
+        /// <summary>
+        /// In some cases we want to apply changes to the relative size of our contained <see cref="Playfield{TObject, TJudgement}"/> based on custom conditions.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual Vector2 GetPlayfieldAspectAdjust() => new Vector2(0.75f); //a sane default
 
         /// <summary>
         /// Triggered when an object's Judgement is updated.

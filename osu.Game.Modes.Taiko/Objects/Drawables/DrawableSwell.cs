@@ -65,7 +65,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Alpha = 0,
-                            Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
+                            Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER),
                             BlendingMode = BlendingMode.Additive,
                             Masking = true,
                             Children = new []
@@ -82,7 +82,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
                             Name = "Target ring (thick border)",
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
+                            Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER),
                             Masking = true,
                             BorderThickness = target_ring_thick_border,
                             BlendingMode = BlendingMode.Additive,

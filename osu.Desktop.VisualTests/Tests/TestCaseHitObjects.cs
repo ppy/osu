@@ -99,6 +99,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddToggleStep(@"auto", state => { auto = state; load(mode); });
 
+            BasicSliderBar<double> sliderBar;
             Add(new Container
             {
                 Anchor = Anchor.TopRight,
@@ -107,15 +108,16 @@ namespace osu.Desktop.VisualTests.Tests
                 Children = new Drawable[]
                 {
                     new SpriteText { Text = "Playback Speed" },
-                    new BasicSliderBar<double>
+                    sliderBar = new BasicSliderBar<double>
                     {
                         Width = 150,
                         Height = 10,
                         SelectionColor = Color4.Orange,
-                        Value = playbackSpeed
                     }
                 }
             });
+
+            sliderBar.Current.BindTo(playbackSpeed);
 
             framedClock.ProcessFrame();
 
