@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         /// </summary>
         private readonly List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
 
-        public override Vector2 OriginPosition => new Vector2(DrawHeight / 2f);
+        public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
         protected override Container<Drawable> Content => bodyContainer;
 
