@@ -39,7 +39,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
         public TaikoPiece()
         {
             //just a default
-            Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2);
+            Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER);
         }
     }
 }
