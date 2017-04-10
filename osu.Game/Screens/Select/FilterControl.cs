@@ -93,11 +93,6 @@ namespace osu.Game.Screens.Select
                         searchTextBox = new SearchTextBox
                         {
                             RelativeSizeAxes = Axes.X,
-                            OnChange = (sender, newText) =>
-                            {
-                                if (newText)
-                                    FilterChanged?.Invoke(CreateCriteria());
-                            },
                             Exit = () => Exit?.Invoke(),
                         },
                         new Box
@@ -149,10 +144,12 @@ namespace osu.Game.Screens.Select
                 }
             };
 
+            searchTextBox.Current.ValueChanged += t => FilterChanged?.Invoke(CreateCriteria());
+
             groupTabs.PinItem(GroupMode.All);
             groupTabs.PinItem(GroupMode.RecentlyPlayed);
-            groupTabs.SelectedItem.ValueChanged += val => Group = val;
-            sortTabs.SelectedItem.ValueChanged += val => Sort = val;
+            groupTabs.Current.ValueChanged += val => Group = val;
+            sortTabs.Current.ValueChanged += val => Sort = val;
         }
 
         public void Deactivate()
