@@ -15,10 +15,8 @@ namespace osu.Game.Overlays.Options
             set
             {
                 bindable = value;
-
-                Current = bindable;
-
-                if (bindable?.Disabled ?? true)
+                Current.BindTo(bindable);
+                if (value?.Disabled ?? true)
                     Alpha = 0.3f;
             }
         }
