@@ -92,12 +92,6 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private readonly Bindable<bool> current = new Bindable<bool>();
-
-        public Bindable<bool> Current
-        {
-            get { return current; }
-            set { current.BindTo(value); }
-        }
+        public Bindable<bool> Current { get; } = new Bindable<bool>();
     }
 }

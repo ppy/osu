@@ -24,11 +24,8 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 bindable = value;
-
-                if (bindable != null)
-                    Current = bindable;
-
-                if (bindable?.Disabled ?? true)
+                Current.BindTo(bindable);
+                if (value?.Disabled ?? true)
                     Alpha = 0.3f;
             }
         }
@@ -72,12 +69,13 @@ namespace osu.Game.Graphics.UserInterface
                 labelSpriteText = new OsuSpriteText(),
                 nub = new Nub
                 {
-                    Current = Current,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Margin = new MarginPadding { Right = 5 },
                 }
             };
+
+            nub.Current.BindTo(Current);
 
             Current.ValueChanged += newValue =>
             {
