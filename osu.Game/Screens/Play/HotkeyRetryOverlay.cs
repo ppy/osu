@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using OpenTK.Graphics;
-using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
 {
@@ -20,11 +19,12 @@ namespace osu.Game.Screens.Play
         public Action Action;
 
         private SampleChannel retrySample;
-        private ScheduledDelegate task;
         private Box overlay;
 
         private const int activate_delay = 500;
         private const int fadeout_delay = 200;
+
+        private bool fired;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -52,13 +52,6 @@ namespace osu.Game.Screens.Play
             if (args.Key == Key.Tilde)
             {
                 overlay.FadeIn(activate_delay);
-
-                task = Scheduler.AddDelayed(() =>
-                {
-                    retrySample.Play();
-                    Action();
-                }, activate_delay);
-
                 return true;
             }
 
@@ -67,14 +60,24 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
-            if (args.Key == Key.Tilde)
+            if (args.Key == Key.Tilde && !fired)
             {
-                task?.Cancel();
                 overlay.FadeOut(fadeout_delay);
                 return true;
             }
 
             return base.OnKeyUp(state, args);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            if (!fired && overlay.Alpha == 1)
+            {
+                fired = true;
+                retrySample.Play();
+                Action?.Invoke();
+            }
         }
     }
 }
