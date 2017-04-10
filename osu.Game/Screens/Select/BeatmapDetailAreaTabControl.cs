@@ -8,7 +8,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
@@ -24,7 +23,7 @@ namespace osu.Game.Screens.Select
 
         private void invokeOnFilter()
         {
-            OnFilter?.Invoke(tabs.SelectedItem, modsCheckbox.State == CheckboxState.Checked);
+            OnFilter?.Invoke(tabs.Current, modsCheckbox.Current);
         }
 
         [BackgroundDependencyLoader]
@@ -61,10 +60,10 @@ namespace osu.Game.Screens.Select
                 },
             };
 
-            tabs.SelectedItem.ValueChanged += item => invokeOnFilter();
-            modsCheckbox.Action += (sender, e) => invokeOnFilter();
+            tabs.Current.ValueChanged += item => invokeOnFilter();
+            modsCheckbox.Current.ValueChanged += item => invokeOnFilter();
 
-            tabs.SelectedItem.Value = BeatmapDetailTab.Global;
+            tabs.Current.Value = BeatmapDetailTab.Global;
         }
     }
 

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -24,8 +23,6 @@ namespace osu.Game.Graphics.UserInterface
         private readonly SpriteText text;
         private readonly TextAwesome icon;
 
-        public event EventHandler<CheckboxState> Action;
-
         private Color4? accentColour;
         public Color4 AccentColour
         {
@@ -34,7 +31,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 accentColour = value;
 
-                if (State != CheckboxState.Checked)
+                if (Current)
                 {
                     text.Colour = AccentColour;
                     icon.Colour = AccentColour;
@@ -46,20 +43,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             get { return text.Text; }
             set { text.Text = value; }
-        }
-
-        protected override void OnChecked()
-        {
-            fadeIn();
-            icon.Icon = FontAwesome.fa_check_circle_o;
-            Action?.Invoke(this, State);
-        }
-
-        protected override void OnUnchecked()
-        {
-            fadeOut();
-            icon.Icon = FontAwesome.fa_circle_o;
-            Action?.Invoke(this, State);
         }
 
         private const float transition_length = 500;
@@ -84,7 +67,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(InputState state)
         {
-            if (State == CheckboxState.Unchecked)
+            if (!Current)
                 fadeOut();
 
             base.OnHoverLost(state);
@@ -132,6 +115,20 @@ namespace osu.Game.Graphics.UserInterface
                     Colour = Color4.White,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
+                }
+            };
+
+            Current.ValueChanged += v =>
+            {
+                if (v)
+                {
+                    fadeIn();
+                    icon.Icon = FontAwesome.fa_check_circle_o;
+                }
+                else
+                {
+                    fadeOut();
+                    icon.Icon = FontAwesome.fa_circle_o;
                 }
             };
         }
