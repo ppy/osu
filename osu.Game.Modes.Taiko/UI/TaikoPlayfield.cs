@@ -215,6 +215,9 @@ namespace osu.Game.Modes.Taiko.UI
                 hitExplosionContainer.Children.FirstOrDefault(e => e.Judgement == judgedObject.Judgement)?.VisualiseSecondHit();
         }
 
+        /// <summary>
+        /// Container for hit objects. Locks width to parent width even through scale.
+        /// </summary>
         private class HitObjectContainer : Container
         {
             public HitObjectContainer()
