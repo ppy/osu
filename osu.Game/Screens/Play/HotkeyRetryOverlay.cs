@@ -8,23 +8,41 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
 using System;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
+using OpenTK.Graphics;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
 {
-    public class RetryOverlay : Container
+    public class HotkeyRetryOverlay : Container
     {
         public Action Action;
-        public Action OnKeyPressed;
-        public Action OnKeyReleased;
 
         private SampleChannel retrySample;
-        private bool keyIsHeld;
+        private ScheduledDelegate task;
+        private Box overlay;
+
+        private const int activate_delay = 500;
+        private const int fadeout_delay = 200;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
             retrySample = audio.Sample.Get(@"Menu/menuback");
+            RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
+
+            Children = new Drawable[]
+            {
+                overlay = new Box
+                {
+                    Alpha = 0,
+                    AlwaysPresent = true,
+                    Colour = Color4.Black,
+                    RelativeSizeAxes = Axes.Both,
+                }
+            };
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -33,17 +51,14 @@ namespace osu.Game.Screens.Play
 
             if (args.Key == Key.Tilde)
             {
-                keyIsHeld = true;
-                OnKeyPressed();
+                overlay.FadeIn(activate_delay);
 
-                Delay(500).Schedule(() =>
+                task = Scheduler.AddDelayed(() =>
                 {
-                    if (keyIsHeld)
-                    {
-                        retrySample.Play();
-                        Action();
-                    }
-                });
+                    retrySample.Play();
+                    Action();
+                }, activate_delay);
+
                 return true;
             }
 
@@ -54,8 +69,8 @@ namespace osu.Game.Screens.Play
         {
             if (args.Key == Key.Tilde)
             {
-                keyIsHeld = false;
-                OnKeyReleased();
+                task?.Cancel();
+                overlay.FadeOut(fadeout_delay);
                 return true;
             }
 
