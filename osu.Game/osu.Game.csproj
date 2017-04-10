@@ -180,6 +180,7 @@
     <Compile Include="Screens\Backgrounds\BackgroundScreenEmpty.cs" />
     <Compile Include="Screens\Charts\ChartInfo.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
+    <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
     <Compile Include="Screens\ScreenWhiteBox.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />

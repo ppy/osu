@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Beatmaps;
@@ -46,5 +47,7 @@ namespace osu.Game.Modes.Osu.UI
                 return new DrawableSpinner(spinner);
             return null;
         }
+
+        protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(0.75f);
     }
 }
