@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play
         private SampleChannel retrySample;
         private Box overlay;
 
-        private const int activate_delay = 500;
+        private const int activate_delay = 400;
         private const int fadeout_delay = 200;
 
         private bool fired;
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
 
             if (args.Key == Key.Tilde)
             {
-                overlay.FadeIn(activate_delay);
+                overlay.FadeIn(activate_delay, EasingTypes.Out);
                 return true;
             }
 
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Play
         {
             if (args.Key == Key.Tilde && !fired)
             {
-                overlay.FadeOut(fadeout_delay);
+                overlay.FadeOut(fadeout_delay, EasingTypes.Out);
                 return true;
             }
 
