@@ -79,6 +79,7 @@
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
     <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
     <Compile Include="Beatmaps\Timing\TimingInfo.cs" />
+    <Compile Include="Database\BeatmapMetric.cs" />
     <Compile Include="Database\ScoreDatabase.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />

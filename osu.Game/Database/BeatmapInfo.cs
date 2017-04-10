@@ -41,6 +41,9 @@ namespace osu.Game.Database
         [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BeatmapDifficulty Difficulty { get; set; }
 
+        [Ignore]
+        public BeatmapMetric Metric { get; set; }
+
         public string Path { get; set; }
 
         public string Hash { get; set; }

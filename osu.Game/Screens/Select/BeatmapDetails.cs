@@ -47,85 +47,49 @@ namespace osu.Game.Screens.Select
             {
                 return beatmap;
             }
-
             set
             {
                 if (beatmap == value) return;
                 beatmap = value;
 
-                description.ContentText = beatmap.Version;
-                source.ContentText = beatmap.Metadata.Source;
-                tags.ContentText = beatmap.Metadata.Tags;
+                description.Text = beatmap.Version;
+                source.Text = beatmap.Metadata.Source;
+                tags.Text = beatmap.Metadata.Tags;
 
                 circleSize.Value = beatmap.Difficulty.CircleSize;
                 drainRate.Value = beatmap.Difficulty.DrainRate;
                 overallDifficulty.Value = beatmap.Difficulty.OverallDifficulty;
                 approachRate.Value = beatmap.Difficulty.ApproachRate;
                 stars.Value = (float)beatmap.StarDifficulty;
-            }
-        }
 
-        private List<int> ratings;
-        public IEnumerable<int> Ratings
-        {
-            get
-            {
-                return ratings;
-            }
-            set
-            {
-                ratings = value?.ToList() ?? new List<int>();
-                if(ratings.Count == 0)
-                    ratingsContainer.FadeOut(250);
+
+                List<int> ratings = beatmap.Metric?.Ratings?.ToList() ?? new List<int>();
+                if (ratings.Count == 0)
+                    ratingsContainer.Hide();
                 else
                 {
-                    ratingsContainer.FadeIn(250);
+                    ratingsContainer.Show();
                     negativeRatings.Text = ratings.GetRange(0, 5).Sum().ToString();
                     positiveRatings.Text = ratings.GetRange(5, 5).Sum().ToString();
                     ratingsBar.Length = (float)ratings.GetRange(0, 5).Sum() / ratings.Sum();
 
                     ratingsGraph.Values = ratings.Select(rating => (float)rating);
                 }
-            }
-        }
 
-        private List<int> retries;
-        public IEnumerable<int> Retries
-        {
-            get
-            {
-                return retries;
-            }
-            set
-            {
-                retries = value?.ToList() ?? new List<int>();
-                calcRetryAndFailGraph();
-            }
-        }
+                List<int> retries = beatmap.Metric?.Retries?.ToList() ?? new List<int>();
+                List<int> fails = beatmap.Metric?.Fails?.ToList() ?? new List<int>();
 
-        private List<int> fails;
-        public IEnumerable<int> Fails
-        {
-            get
-            {
-                return fails;
-            }
-            set
-            {
-                fails = value?.ToList() ?? new List<int>();
-                calcRetryAndFailGraph();
-            }
-        }
-
-        private void calcRetryAndFailGraph()
-        {
-            if ((fails?.Count ?? 0) == 0 || (retries?.Count ?? 0) == 0)
-                retryAndFailContainer.FadeOut(250);
-            else
-            {
-                retryAndFailContainer.FadeIn(250);
-                failGraph.Values = fails.Select(fail => (float)fail);
-                retryGraph.Values = retries?.Select((retry, index) => (float)retry + fails[index]);
+                if ((fails?.Count ?? 0) == 0 || (retries?.Count ?? 0) == 0)
+                    retryAndFailContainer.Hide();
+                else
+                {
+                    retryAndFailContainer.Show();
+                    float maxValue = fails.Select((fail, index) => fail + retries[index]).Max();
+                    failGraph.MaxValue = maxValue;
+                    retryGraph.MaxValue = maxValue;
+                    failGraph.Values = fails.Select(fail => (float)fail);
+                    retryGraph.Values = retries.Select((retry, index) => retry + MathHelper.Clamp(fails[index], 0, maxValue));
+                }
             }
         }
 
@@ -152,24 +116,9 @@ namespace osu.Game.Screens.Select
                     Padding = new MarginPadding(10) { Top = 25 },
                     Children = new []
                     {
-                        description = new MetadataSegment
-                        {
-                            HeaderText = "Description",
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        },
-                        source = new MetadataSegment
-                        {
-                            HeaderText = "Source",
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        },
-                        tags = new MetadataSegment
-                        {
-                            HeaderText = "Tags",
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        }
+                        description = new MetadataSegment("Description"),
+                        source = new MetadataSegment("Source"),
+                        tags = new MetadataSegment("Tags")
                     },
                 },
                 new FillFlowContainer
@@ -178,7 +127,7 @@ namespace osu.Game.Screens.Select
                     AutoSizeAxes = Axes.Y,
                     Width = 0.6f,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0,15),
+                    Spacing = new Vector2(0, 15),
                     Padding = new MarginPadding(10) { Top = 0 },
                     Children = new Drawable[]
                     {
@@ -203,37 +152,11 @@ namespace osu.Game.Screens.Select
                                     Padding = new MarginPadding(15) { Top = 25 },
                                     Children = new []
                                     {
-                                        circleSize = new DifficultyRow
-                                        {
-                                            DifficultyName = "Circle Size",
-                                            AutoSizeAxes = Axes.Y,
-                                            RelativeSizeAxes = Axes.X,
-                                            MaxValue = 7,
-                                        },
-                                        drainRate = new DifficultyRow
-                                        {
-                                            DifficultyName = "HP Drain",
-                                            AutoSizeAxes = Axes.Y,
-                                            RelativeSizeAxes = Axes.X,
-                                        },
-                                        overallDifficulty = new DifficultyRow
-                                        {
-                                            DifficultyName = "Accuracy",
-                                            AutoSizeAxes = Axes.Y,
-                                            RelativeSizeAxes = Axes.X,
-                                        },
-                                        approachRate = new DifficultyRow
-                                        {
-                                            DifficultyName = "Approach Rate",
-                                            AutoSizeAxes = Axes.Y,
-                                            RelativeSizeAxes = Axes.X,
-                                        },
-                                        stars = new DifficultyRow
-                                        {
-                                            DifficultyName = "Star Difficulty",
-                                            AutoSizeAxes = Axes.Y,
-                                            RelativeSizeAxes = Axes.X,
-                                        },
+                                        circleSize = new DifficultyRow("Circle Size", 7),
+                                        drainRate = new DifficultyRow("HP Drain"),
+                                        overallDifficulty = new DifficultyRow("Accuracy"),
+                                        approachRate = new DifficultyRow("Approach Rate"),
+                                        stars = new DifficultyRow("Star Diffculty"),
                                     },
                                 },
                             },
@@ -320,7 +243,7 @@ namespace osu.Game.Screens.Select
                                 new OsuSpriteText
                                 {
                                     Text = "Points of Failure",
-                                   Font = @"Exo2.0-Regular",
+                                    Font = @"Exo2.0-Regular",
                                 },
                                 new Container<BarGraph>
                                 {
@@ -341,7 +264,7 @@ namespace osu.Game.Screens.Select
                             }
                         },
                     },
-                },
+                }
             };
         }
 
@@ -368,8 +291,9 @@ namespace osu.Game.Screens.Select
             private readonly Bar bar;
             private readonly OsuSpriteText valueText;
 
-            private float difficultyValue;
+            private readonly float maxValue;
 
+            private float difficultyValue;
             public float Value
             {
                 get
@@ -381,33 +305,6 @@ namespace osu.Game.Screens.Select
                     difficultyValue = value;
                     bar.Length = value / maxValue;
                     valueText.Text = value.ToString(CultureInfo.InvariantCulture);
-                }
-            }
-
-            private float maxValue = 10;
-
-            public float MaxValue
-            {
-                get
-                {
-                    return maxValue;
-                }
-                set
-                {
-                    maxValue = value;
-                    bar.Length = Value / value;
-                }
-            }
-
-            public string DifficultyName
-            {
-                get
-                {
-                    return name.Text;
-                }
-                set
-                {
-                    name.Text = value;
                 }
             }
 
@@ -423,13 +320,17 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            public DifficultyRow()
+            public DifficultyRow(string difficultyName, float maxValue = 10)
             {
+                this.maxValue = maxValue;
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
                 Children = new Drawable[]
                 {
                     name = new OsuSpriteText
                     {
                         Font = @"Exo2.0-Regular",
+                        Text = difficultyName,
                     },
                     bar = new Bar
                     {
@@ -462,30 +363,30 @@ namespace osu.Game.Screens.Select
             private readonly OsuSpriteText header;
             private readonly FillFlowContainer<OsuSpriteText> content;
 
-            private const int fade_time = 250;
-
-            public string HeaderText
+            public string Text
             {
                 set
                 {
-                    header.Text = value;
-                }
-            }
-
-            public string ContentText
-            {
-                set
-                {
-                    if (value == "")
-                        FadeOut(fade_time);
+                    if (string.IsNullOrEmpty(value))
+                        Hide();
                     else
                     {
-                        FadeIn(fade_time);
-                        content.Children = value.Split(' ').Select(text => new OsuSpriteText
-                        {
-                            Text = text,
-                            Font = "Exo2.0-Regular",
-                        });
+                        Show();
+                        if (header.Text == "Tags")
+                            content.Children = value.Split(' ').Select(text => new OsuSpriteText
+                            {
+                                Text = text,
+                                Font = "Exo2.0-Regular",
+                            });
+                        else
+                            content.Children = new[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Text = value,
+                                    Font = "Exo2.0-Regular",
+                                }
+                            };
                     }
                 }
             }
@@ -502,13 +403,17 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            public MetadataSegment()
+            public MetadataSegment(string headerText)
             {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                Margin = new MarginPadding { Top = 10 };
                 Children = new Drawable[]
                 {
                     header = new OsuSpriteText
                     {
                         Font = @"Exo2.0-Bold",
+                        Text = headerText,
                     },
                     content = new FillFlowContainer<OsuSpriteText>
                     {
