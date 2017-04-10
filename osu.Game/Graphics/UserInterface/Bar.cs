@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             get
             {
-                return background?.Colour ?? default(Color4);
+                return background.Colour;
             }
             set
             {
