@@ -4,15 +4,31 @@
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Modes.Objects;
+using osu.Game.Modes.Taiko.UI;
 
 namespace osu.Game.Modes.Taiko.Objects
 {
     public abstract class TaikoHitObject : HitObject
     {
         /// <summary>
-        /// HitCircle radius.
+        /// Diameter of a circle relative to the size of the <see cref="TaikoPlayfield"/>.
         /// </summary>
-        public const float CIRCLE_RADIUS = 42f;
+        public const float PLAYFIELD_RELATIVE_DIAMETER = 0.5f;
+
+        /// <summary>
+        /// Scale multiplier for a strong circle.
+        /// </summary>
+        public const float STRONG_CIRCLE_DIAMETER_SCALE = 1.5f;
+
+        /// <summary>
+        /// Default circle diameter.
+        /// </summary>
+        public const float DEFAULT_CIRCLE_DIAMETER = TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT * PLAYFIELD_RELATIVE_DIAMETER;
+
+        /// <summary>
+        /// Default strong circle diameter.
+        /// </summary>
+        public const float DEFAULT_STRONG_CIRCLE_DIAMETER = DEFAULT_CIRCLE_DIAMETER * STRONG_CIRCLE_DIAMETER_SCALE;
 
         /// <summary>
         /// The time taken from the initial (off-screen) spawn position to the centre of the hit target for a <see cref="ControlPoint.BeatLength"/> of 1000ms.
