@@ -12,7 +12,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class Bar : Container, IHasAccentColour
     {
-        private Box background;
+        private readonly Box background;
         private readonly Box bar;
 
         private const int resize_duration = 250;

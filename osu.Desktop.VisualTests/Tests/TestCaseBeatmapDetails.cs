@@ -6,7 +6,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Screens.Select;
-using System;
 using System.Linq;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -44,8 +43,8 @@ namespace osu.Desktop.VisualTests.Tests
                     Metric = new BeatmapMetric
                     {
                         Ratings = Enumerable.Range(0,10).ToArray(),
-                        Fails = Enumerable.Range(lastRange, 100).Select(i => (i % 12) - 6).ToArray(),
-                        Retries = Enumerable.Range(lastRange - 3, 100).Select(i => (i % 12) - 6).ToArray(),
+                        Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6).ToArray(),
+                        Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6).ToArray(),
                     },
                 },
             });
@@ -76,8 +75,8 @@ namespace osu.Desktop.VisualTests.Tests
                 Metric = new BeatmapMetric
                 {
                     Ratings = Enumerable.Range(0, 10).ToArray(),
-                    Fails = Enumerable.Range(lastRange, 100).Select(i => (i % 12) - 6).ToArray(),
-                    Retries = Enumerable.Range(lastRange - 3, 100).Select(i => (i % 12) - 6).ToArray(),
+                    Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6).ToArray(),
+                    Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6).ToArray(),
                 },
             };
             lastRange += 100;
