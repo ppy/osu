@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private class OsuDropdownMenuItem : DropdownMenuItem<T>
         {
-            public OsuDropdownMenuItem(string text, T value) : base(text, value)
+            public OsuDropdownMenuItem(string text, T current) : base(text, current)
             {
                 Foreground.Padding = new MarginPadding(2);
 
