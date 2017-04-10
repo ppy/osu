@@ -159,11 +159,9 @@ namespace osu.Game.Screens.Play
                     OnRetry = Restart,
                     OnQuit = Exit,
                 },
-                new RetryOverlay
+                new HotkeyRetryOverlay
                 {
                     Action = Restart,
-                    OnKeyPressed = () => Content.FadeColour(Color4.Black, 500),
-                    OnKeyReleased = () => Content.FadeColour(Color4.White, 200),
                 }
             };
         }
