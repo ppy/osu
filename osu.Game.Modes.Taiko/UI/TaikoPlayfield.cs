@@ -107,9 +107,10 @@ namespace osu.Game.Modes.Taiko.UI
                                     Origin = Anchor.Centre,
                                     FillMode = FillMode.Fit
                                 },
-                                hitObjectContainer = new Container
+                                hitObjectContainer = new HitObjectContainer
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    Height = DEFAULT_PLAYFIELD_HEIGHT,
+                                    FillMode = FillMode.Fit
                                 },
                                 judgementContainer = new Container<DrawableTaikoJudgement>
                                 {
@@ -169,9 +170,6 @@ namespace osu.Game.Modes.Taiko.UI
 
         public override void Add(DrawableHitObject<TaikoHitObject, TaikoJudgement> h)
         {
-            h.AutoSizeAxes = h.AutoSizeAxes & ~Axes.Y;
-            h.Height = DEFAULT_PLAYFIELD_HEIGHT;
-            h.FillMode = FillMode.Fit;
             h.Depth = (float)h.HitObject.StartTime;
 
             base.Add(h);
@@ -215,6 +213,21 @@ namespace osu.Game.Modes.Taiko.UI
             }
             else
                 hitExplosionContainer.Children.FirstOrDefault(e => e.Judgement == judgedObject.Judgement)?.VisualiseSecondHit();
+        }
+
+        private class HitObjectContainer : Container
+        {
+            public HitObjectContainer()
+            {
+                RelativeSizeAxes = Axes.X;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                Width = 1 / DrawScale.X;
+            }
         }
     }
 }
