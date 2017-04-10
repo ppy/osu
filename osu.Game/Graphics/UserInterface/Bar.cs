@@ -20,6 +20,9 @@ namespace osu.Game.Graphics.UserInterface
         private const EasingTypes easing = EasingTypes.InOutCubic;
 
         private float length;
+        /// <summary>
+        /// Length of the bar, ranges from 0 to 1
+        /// </summary>
         public float Length
         {
             get
@@ -41,12 +44,6 @@ namespace osu.Game.Graphics.UserInterface
             }
             set
             {
-                if (background == null)
-                    Add(background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Depth = 1,
-                    });
                 background.Colour = value;
             }
         }
@@ -81,10 +78,15 @@ namespace osu.Game.Graphics.UserInterface
         {
             Children = new[]
             {
+                background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = new Color4(0,0,0,0)
+                },
                 bar = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
             };
         }
 
