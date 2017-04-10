@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Options
             {
                 bindable = value;
                 dropdown.Current = bindable;
-                if (bindable.Disabled)
+                if (value?.Disabled ?? true)
                     Alpha = 0.3f;
             }
         }
