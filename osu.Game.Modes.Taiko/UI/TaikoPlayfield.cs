@@ -25,12 +25,12 @@ namespace osu.Game.Modes.Taiko.UI
         /// The play field height. This is relative to the size of hit objects
         /// such that the playfield is just a bit larger than strong hits.
         /// </summary>
-        public const float DEFAULT_PLAYFIELD_HEIGHT = TaikoHitObject.CIRCLE_RADIUS * 2 * 2;
+        public const float DEFAULT_PLAYFIELD_HEIGHT = 168f;
 
         /// <summary>
         /// The offset from <see cref="left_area_size"/> which the center of the hit target lies at.
         /// </summary>
-        private const float hit_target_offset = TaikoHitObject.CIRCLE_RADIUS * 1.5f + 40;
+        private const float hit_target_offset = TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER / 2f + 40;
 
         /// <summary>
         /// The size of the left area of the playfield. This area contains the input drum.

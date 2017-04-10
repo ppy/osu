@@ -19,11 +19,6 @@ namespace osu.Game.Modes.Taiko.UI
     internal class HitExplosion : CircularContainer
     {
         /// <summary>
-        /// The size multiplier of a hit explosion if a hit object has been hit with the second key.
-        /// </summary>
-        private const float secondhit_size_multiplier = 1.5f;
-
-        /// <summary>
         /// The judgement this hit explosion visualises.
         /// </summary>
         public readonly TaikoJudgement Judgement;
@@ -34,7 +29,7 @@ namespace osu.Game.Modes.Taiko.UI
         {
             Judgement = judgement;
 
-            Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2);
+            Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -85,7 +80,7 @@ namespace osu.Game.Modes.Taiko.UI
         /// </summary>
         public void VisualiseSecondHit()
         {
-            ResizeTo(Size * secondhit_size_multiplier, 50);
+            ResizeTo(Size * TaikoHitObject.STRONG_CIRCLE_DIAMETER_SCALE, 50);
         }
     }
 }
