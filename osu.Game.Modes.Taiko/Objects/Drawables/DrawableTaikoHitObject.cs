@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
         /// </summary>
         private readonly List<Key> validKeys = new List<Key>(new[] { Key.D, Key.F, Key.J, Key.K });
 
-        public override Vector2 OriginPosition => new Vector2(bodyContainer.DrawHeight / 2f, DrawHeight / 2f);
+        public override Vector2 OriginPosition => new Vector2(DrawHeight / 2f);
 
         protected override Container<Drawable> Content => bodyContainer;
 
@@ -46,8 +46,6 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables
 
             AddInternal(bodyContainer = new Container
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
                 AutoSizeAxes = Axes.Both,
                 Children = new[]
                 {
