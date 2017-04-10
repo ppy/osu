@@ -22,7 +22,6 @@ using System;
 using System.Linq;
 using osu.Framework.Threading;
 using osu.Game.Modes.Scoring;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
