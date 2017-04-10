@@ -17,6 +17,7 @@ using osu.Game.Modes.Taiko.Objects.Drawables;
 using osu.Game.Modes.Taiko.Scoring;
 using osu.Game.Modes.UI;
 using osu.Game.Modes.Taiko.Replays;
+using OpenTK;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -99,6 +100,17 @@ namespace osu.Game.Modes.Taiko.UI
                 time = timingPoints[currentIndex].Time;
             }
         }
+
+        protected override Vector2 GetPlayfieldAspectAdjust()
+        {
+            const float default_relative_height = TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT / 768;
+            const float default_aspect = 16f / 9f;
+
+            float aspectAdjust = MathHelper.Clamp(DrawWidth / DrawHeight, 0.4f, 4) / default_aspect;
+
+            return new Vector2(1, default_relative_height * aspectAdjust);
+        }
+
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
