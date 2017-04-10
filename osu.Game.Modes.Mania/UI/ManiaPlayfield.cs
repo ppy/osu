@@ -15,8 +15,7 @@ namespace osu.Game.Modes.Mania.UI
     {
         public ManiaPlayfield(int columns)
         {
-            RelativeSizeAxes = Axes.Both;
-            Size = new Vector2(columns / 20f, 1f);
+            Size = new Vector2(0.8f, 1f);
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
 
