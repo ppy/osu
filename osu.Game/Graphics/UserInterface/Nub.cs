@@ -3,8 +3,8 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -12,18 +12,18 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class Nub : CircularContainer, IStateful<CheckboxState>
+    public class Nub : CircularContainer, IHasCurrentValue<bool>
     {
         public const float COLLAPSED_SIZE = 20;
         public const float EXPANDED_SIZE = 40;
-
-        private readonly Box fill;
 
         private const float border_width = 3;
         private Color4 glowingColour, idleColour;
 
         public Nub()
         {
+            Box fill;
+
             Size = new Vector2(COLLAPSED_SIZE, 12);
 
             BorderColour = Color4.White;
@@ -39,6 +39,14 @@ namespace osu.Game.Graphics.UserInterface
                     Alpha = 0,
                     AlwaysPresent = true,
                 },
+            };
+
+            Current.ValueChanged += newValue =>
+            {
+                if (newValue)
+                    fill.FadeIn(200, EasingTypes.OutQuint);
+                else
+                    fill.FadeTo(0.01f, 200, EasingTypes.OutQuint); //todo: remove once we figure why containers aren't drawing at all times
             };
         }
 
@@ -84,28 +92,6 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private CheckboxState state;
-
-        public CheckboxState State
-        {
-            get
-            {
-                return state;
-            }
-            set
-            {
-                state = value;
-
-                switch (state)
-                {
-                    case CheckboxState.Checked:
-                        fill.FadeIn(200, EasingTypes.OutQuint);
-                        break;
-                    case CheckboxState.Unchecked:
-                        fill.FadeTo(0.01f, 200, EasingTypes.OutQuint); //todo: remove once we figure why containers aren't drawing at all times
-                        break;
-                }
-            }
-        }
+        public Bindable<bool> Current { get; } = new Bindable<bool>();
     }
 }

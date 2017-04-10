@@ -14,8 +14,7 @@ namespace osu.Game.Modes.Catch.UI
     {
         public CatchPlayfield()
         {
-            RelativeSizeAxes = Axes.Y;
-            Size = new Vector2(512, 0.9f);
+            Size = new Vector2(1, 0.9f);
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
 
