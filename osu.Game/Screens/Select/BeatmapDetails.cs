@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Select
                 List<int> retries = beatmap.Metric?.Retries?.ToList() ?? new List<int>();
                 List<int> fails = beatmap.Metric?.Fails?.ToList() ?? new List<int>();
 
-                if ((fails?.Count ?? 0) == 0 || (retries?.Count ?? 0) == 0)
+                if (fails.Count == 0 || retries.Count == 0)
                     retryAndFailContainer.Hide();
                 else
                 {
