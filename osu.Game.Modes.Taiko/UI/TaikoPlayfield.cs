@@ -52,11 +52,6 @@ namespace osu.Game.Modes.Taiko.UI
 
         public TaikoPlayfield()
         {
-            RelativeSizeAxes = Axes.X;
-
-            // Default height
-            Height = DEFAULT_PLAYFIELD_HEIGHT;
-
             AddInternal(new Drawable[]
             {
                 rightBackgroundContainer = new Container
