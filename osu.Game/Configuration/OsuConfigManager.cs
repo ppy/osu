@@ -46,6 +46,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.AutomaticDownload, true).Disabled = true;
             Set(OsuConfig.AutomaticDownloadNoVideo, false).Disabled = true;
             Set(OsuConfig.BlockNonFriendPM, false).Disabled = true;
+            Set(OsuConfig.Bloom, false).Disabled = true;
             Set(OsuConfig.BloomSoftening, false).Disabled = true;
             Set(OsuConfig.BossKeyFirstActivation, true).Disabled = true;
             Set(OsuConfig.ChatAudibleHighlight, true).Disabled = true;
