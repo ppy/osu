@@ -24,11 +24,8 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 bindable = value;
-
-                if (bindable != null)
-                    Current = bindable;
-
-                if (bindable?.Disabled ?? true)
+                Current = bindable;
+                if (value?.Disabled ?? true)
                     Alpha = 0.3f;
             }
         }
