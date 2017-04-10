@@ -42,14 +42,14 @@ namespace osu.Game.Modes.Osu
             {
                 if (mouseDisabled.Value)
                 {
-                    mouse.PressedButtons.Remove(MouseButton.Left);
-                    mouse.PressedButtons.Remove(MouseButton.Right);
+                    mouse.SetPressed(MouseButton.Left, false);
+                    mouse.SetPressed(MouseButton.Right, false);
                 }
 
                 if (leftViaKeyboard)
-                    mouse.PressedButtons.Add(MouseButton.Left);
+                    mouse.SetPressed(MouseButton.Left, true);
                 if (rightViaKeyboard)
-                    mouse.PressedButtons.Add(MouseButton.Right);
+                    mouse.SetPressed(MouseButton.Right, true);
             }
         }
     }
