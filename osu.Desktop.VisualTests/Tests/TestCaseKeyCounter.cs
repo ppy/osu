@@ -57,7 +57,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Width = 150,
                         Height = 10,
                         SelectionColor = Color4.Orange,
-                        Value = bindable
+                        Current = bindable
                     }
                 }
             });
