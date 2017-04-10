@@ -38,7 +38,6 @@ namespace osu.Game.Screens.Play
                 overlay = new Box
                 {
                     Alpha = 0,
-                    AlwaysPresent = true,
                     Colour = Color4.Black,
                     RelativeSizeAxes = Axes.Both,
                 }
