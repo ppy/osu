@@ -58,7 +58,7 @@ namespace osu.Game.Graphics.UserInterface
                             Length = values[i] / (MaxValue ?? values.Max()),
                             Direction = Direction,
                         });
-                Remove(Children.Where((bar, index) => index >= values.Count));
+                Remove(Children.Where((bar, index) => index >= values.Count).ToList());
             }
         }
     }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
+
 namespace osu.Game.Database
 {
     public class BeatmapMetric
@@ -8,16 +10,16 @@ namespace osu.Game.Database
         /// <summary>
         /// Ratings for a beatmap, length should be 10
         /// </summary>
-        public int[] Ratings { get; set; }
+        public List<int> Ratings { get; set; }
 
         /// <summary>
         /// Fails for a beatmap, length should be 100
         /// </summary>
-        public int[] Fails { get; set; }
+        public List<int> Fails { get; set; }
 
         /// <summary>
         /// Retries for a beatmap, length should be 100
         /// </summary>
-        public int[] Retries { get; set; }
+        public List<int> Retries { get; set; }
     }
 }

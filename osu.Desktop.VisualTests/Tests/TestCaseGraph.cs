@@ -9,9 +9,9 @@ using System.Linq;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    internal class TestCaseGraphAndBar : TestCase
+    internal class TestCaseGraph : TestCase
     {
-        public override string Description => "graphs and bars, bars and graphs";
+        public override string Description => "graph";
 
         private BarGraph graph;
 
@@ -31,6 +31,7 @@ namespace osu.Desktop.VisualTests.Tests
             };
 
             AddStep("values from 1-10", () => graph.Values = Enumerable.Range(1,10).Select(i => (float)i));
+            AddStep("values from 1-100", () => graph.Values = Enumerable.Range(1, 100).Select(i => (float)i));
             AddStep("reversed values from 1-10", () => graph.Values = Enumerable.Range(1, 10).Reverse().Select(i => (float)i));
             AddStep("Bottom to top", () => graph.Direction = BarDirection.BottomToTop);
             AddStep("Top to bottom", () => graph.Direction = BarDirection.TopToBottom);

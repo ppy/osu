@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Select
         private readonly OsuSpriteText positiveRatings;
         private readonly BarGraph ratingsGraph;
 
-        private readonly FillFlowContainer retryAndFailContainer;
+        private readonly FillFlowContainer retryFailContainer;
         private readonly BarGraph retryGraph;
         private readonly BarGraph failGraph;
 
@@ -62,34 +62,34 @@ namespace osu.Game.Screens.Select
                 approachRate.Value = beatmap.Difficulty.ApproachRate;
                 stars.Value = (float)beatmap.StarDifficulty;
 
-
-                List<int> ratings = beatmap.Metric?.Ratings?.ToList() ?? new List<int>();
-                if (ratings.Count == 0)
-                    ratingsContainer.Hide();
-                else
+                if (beatmap.Metric?.Ratings.Count != 0)
                 {
+                    List<int> ratings = beatmap.Metric?.Ratings;
                     ratingsContainer.Show();
+
                     negativeRatings.Text = ratings.GetRange(0, 5).Sum().ToString();
                     positiveRatings.Text = ratings.GetRange(5, 5).Sum().ToString();
                     ratingsBar.Length = (float)ratings.GetRange(0, 5).Sum() / ratings.Sum();
 
                     ratingsGraph.Values = ratings.Select(rating => (float)rating);
                 }
-
-                List<int> retries = beatmap.Metric?.Retries?.ToList() ?? new List<int>();
-                List<int> fails = beatmap.Metric?.Fails?.ToList() ?? new List<int>();
-
-                if (fails.Count == 0 || retries.Count == 0)
-                    retryAndFailContainer.Hide();
                 else
+                    ratingsContainer.Hide();
+
+                if (beatmap.Metric?.Retries.Count != 0 && beatmap.Metric?.Fails.Count != 0)
                 {
-                    retryAndFailContainer.Show();
+                    List<int> retries = beatmap.Metric?.Retries;
+                    List<int> fails = beatmap.Metric?.Fails;
+
+                    retryFailContainer.Show();
                     float maxValue = fails.Select((fail, index) => fail + retries[index]).Max();
                     failGraph.MaxValue = maxValue;
                     retryGraph.MaxValue = maxValue;
                     failGraph.Values = fails.Select(fail => (float)fail);
                     retryGraph.Values = retries.Select((retry, index) => retry + MathHelper.Clamp(fails[index], 0, maxValue));
                 }
+                else
+                    retryFailContainer.Hide();
             }
         }
 
@@ -233,7 +233,7 @@ namespace osu.Game.Screens.Select
                                 },
                             },
                         },
-                        retryAndFailContainer = new FillFlowContainer
+                        retryFailContainer = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
