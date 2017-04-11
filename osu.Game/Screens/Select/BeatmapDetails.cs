@@ -12,7 +12,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
@@ -50,6 +49,7 @@ namespace osu.Game.Screens.Select
             set
             {
                 beatmap = value;
+                if (beatmap == null) return;
 
                 description.Text = beatmap.Version;
                 source.Text = beatmap.Metadata.Source;
@@ -61,9 +61,9 @@ namespace osu.Game.Screens.Select
                 approachRate.Value = beatmap.Difficulty.ApproachRate;
                 stars.Value = (float)beatmap.StarDifficulty;
 
-                if (beatmap.Metric?.Ratings.Count() > 0)
+                if (beatmap.Metric?.Ratings.Count() == 10)
                 {
-                    List<int> ratings = beatmap.Metric.Ratings.ToList();
+                    var ratings = beatmap.Metric.Ratings.ToList();
                     ratingsContainer.Show();
 
                     negativeRatings.Text = ratings.GetRange(0, 5).Sum().ToString();
@@ -75,10 +75,10 @@ namespace osu.Game.Screens.Select
                 else
                     ratingsContainer.Hide();
 
-                if (beatmap.Metric?.Retries.Count() > 0 && beatmap.Metric?.Retries.Count() > 0)
+                if (beatmap.Metric?.Retries.Count() == 100 && beatmap.Metric?.Fails.Count() == 100)
                 {
-                    IEnumerable<int> retries = beatmap.Metric.Retries;
-                    IEnumerable<int> fails = beatmap.Metric.Fails;
+                    var retries = beatmap.Metric.Retries;
+                    var fails = beatmap.Metric.Fails;
                     retryFailContainer.Show();
 
                     float maxValue = fails.Zip(retries, (fail, retry) => fail + retry).Max();
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Select
                     AutoSizeAxes = Axes.Y,
                     Width = 0.4f,
                     Direction = FillDirection.Vertical,
-                    LayoutDuration = 1,
+                    LayoutDuration = 200,
                     LayoutEasing = EasingTypes.OutQuint,
                     Padding = new MarginPadding(10) { Top = 25 },
                     Children = new []
