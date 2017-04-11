@@ -37,7 +37,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             base.Reset();
 
-            Add(new Results(new Score()
+            Add(new Results(new Score
             {
                 TotalScore = 2845370,
                 Accuracy = 0.98,
