@@ -35,8 +35,8 @@ namespace osu.Game.Modes.Scoring
             {
                 return user ?? new User
                 {
-                    Username = temporaryUsername,
-                    Id = temporaryUserID
+                    Username = LegacyUsername,
+                    Id = LegacyUserID
                 };
             }
 
@@ -55,10 +55,10 @@ namespace osu.Game.Modes.Scoring
         public long OnlineScoreID;
 
         [JsonProperty(@"username")]
-        private string temporaryUsername;
+        public string LegacyUsername;
 
         [JsonProperty(@"user_id")]
-        private long temporaryUserID;
+        public long LegacyUserID;
 
         [JsonProperty(@"date")]
         public DateTime Date;
