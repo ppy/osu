@@ -15,6 +15,9 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
 using osu.Framework.Input;
 using OpenTK.Input;
+using osu.Game.Overlays;
+using osu.Game.Configuration;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Screens.Menu
 {
@@ -26,6 +29,8 @@ namespace osu.Game.Screens.Menu
 
         private readonly BackgroundScreen background;
         private Screen songSelect;
+        private DialogOverlay dialog;
+        private Bindable<bool> confirmExit;
 
         protected override BackgroundScreen CreateBackground() => background;
 
@@ -47,7 +52,17 @@ namespace osu.Game.Screens.Menu
                             OnEdit = delegate { Push(new Editor()); },
                             OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
-                            OnExit = delegate { Exit(); },
+                            OnExit = delegate
+                            {
+                                if(confirmExit)
+                                {
+                                    dialog?.Push(new ExitConfirmDialog()
+                                    {
+                                        OnExit = () => Exit(),
+                                    });
+                                }
+                                else Exit();
+                            },
                         }
                     }
                 }
@@ -55,11 +70,15 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame game)
+        private void load(OsuGame game, DialogOverlay dialogOverlay, OsuConfigManager config)
         {
             LoadComponentAsync(background);
 
+            confirmExit = config.GetBindable<bool>(OsuConfig.ConfirmExit);
+
             buttons.OnSettings = game.ToggleOptions;
+
+            dialog = dialogOverlay;
 
             preloadSongSelect();
         }
