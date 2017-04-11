@@ -28,7 +28,7 @@ namespace osu.Game.Graphics
         /// <param name="easing">The tween easing.</param>
         public static void FadeAccent(this IHasAccentColour accentedDrawable, Color4 newColour, double duration = 0, EasingTypes easing = EasingTypes.None)
         {
-            accentedDrawable.TransformTo(accentedDrawable.AccentColour, newColour, duration, easing, new TransformAccent());
+            accentedDrawable.TransformTo(() => accentedDrawable.AccentColour, newColour, duration, easing, new TransformAccent());
         }
     }
 }
