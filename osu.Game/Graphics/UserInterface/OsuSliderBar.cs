@@ -84,13 +84,6 @@ namespace osu.Game.Graphics.UserInterface
             base.OnHoverLost(state);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (args.Key == Key.Left || args.Key == Key.Right)
-                playSample();
-            return base.OnKeyDown(state, args);
-        }
-
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             nub.Current.Value = true;
@@ -101,12 +94,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             nub.Current.Value = false;
             return base.OnMouseUp(state, args);
-        }
-
-        protected override bool OnClick(InputState state)
-        {
-            playSample();
-            return base.OnClick(state);
         }
 
         protected override bool OnDrag(InputState state)
