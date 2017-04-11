@@ -202,6 +202,9 @@
     <Compile Include="Screens\Edit\Editor.cs" />
     <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
     <Compile Include="Screens\Play\SquareGraph.cs" />
+    <Compile Include="Screens\Ranking\ResultsPage.cs" />
+    <Compile Include="Screens\Ranking\ResultsRankingPage.cs" />
+    <Compile Include="Screens\Ranking\ResultsScorePage.cs" />
     <Compile Include="Screens\ScreenWhiteBox.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
@@ -225,6 +228,10 @@
     <Compile Include="Screens\Play\ReplayPlayer.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Rulesets\UI\StandardComboCounter.cs" />
+    <Compile Include="Screens\Ranking\AspectContainer.cs" />
+    <Compile Include="Screens\Ranking\ResultMode.cs" />
+    <Compile Include="Screens\Ranking\ResultModeButton.cs" />
+    <Compile Include="Screens\Ranking\ResultModeTabControl.cs" />
     <Compile Include="Screens\Select\BeatmapCarousel.cs" />
     <Compile Include="Screens\Select\BeatmapDetails.cs" />
     <Compile Include="Graphics\UserInterface\BarGraph.cs" />

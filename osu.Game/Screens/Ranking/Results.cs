@@ -1,93 +1,218 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Screens;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Scoring;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Screens;
+using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Ranking
 {
-    internal class Results : OsuScreen
+    public class Results : OsuScreen
     {
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
+        private readonly Score score;
+        private Container circleOuterBackground;
+        private Container circleOuter;
+        private Container circleInner;
+
+        private ParallaxContainer backgroundParallax;
+
+        private ResultModeTabControl modeChangeButtons;
+
+        private Container currentPage;
 
         private static readonly Vector2 background_blur = new Vector2(20);
 
-        private ScoreDisplay scoreDisplay;
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
+
+        private const float overscan = 1.3f;
+
+        private const float circle_outer_scale = 0.96f;
+
+        public Results(Score score)
+        {
+            this.score = score;
+        }
 
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
-            Background.Schedule(() => (Background as BackgroundScreenBeatmap)?.BlurTo(background_blur, 1000));
-        }
+            (Background as BackgroundScreenBeatmap)?.BlurTo(background_blur, 2500, EasingTypes.OutQuint);
 
-        protected override bool OnExiting(Screen next)
-        {
-            Background.Schedule(() => Background.FadeColour(Color4.White, 500));
-            return base.OnExiting(next);
-        }
+            var allCircles = new[] { circleOuterBackground, circleInner, circleOuter };
 
-        public Score Score
-        {
-            set
+            allCircles.ForEach(c =>
             {
-                scoreDisplay?.FadeOut(500);
-                scoreDisplay?.Expire();
+                c.FadeOut();
+                c.ScaleTo(0);
+            });
 
-                scoreDisplay = new ScoreDisplay(value)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                };
+            backgroundParallax.FadeOut();
+            modeChangeButtons.FadeOut();
+            currentPage.FadeOut();
 
-                Add(scoreDisplay);
+            const float appear_time = 800;
 
-                scoreDisplay.FadeIn(500);
-                scoreDisplay.ScaleTo(0.1f);
-                scoreDisplay.ScaleTo(1, 1000, EasingTypes.OutElastic);
-                scoreDisplay.RotateTo(360 * 5, 1000, EasingTypes.OutElastic);
+            circleOuterBackground.ScaleTo(1, appear_time, EasingTypes.OutQuint);
+            circleOuterBackground.FadeTo(1, appear_time, EasingTypes.OutQuint);
 
-            }
+            Content.Delay(appear_time * 0.25f, true);
+
+            circleOuter.ScaleTo(1, appear_time, EasingTypes.OutQuint);
+            circleOuter.FadeTo(1, appear_time, EasingTypes.OutQuint);
+
+            Content.Delay(appear_time * 0.3f, true);
+
+            backgroundParallax.FadeIn(appear_time, EasingTypes.OutQuint);
+
+            circleInner.ScaleTo(1, appear_time, EasingTypes.OutQuint);
+            circleInner.FadeTo(1, appear_time, EasingTypes.OutQuint);
+
+            Content.Delay(appear_time * 0.4f, true);
+
+            modeChangeButtons.FadeIn(appear_time, EasingTypes.OutQuint);
+            currentPage.FadeIn(appear_time, EasingTypes.OutQuint);
+
+            Content.DelayReset();
         }
-    }
 
-    internal class ScoreDisplay : Container
-    {
-        public ScoreDisplay(Score s)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            AutoSizeAxes = Axes.Both;
-
             Children = new Drawable[]
             {
-                new FillFlowContainer
+                new AspectContainer
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
+                    RelativeSizeAxes = Axes.Y,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Height = overscan,
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        circleOuterBackground = new CircularContainer
                         {
-                            TextSize = 40,
-                            Text = $@"Accuracy: {s.Accuracy:#0.00%}",
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Masking = true,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    Alpha = 0.2f,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.Black,
+                                }
+                            }
                         },
-                        new OsuSpriteText
+                        circleOuter = new CircularContainer
                         {
-                            TextSize = 40,
-                            Text = $@"Score: {s.TotalScore}",
+                            Size = new Vector2(circle_outer_scale),
+                            EdgeEffect = new EdgeEffect
+                            {
+                                Colour = Color4.Black.Opacity(0.4f),
+                                Type = EdgeEffectType.Shadow,
+                                Radius = 15,
+                            },
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Masking = true,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.White,
+                                },
+                                backgroundParallax = new ParallaxContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ParallaxAmount = 0.01f,
+                                    Scale = new Vector2(1 / circle_outer_scale / overscan),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Children = new Drawable[]
+                                    {
+                                        new Sprite
+                                        {
+                                            Alpha = 0.5f,
+                                            Texture = Beatmap?.Background,
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            FillMode = FillMode.Fill
+                                        }
+                                    }
+                                },
+                                modeChangeButtons = new ResultModeTabControl
+                                {
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomCentre,
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 50,
+                                    Margin = new MarginPadding { Bottom = 110 },
+                                }
+                            }
                         },
-                        new OsuSpriteText
+                        circleInner = new CircularContainer
                         {
-                            TextSize = 40,
-                            Text = $@"MaxCombo: {s.MaxCombo}",
+                            Size = new Vector2(0.6f),
+                            EdgeEffect = new EdgeEffect
+                            {
+                                Colour = Color4.Black.Opacity(0.4f),
+                                Type = EdgeEffectType.Shadow,
+                                Radius = 15,
+                            },
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Masking = true,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.White,
+                                },
+                            }
                         }
                     }
                 }
             };
+
+            modeChangeButtons.AddItem(ResultMode.Summary);
+            modeChangeButtons.AddItem(ResultMode.Ranking);
+            modeChangeButtons.AddItem(ResultMode.Share);
+
+            modeChangeButtons.Current.ValueChanged += mode =>
+            {
+                currentPage?.FadeOut();
+                currentPage?.Expire();
+
+                switch (mode)
+                {
+                    case ResultMode.Summary:
+                        currentPage = new ResultsScorePage(score);
+                        break;
+                    case ResultMode.Ranking:
+                        currentPage = new ResultsRankingPage(score, Beatmap.BeatmapInfo);
+                        break;
+                }
+
+                if (currentPage != null)
+                    circleInner.Add(currentPage);
+            };
+
+            modeChangeButtons.Current.TriggerChange();
         }
     }
 }
