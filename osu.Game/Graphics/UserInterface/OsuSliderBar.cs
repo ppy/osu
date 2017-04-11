@@ -115,7 +115,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (PlaySound == true)
                 playSample();
-            
+
             nub.MoveToX(RangePadding + UsableWidth * value, 250, EasingTypes.OutQuint);
         }
     }
