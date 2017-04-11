@@ -48,7 +48,10 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override string FormatCount(double count)
         {
-            return ((long)count).ToString("D" + LeadingZeroes);
+            string s = ((long)count).ToString("D" + LeadingZeroes);
+            for (int i = s.Length - 3; i > 0; i -= 3)
+                s = s.Insert(i, ",");
+            return s;
         }
 
         public override void Increment(double amount)
