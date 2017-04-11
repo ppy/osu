@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -43,12 +44,14 @@ namespace osu.Game.Screens.Ranking
             this.score = score;
         }
 
+        private const float transition_time = 800;
+
+        private IEnumerable<Drawable> allCircles => new Drawable[] { circleOuterBackground, circleInner, circleOuter };
+
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
             (Background as BackgroundScreenBeatmap)?.BlurTo(background_blur, 2500, EasingTypes.OutQuint);
-
-            var allCircles = new[] { circleOuterBackground, circleInner, circleOuter };
 
             allCircles.ForEach(c =>
             {
@@ -60,29 +63,41 @@ namespace osu.Game.Screens.Ranking
             modeChangeButtons.FadeOut();
             currentPage.FadeOut();
 
-            const float appear_time = 800;
+            
 
-            circleOuterBackground.ScaleTo(1, appear_time, EasingTypes.OutQuint);
-            circleOuterBackground.FadeTo(1, appear_time, EasingTypes.OutQuint);
+            circleOuterBackground.ScaleTo(1, transition_time, EasingTypes.OutQuint);
+            circleOuterBackground.FadeTo(1, transition_time, EasingTypes.OutQuint);
 
-            Content.Delay(appear_time * 0.25f, true);
+            Content.Delay(transition_time * 0.25f, true);
 
-            circleOuter.ScaleTo(1, appear_time, EasingTypes.OutQuint);
-            circleOuter.FadeTo(1, appear_time, EasingTypes.OutQuint);
+            circleOuter.ScaleTo(1, transition_time, EasingTypes.OutQuint);
+            circleOuter.FadeTo(1, transition_time, EasingTypes.OutQuint);
 
-            Content.Delay(appear_time * 0.3f, true);
+            Content.Delay(transition_time * 0.3f, true);
 
-            backgroundParallax.FadeIn(appear_time, EasingTypes.OutQuint);
+            backgroundParallax.FadeIn(transition_time, EasingTypes.OutQuint);
 
-            circleInner.ScaleTo(1, appear_time, EasingTypes.OutQuint);
-            circleInner.FadeTo(1, appear_time, EasingTypes.OutQuint);
+            circleInner.ScaleTo(1, transition_time, EasingTypes.OutQuint);
+            circleInner.FadeTo(1, transition_time, EasingTypes.OutQuint);
 
-            Content.Delay(appear_time * 0.4f, true);
+            Content.Delay(transition_time * 0.4f, true);
 
-            modeChangeButtons.FadeIn(appear_time, EasingTypes.OutQuint);
-            currentPage.FadeIn(appear_time, EasingTypes.OutQuint);
+            modeChangeButtons.FadeIn(transition_time, EasingTypes.OutQuint);
+            currentPage.FadeIn(transition_time, EasingTypes.OutQuint);
 
             Content.DelayReset();
+        }
+
+        protected override bool OnExiting(Screen next)
+        {
+            allCircles.ForEach(c =>
+            {
+                c.ScaleTo(0, transition_time, EasingTypes.OutSine);
+            });
+
+            Content.FadeOut(transition_time / 4);
+
+            return base.OnExiting(next);
         }
 
         [BackgroundDependencyLoader]
