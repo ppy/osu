@@ -42,23 +42,22 @@ namespace osu.Game.Graphics.UserInterface
         {
             set
             {
-                List<float> values = value?.ToList() ?? new List<float>();
-                List<Bar> graphBars = Children.ToList();
-                for (int i = 0; i < values.Count; i++)
-                    if (graphBars.Count > i)
+                List<Bar> bars = Children.ToList();
+                foreach (var bar in value.Select((length, index) => new { Value = length, Bar = bars.Count > index ? bars[index] : null }))
+                    if (bar.Bar != null)
                     {
-                        graphBars[i].Length = values[i] / (MaxValue ?? values.Max());
-                        graphBars[i].Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / values.Count) : new Vector2(1.0f / values.Count, 1);
+                        bar.Bar.Length = bar.Value / (MaxValue ?? value.Max());
+                        bar.Bar.Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / value.Count()) : new Vector2(1.0f / value.Count(), 1);
                     }
                     else
                         Add(new Bar
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / values.Count) : new Vector2(1.0f / values.Count, 1),
-                            Length = values[i] / (MaxValue ?? values.Max()),
+                            Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / value.Count()) : new Vector2(1.0f / value.Count(), 1),
+                            Length = bar.Value / (MaxValue ?? value.Max()),
                             Direction = Direction,
                         });
-                Remove(Children.Where((bar, index) => index >= values.Count).ToList());
+                Remove(Children.Where((bar, index) => index >= value.Count()).ToList());
             }
         }
     }

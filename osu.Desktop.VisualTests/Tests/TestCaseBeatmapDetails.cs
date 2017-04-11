@@ -42,9 +42,9 @@ namespace osu.Desktop.VisualTests.Tests
                     StarDifficulty = 5.3f,
                     Metric = new BeatmapMetric
                     {
-                        Ratings = Enumerable.Range(0,10).ToList(),
-                        Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6).ToList(),
-                        Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6).ToList(),
+                        Ratings = Enumerable.Range(0,10),
+                        Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6),
+                        Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6),
                     },
                 },
             });
@@ -56,29 +56,9 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void newRetryAndFailValues()
         {
-            details.Beatmap = new BeatmapInfo
-            {
-                Version = "VisualTest",
-                Metadata = new BeatmapMetadata
-                {
-                    Source = "Some guy",
-                    Tags = "beatmap metadata example with a very very long list of tags and not much creativity",
-                },
-                Difficulty = new BeatmapDifficulty
-                {
-                    CircleSize = 7,
-                    ApproachRate = 3.5f,
-                    OverallDifficulty = 5.7f,
-                    DrainRate = 1,
-                },
-                StarDifficulty = 5.3f,
-                Metric = new BeatmapMetric
-                {
-                    Ratings = Enumerable.Range(0, 10).ToList(),
-                    Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6).ToList(),
-                    Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6).ToList(),
-                },
-            };
+            details.Beatmap.Metric.Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6);
+            details.Beatmap.Metric.Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6);
+            details.Beatmap = details.Beatmap;
             lastRange += 100;
         }
     }
