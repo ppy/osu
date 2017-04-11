@@ -27,7 +27,24 @@ namespace osu.Game.Modes.Scoring
         public int Combo { get; set; }
         public Mod[] Mods { get; set; }
 
-        public User User { get; set; }
+        private User user;
+
+        public User User
+        {
+            get
+            {
+                return user ?? new User
+                {
+                    Username = LegacyUsername,
+                    Id = LegacyUserID
+                };
+            }
+
+            set
+            {
+                user = value;
+            }
+        }
 
         [JsonProperty(@"replay_data")]
         public Replay Replay;
@@ -38,10 +55,10 @@ namespace osu.Game.Modes.Scoring
         public long OnlineScoreID;
 
         [JsonProperty(@"username")]
-        public string Username;
+        public string LegacyUsername;
 
         [JsonProperty(@"user_id")]
-        public long UserID;
+        public long LegacyUserID;
 
         [JsonProperty(@"date")]
         public DateTime Date;
