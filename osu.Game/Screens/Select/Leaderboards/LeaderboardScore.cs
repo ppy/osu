@@ -17,7 +17,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public class LeaderboardScore : Container, IStateful<Visibility>
+    public class LeaderboardScore : ClickableContainer, IStateful<Visibility>
     {
         public static readonly float HEIGHT = 60;
 
