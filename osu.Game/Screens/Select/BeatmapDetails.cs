@@ -62,9 +62,11 @@ namespace osu.Game.Screens.Select
                 approachRate.Value = beatmap.Difficulty.ApproachRate;
                 stars.Value = (float)beatmap.StarDifficulty;
 
-                if (beatmap.Metric?.Ratings.Count != 0)
+                if (beatmap.Metric?.Ratings?.Count == 0)
+                    ratingsContainer.Hide();
+                else
                 {
-                    List<int> ratings = beatmap.Metric?.Ratings;
+                    List<int> ratings = beatmap.Metric.Ratings;
                     ratingsContainer.Show();
 
                     negativeRatings.Text = ratings.GetRange(0, 5).Sum().ToString();
@@ -73,23 +75,22 @@ namespace osu.Game.Screens.Select
 
                     ratingsGraph.Values = ratings.Select(rating => (float)rating);
                 }
+
+                if (beatmap.Metric?.Retries?.Count == 0 && beatmap.Metric?.Fails?.Count == 0)
+                    retryFailContainer.Hide();
                 else
-                    ratingsContainer.Hide();
-
-                if (beatmap.Metric?.Retries.Count != 0 && beatmap.Metric?.Fails.Count != 0)
                 {
-                    List<int> retries = beatmap.Metric?.Retries;
-                    List<int> fails = beatmap.Metric?.Fails;
-
+                    List<int> retries = beatmap.Metric.Retries;
+                    List<int> fails = beatmap.Metric.Fails;
                     retryFailContainer.Show();
+
                     float maxValue = fails.Select((fail, index) => fail + retries[index]).Max();
                     failGraph.MaxValue = maxValue;
                     retryGraph.MaxValue = maxValue;
+
                     failGraph.Values = fails.Select(fail => (float)fail);
                     retryGraph.Values = retries.Select((retry, index) => retry + MathHelper.Clamp(fails[index], 0, maxValue));
                 }
-                else
-                    retryFailContainer.Hide();
             }
         }
 
