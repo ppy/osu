@@ -10,16 +10,16 @@ namespace osu.Game.Database
         /// <summary>
         /// Ratings for a beatmap, length should be 10
         /// </summary>
-        public List<int> Ratings { get; set; }
+        public IEnumerable<int> Ratings { get; set; }
 
         /// <summary>
         /// Fails for a beatmap, length should be 100
         /// </summary>
-        public List<int> Fails { get; set; }
+        public IEnumerable<int> Fails { get; set; }
 
         /// <summary>
         /// Retries for a beatmap, length should be 100
         /// </summary>
-        public List<int> Retries { get; set; }
+        public IEnumerable<int> Retries { get; set; }
     }
 }

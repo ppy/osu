@@ -49,7 +49,6 @@ namespace osu.Game.Screens.Select
             }
             set
             {
-                if (beatmap == value) return;
                 beatmap = value;
 
                 description.Text = beatmap.Version;
@@ -62,11 +61,9 @@ namespace osu.Game.Screens.Select
                 approachRate.Value = beatmap.Difficulty.ApproachRate;
                 stars.Value = (float)beatmap.StarDifficulty;
 
-                if (beatmap.Metric?.Ratings == null)
-                    ratingsContainer.Hide();
-                else
+                if (beatmap.Metric?.Ratings.Count() > 0)
                 {
-                    List<int> ratings = beatmap.Metric.Ratings;
+                    List<int> ratings = beatmap.Metric.Ratings.ToList();
                     ratingsContainer.Show();
 
                     negativeRatings.Text = ratings.GetRange(0, 5).Sum().ToString();
@@ -75,22 +72,24 @@ namespace osu.Game.Screens.Select
 
                     ratingsGraph.Values = ratings.Select(rating => (float)rating);
                 }
-
-                if (beatmap.Metric?.Retries == null || beatmap.Metric?.Fails == null)
-                    retryFailContainer.Hide();
                 else
+                    ratingsContainer.Hide();
+
+                if (beatmap.Metric?.Retries.Count() > 0 && beatmap.Metric?.Retries.Count() > 0)
                 {
-                    List<int> retries = beatmap.Metric.Retries;
-                    List<int> fails = beatmap.Metric.Fails;
+                    IEnumerable<int> retries = beatmap.Metric.Retries;
+                    IEnumerable<int> fails = beatmap.Metric.Fails;
                     retryFailContainer.Show();
 
-                    float maxValue = fails.Select((fail, index) => fail + retries[index]).Max();
+                    float maxValue = fails.Zip(retries, (fail, retry) => fail + retry).Max();
                     failGraph.MaxValue = maxValue;
                     retryGraph.MaxValue = maxValue;
 
                     failGraph.Values = fails.Select(fail => (float)fail);
-                    retryGraph.Values = retries.Select((retry, index) => retry + MathHelper.Clamp(fails[index], 0, maxValue));
+                    retryGraph.Values = retries.Zip(fails, (retry, fail) => retry + MathHelper.Clamp(fail, 0, maxValue));
                 }
+                else
+                    retryFailContainer.Hide();
             }
         }
 
