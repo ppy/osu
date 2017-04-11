@@ -42,9 +42,9 @@ namespace osu.Desktop.VisualTests.Tests
                     StarDifficulty = 5.3f,
                     Metric = new BeatmapMetric
                     {
-                        Ratings = Enumerable.Range(0,10).ToArray(),
-                        Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6).ToArray(),
-                        Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6).ToArray(),
+                        Ratings = Enumerable.Range(0,10).ToList(),
+                        Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6).ToList(),
+                        Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6).ToList(),
                     },
                 },
             });
@@ -74,9 +74,9 @@ namespace osu.Desktop.VisualTests.Tests
                 StarDifficulty = 5.3f,
                 Metric = new BeatmapMetric
                 {
-                    Ratings = Enumerable.Range(0, 10).ToArray(),
-                    Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6).ToArray(),
-                    Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6).ToArray(),
+                    Ratings = Enumerable.Range(0, 10).ToList(),
+                    Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6).ToList(),
+                    Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6).ToList(),
                 },
             };
             lastRange += 100;
