@@ -30,21 +30,6 @@ namespace osu.Game.Modes.Osu.Scoring
 
         protected override void OnNewJudgement(OsuJudgement judgement)
         {
-            if (judgement != null)
-            {
-                switch (judgement.Result)
-                {
-                    case HitResult.Hit:
-                        Combo.Value++;
-                        Health.Value += 0.1f;
-                        break;
-                    case HitResult.Miss:
-                        Combo.Value = 0;
-                        Health.Value -= 0.2f;
-                        break;
-                }
-            }
-
             int score = 0;
             int maxScore = 0;
 
