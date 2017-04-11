@@ -52,17 +52,7 @@ namespace osu.Game.Screens.Menu
                             OnEdit = delegate { Push(new Editor()); },
                             OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
-                            OnExit = delegate
-                            {
-                                if(confirmExit)
-                                {
-                                    dialog?.Push(new ExitConfirmDialog()
-                                    {
-                                        OnExit = () => Exit(),
-                                    });
-                                }
-                                else Exit();
-                            },
+                            OnExit = delegate { promptExit(); }
                         }
                     }
                 }
@@ -136,11 +126,31 @@ namespace osu.Game.Screens.Menu
             return base.OnExiting(next);
         }
 
+        private void promptExit()
+        {
+            if (confirmExit)
+            {
+                dialog?.Push(new ExitConfirmDialog()
+                {
+                    OnExit = Exit,
+                });
+            }
+            else Exit();
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (args.Repeat) return false;
+
             if (!args.Repeat && state.Keyboard.ControlPressed && state.Keyboard.ShiftPressed && args.Key == Key.D)
             {
                 Push(new Drawings());
+                return true;
+            }
+
+            if(args.Key == Key.Escape)
+            {
+                promptExit();
                 return true;
             }
 

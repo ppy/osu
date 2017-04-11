@@ -20,7 +20,11 @@ namespace osu.Game.Screens.Select
                 new PopupDialogOkButton
                 {
                     Text = @"Yes. Totally.",
-                    Action = OnExit,
+                    Action = delegate
+                    {
+                        OnExit?.Invoke();
+                        Hide();
+                    }
                 },
                 new PopupDialogCancelButton
                 {
