@@ -35,11 +35,9 @@ namespace osu.Game.Modes.Osu.Scoring
                 switch (judgement.Result)
                 {
                     case HitResult.Hit:
-                        Combo.Value++;
                         Health.Value += 0.1f;
                         break;
                     case HitResult.Miss:
-                        Combo.Value = 0;
                         Health.Value -= 0.2f;
                         break;
                 }
