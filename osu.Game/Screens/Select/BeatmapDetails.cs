@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Select
                 approachRate.Value = beatmap.Difficulty.ApproachRate;
                 stars.Value = (float)beatmap.StarDifficulty;
 
-                if (beatmap.Metric?.Ratings?.Count == 0)
+                if (beatmap.Metric?.Ratings == null)
                     ratingsContainer.Hide();
                 else
                 {
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Select
                     ratingsGraph.Values = ratings.Select(rating => (float)rating);
                 }
 
-                if (beatmap.Metric?.Retries?.Count == 0 && beatmap.Metric?.Fails?.Count == 0)
+                if (beatmap.Metric?.Retries == null && beatmap.Metric?.Fails == null)
                     retryFailContainer.Hide();
                 else
                 {
