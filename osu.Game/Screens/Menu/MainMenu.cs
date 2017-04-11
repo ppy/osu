@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Menu
         {
             if (args.Repeat) return false;
 
-            if (!args.Repeat && state.Keyboard.ControlPressed && state.Keyboard.ShiftPressed && args.Key == Key.D)
+            if (state.Keyboard.ControlPressed && state.Keyboard.ShiftPressed && args.Key == Key.D)
             {
                 Push(new Drawings());
                 return true;

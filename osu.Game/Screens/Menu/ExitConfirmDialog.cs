@@ -5,16 +5,17 @@ using System;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Dialog;
 
-namespace osu.Game.Screens.Select
+namespace osu.Game.Screens.Menu
 {
     public class ExitConfirmDialog : PopupDialog
     {
         public Action OnExit;
+
         public ExitConfirmDialog()
         {
             Icon = FontAwesome.fa_question;
             HeaderText = @"Confirm exit";
-            BodyText = @"You'll left";
+            BodyText = @"You'll leave :(";
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton
