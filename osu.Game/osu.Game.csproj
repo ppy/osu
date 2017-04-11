@@ -203,8 +203,8 @@
     <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
     <Compile Include="Screens\Play\SquareGraph.cs" />
     <Compile Include="Screens\Ranking\ResultsPage.cs" />
-    <Compile Include="Screens\Ranking\ResultsRankingPage.cs" />
-    <Compile Include="Screens\Ranking\ResultsScorePage.cs" />
+    <Compile Include="Screens\Ranking\ResultsPageRanking.cs" />
+    <Compile Include="Screens\Ranking\ResultsPageScore.cs" />
     <Compile Include="Screens\ScreenWhiteBox.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />

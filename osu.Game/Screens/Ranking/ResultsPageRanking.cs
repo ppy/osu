@@ -12,13 +12,10 @@ using OpenTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    internal class ResultsRankingPage : ResultsPage
+    internal class ResultsPageRanking : ResultsPage
     {
-        private readonly BeatmapInfo beatmap;
-
-        public ResultsRankingPage(Score score, BeatmapInfo beatmap = null) : base(score)
+        public ResultsPageRanking(Score score, BeatmapInfo beatmap = null) : base(score, beatmap)
         {
-            this.beatmap = beatmap;
         }
 
         [BackgroundDependencyLoader]
@@ -36,7 +33,7 @@ namespace osu.Game.Screens.Ranking
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Beatmap = beatmap ?? Score.Beatmap,
+                    Beatmap = Beatmap ?? Score.Beatmap,
                     Scale = new Vector2(0.7f)
                 }
             };

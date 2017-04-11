@@ -201,10 +201,10 @@ namespace osu.Game.Screens.Ranking
                 switch (mode)
                 {
                     case ResultMode.Summary:
-                        currentPage = new ResultsScorePage(score);
+                        currentPage = new ResultsPageScore(score, Beatmap.BeatmapInfo);
                         break;
                     case ResultMode.Ranking:
-                        currentPage = new ResultsRankingPage(score, Beatmap.BeatmapInfo);
+                        currentPage = new ResultsPageRanking(score, Beatmap.BeatmapInfo);
                         break;
                 }
 

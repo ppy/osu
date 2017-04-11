@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Modes.Scoring;
 using OpenTK;
@@ -15,15 +16,17 @@ namespace osu.Game.Screens.Ranking
 {
     internal class ResultsPage : Container
     {
-        protected Score Score;
+        protected readonly Score Score;
+        protected readonly BeatmapInfo Beatmap;
         private CircularContainer content;
         private Box fill;
 
         protected override Container<Drawable> Content => content;
 
-        public ResultsPage(Score score)
+        public ResultsPage(Score score, BeatmapInfo beatmap)
         {
             Score = score;
+            Beatmap = beatmap;
             RelativeSizeAxes = Axes.Both;
         }
 
