@@ -80,14 +80,12 @@ namespace osu.Game.Graphics.Cursor
         protected override void PopIn()
         {
             ActiveCursor.FadeTo(1, 250, EasingTypes.OutQuint);
-            ActiveCursor.ScaleTo(1, 1000, EasingTypes.OutElastic);
+            ActiveCursor.ScaleTo(1, 400, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
         {
-            ActiveCursor.FadeTo(0, 1400, EasingTypes.OutQuint);
-            ActiveCursor.ScaleTo(1.1f, 100, EasingTypes.Out);
-            ActiveCursor.Delay(100);
+            ActiveCursor.FadeTo(0, 900, EasingTypes.OutQuint);
             ActiveCursor.ScaleTo(0, 500, EasingTypes.In);
         }
 
