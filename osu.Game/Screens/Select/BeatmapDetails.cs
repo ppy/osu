@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Select
                     ratingsGraph.Values = ratings.Select(rating => (float)rating);
                 }
 
-                if (beatmap.Metric?.Retries == null && beatmap.Metric?.Fails == null)
+                if (beatmap.Metric?.Retries == null || beatmap.Metric?.Fails == null)
                     retryFailContainer.Hide();
                 else
                 {
