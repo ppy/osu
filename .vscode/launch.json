@@ -11,7 +11,7 @@
             "preLaunchTask": "build",
             "runtimeExecutable": null,
             "env": {},
-            "externalConsole": false
+            "console": "internalConsole"
         },
         {
             "name": "Launch Desktop",
@@ -23,7 +23,7 @@
             "preLaunchTask": "build",
             "runtimeExecutable": null,
             "env": {},
-            "externalConsole": false
+            "console": "internalConsole"
         },
         {
             "name": "Attach",

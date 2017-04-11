@@ -27,12 +27,14 @@ namespace osu.Game.Overlays.Options
             }
         }
 
-        public BindableNumber<T> Bindable
+        private Bindable<T> bindable;
+
+        public Bindable<T> Bindable
         {
-            get { return slider.Value; }
             set
             {
-                slider.Value = value;
+                bindable = value;
+                slider.Current.BindTo(bindable);
                 if (value?.Disabled ?? true)
                     Alpha = 0.3f;
             }

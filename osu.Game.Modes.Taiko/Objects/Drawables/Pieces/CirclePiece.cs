@@ -19,14 +19,9 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
     /// </summary>
     public class CirclePiece : TaikoPiece
     {
-        public const float SYMBOL_SIZE = TaikoHitObject.CIRCLE_RADIUS * 2f * 0.45f;
+        public const float SYMBOL_SIZE = TaikoHitObject.DEFAULT_CIRCLE_DIAMETER * 0.45f;
         public const float SYMBOL_BORDER = 8;
         public const float SYMBOL_INNER_SIZE = SYMBOL_SIZE - 2 * SYMBOL_BORDER;
-
-        /// <summary>
-        /// The amount to scale up the base circle to show it as a "strong" piece.
-        /// </summary>
-        private const float strong_scale = 1.5f;
 
         /// <summary>
         /// The colour of the inner circle and outer glows.
@@ -129,10 +124,10 @@ namespace osu.Game.Modes.Taiko.Objects.Drawables.Pieces
 
             if (isStrong)
             {
-                Size *= strong_scale;
+                Size *= TaikoHitObject.STRONG_CIRCLE_DIAMETER_SCALE;
 
                 //default for symbols etc.
-                Content.Scale *= strong_scale;
+                Content.Scale *= TaikoHitObject.STRONG_CIRCLE_DIAMETER_SCALE;
             }
         }
 

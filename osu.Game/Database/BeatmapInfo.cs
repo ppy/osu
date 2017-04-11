@@ -43,6 +43,7 @@ namespace osu.Game.Database
 
         public string Path { get; set; }
 
+        [JsonProperty("file_md5")]
         public string Hash { get; set; }
 
         // General
