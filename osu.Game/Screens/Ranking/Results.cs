@@ -63,8 +63,6 @@ namespace osu.Game.Screens.Ranking
             modeChangeButtons.FadeOut();
             currentPage.FadeOut();
 
-            
-
             circleOuterBackground.ScaleTo(1, transition_time, EasingTypes.OutQuint);
             circleOuterBackground.FadeTo(1, transition_time, EasingTypes.OutQuint);
 
