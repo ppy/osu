@@ -111,11 +111,9 @@ namespace osu.Game.Modes.Taiko.UI
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.Centre,
                                         },
-                                        hitObjectContainer = new ExternalMaskingRectangleContainer
+                                        hitObjectContainer = new Container
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Masking = true,
-                                            MaskingReference = () => this
                                         },
                                         judgementContainer = new Container<DrawableTaikoJudgement>
                                         {
@@ -269,37 +267,6 @@ namespace osu.Game.Modes.Taiko.UI
                     // Reverse the DrawScale adjustment
                     Width = Parent.DrawSize.X / ParentDrawScaleReference();
                 }
-            }
-        }
-
-        private class ExternalMaskingRectangleContainer : Container
-        {
-            public Func<Drawable> MaskingReference;
-
-            protected override void ApplyDrawNode(DrawNode node)
-            {
-                base.ApplyDrawNode(node);
-
-                Drawable maskingReference = MaskingReference?.Invoke();
-
-                if (MaskingReference == null)
-                    return;
-
-                var cn = node as ContainerDrawNode;
-
-                cn.MaskingInfo = !Masking
-                    ? (MaskingInfo?)null
-                    : new MaskingInfo
-                    {
-                        ScreenSpaceAABB = maskingReference.ScreenSpaceDrawQuad.AABB,
-                        MaskingRect = maskingReference.DrawRectangle,
-                        ToMaskingSpace = cn.MaskingInfo.Value.ToMaskingSpace,
-                        CornerRadius = cn.MaskingInfo.Value.CornerRadius,
-                        BorderThickness = cn.MaskingInfo.Value.BorderThickness,
-                        BorderColour = cn.MaskingInfo.Value.BorderColour,
-                        BlendRange = cn.MaskingInfo.Value.BlendRange,
-                        AlphaExponent = cn.MaskingInfo.Value.AlphaExponent
-                    };
             }
         }
     }

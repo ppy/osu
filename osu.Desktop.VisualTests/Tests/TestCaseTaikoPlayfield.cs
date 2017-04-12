@@ -59,7 +59,6 @@ namespace osu.Desktop.VisualTests.Tests
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
                 Height = TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT,
-                Width = 0.8f,
                 Clock = new FramedClock(rateAdjustClock),
                 Children = new[]
                 {
