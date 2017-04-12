@@ -42,7 +42,7 @@ namespace osu.Game.Database
         public BeatmapDifficulty Difficulty { get; set; }
 
         [Ignore]
-        public BeatmapMetric Metric { get; set; }
+        public BeatmapMetrics Metrics { get; set; }
 
         public string Path { get; set; }
 

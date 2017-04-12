@@ -5,7 +5,10 @@ using System.Collections.Generic;
 
 namespace osu.Game.Database
 {
-    public class BeatmapMetric
+    /// <summary>
+    /// Beatmap metrics based on acculumated online data from community plays.
+    /// </summary>
+    public class BeatmapMetrics
     {
         /// <summary>
         /// Total vote counts of user ratings on a scale of 0..length.

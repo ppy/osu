@@ -61,9 +61,9 @@ namespace osu.Game.Screens.Select
                 approachRate.Value = beatmap.Difficulty.ApproachRate;
                 stars.Value = (float)beatmap.StarDifficulty;
 
-                if (beatmap.Metric?.Ratings.Any() ?? false)
+                if (beatmap.Metrics?.Ratings.Any() ?? false)
                 {
-                    var ratings = beatmap.Metric.Ratings.ToList();
+                    var ratings = beatmap.Metrics.Ratings.ToList();
                     ratingsContainer.Show();
 
                     negativeRatings.Text = ratings.GetRange(0, ratings.Count / 2).Sum().ToString();
@@ -75,10 +75,10 @@ namespace osu.Game.Screens.Select
                 else
                     ratingsContainer.Hide();
 
-                if ((beatmap.Metric?.Retries.Any() ?? false) && beatmap.Metric.Fails.Any())
+                if ((beatmap.Metrics?.Retries.Any() ?? false) && beatmap.Metrics.Fails.Any())
                 {
-                    var retries = beatmap.Metric.Retries;
-                    var fails = beatmap.Metric.Fails;
+                    var retries = beatmap.Metrics.Retries;
+                    var fails = beatmap.Metrics.Fails;
                     retryFailContainer.Show();
 
                     float maxValue = fails.Zip(retries, (fail, retry) => fail + retry).Max();

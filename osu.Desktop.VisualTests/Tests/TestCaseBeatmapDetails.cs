@@ -40,7 +40,7 @@ namespace osu.Desktop.VisualTests.Tests
                         DrainRate = 1,
                     },
                     StarDifficulty = 5.3f,
-                    Metric = new BeatmapMetric
+                    Metrics = new BeatmapMetrics
                     {
                         Ratings = Enumerable.Range(0,10),
                         Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6),
@@ -56,8 +56,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void newRetryAndFailValues()
         {
-            details.Beatmap.Metric.Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6);
-            details.Beatmap.Metric.Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6);
+            details.Beatmap.Metrics.Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6);
+            details.Beatmap.Metrics.Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6);
             details.Beatmap = details.Beatmap;
             lastRange += 100;
         }
