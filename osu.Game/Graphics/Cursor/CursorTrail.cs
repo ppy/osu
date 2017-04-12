@@ -38,6 +38,8 @@ namespace osu.Game.Graphics.Cursor
 
         private Vector2? lastPosition;
 
+        private Vector2? lastPhysicalPosition;
+
         protected override DrawNode CreateDrawNode() => new TrailDrawNode();
 
         protected override void ApplyDrawNode(DrawNode node)
@@ -114,6 +116,8 @@ namespace osu.Game.Graphics.Cursor
                 lastPosition = state.Mouse.NativeState.Position;
                 return base.OnMouseMove(state);
             }
+            if (lastPhysicalPosition == null)
+                lastPhysicalPosition = state.Mouse.NativeState.Position;
 
             Vector2 pos1 = lastPosition.Value;
             Vector2 pos2 = state.Mouse.NativeState.Position;
@@ -121,6 +125,13 @@ namespace osu.Game.Graphics.Cursor
             Vector2 diff = pos2 - pos1;
             float distance = diff.Length;
             Vector2 direction = diff / distance;
+
+            Vector2 realDiff = pos2 - lastPhysicalPosition.Value;
+            lastPhysicalPosition = pos2;
+
+            // don't update when it moved less than 10 pixels from the last position in a straight fashion
+            if (distance < 10 && Vector2.Dot(direction, realDiff.Normalized()) > 0.7)
+                return base.OnMouseMove(state);
 
             float interval = size.X / 2 * 0.9f;
 
