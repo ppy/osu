@@ -17,7 +17,6 @@ using osu.Framework.Graphics.Primitives;
 using System.Linq;
 using osu.Game.Modes.Taiko.Objects.Drawables;
 using System;
-using osu.Framework.Graphics.OpenGL;
 
 namespace osu.Game.Modes.Taiko.UI
 {
