@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Select
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
-        public readonly Container Details; //todo: replace with a real details view when added
+        public readonly BeatmapDetails Details;
         public readonly Leaderboard Leaderboard;
 
         private WorkingBeatmap beatmap;
@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Select
             {
                 beatmap = value;
                 Leaderboard.Beatmap = beatmap?.BeatmapInfo;
+                Details.Beatmap = beatmap?.Beatmap.BeatmapInfo;
             }
         }
 
@@ -46,6 +47,7 @@ namespace osu.Game.Screens.Select
                                 Details.Show();
                                 Leaderboard.Hide();
                                 break;
+
                             default:
                                 Details.Hide();
                                 Leaderboard.Show();
@@ -62,9 +64,11 @@ namespace osu.Game.Screens.Select
 
             Add(new Drawable[]
             {
-                Details = new Container
+                Details = new BeatmapDetails
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding(5),
+                    Alpha = 0,
                 },
                 Leaderboard = new Leaderboard
                 {
