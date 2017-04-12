@@ -23,7 +23,6 @@ namespace osu.Game.Screens.Play
             if (args.Repeat) return false;
             if (args.Key == Key.Escape)
             {
-                if (State == Visibility.Hidden) return false;
                 OnResume();
                 return true;
             }

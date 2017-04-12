@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
 
         public BeatmapInfo BeatmapInfo;
 
-        public bool IsPaused { get; private set; }
+        public bool IsPaused => !sourceClock.IsRunning;
 
         public bool HasFailed { get; private set; }
 
@@ -204,19 +204,13 @@ namespace osu.Game.Screens.Play
 
         public void Pause(bool force = false)
         {
-            if (canPause || force)
-            {
-                lastPauseActionTime = Time.Current;
-                hudOverlay.KeyCounter.IsCounting = false;
-                pauseOverlay.Retries = RestartCount;
-                pauseOverlay.Show();
-                sourceClock.Stop();
-                IsPaused = true;
-            }
-            else
-            {
-                IsPaused = false;
-            }
+            if (!canPause && !force) return;
+
+            lastPauseActionTime = Time.Current;
+            hudOverlay.KeyCounter.IsCounting = false;
+            pauseOverlay.Retries = RestartCount;
+            pauseOverlay.Show();
+            sourceClock.Stop();
         }
 
         public void Resume()
@@ -225,13 +219,6 @@ namespace osu.Game.Screens.Play
             hudOverlay.KeyCounter.IsCounting = true;
             pauseOverlay.Hide();
             sourceClock.Start();
-            IsPaused = false;
-        }
-
-        public void TogglePaused()
-        {
-            IsPaused = !IsPaused;
-            if (IsPaused) Pause(); else Resume();
         }
 
         public void Restart()
@@ -273,11 +260,6 @@ namespace osu.Game.Screens.Play
 
         private void onFail()
         {
-            if (IsPaused)
-            {
-                pauseOverlay.Hide();
-                IsPaused = false;
-            }
             sourceClock.Stop();
 
             Delay(500);
@@ -331,7 +313,7 @@ namespace osu.Game.Screens.Play
                 //pause screen override logic.
                 if (pauseOverlay?.State == Visibility.Hidden && !canPause) return true;
 
-                if (!IsPaused && sourceClock.IsRunning) // For if the user presses escape quickly when entering the map
+                if (!IsPaused) // For if the user presses escape quickly when entering the map
                 {
                     Pause();
                     return true;

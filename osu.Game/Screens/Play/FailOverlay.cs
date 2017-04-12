@@ -15,18 +15,6 @@ namespace osu.Game.Screens.Play
 
         public override string Header => "failed";
         public override string Description => "you're dead, try again?";
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (args.Repeat) return false;
-            if (args.Key == Key.Escape)
-            {
-                if (State == Visibility.Hidden) return false;
-                OnQuit();
-                return true;
-            }
-
-            return base.OnKeyDown(state, args);
-        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
