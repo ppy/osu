@@ -38,6 +38,9 @@ namespace osu.Game.Modes.UI
         protected Playfield(float? customWidth = null)
         {
             AlwaysReceiveInput = true;
+            
+            // Default height since we force RelativeSizeAxes = Both
+            Size = Vector2.One;
 
             AddInternal(ScaledContent = new ScaledContainer
             {
