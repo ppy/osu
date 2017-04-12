@@ -27,6 +27,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private readonly Random rng = new Random(1337);
         private TaikoPlayfield playfield;
+        private Container playfieldContainer;
 
         public override void Reset()
         {
@@ -48,14 +49,17 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep("Height test 3", () => changePlayfieldSize(3));
             AddStep("Height test 4", () => changePlayfieldSize(4));
             AddStep("Height test 5", () => changePlayfieldSize(5));
+            AddStep("Reset height", () => changePlayfieldSize(6));
 
             var rateAdjustClock = new StopwatchClock(true) { Rate = 1 };
 
-            Add(new Container
+            Add(playfieldContainer = new Container
             {
-                Clock = new FramedClock(rateAdjustClock),
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
-                Y = 200,
+                Height = TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT,
+                Clock = new FramedClock(rateAdjustClock),
                 Children = new[]
                 {
                     playfield = new TaikoPlayfield()
@@ -65,6 +69,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void changePlayfieldSize(int step)
         {
+            // Add new hits
             switch (step)
             {
                 case 1:
@@ -81,11 +86,20 @@ namespace osu.Desktop.VisualTests.Tests
                     break;
                 case 5:
                     addSwell(1000);
-                    playfield.Delay(scroll_time - 100);
+                    playfieldContainer.Delay(scroll_time - 100);
                     break;
             }
 
-            playfield.ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
+            // Tween playfield height
+            switch (step)
+            {
+                default:
+                    playfieldContainer.ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
+                    break;
+                case 6:
+                    playfieldContainer.ResizeTo(new Vector2(1, TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT), 500);
+                    break;
+            }
         }
 
         private void addHitJudgement()
