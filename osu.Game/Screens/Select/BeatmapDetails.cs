@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Select
                 else
                     ratingsContainer.Hide();
 
-                if ((beatmap.Metric?.Retries.Any() ?? false) && (beatmap.Metric?.Fails.Any() ?? false))
+                if ((beatmap.Metric?.Retries.Any() ?? false) && beatmap.Metric.Fails.Any())
                 {
                     var retries = beatmap.Metric.Retries;
                     var fails = beatmap.Metric.Fails;
