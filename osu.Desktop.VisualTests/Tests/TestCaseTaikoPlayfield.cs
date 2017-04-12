@@ -27,6 +27,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private readonly Random rng = new Random(1337);
         private TaikoPlayfield playfield;
+        private Container playfieldContainer;
 
         public override void Reset()
         {
@@ -51,11 +52,14 @@ namespace osu.Desktop.VisualTests.Tests
 
             var rateAdjustClock = new StopwatchClock(true) { Rate = 1 };
 
-            Add(new Container
+            Add(playfieldContainer = new Container
             {
-                Clock = new FramedClock(rateAdjustClock),
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
-                Y = 200,
+                Height = TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT,
+                Width = 0.8f,
+                Clock = new FramedClock(rateAdjustClock),
                 Children = new[]
                 {
                     playfield = new TaikoPlayfield()
@@ -81,11 +85,11 @@ namespace osu.Desktop.VisualTests.Tests
                     break;
                 case 5:
                     addSwell(1000);
-                    playfield.Delay(scroll_time - 100);
+                    playfieldContainer.Delay(scroll_time - 100);
                     break;
             }
 
-            playfield.ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
+                    playfieldContainer.ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
         }
 
         private void addHitJudgement()
