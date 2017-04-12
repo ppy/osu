@@ -52,8 +52,6 @@ namespace osu.Game.Modes.Taiko.UI
 
         public TaikoPlayfield()
         {
-            Masking = true;
-
             AddInternal(new Drawable[]
             {
                 rightBackgroundContainer = new Container
@@ -113,9 +111,11 @@ namespace osu.Game.Modes.Taiko.UI
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.Centre,
                                         },
-                                        hitObjectContainer = new Container
+                                        hitObjectContainer = new ExternalMaskingRectangleContainer
                                         {
                                             RelativeSizeAxes = Axes.Both,
+                                            Masking = true,
+                                            MaskingReference = () => this
                                         },
                                         judgementContainer = new Container<DrawableTaikoJudgement>
                                         {
@@ -221,22 +221,6 @@ namespace osu.Game.Modes.Taiko.UI
                 hitExplosionContainer.Children.FirstOrDefault(e => e.Judgement == judgedObject.Judgement)?.VisualiseSecondHit();
         }
 
-        protected override void ApplyDrawNode(DrawNode node)
-        {
-            base.ApplyDrawNode(node);
-
-            var cn = node as ContainerDrawNode;
-
-            if (!Masking)
-                return;
-
-            MaskingInfo old = cn.MaskingInfo.Value;
-            old.MaskingRect = new RectangleF(old.MaskingRect.X, old.MaskingRect.Y - 2000, old.MaskingRect.Width, old.MaskingRect.Height + 4000);
-            old.ScreenSpaceAABB = new System.Drawing.Rectangle(old.ScreenSpaceAABB.X, old.ScreenSpaceAABB.Y - 2000, old.ScreenSpaceAABB.Width, old.ScreenSpaceAABB.Height + 4000);
-
-            cn.MaskingInfo = old;
-        }
-
         /// <summary>
         /// This is a very special type of container. It serves a similar purpose to <see cref="FillMode.Fit"/>, however unlike <see cref="FillMode.Fit"/>,
         /// this will only adjust the scale relative to the height of its parent and will maintain the original width relative to its parent.
@@ -285,6 +269,37 @@ namespace osu.Game.Modes.Taiko.UI
                     // Reverse the DrawScale adjustment
                     Width = Parent.DrawSize.X / ParentDrawScaleReference();
                 }
+            }
+        }
+
+        private class ExternalMaskingRectangleContainer : Container
+        {
+            public Func<Drawable> MaskingReference;
+
+            protected override void ApplyDrawNode(DrawNode node)
+            {
+                base.ApplyDrawNode(node);
+
+                Drawable maskingReference = MaskingReference?.Invoke();
+
+                if (MaskingReference == null)
+                    return;
+
+                var cn = node as ContainerDrawNode;
+
+                cn.MaskingInfo = !Masking
+                    ? (MaskingInfo?)null
+                    : new MaskingInfo
+                    {
+                        ScreenSpaceAABB = maskingReference.ScreenSpaceDrawQuad.AABB,
+                        MaskingRect = maskingReference.DrawRectangle,
+                        ToMaskingSpace = cn.MaskingInfo.Value.ToMaskingSpace,
+                        CornerRadius = cn.MaskingInfo.Value.CornerRadius,
+                        BorderThickness = cn.MaskingInfo.Value.BorderThickness,
+                        BorderColour = cn.MaskingInfo.Value.BorderColour,
+                        BlendRange = cn.MaskingInfo.Value.BlendRange,
+                        AlphaExponent = cn.MaskingInfo.Value.AlphaExponent
+                    };
             }
         }
     }
