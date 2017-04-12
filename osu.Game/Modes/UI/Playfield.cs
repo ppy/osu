@@ -39,7 +39,7 @@ namespace osu.Game.Modes.UI
         {
             AlwaysReceiveInput = true;
             
-            // Default height since we force RelativeSizeAxes = Both
+            // Default height since we force relative size axes
             Size = Vector2.One;
 
             AddInternal(ScaledContent = new ScaledContainer
