@@ -86,6 +86,7 @@ namespace osu.Game.Graphics.UserInterface
                 bar = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Width = 0,
                 },
             };
         }

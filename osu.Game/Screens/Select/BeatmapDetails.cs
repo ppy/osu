@@ -180,7 +180,12 @@ namespace osu.Game.Screens.Select
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
-                                    Padding = new MarginPadding(15) { Top = 25, Bottom = 0 },
+                                    Padding = new MarginPadding
+                                    {
+                                        Top = 25,
+                                        Left = 15,
+                                        Right = 15,
+                                    },
                                     Children = new Drawable[]
                                     {
                                         new OsuSpriteText
@@ -194,7 +199,6 @@ namespace osu.Game.Screens.Select
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             Height = 5,
-                                            Length = 0,
                                         },
                                         new Container
                                         {
