@@ -4,7 +4,6 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -64,12 +63,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Clock = new FramedClock(rateAdjustClock),
                 Children = new[]
                 {
-                    playfield = new TaikoPlayfield
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Height = 0.75f
-                    }
+                    playfield = new TaikoPlayfield()
                 }
             });
         }
