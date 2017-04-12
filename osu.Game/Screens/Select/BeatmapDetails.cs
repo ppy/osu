@@ -61,21 +61,21 @@ namespace osu.Game.Screens.Select
                 approachRate.Value = beatmap.Difficulty.ApproachRate;
                 stars.Value = (float)beatmap.StarDifficulty;
 
-                if (beatmap.Metric?.Ratings.Count() == 10)
+                if (beatmap.Metric?.Ratings.Any() ?? false)
                 {
                     var ratings = beatmap.Metric.Ratings.ToList();
                     ratingsContainer.Show();
 
-                    negativeRatings.Text = ratings.GetRange(0, 5).Sum().ToString();
-                    positiveRatings.Text = ratings.GetRange(5, 5).Sum().ToString();
-                    ratingsBar.Length = (float)ratings.GetRange(0, 5).Sum() / ratings.Sum();
+                    negativeRatings.Text = ratings.GetRange(0, ratings.Count / 2).Sum().ToString();
+                    positiveRatings.Text = ratings.GetRange(ratings.Count / 2, ratings.Count / 2).Sum().ToString();
+                    ratingsBar.Length = (float)ratings.GetRange(0, ratings.Count / 2).Sum() / ratings.Sum();
 
                     ratingsGraph.Values = ratings.Select(rating => (float)rating);
                 }
                 else
                     ratingsContainer.Hide();
 
-                if (beatmap.Metric?.Retries.Count() == 100 && beatmap.Metric?.Fails.Count() == 100)
+                if ((beatmap.Metric?.Retries.Any() ?? false) && (beatmap.Metric?.Fails.Any() ?? false))
                 {
                     var retries = beatmap.Metric.Retries;
                     var fails = beatmap.Metric.Fails;
