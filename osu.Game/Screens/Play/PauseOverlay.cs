@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK.Input;
-using osu.Framework.Graphics.Containers;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 
