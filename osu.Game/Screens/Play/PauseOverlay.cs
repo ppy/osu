@@ -20,6 +20,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (args.Repeat) return false;
             if (args.Key == Key.Escape)
             {
                 if (State == Visibility.Hidden) return false;
