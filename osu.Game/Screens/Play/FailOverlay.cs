@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Play
         public override string Description => "you're dead, try again?";
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (args.Repeat) return false;
             if (args.Key == Key.Escape)
             {
                 if (State == Visibility.Hidden) return false;
