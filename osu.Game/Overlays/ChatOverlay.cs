@@ -93,7 +93,7 @@ namespace osu.Game.Overlays
         {
             var postText = sender.Text;
 
-            if (!string.IsNullOrEmpty(postText))
+            if (!string.IsNullOrEmpty(postText) && api.LocalUser.Value != null)
             {
                 //todo: actually send to server
                 careChannels.FirstOrDefault()?.AddNewMessages(new[]
