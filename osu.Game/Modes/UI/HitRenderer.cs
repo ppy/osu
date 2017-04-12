@@ -34,6 +34,11 @@ namespace osu.Game.Modes.UI
         public event Action OnAllJudged;
 
         /// <summary>
+        /// Whether to apply adjustments to the child <see cref="Playfield{TObject,TJudgement}"/> based on our own size.
+        /// </summary>
+        public bool AspectAdjust = true;
+
+        /// <summary>
         /// The input manager for this HitRenderer.
         /// </summary>
         internal readonly PlayerInputManager InputManager = new PlayerInputManager();
@@ -167,11 +172,6 @@ namespace osu.Game.Modes.UI
         where TJudgement : Judgement
     {
         public event Action<TJudgement> OnJudgement;
-
-        /// <summary>
-        /// Whether to apply adjustments to the child <see cref="Playfield{TObject,TJudgement}"/> based on our own size.
-        /// </summary>
-        public bool AspectAdjust = true;
 
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
