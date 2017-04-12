@@ -8,17 +8,17 @@ namespace osu.Game.Database
     public class BeatmapMetric
     {
         /// <summary>
-        /// Ratings for a beatmap, length should be 10
+        /// Total vote counts of user ratings on a scale of 0..length.
         /// </summary>
         public IEnumerable<int> Ratings { get; set; }
 
         /// <summary>
-        /// Fails for a beatmap, length should be 100
+        /// Points of failure on a relative time scale (usually 0..100).
         /// </summary>
         public IEnumerable<int> Fails { get; set; }
 
         /// <summary>
-        /// Retries for a beatmap, length should be 100
+        /// Points of retry on a relative time scale (usually 0..100).
         /// </summary>
         public IEnumerable<int> Retries { get; set; }
     }
