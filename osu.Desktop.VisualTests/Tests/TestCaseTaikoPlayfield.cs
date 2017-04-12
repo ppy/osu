@@ -49,6 +49,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep("Height test 3", () => changePlayfieldSize(3));
             AddStep("Height test 4", () => changePlayfieldSize(4));
             AddStep("Height test 5", () => changePlayfieldSize(5));
+            AddStep("Reset height", () => changePlayfieldSize(6));
 
             var rateAdjustClock = new StopwatchClock(true) { Rate = 1 };
 
@@ -69,6 +70,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void changePlayfieldSize(int step)
         {
+            // Add new hits
             switch (step)
             {
                 case 1:
@@ -89,7 +91,16 @@ namespace osu.Desktop.VisualTests.Tests
                     break;
             }
 
+            // Tween playfield height
+            switch (step)
+            {
+                default:
                     playfieldContainer.ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
+                    break;
+                case 6:
+                    playfieldContainer.ResizeTo(new Vector2(1, TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT), 500);
+                    break;
+            }
         }
 
         private void addHitJudgement()
