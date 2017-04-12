@@ -273,6 +273,11 @@ namespace osu.Game.Screens.Play
 
         private void onFail()
         {
+            if (IsPaused)
+            {
+                pauseOverlay.Hide();
+                IsPaused = false;
+            }
             sourceClock.Stop();
 
             Delay(500);
