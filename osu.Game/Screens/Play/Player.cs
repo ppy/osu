@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
 
         public BeatmapInfo BeatmapInfo;
 
-        public bool IsPaused => !sourceClock.IsRunning;
+        public bool IsPaused => !interpolatedSourceClock.IsRunning;
 
         public bool HasFailed { get; private set; }
 
@@ -206,12 +206,12 @@ namespace osu.Game.Screens.Play
         {
             if (!canPause && !force) return;
 
-            sourceClock.Stop();
-
             // the actual pausing is potentially happening on a different thread.
             // we want to wait for the source clock to stop so we can be sure all components are in a stable state.
             if (!IsPaused)
             {
+                sourceClock.Stop();
+
                 Schedule(() => Pause(force));
                 return;
             }
