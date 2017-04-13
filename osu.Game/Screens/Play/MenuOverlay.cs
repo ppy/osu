@@ -17,7 +17,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class MenuOverlay : OverlayContainer
+    public abstract class MenuOverlay : OverlayContainer, IRequireHighFrequencyMousePosition
     {
         private const int transition_duration = 200;
         private const int button_height = 70;
@@ -80,6 +80,8 @@ namespace osu.Game.Screens.Play
 
         // Don't let mouse down events through the overlay or people can click circles while paused.
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
 
         protected override bool OnMouseMove(InputState state) => true;
 
