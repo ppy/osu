@@ -13,6 +13,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play
 {
@@ -30,7 +31,7 @@ namespace osu.Game.Screens.Play
         public abstract string Header { get; }
         public abstract string Description { get; }
 
-        private FillFlowContainer buttons;
+        protected FillFlowContainer<DialogButton> Buttons;
 
         public int Retries
         {
@@ -84,7 +85,7 @@ namespace osu.Game.Screens.Play
 
         protected void AddButton(string text, Color4 colour, Action action)
         {
-            buttons.Add(new PauseButton
+            Buttons.Add(new PauseButton
             {
                 Text = text,
                 ButtonColour = colour,
@@ -151,7 +152,7 @@ namespace osu.Game.Screens.Play
                                 }
                             }
                         },
-                        buttons = new FillFlowContainer
+                        Buttons = new FillFlowContainer<DialogButton>
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
