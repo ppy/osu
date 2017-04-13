@@ -67,7 +67,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
                     ComboIndex = s.ComboIndex,
                     Scale = s.Scale,
                     ComboColour = s.ComboColour,
-                    Sample = s.Sample,
+                    Samples = s.Samples,
                 }),
             };
 
@@ -111,7 +111,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             if (repeat > currentRepeat)
             {
                 if (repeat < slider.RepeatCount && ball.Tracking)
-                    PlaySample();
+                    PlaySamples();
                 currentRepeat = repeat;
             }
 

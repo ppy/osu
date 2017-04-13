@@ -44,6 +44,8 @@ namespace osu.Desktop.VisualTests.Tests
                 kc.Add(new KeyCounterKeyboard(key));
             });
 
+            TestSliderBar<int> sliderBar;
+
             Add(new Container
             {
                 Anchor = Anchor.TopRight,
@@ -52,15 +54,16 @@ namespace osu.Desktop.VisualTests.Tests
                 Children = new Drawable[]
                 {
                     new SpriteText { Text = "FadeTime" },
-                    new TestSliderBar<int>
+                    sliderBar =new TestSliderBar<int>
                     {
                         Width = 150,
                         Height = 10,
                         SelectionColor = Color4.Orange,
-                        Bindable = bindable
                     }
                 }
             });
+
+            sliderBar.Current.BindTo(bindable);
 
             Add(kc);
         }

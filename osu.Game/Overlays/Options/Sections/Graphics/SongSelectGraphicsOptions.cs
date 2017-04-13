@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
     public class SongSelectGraphicsOptions : OptionsSubsection
     {
         protected override string Header => "Song Select";
-        
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {

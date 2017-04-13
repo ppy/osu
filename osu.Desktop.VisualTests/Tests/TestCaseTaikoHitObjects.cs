@@ -1,13 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Graphics;
-using osu.Game.Modes.Taiko.Objects.Drawable.Pieces;
+using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -24,13 +23,12 @@ namespace osu.Desktop.VisualTests.Tests
             AddToggleStep("Kiai", b =>
             {
                 kiai = !kiai;
-                Reset();
+                updateKiaiState();
             });
 
             Add(new CirclePiece
             {
                 Position = new Vector2(100, 100),
-                Width = 0,
                 AccentColour = Color4.DarkRed,
                 KiaiMode = kiai,
                 Children = new[]
@@ -39,10 +37,9 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            Add(new StrongCirclePiece
+            Add(new CirclePiece(true)
             {
                 Position = new Vector2(350, 100),
-                Width = 0,
                 AccentColour = Color4.DarkRed,
                 KiaiMode = kiai,
                 Children = new[]
@@ -54,7 +51,6 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new CirclePiece
             {
                 Position = new Vector2(100, 300),
-                Width = 0,
                 AccentColour = Color4.DarkBlue,
                 KiaiMode = kiai,
                 Children = new[]
@@ -63,10 +59,9 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            Add(new StrongCirclePiece
+            Add(new CirclePiece(true)
             {
                 Position = new Vector2(350, 300),
-                Width = 0,
                 AccentColour = Color4.DarkBlue,
                 KiaiMode = kiai,
                 Children = new[]
@@ -78,7 +73,6 @@ namespace osu.Desktop.VisualTests.Tests
             Add(new CirclePiece
             {
                 Position = new Vector2(100, 500),
-                Width = 0,
                 AccentColour = Color4.Orange,
                 KiaiMode = kiai,
                 Children = new[]
@@ -87,37 +81,29 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            Add(new DrumRollCircle(new CirclePiece
+            Add(new ElongatedCirclePiece
             {
-                KiaiMode = kiai
-            })
-            {
-                Width = 250,
-                Position = new Vector2(575, 100)
+                Position = new Vector2(575, 100),
+                AccentColour = Color4.Orange,
+                KiaiMode = kiai,
+                Length = 0.10f,
+                PlayfieldLengthReference = () => DrawSize.X
             });
 
-            Add(new DrumRollCircle(new StrongCirclePiece
+            Add(new ElongatedCirclePiece(true)
             {
-                KiaiMode = kiai
-            })
-            {
-                Width = 250,
-                Position = new Vector2(575, 300)
+                Position = new Vector2(575, 300),
+                AccentColour = Color4.Orange,
+                KiaiMode = kiai,
+                Length = 0.10f,
+                PlayfieldLengthReference = () => DrawSize.X
             });
         }
 
-        private class DrumRollCircle : BaseCircle
+        private void updateKiaiState()
         {
-            public DrumRollCircle(CirclePiece piece)
-                : base(piece)
-            {
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Piece.AccentColour = colours.YellowDark;
-            }
+            foreach (var c in Children.OfType<CirclePiece>())
+                c.KiaiMode = kiai;
         }
 
         private abstract class BaseCircle : Container

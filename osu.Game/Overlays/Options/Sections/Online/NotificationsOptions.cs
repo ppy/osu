@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Options.Sections.Online
     public class NotificationsOptions : OptionsSubsection
     {
         protected override string Header => "Notifications";
-        
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {

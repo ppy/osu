@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
-using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.IO
 {
@@ -34,11 +33,6 @@ namespace osu.Game.Beatmaps.IO
         {
             readers.Add(new Reader { Test = test, Type = typeof(T) });
         }
-
-        /// <summary>
-        /// Reads the beatmap metadata from this archive.
-        /// </summary>
-        public abstract BeatmapMetadata ReadMetadata();
 
         /// <summary>
         /// Gets a list of beatmap file names.

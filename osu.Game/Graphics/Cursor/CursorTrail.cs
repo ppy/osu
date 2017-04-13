@@ -13,6 +13,7 @@ using osu.Framework.Graphics.OpenGL.Buffers;
 using OpenTK.Graphics.ES30;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Timing;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -58,6 +59,9 @@ namespace osu.Game.Graphics.Cursor
 
         public CursorTrail()
         {
+            // as we are currently very dependent on having a running clock, let's make our own clock for the time being.
+            Clock = new FramedClock();
+
             AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
 

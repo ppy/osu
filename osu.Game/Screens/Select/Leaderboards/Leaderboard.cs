@@ -10,7 +10,11 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using System;
+using osu.Framework.Allocation;
+using osu.Game.Database;
 using osu.Game.Modes.Scoring;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -26,6 +30,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             set
             {
                 scores = value;
+                getScoresRequest?.Cancel();
 
                 int i = 150;
                 if (scores == null)
@@ -79,6 +84,41 @@ namespace osu.Game.Screens.Select.Leaderboards
                     },
                 },
             };
+        }
+
+        private APIAccess api;
+
+        private BeatmapInfo beatmap;
+
+        public BeatmapInfo Beatmap
+        {
+            get { return beatmap; }
+            set
+            {
+                beatmap = value;
+                Schedule(updateScores);
+            }
+        }
+
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(APIAccess api)
+        {
+            this.api = api;
+        }
+
+        private GetScoresRequest getScoresRequest;
+        private void updateScores()
+        {
+            if (!IsLoaded) return;
+
+            Scores = null;
+            getScoresRequest?.Cancel();
+
+            if (api == null || Beatmap == null) return;
+
+            getScoresRequest = new GetScoresRequest(Beatmap);
+            getScoresRequest.Success += r => Scores = r.Scores;
+            api.Queue(getScoresRequest);
         }
 
         protected override void Update()

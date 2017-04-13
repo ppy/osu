@@ -3,15 +3,12 @@
 
 using osu.Framework.Testing;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Threading;
 using osu.Game.Overlays;
 
 namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseChatDisplay : TestCase
     {
-        private ScheduledDelegate messageRequest;
-
         public override string Description => @"Testing chat api and overlay";
 
         public override void Reset()

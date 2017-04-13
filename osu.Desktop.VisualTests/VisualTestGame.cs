@@ -14,7 +14,7 @@ namespace osu.Desktop.VisualTests
         {
             base.LoadComplete();
 
-            new BackgroundScreenDefault { Depth = 10 }.LoadAsync(this, AddInternal);
+            LoadComponentAsync(new BackgroundScreenDefault { Depth = 10 }, AddInternal);
 
             // Have to construct this here, rather than in the constructor, because
             // we depend on some dependencies to be loaded within OsuGameBase.load().

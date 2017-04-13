@@ -93,11 +93,6 @@ namespace osu.Game.Screens.Select
                         searchTextBox = new SearchTextBox
                         {
                             RelativeSizeAxes = Axes.X,
-                            OnChange = (sender, newText) =>
-                            {
-                                if (newText)
-                                    FilterChanged?.Invoke(CreateCriteria());
-                            },
                             Exit = () => Exit?.Invoke(),
                         },
                         new Box
@@ -149,10 +144,12 @@ namespace osu.Game.Screens.Select
                 }
             };
 
+            searchTextBox.Current.ValueChanged += t => FilterChanged?.Invoke(CreateCriteria());
+
             groupTabs.PinItem(GroupMode.All);
             groupTabs.PinItem(GroupMode.RecentlyPlayed);
-            groupTabs.ItemChanged += (sender, value) => Group = value;
-            sortTabs.ItemChanged += (sender, value) => Sort = value;
+            groupTabs.Current.ValueChanged += val => Group = val;
+            sortTabs.Current.ValueChanged += val => Sort = val;
         }
 
         public void Deactivate()
@@ -173,9 +170,9 @@ namespace osu.Game.Screens.Select
         {
             sortTabs.AccentColour = colours.GreenLight;
 
-            if (osu != null)
-                playMode.BindTo(osu.PlayMode);
-            playMode.ValueChanged += (s, e) => FilterChanged?.Invoke(CreateCriteria());
+            if (osu != null) playMode.BindTo(osu.PlayMode);
+            playMode.ValueChanged += val => FilterChanged?.Invoke(CreateCriteria());
+            playMode.TriggerChange();
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
