@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK.Input;
-using osu.Framework.Graphics.Containers;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 
@@ -20,9 +19,9 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (args.Repeat) return false;
             if (args.Key == Key.Escape)
             {
-                if (State == Visibility.Hidden) return false;
                 OnResume();
                 return true;
             }
