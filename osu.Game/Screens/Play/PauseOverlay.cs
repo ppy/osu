@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK.Input;
@@ -19,10 +20,9 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Repeat) return false;
-            if (args.Key == Key.Escape)
+            if (!args.Repeat && args.Key == Key.Escape)
             {
-                OnResume();
+                Buttons.Children.First().TriggerClick();
                 return true;
             }
 
@@ -38,4 +38,3 @@ namespace osu.Game.Screens.Play
         }
     }
 }
-        
