@@ -12,10 +12,8 @@ using osu.Framework.Input;
 using osu.Game.Configuration;
 using System;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Graphics.UserInterface;
 using osu.Framework.Threading;
 using System.Linq;
-using System.Collections.Generic;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -40,15 +38,16 @@ namespace osu.Game.Graphics.Cursor
             {
                 Tooltip tooltip = ((Cursor)ActiveCursor).Tooltip;
                 show?.Cancel();
-                tooltip.Hide();
-                Delay(250);
-                show = Schedule(delegate
+                tooltip.TooltipText = string.Empty;
+                IHasTooltip hasTooltip = null;
+                if (game.InternalChildren.OfType<IContainer>().Any(child => (hasTooltip = searchTooltip(child as IContainerEnumerable<Drawable>)) != null))
                 {
-                    tooltip.TooltipText = "";
-                    searchTooltip(tooltip, ToScreenSpace(state.Mouse.Position), game);
-                    if (tooltip.TooltipText != "")
-                        tooltip.Show();
-                });
+                    IHasDelayedTooltip delayedTooltip = hasTooltip as IHasDelayedTooltip;
+                    show = Scheduler.AddDelayed(delegate
+                    {
+                        tooltip.TooltipText = hasTooltip.Tooltip;
+                    }, delayedTooltip?.Delay ?? 250);
+                }
             }
 
             if (dragging)
@@ -68,18 +67,16 @@ namespace osu.Game.Graphics.Cursor
             return base.OnMouseMove(state);
         }
 
-        private void searchTooltip(Tooltip tooltip, Vector2 mousePosition, IContainerEnumerable<Drawable> children)
+        private IHasTooltip searchTooltip(IContainerEnumerable<Drawable> children)
         {
-            IEnumerable<Drawable> next = children.InternalChildren.Where(drawable => drawable.Contains(mousePosition) && !(drawable is CursorContainer));
+            Drawable next = children.InternalChildren.OrderBy(drawable => drawable.Depth).FirstOrDefault(drawable => drawable.Hovering && !(drawable is CursorContainer));
 
-            foreach (Drawable drawable in next)
-            {
-                string tooltipText = (drawable as IHasTooltip)?.Tooltip ?? "";
-                if (tooltipText != "") tooltip.TooltipText = tooltipText;
-                
-                if (drawable is IContainer)
-                    searchTooltip(tooltip, mousePosition, drawable as IContainerEnumerable<Drawable>);
-            }
+            IHasTooltip tooltipText = next as IHasTooltip;
+            if (tooltipText != null) return tooltipText;
+
+            if (next is IContainer)
+                return searchTooltip(next as IContainerEnumerable<Drawable>);
+            return null;
         }
 
         protected override bool OnDragStart(InputState state)
