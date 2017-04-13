@@ -2,8 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
 
@@ -53,5 +56,20 @@ namespace osu.Game.Modes.UI
             TextSize = 40,
             Position = new Vector2(0, 30),
         };
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            ComboCounter.AccentColour = colours.BlueLighter;
+            AccuracyCounter.AccentColour = colours.BlueLighter;
+            ScoreCounter.AccentColour = colours.BlueLighter;
+
+            var shd = HealthDisplay as StandardHealthDisplay;
+            if (shd != null)
+            {
+                shd.AccentColour = colours.BlueLighter;
+                shd.GlowColour = colours.BlueDarker.Opacity(0.6f);
+            }
+        }
     }
 }

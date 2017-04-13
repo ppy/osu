@@ -31,12 +31,6 @@ namespace osu.Game.Graphics.UserInterface
             Current.Value = DisplayedCount = 1.0f;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            DisplayedCountSpriteText.Colour = colours.BlueLighter;
-        }
-
         protected override string FormatCount(double count)
         {
             return $@"{count:P2}";

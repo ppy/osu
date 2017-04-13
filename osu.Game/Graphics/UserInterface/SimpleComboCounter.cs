@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
@@ -36,12 +37,6 @@ namespace osu.Game.Graphics.UserInterface
         public override void Increment(int amount)
         {
             Current.Value = Current + amount;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            DisplayedCountSpriteText.Colour = colours.BlueLighter;
         }
 
         protected class TransformCount : Transform<int>
