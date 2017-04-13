@@ -324,6 +324,9 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(Screen next)
         {
+            if (HasFailed || !ValidForResume)
+                return false;
+
             if (pauseOverlay != null && !HitRenderer.HasReplayLoaded)
             {
                 //pause screen override logic.
