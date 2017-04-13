@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         private const double pause_cooldown = 1000;
         private double lastPauseActionTime;
 
-        private bool canPause => Time.Current >= lastPauseActionTime + pause_cooldown;
+        private bool canPause => ValidForResume && !HasFailed && Time.Current >= lastPauseActionTime + pause_cooldown;
 
         private IAdjustableClock sourceClock;
         private IFrameBasedClock interpolatedSourceClock;
@@ -206,11 +206,28 @@ namespace osu.Game.Screens.Play
         {
             if (!canPause && !force) return;
 
-            lastPauseActionTime = Time.Current;
-            hudOverlay.KeyCounter.IsCounting = false;
-            pauseOverlay.Retries = RestartCount;
-            pauseOverlay.Show();
             sourceClock.Stop();
+
+            // the actual pausing is potentially happening on a different thread.
+            // we want to wait for the source clock to stop so we can be sure all components are in a stable state.
+            if (!IsPaused)
+            {
+                Schedule(() => Pause(force));
+                return;
+            }
+
+            // we need to do a final check after all of our children have processed up to the paused clock time.
+            // this is to cover cases where, for instance, the player fails in the last processed frame (which would change canPause).
+            // as the scheduler runs before children updates, let's schedule for the next frame.
+            Schedule(() =>
+            {
+                if (!canPause) return;
+
+                lastPauseActionTime = Time.Current;
+                hudOverlay.KeyCounter.IsCounting = false;
+                pauseOverlay.Retries = RestartCount;
+                pauseOverlay.Show();
+            });
         }
 
         public void Resume()
@@ -227,11 +244,11 @@ namespace osu.Game.Screens.Play
 
             var newPlayer = new Player();
 
+            ValidForResume = false;
+
             LoadComponentAsync(newPlayer, delegate
             {
                 newPlayer.RestartCount = RestartCount + 1;
-                ValidForResume = false;
-
                 if (!Push(newPlayer))
                 {
                     // Error(?)
@@ -247,10 +264,11 @@ namespace osu.Game.Screens.Play
             if (scoreProcessor.HasFailed || onCompletionEvent != null)
                 return;
 
+            ValidForResume = false;
+
             Delay(1000);
             onCompletionEvent = Schedule(delegate
             {
-                ValidForResume = false;
                 Push(new Results
                 {
                     Score = scoreProcessor.CreateScore()
@@ -261,8 +279,6 @@ namespace osu.Game.Screens.Play
         private void onFail()
         {
             sourceClock.Stop();
-
-            Delay(500);
 
             HasFailed = true;
             failOverlay.Retries = RestartCount;
