@@ -31,23 +31,32 @@ namespace osu.Game.Graphics.Cursor
 
         private ScheduledDelegate show;
         private OsuGameBase game;
+        private IHasOverhangingTooltip overhang;
 
         protected override bool OnMouseMove(InputState state)
         {
-            if (state.Mouse.Position != state.Mouse.LastPosition)
+            Tooltip tooltip = ((Cursor)ActiveCursor).Tooltip;
+            if (overhang?.Overhanging ?? false)
+                tooltip.TooltipText = overhang.Tooltip;
+            else if (state.Mouse.Position != state.Mouse.LastPosition)
             {
-                Tooltip tooltip = ((Cursor)ActiveCursor).Tooltip;
                 show?.Cancel();
                 tooltip.TooltipText = string.Empty;
                 IHasTooltip hasTooltip = null;
                 if (game.InternalChildren.OfType<IContainer>().Any(child => (hasTooltip = searchTooltip(child as IContainerEnumerable<Drawable>)) != null))
                 {
                     IHasDelayedTooltip delayedTooltip = hasTooltip as IHasDelayedTooltip;
+                    overhang = hasTooltip as IHasOverhangingTooltip;
                     show = Scheduler.AddDelayed(delegate
                     {
                         tooltip.TooltipText = hasTooltip.Tooltip;
                     }, delayedTooltip?.Delay ?? 250);
                 }
+            }
+            else if(overhang != null)
+            {
+                overhang = null;
+                tooltip.TooltipText = string.Empty;
             }
 
             if (dragging)
