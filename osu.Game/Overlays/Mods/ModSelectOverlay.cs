@@ -39,9 +39,9 @@ namespace osu.Game.Overlays.Mods
 
         public readonly Bindable<PlayMode> PlayMode = new Bindable<PlayMode>();
 
-        private void modeChanged(object sender, EventArgs eventArgs)
+        private void modeChanged(PlayMode newMode)
         {
-            var ruleset = Ruleset.GetRuleset(PlayMode);
+            var ruleset = Ruleset.GetRuleset(newMode);
             foreach (ModSection section in modSectionsContainer.Children)
                 section.Buttons = ruleset.GetModsFor(section.ModType).Select(m => new ModButton(m)).ToArray();
             refreshSelectedMods();
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Mods
             if (osu != null)
                 PlayMode.BindTo(osu.PlayMode);
             PlayMode.ValueChanged += modeChanged;
-            modeChanged(null, null);
+            PlayMode.TriggerChange();
         }
 
         protected override void PopOut()

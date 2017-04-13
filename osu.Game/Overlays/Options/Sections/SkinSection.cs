@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Options.Sections
     {
         public override string Header => "Skin";
         public override FontAwesome Icon => FontAwesome.fa_paint_brush;
-        
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {

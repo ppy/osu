@@ -98,20 +98,15 @@ namespace osu.Game.Graphics.UserInterface
 
             DisplayedCount = Current;
 
-            Current.ValueChanged += currentChanged;
-        }
-
-        private void currentChanged(object sender, EventArgs e)
-        {
-            if (IsLoaded)
-                TransformCount(displayedCount, Current);
+            Current.ValueChanged += newValue =>
+            {
+                if (IsLoaded) TransformCount(displayedCount, newValue);
+            };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            Flush(false, TransformType);
 
             DisplayedCountSpriteText.Text = FormatCount(Current);
             DisplayedCountSpriteText.Anchor = Anchor;
@@ -208,8 +203,8 @@ namespace osu.Game.Graphics.UserInterface
                     ? GetProportionalDuration(currentValue, newValue)
                     : RollingDuration;
 
-            transform.StartTime = Time.Current;
-            transform.EndTime = Time.Current + rollingTotalDuration;
+            transform.StartTime = TransformStartTime;
+            transform.EndTime = TransformStartTime + rollingTotalDuration;
             transform.StartValue = currentValue;
             transform.EndValue = newValue;
             transform.Easing = RollingEasing;

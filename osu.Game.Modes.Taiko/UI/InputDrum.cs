@@ -21,7 +21,7 @@ namespace osu.Game.Modes.Taiko.UI
     {
         public InputDrum()
         {
-            Size = new Vector2(TaikoPlayfield.PLAYFIELD_HEIGHT);
+            Size = new Vector2(TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT);
 
             const float middle_split = 10;
 
@@ -60,7 +60,7 @@ namespace osu.Game.Modes.Taiko.UI
             /// The key to be used for the rim of the half-drum.
             /// </summary>
             public Key RimKey;
-            
+
             /// <summary>
             /// The key to be used for the centre of the half-drum.
             /// </summary>
@@ -128,17 +128,36 @@ namespace osu.Game.Modes.Taiko.UI
                     return false;
 
                 Drawable target = null;
+                Drawable back = null;
 
                 if (args.Key == CentreKey)
+                {
                     target = centreHit;
+                    back = centre;
+                }
                 else if (args.Key == RimKey)
+                {
                     target = rimHit;
+                    back = rim;
+                }
 
                 if (target != null)
                 {
-                    target.FadeTo(Math.Min(target.Alpha + 0.4f, 1), 40, EasingTypes.OutQuint);
-                    target.Delay(40);
-                    target.FadeOut(1000, EasingTypes.OutQuint);
+                    const float scale_amount = 0.05f;
+                    const float alpha_amount = 0.5f;
+
+                    const float down_time = 40;
+                    const float up_time = 1000;
+
+                    back.ScaleTo(target.Scale.X - scale_amount, down_time, EasingTypes.OutQuint);
+                    back.Delay(down_time);
+                    back.ScaleTo(1, up_time, EasingTypes.OutQuint);
+
+                    target.ScaleTo(target.Scale.X - scale_amount, down_time, EasingTypes.OutQuint);
+                    target.FadeTo(Math.Min(target.Alpha + alpha_amount, 1), down_time, EasingTypes.OutQuint);
+                    target.Delay(down_time);
+                    target.ScaleTo(1, up_time, EasingTypes.OutQuint);
+                    target.FadeOut(up_time, EasingTypes.OutQuint);
                 }
 
                 return false;

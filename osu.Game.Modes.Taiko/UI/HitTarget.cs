@@ -16,16 +16,6 @@ namespace osu.Game.Modes.Taiko.UI
     internal class HitTarget : Container
     {
         /// <summary>
-        /// Diameter of normal hit object circles.
-        /// </summary>
-        private const float normal_diameter = TaikoHitObject.CIRCLE_RADIUS * 2;
-        
-        /// <summary>
-        /// Diameter of finisher hit object circles.
-        /// </summary>
-        private const float finisher_diameter = normal_diameter * 1.5f;
-
-        /// <summary>
         /// The 1px inner border of the taiko playfield.
         /// </summary>
         private const float border_offset = 1;
@@ -37,7 +27,7 @@ namespace osu.Game.Modes.Taiko.UI
 
         public HitTarget()
         {
-            RelativeSizeAxes = Axes.Y;
+            Size = new Vector2(TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT);
 
             Children = new Drawable[]
             {
@@ -47,15 +37,15 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Y = border_offset,
-                    Size = new Vector2(border_thickness, (TaikoPlayfield.PLAYFIELD_HEIGHT - finisher_diameter) / 2f - border_offset),
+                    Size = new Vector2(border_thickness, (TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT - TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER) / 2f - border_offset),
                     Alpha = 0.1f
                 },
                 new CircularContainer
                 {
-                    Name = "Finisher Ring",
+                    Name = "Strong Hit Ring",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(finisher_diameter),
+                    Size = new Vector2(TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER),
                     Masking = true,
                     BorderColour = Color4.White,
                     BorderThickness = border_thickness,
@@ -72,10 +62,10 @@ namespace osu.Game.Modes.Taiko.UI
                 },
                 new CircularContainer
                 {
-                    Name = "Normal Ring",
+                    Name = "Normal Hit Ring",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(normal_diameter),
+                    Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER),
                     Masking = true,
                     BorderColour = Color4.White,
                     BorderThickness = border_thickness,
@@ -96,7 +86,7 @@ namespace osu.Game.Modes.Taiko.UI
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Y = -border_offset,
-                    Size = new Vector2(border_thickness, (TaikoPlayfield.PLAYFIELD_HEIGHT - finisher_diameter) / 2f - border_offset),
+                    Size = new Vector2(border_thickness, (TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT - TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER) / 2f - border_offset),
                     Alpha = 0.1f
                 },
             };

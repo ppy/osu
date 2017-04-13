@@ -21,6 +21,8 @@ namespace osu.Game.Modes.Osu.UI
         private readonly Container judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
+        public override bool ProvidingUserCursor => true;
+
         public override Vector2 Size
         {
             get
@@ -36,8 +38,6 @@ namespace osu.Game.Modes.Osu.UI
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            RelativeSizeAxes = Axes.Both;
-            Size = new Vector2(0.75f);
 
             Add(new Drawable[]
             {

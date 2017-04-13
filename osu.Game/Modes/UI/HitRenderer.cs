@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Game.Modes.Replays;
 using osu.Game.Modes.Scoring;
+using OpenTK;
 
 namespace osu.Game.Modes.UI
 {
@@ -33,6 +34,11 @@ namespace osu.Game.Modes.UI
         public event Action OnAllJudged;
 
         /// <summary>
+        /// Whether to apply adjustments to the child <see cref="Playfield{TObject,TJudgement}"/> based on our own size.
+        /// </summary>
+        public bool AspectAdjust = true;
+
+        /// <summary>
         /// The input manager for this HitRenderer.
         /// </summary>
         internal readonly PlayerInputManager InputManager = new PlayerInputManager();
@@ -41,6 +47,16 @@ namespace osu.Game.Modes.UI
         /// The key conversion input manager for this HitRenderer.
         /// </summary>
         protected readonly KeyConversionInputManager KeyConversionInputManager;
+
+        /// <summary>
+        /// Whether we are currently providing the local user a gameplay cursor.
+        /// </summary>
+        public virtual bool ProvidingUserCursor => false;
+
+        /// <summary>
+        /// Whether we have a replay loaded currently.
+        /// </summary>
+        public bool HasReplayLoaded => InputManager.ReplayInputHandler != null;
 
         /// <summary>
         /// Whether all the HitObjects have been judged.
@@ -157,6 +173,8 @@ namespace osu.Game.Modes.UI
     {
         public event Action<TJudgement> OnJudgement;
 
+        public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
+
         protected override Container<Drawable> Content => content;
         protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result != HitResult.None);
 
@@ -206,6 +224,19 @@ namespace osu.Game.Modes.UI
 
             Playfield.PostProcess();
         }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Playfield.Size = AspectAdjust ? GetPlayfieldAspectAdjust() : Vector2.One;
+        }
+
+        /// <summary>
+        /// In some cases we want to apply changes to the relative size of our contained <see cref="Playfield{TObject, TJudgement}"/> based on custom conditions.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual Vector2 GetPlayfieldAspectAdjust() => new Vector2(0.75f); //a sane default
 
         /// <summary>
         /// Triggered when an object's Judgement is updated.

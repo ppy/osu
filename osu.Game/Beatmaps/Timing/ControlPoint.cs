@@ -5,18 +5,16 @@ namespace osu.Game.Beatmaps.Timing
 {
     public class ControlPoint
     {
-        public static ControlPoint Default = new ControlPoint
-        {
-            BeatLength = 500,
-            TimingChange = true,
-        };
-
+        public string SampleBank;
+        public int SampleVolume;
         public TimeSignatures TimeSignature;
         public double Time;
-        public double BeatLength;
-        public double VelocityAdjustment;
-        public bool TimingChange;
+        public double BeatLength = 500;
+        public double SpeedMultiplier = 1;
+        public bool TimingChange = true;
         public bool KiaiMode;
         public bool OmitFirstBarLine;
+
+        public ControlPoint Clone() => (ControlPoint)MemberwiseClone();
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects;
@@ -22,6 +23,11 @@ namespace osu.Game.Modes.UI
 
         internal Container<Drawable> ScaledContent;
 
+        /// <summary>
+        /// Whether we are currently providing the local user a gameplay cursor.
+        /// </summary>
+        public virtual bool ProvidingUserCursor => false;
+
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
 
@@ -32,6 +38,9 @@ namespace osu.Game.Modes.UI
         protected Playfield(float? customWidth = null)
         {
             AlwaysReceiveInput = true;
+
+            // Default height since we force relative size axes
+            Size = Vector2.One;
 
             AddInternal(ScaledContent = new ScaledContainer
             {
@@ -56,6 +65,12 @@ namespace osu.Game.Modes.UI
         private void load()
         {
             Add(HitObjects);
+        }
+
+        public override Axes RelativeSizeAxes
+        {
+            get { return Axes.Both; }
+            set { throw new InvalidOperationException($@"{nameof(Playfield<TObject, TJudgement>)}'s {nameof(RelativeSizeAxes)} should never be changed from {Axes.Both}"); }
         }
 
         /// <summary>
