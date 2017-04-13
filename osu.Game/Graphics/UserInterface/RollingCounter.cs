@@ -10,10 +10,11 @@ using osu.Game.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class RollingCounter<T> : Container
+    public abstract class RollingCounter<T> : Container, IHasAccentColour
     {
         /// <summary>
         /// The current value.
@@ -78,6 +79,12 @@ namespace osu.Game.Graphics.UserInterface
                 textSize = value;
                 DisplayedCountSpriteText.TextSize = value;
             }
+        }
+
+        public Color4 AccentColour
+        {
+            get { return DisplayedCountSpriteText.Colour; }
+            set { DisplayedCountSpriteText.Colour = value; }
         }
 
         /// <summary>

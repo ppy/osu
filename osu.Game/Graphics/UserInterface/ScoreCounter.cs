@@ -35,12 +35,6 @@ namespace osu.Game.Graphics.UserInterface
             LeadingZeroes = leading;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            DisplayedCountSpriteText.Colour = colours.BlueLighter;
-        }
-
         protected override double GetProportionalDuration(double currentValue, double newValue)
         {
             return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
