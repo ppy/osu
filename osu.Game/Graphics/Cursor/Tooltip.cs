@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,7 +10,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.Graphics.Cursor
 {
     public class Tooltip : Container
     {
@@ -26,10 +25,12 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 text.Text = value;
+                if (string.IsNullOrEmpty(value))
+                    Hide();
+                else
+                    Show();
             }
         }
-
-        public Vector2 TooltipOffset = new Vector2();
 
         public Tooltip()
         {
