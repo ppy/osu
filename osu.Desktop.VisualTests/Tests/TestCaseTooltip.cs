@@ -21,6 +21,7 @@ namespace osu.Desktop.VisualTests.Tests
         public override void Reset()
         {
             base.Reset();
+            TooltipSlider slider;
 
             Children = new Drawable[]
             {
@@ -28,6 +29,7 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0,10),
                     Children = new Drawable[]
                     {
                         new TooltipContainer("Text with some tooltip"),
@@ -35,20 +37,22 @@ namespace osu.Desktop.VisualTests.Tests
                         new TooltipTextbox
                         {
                             Text = "a box with a tooltip",
-                            Width = 300,
+                            Size = new Vector2(300,30),
                         },
-                        new TooltipSlider
+                        slider = new TooltipSlider
                         {
-                            Bindable = new BindableInt(5)
-                            {
-                                MaxValue = 10,
-                                MinValue = 0,
-                            },
-                            Size = new Vector2(300,16),
+                            Width = 300,
                         },
                     },
                 },
             };
+
+
+            slider.Current.BindTo(new BindableInt(5)
+            {
+                MaxValue = 10,
+                MinValue = 0
+            });
         }
 
         private class TooltipContainer : Container, IHasTooltip
@@ -76,23 +80,23 @@ namespace osu.Desktop.VisualTests.Tests
             public string Tooltip => Text;
         }
 
-        private class TooltipSlider : OsuSliderBar<int>, IHasDelayedTooltip
+        private class TooltipSlider : OsuSliderBar<int>, IHasDelayedTooltip, IHasOverhangingTooltip
         {
-            public string Tooltip => Bindable.Value.ToString();
+            public string Tooltip => Current.Value.ToString();
 
-            int IHasDelayedTooltip.Delay => mousePressed ? 0 : 250;
+            int IHasDelayedTooltip.Delay => Overhanging ? 0 : 250;
 
-            private bool mousePressed;
+            public bool Overhanging { get; set; }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                mousePressed = true;
+                Overhanging = true;
                 return base.OnMouseDown(state, args);
             }
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                mousePressed = false;
+                Overhanging = false;
                 return base.OnMouseUp(state, args);
             }
         }

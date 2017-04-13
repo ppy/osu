@@ -12,7 +12,7 @@ namespace osu.Game.Graphics.Cursor
     }
 
     /// <summary>
-    /// Interface of <see cref="IHasTooltip"/> with custom appear time
+    /// Tooltip with custom appear time
     /// </summary>
     public interface IHasDelayedTooltip : IHasTooltip
     {
@@ -20,5 +20,16 @@ namespace osu.Game.Graphics.Cursor
         /// Time until the tooltip appears (in milliseconds)
         /// </summary>
         int Delay { get; }
+    }
+
+    /// <summary>
+    /// Tooltip which can show after hovering over the object
+    /// </summary>
+    public interface IHasOverhangingTooltip : IHasTooltip
+    {
+        /// <summary>
+        /// Should the tooltip still show?
+        /// </summary>
+        bool Overhanging { get; }
     }
 }

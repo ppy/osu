@@ -34,8 +34,6 @@ namespace osu.Game.Graphics.Cursor
 
         public Tooltip()
         {
-            Depth = float.MinValue;
-            AlwaysReceiveInput = true;
             Children = new[]
             {
                 new Container
