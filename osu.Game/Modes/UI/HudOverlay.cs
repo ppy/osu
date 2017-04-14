@@ -13,7 +13,6 @@ using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using OpenTK;
 
 namespace osu.Game.Modes.UI
 {
