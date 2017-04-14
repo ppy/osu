@@ -59,7 +59,7 @@ namespace osu.Game.Overlays
         {
             if (IsSeeking || !IsEnabled) return;
 
-            updatePosition(position);
+            updatePosition(position, false);
         }
 
         private void seek(InputState state)
@@ -72,10 +72,10 @@ namespace osu.Game.Overlays
             updatePosition(seekLocation);
         }
 
-        private void updatePosition(float position)
+        private void updatePosition(float position, bool easing = true)
         {
             position = MathHelper.Clamp(position, 0, 1);
-            Fill.TransformTo(() => Fill.Width, position, 200, EasingTypes.OutQuint, new TransformSeek());
+            Fill.TransformTo(() => Fill.Width, position, easing ? 200 : 0, EasingTypes.OutQuint, new TransformSeek());
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
