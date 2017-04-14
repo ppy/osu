@@ -103,6 +103,9 @@ namespace osu.Game.Screens.Play
             });
 
             ruleset = Beatmap.BeatmapInfo.Ruleset;
+
+            // Todo: This should be done as early as possible, and should check if the hit renderer
+            // can actually convert the hit objects... Somehow...
             HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
