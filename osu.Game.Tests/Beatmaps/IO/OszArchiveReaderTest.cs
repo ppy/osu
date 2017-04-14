@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public void SetUp()
         {
             OszArchiveReader.Register();
-            Ruleset.Register(new OsuRuleset());
+            RulesetCollection.Register(typeof(OsuRuleset));
         }
 
         [Test]

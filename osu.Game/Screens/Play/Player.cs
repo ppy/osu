@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play
                 sourceClock.Reset();
             });
 
-            ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
+            ruleset = RulesetCollection.GetRuleset(Beatmap.PlayMode);
             HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();

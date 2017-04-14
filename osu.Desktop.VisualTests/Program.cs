@@ -21,10 +21,10 @@ namespace osu.Desktop.VisualTests
 
             using (GameHost host = Host.GetSuitableHost(@"osu"))
             {
-                Ruleset.Register(new OsuRuleset());
-                Ruleset.Register(new TaikoRuleset());
-                Ruleset.Register(new ManiaRuleset());
-                Ruleset.Register(new CatchRuleset());
+                RulesetCollection.Register(typeof(OsuRuleset));
+                RulesetCollection.Register(typeof(TaikoRuleset));
+                RulesetCollection.Register(typeof(ManiaRuleset));
+                RulesetCollection.Register(typeof(CatchRuleset));
 
                 if (benchmark)
                     host.Run(new AutomatedVisualTestGame());

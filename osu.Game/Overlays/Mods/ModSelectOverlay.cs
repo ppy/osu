@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Mods
 
         private void modeChanged(PlayMode newMode)
         {
-            var ruleset = Ruleset.GetRuleset(newMode);
+            var ruleset = RulesetCollection.GetRuleset(newMode);
             foreach (ModSection section in modSectionsContainer.Children)
                 section.Buttons = ruleset.GetModsFor(section.ModType).Select(m => new ModButton(m)).ToArray();
             refreshSelectedMods();
