@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Select
                 }));
 
                 //get statistics fromt he current ruleset.
-                labels.AddRange(RulesetCollection.GetRuleset(beatmap.BeatmapInfo.Mode).GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
+                labels.AddRange(beatmap.BeatmapInfo.Ruleset.GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
             }
 
             AlwaysPresent = true;
