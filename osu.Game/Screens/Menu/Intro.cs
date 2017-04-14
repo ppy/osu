@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Menu
 
             if(menuVoice)
                 welcome.Play();
-                
+
             Scheduler.AddDelayed(delegate
             {
                 if(menuMusic)
