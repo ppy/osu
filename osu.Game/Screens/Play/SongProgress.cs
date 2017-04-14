@@ -6,8 +6,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using System;
+using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using System.Linq;
+using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Screens.Play
 {
@@ -37,10 +41,31 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public int[] Values
+        public IEnumerable<HitObject> Objects
         {
-            get { return graph.Values; }
-            set { graph.Values = value; }
+            set
+            {
+                var objects = value;
+
+                const int granularity = 200;
+
+                var lastHit = ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
+                var interval = lastHit / granularity;
+
+                var values = new int[granularity];
+
+                foreach (var h in objects)
+                {
+                    IHasEndTime end = h as IHasEndTime;
+
+                    int startRange = (int)(h.StartTime / interval);
+                    int endRange = (int)((end?.EndTime ?? h.StartTime) / interval);
+                    for (int i = startRange; i <= endRange; i++)
+                        values[i]++;
+                }
+
+                graph.Values = values;
+            }
         }
 
         [BackgroundDependencyLoader]

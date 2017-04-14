@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
+using osu.Game.Modes.Objects;
 using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -35,13 +36,11 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void displayNewValues()
         {
-            List<int> newValues = new List<int>();
-            for (int i = 0; i < 1000; i++)
-            {
-                newValues.Add(RNG.Next(0, 6));
-            }
+            List<HitObject> objects = new List<HitObject>();
+            for (double i = 0; i < 2000; i += RNG.NextDouble() * 10 + i / 1000)
+                objects.Add(new HitObject { StartTime = i });
 
-            progress.Values = newValues.ToArray();
+            progress.Objects = objects;
             progress.Progress = RNG.NextDouble();
         }
     }
