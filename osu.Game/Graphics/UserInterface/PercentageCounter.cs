@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using System;
-using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.UserInterface
 {
