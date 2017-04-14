@@ -14,18 +14,20 @@ namespace osu.Game.Screens.Play
     {
         public Color4 FillColour
         {
-            get { return FillContainer.Colour; }
-            set { FillContainer.Colour = value; }
+            get { return Fill.Colour; }
+            set { Fill.Colour = value; }
         }
 
         public SongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
         {
             Height = barHeight + handleBarHeight + handleSize.Y;
-            FillContainer.RelativeSizeAxes = Axes.X;
-            FillContainer.Height = barHeight;
+
+            Fill.RelativeSizeAxes = Axes.X;
+            Fill.Height = barHeight;
 
             Add(new Box
             {
+                Name = "Background",
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
                 RelativeSizeAxes = Axes.X,
@@ -34,7 +36,8 @@ namespace osu.Game.Screens.Play
                 Alpha = 0.5f,
                 Depth = 1
             });
-            FillContainer.Add(new Container
+
+            Fill.Add(new Container
             {
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,

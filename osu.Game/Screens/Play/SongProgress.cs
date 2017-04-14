@@ -11,7 +11,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play
 {
-    public class SongProgress : OverlayContainer
+        public class SongProgress : OverlayContainer
     {
         private const int progress_height = 5;
 
@@ -51,6 +51,7 @@ namespace osu.Game.Screens.Play
         {
             RelativeSizeAxes = Axes.X;
             Height = progress_height + SongProgressGraph.Column.HEIGHT + handle_size.Y;
+            Y = progress_height;
 
             Children = new Drawable[]
             {
@@ -64,8 +65,9 @@ namespace osu.Game.Screens.Play
                 },
                 bar = new SongProgressBar(progress_height, SongProgressGraph.Column.HEIGHT, handle_size)
                 {
-                    Origin = Anchor.BottomLeft,
+                    Alpha = 0,
                     Anchor = Anchor.BottomLeft,
+                    Origin =  Anchor.BottomLeft,
                     SeekRequested = delegate (float position)
                     {
                         OnSeek?.Invoke(position);
@@ -74,26 +76,40 @@ namespace osu.Game.Screens.Play
             };
         }
 
+        protected override void LoadComplete()
+        {
+            State = Visibility.Visible;
+        }
+
         private void updateProgress()
         {
             bar.UpdatePosition((float)progress);
             graph.Progress = (int)(graph.ColumnCount * progress);
         }
 
+        private bool barVisible;
+
+        public void ToggleBar()
+        {
+            barVisible = !barVisible;
+            updateBarVisibility();
+        }
+
+        private void updateBarVisibility()
+        {
+            bar.FadeTo(barVisible ? 1 : 0, transition_duration, EasingTypes.In);
+            MoveTo(new Vector2(0, barVisible ? 0 : progress_height), transition_duration, EasingTypes.In);
+        }
+
         protected override void PopIn()
         {
-            bar.IsEnabled = true;
-            updateProgress(); //in case progress was changed while the bar was hidden
-
-            bar.FadeIn(transition_duration, EasingTypes.In);
-            MoveTo(Vector2.Zero, transition_duration, EasingTypes.In);
+            updateBarVisibility();
+            FadeIn(100);
         }
 
         protected override void PopOut()
         {
-            bar.IsEnabled = false;
-            bar.FadeOut(transition_duration, EasingTypes.In);
-            MoveTo(new Vector2(0f, progress_height), transition_duration, EasingTypes.In);
+            FadeOut(100);
         }
 
         protected override void Update()
