@@ -20,6 +20,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
+using osu.Framework.Threading;
 using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Screens.Play
@@ -115,7 +116,12 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
 
-            hudOverlay = new StandardHudOverlay();
+            hudOverlay = new StandardHudOverlay()
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
+            };
+
             hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
             hudOverlay.BindProcessor(scoreProcessor);
             hudOverlay.BindHitRenderer(HitRenderer);
@@ -157,6 +163,15 @@ namespace osu.Game.Screens.Play
                 {
                     OnRetry = Restart,
                     OnQuit = Exit,
+                },
+                new HotkeyRetryOverlay
+                {
+                    Action = () => {
+                        //we want to hide the hitrenderer immediately (looks better).
+                        //we may be able to remove this once the mouse cursor trail is improved.
+                        HitRenderer?.Hide();
+                        Restart();
+                    },
                 }
             };
         }
@@ -247,14 +262,16 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        private ScheduledDelegate onCompletionEvent;
+
         private void onCompletion()
         {
             // Only show the completion screen if the player hasn't failed
-            if (scoreProcessor.HasFailed)
+            if (scoreProcessor.HasFailed || onCompletionEvent != null)
                 return;
 
             Delay(1000);
-            Schedule(delegate
+            onCompletionEvent = Schedule(delegate
             {
                 ValidForResume = false;
                 Push(new Results
@@ -299,37 +316,47 @@ namespace osu.Game.Screens.Play
                 sourceClock.Start();
                 initializeSkipButton();
             });
+
+            //keep in mind this is using the interpolatedSourceClock so won't be run as early as we may expect.
+            HitRenderer.Alpha = 0;
+            HitRenderer.FadeIn(750, EasingTypes.OutQuint);
         }
 
         protected override void OnSuspending(Screen next)
         {
-            Content.FadeOut(350);
-            Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
+            fadeOut();
 
             base.OnSuspending(next);
         }
 
         protected override bool OnExiting(Screen next)
         {
-            if (pauseOverlay == null) return false;
-
-            if (HitRenderer.HasReplayLoaded)
-                return false;
-
-            if (pauseOverlay.State != Visibility.Visible && !canPause) return true;
-
-            if (!IsPaused && sourceClock.IsRunning) // For if the user presses escape quickly when entering the map
+            if (pauseOverlay != null && !HitRenderer.HasReplayLoaded)
             {
-                Pause();
-                return true;
+                //pause screen override logic.
+                if (pauseOverlay?.State == Visibility.Hidden && !canPause) return true;
+
+                if (!IsPaused && sourceClock.IsRunning) // For if the user presses escape quickly when entering the map
+                {
+                    Pause();
+                    return true;
+                }
             }
-            else
-            {
-                FadeOut(250);
-                Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
-                Background?.FadeTo(1f, 200);
-                return base.OnExiting(next);
-            }
+
+            fadeOut();
+            return base.OnExiting(next);
+        }
+
+        private void fadeOut()
+        {
+            const float fade_out_duration = 250;
+
+            HitRenderer?.FadeOut(fade_out_duration);
+            Content.FadeOut(fade_out_duration);
+
+            hudOverlay.ScaleTo(0.7f, fade_out_duration * 3, EasingTypes.In);
+
+            Background?.FadeTo(1f, fade_out_duration);
         }
 
         private Bindable<bool> mouseWheelDisabled;

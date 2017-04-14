@@ -48,7 +48,7 @@ namespace osu.Game.Overlays
 
         private const float progress_height = 10;
 
-        private const float bottom_black_area_height = 50;
+        private const float bottom_black_area_height = 55;
 
         public MusicController()
         {
@@ -119,7 +119,8 @@ namespace osu.Game.Overlays
                             Text = @"Nothing to play",
                             Font = @"Exo2.0-BoldItalic"
                         },
-                        new Container {
+                        new Container
+                        {
                             Padding = new MarginPadding { Bottom = progress_height },
                             Height = bottom_black_area_height,
                             RelativeSizeAxes = Axes.X,
@@ -143,7 +144,8 @@ namespace osu.Game.Overlays
                                         },
                                         playButton = new Button
                                         {
-                                            //Scale = new Vector2(1.3f),
+                                            Scale = new Vector2(1.4f),
+                                            IconScale = new Vector2(1.4f),
                                             Action = () =>
                                             {
                                                 if (current?.Track == null) return;
@@ -421,6 +423,13 @@ namespace osu.Game.Overlays
             }
 
             private const float button_size = 30;
+            private Color4 flashColour;
+
+            public Vector2 IconScale
+            {
+                get { return icon.Scale; }
+                set { icon.Scale = value; }
+            }
 
             public Button()
             {
@@ -467,6 +476,7 @@ namespace osu.Game.Overlays
             private void load(OsuColour colours)
             {
                 hover.Colour = colours.Yellow.Opacity(0.6f);
+                flashColour = colours.Yellow;
             }
 
             protected override bool OnHover(InputState state)
@@ -481,9 +491,15 @@ namespace osu.Game.Overlays
                 base.OnHoverLost(state);
             }
 
+            protected override bool OnClick(InputState state)
+            {
+                hover.FlashColour(flashColour, 800, EasingTypes.OutQuint);
+                return base.OnClick(state);
+            }
+
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                content.ScaleTo(1, 2000, EasingTypes.OutQuint);
+                content.ScaleTo(0.75f, 2000, EasingTypes.OutQuint);
                 return base.OnMouseDown(state, args);
             }
 
