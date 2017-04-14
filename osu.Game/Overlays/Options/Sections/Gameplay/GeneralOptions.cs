@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                 },
                 new OsuCheckbox
                 {
-                    LabelText = "Always show song progress",
+                    LabelText = "Show song progress while playing",
                     Bindable = config.GetBindable<bool>(OsuConfig.ShowProgress)
                 },
                 new OsuCheckbox

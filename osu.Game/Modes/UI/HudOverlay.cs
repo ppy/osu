@@ -33,7 +33,7 @@ namespace osu.Game.Modes.UI
         private Bindable<bool> showProgress;
 
         private static bool hasShownNotificationOnce;
-        private bool hasPaused;
+        private bool hasForcedProgressVisibility;
 
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract RollingCounter<int> CreateComboCounter();
@@ -88,14 +88,14 @@ namespace osu.Game.Modes.UI
             showProgress = config.GetBindable<bool>(OsuConfig.ShowProgress);
             showProgress.ValueChanged += progressVisibility =>
             {
-                if (showProgress)
+                if (progressVisibility)
                 {
                     Progress.FadeIn(duration);
                     KeyCounter.MoveToY(-TwoLayerButton.SIZE_RETRACTED.Y, duration);
                 }
                 else
                 {
-                    if (!hasPaused)
+                    if (!hasForcedProgressVisibility)
                     {
                         Progress.FadeOut(duration);
                         KeyCounter.MoveToY(0, duration);
@@ -115,16 +115,16 @@ namespace osu.Game.Modes.UI
             }
         }
 
-        public void ShowProgress()
+        public void ForceProgressVisibility()
         {
-            hasPaused = true;
+            hasForcedProgressVisibility = true;
             Progress.FadeIn(duration);
             KeyCounter.MoveToY(-TwoLayerButton.SIZE_RETRACTED.Y, duration);
         }
 
         public void HideProgress()
         {
-            hasPaused = false;
+            hasForcedProgressVisibility = false;
             if (!showProgress)
             {
                 Progress.FadeOut(duration);
