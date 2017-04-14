@@ -217,7 +217,6 @@
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Screens\Play\Player.cs" />
     <Compile Include="Screens\Charts\ChartListing.cs" />
-    <Compile Include="Modes\PlayMode.cs" />
     <Compile Include="Modes\Ruleset.cs" />
     <Compile Include="Screens\Ranking\Results.cs" />
     <Compile Include="Screens\Direct\OnlineListing.cs" />

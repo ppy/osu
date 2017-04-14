@@ -96,8 +96,6 @@ namespace osu.Game.Modes.Mania
             }
         }
 
-        protected override PlayMode PlayMode => PlayMode.Mania;
-
         public override string Description => "osu!mania";
 
         public override FontAwesome Icon => FontAwesome.fa_osu_mania_o;

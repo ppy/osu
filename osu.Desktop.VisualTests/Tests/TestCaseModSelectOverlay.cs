@@ -26,10 +26,9 @@ namespace osu.Desktop.VisualTests.Tests
             });
 
             AddStep("Toggle", modSelect.ToggleVisibility);
-            AddStep("osu!", () => modSelect.PlayMode.Value = PlayMode.Osu);
-            AddStep("osu!taiko", () => modSelect.PlayMode.Value = PlayMode.Taiko);
-            AddStep("osu!catch", () => modSelect.PlayMode.Value = PlayMode.Catch);
-            AddStep("osu!mania", () => modSelect.PlayMode.Value = PlayMode.Mania);
+
+            foreach (var ruleset in RulesetCollection.AllRulesets)
+                AddStep(ruleset.Description, () => modSelect.Ruleset.Value = ruleset);
         }
     }
 }

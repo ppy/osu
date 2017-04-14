@@ -9,16 +9,16 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarModeButton : ToolbarButton
     {
-        private PlayMode mode;
-        public PlayMode Mode
+        private Ruleset ruleset;
+        public Ruleset Ruleset
         {
-            get { return mode; }
+            get { return ruleset; }
             set
             {
-                mode = value;
-                TooltipMain = Ruleset.GetRuleset(mode).Description;
-                TooltipSub = $"Play some {Ruleset.GetRuleset(mode).Description}";
-                Icon = Ruleset.GetRuleset(mode).Icon;
+                ruleset = value;
+                TooltipMain = ruleset.Description;
+                TooltipSub = $"Play some {ruleset.Description}";
+                Icon = ruleset.Icon;
             }
         }
 

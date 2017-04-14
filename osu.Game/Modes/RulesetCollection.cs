@@ -21,11 +21,6 @@ namespace osu.Game.Modes
             available_rulesets.TryAdd(available_rulesets.Count, ruleset);
         }
 
-        public static Ruleset GetRuleset(PlayMode playMode)
-        {
-            return GetRuleset((int)playMode);
-        }
-
         public static Ruleset GetRuleset(int rulesetId)
         {
             Ruleset ruleset;
